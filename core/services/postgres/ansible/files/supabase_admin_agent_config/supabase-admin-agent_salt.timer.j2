@@ -1,0 +1,21 @@
+[Unit]
+Description=Run Supabase supabase-admin-agent salt on a schedule
+Requires=supabase-admin-agent_salt.service
+
+[Timer]
+{# We're using a significantly lower frequency for triggering this agent on qemu images for the moment. Once we've performed additional validations re: the aggregate impact of running it more frequently, the frequency can be increased. #}
+{% if qemu %}
+OnCalendar=*-*-* 0,6,12,18:00:00
+RandomizedDelaySec={{ supabase_admin_agent_splay }}
+AccuracySec=1h
+OnBootSec=5m
+Persistent=true
+{% else %}
+OnCalendar=*:0/10
+RandomizedDelaySec={{ supabase_admin_agent_splay }}
+AccuracySec=1s
+Persistent=true
+{% endif %}
+
+[Install]
+WantedBy=timers.target

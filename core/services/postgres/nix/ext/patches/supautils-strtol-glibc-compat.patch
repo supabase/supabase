@@ -1,0 +1,29 @@
+diff --git a/src/constrained_extensions.c b/src/constrained_extensions.c
+index 18e5aee..cdfb63f 100644
+--- a/src/constrained_extensions.c
++++ b/src/constrained_extensions.c
+@@ -9,6 +9,24 @@
+ #include "constrained_extensions.h"
+ #include "utils.h"
+
++#if defined(__linux__) && defined(__GLIBC__) && (defined(__x86_64__) || defined(__aarch64__))
++#  if defined(__x86_64__)
++#    define SUPAUTILS_GLIBC_COMPAT_VER "GLIBC_2.2.5"
++#  else
++#    define SUPAUTILS_GLIBC_COMPAT_VER "GLIBC_2.17"
++#  endif
++extern void *dlvsym(void *handle, const char *symbol, const char *version);
++__asm__(".symver dlvsym,dlvsym@" SUPAUTILS_GLIBC_COMPAT_VER);
++static int
++_supautils_compat_atoi(const char *nptr)
++{
++    long (*fn)(const char *, char **, int) =
++        (long (*)(const char *, char **, int)) dlvsym((void *) 0, "strtol", SUPAUTILS_GLIBC_COMPAT_VER);
++    return fn ? (int) fn(nptr, NULL, 10) : 0;
++}
++#define atoi(a) _supautils_compat_atoi(a)
++#endif
++
+ static JSON_ACTION_RETURN_TYPE json_array_start(void *state) {
+   json_constrained_extension_parse_state *parse = state;
+ 

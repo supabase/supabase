@@ -1,0 +1,364 @@
+;;;
+;;; PgBouncer configuration file
+;;;
+
+;; database name = connect string
+;;
+;; connect string params:
+;;   dbname= host= port= user= password= auth_user=
+;;   client_encoding= datestyle= timezone=
+;;   pool_size= reserve_pool= max_db_connections=
+;;   pool_mode= connect_query= application_name=
+[databases]
+* = host=localhost auth_user=pgbouncer
+
+;; foodb over Unix socket
+;foodb =
+
+;; redirect bardb to bazdb on localhost
+;bardb = host=localhost dbname=bazdb
+
+;; access to dest database will go with single user
+;forcedb = host=localhost port=300 user=baz password=foo client_encoding=UNICODE datestyle=ISO connect_query='SELECT 1'
+
+;; use custom pool sizes
+;nondefaultdb = pool_size=50 reserve_pool=10
+
+;; use auth_user with auth_query if user not present in auth_file
+;; auth_user must exist in auth_file
+; foodb = auth_user=bar
+
+;; fallback connect string
+;* = host=testserver
+
+;; User-specific configuration
+[users]
+
+;user1 = pool_mode=transaction max_user_connections=10
+
+;; Configuration section
+[pgbouncer]
+
+;;;
+;;; Administrative settings
+;;;
+
+;logfile = /var/log/pgbouncer.log
+pidfile = /var/run/pgbouncer/pgbouncer.pid
+
+;;;
+;;; Where to wait for clients
+;;;
+
+;; IP address or * which means all IPs
+listen_addr = *
+listen_port = 6543
+
+;; Unix socket is also used for -R.
+;; On Debian it should be /var/run/postgresql
+unix_socket_dir = /tmp
+;unix_socket_mode = 0777
+;unix_socket_group =
+
+;;;
+;;; TLS settings for accepting clients
+;;;
+
+;; disable, allow, require, verify-ca, verify-full
+;client_tls_sslmode = disable
+
+;; Path to file that contains trusted CA certs
+;client_tls_ca_file = <system default>
+
+;; Private key and cert to present to clients.
+;; Required for accepting TLS connections from clients.
+;client_tls_key_file =
+;client_tls_cert_file =
+
+;; fast, normal, secure, legacy, <ciphersuite string>
+;client_tls_ciphers = fast
+
+;; all, secure, tlsv1.0, tlsv1.1, tlsv1.2, tlsv1.3
+;client_tls_protocols = secure
+
+;; none, auto, legacy
+;client_tls_dheparams = auto
+
+;; none, auto, <curve name>
+;client_tls_ecdhcurve = auto
+
+;;;
+;;; TLS settings for connecting to backend databases
+;;;
+
+;; disable, allow, require, verify-ca, verify-full
+;server_tls_sslmode = disable
+
+;; Path to that contains trusted CA certs
+;server_tls_ca_file = <system default>
+
+;; Private key and cert to present to backend.
+;; Needed only if backend server require client cert.
+;server_tls_key_file =
+;server_tls_cert_file =
+
+;; all, secure, tlsv1.0, tlsv1.1, tlsv1.2, tlsv1.3
+;server_tls_protocols = secure
+
+;; fast, normal, secure, legacy, <ciphersuite string>
+;server_tls_ciphers = fast
+
+;;;
+;;; Authentication settings
+;;;
+
+;; any, trust, plain, md5, cert, hba, pam
+auth_type = scram-sha-256
+auth_file = /etc/pgbouncer/userlist.txt
+
+;; Path to HBA-style auth config
+;auth_hba_file =
+
+;; Query to use to fetch password from database.  Result
+;; must have 2 columns - username and password hash.
+auth_query = SELECT * FROM pgbouncer.get_auth($1)
+
+;;;
+;;; Users allowed into database 'pgbouncer'
+;;;
+
+;; comma-separated list of users who are allowed to change settings
+admin_users = pgbouncer
+
+;; comma-separated list of users who are just allowed to use SHOW command
+stats_users = pgbouncer
+
+;;;
+;;; Pooler personality questions
+;;;
+
+;; When server connection is released back to pool:
+;;   session      - after client disconnects (default)
+;;   transaction  - after transaction finishes
+;;   statement    - after statement finishes
+pool_mode = transaction
+
+;; Query for cleaning connection immediately after releasing from
+;; client.  No need to put ROLLBACK here, pgbouncer does not reuse
+;; connections where transaction is left open.
+;server_reset_query = DISCARD ALL
+
+;; Whether server_reset_query should run in all pooling modes.  If it
+;; is off, server_reset_query is used only for session-pooling.
+;server_reset_query_always = 0
+
+;; Comma-separated list of parameters to ignore when given in startup
+;; packet.  Newer JDBC versions require the extra_float_digits here.
+ignore_startup_parameters = extra_float_digits
+
+;; When taking idle server into use, this query is run first.
+;server_check_query = select 1
+
+;; If server was used more recently that this many seconds ago,
+; skip the check query.  Value 0 may or may not run in immediately.
+;server_check_delay = 30
+
+;; Close servers in session pooling mode after a RECONNECT, RELOAD,
+;; etc. when they are idle instead of at the end of the session.
+;server_fast_close = 0
+
+;; Use <appname - host> as application_name on server.
+;application_name_add_host = 0
+
+;; Period for updating aggregated stats.
+;stats_period = 60
+
+;;;
+;;; Connection limits
+;;;
+
+;; Total number of clients that can connect
+;max_client_conn = 100
+
+;; Default pool size.  20 is good number when transaction pooling
+;; is in use, in session pooling it needs to be the number of
+;; max clients you want to handle at any moment
+default_pool_size = 15
+
+;; Minimum number of server connections to keep in pool.
+;min_pool_size = 0
+
+; how many additional connection to allow in case of trouble
+;reserve_pool_size = 0
+
+;; If a clients needs to wait more than this many seconds, use reserve
+;; pool.
+;reserve_pool_timeout = 5
+
+;; Maximum number of server connections for a database
+;max_db_connections = 0
+
+;; Maximum number of server connections for a user
+;max_user_connections = 0
+
+;; If off, then server connections are reused in LIFO manner
+;server_round_robin = 0
+
+;;;
+;;; Logging
+;;;
+
+;; Syslog settings
+;syslog = 0
+;syslog_facility = daemon
+;syslog_ident = pgbouncer
+
+;; log if client connects or server connection is made
+;log_connections = 1
+
+;; log if and why connection was closed
+;log_disconnections = 1
+
+;; log error messages pooler sends to clients
+;log_pooler_errors = 1
+
+;; write aggregated stats into log
+;log_stats = 1
+
+;; Logging verbosity.  Same as -v switch on command line.
+;verbose = 0
+
+;;;
+;;; Timeouts
+;;;
+
+;; Close server connection if its been connected longer.
+;server_lifetime = 3600
+
+;; Close server connection if its not been used in this time.  Allows
+;; to clean unnecessary connections from pool after peak.
+;server_idle_timeout = 600
+
+;; Cancel connection attempt if server does not answer takes longer.
+;server_connect_timeout = 15
+
+;; If server login failed (server_connect_timeout or auth failure)
+;; then wait this many second.
+;server_login_retry = 15
+
+;; Dangerous.  Server connection is closed if query does not return in
+;; this time.  Should be used to survive network problems, _not_ as
+;; statement_timeout. (default: 0)
+;query_timeout = 0
+
+;; Dangerous.  Client connection is closed if the query is not
+;; assigned to a server in this time.  Should be used to limit the
+;; number of queued queries in case of a database or network
+;; failure. (default: 120)
+;query_wait_timeout = 120
+
+;; Dangerous.  Client connection is closed if no activity in this
+;; time.  Should be used to survive network problems. (default: 0)
+;client_idle_timeout = 0
+
+;; Disconnect clients who have not managed to log in after connecting
+;; in this many seconds.
+;client_login_timeout = 60
+
+;; Clean automatically created database entries (via "*") if they stay
+;; unused in this many seconds.
+; autodb_idle_timeout = 3600
+
+;; Close connections which are in "IDLE in transaction" state longer
+;; than this many seconds.
+;idle_transaction_timeout = 0
+
+;; How long SUSPEND/-R waits for buffer flush before closing
+;; connection.
+;suspend_timeout = 10
+
+;;;
+;;; Low-level tuning options
+;;;
+
+;; buffer for streaming packets
+;pkt_buf = 4096
+
+;; man 2 listen
+;listen_backlog = 128
+
+;; Max number pkt_buf to process in one event loop.
+;sbuf_loopcnt = 5
+
+;; Maximum PostgreSQL protocol packet size.
+;max_packet_size = 2147483647
+
+;; Set SO_REUSEPORT socket option
+;so_reuseport = 0
+
+;; networking options, for info: man 7 tcp
+
+;; Linux: Notify program about new connection only if there is also
+;; data received.  (Seconds to wait.)  On Linux the default is 45, on
+;; other OS'es 0.
+;tcp_defer_accept = 0
+
+;; In-kernel buffer size (Linux default: 4096)
+;tcp_socket_buffer = 0
+
+;; whether tcp keepalive should be turned on (0/1)
+;tcp_keepalive = 1
+
+;; The following options are Linux-specific.  They also require
+;; tcp_keepalive=1.
+
+;; Count of keepalive packets
+;tcp_keepcnt = 0
+
+;; How long the connection can be idle before sending keepalive
+;; packets
+;tcp_keepidle = 0
+
+;; The time between individual keepalive probes
+;tcp_keepintvl = 0
+
+;; How long may transmitted data remain unacknowledged before TCP
+;; connection is closed (in milliseconds)
+;tcp_user_timeout = 0
+
+;; DNS lookup caching time
+;dns_max_ttl = 15
+
+;; DNS zone SOA lookup period
+;dns_zone_check_period = 0
+
+;; DNS negative result caching time
+;dns_nxdomain_ttl = 15
+
+;; Custom resolv.conf file, to set custom DNS servers or other options
+;; (default: empty = use OS settings)
+;resolv_conf = /etc/pgbouncer/resolv.conf
+
+;;;
+;;; Random stuff
+;;;
+
+;; Hackish security feature.  Helps against SQL injection: when PQexec
+;; is disabled, multi-statement cannot be made.
+;disable_pqexec = 0
+
+;; Config file to use for next RELOAD/SIGHUP
+;; By default contains config file from command line.
+;conffile
+
+;; Windows service name to register as.  job_name is alias for
+;; service_name, used by some Skytools scripts.
+;service_name = pgbouncer
+;job_name = pgbouncer
+
+;; Read additional config from other file
+;%include /etc/pgbouncer/pgbouncer-other.ini
+
+%include /etc/pgbouncer-custom/generated-optimizations.ini
+%include /etc/pgbouncer-custom/custom-overrides.ini
+%include /etc/pgbouncer-custom/ssl-config.ini

@@ -1,0 +1,16 @@
+- name: run stage2 tasks
+  when: stage2
+  block:
+    - name: Run migrate.sh script
+      ansible.builtin.command:
+        cmd: './migrate.sh'
+      args:
+        chdir: '/tmp/migrations/db'
+      failed_when:
+        - retval['rc'] != 0
+      register: 'retval'
+
+    - name: Create /root/MIGRATION-AMI file
+      ansible.builtin.file:
+        path: '/root/MIGRATION-AMI'
+        state: 'touch'

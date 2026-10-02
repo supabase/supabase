@@ -1,0 +1,34 @@
+# Mount baseline for AMI build
+# Only checks that critical mounts exist with correct filesystem type
+# Mount options vary by kernel version and environment - not checked
+mount:
+  /:
+    exists: true
+    filesystem: ext4
+  /boot/efi:
+    exists: true
+    filesystem: vfat
+  /data:
+    exists: true
+    filesystem: ext4
+  /dev:
+    exists: true
+    filesystem: devtmpfs
+  /dev/pts:
+    exists: true
+    filesystem: devpts
+  /dev/shm:
+    exists: true
+    filesystem: tmpfs
+  /proc:
+    exists: true
+    filesystem: proc
+  /run:
+    exists: true
+    filesystem: tmpfs
+  /sys:
+    exists: true
+    filesystem: sysfs
+  /sys/fs/cgroup:
+    exists: true
+    filesystem: cgroup2

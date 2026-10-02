@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -euo pipefail
+
+KEY_FILE=/etc/postgresql-custom/pgsodium_root.key
+
+# On the hosted platform, the root key is generated and managed for each project
+# If for some reason the key is missing, we want to fail loudly,
+# rather than generating a new one.
+if [[ ! -f "${KEY_FILE}" ]]; then
+    echo "Key file ${KEY_FILE} does not exist." >&2
+    exit 1
+fi
+cat $KEY_FILE

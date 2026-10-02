@@ -1,0 +1,7 @@
+database = off
+declarative_config = /etc/kong/kong.yml
+
+# plugins defined in the dockerfile
+plugins = request-transformer,cors,key-auth,http-log
+
+proxy_listen = 0.0.0.0:80 reuseport backlog=16384, 0.0.0.0:443 http2 ssl reuseport backlog=16834, [::]:80 reuseport backlog=16384, [::]:443 http2 ssl reuseport backlog=16384

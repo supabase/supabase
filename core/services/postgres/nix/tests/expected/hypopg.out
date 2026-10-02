@@ -1,0 +1,14 @@
+create schema v;
+create table v.samp(
+  id int
+);
+select 1 from hypopg_create_index($$
+  create index on v.samp(id)
+$$);
+ ?column? 
+----------
+        1
+(1 row)
+
+drop schema v cascade;
+NOTICE:  drop cascades to table v.samp

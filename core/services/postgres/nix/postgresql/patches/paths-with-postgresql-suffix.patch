@@ -1,0 +1,41 @@
+Nix outputs put the `name' in each store path like
+/nix/store/...-<name>. This was confusing the Postgres make script
+because it thought its data directory already had postgresql in its
+directory. This lead to Postgres installing all of its fils in
+$out/share. To fix this, we just look for postgres or psql in the part
+after the / using make's notdir.
+
+---
+--- a/src/Makefile.global.in
++++ b/src/Makefile.global.in
+@@ -102,15 +102,15 @@ datarootdir := @datarootdir@
+ bindir := @bindir@
+ 
+ datadir := @datadir@
+-ifeq "$(findstring pgsql, $(datadir))" ""
+-ifeq "$(findstring postgres, $(datadir))" ""
++ifeq "$(findstring pgsql, $(notdir $(datadir)))" ""
++ifeq "$(findstring postgres, $(notdir $(datadir)))" ""
+ override datadir := $(datadir)/postgresql
+ endif
+ endif
+ 
+ sysconfdir := @sysconfdir@
+-ifeq "$(findstring pgsql, $(sysconfdir))" ""
+-ifeq "$(findstring postgres, $(sysconfdir))" ""
++ifeq "$(findstring pgsql, $(notdir $(sysconfdir)))" ""
++ifeq "$(findstring postgres, $(notdir $(sysconfdir)))" ""
+ override sysconfdir := $(sysconfdir)/postgresql
+ endif
+ endif
+@@ -136,8 +136,8 @@ endif
+ mandir := @mandir@
+ 
+ docdir := @docdir@
+-ifeq "$(findstring pgsql, $(docdir))" ""
+-ifeq "$(findstring postgres, $(docdir))" ""
++ifeq "$(findstring pgsql, $(notdir $(docdir)))" ""
++ifeq "$(findstring postgres, $(notdir $(docdir)))" ""
+ override docdir := $(docdir)/postgresql
+ endif
+ endif

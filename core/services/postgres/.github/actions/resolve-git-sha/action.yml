@@ -1,0 +1,22 @@
+name: Resolve git sha
+description: Resolves the git sha to install packages from, honoring a flake input override
+
+inputs:
+  flake_input:
+    description: 'Flake input name to resolve from flake.lock, if set'
+    required: false
+    default: ''
+
+outputs:
+  sha:
+    description: 'Resolved git sha'
+    value: ${{ steps.resolve.outputs.sha }}
+
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      run: |
+        SHA=$(jq -r --arg k "${{ inputs.flake_input }}" 'if $k == "" then empty else (.nodes[$k].locked.rev // empty) end' flake.lock 2>/dev/null || true)
+        echo "sha=${SHA:-${{ github.sha }}}" >> "$GITHUB_OUTPUT"

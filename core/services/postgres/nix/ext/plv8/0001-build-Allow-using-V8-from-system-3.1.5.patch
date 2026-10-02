@@ -1,0 +1,84 @@
+From 7523ea5bced10511688e73f6261857c04726a8a9 Mon Sep 17 00:00:00 2001
+From: Jan Tojnar <jtojnar@gmail.com>
+Date: Thu, 13 Oct 2022 10:16:32 +0200
+Subject: [PATCH] build: Allow using V8 from system
+
+Building V8 is slow and pointless on systems that already provide a recent version like some Linux distros.
+With this change, you can build against system V8 with the following:
+
+    make USE_SYSTEM_V8=1 SHLIB_LINK=-lv8 V8_OUTDIR=/usr/lib
+---
+ Makefile | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 38879cc..a6abae5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -20,6 +20,7 @@ OBJS = $(SRCS:.cc=.o)
+ MODULE_big = plv8-$(PLV8_VERSION)
+ EXTENSION = plv8
+ PLV8_DATA = plv8.control plv8--$(PLV8_VERSION).sql $(wildcard upgrade/*.sql)
++USE_SYSTEM_V8 = 0
+ 
+ 
+ # Platform detection
+@@ -41,6 +42,7 @@ PGXS := $(shell $(PG_CONFIG) --pgxs)
+ PG_VERSION_NUM := $(shell cat `$(PG_CONFIG) --includedir-server`/pg_config*.h \
+ 		   | perl -ne 'print $$1 and exit if /PG_VERSION_NUM\s+(\d+)/')
+ 
++ifeq ($(USE_SYSTEM_V8),0)
+ AUTOV8_DIR = build/v8
+ AUTOV8_OUT = build/v8/out.gn/obj
+ AUTOV8_STATIC_LIBS = -lv8_libplatform -lv8_libbase
+@@ -67,22 +69,6 @@ v8:
+ endif
+ endif
+ 
+-# enable direct jsonb conversion by default
+-CCFLAGS += -DJSONB_DIRECT_CONVERSION
+-
+-CCFLAGS += -DV8_COMPRESS_POINTERS=1 -DV8_31BIT_SMIS_ON_64BIT_ARCH=1
+-
+-CCFLAGS += -I$(AUTOV8_DIR)/include -I$(AUTOV8_DIR)
+-
+-ifdef EXECUTION_TIMEOUT
+-	CCFLAGS += -DEXECUTION_TIMEOUT
+-endif
+-
+-ifdef BIGINT_GRACEFUL
+-	CCFLAGS += -DBIGINT_GRACEFUL
+-endif
+-
+-
+ # We're gonna build static link.  Rip it out after include Makefile
+ SHLIB_LINK := $(filter-out -lv8, $(SHLIB_LINK))
+ 
+@@ -101,6 +87,24 @@ else
+ 		SHLIB_LINK += -lrt -std=c++14 
+ 	endif
+ endif
++endif
++
++
++# enable direct jsonb conversion by default
++CCFLAGS += -DJSONB_DIRECT_CONVERSION
++
++CCFLAGS += -DV8_COMPRESS_POINTERS=1 -DV8_31BIT_SMIS_ON_64BIT_ARCH=1
++
++CCFLAGS += -I$(AUTOV8_DIR)/include -I$(AUTOV8_DIR)
++
++ifdef EXECUTION_TIMEOUT
++	CCFLAGS += -DEXECUTION_TIMEOUT
++endif
++
++ifdef BIGINT_GRACEFUL
++	CCFLAGS += -DBIGINT_GRACEFUL
++endif
++
+ 
+ DATA = $(PLV8_DATA)
+ ifndef DISABLE_DIALECT
+-- 
+2.49.0
+

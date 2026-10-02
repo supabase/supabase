@@ -1,0 +1,102 @@
+name: CLI Smoke Test
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - develop
+      - release/*
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  check-changes:
+    name: Check Docker Image Changes
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      input_hash: ${{ steps.check.outputs.input_hash }}
+      base_hash: ${{ steps.check.outputs.base_hash }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Check Docker image changes
+        id: check
+        uses: ./.github/actions/check-docker-image-changes
+        with:
+          event_name: ${{ github.event_name }}
+          base_ref: ${{ github.base_ref }}
+
+  cli-smoke-test:
+    name: CLI Smoke Test (PG ${{ matrix.pg_version }})
+    needs: check-changes
+    if: needs.check-changes.outputs.should_run == 'true'
+    runs-on: large-linux-arm
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        pg_version: ['15', '17']
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Create Docker context
+        run: docker context create builders
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        with:
+          endpoint: builders
+
+      - name: Build Docker image
+        run: |
+          DOCKERFILE="Dockerfile-${{ matrix.pg_version }}"
+          echo "Building $DOCKERFILE..."
+          # Tag with ECR prefix since CLI uses public.ecr.aws/supabase/postgres as base
+          docker build -f "$DOCKERFILE" -t "public.ecr.aws/supabase/postgres:${{ matrix.pg_version }}" .
+
+      - name: Run CLI smoke test
+        run: |
+          echo "Running CLI smoke test for PostgreSQL ${{ matrix.pg_version }}..."
+          nix run --accept-flake-config .#cli-smoke-test -- --no-build ${{ matrix.pg_version }}
+        timeout-minutes: 10
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          echo "=== Supabase Status ==="
+          nix run --accept-flake-config .#supabase-cli -- status || true
+
+          echo "=== Docker containers ==="
+          docker ps -a
+
+          echo "=== Database container logs ==="
+          docker logs supabase_db_postgres 2>&1 | tail -100 || true
+
+      - name: Cleanup
+        if: always()
+        run: |
+          nix run --accept-flake-config .#supabase-cli -- stop --no-backup || true
+
+  skip-notification:
+    name: CLI Smoke Test (Skipped)
+    needs: check-changes
+    if: needs.check-changes.outputs.should_run == 'false'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report skipped
+        run: |
+          echo "CLI smoke test skipped - Docker image inputs unchanged"
+          echo "Input hash: ${{ needs.check-changes.outputs.input_hash }}"

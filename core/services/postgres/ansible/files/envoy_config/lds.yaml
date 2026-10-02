@@ -1,0 +1,450 @@
+resources:
+  - '@type': type.googleapis.com/envoy.config.listener.v3.Listener
+    name: http_listener
+    address:
+      socket_address:
+        address: '::'
+        port_value: 80
+        ipv4_compat: true
+    filter_chains:
+      - filters: &ref_1
+          - name: envoy.filters.network.http_connection_manager
+            typed_config:
+              '@type': >-
+                type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+              common_http_protocol_options:
+                idle_timeout: 300s
+                max_connection_duration: 600s
+              access_log:
+                - name: envoy.access_loggers.stdout
+                  filter:
+                    status_code_filter:
+                      comparison:
+                        op: GE
+                        value:
+                          default_value: 400
+                          runtime_key: unused
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+              generate_request_id: false
+              http_filters:
+                - name: envoy.filters.http.cors
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+                - name: envoy.filters.http.rbac
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC
+                    rules:
+                      action: DENY
+                      policies:
+                        api_key_missing:
+                          permissions:
+                            - any: true
+                          principals:
+                            - not_id:
+                                or_ids:
+                                  ids:
+                                    - header:
+                                        name: apikey
+                                        present_match: true
+                                    - header:
+                                        name: ':path'
+                                        string_match:
+                                          contains: apikey=
+                        api_key_not_valid:
+                          permissions:
+                            - any: true
+                          principals:
+                            - not_id:
+                                or_ids:
+                                  ids:
+                                    - header:
+                                        name: apikey
+                                        string_match:
+                                          exact: anon_key
+                                    - header:
+                                        name: apikey
+                                        string_match:
+                                          exact: service_key
+                                    - header:
+                                        name: apikey
+                                        string_match:
+                                          exact: supabase_admin_key
+                                    - header:
+                                        name: ':path'
+                                        string_match:
+                                          contains: apikey=anon_key
+                                    - header:
+                                        name: ':path'
+                                        string_match:
+                                          contains: apikey=service_key
+                                    - header:
+                                        name: ':path'
+                                        string_match:
+                                          contains: apikey=supabase_admin_key
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    source_codes:
+                      remove_apikey_and_empty_key_query_parameters:
+                        inline_string: |-
+                          function envoy_on_request(request_handle)
+                            local path = request_handle:headers():get(":path")
+                            request_handle
+                              :headers()
+                              :replace(":path", path:gsub("&=[^&]*", ""):gsub("?=[^&]*$", ""):gsub("?=[^&]*&", "?"):gsub("&apikey=[^&]*", ""):gsub("?apikey=[^&]*$", ""):gsub("?apikey=[^&]*&", "?"))
+                          end
+                      remove_empty_key_query_parameters:
+                        inline_string: |-
+                          function envoy_on_request(request_handle)
+                            local path = request_handle:headers():get(":path")
+                            request_handle
+                              :headers()
+                              :replace(":path", path:gsub("&=[^&]*", ""):gsub("?=[^&]*$", ""):gsub("?=[^&]*&", "?"))
+                          end
+                - name: envoy.filters.http.compressor.brotli
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.compressor.v3.Compressor
+                    response_direction_config:
+                      common_config:
+                        min_content_length: 100
+                        content_type:
+                          - application/vnd.pgrst.object+json
+                          - application/vnd.pgrst.array+json
+                          - application/openapi+json
+                          - application/geo+json
+                          - text/csv
+                          - application/vnd.pgrst.plan
+                          - application/vnd.pgrst.object
+                          - application/vnd.pgrst.array
+                          - application/javascript
+                          - application/json
+                          - application/xhtml+xml
+                          - image/svg+xml
+                          - text/css
+                          - text/html
+                          - text/plain
+                          - text/xml
+                      disable_on_etag_header: true
+                    request_direction_config:
+                      common_config:
+                        enabled:
+                          default_value: false
+                          runtime_key: request_compressor_enabled
+                    compressor_library:
+                      name: text_optimized
+                      typed_config:
+                        '@type': >-
+                          type.googleapis.com/envoy.extensions.compression.brotli.compressor.v3.Brotli
+                - name: envoy.filters.http.compressor.gzip
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.compressor.v3.Compressor
+                    response_direction_config:
+                      common_config:
+                        min_content_length: 100
+                        content_type:
+                          - application/vnd.pgrst.object+json
+                          - application/vnd.pgrst.array+json
+                          - application/openapi+json
+                          - application/geo+json
+                          - text/csv
+                          - application/vnd.pgrst.plan
+                          - application/vnd.pgrst.object
+                          - application/vnd.pgrst.array
+                          - application/javascript
+                          - application/json
+                          - application/xhtml+xml
+                          - image/svg+xml
+                          - text/css
+                          - text/html
+                          - text/plain
+                          - text/xml
+                      disable_on_etag_header: true
+                    request_direction_config:
+                      common_config:
+                        enabled:
+                          default_value: false
+                          runtime_key: request_compressor_enabled
+                    compressor_library:
+                      name: text_optimized
+                      typed_config:
+                        '@type': >-
+                          type.googleapis.com/envoy.extensions.compression.gzip.compressor.v3.Gzip
+                - name: envoy.filters.http.router
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+                    dynamic_stats: false
+              local_reply_config:
+                mappers:
+                  - filter:
+                      and_filter:
+                        filters:
+                          - status_code_filter:
+                              comparison:
+                                value:
+                                  default_value: 403
+                                  runtime_key: unused
+                          - header_filter:
+                              header:
+                                name: ':path'
+                                string_match:
+                                  prefix: /customer/v1/privileged/
+                    status_code: 401
+                    body:
+                      inline_string: Unauthorized
+                    headers_to_add:
+                      - header:
+                          key: WWW-Authenticate
+                          value: Basic realm="Unknown"
+                  - filter:
+                      and_filter:
+                        filters:
+                          - status_code_filter:
+                              comparison:
+                                value:
+                                  default_value: 403
+                                  runtime_key: unused
+                          - header_filter:
+                              header:
+                                name: ':path'
+                                string_match:
+                                  prefix: /metrics/aggregated
+                                invert_match: true
+                    status_code: 401
+                    headers_to_add:
+                      - header:
+                          key: x-sb-error-code
+                          value: '%RESPONSE_CODE_DETAILS%'
+                    body_format_override:
+                      json_format:
+                        message: >-
+                          `apikey` request header or query parameter is either
+                          missing or invalid. Double check your Supabase `anon`
+                          or `service_role` API key.
+                        hint: '%RESPONSE_CODE_DETAILS%'
+                      json_format_options:
+                        sort_properties: false
+              merge_slashes: true
+              route_config:
+                name: route_config_0
+                virtual_hosts:
+                  - name: virtual_host_0
+                    domains:
+                      - '*'
+                    typed_per_filter_config:
+                      envoy.filters.http.cors:
+                        '@type': >-
+                          type.googleapis.com/envoy.extensions.filters.http.cors.v3.CorsPolicy
+                        allow_origin_string_match:
+                          - safe_regex:
+                              regex: \*
+                        allow_methods: GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,TRACE,CONNECT
+                        allow_headers: apikey,authorization,x-client-info
+                        max_age: '3600'
+                    routes:
+                      - match:
+                          path: /health
+                        direct_response:
+                          status: 200
+                          body:
+                            inline_string: Healthy
+                        typed_per_filter_config: &ref_0
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                      - match:
+                          safe_regex:
+                            google_re2:
+                              max_program_size: 150
+                            regex: >-
+                              /auth/v1/(verify|callback|authorize|sso/saml/(acs|metadata|slo)|\.well-known/(openid-configuration|jwks\.json))
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: gotrue
+                          regex_rewrite:
+                            pattern:
+                              regex: ^/auth/v1
+                            substitution: ''
+                          retry_policy:
+                            num_retries: 3
+                            retry_on: 5xx
+                          timeout: 35s
+                        typed_per_filter_config: *ref_0
+                      - match:
+                          prefix: /auth/v1/
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: gotrue
+                          prefix_rewrite: /
+                          timeout: 35s
+                          retry_policy:
+                            retry_on: "connect-failure,refused-stream,gateway-error"
+                            num_retries: 3
+                            retry_back_off:
+                              base_interval: 1s
+                              max_interval: 3s
+                      - match:
+                          prefix: /rest/v1/
+                          query_parameters:
+                            - name: apikey
+                              present_match: true
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: postgrest
+                          prefix_rewrite: /
+                          timeout: 125s
+                        typed_per_filter_config:
+                          envoy.filters.http.lua:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                            name: remove_apikey_and_empty_key_query_parameters
+                      - match:
+                          prefix: /rest/v1/
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: postgrest
+                          prefix_rewrite: /
+                          timeout: 125s
+                        typed_per_filter_config:
+                          envoy.filters.http.lua:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                            name: remove_empty_key_query_parameters
+                      - match:
+                          prefix: /rest-admin/v1/
+                          query_parameters:
+                            - name: apikey
+                              present_match: true
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: postgrest_admin
+                          prefix_rewrite: /
+                        typed_per_filter_config:
+                          envoy.filters.http.lua:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                            name: remove_apikey_and_empty_key_query_parameters
+                      - match:
+                          prefix: /rest-admin/v1/
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: postgrest_admin
+                          prefix_rewrite: /
+                      - match:
+                          path: /graphql/v1
+                        request_headers_to_add:
+                          header:
+                            key: Content-Profile
+                            value: graphql_public
+                        request_headers_to_remove:
+                          - apikey
+                          - sb-opk
+                        route:
+                          cluster: postgrest
+                          prefix_rewrite: /rpc/graphql
+                          timeout: 125s
+                      - match:
+                          prefix: /admin/v1/
+                        request_headers_to_remove:
+                          - sb-opk
+                        route:
+                          cluster: admin_api
+                          prefix_rewrite: /
+                          timeout: 600s
+                      - match:
+                          prefix: /customer/v1/privileged/
+                        request_headers_to_remove:
+                          - sb-opk
+                        route:
+                          cluster: admin_api
+                          prefix_rewrite: /privileged/
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  basic_auth:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - header:
+                                          name: authorization
+                                          invert_match: true
+                                          string_match:
+                                            exact: Basic c2VydmljZV9yb2xlOnNlcnZpY2Vfa2V5
+                                          treat_missing_header_as_empty: true
+                      - match:
+                          prefix: /metrics/aggregated
+                        request_headers_to_remove:
+                          - sb-opk
+                        route:
+                          cluster: admin_api
+                          prefix_rewrite: /supabase-internal/metrics
+                        typed_per_filter_config:
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: DENY
+                                policies:
+                                  not_private_ip:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - not_id:
+                                          direct_remote_ip:
+                                            address_prefix: 10.0.0.0
+                                            prefix_len: 8
+                    include_attempt_count_in_response: true
+                    retry_policy:
+                      num_retries: 5
+                      retry_back_off:
+                        base_interval: 0.1s
+                        max_interval: 1s
+                      retry_on: gateway-error
+              stat_prefix: ingress_http
+  - '@type': type.googleapis.com/envoy.config.listener.v3.Listener
+    name: https_listener
+    address:
+      socket_address:
+        address: '::'
+        port_value: 443
+        ipv4_compat: true
+    filter_chains:
+      - filters: *ref_1
+        transport_socket:
+          name: envoy.transport_sockets.tls
+          typed_config:
+            '@type': >-
+              type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+            common_tls_context:
+              alpn_protocols: [ "h2,http/1.1" ]
+              tls_certificates:
+                - certificate_chain:
+                    filename: /etc/envoy/fullChain.pem
+                  private_key:
+                    filename: /etc/envoy/privKey.pem
+

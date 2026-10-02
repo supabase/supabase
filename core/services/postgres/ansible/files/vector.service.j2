@@ -1,0 +1,23 @@
+[Unit]
+Description=Vector
+Documentation=https://vector.dev
+After=network-online.target
+Requires=network-online.target
+
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+User=vector
+Group=vector
+ExecStartPre=/usr/bin/vector validate --config-yaml /etc/vector/vector.yaml
+ExecStart=/usr/bin/vector --config-yaml /etc/vector/vector.yaml
+ExecReload=/usr/bin/vector validate --config-yaml /etc/vector/vector.yaml
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+EnvironmentFile=-/etc/default/vector
+
+[Install]
+WantedBy=multi-user.target

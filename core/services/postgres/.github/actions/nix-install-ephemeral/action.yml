@@ -1,0 +1,57 @@
+name: Install Nix on ephemeral runners
+description: Installs Nix and sets up AWS credentials to push to the Nix binary cache
+inputs:
+  aws-region:
+    description: AWS region for the Nix binary cache S3 bucket
+    required: false
+    default: us-east-1
+  nix-signing-key:
+    description: Key used to sign uploads to binary cache, required if push-to-cache is true
+    required: false
+  push-to-cache:
+    description: Whether to push build outputs to the Nix binary cache
+    required: false
+    default: false
+  role-to-assume:
+    description: AWS Role to assume when configuring aws credentials, required if push-to-cache is true
+    required: false
+runs:
+  using: composite
+  steps:
+    - name: resolve push-to-cache
+      id: resolve-push-to-cache
+      shell: bash
+      run: |
+        VALUE=false
+        if [[ "$PUSH_TO_CACHE" == true && -n ${NIX_SIGNING_KEY:+ok} && -n ${ROLE_TO_ASSUME:+ok} ]]; then
+          VALUE=true
+        elif [[ "$PUSH_TO_CACHE" == true ]]; then
+          echo "::notice::push-to-cache requested but nix-signing-key/role-to-assume not set; skipping cache push"
+        fi
+        echo "value=$VALUE" >> "$GITHUB_OUTPUT"
+      env:
+        PUSH_TO_CACHE: ${{ inputs.push-to-cache }}
+        NIX_SIGNING_KEY: ${{ inputs.nix-signing-key }}
+        ROLE_TO_ASSUME: ${{ inputs.role-to-assume }}
+
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+      if: steps.resolve-push-to-cache.outputs.value == 'true'
+      with:
+        role-to-assume: ${{ inputs.role-to-assume }}
+        aws-region: ${{ inputs.aws-region }}
+        output-credentials: true
+        role-duration-seconds: 7200
+
+    - name: setup nix
+      shell: bash
+      run: cd ${{ github.action_path }} && ./setup-nix.sh
+      env:
+        AWS_REGION: ${{ inputs.aws-region }}
+        GITHUB_TOKEN: ${{ github.token }}
+        NIX_SIGN_SECRET_KEY: ${{ inputs.nix-signing-key }}
+        PUSH_TO_CACHE: ${{ steps.resolve-push-to-cache.outputs.value }}
+
+    - name: verify nix in path
+      shell: bash
+      run: nix --version

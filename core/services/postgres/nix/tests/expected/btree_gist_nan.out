@@ -1,0 +1,47 @@
+-- btree_gist NaN handling in the float4/float8 opclasses (comparisons and the
+-- GiST penalty/distance functions) previously gave wrong answers when a NaN was
+-- present; upstream recommends reindexing btree_gist float indexes that may hold
+-- NaN after the update. This pins the post-fix within-version correctness of
+-- index scans over a float8 column containing NaN.
+--
+-- Upstream commit: (PG 15.19) / (PG 17.11), fixed 2026-08-13.
+-- (The cross-version pre-upgrade-build / post-upgrade-REINDEX leg is A3,
+-- PSQL-1235.)
+--
+-- Refs: PSQL-1110, PSQL-1234.
+BEGIN;
+SET client_min_messages = warning; -- OrioleDB shows a NOTICE/DETAILS, lets avoid the diff from vanilla
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+CREATE TABLE bg_nan (v float8);
+INSERT INTO bg_nan VALUES (1), (2), (3), ('NaN');
+CREATE INDEX bg_nan_gist ON bg_nan USING gist (v);
+SET enable_seqscan = off; -- Force index scans so we exercise the opclass, not a seqscan recheck.
+-- NaN sorts as greater than every non-NaN value and equals only itself.
+SELECT count(*) AS eq_nan   FROM bg_nan WHERE v = 'NaN'::float8;
+ eq_nan 
+--------
+      1
+(1 row)
+
+SELECT count(*) AS gt_one   FROM bg_nan WHERE v > 1;          -- 2, 3, NaN
+ gt_one 
+--------
+      3
+(1 row)
+
+SELECT count(*) AS ne_two   FROM bg_nan WHERE v <> 2;         -- 1, 3, NaN
+ ne_two 
+--------
+      3
+(1 row)
+
+SELECT v FROM bg_nan WHERE v >= 3 ORDER BY v;                 -- 3, NaN
+  v  
+-----
+   3
+ NaN
+(2 rows)
+
+RESET enable_seqscan;
+RESET client_min_messages;
+ROLLBACK;

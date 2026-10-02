@@ -1,0 +1,4 @@
+* @supabase/backend @supabase/postgres
+migrations/ @supabase/dev-workflows @supabase/postgres @supabase/backend
+docker/orioledb @supabase/postgres @supabase/backend
+common.vars.pkr.hcl @supabase/postgres @supabase/backend

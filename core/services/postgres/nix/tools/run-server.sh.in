@@ -1,0 +1,383 @@
+#!@SHELL_PATH@
+# shellcheck shell=bash
+[ ! -z "$DEBUG" ] && set -x
+
+# Default values
+SKIP_MIGRATIONS=false
+PSQL_USER="postgres"
+MIGRATION_FILE=""
+DAEMONIZE=false
+GETKEY_SCRIPT=""
+
+# Function to display help
+print_help() {
+    echo "Usage: start-postgres-server [options] VERSION [PORT]"
+    echo
+    echo "Options:"
+    echo "  --skip-migrations        Skip running migrations and SQL statements"
+    echo "  --migration-file FILE    Provide a custom migration script"
+    echo "  --user USER             Specify the user/role to use (default: postgres)"
+    echo "  --getkey-script SCRIPT   Provide a custom path to the PGSODIUM_GETKEY_SCRIPT"
+    echo "  -h, --help              Show this help message"
+    echo
+    echo "VERSION must be one of: 15, orioledb-17"
+    echo "PORT is optional (default: @PGSQL_DEFAULT_PORT@)"
+}
+
+start_postgres() {
+    local mode=$1
+    local LOG_DIR="${DATDIR}_logs"
+    mkdir -p "$LOG_DIR"
+    local LOG_FILE="$LOG_DIR/postgres.log"
+    touch "$LOG_FILE"
+    if [ "$mode" = "daemon" ]; then
+        # Start the server
+        pg_ctl start -D "$DATDIR" -l "$LOG_FILE" \
+            -o "--config-file=$DATDIR/postgresql.conf -p $PORTNO -k $DATDIR/tmp"
+            
+        # Give it a moment to write logs
+        sleep 1
+        
+        # Check server status and logs
+        if ! pg_ctl status -D "$DATDIR"; then
+            echo "PostgreSQL failed to start. Full logs:"
+            cat "$LOG_FILE"
+            # You might also want to see the postmaster.pid if it exists
+            if [ -f "$DATDIR/postmaster.pid" ]; then
+                echo "postmaster.pid contents:"
+                cat "$DATDIR/postmaster.pid"
+            fi
+            return 1
+        fi
+    else
+        # Foreground mode
+        exec postgres --config-file="$DATDIR/postgresql.conf" -p "$PORTNO" -D "$DATDIR" -k "/tmp" -F
+    fi
+}
+
+stop_postgres() {
+    if [ "$DAEMONIZE" = true ]; then
+        echo "PostgreSQL is running in daemon mode. Please stop it using pg_ctl."
+    else
+        pg_ctl stop -D "$DATDIR" -m fast
+    fi
+}
+
+trap 'stop_postgres' SIGINT SIGTERM
+
+# Parse arguments
+while [[ "$#" -gt 0 ]]; do
+    case "$1" in
+        --skip-migrations)
+            SKIP_MIGRATIONS=true
+            shift
+            ;;
+        --migration-file)
+            if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+                MIGRATION_FILE="$2"
+                shift 2
+            else
+                echo "Error: --migration-file requires a filename"
+                exit 1
+            fi
+            ;;
+        --user)
+            if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+                PSQL_USER="$2"
+                shift 2
+            else
+                echo "Error: --user requires an argument"
+                exit 1
+            fi
+            ;;
+        --getkey-script)
+            if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+                GETKEY_SCRIPT="$2"
+                shift 2
+            else
+                echo "Error: --getkey-script requires a script path"
+                exit 1
+            fi
+            ;;
+        --daemonize)
+            DAEMONIZE=true
+            shift
+            ;;
+        -h|--help)
+            print_help
+            exit 0
+            ;;
+        --datdir)
+            if [[ -n "$2" && ! "$2" =~ ^- ]]; then
+                DATDIR="$2"
+                shift 2
+            else
+                echo "Error: --datadir requires a directory path"
+                exit 1
+            fi
+            ;;
+        *)
+            if [[ "$1" =~ ^- ]]; then
+                echo "Unknown option: $1"
+                print_help
+                exit 1
+            elif [[ -z "$VERSION" ]]; then
+                VERSION="$1"
+                shift
+            elif [[ -z "$PORTNO" ]]; then
+                PORTNO="$1"
+                shift
+            else
+                echo "Error: Unexpected argument: $1"
+                print_help
+                exit 1
+            fi
+            ;;
+    esac
+done
+if [[ -n "${GETKEY_SCRIPT:-}" ]]; then
+    export PGSODIUM_GETKEY_SCRIPT="$GETKEY_SCRIPT"
+else
+    PGSODIUM_GETKEY_SCRIPT="${PGSODIUM_GETKEY_SCRIPT:-@PGSODIUM_GETKEY@}"
+fi
+# Verify version and set binary directory
+if [ "$VERSION" == "15" ]; then
+    echo "Starting server for PSQL 15"
+    PSQL15=@PSQL15_BINDIR@
+    BINDIR="$PSQL15"
+elif [ "$VERSION" == "17" ]; then
+    echo "Starting server for PSQL 17"
+    PSQL17=@PSQL17_BINDIR@
+    BINDIR="$PSQL17"
+elif [ "$VERSION" == "orioledb-17" ]; then
+    echo "Starting server for PSQL ORIOLEDB 17"
+    PSQLORIOLEDB17=@PSQLORIOLEDB17_BINDIR@
+    BINDIR="$PSQLORIOLEDB17"
+else
+    echo "Please provide a valid Postgres version (15, 17, orioledb-17)"
+    exit 1
+fi
+
+# Set environment variables and paths
+export PATH=$BINDIR/bin:$PATH
+PGSQL_SUPERUSER=@PGSQL_SUPERUSER@
+PSQL_CONF_FILE=@PSQL_CONF_FILE@
+PORTNO="${PORTNO:-@PGSQL_DEFAULT_PORT@}"
+SUPAUTILS_CONFIG_FILE=@SUPAUTILS_CONF_FILE@
+LOGGING_CONFIG_FILE=@LOGGING_CONF_FILE@
+READREPL_CONFIG_FILE=@READREPL_CONF_FILE@
+PG_HBA_FILE=@PG_HBA@
+PG_IDENT_FILE=@PG_IDENT@
+EXTENSION_CUSTOM_SCRIPTS=@EXTENSION_CUSTOM_SCRIPTS_DIR@
+GROONGA=@GROONGA_DIR@
+MIGRATIONS_DIR=@MIGRATIONS_DIR@
+POSTGRESQL_SCHEMA_SQL=@POSTGRESQL_SCHEMA_SQL@
+PGBOUNCER_AUTH_SCHEMA_SQL=@PGBOUNCER_AUTH_SCHEMA_SQL@
+STAT_EXTENSION_SQL=@STAT_EXTENSION_SQL@
+MECAB_LIB=@MECAB_LIB@
+
+# Setup directories and locale settings
+if [[ -z "$DATDIR" ]]; then
+    DATDIR=$(mktemp -d)
+fi
+LOCALE_ARCHIVE=@LOCALES@
+CURRENT_SYSTEM=@CURRENT_SYSTEM@
+
+# Set locale environment
+export LOCALE_ARCHIVE
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LC_CTYPE=en_US.UTF-8
+export KEY_FILE="$DATDIR/pgsodium.key"
+echo "KEY_FILE: $KEY_FILE"
+echo "KEY_FILE contents:"
+cat "$KEY_FILE" 
+
+echo "PGSODIUM_GETKEY_SCRIPT: $PGSODIUM_GETKEY_SCRIPT"
+echo "NOTE: using port $PORTNO for server"
+echo "NOTE: using temporary directory $DATDIR for data"
+echo "NOTE: you are free to re-use this data directory at will"
+
+# Initialize database
+if [ "$VERSION" = "orioledb-17" ]; then
+    initdb -D "$DATDIR" \
+        --allow-group-access \
+        --username="$PGSQL_SUPERUSER" \
+        --locale-provider=icu \
+        --encoding=UTF-8 \
+        --icu-locale=en_US.UTF-8
+else
+    initdb -U "$PGSQL_SUPERUSER" -D "$DATDIR"
+fi
+
+# Copy configuration files
+echo "NOTE: patching postgresql.conf files"
+cp "$PG_HBA_FILE" "$DATDIR/pg_hba.conf"
+cp "$PG_IDENT_FILE" "$DATDIR/pg_ident.conf"
+# Copy entire conf.d directory from postgresql_config
+POSTGRESQL_CONFIG_DIR="@POSTGRESQL_CONFIG_DIR@"
+cp -r "$POSTGRESQL_CONFIG_DIR/conf.d" "$DATDIR/"
+
+# Make conf.d files writable (they're read-only from Nix store)
+chmod -R u+w "$DATDIR/conf.d"
+
+cp "$READREPL_CONFIG_FILE" "$DATDIR/read-replica.conf"
+mkdir -p "$DATDIR/extension-custom-scripts"
+cp -r "$EXTENSION_CUSTOM_SCRIPTS"/* "$DATDIR/extension-custom-scripts"
+
+# Configure supautils
+sed "s|supautils.extension_custom_scripts_path = '/etc/postgresql-custom/extension-custom-scripts'|supautils.extension_custom_scripts_path = '$DATDIR/extension-custom-scripts'|" "$SUPAUTILS_CONFIG_FILE" > "$DATDIR/supautils.conf"
+
+# Configure PostgreSQL
+sed -e "1i\\
+include = '$DATDIR/supautils.conf'" \
+-e "\$a\\
+pgsodium.getkey_script = '$PGSODIUM_GETKEY_SCRIPT'" \
+-e "\$a\\
+vault.getkey_script = '$PGSODIUM_GETKEY_SCRIPT'" \
+-e "s|data_directory = '/var/lib/postgresql/data'|data_directory = '$DATDIR'|" \
+-e "s|hba_file = '/etc/postgresql/pg_hba.conf'|hba_file = '$DATDIR/pg_hba.conf'|" \
+-e "s|ident_file = '/etc/postgresql/pg_ident.conf'|ident_file = '$DATDIR/pg_ident.conf'|" \
+-e "s|include = '/etc/postgresql/logging.conf'|#&|" \
+-e "s|include = '/etc/postgresql-custom/read-replica.conf'|include = '$DATDIR/read-replica.conf'|" \
+-e "\$a\\
+session_preload_libraries = 'supautils'" \
+-e "$ a output_plugin_libraries = 'pgoutput, test_decoding, wal2json'" \
+-e "s|include_dir = '/etc/postgresql-custom/conf.d'|include_dir = '$DATDIR/conf.d'|" \
+"$PSQL_CONF_FILE" > "$DATDIR/postgresql.conf"
+
+# Function to configure OrioleDB specific settings
+orioledb_config_items() {
+    if [[ "$1" = "orioledb-17" && "$CURRENT_SYSTEM" != "aarch64-darwin" ]]; then
+        # Remove items from postgresql.conf
+        echo "non-macos oriole conf"
+        sed -i 's/ timescaledb,//g;' "$DATDIR/postgresql.conf"
+        sed -i 's/db_user_namespace = off/#db_user_namespace = off/g;' "$DATDIR/postgresql.conf"
+        sed -i 's/ timescaledb,//g; s/ plv8,//g; s/ pgjwt,//g;' "$DATDIR/supautils.conf"
+        sed -i 's/\(shared_preload_libraries.*\)'\''\(.*\)$/\1, orioledb'\''\2/' "$DATDIR/postgresql.conf"
+        echo "default_table_access_method = 'orioledb'" >> "$DATDIR/postgresql.conf"
+    elif [[ "$1" = "orioledb-17" && "$CURRENT_SYSTEM" = "aarch64-darwin" ]]; then
+        # macOS specific configuration
+        echo "macOS detected, applying macOS specific configuration"
+        ls -la "$DATDIR"
+        
+        # Use perl instead of sed for macOS
+        perl -pi -e 's/ timescaledb,//g' "$DATDIR/postgresql.conf"
+        perl -pi -e 's/db_user_namespace = off/#db_user_namespace = off/g' "$DATDIR/postgresql.conf"
+        
+        perl -pi -e 's/ timescaledb,//g' "$DATDIR/supautils.conf"
+        perl -pi -e 's/ plv8,//g' "$DATDIR/supautils.conf"
+        perl -pi -e 's/ pgjwt,//g' "$DATDIR/supautils.conf"
+        perl -pi -e 's/(shared_preload_libraries\s*=\s*'\''.*?)'\''/\1, orioledb'\''/' "$DATDIR/postgresql.conf"
+        
+        echo "default_table_access_method = 'orioledb'" >> "$DATDIR/postgresql.conf"
+    elif [[ "$VERSION" == "17" && "$CURRENT_SYSTEM" != "aarch64-darwin" ]]; then
+        echo "non-macos pg 17 conf"
+        sed -i 's/ timescaledb,//g;' "$DATDIR/postgresql.conf"
+        sed -i 's/db_user_namespace = off/#db_user_namespace = off/g;' "$DATDIR/postgresql.conf"
+        sed -i 's/ timescaledb,//g; s/ plv8,//g;' "$DATDIR/supautils.conf"
+    elif [[ "$VERSION" == "17" && "$CURRENT_SYSTEM" = "aarch64-darwin" ]]; then
+        perl -pi -e 's/db_user_namespace = off/#db_user_namespace = off/g;' "$DATDIR/postgresql.conf"
+        perl -pi -e 's/ timescaledb,//g' "$DATDIR/postgresql.conf"
+        perl -pi -e 's/ timescaledb,//g' "$DATDIR/supautils.conf"
+        perl -pi -e 's/ plv8,//g;' "$DATDIR/supautils.conf"
+    fi
+}
+
+# Apply OrioleDB configuration if needed
+orioledb_config_items "$VERSION"
+
+# Fix archive_command for macOS (Darwin doesn't have /bin/true, use /usr/bin/true instead)
+if [[ "$CURRENT_SYSTEM" == *"-darwin" ]]; then
+    perl -pi -e "s|archive_command = '/bin/true'|archive_command = '/usr/bin/true'|" "$DATDIR/postgresql.conf"
+fi
+
+# Configure Groonga
+export GRN_PLUGINS_DIR=$GROONGA/lib/groonga/plugins
+
+# Start postgres
+mkdir -p "$DATDIR/tmp"
+chmod 1777 "$DATDIR/tmp"  
+start_postgres "daemon"
+
+# Wait for PostgreSQL to start
+for i in {1..60}; do
+    if pg_isready -h localhost -p "$PORTNO" -q; then
+        echo "PostgreSQL is ready"
+        break
+    fi
+    sleep 1
+    if [ $i -eq 60 ]; then
+        echo "PostgreSQL failed to start"
+        'stop_postgres' 1
+    fi
+done
+
+# Create orioledb extension if needed
+if [ "$VERSION" = "orioledb-17" ]; then
+    psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PGSQL_SUPERUSER" -p "$PORTNO" -h localhost -d postgres -c "CREATE EXTENSION IF NOT EXISTS orioledb;"
+fi
+
+# Skip migrations if requested
+if [ "$SKIP_MIGRATIONS" = false ]; then
+    # Create postgres role and set ownership
+    if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PGSQL_SUPERUSER" -p "$PORTNO" -h localhost -d postgres <<-EOSQL
+        create role postgres superuser login password '$PGPASSWORD';
+        alter database postgres owner to postgres;
+EOSQL
+    then
+        'stop_postgres' 1
+    fi
+
+    if [ -n "$MIGRATION_FILE" ]; then
+        echo "Running user-provided migration file $MIGRATION_FILE"
+        if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PGSQL_SUPERUSER" -p "$PORTNO" -h localhost -f "$MIGRATION_FILE" postgres; then
+            'stop_postgres' 1
+        fi
+    else
+        # Run default init scripts
+        for sql in "$MIGRATIONS_DIR"/init-scripts/*.sql; do
+            echo "Running $sql"
+            if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PSQL_USER" -p "$PORTNO" -h localhost -f "$sql" postgres; then
+                'stop_postgres' 1
+            fi
+        done
+
+        # Set superuser password
+        if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PSQL_USER" -p "$PORTNO" -h localhost -c "ALTER USER supabase_admin WITH PASSWORD '$PGPASSWORD'"; then
+            'stop_postgres' 1
+        fi
+
+        # Run additional schema files
+        if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PSQL_USER" -p "$PORTNO" -h localhost -d postgres -f "$PGBOUNCER_AUTH_SCHEMA_SQL"; then
+            'stop_postgres' 1
+        fi
+        if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PSQL_USER" -p "$PORTNO" -h localhost -d postgres -f "$STAT_EXTENSION_SQL"; then
+            'stop_postgres' 1
+        fi
+
+        # Run migrations as superuser
+        for sql in "$MIGRATIONS_DIR"/migrations/*.sql; do
+            echo "Running $sql"
+            if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PGSQL_SUPERUSER" -p "$PORTNO" -h localhost -f "$sql" postgres; then
+                'stop_postgres' 1
+            fi
+        done
+
+        # Run PostgreSQL schema
+        if ! psql -v ON_ERROR_STOP=1 --no-password --no-psqlrc -U "$PGSQL_SUPERUSER" -p "$PORTNO" -h localhost -f "$POSTGRESQL_SCHEMA_SQL" postgres; then
+            'stop_postgres' 1
+        fi
+    fi
+fi
+echo "Shutting down PostgreSQL..."
+
+stop_postgres
+
+# Step 4: Restart PostgreSQL in the foreground (with log output visible) or as a daemon
+if [ "$DAEMONIZE" = true ]; then
+    start_postgres "daemon"
+else 
+    start_postgres "foreground"
+fi

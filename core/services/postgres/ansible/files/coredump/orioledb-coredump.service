@@ -1,0 +1,14 @@
+[Unit]
+Description=Process PostgreSQL/OrioleDB core dumps into a redacted diagnostic bundle
+After=systemd-coredump@.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/process-orioledb-coredumps.sh
+User=root
+Group=root
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/systemd/coredump /var/lib/orioledb-coredumps /run

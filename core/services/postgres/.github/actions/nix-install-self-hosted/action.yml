@@ -1,0 +1,33 @@
+name: 'Configure Nix on self hosted runners'
+description: 'Sets up AWS credentials to push to the Nix binary cache'
+inputs:
+  aws-role-duration:
+    description: 'AWS role session duration in seconds'
+    required: false
+    default: '18000'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: aws-creds
+      uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+      with:
+        disable-retry: true
+        aws-region: us-east-2
+        role-to-assume: arn:aws:iam::436098097459:role/nix-artifacts-deploy-role # supabase-dev
+        role-session-name: gha-oidc-${{ github.run_id }}
+        role-duration-seconds: ${{ inputs.aws-role-duration }}
+
+    - name: Print Nix version
+      shell: bash
+      run: nix --version
+    - name: Write creds files
+      shell: bash
+      run: |
+        umask 006
+        cat > /etc/nix/aws/nix-aws-credentials <<EOF
+        [ci-uploader]
+        aws_access_key_id = ${AWS_ACCESS_KEY_ID}
+        aws_secret_access_key = ${AWS_SECRET_ACCESS_KEY}
+        aws_session_token = ${AWS_SESSION_TOKEN}
+        EOF

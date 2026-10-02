@@ -1,0 +1,11 @@
+# kernel-param baseline for AMI build
+# Checks that critical kernel parameters haven't changed
+kernel-param:
+  vm.page-cluster:
+    value: '3'        # kernel default; assert to catch if kernel upgrade changes it
+  kernel.panic:
+    value: '10'       # set by setup-system.yml
+  vm.panic_on_oom:
+    value: '1'        # set by setup-system.yml
+  vm.swappiness:
+    value: '10'       # intentionally lowered from kernel default (60) for DB + zswap

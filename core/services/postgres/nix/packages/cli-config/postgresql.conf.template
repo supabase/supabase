@@ -1,0 +1,43 @@
+# Supabase CLI PostgreSQL Configuration
+# Minimal configuration for local development
+
+# Connection Settings
+listen_addresses = '127.0.0.1'
+port = 54322
+max_connections = 100
+unix_socket_directories = '/tmp'
+
+# Memory Settings (conservative for local dev)
+shared_buffers = 128MB
+effective_cache_size = 256MB
+work_mem = 4MB
+maintenance_work_mem = 64MB
+
+# Write Ahead Log
+wal_level = replica
+max_wal_senders = 0
+
+# Logging
+log_destination = 'stderr'
+logging_collector = off
+log_min_messages = warning
+log_min_error_statement = error
+
+# Locale
+lc_messages = 'C'
+lc_monetary = 'C'
+lc_numeric = 'C'
+lc_time = 'C'
+
+# Extensions
+shared_preload_libraries = 'pg_stat_statements, pg_cron, pg_net, pgsodium, supabase_vault, supautils'
+
+# pgsodium and vault configuration
+# Set the path to your pgsodium_getkey.sh script
+# Default location when using portable bundle: share/supabase-cli/config/pgsodium_getkey.sh
+#pgsodium.getkey_script = '/path/to/pgsodium_getkey.sh'
+#vault.getkey_script = '/path/to/pgsodium_getkey.sh'
+
+# Supautils configuration
+supautils.reserved_roles = 'supabase_admin,supabase_auth_admin,supabase_storage_admin,supabase_read_only_user,supabase_replication_admin,supabase_realtime_admin,supabase_functions_admin'
+supautils.reserved_memberships = 'pg_read_server_files,pg_write_server_files,pg_execute_server_program'

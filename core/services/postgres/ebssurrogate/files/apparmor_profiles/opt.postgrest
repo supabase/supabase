@@ -1,0 +1,12 @@
+#include <tunables/global>
+
+/opt/postgrest {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/openssl>
+
+  /etc/gss/mech.d/ r,
+  /sys/devices/system/node/ r,
+  /sys/devices/system/node/node0/meminfo r,
+  owner /etc/postgrest/merged.conf r,
+}

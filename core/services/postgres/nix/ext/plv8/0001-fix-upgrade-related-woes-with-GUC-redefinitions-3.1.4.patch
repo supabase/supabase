@@ -1,0 +1,411 @@
+From 9c280302b5b8628e5b8635be63c8cbef55f5d98c Mon Sep 17 00:00:00 2001
+From: Constantine Peresypkin <pconstantine@gmail.com>
+Date: Mon, 31 Jul 2023 19:36:01 -0400
+Subject: [PATCH] fix upgrade-related woes with GUC redefinitions
+
+Forward-port of #409
+---
+ .gitignore                       |   1 +
+ Makefile                         |   2 +-
+ platforms/windows/CMakeLists.txt |   1 +
+ plv8.cc                          | 164 ++++++++++++++++++++-----------
+ plv8.h                           |   4 +
+ plv8_guc.cc                      | 138 ++++++++++++++++++++++++++
+ 6 files changed, 249 insertions(+), 61 deletions(-)
+ create mode 100644 plv8_guc.cc
+
+diff --git a/.gitignore b/.gitignore
+index 798df71..2b3e1a9 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -14,6 +14,7 @@
+ # Generic build files
+ *.o
+ *.so
++*.bc
+ 
+ # For static build
+ /build
+diff --git a/Makefile b/Makefile
+index cfa50bc..6d5e202 100644
+--- a/Makefile
++++ b/Makefile
+@@ -15,7 +15,7 @@ CUSTOM_CC = g++
+ JSS  = coffee-script.js livescript.js
+ # .cc created from .js
+ JSCS = $(JSS:.js=.cc)
+-SRCS = plv8.cc plv8_type.cc plv8_func.cc plv8_param.cc plv8_allocator.cc $(JSCS)
++SRCS = plv8.cc plv8_type.cc plv8_func.cc plv8_param.cc plv8_allocator.cc plv8_guc.cc $(JSCS)
+ OBJS = $(SRCS:.cc=.o)
+ MODULE_big = plv8-$(PLV8_VERSION)
+ EXTENSION = plv8
+diff --git a/platforms/windows/CMakeLists.txt b/platforms/windows/CMakeLists.txt
+index 1b787b8..070463e 100644
+--- a/platforms/windows/CMakeLists.txt
++++ b/platforms/windows/CMakeLists.txt
+@@ -29,6 +29,7 @@ set(SOURCES
+   "livescript.cc"
+   "../plv8.cc"
+   "../plv8_func.cc"
++  "../plv8_guc.cc"
+   "../plv8_param.cc"
+   "../plv8_type.cc")
+ 
+diff --git a/plv8.cc b/plv8.cc
+index 843da9c..986f23c 100644
+--- a/plv8.cc
++++ b/plv8.cc
+@@ -29,6 +29,7 @@ extern "C" {
+ #include "miscadmin.h"
+ #include "utils/builtins.h"
+ #include "utils/guc.h"
++#include "utils/guc_tables.h"
+ #include "utils/memutils.h"
+ #include "utils/lsyscache.h"
+ #include "utils/rel.h"
+@@ -349,82 +350,125 @@ _PG_init(void)
+ 	hash_ctl.hash = oid_hash;
+ 	plv8_proc_cache_hash = hash_create("PLv8 Procedures", 32,
+ 									   &hash_ctl, HASH_ELEM | HASH_FUNCTION);
+-
+-	DefineCustomStringVariable("plv8.start_proc",
+-							   gettext_noop("PLV8 function to run once when PLV8 is first used."),
+-							   NULL,
+-							   &plv8_start_proc,
+-							   NULL,
+-							   PGC_USERSET, 0,
++	config_generic *guc_value;
++
++#define START_PROC_VAR "plv8.start_proc"
++    guc_value = plv8_find_option(START_PROC_VAR);
++    if (guc_value != NULL) {
++        plv8_start_proc = plv8_string_option(guc_value);
++    } else {
++        DefineCustomStringVariable(START_PROC_VAR,
++                                   gettext_noop("PLV8 function to run once when PLV8 is first used."),
++                                   NULL,
++                                   &plv8_start_proc,
++                                   NULL,
++                                   PGC_USERSET, 0,
+ #if PG_VERSION_NUM >= 90100
+-							   NULL,
++                                   NULL,
+ #endif
+-							   NULL,
+-							   NULL);
+-
+-	DefineCustomStringVariable("plv8.icu_data",
+-							   gettext_noop("ICU data file directory."),
+-							   NULL,
+-							   &plv8_icu_data,
+-							   NULL,
+-							   PGC_USERSET, 0,
++                                   NULL,
++                                   NULL);
++    }
++#undef START_PROC_VAR
++
++#define ICU_DATA_VAR "plv8.icu_data"
++    guc_value = plv8_find_option(ICU_DATA_VAR);
++    if (guc_value != NULL) {
++        plv8_start_proc = plv8_string_option(guc_value);
++    } else {
++        DefineCustomStringVariable(ICU_DATA_VAR,
++                                   gettext_noop("ICU data file directory."),
++                                   NULL,
++                                   &plv8_icu_data,
++                                   NULL,
++                                   PGC_USERSET, 0,
+ #if PG_VERSION_NUM >= 90100
+-							   NULL,
++                                   NULL,
+ #endif
+-							   NULL,
+-							   NULL);
+-
+-	DefineCustomStringVariable("plv8.v8_flags",
+-							   gettext_noop("V8 engine initialization flags (e.g. --harmony for all current harmony features)."),
+-							   NULL,
+-							   &plv8_v8_flags,
+-							   NULL,
+-							   PGC_USERSET, 0,
++                                   NULL,
++                                   NULL);
++    }
++#undef ICU_DATA_VAR
++
++#define V8_FLAGS_VAR "plv8.v8_flags"
++    guc_value = plv8_find_option(V8_FLAGS_VAR);
++    if (guc_value != NULL) {
++        plv8_start_proc = plv8_string_option(guc_value);
++    } else {
++        DefineCustomStringVariable(V8_FLAGS_VAR,
++                                   gettext_noop("V8 engine initialization flags (e.g. --harmony for all current harmony features)."),
++                                   NULL,
++                                   &plv8_v8_flags,
++                                   NULL,
++                                   PGC_USERSET, 0,
+ #if PG_VERSION_NUM >= 90100
+-							   NULL,
++                                   NULL,
+ #endif
+-							   NULL,
+-							   NULL);
+-
+-	DefineCustomIntVariable("plv8.debugger_port",
+-							gettext_noop("V8 remote debug port."),
+-							gettext_noop("The default value is 35432.  "
+-										 "This is effective only if PLV8 is built with ENABLE_DEBUGGER_SUPPORT."),
+-							&plv8_debugger_port,
+-							35432, 0, 65536,
+-							PGC_USERSET, 0,
++                                   NULL,
++                                   NULL);
++    }
++#undef V8_FLAGS_VAR
++
++#define DEBUGGER_PORT_VAR "plv8.debugger_port"
++    guc_value = plv8_find_option(DEBUGGER_PORT_VAR);
++    if (guc_value != NULL) {
++        plv8_debugger_port = plv8_int_option(guc_value);
++    } else {
++        DefineCustomIntVariable(DEBUGGER_PORT_VAR,
++                                gettext_noop("V8 remote debug port."),
++                                gettext_noop("The default value is 35432.  "
++                                             "This is effective only if PLV8 is built with ENABLE_DEBUGGER_SUPPORT."),
++                                &plv8_debugger_port,
++                                35432, 0, 65536,
++                                PGC_USERSET, 0,
+ #if PG_VERSION_NUM >= 90100
+-							NULL,
++                                NULL,
+ #endif
+-							NULL,
+-							NULL);
++                                NULL,
++                                NULL);
++    }
++#undef DEBUGGER_PORT_VAR
+ 
+ #ifdef EXECUTION_TIMEOUT
+-	DefineCustomIntVariable("plv8.execution_timeout",
+-							gettext_noop("V8 execution timeout."),
+-							gettext_noop("The default value is 300 seconds.  "
+-										 "This allows you to override the default execution timeout."),
+-							&plv8_execution_timeout,
+-							300, 1, 65536,
+-							PGC_USERSET, 0,
++#define EXECUTION_TIMEOUT_VAR "plv8.execution_timeout"
++	guc_value = plv8_find_option(EXECUTION_TIMEOUT_VAR);
++	if (guc_value != NULL) {
++		plv8_execution_timeout = plv8_int_option(guc_value);
++	} else {
++        DefineCustomIntVariable(EXECUTION_TIMEOUT_VAR,
++                                gettext_noop("V8 execution timeout."),
++                                gettext_noop("The default value is 300 seconds.  "
++                                             "This allows you to override the default execution timeout."),
++                                &plv8_execution_timeout,
++                                300, 1, 65536,
++                                PGC_USERSET, 0,
+ #if PG_VERSION_NUM >= 90100
+-							NULL,
++                                NULL,
+ #endif
+-							NULL,
+-							NULL);
++                                NULL,
++                                NULL);
++    }
++#undef EXECUTION_TIMEOUT_VAR
+ #endif
+ 
+-	DefineCustomIntVariable("plv8.memory_limit",
+-							gettext_noop("Per-isolate memory limit in MBytes"),
+-							gettext_noop("The default value is 256 MB"),
+-							(int*)&plv8_memory_limit,
+-							256, 256, 3096, // hardcoded v8 limits for isolates
+-							PGC_SUSET, 0,
++#define MEMORY_LIMIT_VAR "plv8.memory_limit"
++    guc_value = plv8_find_option(MEMORY_LIMIT_VAR);
++    if (guc_value != NULL) {
++        plv8_memory_limit = plv8_int_option(guc_value);
++    } else {
++        DefineCustomIntVariable(MEMORY_LIMIT_VAR,
++                                gettext_noop("Per-isolate memory limit in MBytes"),
++                                gettext_noop("The default value is 256 MB"),
++                                (int *) &plv8_memory_limit,
++                                256, 256, 3096, // hardcoded v8 limits for isolates
++                                PGC_SUSET, 0,
+ #if PG_VERSION_NUM >= 90100
+-							NULL,
++                                NULL,
+ #endif
+-							NULL,
+-							NULL);
++                                NULL,
++                                NULL);
++    }
++#undef MEMORY_LIMIT_VAR
+ 
+ 	RegisterXactCallback(plv8_xact_cb, NULL);
+ 
+diff --git a/plv8.h b/plv8.h
+index 8fd1d66..ab12642 100644
+--- a/plv8.h
++++ b/plv8.h
+@@ -306,4 +306,8 @@ extern void HandleUnhandledPromiseRejections();
+ 
+ extern void GetMemoryInfo(v8::Local<v8::Object> obj);
+ 
++extern struct config_generic *plv8_find_option(const char *name);
++char *plv8_string_option(struct config_generic * record);
++int plv8_int_option(struct config_generic * record);
++
+ #endif	// _PLV8_
+diff --git a/plv8_guc.cc b/plv8_guc.cc
+new file mode 100644
+index 0000000..93b4daa
+--- /dev/null
++++ b/plv8_guc.cc
+@@ -0,0 +1,138 @@
++/*
++ * This code was copied from postgres:src/backend/utils/misc/guc.c (with some changes)
++ * because public postgresql headers do not expose it for some reason
++ * there is GetConfigOptionName(), GetConfigOption(), GetConfigOptionFlags()
++ * unfortunately none of these answer a simple question: does GUC variable exist?
++ * and all of them fail hard if not provided with "missing_ok = true"
++ */
++
++#include "plv8.h"
++
++extern "C" {
++#include "utils/guc.h"
++#include "utils/guc_tables.h"
++}
++
++/*
++ * To allow continued support of obsolete names for GUC variables, we apply
++ * the following mappings to any unrecognized name.  Note that an old name
++ * should be mapped to a new one only if the new variable has very similar
++ * semantics to the old.
++ */
++static const char *const map_old_guc_names[] = {
++		/* The format is
++ 		 * "old_name", "new_name",
++ 		 */
++		NULL
++};
++
++static int plv8_guc_name_compare(const char *, const char *);
++static int plv8_guc_var_compare(const void *, const void *);
++
++char *
++plv8_string_option(struct config_generic *record) {
++	if (record->vartype != PGC_STRING)
++		elog(ERROR, "'%s' is not a string", record->name);
++
++	auto *conf = (struct config_string *) record;
++	if (*conf->variable && **conf->variable)
++		return *conf->variable;
++	return pstrdup("");
++}
++
++int
++plv8_int_option(struct config_generic *record) {
++	if (record->vartype != PGC_INT)
++		elog(ERROR, "'%s' is not an int", record->name);
++
++	auto *conf = (struct config_int *) record;
++	return *conf->variable;
++}
++
++/*
++ * Look up option NAME.  If it exists, return a pointer to its record,
++ * else return NULL.
++ */
++struct config_generic *
++plv8_find_option(const char *name)
++{
++	const char **key = &name;
++	struct config_generic **res;
++	int			i;
++
++	/*
++	 * By equating const char ** with struct config_generic *, we are assuming
++	 * the name field is first in config_generic.
++	 */
++	res = (struct config_generic **) bsearch((void *) &key,
++											 (void *) get_guc_variables(),
++											 GetNumConfigOptions(),
++											 sizeof(struct config_generic *),
++											 plv8_guc_var_compare);
++	/*
++	 * Return NULL for placeholders,
++	 * these can be safely overwritten by DefineCustomTYPEVariable() functions
++	 */
++	if (res) {
++		if ((*res)->flags & GUC_CUSTOM_PLACEHOLDER)
++			return NULL;
++		return *res;
++	}
++
++	/*
++	 * See if the name is an obsolete name for a variable.  We assume that the
++	 * set of supported old names is short enough that a brute-force search is
++	 * the best way.
++	 */
++	for (i = 0; map_old_guc_names[i] != NULL; i += 2)
++	{
++		if (plv8_guc_name_compare(name, map_old_guc_names[i]) == 0)
++			return plv8_find_option(map_old_guc_names[i + 1]);
++	}
++
++	/* Unknown name */
++	return NULL;
++}
++
++
++/*
++ * comparator for qsorting and bsearching guc_variables array
++ */
++static int
++plv8_guc_var_compare(const void *a, const void *b)
++{
++	const struct config_generic *confa = *(struct config_generic *const *) a;
++	const struct config_generic *confb = *(struct config_generic *const *) b;
++
++	return plv8_guc_name_compare(confa->name, confb->name);
++}
++
++/*
++ * the bare comparison function for GUC names
++ */
++static int
++plv8_guc_name_compare(const char *namea, const char *nameb)
++{
++	/*
++	 * The temptation to use strcasecmp() here must be resisted, because the
++	 * array ordering has to remain stable across setlocale() calls. So, build
++	 * our own with a simple ASCII-only downcasing.
++	 */
++	while (*namea && *nameb)
++	{
++		char		cha = *namea++;
++		char		chb = *nameb++;
++
++		if (cha >= 'A' && cha <= 'Z')
++			cha += 'a' - 'A';
++		if (chb >= 'A' && chb <= 'Z')
++			chb += 'a' - 'A';
++		if (cha != chb)
++			return cha - chb;
++	}
++	if (*namea)
++		return 1;				/* a is longer */
++	if (*nameb)
++		return -1;				/* b is longer */
++	return 0;
++}
+-- 
+2.49.0
+

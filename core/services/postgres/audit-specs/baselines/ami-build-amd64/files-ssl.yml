@@ -1,0 +1,30 @@
+# File baseline: ssl
+# SSL certificate and key directories for AMI build
+# Uses string names for owner/group (not numeric IDs)
+file:
+  # System SSL directory
+  /etc/ssl:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+  /etc/ssl/certs:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+  /etc/ssl/private:
+    exists: true
+    filetype: directory
+    owner: root
+    group: postgres
+    mode: '0750'
+  /etc/ssl/openssl.cnf:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+  # Note: /etc/ssl/adminapi is created at deploy time, not during AMI build

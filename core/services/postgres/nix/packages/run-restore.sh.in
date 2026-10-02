@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# shellcheck shell=bash
+
+set -euo pipefail
+
+# Function to display help message
+show_help() {
+    echo "Usage: nix run .#pg-restore -- [OPTIONS]"
+    echo
+    echo "Run pg_restore with the specified parameters."
+    echo
+    echo "Options:"
+    echo "  --version     PostgreSQL version (currently only 15 is supported)"
+    echo "  --dbname      Name of the database to restore to"
+    echo "  --host        Host of the database server"
+    echo "  --user        Database user to connect as"
+    echo "  --file        Path to the file to restore from (absolute or relative to current directory)"
+    echo "  --port        Port number (default: 5432)"
+    echo "  -h, --help    Show this help message and exit"
+    echo "Example:"
+    echo "nix run .#pg-restore --  --version 15 --dbname postgres --host localhost --user postgres --port 5435 --file my.dump"
+}
+
+# Initialize variables
+PG_VERSION=""
+DBNAME=""
+DBHOST=""
+DBUSER=""
+RESTORE_FILE=""
+PORT="5432"
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --version)
+            PG_VERSION="$2"
+            shift 2
+            ;;
+        --dbname)
+            DBNAME="$2"
+            shift 2
+            ;;
+        --host)
+            DBHOST="$2"
+            shift 2
+            ;;
+        --user)
+            DBUSER="$2"
+            shift 2
+            ;;
+        --file)
+            RESTORE_FILE="$2"
+            shift 2
+            ;;
+        --port)
+            PORT="$2"
+            shift 2
+            ;;
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1"
+            show_help
+            exit 1
+            ;;
+    esac
+done
+
+# Check if all required arguments are provided
+if [ -z "$PG_VERSION" ] || [ -z "$DBNAME" ] || [ -z "$DBHOST" ] || [ -z "$DBUSER" ] || [ -z "$RESTORE_FILE" ]; then
+    echo "Error: Missing required arguments."
+    show_help
+    exit 1
+fi
+
+if [ "$PG_VERSION" == "15" ]; then
+    echo "Starting restore for PSQL 15"
+    PSQL15=@PSQL15_BINDIR@
+    PSQL_BINDIR="$PSQL15"
+else
+    echo "Error: Please provide a valid Postgres version (currently only 15 is supported)"
+    show_help
+    exit 1
+fi
+
+# Convert RESTORE_FILE to an absolute path if it's relative
+if [[ "$RESTORE_FILE" != /* ]]; then
+    RESTORE_FILE="$(pwd)/$RESTORE_FILE"
+fi
+
+# Check if the file exists
+if [ ! -f "$RESTORE_FILE" ]; then
+    echo "Error: Restore file '$RESTORE_FILE' does not exist."
+    exit 1
+fi
+
+echo "Using restore file: $RESTORE_FILE"
+
+# Run pg_restore and capture its exit status
+"$PSQL_BINDIR/bin/pg_restore" \
+    -h "$DBHOST" \
+    -p "$PORT" \
+    -U "$DBUSER" \
+    -d "$DBNAME" \
+    -v \
+    --no-owner \
+    --no-acl \
+    "$RESTORE_FILE"
+
+RESTORE_STATUS=$?
+
+# Check the exit status of pg_restore
+if [ $RESTORE_STATUS -eq 0 ]; then
+    echo "Restore completed successfully."
+    exit 0
+else
+    echo "Restore failed with exit code $RESTORE_STATUS."
+    exit $RESTORE_STATUS
+fi

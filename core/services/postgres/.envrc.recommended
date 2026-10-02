@@ -1,0 +1,3 @@
+watch_file nix/devShells.nix
+
+use flake

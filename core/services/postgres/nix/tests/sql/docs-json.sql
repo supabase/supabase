@@ -1,0 +1,47 @@
+-- testing sql found in https://supabase.com/docs/guides/database/json
+
+create table books (
+  id serial primary key,
+  title text,
+  author text,
+  metadata jsonb
+);
+
+insert into books
+  (title, author, metadata)
+values
+  (
+    'The Poky Little Puppy',
+    'Janette Sebring Lowrey',
+    '{"description":"Puppy is slower than other, bigger animals.","price":5.95,"ages":[3,6]}'
+  ),
+  (
+    'The Tale of Peter Rabbit',
+    'Beatrix Potter',
+    '{"description":"Rabbit eats some vegetables.","price":4.49,"ages":[2,5]}'
+  ),
+  (
+    'Tootle',
+    'Gertrude Crampton',
+    '{"description":"Little toy train has big dreams.","price":3.99,"ages":[2,5]}'
+  ),
+  (
+    'Green Eggs and Ham',
+    'Dr. Seuss',
+    '{"description":"Sam has changing food preferences and eats unusually colored food.","price":7.49,"ages":[4,8]}'
+  ),
+  (
+    'Harry Potter and the Goblet of Fire',
+    'J.K. Rowling',
+    '{"description":"Fourth year of school starts, big drama ensues.","price":24.95,"ages":[10,99]}'
+  );
+
+select
+  title,
+  metadata ->> 'description' as description, -- returned as text
+  metadata -> 'price' as price,
+  metadata -> 'ages' -> 0 as low_age,
+  metadata -> 'ages' -> 1 as high_age
+from books;
+
+drop table books cascade;

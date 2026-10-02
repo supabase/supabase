@@ -1,0 +1,164 @@
+From 6a14bd4cf44ebfa86404aa3e0b3f12dcac3f160c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Roche?= <jfroche@pyxel.be>
+Date: Thu, 12 Jun 2025 17:26:02 +0200
+Subject: [PATCH] bump pgrx to 0.11.3
+
+Backport https://github.com/supabase/wrappers/pull/254
+---
+ Cargo.lock                   | 36 +++++++++++++++---------------------
+ supabase-wrappers/Cargo.toml |  4 ++--
+ wrappers/Cargo.toml          |  4 ++--
+ 3 files changed, 19 insertions(+), 25 deletions(-)
+
+diff --git a/Cargo.lock b/Cargo.lock
+index 7c6b6b2..a3ba635 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -759,16 +759,16 @@ checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
+ 
+ [[package]]
+ name = "bindgen"
+-version = "0.68.1"
++version = "0.69.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "726e4313eb6ec35d2730258ad4e15b547ee75d6afaa1361a922e78e59b7d8078"
++checksum = "a00dc851838a2120612785d195287475a3ac45514741da670b735818822129a0"
+ dependencies = [
+  "bitflags 2.4.0",
+  "cexpr",
+  "clang-sys",
++ "itertools",
+  "lazy_static",
+  "lazycell",
+- "peeking_take_while",
+  "proc-macro2",
+  "quote",
+  "regex",
+@@ -2815,12 +2815,6 @@ dependencies = [
+  "libc",
+ ]
+ 
+-[[package]]
+-name = "peeking_take_while"
+-version = "0.1.2"
+-source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "19b17cddbe7ec3f8bc800887bab5e717348c95ea2ca0b1bf0837fb964dc67099"
+-
+ [[package]]
+ name = "percent-encoding"
+ version = "2.3.0"
+@@ -2849,9 +2843,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "pgrx"
+-version = "0.11.2"
++version = "0.11.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "cb44171122605250e719ca2ae49afb357bdb2fce4b3c876fcf2225165237328a"
++checksum = "2102faa5ef4a7bf096fefcf67692b293583efd18f9236340ad3169807dfc2b73"
+ dependencies = [
+  "atomic-traits",
+  "bitflags 2.4.0",
+@@ -2874,9 +2868,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "pgrx-macros"
+-version = "0.11.2"
++version = "0.11.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "a18ac8628b7de2f29a93d0abdbdcaee95a0e0ef4b59fd4de99cc117e166e843b"
++checksum = "c26810d09910ec987a6708d48d243efb5f879331e01c6fec0893714d0eb12bae"
+ dependencies = [
+  "pgrx-sql-entity-graph",
+  "proc-macro2",
+@@ -2886,9 +2880,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "pgrx-pg-config"
+-version = "0.11.2"
++version = "0.11.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "acd45ac6eb1142c5690df63c4e0bdfb74f27c9f93a7af84f064dc2c0a2c2d6f7"
++checksum = "0b0099ba4b635dfe1e34afc8bca8be43e9577c5d726aaf1dc7dd23a78f6c8a60"
+ dependencies = [
+  "cargo_toml",
+  "dirs",
+@@ -2904,9 +2898,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "pgrx-pg-sys"
+-version = "0.11.2"
++version = "0.11.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "81c6207939582934fc26fceb651cb5338e363c06ddc6b2d50ca71867f7c70ffe"
++checksum = "3f40315259c41fede51eb23b791b48d0a112b0f47d0dcb6862b798d1fa1db6ea"
+ dependencies = [
+  "bindgen",
+  "clang-sys",
+@@ -2928,9 +2922,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "pgrx-sql-entity-graph"
+-version = "0.11.2"
++version = "0.11.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "a50083de83b1fac2484e8f2c2a7da5fed0193904e2578fa6c4ce02262c455c2b"
++checksum = "7d47a4e991c8c66162c5d6b0fc2bd382e43a58fc893ce05a6a15ddcb1bf7eee4"
+ dependencies = [
+  "convert_case",
+  "eyre",
+@@ -2943,9 +2937,9 @@ dependencies = [
+ 
+ [[package]]
+ name = "pgrx-tests"
+-version = "0.11.2"
++version = "0.11.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "6ba0115cd80d9e3ca1d5d2a8ab8b7320d6ed614a53d025b86152696a8b3caa75"
++checksum = "ab3abc01e2bb930b072bd660d04c8eaa69a29d4727d5b2a641f946c603c1605e"
+ dependencies = [
+  "clap-cargo",
+  "eyre",
+diff --git a/supabase-wrappers/Cargo.toml b/supabase-wrappers/Cargo.toml
+index a825fea..be66f25 100644
+--- a/supabase-wrappers/Cargo.toml
++++ b/supabase-wrappers/Cargo.toml
+@@ -19,14 +19,14 @@ pg16 = ["pgrx/pg16", "pgrx-tests/pg16"]
+ pg_test = []
+ 
+ [dependencies]
+-pgrx = { version = "=0.11.2", default-features = false }
++pgrx = { version = "=0.11.3", default-features = false }
+ thiserror = "1.0.48"
+ tokio = { version = "1.35", features = ["rt", "net"] }
+ uuid = { version = "1.2.2" }
+ supabase-wrappers-macros = { version = "0.1", path = "../supabase-wrappers-macros" }
+ 
+ [dev-dependencies]
+-pgrx-tests = "=0.11.2"
++pgrx-tests = "=0.11.3"
+ 
+ [package.metadata.docs.rs]
+ features = ["pg15", "cshim"]
+diff --git a/wrappers/Cargo.toml b/wrappers/Cargo.toml
+index a6dd573..6f63519 100644
+--- a/wrappers/Cargo.toml
++++ b/wrappers/Cargo.toml
+@@ -134,7 +134,7 @@ all_fdws = [
+ ]
+ 
+ [dependencies]
+-pgrx = { version = "=0.11.2" }
++pgrx = { version = "=0.11.3" }
+ #supabase-wrappers = "0.1"
+ supabase-wrappers = { path = "../supabase-wrappers", default-features = false }
+ 
+@@ -204,4 +204,4 @@ redis = { version = "0.24.0", features = ["streams"], optional = true }
+ thiserror = { version = "1.0.48", optional = true }
+ 
+ [dev-dependencies]
+-pgrx-tests = "=0.11.2"
++pgrx-tests = "=0.11.3"
+-- 
+2.49.0
+

@@ -1,0 +1,4 @@
+# excluding these since running debug.sh will download the files locally
+pg_upgrade_bin*.tar.gz
+pg_upgrade_scripts*.tar.gz
+pg_upgrade_scripts/

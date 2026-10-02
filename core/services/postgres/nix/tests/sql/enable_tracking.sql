@@ -1,0 +1,5 @@
+alter role postgres set track_functions = 'pl';
+alter role postgres set track_io_timing = on;
+
+alter role postgres reset track_functions;
+alter role postgres reset track_io_timing;

@@ -1,0 +1,117 @@
+name: Docker Image Test
+
+on:
+  workflow_call:
+    secrets:
+      DEV_AWS_ROLE:
+        required: true
+      NIX_SIGN_SECRET_KEY:
+        required: true
+  workflow_dispatch:
+    inputs:
+      dockerfile:
+        description: 'Specific Dockerfile to test (leave empty for all)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  check-changes:
+    name: skippable
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      input_hash: ${{ steps.check.outputs.input_hash }}
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Check Docker image changes
+        id: check
+        uses: ./.github/actions/check-docker-image-changes
+        with:
+          event_name: ${{ github.event_name }}
+          base_ref: ${{ github.base_ref }}
+
+  docker-image-test:
+    name: Test ${{ matrix.name }}
+    needs: check-changes
+    if: needs.check-changes.outputs.should_run == 'true'
+    runs-on: large-linux-arm
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { dockerfile: Dockerfile-15,          target: "",                  name: 15                      }
+          - { dockerfile: Dockerfile-17,          target: "",                  name: 17                      }
+          - { dockerfile: Dockerfile-orioledb-17, target: "",                  name: orioledb-17             }
+          - { dockerfile: Dockerfile-multigres,   target: variant-17,          name: multigres-17            }
+          - { dockerfile: Dockerfile-multigres,   target: variant-orioledb-17, name: multigres-orioledb-17   }
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Create Docker context
+        run: docker context create builders
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+        with:
+          endpoint: builders
+
+      - name: Build Docker image
+        run: |
+          echo "Building ${{ matrix.name }}..."
+          TARGET_ARG=""
+          if [ -n "${{ matrix.target }}" ]; then
+            TARGET_ARG="--target ${{ matrix.target }}"
+          fi
+          docker build -f "${{ matrix.dockerfile }}" $TARGET_ARG \
+            -t "pg-docker-test:${{ matrix.name }}" \
+            -t "supabase-postgres:${{ matrix.name }}-analyze" \
+            .
+
+      - name: Run image size analysis
+        if: ${{ matrix.target == '' }}
+        run: |
+          echo "=== Image Size Analysis for ${{ matrix.name }} ==="
+          nix run --accept-flake-config .#image-size-analyzer -- --image Dockerfile-${{ matrix.name }} --no-build
+
+      - name: Run Docker image tests
+        if: ${{ matrix.target == '' }}
+        run: |
+          echo "=== Running tests for ${{ matrix.name }} ==="
+          nix run --accept-flake-config .#docker-image-test -- --no-build Dockerfile-${{ matrix.name }}
+
+      - name: Run multigres Docker image tests
+        if: ${{ matrix.target != '' }}
+        run: |
+          echo "=== Running tests for ${{ matrix.name }} ==="
+          nix run --accept-flake-config .#docker-image-test -- --no-build --target ${{ matrix.target }} ${{ matrix.dockerfile }}
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          CONTAINER_NAME=$(docker ps -a --filter "name=pg-test-${{ matrix.name }}" --format "{{.Names}}" | head -1)
+          if [[ -n "$CONTAINER_NAME" ]]; then
+            echo "=== Container logs for $CONTAINER_NAME ==="
+            docker logs "$CONTAINER_NAME" 2>&1 || true
+          fi
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker ps -a --filter "name=pg-test-${{ matrix.name }}" -q | xargs -r docker rm -f || true
+          docker rmi "pg-docker-test:${{ matrix.name }}" || true
+          docker rmi "supabase-postgres:${{ matrix.name }}-analyze" || true

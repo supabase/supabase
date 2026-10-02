@@ -1,0 +1,185 @@
+-- testing sql found in https://supabase.com/docs/guides/database/postgresenums
+create type mood as enum (
+  'happy',
+  'sad',
+  'excited',
+  'calm'
+);
+create table person (
+  id serial primary key,
+  name text,
+  current_mood mood
+);
+insert into person
+  (name, current_mood)
+values
+  ('Alice', 'happy');
+insert into person
+  (name, current_mood)
+values
+  ('Bob', 'sad');
+insert into person
+  (name, current_mood)
+values
+  ('Charlie', 'excited');
+select * 
+from person 
+where current_mood = 'sad';
+ id | name | current_mood 
+----+------+--------------
+  2 | Bob  | sad
+(1 row)
+
+select * 
+from person 
+where current_mood = 'happy';
+ id | name  | current_mood 
+----+-------+--------------
+  1 | Alice | happy
+(1 row)
+
+update person
+set current_mood = 'excited'
+where name = 'Alice';
+select * 
+from person 
+where name = 'Alice';
+ id | name  | current_mood 
+----+-------+--------------
+  1 | Alice | excited
+(1 row)
+
+alter type mood add value 'content';
+insert into person
+  (name, current_mood)
+values
+  ('David', 'content');
+select enum_range(null::mood);
+            enum_range            
+----------------------------------
+ {happy,sad,excited,calm,content}
+(1 row)
+
+select * 
+from person 
+where current_mood = 'content';
+ id | name  | current_mood 
+----+-------+--------------
+  4 | David | content
+(1 row)
+
+create type status as enum (
+  'active',
+  'inactive',
+  'pending'
+);
+create table orders (
+  id serial primary key,
+  order_number text,
+  status status
+);
+insert into orders
+  (order_number, status)
+values
+  ('ORD-001', 'active'),
+  ('ORD-002', 'pending'),
+  ('ORD-003', 'inactive');
+select * 
+from orders 
+where status = 'active';
+ id | order_number | status 
+----+--------------+--------
+  1 | ORD-001      | active
+(1 row)
+
+update orders
+set status = 'inactive'
+where order_number = 'ORD-002';
+select * 
+from orders 
+where order_number = 'ORD-002';
+ id | order_number |  status  
+----+--------------+----------
+  2 | ORD-002      | inactive
+(1 row)
+
+alter type status add value 'cancelled';
+insert into orders
+  (order_number, status)
+values
+  ('ORD-004', 'cancelled');
+select enum_range(null::status);
+             enum_range              
+-------------------------------------
+ {active,inactive,pending,cancelled}
+(1 row)
+
+select * 
+from orders 
+where status = 'cancelled';
+ id | order_number |  status   
+----+--------------+-----------
+  4 | ORD-004      | cancelled
+(1 row)
+
+create type priority as enum (
+  'low',
+  'medium',
+  'high',
+  'critical'
+);
+create table tasks (
+  id serial primary key,
+  title text,
+  priority priority
+);
+insert into tasks
+  (title, priority)
+values
+  ('Fix bug', 'high'),
+  ('Update docs', 'low'),
+  ('Security audit', 'critical');
+select * 
+from tasks 
+where priority = 'critical';
+ id |     title      | priority 
+----+----------------+----------
+  3 | Security audit | critical
+(1 row)
+
+update tasks
+set priority = 'medium'
+where title = 'Update docs';
+select * 
+from tasks 
+where title = 'Update docs';
+ id |    title    | priority 
+----+-------------+----------
+  2 | Update docs | medium
+(1 row)
+
+alter type priority add value 'urgent';
+insert into tasks
+  (title, priority)
+values
+  ('Server maintenance', 'urgent');
+select enum_range(null::priority);
+            enum_range             
+-----------------------------------
+ {low,medium,high,critical,urgent}
+(1 row)
+
+select * 
+from tasks 
+where priority = 'urgent';
+ id |       title        | priority 
+----+--------------------+----------
+  4 | Server maintenance | urgent
+(1 row)
+
+drop table tasks;
+drop table orders;
+drop table person;
+drop type priority;
+drop type status;
+drop type mood;

@@ -1,0 +1,27 @@
+-- CVE-2026-6471: logical decoding could load any library named as an output
+-- plugin. PG 15.19 / 17.11 add the "output_plugin_libraries" allowlist GUC;
+-- only libraries named there may be used as output plugins.
+--
+-- Upstream commit: (PG 15.19) / (PG 17.11), fixed 2026-08-13.
+--
+-- This pins the allowlist enforcement, independent of the exact allowlist value:
+--   * an allowlisted, always-shipped plugin (test_decoding) can back a slot;
+--   * a non-allowlisted library is rejected at slot-creation time.
+-- The image's own allowlist additionally includes wal2json (Realtime); that
+-- positive case is covered by wal2json.sql. Requires wal_level = logical, which
+-- the image config sets.
+--
+-- Refs: PSQL-1110, PSQL-1234.
+
+BEGIN;
+
+-- 1) Allowlisted plugin: slot creation succeeds, then clean up.
+SELECT slot_name FROM pg_create_logical_replication_slot('opl_ok', 'test_decoding');
+SELECT pg_drop_replication_slot('opl_ok');
+
+-- 2) Non-allowlisted library: slot creation must be rejected.
+SAVEPOINT s_bad;
+SELECT pg_create_logical_replication_slot('opl_bad', 'nonesuch_plugin');
+ROLLBACK TO SAVEPOINT s_bad;
+
+ROLLBACK;

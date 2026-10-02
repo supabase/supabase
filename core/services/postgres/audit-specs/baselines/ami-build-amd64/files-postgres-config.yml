@@ -1,0 +1,97 @@
+# File baseline: postgres-config
+# PostgreSQL configuration files for AMI build
+# Uses string names for owner/group (not numeric IDs)
+file:
+  # Main PostgreSQL config directory
+  /etc/postgresql:
+    exists: true
+    filetype: directory
+    owner: postgres
+    group: postgres
+    mode: '0775'
+  /etc/postgresql/postgresql.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+  /etc/postgresql/pg_hba.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: postgres
+    mode: '0664'
+  /etc/postgresql/pg_ident.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: postgres
+    mode: '0644'
+  /etc/postgresql/logging.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: postgres
+    mode: '0644'
+
+  # Custom PostgreSQL config directory
+  /etc/postgresql-custom:
+    exists: true
+    filetype: directory
+    owner: postgres
+    group: postgres
+    mode: '0775'
+  # Note: platform-defaults.conf, pgsodium_root.key, custom-overrides.conf, and
+  # generated-optimizations.conf are created at deploy time (not during AMI build)
+  /etc/postgresql-custom/supautils.conf:
+    exists: true
+    filetype: file
+    owner: postgres
+    group: postgres
+    mode: '0664'
+  /etc/postgresql-custom/conf.d:
+    exists: true
+    filetype: directory
+    owner: postgres
+    group: postgres
+    mode: '0775'
+  /etc/postgresql-custom/wal-g.conf:
+    exists: true
+    filetype: file
+    owner: postgres
+    group: postgres
+    mode: '0664'
+  /etc/postgresql-custom/read-replica.conf:
+    exists: true
+    filetype: file
+    owner: postgres
+    group: postgres
+    mode: '0664'
+
+  # Extension custom scripts directory
+  /etc/postgresql-custom/extension-custom-scripts:
+    exists: true
+    filetype: directory
+    owner: postgres
+    group: postgres
+    mode: '0775'
+  /etc/postgresql-custom/extension-custom-scripts/before-create.sql:
+    exists: true
+    filetype: file
+    owner: postgres
+    group: postgres
+    mode: '0775'
+
+  # PostgREST config directory
+  /etc/postgrest:
+    exists: true
+    filetype: directory
+    owner: postgrest
+    group: postgrest
+    mode: '0775'
+  /etc/postgrest/base.conf:
+    exists: true
+    filetype: file
+    owner: postgrest
+    group: postgrest
+    mode: '0644'

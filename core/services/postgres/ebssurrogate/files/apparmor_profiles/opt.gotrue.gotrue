@@ -1,0 +1,15 @@
+#include <tunables/global>
+
+/opt/gotrue/gotrue {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/ssl_keys>
+
+  /opt/gotrue/gotrue r,
+  /opt/gotrue/migrations/ r,
+  /etc/ssl/certs/java/* r,
+  /opt/gotrue/migrations/** rw,
+  /proc/sys/net/core/somaxconn r,
+  /sys/kernel/mm/transparent_hugepage/hpage_pmd_size r,
+  owner /etc/gotrue.env r,
+}

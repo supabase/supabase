@@ -1,0 +1,34 @@
+- name: nftables overrides
+  file:
+    state: directory
+    path: /etc/nftables
+    owner: adminapi
+
+- name: nftables empty config
+  file:
+    state: touch
+    path: /etc/nftables/supabase_managed.conf
+    owner: adminapi
+
+- name: include managed config
+  shell: |
+    cat >> "/etc/nftables.conf" << EOF
+    table inet supabase_managed { }
+    include "/etc/nftables/supabase_managed.conf";
+
+    EOF
+
+- name: ufw overrides dir
+  file:
+    state: directory
+    path: /etc/systemd/system/ufw.service.d
+    owner: root
+
+- name: Custom systemd overrides
+  copy:
+    src: files/ufw.service.conf
+    dest: /etc/systemd/system/ufw.service.d/overrides.conf
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes

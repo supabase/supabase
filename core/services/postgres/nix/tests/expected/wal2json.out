@@ -1,0 +1,43 @@
+create schema v;
+create table v.foo(
+  id int primary key
+);
+select
+  1
+from
+  pg_create_logical_replication_slot('reg_test', 'wal2json', false);
+ ?column? 
+----------
+        1
+(1 row)
+
+insert into v.foo(id) values (1);
+select
+  data
+from
+  pg_logical_slot_get_changes(
+	'reg_test',
+    null,
+    null,
+	'include-pk', 'true',
+	'include-transaction', 'false',
+	'include-timestamp', 'false',
+	'include-type-oids', 'true',
+	'format-version', '2',
+	'actions', 'insert,update,delete',
+	'add-tables', 'v.foo'
+  ) x;
+                                                                              data                                                                              
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"action":"I","schema":"v","table":"foo","columns":[{"name":"id","type":"integer","typeoid":23,"value":1}],"pk":[{"name":"id","type":"integer","typeoid":23}]}
+(1 row)
+
+select
+  pg_drop_replication_slot('reg_test');
+ pg_drop_replication_slot 
+--------------------------
+ 
+(1 row)
+
+drop schema v cascade;
+NOTICE:  drop cascades to table v.foo

@@ -1,0 +1,11 @@
+--- a/src/backend/commands/collationcmds.c
++++ b/src/backend/commands/collationcmds.c
+@@ -611,7 +611,7 @@ pg_import_system_collations(PG_FUNCTION_ARGS)
+ 		aliases = (CollAliasData *) palloc(maxaliases * sizeof(CollAliasData));
+ 		naliases = 0;
+ 
+-		locale_a_handle = OpenPipeStream("locale -a", "r");
++		locale_a_handle = OpenPipeStream("@locale@ -a", "r");
+ 		if (locale_a_handle == NULL)
+ 			ereport(ERROR,
+ 					(errcode_for_file_access(),

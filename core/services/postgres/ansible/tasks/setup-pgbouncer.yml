@@ -1,0 +1,119 @@
+# PgBouncer
+- name: Create pgbouncer group
+  ansible.builtin.group:
+    name: pgbouncer
+    gid: 1003
+    state: 'present'
+
+- name: Create pgbouncer user
+  ansible.builtin.user:
+    name: 'pgbouncer'
+    uid: "{{ 1000 if not qemu else 1001 }}"
+    comment: 'PgBouncer user'
+    group: pgbouncer
+    groups: 'postgres,ssl-cert'
+    shell: '/usr/sbin/nologin'
+    state: 'present'
+
+- name: Install PgBouncer from nix binary cache
+  when: stage2
+  ansible.builtin.shell:
+    cmd: sudo -u pgbouncer bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix profile install github:supabase/postgres/{{ git_commit_sha }}#pgbouncer"
+  become: true
+
+- name: Link PgBouncer into /usr/local/bin
+  when: stage2
+  ansible.builtin.file:
+    dest: '/usr/local/bin/pgbouncer'
+    force: true
+    src: '/home/pgbouncer/.nix-profile/bin/pgbouncer'
+    state: 'link'
+  become: true
+
+- name: Create PgBouncer directories if they do not exist
+  ansible.builtin.file:
+    group: 'pgbouncer'
+    mode: "{{ pgbouncer_dir_item['mode'] }}"
+    owner: 'pgbouncer'
+    path: "{{ pgbouncer_dir_item['dir'] }}"
+    state: 'directory'
+  loop_control:
+    loop_var: 'pgbouncer_dir_item'
+  with_items:
+    - { mode: '0700', dir: '/etc/pgbouncer' }
+    - { mode: '0775', dir: '/etc/pgbouncer-custom' }
+
+- name: create PgBouncer placeholder config files
+  when: not stage2
+  ansible.builtin.file:
+    group: 'pgbouncer'
+    mode: '0664'
+    owner: 'pgbouncer'
+    path: "/etc/pgbouncer-custom/{{ pgbouncer_config_item }}"
+    state: 'touch'
+  loop_control:
+    loop_var: 'pgbouncer_config_item'
+  with_items:
+    - 'custom-overrides.ini'
+    - 'generated-optimizations.ini'
+    - 'ssl-config.ini'
+
+- name: PgBouncer - adjust pgbouncer.ini
+  ansible.builtin.copy:
+    dest: '/etc/pgbouncer/pgbouncer.ini'
+    mode: '0700'
+    owner: 'pgbouncer'
+    src: 'files/pgbouncer_config/pgbouncer.ini.j2'
+
+- name: PgBouncer - create a userlist file if it does not exist
+  ansible.builtin.file:
+    mode: '0700'
+    owner: 'pgbouncer'
+    path: '/etc/pgbouncer/userlist.txt'
+    state: 'touch'
+      
+- name: import /etc/tmpfiles.d/pgbouncer.conf
+  ansible.builtin.template:
+    dest: '/etc/tmpfiles.d/pgbouncer.conf'
+    src: 'files/pgbouncer_config/tmpfiles.d-pgbouncer.conf.j2'
+  become: true
+
+- name: PgBouncer - By default allow ssl connections.
+  ansible.builtin.lineinfile:
+    line: 'client_tls_sslmode = allow'
+    path: '/etc/pgbouncer-custom/ssl-config.ini'
+  become: true
+
+- name: Grant pg_hba and pgbouncer grp perm for adminapi updates
+  ansible.builtin.file:
+    mode: '0664'
+    path: "{{ pgbouncer_group_item }}"
+  loop:
+    - /etc/pgbouncer-custom/ssl-config.ini
+    - /etc/postgresql/pg_hba.conf
+  loop_control:
+    loop_var: 'pgbouncer_group_item'
+
+# Add fail2ban filter
+- name: import jail.d/pgbouncer.conf
+  ansible.builtin.template:
+    dest: '/etc/fail2ban/jail.d/pgbouncer.conf'
+    src: 'files/fail2ban_config/jail-pgbouncer.conf.j2'
+  become: true
+
+- name: import filter.d/pgbouncer.conf
+  ansible.builtin.template:
+    dest: '/etc/fail2ban/filter.d/pgbouncer.conf'
+    src: 'files/fail2ban_config/filter-pgbouncer.conf.j2'
+  become: true
+
+# Add systemd file for PgBouncer
+- name: PgBouncer - import pgbouncer.service
+  ansible.builtin.template:
+    dest: '/etc/systemd/system/pgbouncer.service'
+    src: 'files/pgbouncer_config/pgbouncer.service.j2'
+  become: true
+
+- name: PgBouncer - reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true

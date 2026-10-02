@@ -1,0 +1,77 @@
+# File baseline: security
+# Critical security-related files for AMI build
+# Uses string names for owner/group (not numeric IDs)
+file:
+  # fail2ban configuration directory
+  /etc/fail2ban:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+  /etc/fail2ban/jail.local:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+
+  # AppArmor
+  /etc/apparmor.d:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+  # UFW firewall
+  /etc/ufw:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+  /etc/ufw/ufw.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+
+  # SSH configuration
+  /etc/ssh/sshd_config:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'
+
+  # PAM configuration
+  /etc/pam.d:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+  # Sudoers
+  /etc/sudoers:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0440'
+  /etc/sudoers.d:
+    exists: true
+    filetype: directory
+    owner: root
+    group: root
+    mode: '0750'
+
+  # Security limits
+  /etc/security/limits.conf:
+    exists: true
+    filetype: file
+    owner: root
+    group: root
+    mode: '0644'

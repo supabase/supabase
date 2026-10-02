@@ -1,0 +1,34 @@
+name: Release Migrations - Staging
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  release-migrations-staging:
+    runs-on: blacksmith-2vcpu-ubuntu-2404-arm
+    timeout-minutes: 15
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+      - name: Merging migration files
+        run: cat $(ls -1) > ../migration-output.sql
+        working-directory: ${{ github.workspace }}/migrations/db/migrations
+
+      - name: configure aws credentials - staging
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: "ap-southeast-1"
+
+      - name: Deploy to S3 staging
+        shell: bash
+        run: aws s3 sync migrations/db s3://$AWS_S3_BUCKET/migrations/db --delete
+        env:
+          AWS_S3_BUCKET: ${{ secrets.PG_INIT_SCRIPT_S3_BUCKET_STAGING }}

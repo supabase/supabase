@@ -1,0 +1,24 @@
+[Unit]
+Description=AdminAPI
+Requires=network-online.target
+After=network-online.target
+
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+Type=simple
+ExecStart=/opt/supabase-admin-api
+User=adminapi
+Restart=always
+RestartSec=3
+TimeoutStopSec=10
+Environment="AWS_USE_DUALSTACK_ENDPOINT=true"
+{% if qemu %}
+Environment="AWS_SDK_LOAD_CONFIG=true"
+{% endif %}
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

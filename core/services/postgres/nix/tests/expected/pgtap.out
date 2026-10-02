@@ -1,0 +1,21 @@
+begin;
+select plan(1);
+ plan 
+------
+ 1..1
+(1 row)
+
+-- Run the tests.
+select pass( 'My test passed, w00t!' );
+             pass             
+------------------------------
+ ok 1 - My test passed, w00t!
+(1 row)
+
+-- Finish the tests and clean up.
+select * from finish();
+ finish 
+--------
+(0 rows)
+
+rollback;

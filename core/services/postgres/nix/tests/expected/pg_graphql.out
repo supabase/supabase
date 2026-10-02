@@ -1,0 +1,259 @@
+begin;
+    comment on schema public is '@graphql({"inflect_names": true})';
+    create table account(
+        id serial primary key,
+        email varchar(255) not null,
+        priority int,
+        status text default 'active'
+    );
+    create table blog(
+        id serial primary key,
+        owner_id integer not null references account(id)
+    );
+    comment on table blog is e'@graphql({"totalCount": {"enabled": true}})';
+    -- Make sure functions still work
+    create function _echo_email(account)
+        returns text
+        language sql
+    as $$ select $1.email $$;
+    /*
+        Literals
+    */
+    select graphql.resolve($$
+    mutation {
+      insertIntoAccountCollection(objects: [
+        { email: "foo@barsley.com", priority: 1 },
+        { email: "bar@foosworth.com" }
+      ]) {
+        affectedCount
+        records {
+          id
+          status
+          echoEmail
+          blogCollection {
+            totalCount
+          }
+        }
+      }
+    }
+    $$);
+                                                                                                                                        resolve                                                                                                                                         
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ {"data": {"insertIntoAccountCollection": {"records": [{"id": 1, "status": "active", "echoEmail": "foo@barsley.com", "blogCollection": {"totalCount": 0}}, {"id": 2, "status": "active", "echoEmail": "bar@foosworth.com", "blogCollection": {"totalCount": 0}}], "affectedCount": 2}}}
+(1 row)
+
+    select graphql.resolve($$
+    mutation {
+      insertIntoBlogCollection(objects: [{
+        ownerId: 1
+      }]) {
+        records {
+          id
+          owner {
+            id
+          }
+        }
+      }
+    }
+    $$);
+                                       resolve                                        
+--------------------------------------------------------------------------------------
+ {"data": {"insertIntoBlogCollection": {"records": [{"id": 1, "owner": {"id": 1}}]}}}
+(1 row)
+
+    -- Override a default on status with null
+    select graphql.resolve($$
+    mutation {
+      insertIntoAccountCollection(objects: [
+        { email: "baz@baz.com", status: null },
+      ]) {
+        affectedCount
+        records {
+          email
+          status
+        }
+      }
+    }
+    $$);
+                                                        resolve                                                         
+------------------------------------------------------------------------------------------------------------------------
+ {"data": {"insertIntoAccountCollection": {"records": [{"email": "baz@baz.com", "status": null}], "affectedCount": 1}}}
+(1 row)
+
+    /*
+        Variables
+    */
+    select graphql.resolve($$
+    mutation newAccount($emailAddress: String) {
+       xyz: insertIntoAccountCollection(objects: [
+        { email: $emailAddress },
+        { email: "other@email.com" }
+       ]) {
+        affectedCount
+        records {
+          id
+          email
+        }
+      }
+    }
+    $$,
+    variables := '{"emailAddress": "foo@bar.com"}'::jsonb
+    );
+                                                            resolve                                                             
+--------------------------------------------------------------------------------------------------------------------------------
+ {"data": {"xyz": {"records": [{"id": 4, "email": "foo@bar.com"}, {"id": 5, "email": "other@email.com"}], "affectedCount": 2}}}
+(1 row)
+
+    -- Variable override of default with null results in null
+    select graphql.resolve($$
+    mutation newAccount($status: String) {
+       xyz: insertIntoAccountCollection(objects: [
+        { email: "1@email.com", status: $status}
+       ]) {
+        affectedCount
+        records {
+          email
+          status
+        }
+      }
+    }
+    $$,
+    variables := '{"status": null}'::jsonb
+    );
+                                            resolve                                             
+------------------------------------------------------------------------------------------------
+ {"data": {"xyz": {"records": [{"email": "1@email.com", "status": null}], "affectedCount": 1}}}
+(1 row)
+
+    -- Skipping variable override of default results in default
+    select graphql.resolve($$
+    mutation newAccount($status: String) {
+       xyz: insertIntoAccountCollection(objects: [
+        { email: "x@y.com", status: $status},
+       ]) {
+        affectedCount
+        records {
+          email
+          status
+        }
+      }
+    }
+    $$,
+    variables := '{}'::jsonb
+    );
+                                            resolve                                             
+------------------------------------------------------------------------------------------------
+ {"data": {"xyz": {"records": [{"email": "x@y.com", "status": "active"}], "affectedCount": 1}}}
+(1 row)
+
+    select graphql.resolve($$
+    mutation newAccount($acc: AccountInsertInput!) {
+       insertIntoAccountCollection(objects: [$acc]) {
+        affectedCount
+        records {
+          id
+          email
+        }
+      }
+    }
+    $$,
+    variables := '{"acc": {"email": "bar@foo.com"}}'::jsonb
+    );
+                                                     resolve                                                     
+-----------------------------------------------------------------------------------------------------------------
+ {"data": {"insertIntoAccountCollection": {"records": [{"id": 8, "email": "bar@foo.com"}], "affectedCount": 1}}}
+(1 row)
+
+    select graphql.resolve($$
+    mutation newAccounts($acc: [AccountInsertInput!]!) {
+       insertIntoAccountCollection(objects: $accs) {
+        affectedCount
+        records {
+          id
+          email
+        }
+      }
+    }
+    $$,
+    variables := '{"accs": [{"email": "bar@foo.com"}]}'::jsonb
+    );
+                                                     resolve                                                     
+-----------------------------------------------------------------------------------------------------------------
+ {"data": {"insertIntoAccountCollection": {"records": [{"id": 9, "email": "bar@foo.com"}], "affectedCount": 1}}}
+(1 row)
+
+    -- Single object coerces to a list
+    select graphql.resolve($$
+    mutation {
+      insertIntoBlogCollection(objects: {ownerId: 1}) {
+        affectedCount
+      }
+    }
+    $$);
+                           resolve                            
+--------------------------------------------------------------
+ {"data": {"insertIntoBlogCollection": {"affectedCount": 1}}}
+(1 row)
+
+    /*
+        Errors
+    */
+    -- Field does not exist
+    select graphql.resolve($$
+    mutation createAccount($acc: AccountInsertInput) {
+       insertIntoAccountCollection(objects: [$acc]) {
+        affectedCount
+        records {
+          id
+          email
+        }
+      }
+    }
+    $$,
+    variables := '{"acc": {"doesNotExist": "other"}}'::jsonb
+    );
+                                                       resolve                                                       
+---------------------------------------------------------------------------------------------------------------------
+ {"data": null, "errors": [{"message": "Input for type AccountInsertInput contains extra keys [\"doesNotExist\"]"}]}
+(1 row)
+
+    -- Wrong input type (list of string, not list of object)
+    select graphql.resolve($$
+    mutation {
+      insertIntoBlogCollection(objects: ["not an object"]) {
+        affectedCount
+      }
+    }
+    $$);
+                                      resolve                                      
+-----------------------------------------------------------------------------------
+ {"data": null, "errors": [{"message": "Invalid input for BlogInsertInput type"}]}
+(1 row)
+
+    -- objects argument is missing
+    select graphql.resolve($$
+    mutation {
+      insertIntoBlogCollection {
+        affectedCount
+      }
+    }
+    $$);
+                                  resolve                                  
+---------------------------------------------------------------------------
+ {"data": null, "errors": [{"message": "Invalid input for NonNull type"}]}
+(1 row)
+
+    -- Empty call
+    select graphql.resolve($$
+    mutation {
+      insertIntoBlogCollection(objects: []) {
+        affectedCount
+      }
+    }
+    $$);
+                                          resolve                                           
+--------------------------------------------------------------------------------------------
+ {"data": null, "errors": [{"message": "At least one record must be provided to objects"}]}
+(1 row)
+
+rollback;

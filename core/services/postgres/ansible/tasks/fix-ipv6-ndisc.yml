@@ -1,0 +1,30 @@
+---
+- name: fix Network - systemd timer and service file
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/systemd-networkd-check-and-fix.{{ network_item }}"
+    group: 'root'
+    mode: '0644'
+    owner: 'root'
+    src: "files/systemd-networkd/systemd-networkd-check-and-fix.{{ network_item }}"
+  loop:
+    - service
+    - timer
+  loop_control:
+    loop_var: 'network_item'
+
+- name: fix Network - detect script
+  ansible.builtin.copy:
+    dest: '/usr/local/bin/systemd-networkd-check-and-fix.sh'
+    src: 'files/systemd-networkd/systemd-networkd-check-and-fix.sh'
+    owner: 'root'
+    group: 'root'
+    mode: '0700'
+
+- name: fix Network - reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: false
+
+- name: fix Network - ensure systemd timer is installed but disabled
+  ansible.builtin.systemd_service:
+    name: 'systemd-networkd-check-and-fix.timer'
+    enabled: false

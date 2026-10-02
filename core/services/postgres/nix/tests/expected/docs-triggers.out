@@ -1,0 +1,217 @@
+-- testing sql found in https://supabase.com/docs/guides/database/postgres/triggers
+create table employees (
+  id serial primary key,
+  name text,
+  salary numeric
+);
+create table salary_log (
+  id serial primary key,
+  employee_id integer,
+  old_salary numeric,
+  new_salary numeric,
+  created_at timestamp default now()
+);
+create function update_salary_log()
+returns trigger
+language plpgsql
+as $$
+begin
+  insert into salary_log(employee_id, old_salary, new_salary)
+  values (new.id, old.salary, new.salary);
+  return new;
+end;
+$$;
+create trigger salary_update_trigger
+after update on employees
+for each row
+execute function update_salary_log();
+insert into employees (name, salary) values ('John Doe', 50000);
+insert into employees (name, salary) values ('Jane Smith', 60000);
+update employees set salary = 55000 where name = 'John Doe';
+select id, employee_id, old_salary, new_salary from salary_log;
+ id | employee_id | old_salary | new_salary 
+----+-------------+------------+------------
+  1 |           1 |      50000 |      55000
+(1 row)
+
+create table orders (
+  id serial primary key,
+  customer_id integer,
+  amount numeric,
+  status text
+);
+create table customers (
+  id serial primary key,
+  name text,
+  email text
+);
+create function before_insert_function()
+returns trigger
+language plpgsql
+as $$
+begin
+  if new.amount <= 0 then
+    raise exception 'Order amount must be greater than 0';
+  end if;
+  return new;
+end;
+$$;
+create trigger before_insert_trigger
+before insert on orders
+for each row
+execute function before_insert_function();
+create table customer_audit (
+  id serial primary key,
+  customer_id integer,
+  action text,
+  customer_name text,
+  deleted_at timestamp default now()
+);
+create function after_delete_function()
+returns trigger
+language plpgsql
+as $$
+begin
+  insert into customer_audit(customer_id, action, customer_name)
+  values (old.id, 'DELETE', old.name);
+  return old;
+end;
+$$;
+create trigger after_delete_trigger
+after delete on customers
+for each row
+execute function after_delete_function();
+insert into customers (name, email) values ('Alice Johnson', 'alice@example.com');
+insert into customers (name, email) values ('Bob Wilson', 'bob@example.com');
+insert into orders (customer_id, amount, status) values (1, 100.50, 'pending');
+insert into orders (customer_id, amount, status) values (2, 250.75, 'pending');
+delete from customers where name = 'Alice Johnson';
+select id, customer_id, action, customer_name from customer_audit;
+ id | customer_id | action | customer_name 
+----+-------------+--------+---------------
+  1 |           1 | DELETE | Alice Johnson
+(1 row)
+
+create table trigger_events (
+  id serial primary key,
+  trigger_name text,
+  operation text,
+  table_name text,
+  event_time timestamp default now()
+);
+create function statement_level_function()
+returns trigger
+language plpgsql
+as $$
+begin
+  insert into trigger_events(trigger_name, operation, table_name)
+  values (tg_name, tg_op, tg_table_name);
+  return null;
+end;
+$$;
+create trigger statement_level_trigger
+after insert on orders
+for each statement
+execute function statement_level_function();
+insert into orders (customer_id, amount, status) values (2, 150.25, 'pending');
+select id, trigger_name, operation, table_name from trigger_events;
+ id |      trigger_name       | operation | table_name 
+----+-------------------------+-----------+------------
+  1 | statement_level_trigger | INSERT    | orders
+(1 row)
+
+create table trigger_variables_log (
+  id serial primary key,
+  trigger_name text,
+  trigger_when text,
+  operation text,
+  table_name text,
+  table_schema text,
+  row_id integer,
+  event_time timestamp default now()
+);
+create function trigger_variables_example()
+returns trigger
+language plpgsql
+as $$
+begin
+  if tg_op = 'INSERT' then
+    insert into trigger_variables_log(trigger_name, trigger_when, operation, table_name, table_schema, row_id)
+    values (tg_name, tg_when, tg_op, tg_table_name, tg_table_schema, new.id);
+  elsif tg_op = 'UPDATE' then
+    insert into trigger_variables_log(trigger_name, trigger_when, operation, table_name, table_schema, row_id)
+    values (tg_name, tg_when, tg_op, tg_table_name, tg_table_schema, new.id);
+  elsif tg_op = 'DELETE' then
+    insert into trigger_variables_log(trigger_name, trigger_when, operation, table_name, table_schema, row_id)
+    values (tg_name, tg_when, tg_op, tg_table_name, tg_table_schema, old.id);
+  end if;
+  
+  return coalesce(new, old);
+end;
+$$;
+create trigger variables_trigger
+after insert or update or delete on employees
+for each row
+execute function trigger_variables_example();
+insert into employees (name, salary) values ('Charlie Brown', 45000);
+update employees set salary = 47000 where name = 'Charlie Brown';
+delete from employees where name = 'Charlie Brown';
+select id, trigger_name, trigger_when, operation, table_name, table_schema, row_id from trigger_variables_log;
+ id |   trigger_name    | trigger_when | operation | table_name | table_schema | row_id 
+----+-------------------+--------------+-----------+------------+--------------+--------
+  1 | variables_trigger | AFTER        | INSERT    | employees  | public       |      3
+  2 | variables_trigger | AFTER        | UPDATE    | employees  | public       |      3
+  3 | variables_trigger | AFTER        | DELETE    | employees  | public       |      3
+(3 rows)
+
+create table high_salary_alerts (
+  id serial primary key,
+  employee_name text,
+  salary numeric,
+  alert_time timestamp default now()
+);
+create function conditional_trigger_function()
+returns trigger
+language plpgsql
+as $$
+begin
+  if new.salary > 100000 then
+    insert into high_salary_alerts(employee_name, salary)
+    values (new.name, new.salary);
+  end if;
+  return new;
+end;
+$$;
+create trigger conditional_trigger
+after insert or update on employees
+for each row
+when (new.salary > 100000)
+execute function conditional_trigger_function();
+insert into employees (name, salary) values ('Executive', 150000);
+insert into employees (name, salary) values ('Intern', 30000);
+select id, employee_name, salary from high_salary_alerts;
+ id | employee_name | salary 
+----+---------------+--------
+  1 | Executive     | 150000
+(1 row)
+
+drop trigger conditional_trigger on employees;
+drop trigger variables_trigger on employees;
+drop trigger statement_level_trigger on orders;
+drop trigger after_delete_trigger on customers;
+drop trigger before_insert_trigger on orders;
+drop trigger salary_update_trigger on employees;
+drop function conditional_trigger_function();
+drop function trigger_variables_example();
+drop function statement_level_function();
+drop function after_delete_function();
+drop function before_insert_function();
+drop function update_salary_log();
+drop table high_salary_alerts;
+drop table trigger_variables_log;
+drop table trigger_events;
+drop table customer_audit;
+drop table salary_log;
+drop table employees;
+drop table orders;
+drop table customers;

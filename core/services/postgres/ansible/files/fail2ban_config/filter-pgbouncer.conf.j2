@@ -1,0 +1,8 @@
+[Init]
+maxlines = 3
+
+[Definition]
+failregex = ^.+@<HOST>:.+password authentication failed$
+            ^.+@<HOST>:.+pooler error: no such user$
+            ^.+@<HOST>:.+registered new auto-database.*\n.*\n.*server login failed: FATAL database ".+" does not exist.*$
+journalmatch = _SYSTEMD_UNIT=pgbouncer.service

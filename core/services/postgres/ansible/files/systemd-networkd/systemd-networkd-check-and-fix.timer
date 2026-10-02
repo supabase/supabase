@@ -1,0 +1,9 @@
+[Unit]
+Description=Check if systemd-networkd has broken NDisc routes and fix
+
+[Timer]
+# NOTE: cadence must match that of the journalctl search (--since). Risk of repeat matches and restart loop
+OnCalendar=minutely
+
+[Install]
+WantedBy=timers.target

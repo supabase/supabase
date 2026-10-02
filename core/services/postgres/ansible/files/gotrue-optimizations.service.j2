@@ -1,0 +1,12 @@
+[Unit]
+Description=GoTrue (Auth) optimizations
+
+[Service]
+Type=oneshot
+# we don't want failures from this command to cause PG startup to fail
+ExecStart=/bin/bash -c "/opt/supabase-admin-api optimize auth --destination-config-file-path /etc/gotrue/gotrue.generated.env ; exit 0"
+ExecStartPost=/bin/bash -c "cp -a /etc/gotrue/gotrue.generated.env /etc/auth.d/20_generated.env ; exit 0"
+User=postgrest
+
+[Install]
+WantedBy=multi-user.target

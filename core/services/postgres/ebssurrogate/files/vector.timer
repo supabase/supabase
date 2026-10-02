@@ -1,0 +1,9 @@
+[Unit]
+Description= Defer running the vector.service 60secs after boot up
+
+[Timer]
+OnBootSec=60s
+Unit=vector.service
+
+[Install]
+WantedBy=multi-user.target

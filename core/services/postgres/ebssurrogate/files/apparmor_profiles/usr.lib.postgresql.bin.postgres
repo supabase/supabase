@@ -1,0 +1,55 @@
+#include <tunables/global>
+
+profile /usr/lib/postgresql/bin/postgres flags=(attach_disconnected) {
+#include <abstractions/base>
+#include <abstractions/bash>
+#include <abstractions/consoles>
+#include <abstractions/nameservice>
+#include <abstractions/openssl>
+#include <abstractions/ssl_keys>
+#include <abstractions/user-tmp>
+
+capability dac_override,
+capability dac_read_search,
+
+deny @{HOME}/** rwx,
+
+/data/pgdata/** r,
+/dev/shm rw,
+/etc/java-11-openjdk/logging.properties r,
+/etc/java-11-openjdk/security/default.policy r,
+/etc/java-11-openjdk/security/java.policy r,
+/etc/java-11-openjdk/security/java.security r,
+/etc/mecabrc r,
+/etc/postgresql-custom/** r,
+/etc/postgresql/** r,
+/etc/timezone r,
+/etc/wal-g/config.json r,
+/run/systemd/notify rw,
+/usr/bin/cat rix,
+/usr/bin/dash rix,
+/usr/bin/mknod rix,
+/usr/bin/admin-mgr Ux,
+/usr/lib/postgresql/bin/* mrix,
+/usr/local/bin/wal-g rix,
+/usr/local/lib/groonga/plugins/tokenizers/mecab.so mr,
+/usr/local/lib/libSFCGAL.so.* mr,
+/usr/local/lib/libgroonga.so.* mr,
+/usr/local/pgsql/etc/pljava.policy r,
+/usr/share/postgresql/** r,
+/var/lib/mecab/** r,
+/var/lib/postgresql/** rwl,
+/var/log/postgresql/** rw,
+/var/log/wal-g/** w,
+/var/run/systemd/notify rw,
+/{,var/}run/postgresql/** rw,
+owner /data/pgdata/ r,
+owner /data/pgdata/** rwl,
+owner /data/pgdata/pgroonga.log k,
+owner /dev/shm/ rw,
+owner /dev/shm/PostgreSQL.* rw,
+owner /sys/kernel/mm/transparent_hugepage/hpage_pmd_size r,
+owner /var/log/wal-g/** rw,
+owner @{PROC}/[0-9]*/oom_adj rw,
+
+}

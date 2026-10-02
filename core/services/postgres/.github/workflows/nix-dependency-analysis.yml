@@ -1,0 +1,130 @@
+name: Nix Dependency Analysis
+
+on:
+  pull_request:
+    paths:
+      - "flake.lock"
+      - "flake.nix"
+      - "nix/**"
+      - "ci/**"
+      - ".github/workflows/nix-dependency-analysis.yml"
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to analyze"
+        required: false
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write # For AWS OIDC (Nix cache)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dependency-analysis:
+    name: Package Dependency Analysis
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
+    steps:
+      - name: Checkout repository
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Install Nix
+        uses: ./.github/actions/nix-install-ephemeral
+        with:
+          push-to-cache: "false"
+        env:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          NIX_SIGN_SECRET_KEY: ${{ secrets.NIX_SIGN_SECRET_KEY }}
+
+      - name: Run dependency analysis
+        id: dep-analysis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_URL="${{ github.event.pull_request.html_url || format('https://github.com/{0}/pull/{1}', github.repository, github.event.inputs.pr_number) }}"
+          echo "Analyzing PR: $PR_URL"
+          ./ci/postgresql-diff.sh "$PR_URL"
+
+          # Read the generated markdown file
+          MARKDOWN_FILE=$(find . -maxdepth 1 -name "postgresql-diff-pr-*.md" -type f | head -1)
+          if [ -n "$MARKDOWN_FILE" ]; then
+            echo "markdown_file=$MARKDOWN_FILE" >> "$GITHUB_OUTPUT"
+            echo "Generated file: $MARKDOWN_FILE"
+          else
+            echo "Error: No markdown file generated"
+            exit 1
+          fi
+
+      - name: Find existing dependency comment
+        uses: peter-evans/find-comment@v3
+        id: fc-dep
+        if: github.event_name == 'pull_request'
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- dependency-diff-analysis -->"
+
+      - name: Create or update dependency comment
+        uses: peter-evans/create-or-update-comment@v4
+        if: github.event_name == 'pull_request'
+        with:
+          comment-id: ${{ steps.fc-dep.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: ${{ steps.dep-analysis.outputs.markdown_file }}
+          edit-mode: replace
+
+  extension-analysis:
+    name: Extension Dependency Analysis
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Checkout repository
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Install Nix
+        uses: ./.github/actions/nix-install-ephemeral
+        with:
+          push-to-cache: "false"
+        env:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          NIX_SIGN_SECRET_KEY: ${{ secrets.NIX_SIGN_SECRET_KEY }}
+
+      - name: Run extension analysis
+        id: ext-analysis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_URL="${{ github.event.pull_request.html_url || format('https://github.com/{0}/pull/{1}', github.repository, github.event.inputs.pr_number) }}"
+          echo "Analyzing PR: $PR_URL"
+          ./ci/extensions-diff.sh "$PR_URL"
+
+          # Read the generated markdown file
+          MARKDOWN_FILE=$(find . -maxdepth 1 -name "extensions-diff-pr-*.md" -type f | head -1)
+          if [ -n "$MARKDOWN_FILE" ]; then
+            echo "markdown_file=$MARKDOWN_FILE" >> "$GITHUB_OUTPUT"
+            echo "Generated file: $MARKDOWN_FILE"
+          else
+            echo "Error: No markdown file generated"
+            exit 1
+          fi
+
+      - name: Find existing extension comment
+        uses: peter-evans/find-comment@v3
+        id: fc-ext
+        if: github.event_name == 'pull_request'
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- extension-diff-analysis -->"
+
+      - name: Create or update extension comment
+        uses: peter-evans/create-or-update-comment@v4
+        if: github.event_name == 'pull_request'
+        with:
+          comment-id: ${{ steps.fc-ext.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: ${{ steps.ext-analysis.outputs.markdown_file }}
+          edit-mode: replace

@@ -1,0 +1,21 @@
+[Unit]
+Description=PostgREST
+Requires=postgrest-optimizations.service
+After=postgrest-optimizations.service
+
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+Type=simple
+# We allow the base config (sent from the worker) to override the generated config
+ExecStartPre=/etc/postgrest/merge.sh /etc/postgrest/generated.conf /etc/postgrest/base.conf
+ExecStart=/opt/postgrest /etc/postgrest/merged.conf
+User=postgrest
+Slice=services.slice
+Restart=always
+RestartSec=3
+LimitNOFILE=100000
+
+[Install]
+WantedBy=multi-user.target

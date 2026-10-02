@@ -1,0 +1,35 @@
+create schema v;
+create table v.t1(
+  a int,
+  b int
+);
+create or replace function v.f1()
+  returns void
+  language plpgsql
+as $$
+declare r record;
+begin
+  for r in select * from v.t1
+  loop
+    raise notice '%', r.c; -- there is bug - table t1 missing "c" column
+  end loop;
+end;
+$$;
+select * from v.f1();
+ f1 
+----
+ 
+(1 row)
+
+-- use plpgsql_check_function to check the function for errors
+select * from plpgsql_check_function('v.f1()');
+             plpgsql_check_function              
+-------------------------------------------------
+ error:42703:6:RAISE:record "r" has no field "c"
+ Context: SQL expression "r.c"
+(2 rows)
+
+drop schema v cascade;
+NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to table v.t1
+drop cascades to function v.f1()

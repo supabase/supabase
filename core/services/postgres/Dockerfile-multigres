@@ -1,0 +1,317 @@
+# syntax=docker/dockerfile:1.6
+# Multigres PostgreSQL 17 variants — vanilla and OrioleDB
+#
+# Build targets:
+#   docker build -f Dockerfile-multigres --target variant-17 -t multigres-17 .
+#   docker build -f Dockerfile-multigres --target variant-orioledb-17 -t multigres-orioledb-17 .
+
+####################
+# Stage 0: Nix base — shared Alpine + Nix setup for all builders
+####################
+FROM alpine:3.23 AS nix-base
+
+RUN apk add --no-cache \
+    bash \
+    coreutils \
+    curl \
+    shadow \
+    sudo \
+    xz
+
+RUN addgroup -S postgres && \
+    adduser -S -h /var/lib/postgresql -s /bin/bash -G postgres postgres && \
+    addgroup -S wal-g && \
+    adduser -S -s /bin/bash -G wal-g wal-g
+
+RUN cat <<EOF > /tmp/extra-nix.conf
+extra-experimental-features = nix-command flakes
+extra-substituters = https://nix-postgres-artifacts.s3.amazonaws.com
+extra-trusted-public-keys = nix-postgres-artifacts:dGZlQOvKcNEjvT7QEAJbcV6b6uk7VF/hWMjhYleiaLI=
+EOF
+RUN curl -L https://releases.nixos.org/nix/nix-2.34.6/install | sh -s -- --daemon --no-channel-add --yes --nix-extra-conf-file /tmp/extra-nix.conf
+ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
+RUN nix --version
+
+WORKDIR /nixpg
+COPY . .
+
+####################
+# Stage 1a: Nix builder — PostgreSQL 17
+####################
+FROM nix-base AS nix-builder-17
+
+RUN nix profile add path:.#psql_17_slim/bin path:.#pg-backrest path:.#pg-activity path:.#pgctld
+
+RUN nix store gc
+
+RUN nix profile add path:.#supabase-groonga && \
+    mkdir -p /tmp/groonga-plugins && \
+    cp -r /nix/var/nix/profiles/default/lib/groonga/plugins /tmp/groonga-plugins/
+
+RUN nix store gc
+
+####################
+# Stage 1b: Nix builder — OrioleDB 17
+####################
+FROM nix-base AS nix-builder-orioledb-17
+
+RUN nix profile add path:.#psql_orioledb-17_slim/bin path:.#pg-backrest path:.#pg-activity path:.#pgctld
+
+RUN nix store gc
+
+RUN nix profile add path:.#supabase-groonga && \
+    mkdir -p /tmp/groonga-plugins && \
+    cp -r /nix/var/nix/profiles/default/lib/groonga/plugins /tmp/groonga-plugins/
+
+RUN nix store gc
+
+####################
+# Stage 2: Gosu builder
+####################
+FROM alpine:3.23 AS gosu-builder
+
+ARG TARGETARCH
+ARG GOSU_VERSION=1.19
+ARG GO_VERSION=1.26.1
+
+RUN apk add --no-cache curl git
+
+# Install Go
+RUN curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${TARGETARCH}.tar.gz" | tar -C /usr/local -xz
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# Build gosu from source
+RUN git clone --depth 1 --branch "${GOSU_VERSION}" https://github.com/tianon/gosu.git /gosu && \
+    cd /gosu && \
+    CGO_ENABLED=0 go build -ldflags="-s -w" -o /usr/local/bin/gosu . && \
+    chmod +x /usr/local/bin/gosu
+
+####################
+# Stage 3: Shared base — runtime Alpine + config + migrations
+# Both variants inherit from this stage. No /nix dependency here.
+####################
+FROM alpine:3.23 AS base
+
+RUN apk add --no-cache \
+    bash \
+    curl \
+    openssh \
+    procps \
+    shadow \
+    su-exec \
+    tzdata \
+    musl-locales \
+    musl-locales-lang \
+    && rm -rf /var/cache/apk/*
+
+RUN addgroup -S postgres && \
+    adduser -S -G postgres -h /var/lib/postgresql -s /bin/bash postgres && \
+    addgroup -S wal-g && \
+    adduser -S -G wal-g -s /bin/bash wal-g && \
+    adduser postgres wal-g
+
+RUN mkdir -p \
+    /usr/lib/postgresql/bin \
+    /usr/lib/postgresql/share/postgresql \
+    /usr/share/postgresql \
+    /var/lib/postgresql/data \
+    /var/log/postgresql \
+    /var/run/postgresql \
+    /etc/postgresql \
+    /etc/postgresql-custom \
+    && chown -R postgres:postgres \
+        /usr/lib/postgresql \
+        /var/lib/postgresql \
+        /usr/share/postgresql \
+        /var/log/postgresql \
+        /var/run/postgresql \
+        /etc/postgresql \
+        /etc/postgresql-custom
+
+COPY --chown=postgres:postgres ansible/files/postgresql_config/postgresql.conf.j2 /etc/postgresql/postgresql.conf
+COPY --chown=postgres:postgres ansible/files/postgresql_config/pg_hba.conf.j2 /etc/postgresql/pg_hba.conf
+COPY --chown=postgres:postgres ansible/files/postgresql_config/pg_ident.conf.j2 /etc/postgresql/pg_ident.conf
+COPY --chown=postgres:postgres ansible/files/postgresql_config/conf.d /etc/postgresql-custom/conf.d
+COPY --chown=postgres:postgres ansible/files/postgresql_config/postgresql-jsonlog.conf /etc/postgresql/logging.conf
+COPY --chown=postgres:postgres ansible/files/postgresql_config/supautils.conf.j2 /etc/postgresql-custom/supautils.conf
+COPY --chown=postgres:postgres ansible/files/postgresql_extension_custom_scripts /etc/postgresql-custom/extension-custom-scripts
+COPY --chown=postgres:postgres ansible/files/postgresql_config/custom_walg.conf /etc/postgresql-custom/wal-g.conf
+COPY --chown=postgres:postgres ansible/files/postgresql_config/custom_read_replica.conf /etc/postgresql-custom/read-replica.conf
+COPY --chown=postgres:postgres ansible/files/pgsodium_getkey_urandom.sh.j2 /usr/lib/postgresql/bin/pgsodium_getkey.sh
+
+# Apply settings shared by all variants:
+#   - enable unix socket, session preload, config includes
+#   - strip timescaledb and pgsodium (absent from all pg17 builds)
+#   - comment out db_user_namespace (not supported in pg17)
+RUN sed -i \
+    -e "s|#unix_socket_directories = '/tmp'|unix_socket_directories = '/var/run/postgresql'|g" \
+    -e "s|#session_preload_libraries = ''|session_preload_libraries = 'supautils'|g" \
+    -e "s|#include = '/etc/postgresql-custom/supautils.conf'|include = '/etc/postgresql-custom/supautils.conf'|g" \
+    # skip wal-g - unused by multigres
+    # -e "s|#include = '/etc/postgresql-custom/wal-g.conf'|include = '/etc/postgresql-custom/wal-g.conf'|g" \
+    -e "s/ timescaledb,//g" \
+    -e "s/ pgsodium,//g" \
+    -e "s/db_user_namespace = off/#db_user_namespace = off/g" \
+    # skip - managed by pgctld
+    -e "s|^data_directory |#data_directory |g" \
+    /etc/postgresql/postgresql.conf && \
+    echo "pgsodium.getkey_script= '/usr/lib/postgresql/bin/pgsodium_getkey.sh'" >> /etc/postgresql/postgresql.conf && \
+    echo "vault.getkey_script= '/usr/lib/postgresql/bin/pgsodium_getkey.sh'" >> /etc/postgresql/postgresql.conf && \
+    chown -R postgres:postgres /etc/postgresql-custom && \
+    mkdir -p /usr/share/postgresql/extension/ && \
+    ln -s /usr/lib/postgresql/bin/pgsodium_getkey.sh /usr/share/postgresql/extension/pgsodium_getkey && \
+    chmod +x /usr/lib/postgresql/bin/pgsodium_getkey.sh
+
+COPY migrations/db /docker-entrypoint-initdb.d/
+COPY ansible/files/pgbouncer_config/pgbouncer_auth_schema.sql /docker-entrypoint-initdb.d/init-scripts/00-schema.sql
+COPY ansible/files/stat_extension.sql /docker-entrypoint-initdb.d/migrations/00-extension.sql
+
+ENV PGDATA=/var/lib/postgresql/data
+ENV POSTGRES_HOST=/var/run/postgresql
+ENV POSTGRES_USER=supabase_admin
+ENV POSTGRES_DB=postgres
+ENV POSTGRES_INITDB_ARGS="--allow-group-access --locale-provider=icu --encoding=UTF-8 --icu-locale=en_US.UTF-8"
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+ENV GRN_PLUGINS_DIR=/usr/lib/groonga/plugins
+
+####################
+# Stage 4a: variant-17 — PostgreSQL 17 (vanilla)
+####################
+FROM base AS variant-17
+
+COPY --from=nix-builder-17 /nix /nix
+COPY --from=nix-builder-17 /tmp/groonga-plugins/plugins /usr/lib/groonga/plugins
+COPY --from=gosu-builder /usr/local/bin/gosu /usr/local/bin/gosu
+
+RUN for f in /nix/var/nix/profiles/default/bin/*; do \
+        ln -sf "$f" /usr/lib/postgresql/bin/ 2>/dev/null || true; \
+        ln -sf "$f" /usr/bin/ 2>/dev/null || true; \
+    done && \
+    ln -sf /nix/var/nix/profiles/default/share/postgresql/* /usr/lib/postgresql/share/postgresql/ 2>/dev/null || true && \
+    ln -sf /nix/var/nix/profiles/default/share/postgresql/* /usr/share/postgresql/ 2>/dev/null || true && \
+    ln -sf /usr/lib/postgresql/share/postgresql/timezonesets /usr/share/postgresql/timezonesets 2>/dev/null || true
+
+RUN chown -R postgres:postgres /usr/lib/postgresql && \
+    chown -R postgres:postgres /usr/share/postgresql
+
+# Can't use /etc/pgctld because it's a mount point
+COPY docker/pgctld/postgresql.conf.tmpl /etc/pgctld-custom/postgresql.conf.tmpl
+
+# Wrapper: injects --postgres-config-template on every pgctld call AND bridges
+# postgres's JSON log file to container stdout via a /proc/1/fd/1 symlink so
+# kubelet + Vector can ship it without a sidecar. See docker/pgctld/pgctld-wrapper.
+COPY --chmod=755 docker/pgctld/pgctld-wrapper.sh /usr/local/bin/pgctld
+ENV POSTGRES_CONFIG_TEMPLATE_PATH=/etc/pgctld-custom/postgresql.conf.tmpl
+
+# Strip extensions absent from pg17 vanilla build
+RUN sed -i 's/ timescaledb,//g; s/ plv8,//g' /etc/postgresql-custom/supautils.conf
+
+# Generate a single SQL manifest that pgctld runs via --init-db-sql-file after initdb.
+# Creates the postgres role, runs init-scripts as postgres (matching migrate.sh),
+# then runs migrations as supabase_admin.
+RUN set -e && \
+    manifest=/docker-entrypoint-initdb.d/multigres-init.sql && \
+    printf -- "-- Auto-generated: run init-scripts and migrations after initdb\n" > "$manifest" && \
+    printf "DO \$\$ BEGIN\n  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'postgres') THEN\n    CREATE ROLE postgres SUPERUSER LOGIN;\n  END IF;\nEND \$\$;\n" >> "$manifest" && \
+    printf "ALTER DATABASE postgres OWNER TO postgres;\n\n" >> "$manifest" && \
+    printf "SET SESSION AUTHORIZATION postgres;\n" >> "$manifest" && \
+    for f in $(ls /docker-entrypoint-initdb.d/init-scripts/*.sql 2>/dev/null | sort); do \
+        printf '\\ir init-scripts/%s\n' "$(basename "$f")" >> "$manifest"; \
+    done && \
+    printf "\nRESET SESSION AUTHORIZATION;\n\n" >> "$manifest" && \
+    for f in $(ls /docker-entrypoint-initdb.d/migrations/*.sql 2>/dev/null | sort); do \
+        printf '\\ir migrations/%s\n' "$(basename "$f")" >> "$manifest"; \
+    done && \
+    chown postgres:postgres "$manifest"
+
+ENV POSTGRES_INITDB_SQL_FILES=/docker-entrypoint-initdb.d/multigres-init.sql
+ENV PATH="/nix/var/nix/profiles/default/bin:/usr/lib/postgresql/bin:${PATH}"
+ENV LOCALE_ARCHIVE=/nix/var/nix/profiles/default/lib/locale/locale-archive
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD pg_isready -U postgres -h localhost || true
+STOPSIGNAL SIGINT
+USER postgres
+EXPOSE 5432
+
+ENTRYPOINT ["tail"]
+CMD ["-f", "/dev/null"]
+
+####################
+# Stage 4b: variant-orioledb-17 — PostgreSQL 17 with OrioleDB
+####################
+FROM base AS variant-orioledb-17
+
+COPY --from=nix-builder-orioledb-17 /nix /nix
+COPY --from=nix-builder-orioledb-17 /tmp/groonga-plugins/plugins /usr/lib/groonga/plugins
+COPY --from=gosu-builder /usr/local/bin/gosu /usr/local/bin/gosu
+
+RUN for f in /nix/var/nix/profiles/default/bin/*; do \
+        ln -sf "$f" /usr/lib/postgresql/bin/ 2>/dev/null || true; \
+        ln -sf "$f" /usr/bin/ 2>/dev/null || true; \
+    done && \
+    ln -sf /nix/var/nix/profiles/default/share/postgresql/* /usr/lib/postgresql/share/postgresql/ 2>/dev/null || true && \
+    ln -sf /nix/var/nix/profiles/default/share/postgresql/* /usr/share/postgresql/ 2>/dev/null || true && \
+    ln -sf /usr/lib/postgresql/share/postgresql/timezonesets /usr/share/postgresql/timezonesets 2>/dev/null || true
+
+RUN chown -R postgres:postgres /usr/lib/postgresql && \
+    chown -R postgres:postgres /usr/share/postgresql
+
+# Strip extensions absent from orioledb-17 build
+RUN sed -i 's/ timescaledb,//g; s/ plv8,//g; s/ postgis,//g; s/ pgrouting,//g' \
+    /etc/postgresql-custom/supautils.conf
+
+# OrioleDB configuration
+RUN sed -i /etc/postgresql/postgresql.conf \
+        -e "/shared_preload_libraries/ s|'|'orioledb,|" \
+        -e "$ a default_table_access_method = 'orioledb'"
+
+# Register orioledb before initdb migrations run
+RUN echo "CREATE EXTENSION orioledb;" > /docker-entrypoint-initdb.d/init-scripts/00-pre-init.sql && \
+    chown postgres:postgres /docker-entrypoint-initdb.d/init-scripts/00-pre-init.sql
+
+# pgctld calls initdb without locale flags, so it picks up LANG from the environment.
+# OrioleDB requires C, POSIX, or ICU collations; override the base stage's en_US.UTF-8.
+ENV LANG=C
+ENV LC_ALL=C
+ENV LANGUAGE=C
+
+# Can't use /etc/pgctld because it's a mount point
+COPY docker/pgctld/orioledb-postgresql.conf.tmpl /etc/pgctld-custom/orioledb-postgresql.conf.tmpl
+
+# Wrapper: injects --postgres-config-template on every pgctld call AND bridges
+# postgres's JSON log file to container stdout via a /proc/1/fd/1 symlink so
+# kubelet + Vector can ship it without a sidecar. See docker/pgctld/pgctld-wrapper.
+COPY --chmod=755 docker/pgctld/pgctld-wrapper.sh /usr/local/bin/pgctld
+ENV POSTGRES_CONFIG_TEMPLATE_PATH=/etc/pgctld-custom/orioledb-postgresql.conf.tmpl
+
+# Regenerate manifest after orioledb added 00-pre-init.sql to init-scripts/
+RUN set -e && \
+    manifest=/docker-entrypoint-initdb.d/multigres-init.sql && \
+    printf -- "-- Auto-generated: run init-scripts and migrations after initdb\n" > "$manifest" && \
+    printf "DO \$\$ BEGIN\n  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'postgres') THEN\n    CREATE ROLE postgres SUPERUSER LOGIN;\n  END IF;\nEND \$\$;\n" >> "$manifest" && \
+    printf "ALTER DATABASE postgres OWNER TO postgres;\n\n" >> "$manifest" && \
+    printf "SET SESSION AUTHORIZATION postgres;\n" >> "$manifest" && \
+    for f in $(ls /docker-entrypoint-initdb.d/init-scripts/*.sql 2>/dev/null | sort); do \
+        printf '\\ir init-scripts/%s\n' "$(basename "$f")" >> "$manifest"; \
+    done && \
+    printf "\nRESET SESSION AUTHORIZATION;\n\n" >> "$manifest" && \
+    for f in $(ls /docker-entrypoint-initdb.d/migrations/*.sql 2>/dev/null | sort); do \
+        printf '\\ir migrations/%s\n' "$(basename "$f")" >> "$manifest"; \
+    done && \
+    chown postgres:postgres "$manifest"
+
+ENV POSTGRES_INITDB_SQL_FILES=/docker-entrypoint-initdb.d/multigres-init.sql
+ENV PATH="/nix/var/nix/profiles/default/bin:/usr/lib/postgresql/bin:${PATH}"
+ENV LOCALE_ARCHIVE=/nix/var/nix/profiles/default/lib/locale/locale-archive
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD pg_isready -U postgres -h localhost || true
+STOPSIGNAL SIGINT
+USER postgres
+EXPOSE 5432
+
+ENTRYPOINT ["tail"]
+CMD ["-f", "/dev/null"]

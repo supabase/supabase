@@ -1,0 +1,3 @@
+use_default_rules: true
+rulesdir:
+  - lint-rules

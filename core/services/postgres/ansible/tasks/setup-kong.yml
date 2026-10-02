@@ -1,0 +1,76 @@
+- name: Kong - group
+  ansible.builtin.group:
+    name: kong
+    gid: 1009
+    state: present
+
+- name: Kong - user
+  ansible.builtin.user:
+    name: kong
+    uid: "{{ 1004 if not qemu else 1005 }}"
+    group: kong
+    state: present
+
+# Kong installation steps from http://archive.vn/3HRQx
+- name: Kong - system dependencies
+  ansible.builtin.apt:
+    pkg:
+      - libpcre3
+      - openssl
+      - perl
+      - procps
+
+- name: Kong - download deb package
+  get_url:
+    url: "{{ kong_artifacts[platform]['url'] }}"
+    checksum: "{{ kong_artifacts[platform]['checksum'] }}"
+    dest: '/tmp/kong.deb'
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: Kong - deb installation
+  ansible.builtin.apt:
+    deb: '/tmp/kong.deb'
+
+- name: Kong - ensure it is NOT autoremoved
+  ansible.builtin.command:
+    cmd: apt-mark manual kong zlib1g*
+
+- name: Kong - configuration
+  ansible.builtin.template:
+    dest: '/etc/kong/kong.conf'
+    src: 'files/kong_config/kong.conf.j2'
+
+- name: Kong - hand over ownership of /usr/local/kong to user kong
+  ansible.builtin.file:
+    owner: 'kong'
+    path: '/usr/local/kong'
+    recurse: true
+
+# [warn] ulimit is currently set to "1024". For better performance set it to at least
+# "4096" using "ulimit -n"
+- name: Kong - bump up ulimit
+  community.general.pam_limits:
+    domain: 'kong'
+    limit_item: 'nofile'
+    limit_type: 'soft'
+    value: '4096'
+
+- name: Kong - create env file
+  ansible.builtin.template:
+    dest: '/etc/kong/kong.env'
+    src: 'files/kong_config/kong.env.j2'
+
+- name: Kong - create service file
+  ansible.builtin.template:
+    dest: '/etc/systemd/system/kong.service'
+    src: 'files/kong_config/kong.service.j2'
+
+- name: Kong - disable service
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    enabled: false
+    name: 'kong'
+    state: 'stopped'

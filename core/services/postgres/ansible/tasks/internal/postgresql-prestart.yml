@@ -1,0 +1,7 @@
+- name: postgres_prestart - create service file
+  template:
+    src: files/postgres_prestart.sh.j2
+    dest: /usr/local/bin/postgres_prestart.sh
+    mode: a+x
+    owner: root
+    group: root

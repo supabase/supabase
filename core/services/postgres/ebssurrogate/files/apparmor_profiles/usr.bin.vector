@@ -1,0 +1,35 @@
+#include <tunables/global>
+
+/usr/bin/vector flags=(attach_disconnected) {
+  #include <abstractions/base>
+  #include <abstractions/bash>
+  #include <abstractions/consoles>
+  #include <abstractions/dbus-session-strict>
+  #include <abstractions/nameservice>
+  #include <abstractions/openssl>
+  #include <abstractions/ssl_keys>
+  #include <abstractions/user-tmp>
+
+  deny @{HOME}/** rwx,
+  /etc/machine-id r,
+  /etc/vector/** r,
+  /proc/*/sched r,
+  /proc/cmdline r,
+  /proc/sys/kernel/osrelease r,
+  /run/log/journal/ r,
+  /var/log/journal/** r,
+  /run/systemd/notify rw,
+  /sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c r,
+  /sys/fs/cgroup/cpu,cpuacct/cpu.cfs_quota_us r,
+  /sys/kernel/mm/transparent_hugepage/enabled r,
+  /usr/bin/journalctl mrix,
+  /usr/bin/vector mrix,
+  /var/lib/vector/** rw,
+  /var/log/journal/ r,
+  /var/log/postgresql/ r,
+  /var/log/postgresql/** rw,
+  /var/run/systemd/notify rw,
+  owner /proc/*/cgroup r,
+  owner /proc/*/mountinfo r,
+  owner /proc/*/stat r,
+}

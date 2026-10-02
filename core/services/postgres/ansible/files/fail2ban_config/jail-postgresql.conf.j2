@@ -1,0 +1,9 @@
+[postgresql]
+enabled = true
+port    = 5432
+protocol = tcp
+filter = postgresql
+logpath = /var/log/postgresql/auth-failures.csv
+maxretry = 3
+ignoreip = 192.168.0.0/16 172.17.1.0/20
+backend = auto

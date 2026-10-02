@@ -1,0 +1,29 @@
+From 31a9b2d736d8a85f113d592754f4832a0097bb2d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jean-Fran=C3=A7ois=20Roche?= <jfroche@pyxel.be>
+Date: Thu, 9 Oct 2025 10:53:50 +0200
+Subject: [PATCH] fix: replace drop_queue function if exists
+
+Function drop_queue might have been created by running `postgresql_extension_custom_scripts/pgmq/after-create.sql`
+on a previous version of the extension. In that case, running the migration script will fail because the function already exists.
+
+We use `CREATE OR REPLACE FUNCTION` to avoid that issue.
+---
+ pgmq-extension/sql/pgmq--1.4.5--1.5.0.sql | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pgmq-extension/sql/pgmq--1.4.5--1.5.0.sql b/pgmq-extension/sql/pgmq--1.4.5--1.5.0.sql
+index 5754eed..de03788 100644
+--- a/pgmq-extension/sql/pgmq--1.4.5--1.5.0.sql
++++ b/pgmq-extension/sql/pgmq--1.4.5--1.5.0.sql
+@@ -122,7 +122,7 @@ BEGIN
+ END;
+ $$ LANGUAGE plpgsql;
+ 
+-CREATE FUNCTION pgmq.drop_queue(queue_name TEXT)
++CREATE OR REPLACE FUNCTION pgmq.drop_queue(queue_name TEXT)
+ RETURNS BOOLEAN AS $$
+ DECLARE
+     qtable TEXT := pgmq.format_table_name(queue_name, 'q');
+-- 
+2.51.0
+
