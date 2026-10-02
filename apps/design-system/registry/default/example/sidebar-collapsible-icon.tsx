@@ -26,10 +26,7 @@ const items = [
 
 export default function SidebarCollapsibleIcon() {
   return (
-    <SidebarProvider
-      defaultOpen
-      className="h-[380px] min-h-0! w-full max-w-3xl overflow-hidden rounded-lg border"
-    >
+    <SidebarProvider defaultOpen className="h-[480px] min-h-0! w-full overflow-hidden">
       <Sidebar collapsible="icon">
         <SidebarContent>
           <SidebarGroup>
@@ -38,7 +35,11 @@ export default function SidebarCollapsibleIcon() {
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild tooltip={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={item.title === 'Home'}
+                      tooltip={item.title}
+                    >
                       <a href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -53,13 +54,9 @@ export default function SidebarCollapsibleIcon() {
         <SidebarRail />
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-12 items-center gap-2 border-b px-4">
-          <SidebarTrigger />
-          <span className="text-sm text-foreground-light">Icon collapse</span>
+        <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
         </header>
-        <div className="p-4 text-sm text-foreground-muted">
-          Use the trigger or rail to collapse to icons.
-        </div>
       </SidebarInset>
     </SidebarProvider>
   )

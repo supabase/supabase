@@ -10,6 +10,10 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
   ({ doc, children, ...props }, ref) => {
     const ShadcnPanel = () => {
       if (doc.source?.shadcn) {
+        const shadcnDocsUrl = doc.slugAsParams?.startsWith('components/')
+          ? `https://ui.shadcn.com/docs/${doc.slugAsParams}`
+          : 'https://ui.shadcn.com/'
+
         return (
           <div
             className={cn(
@@ -46,7 +50,18 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
               </svg>
               <span className="hidden font-bold sm:inline-block">shadcn/ui</span>
             </div>
-            <span className="text-foreground-light text-sm">This component uses shadcn/ui</span>
+            <div className="flex flex-row items-center justify-between text-sm w-full">
+              <span className="text-foreground-light text-xs">This component uses shadcn/ui</span>
+              <Button
+                variant="outline"
+                className="rounded-full"
+                icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
+              >
+                <Link href={shadcnDocsUrl} target="_blank" rel="noreferrer">
+                  Docs
+                </Link>
+              </Button>
+            </div>
           </div>
         )
       }
