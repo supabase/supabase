@@ -1,5 +1,5 @@
 ---
-title: 'Scale without limits: Multigres, OrioleDB, dbarena, and Pipelines'
+title: 'Scale without limits: Multigres, OrioleDB, and dbarena'
 description: 'The app your agent built in minutes stays on the same Postgres from prototype to petabyte.'
 author: joe_sciarrino, aditya_maruvada, riccardo_busetti
 date: '2026-10-02T10:35:00'
@@ -14,7 +14,7 @@ imgThumb: 'select-2026-scale-without-limits/thumb.png'
 toc_depth: 2
 ---
 
-Today at Supabase Select, we announced Multigres for high availability and scalable connection pooling, OrioleDB for high performance storage, and new destinations for Supabase Pipelines. We launched dbarena, an open benchmarks site for comparing managed Postgres providers’ performance results and costs.
+Today at Supabase Select, we announced Multigres for high availability and scalable connection pooling, and OrioleDB for high performance storage. We launched dbarena, an open benchmarks site for comparing managed Postgres providers’ performance results and costs.
 
 Every Supabase project starts with a single Postgres database. As your project grows, vertically upgrading the database’s available RAM & CPU resources can help, but it isn’t a solution to every challenge.
 
@@ -155,19 +155,8 @@ Subscribe to the [dbarena newsletter](https://dbarena.com/?subscribe) to keep up
   </defs>
 </svg>
 
-## Supabase Pipelines
-
-<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
-  <source src="/images/blog/select-2026-scale-without-limits/pipelines.mp4" type="video/mp4" />
-</video>
-
-Pipelines stream your Postgres data to analytical destinations in near real time, so heavy analytics queries don’t impact primary Postgres. Create a pipeline in the dashboard, choose the destination, and select the tables to replicate. The initial sync starts, and schema changes are detected and applied to the destination automatically. The dashboard shows each pipeline's health and the status of every replicated table.
-
-Pipelines are in public alpha on the Pro, Team, and Enterprise plans. BigQuery is in public alpha. ClickHouse, DuckLake, and Snowflake are in private alpha, and you can request access.
-
 ## Get started
 
 - Multigres: private alpha.
 - OrioleDB: create a new project and choose OrioleDB at project creation. Public beta. [Docs](https://supabase.com/docs/guides/database/orioledb).
 - dbarena: public, at [dbarena.com](http://dbarena.com).
-- Supabase Pipelines: on a paid plan, open Database, then Pipelines in the Dashboard, add a BigQuery destination, and pick your tables. [Docs](https://supabase.com/docs/guides/database/replication/pipelines). Request [ClickHouse, DuckLake, or Snowflake](https://supabase.com/go/supabase-pipelines-new-destinations).
