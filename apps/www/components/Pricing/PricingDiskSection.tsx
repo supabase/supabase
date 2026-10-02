@@ -1,5 +1,4 @@
 import { ArrowUpRight } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from 'ui'
 
 import Panel from '../Panel'
@@ -103,9 +102,9 @@ const PricingDiskSection = () => (
     </Panel>
     <div className="mt-8 flex justify-center">
       <Button asChild size="tiny" iconRight={<ArrowUpRight className="w-4" />}>
-        <Link href="https://supabase.com/docs/guides/platform/compute-and-disk#disk">
+        <a href="https://supabase.com/docs/guides/platform/compute-and-disk#disk">
           Learn about advanced disk config
-        </Link>
+        </a>
       </Button>
     </div>
   </div>
