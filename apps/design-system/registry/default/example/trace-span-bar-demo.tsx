@@ -48,7 +48,7 @@ function Label() {
 function Gallery() {
   return (
     <Trace.Waterfall className="h-auto">
-      <Trace.Rows rowHeight={28} className="h-56" readOnly>
+      <Trace.Rows rowHeight={28} className="h-56">
         <Label />
         <Trace.Lane>
           <Trace.Bar />

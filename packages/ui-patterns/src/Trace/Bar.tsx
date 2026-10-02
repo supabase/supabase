@@ -35,14 +35,14 @@ export function Bar({ className, style, children, ...props }: ComponentProps<'di
       data-zero-duration={geometry.isZeroDuration ? '' : undefined}
       data-running={isRunning ? '' : undefined}
       className={cn(
-        'absolute top-1/2 h-[55%] min-w-[2px] -translate-y-1/2 rounded-sm bg-current',
+        'absolute top-1/2 h-[55%] min-w-0.5 -translate-y-1/2 rounded-sm bg-current',
         'data-[status=ok]:text-brand data-[status=error]:text-destructive data-[status=unset]:text-foreground-muted',
         'transition-[opacity,box-shadow] motion-reduce:transition-none',
         'data-[state=hover]:brightness-110',
         'data-[state=selected]:ring-2 data-[state=selected]:ring-foreground data-[state=selected]:ring-offset-1 data-[state=selected]:ring-offset-background',
         'data-[state=dim]:opacity-40',
         'data-[clip=start]:rounded-l-none data-[clip=end]:rounded-r-none data-[clip=both]:rounded-none',
-        'data-[zero-duration]:w-[2px]',
+        'data-[zero-duration]:w-0.5',
         'data-[running]:bg-[repeating-linear-gradient(135deg,currentColor_0_6px,transparent_6px_10px)] data-[running]:motion-safe:animate-pulse',
         className
       )}
@@ -86,13 +86,9 @@ function Marker({ event, kind, offsetMs }: MarkerProps) {
           style={{ left: `${fraction * 100}%` }}
           onClick={(e) => e.stopPropagation()}
         >
-          {kind === 'exception' && <CircleAlert className="size-3 text-destructive" />}
-          {kind === 'log' && (
-            <span aria-hidden className="size-1.5 rounded-full bg-foreground-lighter" />
-          )}
-          {kind === 'milestone' && (
-            <span aria-hidden className="size-1.5 rotate-45 bg-foreground" />
-          )}
+          {kind === 'exception' && <CircleAlert className="size-2.5 text-destructive" />}
+          {kind === 'log' && <span aria-hidden className="size-1.5 rounded-full bg-black/50" />}
+          {kind === 'milestone' && <span aria-hidden className="size-1.5 rotate-45 bg-black/50" />}
         </button>
       </TooltipTrigger>
       <TooltipContent side="top">

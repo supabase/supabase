@@ -29,8 +29,8 @@ export default function TraceWaterfallDemo() {
           </Toggle>
         </Trace.Header>
         <Trace.Minimap />
-        <div className="flex h-[480px] overflow-hidden rounded-md border border-default">
-          <Trace.Waterfall treeWidth={320} className="min-w-0 flex-1 rounded-none border-0">
+        <div className="flex flex-col overflow-hidden rounded-md border border-default">
+          <Trace.Waterfall treeWidth={300} className="h-[360px] w-full">
             <Trace.Ruler />
             <Trace.Rows rowHeight={28}>
               <Trace.Cell />
@@ -40,7 +40,7 @@ export default function TraceWaterfallDemo() {
               </Trace.Lane>
             </Trace.Rows>
           </Trace.Waterfall>
-          <Trace.Inspector className="w-[340px] shrink-0" />
+          <Trace.Inspector className="h-72 border-l-0 border-t border-default" />
         </div>
       </Trace.Root>
     </div>

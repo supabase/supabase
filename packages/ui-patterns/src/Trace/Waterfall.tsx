@@ -59,19 +59,21 @@ export function Ruler({ targetTickSpacing = 80, className, children, ...props }:
       <div className="flex min-w-(--trace-tree-width) shrink-0 items-center gap-2 px-2 text-xs text-foreground-muted uppercase">
         {children ?? 'Span'}
       </div>
-      <div ref={ref} aria-hidden className="relative min-w-0 flex-1 select-none overflow-hidden">
-        {scale.ticks.map((tick) => (
-          <div
-            key={tick.ms}
-            data-trace-tick
-            className="absolute inset-y-0 border-l border-strong"
-            style={{ left: `${tick.fraction * 100}%` }}
-          >
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-xs tabular-nums text-foreground-muted">
-              {tick.label}
-            </span>
-          </div>
-        ))}
+      <div aria-hidden className="min-w-0 flex-1 select-none overflow-hidden px-3">
+        <div ref={ref} className="relative size-full">
+          {scale.ticks.map((tick) => (
+            <div
+              key={tick.ms}
+              data-trace-tick
+              className="absolute inset-y-0 border-l border-strong"
+              style={{ left: `${tick.fraction * 100}%` }}
+            >
+              <span className="absolute left-2 top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-xs tabular-nums text-foreground-muted">
+                {tick.label}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -285,10 +287,10 @@ export function Lane({ className, children, ...props }: ComponentProps<'div'>) {
   return (
     <div
       data-trace-lane
-      className={cn('relative min-w-0 flex-1 overflow-hidden', className)}
+      className={cn('min-w-0 flex-1 overflow-hidden px-3', className)}
       {...props}
     >
-      {children}
+      <div className="relative size-full">{children}</div>
     </div>
   )
 }
