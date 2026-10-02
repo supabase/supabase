@@ -1047,5 +1047,13 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "matt_linkous",
+    "author": "Matt Linkous",
+    "username": "matlin",
+    "position": "Product Strategy Lead",
+    "author_url": "https://github.com/matlin",
+    "author_image_url": "https://github.com/matlin.png"
   }
 ]
