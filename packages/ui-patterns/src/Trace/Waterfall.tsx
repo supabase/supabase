@@ -29,7 +29,7 @@ export function Waterfall({
     <div
       data-trace-waterfall
       className={cn(
-        'flex min-h-0 flex-col overflow-hidden rounded-md border border-default bg-surface-100 text-sm text-foreground',
+        'flex min-h-0 flex-col overflow-hidden bg-surface-100 text-sm text-foreground',
         className
       )}
       style={{ ...vars, ...style }}
@@ -51,12 +51,12 @@ export function Ruler({ targetTickSpacing = 80, className, children, ...props }:
     <div
       data-trace-ruler
       className={cn(
-        'flex h-7 shrink-0 items-stretch border-b border-default bg-surface-200',
+        'flex h-7 shrink-0 items-stretch border-b border-default bg-surface-200 font-mono',
         className
       )}
       {...props}
     >
-      <div className="flex w-(--trace-tree-width) shrink-0 items-center gap-2 border-r border-default px-2 text-xs text-foreground-light">
+      <div className="flex min-w-(--trace-tree-width) shrink-0 items-center gap-2 px-2 text-xs text-foreground-muted uppercase">
         {children ?? 'Span'}
       </div>
       <div ref={ref} aria-hidden className="relative min-w-0 flex-1 select-none overflow-hidden">
@@ -67,7 +67,7 @@ export function Ruler({ targetTickSpacing = 80, className, children, ...props }:
             className="absolute inset-y-0 border-l border-strong"
             style={{ left: `${tick.fraction * 100}%` }}
           >
-            <span className="absolute left-1 top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-[10px] tabular-nums text-foreground-lighter">
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-xs tabular-nums text-foreground-muted">
               {tick.label}
             </span>
           </div>
