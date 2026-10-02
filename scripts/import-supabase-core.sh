@@ -53,16 +53,15 @@ import_one() {
   fi
   echo "IMPORT: $name default branch -> $ref"
 
-  # GitHub push protection can reject upstream test fixtures that contain
-  # token-shaped credentials. Because --squash creates a new synthetic commit
-  # from the imported tree, sanitize only the known fixture credential forms
-  # before that commit is created. This does not modify the upstream repository.
-  local tmp
-  tmp="$(mktemp -d)"
-  trap 'rm -rf "$tmp"' RETURN
-  git clone --quiet --depth 1 --branch "$ref" "$url" "$tmp/repo"
-
   if [[ "$name" == "supavisor" ]]; then
+    # Supavisor currently contains test fixtures with token-shaped credentials.
+    # Import a sanitized orphan snapshot so the upstream secret-bearing history
+    # is never introduced into the Testagram Git object graph.
+    local tmp
+    tmp="$(mktemp -d)"
+    trap 'rm -rf "$tmp"' RETURN
+    git clone --quiet --depth 1 --branch "$ref" "$url" "$tmp/repo"
+
     python3 - "$tmp/repo" <<'PY'
 import pathlib
 import re
@@ -91,11 +90,16 @@ for path in root.rglob("*"):
     if updated != data:
         path.write_text(updated, encoding="utf-8")
 PY
-    git -C "$tmp/repo" add -A
-    git -C "$tmp/repo" -c user.name="testagram-core-bot" -c user.email="testagram-core-bot@users.noreply.github.com" commit --amend --no-edit >/dev/null
-  fi
 
-  git subtree add --prefix="$path" "$tmp/repo" HEAD --squash
+    git -C "$tmp/repo" checkout --orphan testagram-sanitized >/dev/null
+    git -C "$tmp/repo" add -A
+    git -C "$tmp/repo" -c user.name="testagram-core-bot" -c user.email="testagram-core-bot@users.noreply.github.com" commit -m "Testagram sanitized upstream snapshot $ref" >/dev/null
+    git subtree add --prefix="$path" "$tmp/repo" HEAD --squash
+    rm -rf "$tmp"
+    trap - RETURN
+  else
+    git subtree add --prefix="$path" "$url" "$ref" --squash
+  fi
   rm -rf "$tmp"
   trap - RETURN
 }
