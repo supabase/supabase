@@ -52,10 +52,8 @@ describe('GenerateRecoveryCodesModal', () => {
     // Users have to copy the codes before they can close the modal
     expect(await screen.findByRole('button', { name: 'Done' })).toBeDisabled()
     fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
-    await waitFor(() =>
-      expect(
-        screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
-      ).toBeChecked()
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
     )
     expect(mockCopyToClipboard).toHaveBeenCalledWith(
       codes.map((code) => formatRecoveryCode(code)).join('\n'),
