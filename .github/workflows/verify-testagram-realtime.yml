@@ -180,7 +180,7 @@ jobs:
           test "$(docker exec realtime-smoke id -un)" = "nobody"
 
           docker exec realtime-postgres psql -U postgres -d postgres -v ON_ERROR_STOP=1 -c \
-            "select 1 from information_schema.tables where table_schema='realtime' and table_name='schema_migrations';" \
+            "select 1 from information_schema.tables where table_schema='public' and table_name='schema_migrations';" \
             | grep -q 1
 
           echo "Runtime identity and migration state: GREEN"
