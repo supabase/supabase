@@ -13,7 +13,9 @@ create table if not exists public.storage_nodes (
   storage_used_bytes bigint not null default 0 check (storage_used_bytes >= 0),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
-  revoked_at timestamptz
+  revoked_at timestamptz,
+  node_secret_hash text,
+  node_secret_rotated_at timestamptz
 );
 create index if not exists storage_nodes_user_id_idx on public.storage_nodes(user_id);
 create index if not exists storage_nodes_status_idx on public.storage_nodes(status);
