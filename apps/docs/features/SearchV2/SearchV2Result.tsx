@@ -42,7 +42,7 @@ export function SearchV2Result({
       asChild
       value={result.path}
       onSelect={handleSelect}
-      className="cursor-pointer rounded-md px-2 py-2 max-lg:px-4"
+      className="cursor-pointer rounded-md px-2 py-2"
     >
       <Link href={result.path} prefetch={false} tabIndex={-1} onClick={handleLinkClick}>
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
