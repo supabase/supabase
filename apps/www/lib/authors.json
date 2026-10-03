@@ -1047,5 +1047,37 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "aditya_maruvada",
+    "author": "Aditya Maruvada",
+    "username": "supa-aditya",
+    "position": "Engineering",
+    "author_url": "https://github.com/supa-aditya",
+    "author_image_url": "https://github.com/supa-aditya.png"
+  },
+  {
+    "author_id": "daniel_mitterdorfer",
+    "author": "Daniel Mitterdorfer",
+    "username": "danielmitterdorfer",
+    "position": "Engineering",
+    "author_url": "https://github.com/danielmitterdorfer",
+    "author_image_url": "https://github.com/danielmitterdorfer.png"
+  },
+  {
+    "author_id": "alexander_korotkov",
+    "author": "Alexander Korotkov",
+    "username": "akorotkov",
+    "position": "Engineering",
+    "author_url": "https://github.com/akorotkov",
+    "author_image_url": "https://github.com/akorotkov.png"
+  },
+  {
+    "author_id": "rand_arete",
+    "author": "Rand Arete",
+    "username": "rand",
+    "position": "Engineering",
+    "author_url": "https://github.com/rand",
+    "author_image_url": "https://github.com/rand.png"
   }
 ]

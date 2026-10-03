@@ -1,8 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+import { skipToken, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
 import { BannedIPKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { PROVIDERS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type BannedIPVariables = { projectRef?: string }
@@ -25,13 +27,21 @@ export type IPError = ResponseError
 export const useBannedIPsQuery = <TData = IPData>(
   { projectRef }: BannedIPVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<IPData, IPError, TData> = {}
-) =>
-  useQuery<IPData, IPError, TData>({
+) => {
+  const { data: project } = useProjectDetailQuery(
+    { ref: projectRef },
+    { enabled: enabled && IS_PLATFORM }
+  )
+  const isSupported =
+    !!project && !project.high_availability && project.cloud_provider !== PROVIDERS.AWS_K8S.id
+
+  return useQuery<IPData, IPError, TData>({
     queryKey: BannedIPKeys.list(projectRef),
-    queryFn: ({ signal }) => getBannedIPs({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined',
+    queryFn: isSupported ? ({ signal }) => getBannedIPs({ projectRef }, signal) : skipToken,
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && isSupported,
     retry: false,
     refetchOnWindowFocus: false,
     staleTime: 60_000,
     ...options,
   })
+}

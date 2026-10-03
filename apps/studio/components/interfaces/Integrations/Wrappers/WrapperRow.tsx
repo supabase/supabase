@@ -41,6 +41,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
   const canEdit = canManageWrappers && !isShared
+
   let editTooltip = 'Edit wrapper'
   if (!canManageWrappers) editTooltip = 'You need additional permissions to edit wrappers'
   else if (isShared) editTooltip = 'Shared wrappers cannot be edited in the dashboard'
@@ -69,7 +70,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
                 {' '}
                 Edit this server&apos;s credentials in{' '}
                 <Link
-                  href={`/project/${ref}/settings/vault/secrets`}
+                  href={`/project/${ref}/integrations/vault/secrets`}
                   className="underline underline-offset-2"
                 >
                   Vault
@@ -87,7 +88,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
           >
             <span className="text-foreground-lighter text-nowrap">{metadata.label}:</span>
             <span className="truncate max-w-72" title={serverOptions[metadata.name]}>
-              {serverOptions[metadata.name]}
+              {serverOptions[metadata.name] ?? metadata.defaultValue}
             </span>
           </div>
         ))}
@@ -139,7 +140,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
         {encryptedMetadata.map((metadata) => (
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
-              href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
+              href={`/project/${ref}/integrations/vault/secrets?search=${encodeURIComponent(
                 `${wrapper.name}_${metadata.name}`
               )}`}
               className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"

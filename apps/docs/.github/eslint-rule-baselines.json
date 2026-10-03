@@ -1,0 +1,39 @@
+{
+  "rules": {
+    "shadcn/no-arbitrary-values": 38,
+    "shadcn/no-unknown-classes": 19,
+    "shadcn/no-raw-colors": 3
+  },
+  "ruleFiles": {
+    "shadcn/no-arbitrary-values": {
+      "app/contributing/ContributingToC.tsx": 1,
+      "components/Feedback/Feedback.tsx": 15,
+      "components/GuidesSidebar.tsx": 1,
+      "components/StepHike/index.tsx": 1,
+      "features/docs/Reference.sections.tsx": 4,
+      "features/docs/Reference.ui.tsx": 4,
+      "features/ui/AgentWatchSchedule.tsx": 2,
+      "features/ui/CodeBlock/CodeBlock.client.tsx": 7,
+      "features/ui/PromptPanel.tsx": 3
+    },
+    "shadcn/no-unknown-classes": {
+      "app/guides/getting-started/ai-skills/AiSkillsIndex.tsx": 1,
+      "app/guides/local-development/cli/config/page.tsx": 1,
+      "components/GithubCard.tsx": 1,
+      "components/Navigation/NavigationMenu/GlobalMobileMenu.tsx": 1,
+      "components/Navigation/NavigationMenu/NavigationMenuCliList.tsx": 2,
+      "components/Navigation/NavigationMenu/NavigationMenuRefListItems.tsx": 2,
+      "components/Navigation/SideBar.tsx": 1,
+      "components/Params.tsx": 1,
+      "components/ProjectConfigVariables/ProjectConfigVariables.tsx": 2,
+      "features/docs/Reference.sections.tsx": 2,
+      "layouts/MainSkeleton.tsx": 1,
+      "layouts/ref/RefSubLayout.tsx": 2,
+      "layouts/ref/RefSubLayoutNonFunc.tsx": 2
+    },
+    "shadcn/no-raw-colors": {
+      "features/ui/CodeBlock/CodeBlock.tsx": 1,
+      "features/ui/PromptPanel.tsx": 2
+    }
+  }
+}
