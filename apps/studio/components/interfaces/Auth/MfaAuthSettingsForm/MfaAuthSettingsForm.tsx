@@ -15,7 +15,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -25,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -49,6 +49,7 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
+import { normalizeSmsTemplate, SMS_TEMPLATE_NEWLINE_HINT } from '@/lib/sms-template'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -268,7 +269,7 @@ export const MfaAuthSettingsForm = () => {
   const onSubmitPhoneForm: SubmitHandler<PhoneFormValues> = (values) => {
     let payload: Record<string, string | number | boolean> = {
       MFA_PHONE_OTP_LENGTH: values.MFA_PHONE_OTP_LENGTH,
-      MFA_PHONE_TEMPLATE: values.MFA_PHONE_TEMPLATE,
+      MFA_PHONE_TEMPLATE: normalizeSmsTemplate(values.MFA_PHONE_TEMPLATE),
     }
 
     if (hasAccessToMFA) {
@@ -276,7 +277,7 @@ export const MfaAuthSettingsForm = () => {
         MfaStatusToState(values.MFA_PHONE)
       payload = {
         MFA_PHONE_OTP_LENGTH: values.MFA_PHONE_OTP_LENGTH,
-        MFA_PHONE_TEMPLATE: values.MFA_PHONE_TEMPLATE,
+        MFA_PHONE_TEMPLATE: normalizeSmsTemplate(values.MFA_PHONE_TEMPLATE),
         MFA_PHONE_ENROLL_ENABLED,
         MFA_PHONE_VERIFY_ENABLED,
       }
@@ -536,17 +537,13 @@ export const MfaAuthSettingsForm = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Phone verification message"
-                        description="To format the OTP code use `{{ .Code }}`"
+                        description={SMS_TEMPLATE_NEWLINE_HINT}
                       >
                         <FormControl>
-                          <Input
-                            type="text"
+                          <Textarea
+                            rows={4}
                             {...field}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
-                            data-1p-ignore // 1Password
-                            data-lpignore="true" // LastPass
-                            data-form-type="other" // Dashlane
-                            data-bwignore // Bitwarden
                           />
                         </FormControl>
                       </FormItemLayout>
