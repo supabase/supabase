@@ -16,6 +16,7 @@ import {
   getInvocationChartNavigationUrl,
   getInvocationTotals,
   getInvocationUpdateAnnotation,
+  getLegacyEdgeFunctionLogsUrl,
   getMemoryTooltipDetail,
   getRollingTimeRange,
   getSegmentedButtonClassName,
@@ -290,6 +291,25 @@ describe('EdgeFunctionOverview.utils', () => {
       })
     ).toBe(
       `/project/project-ref/functions/function-slug/logs?date=${Date.parse('2026-03-20T10:00:00.000Z')}-${Date.parse('2026-03-20T11:00:00.000Z')}&filter=level%3Aeq%3Aerror&id=log-id`
+    )
+  })
+
+  it('links to the pre-unified Invocations and Logs tabs with their own params', () => {
+    const base = { projectRef: 'project-ref', functionSlug: 'function-slug' }
+
+    expect(getLegacyEdgeFunctionLogsUrl({ ...base, tab: 'logs' })).toBe(
+      '/project/project-ref/functions/function-slug/logs'
+    )
+    expect(
+      getLegacyEdgeFunctionLogsUrl({
+        ...base,
+        tab: 'invocations',
+        start: '2026-03-20T10:00:00.000Z',
+        end: '2026-03-20T11:00:00.000Z',
+        logId: 'log-id',
+      })
+    ).toBe(
+      '/project/project-ref/functions/function-slug/invocations?its=2026-03-20T10%3A00%3A00.000Z&ite=2026-03-20T11%3A00%3A00.000Z&log=log-id'
     )
   })
 
