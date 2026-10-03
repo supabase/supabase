@@ -68,14 +68,14 @@ select error_if_null(null);
 
 Value checking is common, so Postgres provides the `assert` keyword as a shorthand. It takes the following format:
 
-```sql
--- throw error when condition is false
+```text
 assert <some condition>, 'message';
 ```
 
 For example:
 
 ```sql
+-- assumes an attendance_table with an id uuid column and a student text column
 create function assert_example(name text)
 returns uuid
 language plpgsql
@@ -127,6 +127,7 @@ For a more complex function, or for harder debugging, log the following:
 - Start and end of function calls
 
 ```sql
+-- assumes a some_table with a col_1 int column and a col_2 text column
 create or replace function advanced_example(num int default 10)
 returns text
 language plpgsql
