@@ -70,7 +70,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   )
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
   const secretKey = keys?.secretKey ?? keys?.serviceKey
-  const isServiceRoleKey = secretKey?.id === 'service_role'
+  const isServiceRoleKey = secretKey?.name === 'service_role'
   const maskedValue = secretKey?.api_key
     ? `${secretKey.api_key.slice(0, 15)}${SECRET_MASK}`
     : 'your-secret-key'
