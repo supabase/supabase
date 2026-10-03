@@ -90,6 +90,29 @@ describe('/project/[ref]/compute', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
+  it('links the agent guide from the page header', async () => {
+    mockComputeInstancesList([])
+
+    await renderComputePage()
+
+    expect(screen.getByRole('link', { name: /Agent guide/ })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/guides/ai-tools/compute-private-alpha')
+    )
+  })
+
+  it('offers the agent skill alongside the config in the deploy dialog', async () => {
+    mockComputeInstancesList([])
+
+    await renderComputePage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Deploy' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Agent skill' }))
+
+    expect(await screen.findByText(/name: supabase-compute/)).toBeVisible()
+    expect(screen.getByText(/Save this as/)).toBeVisible()
+  })
+
   it('refreshes the instances list on request', async () => {
     mockComputeInstancesList([computeInstanceDatum('existing')])
 
