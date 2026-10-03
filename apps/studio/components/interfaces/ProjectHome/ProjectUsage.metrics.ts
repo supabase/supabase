@@ -80,9 +80,10 @@ export const getBucketLogRange = (
   timestamp: string,
   interval: ChartIntervalKey
 ): { start: string; end: string } => {
-  const unit = interval === '1hr' ? 'minute' : interval === '1day' ? 'hour' : 'day'
+  const [amount, unit]: [number, dayjs.OpUnitType] =
+    interval === '1hr' ? [1, 'minute'] : interval === '1day' ? [1, 'hour'] : [6, 'hour']
   return {
     start: timestamp,
-    end: dayjs.utc(timestamp).add(1, unit).toISOString(),
+    end: dayjs.utc(timestamp).add(amount, unit).toISOString(),
   }
 }
