@@ -58,7 +58,8 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
           const array = Array.isArray(val) ? val : JSON.parse(val as string)
           return `${formatArrayForSql(array as unknown[])}`
         } else if (format?.includes('json')) {
-          return `${JSON.stringify(val).replace(/\\"/g, '"').replace(/'/g, "''").replace('"', "'").replace(/.$/, "'")}`
+          const jsonText = typeof val === 'string' ? val : JSON.stringify(val)
+          return `'${jsonText.replaceAll("'", "''")}'`
         } else if (
           typeof format === 'string' &&
           typeof val === 'string' &&
