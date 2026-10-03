@@ -64,7 +64,7 @@ The `supabase stack` commands exist only when the `[experimental] stack` setting
    stack = true
    ```
 
-   Don't add a second `[experimental]` table. A duplicate table makes `config.toml` invalid. The CLI then treats the setting as off.
+   Don't add a second `[experimental]` table. A duplicate table makes `config.toml` invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
 
    In a directory without a `config.toml`, set the environment variable instead:
 
@@ -168,7 +168,7 @@ One app can run several local projects by name. This keeps a destructive test ru
 
 A local project started without `--stack` is the app directory's default local project. Named local projects and the default one are independent of each other.
 
-On a local project, the `db`, `migration`, and other database commands use the default local project for the current branch. They don't accept `--stack`. Some commands, such as `supabase db dump`, target the linked project unless you pass `--local`. To reach a named local project from a command that accepts `--db-url`, pass the `DB_URL` from `supabase status --stack <name> --env`. See [Limitations](#limitations).
+The `db`, `migration`, and other database commands don't accept `--stack`. When they run against a local database, they use the default local project for the current branch. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project from a command that accepts `--db-url`, pass the `DB_URL` from `supabase status --stack <name> --env`. See [Limitations](#limitations).
 
 ## Find a local project's endpoints and keys
 
@@ -277,7 +277,7 @@ Keep these differences in mind when you turn the setting on for an app that used
   - Storage Analytics and Storage vector buckets
   - A custom `edge_runtime.deno_version`
   - OrioleDB, and `db.major_version` values other than 15 and 17
-- Database commands don't accept `--stack`. On a local project, `supabase db reset`, `supabase db diff`, and the other database commands use the default local project for the current branch. Commands that accept `--db-url` can reach a named local project through the `DB_URL` from `supabase status --stack <name> --env`.
+- Database commands don't accept `--stack`. `supabase db reset` and `supabase db diff` run against the current branch's default local project. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project, pass the `DB_URL` from `supabase status --stack <name> --env` to a command that accepts `--db-url`.
 - Switching branches switches local projects. The git branch is part of the identity. After you check out another branch in the same directory, `supabase start` creates or resumes a different local project with its own data. The first branch's local project keeps running until you stop it.
 - Moving or renaming an app directory creates a new local project, because the identity includes the project root path. The previous local project's data stays until you destroy it.
 - `supabase stack logs` streams new log lines only. It has no history.
