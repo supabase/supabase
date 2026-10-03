@@ -2,7 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { QueryClient } from '@tanstack/react-query'
 import { act, screen, waitFor } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
-import { AuthContext, useFlag } from 'common'
+import { AuthContext, useFeatureFlags, useFlag } from 'common'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -44,7 +44,13 @@ const PROFILE_CONTEXT = createMockProfileContext()
 
 function FlagValue() {
   const isEnabled = useFlag('projectTargetedFeature')
-  return <div>{isEnabled ? 'Enabled' : 'Disabled'}</div>
+  const { hasLoaded } = useFeatureFlags()
+  return (
+    <>
+      <div>{isEnabled ? 'Enabled' : 'Disabled'}</div>
+      <div>{hasLoaded ? 'Loaded' : 'Loading'}</div>
+    </>
+  )
 }
 
 function TestProvider() {
@@ -142,6 +148,61 @@ describe('StudioFeatureFlagProvider', () => {
         cloud_provider: 'AWS',
         plan: 'pro',
       })
+    })
+    expect(screen.getByText('Disabled')).toBeInTheDocument()
+  })
+
+  it.each([
+    { destination: '/projects/project-b', ref: 'project-b', scenario: 'switching projects' },
+    { destination: '/organizations?slug=test-org', ref: undefined, scenario: 'leaving a project' },
+  ])('hides the previous project flags while $scenario', async ({ destination, ref }) => {
+    const pendingFlags =
+      Promise.withResolvers<Array<{ settingKey: string; settingValue: boolean }>>()
+    getFlags.mockImplementation((_email, attributes) =>
+      attributes.project_ref === ref
+        ? pendingFlags.promise
+        : Promise.resolve([{ settingKey: 'projectTargetedFeature', settingValue: true }])
+    )
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    customRender(<TestProvider />, { profileContext: PROFILE_CONTEXT, queryClient })
+    expect(await screen.findByText('Enabled')).toBeInTheDocument()
+
+    await act(async () => routerMock.push(destination))
+
+    expect(screen.getByText('Disabled')).toBeInTheDocument()
+    expect(screen.getByText('Loading')).toBeInTheDocument()
+
+    await act(async () => {
+      pendingFlags.resolve([{ settingKey: 'projectTargetedFeature', settingValue: false }])
+    })
+    expect(await screen.findByText('Loaded')).toBeInTheDocument()
+    expect(screen.getByText('Disabled')).toBeInTheDocument()
+  })
+
+  it('ignores a late evaluation after navigating to a different project', async () => {
+    const pendingFlags =
+      Promise.withResolvers<Array<{ settingKey: string; settingValue: boolean }>>()
+    getFlags.mockImplementation((_email, attributes) =>
+      attributes.project_ref === 'project-b'
+        ? pendingFlags.promise
+        : Promise.resolve([
+            {
+              settingKey: 'projectTargetedFeature',
+              settingValue: attributes.project_ref === 'project-a',
+            },
+          ])
+    )
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    customRender(<TestProvider />, { profileContext: PROFILE_CONTEXT, queryClient })
+    expect(await screen.findByText('Enabled')).toBeInTheDocument()
+
+    await act(async () => routerMock.push('/projects/project-b'))
+    await act(async () => routerMock.push('/projects/project-c'))
+    expect(await screen.findByText('Loaded')).toBeInTheDocument()
+    expect(screen.getByText('Disabled')).toBeInTheDocument()
+
+    await act(async () => {
+      pendingFlags.resolve([{ settingKey: 'projectTargetedFeature', settingValue: true }])
     })
     expect(screen.getByText('Disabled')).toBeInTheDocument()
   })

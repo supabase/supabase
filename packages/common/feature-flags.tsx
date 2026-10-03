@@ -99,12 +99,23 @@ export const FeatureFlagProvider = ({
   const resolvedProjectRef = projectRef ?? params.ref
   const lastSentGroupContextRef = useRef<string | null>(null)
 
-  const [store, setStore] = useState<FeatureFlagContextType>({
-    API_URL,
-    configcat: {},
-    posthog: {},
-    hasLoaded: false,
+  const [evaluation, setEvaluation] = useState<{
+    projectRef?: string
+    flags: FeatureFlagContextType
+  }>({
+    projectRef: resolvedProjectRef,
+    flags: {
+      API_URL,
+      configcat: {},
+      posthog: {},
+      hasLoaded: false,
+    },
   })
+
+  const store: FeatureFlagContextType =
+    evaluation.projectRef === resolvedProjectRef
+      ? evaluation.flags
+      : { API_URL, configcat: {}, posthog: {}, hasLoaded: false }
 
   useEffect(() => {
     let mounted = true
@@ -229,7 +240,7 @@ export const FeatureFlagProvider = ({
       flagStore.hasLoaded = true
 
       if (mounted) {
-        setStore(flagStore)
+        setEvaluation({ projectRef: resolvedProjectRef, flags: flagStore })
       }
     }
 
