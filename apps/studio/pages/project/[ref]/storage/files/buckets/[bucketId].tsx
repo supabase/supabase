@@ -25,6 +25,7 @@ import {
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
 import { DeleteBucketModal } from '@/components/interfaces/Storage/DeleteBucketModal'
 import { EditBucketModal } from '@/components/interfaces/Storage/EditBucketModal'
 import { EmptyBucketModal } from '@/components/interfaces/Storage/EmptyBucketModal'
@@ -78,6 +79,7 @@ const BucketPage: NextPageWithLayout = () => {
         <PageBreadcrumbs
           actions={
             <PageBreadcrumbsActions>
+              <BucketVersioningPill bucket={bucket} />
               <Button
                 asChild
                 variant="outline"
