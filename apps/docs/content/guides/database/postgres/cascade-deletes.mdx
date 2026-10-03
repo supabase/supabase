@@ -149,7 +149,7 @@ add constraint child_father_fkey foreign key (father) references parent (id)
   on delete no action initially deferred;
 ```
 
-Here you will see that `INITIALLY DEFFERED` seems to operate like `NO ACTION` or `RESTRICT`. When we run a delete, it seems to make no difference:
+Here you will see that `INITIALLY DEFERRED` seems to operate like `NO ACTION` or `RESTRICT`. When we run a delete, it seems to make no difference:
 
 ```shell
 postgres=# delete from grandparent;
