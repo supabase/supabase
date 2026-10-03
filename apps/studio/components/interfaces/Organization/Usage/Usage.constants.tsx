@@ -1,46 +1,20 @@
 import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { STORAGE_SIZE_SEGMENTS } from './StorageRetention/StorageRetention.constants'
+import { StorageRetentionBreakdown } from './StorageRetention/StorageRetentionBreakdown'
+import type { AttributeColor } from './Usage.colors'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { DOCS_URL } from '@/lib/constants'
 
-export const COLOR_MAP = {
-  white: { bar: 'fill-foreground', marker: 'bg-foreground' },
-  green: { bar: 'fill-green-800', marker: 'bg-green-800' },
-  'dark-green': { bar: 'fill-green-1000', marker: 'bg-green-1000' },
-  blue: { bar: 'fill-blue-900', marker: 'bg-blue-900' },
-  yellow: { bar: 'fill-yellow-800', marker: 'bg-yellow-800' },
-  'dark-yellow': { bar: 'fill-yellow-1000', marker: 'bg-yellow-1000' },
-  orange: { bar: 'fill-orange-800', marker: 'bg-orange-800' },
-  'dark-orange': { bar: 'fill-orange-1000', marker: 'bg-orange-1100' },
-  teal: { bar: 'fill-teal-600', marker: 'bg-teal-700' },
-  red: { bar: 'fill-red-800', marker: 'bg-red-800' },
-  'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
-  purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
-}
-
 export const USAGE_STATUS = {
   NORMAL: 'NORMAL',
   APPROACHING: 'APPROACHING',
   EXCEEDED: 'EXCEEDED',
 }
-
-export type AttributeColor =
-  | 'white'
-  | 'blue'
-  | 'green'
-  | 'yellow'
-  | 'orange'
-  | 'purple'
-  | 'red'
-  | 'dark-red'
-  | 'dark-orange'
-  | 'dark-yellow'
-  | 'dark-green'
-  | 'teal'
 
 export interface Attribute {
   key: string
@@ -73,9 +47,14 @@ export interface CategoryMeta {
   attributes: CategoryAttribute[]
 }
 
-export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[] = (
-  subscription
-) => {
+export interface UsageCategoryOptions {
+  isStorageVersioningEnabled?: boolean
+}
+
+export const USAGE_CATEGORIES: (
+  subscription?: OrgSubscription,
+  options?: UsageCategoryOptions
+) => CategoryMeta[] = (subscription, { isStorageVersioningEnabled = false } = {}) => {
   const egressAttributes: CategoryAttribute[] = [
     {
       anchor: 'egress',
@@ -215,13 +194,23 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
   databaseAndStorageSizeAttributes.push({
     anchor: 'storageSize',
     key: PricingMetric.STORAGE_SIZE,
-    attributes: [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
+    attributes: isStorageVersioningEnabled
+      ? STORAGE_SIZE_SEGMENTS.map(({ attributeKey, name, color }) => ({
+          key: attributeKey,
+          name,
+          color,
+        }))
+      : [{ key: PricingMetric.STORAGE_SIZE.toLowerCase(), color: 'white' }],
     name: 'Storage Size',
     chartPrefix: 'Average',
     unit: 'bytes',
-    description:
-      'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
+    description: isStorageVersioningEnabled
+      ? 'Sum of all objects in your storage buckets, including noncurrent objects retained by object versioning.\nBilling is prorated down to the hour and will be displayed GB-Hrs.'
+      : 'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
     chartDescription: 'The data refreshes every hour.',
+    ...(isStorageVersioningEnabled && {
+      additionalInfo: () => <StorageRetentionBreakdown />,
+    }),
     links: [
       {
         name: 'Storage',
