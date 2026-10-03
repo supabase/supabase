@@ -31,7 +31,17 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
+export function generateDynamicColumns({
+  data,
+  selectable = true,
+}: {
+  data: ColumnSchema[]
+  /**
+   * Reveals a checkbox over each row's level dot for multi-selecting logs. Turn off for read-only
+   * lists, which show only the level dot.
+   */
+  selectable?: boolean
+}): {
   columns: ColumnDef<ColumnSchema>[]
   columnVisibility: Record<string, boolean>
 } {
@@ -43,13 +53,18 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'level',
       header: '',
-      cell: ({ row }) => (
-        <LogSelectionIndicator
-          id={row.id}
-          level={row.original.level}
-          isSelected={row.getIsSelected()}
-        />
-      ),
+      cell: ({ row }) =>
+        selectable ? (
+          <LogSelectionIndicator
+            id={row.id}
+            level={row.original.level}
+            isSelected={row.getIsSelected()}
+          />
+        ) : (
+          <div className="flex h-4 w-4 items-center justify-center">
+            <LogLevelDot level={row.original.level} />
+          </div>
+        ),
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
