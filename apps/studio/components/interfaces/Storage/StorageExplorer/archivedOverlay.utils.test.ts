@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
-import { getArchivedOverlayItems, getArchivedSegments } from './archivedOverlay.utils'
+import {
+  getArchivedObjectsUnderFolder,
+  getArchivedOverlayItems,
+  getArchivedSegments,
+} from './archivedOverlay.utils'
 import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-query'
 
 const archived = (path: string, overrides: Partial<ArchivedObject> = {}): ArchivedObject => ({
@@ -13,6 +17,7 @@ const archived = (path: string, overrides: Partial<ArchivedObject> = {}): Archiv
     size: 1024,
     createdAt: '2026-07-01T00:00:00Z',
     action: 'overwrite',
+    mimeType: 'image/png',
   },
   noncurrentVersions: [],
   ...overrides,
@@ -87,6 +92,8 @@ describe('getArchivedOverlayItems', () => {
     expect(rows).toHaveLength(1)
     expect(rows[0].name).toBe('final.png')
     expect(rows[0].type).toBe(STORAGE_ROW_TYPES.FILE)
+    // Carried through so the row icon and the preview both know what this is.
+    expect(rows[0].metadata?.mimetype).toBe('image/png')
   })
 
   it('coalesces several objects under one subfolder into a single row', () => {
@@ -132,5 +139,41 @@ describe('getArchivedOverlayItems', () => {
     const rows = overlay([], [archived('a/b/c/d.png')])
     expect(rows.map((r) => r.name)).toEqual(['a'])
     expect(overlay(['a'], [archived('a/b/c/d.png')]).map((r) => r.name)).toEqual(['b'])
+  })
+})
+
+describe('getArchivedObjectsUnderFolder', () => {
+  const objects = [
+    archived('logo.svg'),
+    archived('matches/final.png'),
+    archived('matches/round-3/a.png'),
+    archived('matches-2026/other.png'),
+  ]
+
+  it('collects everything under the folder at any depth', () => {
+    const under = getArchivedObjectsUnderFolder({
+      folderSegments: ['matches'],
+      archivedObjects: objects,
+    })
+    expect(under.map((object) => object.path)).toEqual([
+      'matches/final.png',
+      'matches/round-3/a.png',
+    ])
+  })
+
+  it('does not match a sibling folder sharing the name as a prefix', () => {
+    const under = getArchivedObjectsUnderFolder({
+      folderSegments: ['matches'],
+      archivedObjects: [archived('matches-2026/other.png')],
+    })
+    expect(under).toEqual([])
+  })
+
+  it('includes the placeholder, so an empty archived folder is still actionable', () => {
+    const under = getArchivedObjectsUnderFolder({
+      folderSegments: ['matches'],
+      archivedObjects: [archived('matches/.emptyFolderPlaceholder')],
+    })
+    expect(under.map((object) => object.path)).toEqual(['matches/.emptyFolderPlaceholder'])
   })
 })
