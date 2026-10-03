@@ -1,0 +1,49 @@
+- name: Allocate and format swapfile
+  ansible.builtin.shell: |
+    fallocate -l 1G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+  args:
+    creates: /swapfile
+
+- name: Add swapfile to fstab
+  ansible.posix.mount:
+    src: /swapfile
+    path: none
+    fstype: swap
+    opts: sw
+    dump: "0"
+    passno: "0"
+    state: present
+
+- name: 'tuned - Decrease the kernel swappiness'  # noqa: name[casing]
+  community.general.ini_file:
+    create: true
+    group: 'root'
+    mode: '0644'
+    no_extra_spaces: true
+    option: 'vm.swappiness'
+    path: '/etc/tuned/profiles/postgresql/tuned.conf'
+    section: 'sysctl'
+    state: 'present'
+    value: '10'
+
+- name: 'tuned - Load zstd compressor module'  # noqa: name[casing]
+  community.general.modprobe:
+    name: 'zstd'
+    persistent: 'present'
+    state: 'present'
+
+- name: 'tuned - Configure and enable zswap'  # noqa: name[casing]
+  ansible.builtin.shell:
+    cmd: "echo {{ zswap_item['value'] }}  > /sys/module/zswap/parameters/{{ zswap_item['param'] }}"
+  changed_when: true
+  loop:
+    - param: 'compressor'
+      value: 'zstd'
+    - param: 'max_pool_percent'
+      value: '10'
+    - param: 'enabled'
+      value: 'Y'
+  loop_control:
+    loop_var: 'zswap_item'

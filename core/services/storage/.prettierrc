@@ -1,0 +1,11 @@
+{
+  "overrides": [
+    {
+      "files": ["**/*.md", "**/*.yml", "**/*.yaml"],
+      "options": {
+        "tabWidth": 2,
+        "printWidth": 100
+      }
+    }
+  ]
+}

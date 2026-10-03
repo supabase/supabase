@@ -1,0 +1,213 @@
+name: Testinfra Integration Tests Nix
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      DEV_AWS_ROLE:
+        description: 'AWS role for dev environment'
+        required: true
+      NIX_SIGN_SECRET_KEY:
+        description: 'Nix signing secret key'
+        required: true
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  AWS_REGION: ap-southeast-1
+
+jobs:
+  gen-matrix:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      postgres_versions: ${{ steps.set-versions.outputs.postgres_versions }}
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Set PostgreSQL versions
+        id: set-versions
+        run: |
+          VERSIONS=$(nix run nixpkgs#yq-go -- -o=json -I=0 '.postgres_major' ansible/vars.yml)
+          echo "postgres_versions=$VERSIONS" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: gen-matrix
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres_version: ${{ fromJson(needs.gen-matrix.outputs.postgres_versions) }}
+        target:
+          - arch: amd64
+            instance_type: c6i.4xlarge
+            runner: blacksmith-2vcpu-ubuntu-2404
+          - arch: arm64
+            instance_type: c6g.4xlarge
+            runner: blacksmith-2vcpu-ubuntu-2404-arm
+    runs-on: ${{ matrix.target.runner }}
+    timeout-minutes: 150
+
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Debug AWS role secret
+        run: |
+          echo "Checking DEV_AWS_ROLE secret availability..."
+          if [ -z "${{ secrets.DEV_AWS_ROLE }}" ]; then
+            echo "❌ DEV_AWS_ROLE is empty or not available"
+          else
+            echo "✅ DEV_AWS_ROLE is available"
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+          output-credentials: true
+          role-duration-seconds: 7200
+
+      - name: Install nix
+        uses: ./.github/actions/nix-install-ephemeral
+        with:
+          push-to-cache: true
+          aws-region: ${{ env.AWS_REGION }}
+          nix-signing-key: ${{ secrets.NIX_SIGN_SECRET_KEY }}
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+
+      - name: Resolve git sha
+        id: resolve-git-sha
+        uses: ./.github/actions/resolve-git-sha
+        with:
+          flake_input: ${{ vars.GIT_SHA_FROM_FLAKE_INPUT }}
+
+      - name: Build AMI
+        id: build-ami
+        uses: ./.github/actions/build-ami
+        with:
+          ami_name_prefix: "supabase-postgres-${{ github.run_id }}-${{ matrix.target.arch }}"
+          ami_regions: '["${{ env.AWS_REGION }}"]'
+          arch: ${{ matrix.target.arch }}
+          git_sha: ${{ github.sha }}
+          packages_git_sha: ${{ steps.resolve-git-sha.outputs.sha }}
+          instance_type: ${{ matrix.target.instance_type }}
+          postgres_version: ${{ matrix.postgres_version }}
+          region: ${{ env.AWS_REGION }}
+
+      - name: Save AMI disk usage
+        env:
+          ARCH: ${{ matrix.target.arch }}
+          DISK_USAGE_JSON: ${{ steps.build-ami.outputs.disk_usage_json }}
+          POSTGRES_VERSION: ${{ matrix.postgres_version }}
+        run: >-
+          jq -cnr
+          --arg arch "$ARCH"
+          --arg version "$POSTGRES_VERSION"
+          --argjson disk_usage "$DISK_USAGE_JSON"
+          '{$version,$arch,bytes:$disk_usage.bytes,human:$disk_usage.human}'
+          >"ami-disk-usage-$POSTGRES_VERSION-$ARCH.json"
+
+      - name: Upload AMI disk usage
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ami-disk-usage-${{ matrix.postgres_version }}-${{ matrix.target.arch }}
+          path: ami-disk-usage-*.json
+          overwrite: true
+          retention-days: 1
+
+      - name: Run tests
+        timeout-minutes: 10
+        env:
+          AMI_ID: ${{ steps.build-ami.outputs.stage2_ami_id }}
+          EXECUTION_ID: ${{ steps.build-ami.outputs.execution_id }}
+        run: |
+          # TODO: use uv for pkg mgmt
+          pip3 install boto3 'boto3-stubs[essential]' ec2instanceconnectcli pytest 'pytest-testinfra[paramiko]' requests
+          pytest -vv -s testinfra/test_ami_nix.py
+
+      - name: Cleanup resources on build cancellation
+        if: ${{ cancelled() }}
+        run: |
+          EXECUTION_ID="${{ steps.build-ami.outputs.execution_id }}"
+          INSTANCE_IDS=$(aws ec2 --region "$AWS_REGION" describe-instances --filters "Name=tag:packerExecutionId,Values=${EXECUTION_ID}" --query "Reservations[].Instances[].InstanceId" --output text)
+          if [ -n "$INSTANCE_IDS" ]; then
+            echo "Terminating packer build instances: $INSTANCE_IDS"
+            echo "$INSTANCE_IDS" | xargs -r aws ec2 terminate-instances --region "$AWS_REGION" --instance-ids
+          else
+            echo "No packer build instances to clean up"
+          fi
+          VOLUME_IDS=$(aws ec2 --region "$AWS_REGION" describe-volumes --filters "Name=tag:packerExecutionId,Values=${EXECUTION_ID}" "Name=status,Values=available" --query "Volumes[*].VolumeId" --output text)
+          if [ -n "$VOLUME_IDS" ]; then
+            echo "Deleting orphaned packer volumes: $VOLUME_IDS"
+            echo "$VOLUME_IDS" | xargs -r -n1 aws ec2 --region "$AWS_REGION" delete-volume --volume-id
+          else
+            echo "No orphaned packer volumes to clean up"
+          fi
+
+      - name: Cleanup resources after build
+        if: ${{ always() }}
+        run: |
+          EXECUTION_ID="${{ steps.build-ami.outputs.execution_id }}"
+          INSTANCE_IDS=$(aws ec2 --region "$AWS_REGION" describe-instances --filters "Name=tag:testinfra-run-id,Values=${EXECUTION_ID}" --query "Reservations[].Instances[].InstanceId" --output text)
+          if [ -n "$INSTANCE_IDS" ]; then
+            echo "Terminating testinfra instances: $INSTANCE_IDS"
+            echo "$INSTANCE_IDS" | xargs -r aws ec2 terminate-instances --region "$AWS_REGION" --instance-ids || true
+          else
+            echo "No testinfra instances to clean up"
+          fi
+          VOLUME_IDS=$(aws ec2 --region "$AWS_REGION" describe-volumes --filters "Name=tag:packerExecutionId,Values=${EXECUTION_ID}" "Name=status,Values=available" --query "Volumes[*].VolumeId" --output text)
+          if [ -n "$VOLUME_IDS" ]; then
+            echo "Deleting orphaned packer volumes: $VOLUME_IDS"
+            echo "$VOLUME_IDS" | xargs -r -n1 aws ec2 --region "$AWS_REGION" delete-volume --volume-id || true
+          else
+            echo "No orphaned packer volumes to clean up"
+          fi
+
+      - name: Cleanup stage 2 AMI
+        if: always()
+        run: |
+          EXECUTION_ID="${{ steps.build-ami.outputs.execution_id }}"
+          STAGE2_AMI_IDS=$(aws ec2 describe-images \
+            --region "$AWS_REGION" \
+            --owners self \
+            --filters "Name=tag:packerExecutionId,Values=${EXECUTION_ID}" \
+            --query 'Images[*].ImageId' \
+            --output text)
+
+          if [ -n "$STAGE2_AMI_IDS" ]; then
+            for ami_id in $STAGE2_AMI_IDS; do
+              echo "Deregistering stage 2 AMI: $ami_id"
+              aws ec2 deregister-image --region "$AWS_REGION" --image-id "$ami_id" || true
+            done
+          else
+            echo "No stage 2 AMI to clean up"
+          fi
+
+  report-disk-usage:
+    needs: build
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - name: Download AMI disk usage
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: ami-disk-usage-*
+          path: ami-disk-usage
+          merge-multiple: true
+
+      - name: Report AMI disk usage
+        run: |
+          cat <<EOF >>"$GITHUB_STEP_SUMMARY"
+          ### AMI Root Disk Usage
+
+          | Version | Arch | Human | Bytes |
+          | ------- | ---- | ----- | ----- |
+          EOF
+          cat ami-disk-usage/ami-disk-usage-*.json |
+          sort -V |
+          jq -rs '.[]|{version,arch,human,bytes}|"| \(join("|")) |"' >>"$GITHUB_STEP_SUMMARY"

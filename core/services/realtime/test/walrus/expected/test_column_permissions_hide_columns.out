@@ -1,0 +1,61 @@
+/*
+Tests that, when a role does not have select access to a column, it is omitted
+from realtime output
+
+In this case, we omit the "body" column
+*/
+select 1 from pg_create_logical_replication_slot('realtime', 'wal2json', false);
+ ?column? 
+----------
+        1
+(1 row)
+
+create table public.notes(
+    id int primary key,
+    body text
+);
+revoke select on public.notes from authenticated;
+grant select (id) on public.notes to authenticated;
+insert into realtime.subscription(subscription_id, entity, claims)
+select
+    seed_uuid(1),
+    'public.notes',
+    jsonb_build_object(
+        'role', 'authenticated',
+        'sub', seed_uuid(2)::text
+    );
+insert into public.notes(id, body) values (1, 'hello');
+select
+    rec,
+    is_rls_enabled,
+    subscription_ids,
+    errors
+from
+   walrus;
+                        rec                         | is_rls_enabled |            subscription_ids            | errors 
+----------------------------------------------------+----------------+----------------------------------------+--------
+ {                                                 +| f              | {f4539ebe-c779-5788-bbc1-2421ffaa8954} | {}
+     "type": "INSERT",                             +|                |                                        | 
+     "table": "notes",                             +|                |                                        | 
+     "record": {                                   +|                |                                        | 
+         "id": 1                                   +|                |                                        | 
+     },                                            +|                |                                        | 
+     "schema": "public",                           +|                |                                        | 
+     "columns": [                                  +|                |                                        | 
+         {                                         +|                |                                        | 
+             "name": "id",                         +|                |                                        | 
+             "type": "int4"                        +|                |                                        | 
+         }                                         +|                |                                        | 
+     ],                                            +|                |                                        | 
+     "commit_timestamp": "2000-01-01T08:01:01.000Z"+|                |                                        | 
+ }                                                  |                |                                        | 
+(1 row)
+
+drop table public.notes;
+select pg_drop_replication_slot('realtime');
+ pg_drop_replication_slot 
+--------------------------
+ 
+(1 row)
+
+truncate table realtime.subscription;

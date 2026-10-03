@@ -1,0 +1,70 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages-deploy"
+  cancel-in-progress: false
+
+jobs:
+  build-docs:
+    name: Build docs
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+
+      - name: export docs
+        run: |
+          npm run docs:export
+          npm run docs:export-ui
+        env:
+          ANON_KEY: ${{ secrets.ANON_KEY }}
+          SERVICE_KEY: ${{ secrets.SERVICE_KEY }}
+          TENANT_ID: ${{ secrets.TENANT_ID }}
+          REGION: ${{ secrets.REGION }}
+          POSTGREST_URL: ${{ secrets.POSTGREST_URL }}
+          GLOBAL_S3_BUCKET: ${{ secrets.GLOBAL_S3_BUCKET }}
+          PGRST_JWT_SECRET: ${{ secrets.PGRST_JWT_SECRET }}
+          AUTHENTICATED_KEY: ${{ secrets.AUTHENTICATED_KEY }}
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1/postgres
+          PGOPTIONS: -c search_path=storage,public
+          FILE_SIZE_LIMIT: "52428800"
+          STORAGE_BACKEND: s3
+          ENABLE_IMAGE_TRANSFORMATION: true
+          VECTOR_ENABLED: true
+          ICEBERG_ENABLED: true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: "./swagger-ui"
+
+  deploy:
+    name: Deploy docs
+    needs: build-docs
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

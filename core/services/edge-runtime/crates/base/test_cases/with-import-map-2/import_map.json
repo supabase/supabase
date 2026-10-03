@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "std/": "https://deno.land/std@0.131.0/",
+    "foo/": "./bar/"
+  }
+}

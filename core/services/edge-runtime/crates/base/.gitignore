@@ -1,0 +1,3 @@
+tests/fixture/testdata/*
+!tests/fixture/testdata/**/*.snapshot
+!tests/fixture/testdata/**/*.metadata

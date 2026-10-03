@@ -1,0 +1,44 @@
+name: Configure Bot
+
+description: Create token and configure PostgREST CI Bot's git identity
+
+inputs:
+  client-id:
+    description: App ID of the Bot
+    required: true
+  private-key:
+    description: Private Key of the Bot
+    required: true
+outputs:
+  token:
+    description: Bot App Token
+    value: ${{ steps.app-token.outputs.token }}
+
+runs:
+  using: composite
+  steps:
+    # This actions creates the github token using the postgrest app secrets
+    - name: Create Github App Token
+      id: app-token
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      with:
+        client-id: ${{ inputs.client-id }}
+        private-key: ${{ inputs.private-key }}
+        permission-contents: write
+
+    - name: Checkout
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        token: ${{ steps.app-token.outputs.token }}
+        persist-credentials: true
+
+    - name: Configure Git identity of PostgREST CI Bot
+      shell: bash
+      env:
+        GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        CI_BOT_NAME: ${{ steps.app-token.outputs.app-slug }}
+      run: |
+        CI_BOT_ID="$(gh api "/users/${CI_BOT_NAME}[bot]" --jq .id)"
+        git config user.name "${CI_BOT_NAME}[bot]"
+        git config user.email \
+          "${CI_BOT_ID}+${CI_BOT_NAME}[bot]@users.noreply.github.com"

@@ -1,0 +1,55 @@
+# The directory Mix will write compiled artifacts to.
+/_build/
+
+# If you run "mix test --cover", coverage assets end up here.
+/cover/
+
+# The directory Mix downloads your dependencies sources to.
+/deps/
+
+# Where 3rd-party dependencies like ExDoc output generated docs.
+/doc/
+
+# Ignore .fetch files in case you like to edit your project deps locally.
+/.fetch
+
+# If the VM crashes, it generates a dump, let's ignore it too.
+erl_crash.dump
+
+# Also ignore archive artifacts (built via "mix archive.build").
+*.ez
+
+# Ignore package tarball (built via "mix hex.build").
+realtime-*.tar
+
+# Ignore assets that are produced by build tools.
+/priv/static/assets/
+
+# Ignore `mix phx.digest` output (digested copies, gzipped copies and the manifest).
+/priv/static/cache_manifest.json
+/priv/static/*.gz
+/priv/static/*-????????????????????????????????.*
+
+# Ignore Dialyzer .plt
+/priv/plts/*
+node_modules
+.supabase
+config/prod.secret.exs
+demo/.env
+.lexical
+.vscode
+.elixir_ls
+
+# Local
+mise.local.toml
+
+.temp
+
+# Scaffolded by `pgdelta schema export` on every run
+priv/repo/tenant_schema/_custom/
+
+# pg_regress output from test/walrus/run.sh
+test/walrus/results/
+
+# Wait-margin diagnostics from WAIT_MARGIN_REPORT=true (see test/test_helper.exs)
+wait-margin.jsonl

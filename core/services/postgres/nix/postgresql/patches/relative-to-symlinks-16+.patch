@@ -1,0 +1,13 @@
+On NixOS we *want* stuff relative to symlinks.
+---
+--- a/src/common/exec.c
++++ b/src/common/exec.c
+@@ -238,6 +238,8 @@
+ static int
+ normalize_exec_path(char *path)
+ {
++	return 0;
++
+ 	/*
+ 	 * We used to do a lot of work ourselves here, but now we just let
+ 	 * realpath(3) do all the heavy lifting.

@@ -1,0 +1,20 @@
+[Unit]
+Description=Ansible pull
+
+[Service]
+Type=simple
+User=ubuntu
+
+ExecStart=/usr/bin/ansible-pull --private-key "$SSH_READ_KEY_FILE" -U "$REPO" --accept-host-key -t "$REGION,db-all" -i localhost --clean --full "$PLAYBOOK" -v -o -C "$REPO_BRANCH"
+
+# --verify-commit
+# temporarily disable commit verification, while we figure out how we want to balance commit signatures
+# and PR reviews; an --ff-only merge options would have allowed us to use this pretty nicely
+
+MemoryAccounting=true
+MemoryMax=30%
+
+StandardOutput=append:/var/log/ansible-pull.stdout
+StandardError=append:/var/log/ansible-pull.error
+
+TimeoutStopSec=600

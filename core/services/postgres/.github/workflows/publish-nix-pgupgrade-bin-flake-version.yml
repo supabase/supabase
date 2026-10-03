@@ -1,0 +1,154 @@
+name: Publish nix pg_upgrade_bin flake version
+
+on:
+  workflow_dispatch:
+    inputs:
+      postgresVersion:
+        description: 'Optional. Postgres version to publish against, i.e. 15.1.1.78'
+        required: false
+
+permissions:
+  id-token: write
+
+jobs:
+  prepare:
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    outputs:
+      postgres_versions: ${{ steps.set-versions.outputs.postgres_versions }}
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Set PostgreSQL versions
+        id: set-versions
+        env:
+          POSTGRES_VERSION: ${{ inputs.postgresVersion }}
+        run: |
+          set -eo pipefail
+          if [[ -n "$POSTGRES_VERSION" ]]; then
+            git rev-parse --verify "$POSTGRES_VERSION" || {
+              echo "Error: git tag '$POSTGRES_VERSION' not found"
+              exit 1
+            }
+            VERSIONS=$(git show "$POSTGRES_VERSION:ansible/vars.yml" | nix run nixpkgs#yq-go -- -o=json -I=0 '.postgres_major')
+          else
+            VERSIONS=$(nix run nixpkgs#yq-go -- -o=json -I=0 '.postgres_major' ansible/vars.yml)
+          fi
+          echo "postgres_versions=$VERSIONS" >> $GITHUB_OUTPUT
+
+  publish-staging:
+    needs: prepare
+    runs-on: large-linux-x86
+    strategy:
+      matrix:
+        postgres_version: ${{ fromJson(needs.prepare.outputs.postgres_versions) }}
+
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Grab release version
+        id: process_release_version
+        env:
+          POSTGRES_VERSION: ${{ inputs.postgresVersion }}
+        run: |
+          set -eo pipefail
+          if [[ -n "$POSTGRES_VERSION" ]]; then
+            VERSION=$(git show "$POSTGRES_VERSION:ansible/vars.yml" | nix run nixpkgs#yq-go -- -r '.postgres_release["postgres'${{ matrix.postgres_version }}'"]')
+          else
+            VERSION=$(nix run nixpkgs#yq-go -- -r '.postgres_release["postgres'${{ matrix.postgres_version }}'"]' ansible/vars.yml)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "major_version=$(echo $VERSION | cut -d'.' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Create a tarball containing the latest nix flake version
+        working-directory: /tmp/
+        run: |
+          mkdir -p "${{ steps.process_release_version.outputs.major_version }}"
+          echo "$GITHUB_SHA" > "${{ steps.process_release_version.outputs.major_version }}/nix_flake_version"
+          tar -czvf pg_upgrade_bin.tar.gz "${{ steps.process_release_version.outputs.major_version }}"
+
+      - name: configure aws credentials - staging
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: "us-east-1"
+
+      - name: Upload pg_upgrade scripts to s3 staging
+        run: |
+          for prefix in upgrades upgrades-x86 ; do
+              aws s3 cp /tmp/pg_upgrade_bin.tar.gz s3://${{ secrets.ARTIFACTS_BUCKET }}/${prefix}/postgres/supabase-postgres-${{ steps.process_release_version.outputs.version }}/20.04.tar.gz
+              aws s3 cp /tmp/pg_upgrade_bin.tar.gz s3://${{ secrets.ARTIFACTS_BUCKET }}/${prefix}/postgres/supabase-postgres-${{ steps.process_release_version.outputs.version }}/24.04.tar.gz
+              aws s3 cp /tmp/pg_upgrade_bin.tar.gz s3://${{ secrets.ARTIFACTS_BUCKET }}/${prefix}/postgres/supabase-postgres-${{ steps.process_release_version.outputs.version }}/upgrade_bundle.tar.gz
+          done
+
+      - name: Slack Notification on Failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
+          SLACK_USERNAME: 'gha-failures-notifier'
+          SLACK_COLOR: 'danger'
+          SLACK_MESSAGE: 'Publishing pg_upgrade binaries flake version failed'
+          SLACK_FOOTER: ''
+
+  publish-prod:
+    runs-on: large-linux-x86
+    if: github.ref_name == 'develop' || startsWith(github.ref_name, 'release/')
+    needs: prepare
+    strategy:
+      matrix:
+        postgres_version: ${{ fromJson(needs.prepare.outputs.postgres_versions) }}
+
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - name: Grab release version
+        id: process_release_version
+        env:
+          POSTGRES_VERSION: ${{ inputs.postgresVersion }}
+        run: |
+          set -eo pipefail
+          if [[ -n "$POSTGRES_VERSION" ]]; then
+            VERSION=$(git show "$POSTGRES_VERSION:ansible/vars.yml" | nix run nixpkgs#yq-go -- -r '.postgres_release["postgres'${{ matrix.postgres_version }}'"]')
+          else
+            VERSION=$(nix run nixpkgs#yq-go -- -r '.postgres_release["postgres'${{ matrix.postgres_version }}'"]' ansible/vars.yml)
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "major_version=$(echo $VERSION | cut -d'.' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Create a tarball containing the latest nix flake version
+        working-directory: /tmp/
+        run: |
+          mkdir -p "${{ steps.process_release_version.outputs.major_version }}"
+          echo "$GITHUB_SHA" > "${{ steps.process_release_version.outputs.major_version }}/nix_flake_version"
+          tar -czvf pg_upgrade_bin.tar.gz "${{ steps.process_release_version.outputs.major_version }}"
+
+      - name: configure aws credentials - prod
+        uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: "us-east-1"
+
+      - name: Upload pg_upgrade scripts to s3 prod
+        run: |
+          for prefix in upgrades upgrades-x86 ; do
+              aws s3 cp /tmp/pg_upgrade_bin.tar.gz s3://${{ secrets.PROD_ARTIFACTS_BUCKET }}/${prefix}/postgres/supabase-postgres-${{ steps.process_release_version.outputs.version }}/20.04.tar.gz
+              aws s3 cp /tmp/pg_upgrade_bin.tar.gz s3://${{ secrets.PROD_ARTIFACTS_BUCKET }}/${prefix}/postgres/supabase-postgres-${{ steps.process_release_version.outputs.version }}/24.04.tar.gz
+              aws s3 cp /tmp/pg_upgrade_bin.tar.gz s3://${{ secrets.PROD_ARTIFACTS_BUCKET }}/${prefix}/postgres/supabase-postgres-${{ steps.process_release_version.outputs.version }}/upgrade_bundle.tar.gz
+          done
+
+      - name: Slack Notification on Failure
+        if: ${{ failure() }}
+        uses: rtCamp/action-slack-notify@e31e87e03dd19038e411e38ae27cbad084a90661 # v2.3.3
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_NOTIFICATIONS_WEBHOOK }}
+          SLACK_USERNAME: 'gha-failures-notifier'
+          SLACK_COLOR: 'danger'
+          SLACK_MESSAGE: 'Publishing pg_upgrade binaries flake version failed'
+          SLACK_FOOTER: ''

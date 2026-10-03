@@ -1,0 +1,5 @@
+{
+  // https://github.com/denoland/deno/issues/25226#issuecomment-2311454504
+  "workspace": [],
+  "importMap": "./import_map.json"
+}

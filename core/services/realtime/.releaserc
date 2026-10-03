@@ -1,0 +1,21 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "sed -i 's/version: \"[^\"]*\"/version: \"${nextRelease.version}\"/' mix.exs"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["mix.exs"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}

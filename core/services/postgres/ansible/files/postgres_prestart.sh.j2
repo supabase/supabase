@@ -1,0 +1,101 @@
+#!/bin/bash
+
+set -x  # Print commands
+
+log() {
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
+}
+
+check_extensions_file() {
+    local extensions_file="/etc/adminapi/pg-extensions.json"
+    if [ ! -f "$extensions_file" ]; then
+        log "extensions: No extensions file found, skipping extensions versions check"
+        return 0 #if file not found, skip
+    fi
+    if [ ! -r "$extensions_file" ]; then
+        log "extensions: Cannot read extensions file"
+        return 1 #a true error, we should be able to read file
+    fi
+    return 0
+}
+
+switch_extension_version() {
+    local extension_name="$1"
+    local version="$2"
+    
+    # Use BIN_PATH environment variable or default to /var/lib/postgresql/.nix-profile
+    : ${BIN_PATH:="/var/lib/postgresql/.nix-profile"}
+    
+    local switch_script="$BIN_PATH/bin/switch_${extension_name}_version"
+
+    if [ ! -x "$switch_script" ]; then
+        log "$extension_name: No version switch script available at $switch_script, skipping"
+        return 0
+    fi
+
+    log "$extension_name: Switching to version $version"
+    # Run directly as root since we're already running as root
+    "$switch_script" "$version"
+    local exit_code=$?
+    if [ $exit_code -eq 0 ]; then
+        log "$extension_name: Version switch completed successfully"
+    else
+        log "$extension_name: Version switch failed with exit code $exit_code"
+    fi
+    return $exit_code
+}
+
+handle_extension_versions() {
+    if ! check_extensions_file; then
+        return
+    fi
+
+    local extensions_file="/etc/adminapi/pg-extensions.json"
+    
+    # Get all extension names from the JSON file
+    local extensions
+    extensions=$(jq -r 'keys[]' "$extensions_file" 2>/dev/null)
+    
+    if [ -z "$extensions" ]; then
+        log "extensions: No extensions found in configuration"
+        return
+    fi
+    
+    # Iterate through each extension
+    while IFS= read -r extension_name; do
+        # Get the version for this extension
+        local version
+        version=$(jq -r --arg ext "$extension_name" '.[$ext] // empty' "$extensions_file")
+        
+        if [ -z "$version" ]; then
+            log "$extension_name: No version specified, skipping"
+            continue
+        fi
+                
+        log "$extension_name: Found version $version in extensions file"
+        
+        # Don't fail if version switch fails - just log and continue
+        switch_extension_version "$extension_name" "$version" || log "$extension_name: Version switch failed but continuing"
+        
+    done <<< "$extensions"
+}
+
+main() {
+   log "Starting prestart script"
+   
+   # 1. Handle all extension versions from config file
+   handle_extension_versions
+
+   log "Prestart script completed"
+}
+
+# Initial locale setup
+if [ $(cat /etc/locale.gen | grep -c en_US.UTF-8) -eq 0 ]; then
+   echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+fi
+
+if [ $(locale -a | grep -c en_US.utf8) -eq 0 ]; then
+   locale-gen
+fi
+
+main

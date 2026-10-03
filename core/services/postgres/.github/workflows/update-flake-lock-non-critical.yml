@@ -1,0 +1,53 @@
+name: Update Flake Lock (Non-Critical)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 */2 *'
+
+jobs:
+  update-flake-lock-non-critical:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+
+      - name: Install Nix
+        uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Update non-critical flake inputs
+        run: |
+          nix flake update \
+            devshell \
+            flake-parts \
+            flake-utils \
+            git-hooks \
+            nix-darwin \
+            nix-editor \
+            nix2container \
+            treefmt-nix
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update flake.lock non-critical inputs (bimonthly)"
+          title: "chore: update flake.lock non-critical inputs (bimonthly)"
+          body: |
+            Automated bimonthly update of non-critical flake inputs:
+            - `devshell`
+            - `flake-parts`
+            - `flake-utils`
+            - `git-hooks`
+            - `nix-darwin`
+            - `nix-editor`
+            - `nix2container`
+            - `treefmt-nix`
+          branch: auto-update-flake-lock-non-critical
+          base: develop
+          labels: |
+            dependencies
+            automated

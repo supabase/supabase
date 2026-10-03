@@ -1,0 +1,22 @@
+CREATE SCHEMA IF NOT EXISTS partman_test;
+
+CREATE TABLE partman_test.time_taptest_table
+    (col1 int,
+    col2 text default 'stuff',
+    col3 timestamptz NOT NULL DEFAULT now())
+PARTITION BY RANGE (col3);
+
+CREATE INDEX ON partman_test.time_taptest_table (col3);
+
+CREATE TABLE partman_test.time_taptest_table_template (LIKE partman_test.time_taptest_table);
+
+ALTER TABLE partman_test.time_taptest_table_template ADD PRIMARY KEY (col1);
+
+SELECT partman.create_parent(
+    p_parent_table := 'partman_test.time_taptest_table'
+    , p_control := 'col3'
+    , p_interval := '1 day'
+    , p_template_table := 'partman_test.time_taptest_table_template'
+);
+
+DROP SCHEMA partman_test CASCADE;

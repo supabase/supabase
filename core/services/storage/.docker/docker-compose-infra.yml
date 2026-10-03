@@ -1,0 +1,240 @@
+# docker-compose.yml
+
+services:
+  tenant_db:
+    image: pgvector/pgvector:pg${POSTGRES_VERSION:-15}
+    shm_size: "1gb"
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+      interval: 5s
+      timeout: 60s
+      retries: 20
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+
+  multitenant_db:
+    image: postgres:${POSTGRES_VERSION:-15}
+    ports:
+      - "5433:5432"
+    configs:
+      - source: init.sql
+        target: /docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "postgres"]
+      interval: 5s
+      timeout: 60s
+      retries: 20
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+  pg_bouncer:
+    image: bitnamilegacy/pgbouncer:latest
+    ports:
+      - 6453:6432
+    depends_on:
+      - tenant_db
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_HOST: tenant_db
+      POSTGRESQL_PASSWORD: postgres
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_IGNORE_STARTUP_PARAMETERS: "extra_float_digits, options"
+      PGBOUNCER_STATS_USERS: postgres
+
+  multitenant_pgbouncer:
+    image: bitnamilegacy/pgbouncer:latest
+    ports:
+      - 6454:6432
+    depends_on:
+      - multitenant_db
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_HOST: multitenant_db
+      POSTGRESQL_PASSWORD: postgres
+      POSTGRESQL_DATABASE: postgres
+      POSTGRESQL_PORT: 5432
+      PGBOUNCER_POOL_MODE: transaction
+      PGBOUNCER_IGNORE_STARTUP_PARAMETERS: "extra_float_digits, options, statement_timeout"
+      PGBOUNCER_STATS_USERS: postgres
+
+  #  supavisor:
+  #    image: supabase/supavisor:1.1.23
+  #    depends_on:
+  #      multitenant_db:
+  #        condition: service_healthy
+  #      tenant_db:
+  #        condition: service_healthy
+  #    ports:
+  #      - 4000:4000
+  #      - 5452:5452
+  #      - 6543:6543
+  #    healthcheck:
+  #      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+  #      interval: 2s
+  #      timeout: 10s
+  #      retries: 5
+  #    environment:
+  #      PORT: 4000
+  #      PROXY_PORT_SESSION: 5452
+  #      PROXY_PORT_TRANSACTION: 6543
+  #      DATABASE_URL: "ecto://postgres:postgres@multitenant_db:5432/postgres"
+  #      CLUSTER_POSTGRES: "true"
+  #      SECRET_KEY_BASE: "12345678901234567890121234567890123456789012345678903212345678901234567890123456789032123456789012345678901234567890323456789032"
+  #      VAULT_ENC_KEY: "12345678901234567890123456789032"
+  #      API_JWT_SECRET: "dev"
+  #      METRICS_JWT_SECRET: "dev"
+  #      REGION: "local"
+  #      ERL_AFLAGS: -proto_dist inet_tcp
+  #    command: sh -c "/app/bin/migrate && /app/bin/server"
+  #
+  #  supavisor_setup:
+  #    image: supabase/supavisor:1.1.23
+  #    command: |
+  #      curl -X PUT \
+  #        "http://supavisor:4000/api/tenants/bjhaohmqunupljrqypxz" \
+  #        --header "Accept: application/json" \
+  #        --header "Authorization: Bearer TEST_JWT_REDACTED" \
+  #        --header "Content-Type: application/json" \
+  #        --data-raw "{
+  #          \"tenant\": {
+  #            \"db_host\": \"tenant_db\",
+  #            \"db_port\": 5432,
+  #            \"db_database\": \"postgres\",
+  #            \"ip_version\": \"auto\",
+  #            \"require_user\": true,
+  #            \"upstream_ssl\": false,
+  #            \"enforce_ssl\": false,
+  #            \"default_max_clients\": 200,
+  #            \"default_pool_size\": 15,
+  #            \"users\": [
+  #              {
+  #                \"db_user\": \"postgres\",
+  #                \"db_password\": \"postgres\",
+  #                \"mode_type\": \"transaction\",
+  #                \"pool_size\": 15,
+  #                \"max_clients\": 200,
+  #                \"pool_checkout_timeout\": 5000
+  #              }
+  #            ]
+  #          }
+  #        }"
+  #    depends_on:
+  #      supavisor:
+  #        condition: service_healthy
+
+  rustfs:
+    image: rustfs/rustfs:1.0.0
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      default:
+        aliases:
+          - warehouse--table-s3.rustfs
+    healthcheck:
+      test: curl -f http://127.0.0.1:9000/health/ready || exit 1
+      interval: 5s
+      timeout: 20s
+      retries: 10
+    environment:
+      RUSTFS_ACCESS_KEY: ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      RUSTFS_SECRET_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_SERVER_DOMAINS: "rustfs"
+
+  rustfs_setup:
+    image: rustfs/rustfs:1.0.0
+    depends_on:
+      rustfs:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      set -e;
+      for b in supa-storage-bucket warehouse--table-s3 supa-storage-profiles; do
+      curl -fsS --aws-sigv4 'aws:amz:us-east-1:s3' -u ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}:${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY} -X PUT http://rustfs:9000/\$b;
+      done
+      "
+
+  imgproxy:
+    image: darthsim/imgproxy:v3.26.0
+    ports:
+      - "5020:8080"
+    volumes:
+      - ${PWD}/data:${PWD}/data
+    environment:
+      - IMGPROXY_WRITE_TIMEOUT=20
+      - IMGPROXY_READ_TIMEOUT=20
+      - IMGPROXY_REQUESTS_QUEUE_SIZE=24
+      - IMGPROXY_LOCAL_FILESYSTEM_ROOT=/
+      - IMGPROXY_USE_ETAG=true
+      - IMGPROXY_ENABLE_WEBP_DETECTION=true
+      - IMGPROXY_ALLOW_SECURITY_OPTIONS=true
+      - IMGPROXY_DEVELOPMENT_ERRORS_MODE=true
+      - IMGPROXY_PRESETS=default=width:3000/height:8192
+      - IMGPROXY_FORMAT_QUALITY=jpeg=80,avif=62,webp=80
+
+  rest-catalog:
+    image: apache/iceberg-rest-fixture:1.10.1
+    container_name: iceberg-rest
+    depends_on:
+      rustfs_setup:
+        condition: service_completed_successfully
+    ports:
+      - 8181:8181
+    environment:
+      - AWS_ACCESS_KEY_ID=${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
+      - AWS_REGION=us-east-1
+      - CATALOG_WAREHOUSE=s3://warehouse--table-s3/
+      - CATALOG_IO__IMPL=org.apache.iceberg.aws.s3.S3FileIO
+      - CATALOG_S3_ENDPOINT=http://rustfs:9000
+
+  # Optional for rate-limiting
+  #  redis:
+  #    image: redis:6.2-alpine
+  #    restart: always
+  #    ports:
+  #      - '6379:6379'
+
+  # Optional for tracing
+  otel:
+    profiles:
+      - monitoring
+    extends:
+      service: otel-collector
+      file: ./.docker/docker-compose-monitoring.yml
+
+  jaeger:
+    profiles:
+      - monitoring
+    extends:
+      service: jaeger
+      file: ./.docker/docker-compose-monitoring.yml
+
+  grafana:
+    profiles:
+      - monitoring
+    extends:
+      service: grafana
+      file: ./.docker/docker-compose-monitoring.yml
+
+  prometheus:
+    profiles:
+      - monitoring
+    extends:
+      service: prometheus
+      file: ./.docker/docker-compose-monitoring.yml
+
+configs:
+  init.sql:
+    content: |
+      CREATE SCHEMA IF NOT EXISTS _supavisor;

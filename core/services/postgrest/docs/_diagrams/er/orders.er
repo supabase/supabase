@@ -1,0 +1,20 @@
+# Build using: -e ortho
+
+entity {font: "FreeSans"}
+relationship {font: "FreeMono"}
+
+[Addresses]
+*id
+name
+city
+state
+postal_code
+
+[Orders]
+*id
+name
++billing_address_id
++shipping_address_id
+
+Orders *--1 Addresses
+Orders *--1 Addresses

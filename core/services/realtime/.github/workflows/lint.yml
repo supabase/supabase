@@ -1,0 +1,118 @@
+name: Lint
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "config/**"
+      - "priv/**"
+      - "!priv/repo/tenant_schema/**"
+      - "assets/**"
+      - "rel/**"
+      - "mix.exs"
+      - "mix.lock"
+      - "Dockerfile"
+      - "run.sh"
+      - "mise.toml"
+      - "test/e2e/nix-build.sh"
+      - ".github/workflows/**"
+      - ".github/actionlint.yaml"
+
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup elixir
+        id: beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: 28.5.0.4 # Define the OTP version [required]
+          elixir-version: 1.19.5 # Define the elixir version [required]
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-
+
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Check for warnings
+        run: mix compile --force --warnings-as-errors
+      - name: Run format check
+        run: mix format --check-formatted
+      - name: Credo checks
+        run: mix credo
+      - name: Run hex audit
+        # Advisories are informational here: fixing/updating dependencies isn't
+        # in scope for an arbitrary PR, so don't block merges on this. 
+        continue-on-error: true
+        run: mix hex.audit
+      - name: Check for unused deps
+        run: mix deps.unlock --check-unused
+      - name: Run sobelow
+        run: mix sobelow --config .sobelow-conf
+      - name: Retrieve PLT Cache
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        id: plt-cache
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-plts-${{ hashFiles('mix.lock', 'forum/mix.lock', 'forum/mix.exs', 'forum/lib/**/*.ex') }}
+      - name: Create PLTs
+        if: steps.plt-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p priv/plts
+          mix dialyzer.build
+      - name: Run dialyzer
+        run: mix dialyzer
+
+  assets:
+    name: Assets Lint
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: "24"
+          cache: "npm"
+          cache-dependency-path: assets/package-lock.json
+      - name: Install dependencies
+        run: npm --prefix assets ci
+      - name: Run oxlint
+        run: npm --prefix assets run lint
+      - name: Run oxfmt check
+        run: npm --prefix assets run format:check
+
+  actionlint:
+    name: Actionlint
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run actionlint
+        uses: rhysd/actionlint@v1.7.7
+
+  shellcheck:
+    name: Shellcheck
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Run shellcheck
+        run: shellcheck run.sh test/e2e/nix-build.sh

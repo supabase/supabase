@@ -1,9 +1,6 @@
 # A string used to distinguish different Supabase projects on the same host. Defaults to the working
 # directory name when running `supabase init`.
-project_id = "supabase"
-
-[remotes.prod]
-project_id = "xguihxuzqibwxjnimxev"
+project_id = "testagram"
 
 [api]
 # Port to use for the API URL.
@@ -17,15 +14,13 @@ extra_search_path = ["public", "extensions"]
 # for accidental or malicious requests.
 max_rows = 1000
 
-[remotes.prod.api]
-schemas = ["public", "content", "storage", "graphql_public"]
 
 [db]
 # Port to use for the local database URL.
 port = 54322
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 15
+major_version = 17
 
 [studio]
 # Port to use for Supabase Studio.
@@ -54,7 +49,6 @@ site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
     "https://*-supabase.vercel.app/*/*",
-    "https://supabase.com/*/*",
     "http://localhost:3000/*/*",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
@@ -72,8 +66,6 @@ double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
 enable_confirmations = false
 
-[remotes.prod.auth.email]
-enable_signup = false
 
 # Uncomment the following to use gh oAuth app locally with your own test app
 # to use env vars locally, run > `source ./supabase/.env && supabase [command...]`
@@ -103,4 +95,8 @@ redirect_uri = ""
 url = ""
 
 [functions.search-embeddings]
+verify_jwt = false
+
+
+[functions.storage-node-gateway]
 verify_jwt = false

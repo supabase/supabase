@@ -1,0 +1,26 @@
+-- get a list of security definer functions owned by supabase_admin
+-- this list should be vetted to ensure the functions are safe to use as security definer
+select
+    n.nspname, p.proname
+from pg_catalog.pg_proc p
+    left join pg_catalog.pg_namespace n ON n.oid = p.pronamespace
+where p.proowner = (select oid from pg_catalog.pg_roles where rolname = 'supabase_admin')
+        and p.prosecdef = true
+order by 1,2;
+  nspname  |         proname          
+-----------+--------------------------
+ graphql   | get_schema_version
+ graphql   | increment_schema_version
+ pgbouncer | get_auth
+ public    | dblink_connect_u
+ public    | dblink_connect_u
+ public    | pgaudit_ddl_command_end
+ public    | pgaudit_sql_drop
+ public    | st_estimatedextent
+ public    | st_estimatedextent
+ public    | st_estimatedextent
+ repack    | repack_trigger
+ vault     | create_secret
+ vault     | update_secret
+(13 rows)
+

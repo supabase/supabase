@@ -1,0 +1,23 @@
+[Unit]
+Description=Supavisor
+After=network.target
+Requires=network.target
+StartLimitIntervalSec=5
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User=${SUPAVISOR_USER}
+EnvironmentFile=/opt/supavisor/service_vars.ini
+WorkingDirectory=/opt/supavisor
+ExecStart=/opt/supavisor/bin/server start
+ExecStop=/opt/supavisor/bin/server stop
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+TasksMax=infinity
+
+# vi: ft=systemd

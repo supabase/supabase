@@ -1,0 +1,5 @@
+{
+  "name": "@workspace/cat",
+  "version": "0.0.1",
+  "exports": "./mod.ts"
+}

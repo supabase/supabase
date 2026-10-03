@@ -1,0 +1,110 @@
+name: Update Tenant DB Snapshots
+
+on:
+  pull_request:
+    paths:
+      - "lib/realtime/tenants/repo/migrations/**"
+      - "lib/realtime/tenants/migrations.ex"
+      - "lib/mix/tasks/realtime.export_tenant_schema.ex"
+      - "dev/scripts/export-tenant-db-dump.sh"
+      - "priv/repo/pgdelta_profile.json"
+      - "mix.lock"
+      - "mise.toml"
+      - "compose.dbs.yml"
+      - "compose.realtime-db.yml"
+      - "compose.tenant-db.yml"
+      - ".github/workflows/update-tenant-db-snapshots.yml"
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  update-snapshots:
+    name: Export and commit schema & dumps
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    # Do not run for dependabot (as usually dependabot upgrades shouldn't touch schema and we don't want to duplicate secrets)
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.user.login != 'dependabot[bot]'
+
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.GH_APP_MANAGER_ID }}
+          private-key: ${{ secrets.GH_APP_MANAGER_PRIVATE_KEY }}
+
+      # The PR branch itself, not the merge commit: whatever comes out is committed back onto it.
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Setup mise
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ github.workflow }}-${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ github.workflow }}-${{ runner.os }}-mix-
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      # `mise run tenant-dumps` starts a database per major and dumps it from inside its own
+      # container, so these are every image the job needs.
+      - name: Resolve Postgres images
+        run: echo "PG_IMAGES=$(mise run tenant-dump-images | tr '\n' ' ')" >> "$GITHUB_ENV"
+
+      - name: Cache Docker images
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        id: docker-cache
+        with:
+          path: /tmp/docker-images
+          key: docker-images-zstd-${{ hashFiles('mise.toml') }}
+
+      - name: Load Docker images from cache
+        if: steps.docker-cache.outputs.cache-hit == 'true'
+        run: zstd -d --stdout /tmp/docker-images/postgres.tar.zst | docker image load
+
+      - name: Pull and save Docker images
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          for image in $PG_IMAGES; do docker pull "$image"; done
+          mkdir -p /tmp/docker-images
+          # PG_IMAGES is a space-separated list; word splitting is intentional here.
+          # shellcheck disable=SC2086
+          docker image save $PG_IMAGES | zstd -T0 -o /tmp/docker-images/postgres.tar.zst
+
+      - name: Export tenant schema and dumps
+        run: mise run tenant-dumps
+
+      - name: Check if schema or dumps changed
+        id: check-changes
+        run: |
+          git add -A priv/repo/tenant_schema priv/repo/tenant_db_dump_*.sql
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push schema and dumps
+        if: steps.check-changes.outputs.changed == 'true'
+        env:
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore: update tenant db schema and dumps"
+          git push origin "HEAD:$PR_HEAD_REF"

@@ -1,0 +1,28 @@
+library
+  hs-source-dirs:      src
+  exposed-modules:     Hasql.Notifications
+  build-depends:       base >= 4.7 && < 5
+                     , bytestring >= 0.10.8.2 && < 0.13
+                     , text >= 2 && < 2.2
+                     , hasql-pool >= 1.3 && < 1.4
+                     , postgresql-libpq >= 0.9 && < 1.0
+                     , hasql >= 1.9 && < 1.10
+
+  default-language:    Haskell2010
+  ghc-options:         -Wall
+  default-extensions: OverloadedStrings
+
+test-suite hasql-notifications-test
+  type:                exitcode-stdio-1.0
+  other-modules:       Hasql.NotificationsSpec
+  hs-source-dirs:      test
+  main-is:             Spec.hs
+  build-depends:       base
+                     , hasql
+                     , hasql-notifications
+                     , hspec
+                     , bytestring
+                     , QuickCheck
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+  default-language:    Haskell2010
+  default-extensions: OverloadedStrings

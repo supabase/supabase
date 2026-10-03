@@ -1,0 +1,17 @@
+[package]
+name = "ext_os"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno_core.workspace = true
+
+ext_runtime.workspace = true
+
+libc.workspace = true
+serde.workspace = true

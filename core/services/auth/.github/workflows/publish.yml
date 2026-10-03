@@ -1,0 +1,102 @@
+name: Publish to Image Registry
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            supabase/gotrue
+            public.ecr.aws/supabase/gotrue
+            ghcr.io/supabase/gotrue
+            ghcr.io/supabase/auth
+            436098097459.dkr.ecr.us-east-1.amazonaws.com/gotrue
+            646182064048.dkr.ecr.us-east-1.amazonaws.com/gotrue
+            supabase/auth
+            public.ecr.aws/supabase/auth
+            436098097459.dkr.ecr.us-east-1.amazonaws.com/auth
+            646182064048.dkr.ecr.us-east-1.amazonaws.com/auth
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=v${{ inputs.version }},enable=true
+
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+        with:
+          platforms: amd64,arm64
+
+      - run: |
+          set -ex
+
+          echo "Adding explicit release version to Dockerfile..."
+
+          sed -i 's/RELEASE_VERSION=unspecified/RELEASE_VERSION=${{ inputs.version }}/' Dockerfile
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: configure aws credentials - prod
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+      - name: Login to ECR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: public.ecr.aws
+      - name: Login to ECR account - prod
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: 646182064048.dkr.ecr.us-east-1.amazonaws.com
+
+      - name: configure aws credentials - staging
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: us-east-1
+      - name: Login to ECR account - staging
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: 436098097459.dkr.ecr.us-east-1.amazonaws.com
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: . # IMPORTANT: Dockerfile is modified above to include the release version. Don't remove this line: https://github.com/docker/build-push-action?tab=readme-ov-file#git-context
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

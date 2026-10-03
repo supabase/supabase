@@ -1,0 +1,695 @@
+policies:
+  - name: read_only_all_buckets
+    tables: ["storage.buckets"]
+    roles: ["authenticated"]
+    permissions: ["select"]
+    content: "USING(owner = '{{uid}}')"
+
+  - name: read_only_all_objects
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["select"]
+    content: "USING(owner = '{{uid}}')"
+
+  - name: insert_only_all_objects
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["insert"]
+    content: "WITH CHECK(auth.uid() = '{{uid}}')"
+
+  - name: insert_only_all_buckets
+    tables: ["storage.buckets"]
+    roles: ["authenticated"]
+    permissions: ["insert"]
+    content: "WITH CHECK(auth.uid() = '{{uid}}')"
+
+  - name: update_only_all_objects
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["update"]
+    content: "USING(owner = '{{uid}}')"
+
+  - name: update_only_all_buckets
+    tables: ["storage.buckets"]
+    roles: ["authenticated"]
+    permissions: ["update"]
+    content: "USING(owner = '{{uid}}')"
+
+  - name: delete_only_all_buckets
+    tables: ["storage.buckets"]
+    roles: ["authenticated"]
+    permissions: ["delete"]
+    content: "USING(owner = '{{uid}}')"
+
+  - name: delete_only_all_objects
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["delete"]
+    content: "USING(owner = '{{uid}}')"
+
+  - name: insert_with_metadata_check
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["insert"]
+    content: "WITH CHECK(user_metadata->>'department' = 'engineering')"
+
+  - name: insert_only_images
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["insert"]
+    content: "WITH CHECK(metadata->>'mimetype' LIKE 'image/%')"
+
+  - name: insert_max_size_limit
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["insert"]
+    content: "WITH CHECK((metadata->>'contentLength')::int <= 100000)"
+
+  - name: read_only_list_objects
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["select"]
+    content: "USING(storage.allow_only_operation('object.list') AND owner = '{{uid}}')"
+
+  - name: read_list_or_get_objects
+    tables: ["storage.objects"]
+    roles: ["authenticated"]
+    permissions: ["select"]
+    content: "USING(storage.allow_any_operation(ARRAY['object.list', 'storage.object.get_authenticated']) AND owner = '{{uid}}')"
+
+tests:
+  - description: "Will only able to read objects"
+    policies:
+      - read_only_all_objects
+    asserts:
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.update
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.get
+        status: 400
+        error: "Bucket not found"
+
+      - operation: upload
+        status: 200
+        policies:
+          - insert_only_all_objects
+
+      - operation: object.get
+        role: authenticated
+        status: 200
+
+      - operation: object.delete
+        role: authenticated
+        status: 400
+        message: "Access denied"
+
+      - operation: upload
+        bucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.copy
+        useExistingBucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        status: 400
+
+      - operation: object.move
+        useExistingBucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        status: 400
+
+  - description: "Will only able to read buckets"
+    policies:
+      - read_only_all_buckets
+    asserts:
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.update
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.get
+        status: 200
+
+      - operation: bucket.list
+        status: 200
+
+      - operation: upload
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.get
+        role: authenticated
+        status: 400
+        message: "Object not found"
+
+      - operation: object.delete
+        role: authenticated
+        status: 400
+        message: "Access denied"
+
+  - description: "Will not empty a bucket without service role"
+    policies:
+      - read_only_all_buckets
+      - read_only_all_objects
+      - update_only_all_buckets
+      - delete_only_all_objects
+    asserts:
+      - operation: object.seed
+        status: 200
+
+      - operation: bucket.empty
+        status: 403
+        error: "Access denied: Invalid role"
+
+  - description: "Will empty a bucket with service role"
+    policies: []
+    asserts:
+      - operation: object.seed
+        status: 200
+
+      - operation: bucket.empty
+        role: service
+        status: 200
+
+  - description: "Will only able to insert objects when authenticated"
+    policies:
+      - insert_only_all_objects
+    asserts:
+      - operation: bucket.create
+        status: 400
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.update
+        status: 400
+        error: "Bucket not found"
+
+      - operation: upload
+        status: 200
+
+      - operation: upload.upsert
+        status: 400
+        message: "Object not found"
+
+      - operation: object.get
+        status: 400
+
+      - operation: object.delete
+        status: 400
+
+  - description: "Will only able to create buckets when authenticated"
+    policies:
+      - insert_only_all_buckets
+    setup:
+      create_bucket: false
+    asserts:
+      - operation: bucket.create
+        status: 200
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.update
+        status: 400
+        error: "Bucket not found"
+
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: upload
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.get
+        status: 400
+
+      - operation: object.delete
+        status: 400
+
+      - operation: upload
+        bucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.copy
+        useExistingBucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        status: 400
+
+      - operation: object.move
+        useExistingBucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        status: 400
+
+  - description: "Will only able to update buckets when authenticated"
+    policies:
+      - update_only_all_buckets
+      - read_only_all_buckets
+    asserts:
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: upload
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.get
+        status: 400
+        error: "Object not found"
+
+      - operation: object.delete
+        status: 400
+        error: "Access denied"
+
+      - operation: bucket.update
+        status: 200
+
+      - operation: bucket.get
+        status: 200
+
+  - description: "Will only able to update objects when authenticated"
+    policies:
+      - insert_only_all_objects
+      - update_only_all_objects
+      - read_only_all_objects
+    asserts:
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+      - operation: upload
+        bucketName: "bucket_{{runId}}"
+        objectName: "to_upsert.txt"
+        status: 200
+
+      - operation: upload.upsert
+        existingBucketName: "bucket_{{runId}}"
+        objectName: "to_upsert.txt"
+        status: 200
+
+      - operation: object.get
+        status: 200
+
+      - operation: object.delete
+        status: 400
+        error: "Access denied"
+
+      - operation: bucket.update
+        status: 400
+        message: "Bucket not found"
+
+      - operation: bucket.get
+        status: 400
+        message: "Bucket not found"
+
+  - description: "Will only able to delete buckets when authenticated"
+    policies:
+      - delete_only_all_buckets
+      - read_only_all_buckets
+    asserts:
+      - operation: bucket.get
+        status: 200
+
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: upload
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.get
+        status: 400
+        error: "Object not found"
+
+      - operation: object.delete
+        status: 400
+        error: "Access denied"
+
+      - operation: object.delete
+        role: service
+        status: 200
+
+      - operation: bucket.delete
+        status: 200
+  #
+  - description: "Will only able to delete objects when authenticated"
+    policies:
+      - delete_only_all_objects
+      - read_only_all_objects
+    asserts:
+      - operation: bucket.get
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: upload
+        bucketName: "bucket_delete_test_{{runId}}"
+        objectName: "object_{{runId}}"
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.delete
+        useExistingBucketName: "bucket_delete_test_{{runId}}"
+        objectName: "object_{{runId}}"
+        status: 200
+
+      - operation: object.get
+        useExistingBucketName: "bucket_delete_test_{{runId}}"
+        objectName: "object_{{runId}}"
+        status: 400
+        error: "Object not found"
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+  - description: "Will only able to move objects when authenticated"
+    policies:
+      - read_only_all_objects
+      - update_only_all_objects
+    asserts:
+      - operation: bucket.get
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.upsert
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: upload
+        bucketName: "bucket_to_move_{{runId}}"
+        objectName: "object_to_move_{{runId}}.txt"
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.move
+        useExistingBucketName: "bucket_to_move_{{runId}}"
+        objectName: "object_to_move_{{runId}}.txt"
+        status: 200
+
+      - operation: object.delete
+        status: 400
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+  - description: "Will only able to copy owned objects when authenticated"
+    policies:
+      - read_only_all_objects
+      - insert_only_all_objects
+    asserts:
+      - operation: bucket.get
+        status: 400
+        error: "Bucket not found"
+
+      - operation: bucket.create
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload
+        bucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        status: 200
+
+      - operation: upload.upsert
+        useExistingBucketName: "bucket_{{runId}}"
+        objectName: "object_{{runId}}.txt"
+        status: 400
+        message: "new row violates row-level security policy"
+
+      - operation: upload
+        bucketName: "bucket_to_copy_{{runId}}"
+        objectName: "object_to_copy_{{runId}}.txt"
+        status: 200
+
+      - operation: object.copy
+        useExistingBucketName: "bucket_to_copy_{{runId}}"
+        objectName: "object_to_copy_{{runId}}.txt"
+        status: 200
+
+      - operation: object.delete
+        status: 400
+
+      - operation: bucket.delete
+        status: 400
+        error: "Bucket not found"
+
+  - description: "Will only upload files with correct user metadata"
+    policies:
+      - insert_with_metadata_check
+      - read_only_all_objects
+    asserts:
+      - operation: upload
+        objectName: "test_file.jpg"
+        userMetadata:
+          department: "engineering"
+        status: 200
+
+      - operation: upload
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.tus
+        objectName: "test_file_tus.jpg"
+        userMetadata:
+          department: "engineering"
+        status: 200
+
+      - operation: upload.tus
+        status: 403
+        error: "new row violates row-level security policy"
+
+      - operation: upload
+        objectName: "source_copy_meta.jpg"
+        userMetadata:
+          department: "engineering"
+        status: 200
+
+      - operation: object.copy
+        objectName: "source_copy_meta.jpg"
+        destinationObjectName: "copied_source_copy_meta_1.jpg"
+        copyMetadata: true
+        status: 200
+
+      - operation: object.copy
+        objectName: "source_copy_meta.jpg"
+        destinationObjectName: "copied_source_copy_meta_2.jpg"
+        copyMetadata: false
+        userMetadata:
+          department: "engineering"
+        status: 200
+
+      - operation: object.copy
+        objectName: "source_copy_meta.jpg"
+        destinationObjectName: "copied_source_copy_meta_3.jpg"
+        copyMetadata: false
+        userMetadata:
+          department: "marketing"
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.signed
+        objectName: "signed_file.jpg"
+        userMetadata:
+          department: "engineering"
+        status: 200
+
+      - operation: upload.signed
+        objectName: "signed_file_no_meta.jpg"
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.s3.multipart
+        objectName: "s3_multi_file.jpg"
+        userMetadata:
+          department: "engineering"
+        status: 200
+
+      - operation: upload.s3.multipart
+        objectName: "s3_multi_file_no_meta.jpg"
+        status: 403
+
+  - description: "Will only upload image files based on mimetype"
+    policies:
+      - insert_only_images
+    asserts:
+      - operation: upload
+        objectName: "test_image.jpg"
+        mimeType: "image/jpeg"
+        status: 200
+
+      - operation: upload
+        objectName: "test_file.txt"
+        mimeType: "text/plain"
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.tus
+        objectName: "test_image_tus.jpg"
+        mimeType: "image/jpeg"
+        status: 200
+
+      - operation: upload.tus
+        objectName: "test_file_tus.txt"
+        mimeType: "text/plain"
+        status: 403
+        error: "new row violates row-level security policy"
+
+  - description: "Will only upload files under size limit based on contentLength"
+    policies:
+      - insert_max_size_limit
+    asserts:
+      - operation: upload
+        objectName: "small_file.jpg"
+        status: 200
+
+      - operation: upload
+        objectName: "large_file.jpg"
+        contentLength: 200000
+        status: 400
+        error: "new row violates row-level security policy"
+
+      - operation: upload.tus
+        objectName: "small_file_tus.jpg"
+        status: 200
+
+      - operation: upload.tus
+        objectName: "large_file_tus.jpg"
+        contentLength: 200000
+        status: 403
+        error: "new row violates row-level security policy"
+
+  - description: "Operation helper list-only policies only allow object listing"
+    policies:
+      - read_only_list_objects
+    asserts:
+      - operation: upload
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.list
+        status: 200
+
+      - operation: object.get
+        status: 400
+        error: "Object not found"
+
+      - operation: object.delete
+        status: 400
+        error: "Access denied"
+
+  - description: "Operation helper any-of policies allow both list and get"
+    policies:
+      - read_list_or_get_objects
+    asserts:
+      - operation: upload
+        policies:
+          - insert_only_all_objects
+        status: 200
+
+      - operation: object.list
+        status: 200
+
+      - operation: object.get
+        status: 200
+
+      - operation: object.delete
+        status: 400
+        error: "Access denied"

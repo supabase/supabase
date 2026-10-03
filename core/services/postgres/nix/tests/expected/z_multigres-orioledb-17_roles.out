@@ -1,0 +1,500 @@
+-- Some predefined roles don't exist in earlier versions of Postgres, so we
+-- exclude them in this test file. They're tested in version-specific test files
+-- (z_<ver>_roles.sql).
+--
+-- Currently those roles are:
+-- pg_create_subscription, pg_maintain, pg_use_reserved_connections
+-- all roles and attributes
+select
+  rolname,
+  rolcreaterole  ,
+  rolcanlogin    ,
+  rolsuper       ,
+  rolinherit     ,
+  rolcreatedb    ,
+  rolreplication ,
+  rolconnlimit   ,
+  rolbypassrls   ,
+  rolvaliduntil
+from pg_roles r
+where rolname not in ('pg_create_subscription', 'pg_maintain', 'pg_use_reserved_connections')
+order by rolname;
+          rolname           | rolcreaterole | rolcanlogin | rolsuper | rolinherit | rolcreatedb | rolreplication | rolconnlimit | rolbypassrls | rolvaliduntil 
+----------------------------+---------------+-------------+----------+------------+-------------+----------------+--------------+--------------+---------------
+ anon                       | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ authenticated              | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ authenticator              | f             | t           | f        | f          | f           | f              |           -1 | f            | 
+ dashboard_user             | t             | f           | f        | t          | t           | t              |           -1 | f            | 
+ pg_checkpoint              | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_database_owner          | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_execute_server_program  | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_monitor                 | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_read_all_data           | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_read_all_settings       | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_read_all_stats          | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_read_server_files       | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_signal_backend          | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_stat_scan_tables        | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_write_all_data          | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pg_write_server_files      | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ pgbouncer                  | f             | t           | f        | t          | f           | f              |           -1 | f            | 
+ pgtle_admin                | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ postgres                   | t             | t           | f        | t          | t           | t              |           -1 | t            | 
+ service_role               | f             | f           | f        | t          | f           | f              |           -1 | t            | 
+ supabase_admin             | t             | t           | t        | t          | t           | t              |           -1 | t            | 
+ supabase_auth_admin        | t             | t           | f        | f          | f           | f              |           -1 | f            | 
+ supabase_etl_admin         | f             | t           | f        | t          | f           | t              |           -1 | t            | 
+ supabase_functions_admin   | t             | t           | f        | f          | f           | f              |           -1 | f            | 
+ supabase_privileged_role   | f             | f           | f        | t          | f           | f              |           -1 | f            | 
+ supabase_read_only_user    | f             | t           | f        | t          | f           | f              |           -1 | t            | 
+ supabase_replication_admin | f             | t           | f        | t          | f           | t              |           -1 | f            | 
+ supabase_storage_admin     | t             | t           | f        | f          | f           | f              |           -1 | f            | 
+(28 rows)
+
+select
+  rolname,
+  rolconfig
+from pg_roles r
+where rolname not in ('pg_create_subscription', 'pg_maintain', 'pg_use_reserved_connections')
+order by rolname;
+          rolname           |                                        rolconfig                                         
+----------------------------+------------------------------------------------------------------------------------------
+ anon                       | {statement_timeout=3s}
+ authenticated              | {statement_timeout=8s}
+ authenticator              | {"session_preload_libraries=supautils, safeupdate",statement_timeout=8s,lock_timeout=8s}
+ dashboard_user             | 
+ pg_checkpoint              | 
+ pg_database_owner          | 
+ pg_execute_server_program  | 
+ pg_monitor                 | 
+ pg_read_all_data           | 
+ pg_read_all_settings       | 
+ pg_read_all_stats          | 
+ pg_read_server_files       | 
+ pg_signal_backend          | 
+ pg_stat_scan_tables        | 
+ pg_write_all_data          | 
+ pg_write_server_files      | 
+ pgbouncer                  | 
+ pgtle_admin                | 
+ postgres                   | {"search_path=\"\\$user\", public, extensions"}
+ service_role               | 
+ supabase_admin             | {"search_path=\"\\$user\", public, auth, extensions",log_statement=none}
+ supabase_auth_admin        | {search_path=auth,idle_in_transaction_session_timeout=60000,log_statement=none}
+ supabase_etl_admin         | 
+ supabase_functions_admin   | 
+ supabase_privileged_role   | 
+ supabase_read_only_user    | {default_transaction_read_only=on}
+ supabase_replication_admin | 
+ supabase_storage_admin     | {search_path=storage,log_statement=none}
+(28 rows)
+
+-- Check all privileges of the roles on the schemas
+select schema_name, privilege_type, grantee, default_for
+from (
+    -- ALTER DEFAULT privileges on schemas
+    select
+        n.nspname as schema_name,
+        a.privilege_type,
+        r.rolname as grantee,
+        d.defaclrole::regrole as default_for,
+        case when n.nspname = 'public' then 0 else 1 end as schema_order
+    from
+        pg_default_acl d
+    join
+        pg_namespace n on d.defaclnamespace = n.oid
+    cross join lateral aclexplode(d.defaclacl) as a
+    join
+        pg_roles r on a.grantee = r.oid
+    where
+        -- PG17+, handled in version-specific test files
+        a.privilege_type != 'MAINTAIN'
+    union all
+    -- explicit grant usage and create on the schemas
+    select
+        n.nspname as schema_name,
+        a.privilege_type,
+        r.rolname as grantee,
+        n.nspowner::regrole as default_for,
+        case when n.nspname = 'public' then 0 else 1 end as schema_order
+    from
+        pg_namespace n
+    cross join lateral aclexplode(n.nspacl) as a
+    join
+        pg_roles r on a.grantee = r.oid
+    where
+        a.privilege_type in ('CREATE', 'USAGE')
+) sub
+order by schema_order, schema_name, privilege_type, grantee, default_for;
+    schema_name     | privilege_type |         grantee          |     default_for     
+--------------------+----------------+--------------------------+---------------------
+ public             | CREATE         | pg_database_owner        | pg_database_owner
+ public             | DELETE         | anon                     | supabase_admin
+ public             | DELETE         | anon                     | postgres
+ public             | DELETE         | authenticated            | supabase_admin
+ public             | DELETE         | authenticated            | postgres
+ public             | DELETE         | postgres                 | supabase_admin
+ public             | DELETE         | postgres                 | postgres
+ public             | DELETE         | service_role             | supabase_admin
+ public             | DELETE         | service_role             | postgres
+ public             | EXECUTE        | anon                     | supabase_admin
+ public             | EXECUTE        | anon                     | postgres
+ public             | EXECUTE        | authenticated            | supabase_admin
+ public             | EXECUTE        | authenticated            | postgres
+ public             | EXECUTE        | postgres                 | supabase_admin
+ public             | EXECUTE        | postgres                 | postgres
+ public             | EXECUTE        | service_role             | supabase_admin
+ public             | EXECUTE        | service_role             | postgres
+ public             | INSERT         | anon                     | supabase_admin
+ public             | INSERT         | anon                     | postgres
+ public             | INSERT         | authenticated            | supabase_admin
+ public             | INSERT         | authenticated            | postgres
+ public             | INSERT         | postgres                 | supabase_admin
+ public             | INSERT         | postgres                 | postgres
+ public             | INSERT         | service_role             | supabase_admin
+ public             | INSERT         | service_role             | postgres
+ public             | REFERENCES     | anon                     | supabase_admin
+ public             | REFERENCES     | anon                     | postgres
+ public             | REFERENCES     | authenticated            | supabase_admin
+ public             | REFERENCES     | authenticated            | postgres
+ public             | REFERENCES     | postgres                 | supabase_admin
+ public             | REFERENCES     | postgres                 | postgres
+ public             | REFERENCES     | service_role             | supabase_admin
+ public             | REFERENCES     | service_role             | postgres
+ public             | SELECT         | anon                     | supabase_admin
+ public             | SELECT         | anon                     | supabase_admin
+ public             | SELECT         | anon                     | postgres
+ public             | SELECT         | anon                     | postgres
+ public             | SELECT         | authenticated            | supabase_admin
+ public             | SELECT         | authenticated            | supabase_admin
+ public             | SELECT         | authenticated            | postgres
+ public             | SELECT         | authenticated            | postgres
+ public             | SELECT         | postgres                 | supabase_admin
+ public             | SELECT         | postgres                 | supabase_admin
+ public             | SELECT         | postgres                 | postgres
+ public             | SELECT         | postgres                 | postgres
+ public             | SELECT         | service_role             | supabase_admin
+ public             | SELECT         | service_role             | supabase_admin
+ public             | SELECT         | service_role             | postgres
+ public             | SELECT         | service_role             | postgres
+ public             | TRIGGER        | anon                     | supabase_admin
+ public             | TRIGGER        | anon                     | postgres
+ public             | TRIGGER        | authenticated            | supabase_admin
+ public             | TRIGGER        | authenticated            | postgres
+ public             | TRIGGER        | postgres                 | supabase_admin
+ public             | TRIGGER        | postgres                 | postgres
+ public             | TRIGGER        | service_role             | supabase_admin
+ public             | TRIGGER        | service_role             | postgres
+ public             | TRUNCATE       | anon                     | supabase_admin
+ public             | TRUNCATE       | anon                     | postgres
+ public             | TRUNCATE       | authenticated            | supabase_admin
+ public             | TRUNCATE       | authenticated            | postgres
+ public             | TRUNCATE       | postgres                 | supabase_admin
+ public             | TRUNCATE       | postgres                 | postgres
+ public             | TRUNCATE       | service_role             | supabase_admin
+ public             | TRUNCATE       | service_role             | postgres
+ public             | UPDATE         | anon                     | supabase_admin
+ public             | UPDATE         | anon                     | supabase_admin
+ public             | UPDATE         | anon                     | postgres
+ public             | UPDATE         | anon                     | postgres
+ public             | UPDATE         | authenticated            | supabase_admin
+ public             | UPDATE         | authenticated            | supabase_admin
+ public             | UPDATE         | authenticated            | postgres
+ public             | UPDATE         | authenticated            | postgres
+ public             | UPDATE         | postgres                 | supabase_admin
+ public             | UPDATE         | postgres                 | supabase_admin
+ public             | UPDATE         | postgres                 | postgres
+ public             | UPDATE         | postgres                 | postgres
+ public             | UPDATE         | service_role             | supabase_admin
+ public             | UPDATE         | service_role             | supabase_admin
+ public             | UPDATE         | service_role             | postgres
+ public             | UPDATE         | service_role             | postgres
+ public             | USAGE          | anon                     | supabase_admin
+ public             | USAGE          | anon                     | pg_database_owner
+ public             | USAGE          | anon                     | postgres
+ public             | USAGE          | authenticated            | supabase_admin
+ public             | USAGE          | authenticated            | pg_database_owner
+ public             | USAGE          | authenticated            | postgres
+ public             | USAGE          | pg_database_owner        | pg_database_owner
+ public             | USAGE          | postgres                 | supabase_admin
+ public             | USAGE          | postgres                 | pg_database_owner
+ public             | USAGE          | postgres                 | postgres
+ public             | USAGE          | service_role             | supabase_admin
+ public             | USAGE          | service_role             | pg_database_owner
+ public             | USAGE          | service_role             | postgres
+ auth               | CREATE         | dashboard_user           | supabase_admin
+ auth               | CREATE         | supabase_admin           | supabase_admin
+ auth               | CREATE         | supabase_auth_admin      | supabase_admin
+ auth               | DELETE         | dashboard_user           | supabase_auth_admin
+ auth               | DELETE         | postgres                 | supabase_auth_admin
+ auth               | EXECUTE        | dashboard_user           | supabase_auth_admin
+ auth               | EXECUTE        | postgres                 | supabase_auth_admin
+ auth               | INSERT         | dashboard_user           | supabase_auth_admin
+ auth               | INSERT         | postgres                 | supabase_auth_admin
+ auth               | REFERENCES     | dashboard_user           | supabase_auth_admin
+ auth               | REFERENCES     | postgres                 | supabase_auth_admin
+ auth               | SELECT         | dashboard_user           | supabase_auth_admin
+ auth               | SELECT         | dashboard_user           | supabase_auth_admin
+ auth               | SELECT         | postgres                 | supabase_auth_admin
+ auth               | SELECT         | postgres                 | supabase_auth_admin
+ auth               | TRIGGER        | dashboard_user           | supabase_auth_admin
+ auth               | TRIGGER        | postgres                 | supabase_auth_admin
+ auth               | TRUNCATE       | dashboard_user           | supabase_auth_admin
+ auth               | TRUNCATE       | postgres                 | supabase_auth_admin
+ auth               | UPDATE         | dashboard_user           | supabase_auth_admin
+ auth               | UPDATE         | dashboard_user           | supabase_auth_admin
+ auth               | UPDATE         | postgres                 | supabase_auth_admin
+ auth               | UPDATE         | postgres                 | supabase_auth_admin
+ auth               | USAGE          | anon                     | supabase_admin
+ auth               | USAGE          | authenticated            | supabase_admin
+ auth               | USAGE          | dashboard_user           | supabase_admin
+ auth               | USAGE          | dashboard_user           | supabase_auth_admin
+ auth               | USAGE          | postgres                 | supabase_admin
+ auth               | USAGE          | postgres                 | supabase_auth_admin
+ auth               | USAGE          | service_role             | supabase_admin
+ auth               | USAGE          | supabase_admin           | supabase_admin
+ auth               | USAGE          | supabase_auth_admin      | supabase_admin
+ extensions         | CREATE         | dashboard_user           | postgres
+ extensions         | CREATE         | postgres                 | postgres
+ extensions         | DELETE         | postgres                 | supabase_admin
+ extensions         | EXECUTE        | postgres                 | supabase_admin
+ extensions         | INSERT         | postgres                 | supabase_admin
+ extensions         | REFERENCES     | postgres                 | supabase_admin
+ extensions         | SELECT         | postgres                 | supabase_admin
+ extensions         | SELECT         | postgres                 | supabase_admin
+ extensions         | TRIGGER        | postgres                 | supabase_admin
+ extensions         | TRUNCATE       | postgres                 | supabase_admin
+ extensions         | UPDATE         | postgres                 | supabase_admin
+ extensions         | UPDATE         | postgres                 | supabase_admin
+ extensions         | USAGE          | anon                     | postgres
+ extensions         | USAGE          | authenticated            | postgres
+ extensions         | USAGE          | dashboard_user           | postgres
+ extensions         | USAGE          | postgres                 | supabase_admin
+ extensions         | USAGE          | postgres                 | postgres
+ extensions         | USAGE          | service_role             | postgres
+ graphql            | CREATE         | supabase_admin           | supabase_admin
+ graphql            | DELETE         | anon                     | supabase_admin
+ graphql            | DELETE         | authenticated            | supabase_admin
+ graphql            | DELETE         | postgres                 | supabase_admin
+ graphql            | DELETE         | service_role             | supabase_admin
+ graphql            | EXECUTE        | anon                     | supabase_admin
+ graphql            | EXECUTE        | authenticated            | supabase_admin
+ graphql            | EXECUTE        | postgres                 | supabase_admin
+ graphql            | EXECUTE        | service_role             | supabase_admin
+ graphql            | INSERT         | anon                     | supabase_admin
+ graphql            | INSERT         | authenticated            | supabase_admin
+ graphql            | INSERT         | postgres                 | supabase_admin
+ graphql            | INSERT         | service_role             | supabase_admin
+ graphql            | REFERENCES     | anon                     | supabase_admin
+ graphql            | REFERENCES     | authenticated            | supabase_admin
+ graphql            | REFERENCES     | postgres                 | supabase_admin
+ graphql            | REFERENCES     | service_role             | supabase_admin
+ graphql            | SELECT         | anon                     | supabase_admin
+ graphql            | SELECT         | anon                     | supabase_admin
+ graphql            | SELECT         | authenticated            | supabase_admin
+ graphql            | SELECT         | authenticated            | supabase_admin
+ graphql            | SELECT         | postgres                 | supabase_admin
+ graphql            | SELECT         | postgres                 | supabase_admin
+ graphql            | SELECT         | service_role             | supabase_admin
+ graphql            | SELECT         | service_role             | supabase_admin
+ graphql            | TRIGGER        | anon                     | supabase_admin
+ graphql            | TRIGGER        | authenticated            | supabase_admin
+ graphql            | TRIGGER        | postgres                 | supabase_admin
+ graphql            | TRIGGER        | service_role             | supabase_admin
+ graphql            | TRUNCATE       | anon                     | supabase_admin
+ graphql            | TRUNCATE       | authenticated            | supabase_admin
+ graphql            | TRUNCATE       | postgres                 | supabase_admin
+ graphql            | TRUNCATE       | service_role             | supabase_admin
+ graphql            | UPDATE         | anon                     | supabase_admin
+ graphql            | UPDATE         | anon                     | supabase_admin
+ graphql            | UPDATE         | authenticated            | supabase_admin
+ graphql            | UPDATE         | authenticated            | supabase_admin
+ graphql            | UPDATE         | postgres                 | supabase_admin
+ graphql            | UPDATE         | postgres                 | supabase_admin
+ graphql            | UPDATE         | service_role             | supabase_admin
+ graphql            | UPDATE         | service_role             | supabase_admin
+ graphql            | USAGE          | anon                     | supabase_admin
+ graphql            | USAGE          | anon                     | supabase_admin
+ graphql            | USAGE          | authenticated            | supabase_admin
+ graphql            | USAGE          | authenticated            | supabase_admin
+ graphql            | USAGE          | postgres                 | supabase_admin
+ graphql            | USAGE          | postgres                 | supabase_admin
+ graphql            | USAGE          | service_role             | supabase_admin
+ graphql            | USAGE          | service_role             | supabase_admin
+ graphql            | USAGE          | supabase_admin           | supabase_admin
+ graphql_public     | CREATE         | supabase_admin           | supabase_admin
+ graphql_public     | DELETE         | anon                     | supabase_admin
+ graphql_public     | DELETE         | authenticated            | supabase_admin
+ graphql_public     | DELETE         | postgres                 | supabase_admin
+ graphql_public     | DELETE         | service_role             | supabase_admin
+ graphql_public     | EXECUTE        | anon                     | supabase_admin
+ graphql_public     | EXECUTE        | authenticated            | supabase_admin
+ graphql_public     | EXECUTE        | postgres                 | supabase_admin
+ graphql_public     | EXECUTE        | service_role             | supabase_admin
+ graphql_public     | INSERT         | anon                     | supabase_admin
+ graphql_public     | INSERT         | authenticated            | supabase_admin
+ graphql_public     | INSERT         | postgres                 | supabase_admin
+ graphql_public     | INSERT         | service_role             | supabase_admin
+ graphql_public     | REFERENCES     | anon                     | supabase_admin
+ graphql_public     | REFERENCES     | authenticated            | supabase_admin
+ graphql_public     | REFERENCES     | postgres                 | supabase_admin
+ graphql_public     | REFERENCES     | service_role             | supabase_admin
+ graphql_public     | SELECT         | anon                     | supabase_admin
+ graphql_public     | SELECT         | anon                     | supabase_admin
+ graphql_public     | SELECT         | authenticated            | supabase_admin
+ graphql_public     | SELECT         | authenticated            | supabase_admin
+ graphql_public     | SELECT         | postgres                 | supabase_admin
+ graphql_public     | SELECT         | postgres                 | supabase_admin
+ graphql_public     | SELECT         | service_role             | supabase_admin
+ graphql_public     | SELECT         | service_role             | supabase_admin
+ graphql_public     | TRIGGER        | anon                     | supabase_admin
+ graphql_public     | TRIGGER        | authenticated            | supabase_admin
+ graphql_public     | TRIGGER        | postgres                 | supabase_admin
+ graphql_public     | TRIGGER        | service_role             | supabase_admin
+ graphql_public     | TRUNCATE       | anon                     | supabase_admin
+ graphql_public     | TRUNCATE       | authenticated            | supabase_admin
+ graphql_public     | TRUNCATE       | postgres                 | supabase_admin
+ graphql_public     | TRUNCATE       | service_role             | supabase_admin
+ graphql_public     | UPDATE         | anon                     | supabase_admin
+ graphql_public     | UPDATE         | anon                     | supabase_admin
+ graphql_public     | UPDATE         | authenticated            | supabase_admin
+ graphql_public     | UPDATE         | authenticated            | supabase_admin
+ graphql_public     | UPDATE         | postgres                 | supabase_admin
+ graphql_public     | UPDATE         | postgres                 | supabase_admin
+ graphql_public     | UPDATE         | service_role             | supabase_admin
+ graphql_public     | UPDATE         | service_role             | supabase_admin
+ graphql_public     | USAGE          | anon                     | supabase_admin
+ graphql_public     | USAGE          | anon                     | supabase_admin
+ graphql_public     | USAGE          | authenticated            | supabase_admin
+ graphql_public     | USAGE          | authenticated            | supabase_admin
+ graphql_public     | USAGE          | postgres                 | supabase_admin
+ graphql_public     | USAGE          | postgres                 | supabase_admin
+ graphql_public     | USAGE          | service_role             | supabase_admin
+ graphql_public     | USAGE          | service_role             | supabase_admin
+ graphql_public     | USAGE          | supabase_admin           | supabase_admin
+ information_schema | CREATE         | supabase_admin           | supabase_admin
+ information_schema | USAGE          | supabase_admin           | supabase_admin
+ net                | CREATE         | supabase_admin           | supabase_admin
+ net                | USAGE          | anon                     | supabase_admin
+ net                | USAGE          | authenticated            | supabase_admin
+ net                | USAGE          | postgres                 | supabase_admin
+ net                | USAGE          | service_role             | supabase_admin
+ net                | USAGE          | supabase_admin           | supabase_admin
+ net                | USAGE          | supabase_functions_admin | supabase_admin
+ pg_catalog         | CREATE         | supabase_admin           | supabase_admin
+ pg_catalog         | USAGE          | supabase_admin           | supabase_admin
+ pgmq               | CREATE         | supabase_admin           | supabase_admin
+ pgmq               | SELECT         | pg_monitor               | supabase_admin
+ pgmq               | SELECT         | pg_monitor               | supabase_admin
+ pgmq               | USAGE          | pg_monitor               | supabase_admin
+ pgmq               | USAGE          | supabase_admin           | supabase_admin
+ pgtle              | CREATE         | pgtle_admin              | supabase_admin
+ pgtle              | CREATE         | supabase_admin           | supabase_admin
+ pgtle              | USAGE          | pgtle_admin              | supabase_admin
+ pgtle              | USAGE          | supabase_admin           | supabase_admin
+ realtime           | CREATE         | supabase_admin           | supabase_admin
+ realtime           | DELETE         | dashboard_user           | supabase_admin
+ realtime           | DELETE         | postgres                 | supabase_admin
+ realtime           | EXECUTE        | dashboard_user           | supabase_admin
+ realtime           | EXECUTE        | postgres                 | supabase_admin
+ realtime           | INSERT         | dashboard_user           | supabase_admin
+ realtime           | INSERT         | postgres                 | supabase_admin
+ realtime           | REFERENCES     | dashboard_user           | supabase_admin
+ realtime           | REFERENCES     | postgres                 | supabase_admin
+ realtime           | SELECT         | dashboard_user           | supabase_admin
+ realtime           | SELECT         | dashboard_user           | supabase_admin
+ realtime           | SELECT         | postgres                 | supabase_admin
+ realtime           | SELECT         | postgres                 | supabase_admin
+ realtime           | TRIGGER        | dashboard_user           | supabase_admin
+ realtime           | TRIGGER        | postgres                 | supabase_admin
+ realtime           | TRUNCATE       | dashboard_user           | supabase_admin
+ realtime           | TRUNCATE       | postgres                 | supabase_admin
+ realtime           | UPDATE         | dashboard_user           | supabase_admin
+ realtime           | UPDATE         | dashboard_user           | supabase_admin
+ realtime           | UPDATE         | postgres                 | supabase_admin
+ realtime           | UPDATE         | postgres                 | supabase_admin
+ realtime           | USAGE          | dashboard_user           | supabase_admin
+ realtime           | USAGE          | postgres                 | supabase_admin
+ realtime           | USAGE          | postgres                 | supabase_admin
+ realtime           | USAGE          | supabase_admin           | supabase_admin
+ repack             | CREATE         | postgres                 | supabase_admin
+ repack             | CREATE         | supabase_admin           | supabase_admin
+ repack             | DELETE         | postgres                 | supabase_admin
+ repack             | INSERT         | postgres                 | supabase_admin
+ repack             | REFERENCES     | postgres                 | supabase_admin
+ repack             | SELECT         | postgres                 | supabase_admin
+ repack             | SELECT         | postgres                 | supabase_admin
+ repack             | TRIGGER        | postgres                 | supabase_admin
+ repack             | TRUNCATE       | postgres                 | supabase_admin
+ repack             | UPDATE         | postgres                 | supabase_admin
+ repack             | UPDATE         | postgres                 | supabase_admin
+ repack             | USAGE          | postgres                 | supabase_admin
+ repack             | USAGE          | postgres                 | supabase_admin
+ repack             | USAGE          | supabase_admin           | supabase_admin
+ storage            | CREATE         | dashboard_user           | supabase_admin
+ storage            | CREATE         | supabase_admin           | supabase_admin
+ storage            | CREATE         | supabase_storage_admin   | supabase_admin
+ storage            | DELETE         | anon                     | postgres
+ storage            | DELETE         | authenticated            | postgres
+ storage            | DELETE         | postgres                 | postgres
+ storage            | DELETE         | service_role             | postgres
+ storage            | EXECUTE        | anon                     | postgres
+ storage            | EXECUTE        | authenticated            | postgres
+ storage            | EXECUTE        | postgres                 | postgres
+ storage            | EXECUTE        | service_role             | postgres
+ storage            | INSERT         | anon                     | postgres
+ storage            | INSERT         | authenticated            | postgres
+ storage            | INSERT         | postgres                 | postgres
+ storage            | INSERT         | service_role             | postgres
+ storage            | REFERENCES     | anon                     | postgres
+ storage            | REFERENCES     | authenticated            | postgres
+ storage            | REFERENCES     | postgres                 | postgres
+ storage            | REFERENCES     | service_role             | postgres
+ storage            | SELECT         | anon                     | postgres
+ storage            | SELECT         | anon                     | postgres
+ storage            | SELECT         | authenticated            | postgres
+ storage            | SELECT         | authenticated            | postgres
+ storage            | SELECT         | postgres                 | postgres
+ storage            | SELECT         | postgres                 | postgres
+ storage            | SELECT         | service_role             | postgres
+ storage            | SELECT         | service_role             | postgres
+ storage            | TRIGGER        | anon                     | postgres
+ storage            | TRIGGER        | authenticated            | postgres
+ storage            | TRIGGER        | postgres                 | postgres
+ storage            | TRIGGER        | service_role             | postgres
+ storage            | TRUNCATE       | anon                     | postgres
+ storage            | TRUNCATE       | authenticated            | postgres
+ storage            | TRUNCATE       | postgres                 | postgres
+ storage            | TRUNCATE       | service_role             | postgres
+ storage            | UPDATE         | anon                     | postgres
+ storage            | UPDATE         | anon                     | postgres
+ storage            | UPDATE         | authenticated            | postgres
+ storage            | UPDATE         | authenticated            | postgres
+ storage            | UPDATE         | postgres                 | postgres
+ storage            | UPDATE         | postgres                 | postgres
+ storage            | UPDATE         | service_role             | postgres
+ storage            | UPDATE         | service_role             | postgres
+ storage            | USAGE          | anon                     | supabase_admin
+ storage            | USAGE          | anon                     | postgres
+ storage            | USAGE          | authenticated            | supabase_admin
+ storage            | USAGE          | authenticated            | postgres
+ storage            | USAGE          | dashboard_user           | supabase_admin
+ storage            | USAGE          | postgres                 | supabase_admin
+ storage            | USAGE          | postgres                 | postgres
+ storage            | USAGE          | service_role             | supabase_admin
+ storage            | USAGE          | service_role             | postgres
+ storage            | USAGE          | supabase_admin           | supabase_admin
+ storage            | USAGE          | supabase_storage_admin   | supabase_admin
+ topology           | CREATE         | supabase_admin           | supabase_admin
+ topology           | USAGE          | supabase_admin           | supabase_admin
+ vault              | CREATE         | supabase_admin           | supabase_admin
+ vault              | USAGE          | postgres                 | supabase_admin
+ vault              | USAGE          | service_role             | supabase_admin
+ vault              | USAGE          | supabase_admin           | supabase_admin
+(363 rows)
+
+-- postgres can alter API roles' timeout
+set role postgres;
+alter role anon set statement_timeout = '10min';
+alter role anon reset statement_timeout;
+reset role;

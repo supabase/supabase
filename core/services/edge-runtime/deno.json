@@ -1,0 +1,20 @@
+{
+  "workspace": [
+    "./examples",
+    "./crates/base/test_cases"
+  ],
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "singleQuote": true,
+    "proseWrap": "preserve"
+  },
+  "imports": {
+  },
+  "compilerOptions": {
+    "types": [
+      "./types/global.d.ts"
+    ]
+  }
+}

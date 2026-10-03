@@ -1,0 +1,92 @@
+name: Integration Tests
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "test/**"
+      - "config/**"
+      - "priv/**"
+      - "!priv/repo/tenant_schema/**"
+      - "assets/**"
+      - "rel/**"
+      - "mix.exs"
+      - "mix.lock"
+      - "Dockerfile"
+      - "run.sh"
+      - "compose.tests.yml"
+      - "dev/**"
+      - ".github/workflows/integration_tests.yml"
+
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DENO_IMAGE: denoland/deno:alpine-2.5.6
+
+jobs:
+  tests:
+    name: Tests (${{ matrix.postgres }})
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    env:
+      POSTGRES_IMAGE: ${{ matrix.postgres_image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: [pg14, pg15, pg15_latest, pg17, orioledb17, multigres]
+        include:
+          - postgres: pg14
+            postgres_image: supabase/postgres:14.1.0.82
+          # test before supautils.policy_grants added all necessary grants
+          - postgres: pg15
+            postgres_image: supabase/postgres:15.1.0.1
+          - postgres: pg15_latest
+            postgres_image: supabase/postgres:15.14.1.167
+          - postgres: pg17
+            postgres_image: supabase/postgres:17.6.1.166
+          - postgres: orioledb17
+            postgres_image: supabase/postgres:17.9.0.019-orioledb
+          - postgres: multigres
+            postgres_image: ghcr.io/multigres/multigres-cluster-supabase:sha-d96b2f9
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Cache Docker images
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        id: docker-cache
+        with:
+          path: /tmp/docker-images
+          key: docker-images-integration-zstd-${{ env.POSTGRES_IMAGE }}-${{ env.DENO_IMAGE }}
+      - name: Load Docker images from cache
+        if: steps.docker-cache.outputs.cache-hit == 'true'
+        run: |
+          zstd -d --stdout /tmp/docker-images/postgres.tar.zst | docker image load &
+          PID1=$!
+          zstd -d --stdout /tmp/docker-images/deno.tar.zst | docker image load &
+          PID2=$!
+          wait $PID1 || exit $?
+          wait $PID2 || exit $?
+      - name: Pull and save Docker images
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          docker pull ${{ env.POSTGRES_IMAGE }} &
+          PID1=$!
+          docker pull ${{ env.DENO_IMAGE }} &
+          PID2=$!
+          wait $PID1 || exit $?
+          wait $PID2 || exit $?
+          mkdir -p /tmp/docker-images
+          docker image save ${{ env.POSTGRES_IMAGE }} | zstd -T0 -o /tmp/docker-images/postgres.tar.zst
+          docker image save ${{ env.DENO_IMAGE }} | zstd -T0 -o /tmp/docker-images/deno.tar.zst
+      - name: Bootstrap the Multigres test database
+        if: matrix.postgres == 'multigres'
+        run: docker compose -f compose.tests.yml run --rm test_db_bootstrap
+      - name: Run integration test
+        run: docker compose -f compose.tests.yml up --abort-on-container-exit --exit-code-from test-runner

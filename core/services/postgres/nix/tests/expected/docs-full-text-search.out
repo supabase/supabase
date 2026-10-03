@@ -1,0 +1,296 @@
+-- testing sql found in https://supabase.com/docs/guides/database/full-text-search
+create table books (
+  id serial primary key,
+  title text,
+  author text,
+  description text
+);
+insert into books
+  (title, author, description)
+values
+  (
+    'The Poky Little Puppy',
+    'Janette Sebring Lowrey',
+    'Puppy is slower than other, bigger animals.'
+  ),
+  ('The Tale of Peter Rabbit', 'Beatrix Potter', 'Rabbit eats some vegetables.'),
+  ('Tootle', 'Gertrude Crampton', 'Little toy train has big dreams.'),
+  (
+    'Green Eggs and Ham',
+    'Dr. Seuss',
+    'Sam has changing food preferences and eats unusually colored food.'
+  ),
+  (
+    'Harry Potter and the Goblet of Fire',
+    'J.K. Rowling',
+    'Fourth year of school starts, big drama ensues.'
+  );
+select to_tsvector('green eggs and ham');
+        to_tsvector        
+---------------------------
+ 'egg':2 'green':1 'ham':4
+(1 row)
+
+select to_tsvector('english', 'green eggs and ham');
+        to_tsvector        
+---------------------------
+ 'egg':2 'green':1 'ham':4
+(1 row)
+
+select *
+from books
+where title = 'Harry';
+ id | title | author | description 
+----+-------+--------+-------------
+(0 rows)
+
+select *
+from books
+where to_tsvector(title) @@ to_tsquery('Harry');
+ id |                title                |    author    |                   description                   
+----+-------------------------------------+--------------+-------------------------------------------------
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues.
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description)
+  @@ to_tsquery('big');
+ id |                title                |      author       |                   description                   
+----+-------------------------------------+-------------------+-------------------------------------------------
+  3 | Tootle                              | Gertrude Crampton | Little toy train has big dreams.
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues.
+(2 rows)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description || ' ' || title)
+  @@ to_tsquery('little');
+ id |         title         |         author         |                 description                 
+----+-----------------------+------------------------+---------------------------------------------
+  1 | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.
+  3 | Tootle                | Gertrude Crampton      | Little toy train has big dreams.
+(2 rows)
+
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+select
+  *
+from
+  books
+where
+  to_tsvector(title_description(books.*))
+  @@ to_tsquery('little');
+ id |         title         |         author         |                 description                 
+----+-----------------------+------------------------+---------------------------------------------
+  1 | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.
+  3 | Tootle                | Gertrude Crampton      | Little toy train has big dreams.
+(2 rows)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description)
+  @@ to_tsquery('little & big');
+ id | title  |      author       |           description            
+----+--------+-------------------+----------------------------------
+  3 | Tootle | Gertrude Crampton | Little toy train has big dreams.
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description)
+  @@ to_tsquery('little | big');
+ id |                title                |      author       |                   description                   
+----+-------------------------------------+-------------------+-------------------------------------------------
+  3 | Tootle                              | Gertrude Crampton | Little toy train has big dreams.
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues.
+(2 rows)
+
+select title from books where to_tsvector(title) @@ to_tsquery('Lit:*');
+         title         
+-----------------------
+ The Poky Little Puppy
+(1 row)
+
+create or replace function search_books_by_title_prefix(prefix text)
+returns setof books AS $$
+begin
+  return query
+  select * from books where to_tsvector('english', title) @@ to_tsquery(prefix || ':*');
+end;
+$$ language plpgsql;
+select * from search_books_by_title_prefix('Lit');
+ id |         title         |         author         |                 description                 
+----+-----------------------+------------------------+---------------------------------------------
+  1 | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.
+(1 row)
+
+select * from search_books_by_title_prefix('Little+Puppy');
+ id |         title         |         author         |                 description                 
+----+-----------------------+------------------------+---------------------------------------------
+  1 | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.
+(1 row)
+
+alter table
+  books
+add column
+  fts tsvector generated always as (to_tsvector('english', description || ' ' || title)) stored;
+create index books_fts on books using gin (fts);
+select id, fts
+from books;
+ id |                                                       fts                                                       
+----+-----------------------------------------------------------------------------------------------------------------
+  1 | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3
+  2 | 'eat':2 'peter':8 'rabbit':1,9 'tale':6 'veget':4
+  3 | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3
+  4 | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unusu':8
+  5 | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2
+(5 rows)
+
+select
+  *
+from
+  books
+where
+  fts @@ to_tsquery('little & big');
+ id | title  |      author       |           description            |                           fts                           
+----+--------+-------------------+----------------------------------+---------------------------------------------------------
+  3 | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description) @@ to_tsquery('big <-> dreams');
+ id | title  |      author       |           description            |                           fts                           
+----+--------+-------------------+----------------------------------+---------------------------------------------------------
+  3 | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description) @@ to_tsquery('year <2> school');
+ id |                title                |    author    |                   description                   |                                                       fts                                                       
+----+-------------------------------------+--------------+-------------------------------------------------+-----------------------------------------------------------------------------------------------------------------
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues. | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description) @@ to_tsquery('big & !little');
+ id |                title                |    author    |                   description                   |                                                       fts                                                       
+----+-------------------------------------+--------------+-------------------------------------------------+-----------------------------------------------------------------------------------------------------------------
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues. | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(title) @@ to_tsquery('harry & potter');
+ id |                title                |    author    |                   description                   |                                                       fts                                                       
+----+-------------------------------------+--------------+-------------------------------------------------+-----------------------------------------------------------------------------------------------------------------
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues. | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(description) @@ to_tsquery('food & !egg');
+ id |       title        |  author   |                            description                             |                                                fts                                                
+----+--------------------+-----------+--------------------------------------------------------------------+---------------------------------------------------------------------------------------------------
+  4 | Green Eggs and Ham | Dr. Seuss | Sam has changing food preferences and eats unusually colored food. | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unusu':8
+(1 row)
+
+select
+  *
+from
+  books
+where
+  to_tsvector(title || ' ' || description) @@ to_tsquery('train & toy');
+ id | title  |      author       |           description            |                           fts                           
+----+--------+-------------------+----------------------------------+---------------------------------------------------------
+  3 | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3
+(1 row)
+
+select
+  *
+from
+  books
+where
+  fts @@ to_tsquery('puppy & slow');
+ id | title | author | description | fts 
+----+-------+--------+-------------+-----
+(0 rows)
+
+select
+  *
+from
+  books
+where
+  fts @@ to_tsquery('rabbit | peter');
+ id |          title           |     author     |         description          |                        fts                        
+----+--------------------------+----------------+------------------------------+---------------------------------------------------
+  2 | The Tale of Peter Rabbit | Beatrix Potter | Rabbit eats some vegetables. | 'eat':2 'peter':8 'rabbit':1,9 'tale':6 'veget':4
+(1 row)
+
+select
+  *
+from
+  books
+where
+  fts @@ to_tsquery('harry <-> potter');
+ id |                title                |    author    |                   description                   |                                                       fts                                                       
+----+-------------------------------------+--------------+-------------------------------------------------+-----------------------------------------------------------------------------------------------------------------
+  5 | Harry Potter and the Goblet of Fire | J.K. Rowling | Fourth year of school starts, big drama ensues. | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2
+(1 row)
+
+select
+  *
+from
+  books
+where
+  fts @@ to_tsquery('fourth <3> year');
+ id | title | author | description | fts 
+----+-------+--------+-------------+-----
+(0 rows)
+
+select
+  *
+from
+  books
+where
+  fts @@ to_tsquery('big & !drama');
+ id | title  |      author       |           description            |                           fts                           
+----+--------+-------------------+----------------------------------+---------------------------------------------------------
+  3 | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3
+(1 row)
+
+drop function search_books_by_title_prefix(text);
+drop function title_description(books);
+drop table books;
+ 

@@ -1,0 +1,222 @@
+- hosts: all
+  become: yes
+
+  pre_tasks:
+    - name: Set the platform arch as a fact
+      ansible.builtin.set_fact:
+        platform: "{{ 'amd64' if ansible_facts['architecture'] == 'x86_64' else 'arm64' }}"
+
+    - import_tasks: tasks/setup-system.yml
+  vars_files:
+    - ./vars.yml
+
+  vars:
+    sql_files:
+      - {
+          source: "pgbouncer_config/pgbouncer_auth_schema.sql",
+          dest: "00-schema.sql",
+        }
+      - { source: "stat_extension.sql", dest: "01-extension.sql" }
+    
+  environment:
+    PATH: /usr/lib/postgresql/bin:{{ ansible_env.PATH }}
+
+  tasks:
+    - set_fact:
+        supabase_internal: true
+      tags:
+        - install-supabase-internal
+
+    - set_fact:
+        parallel_jobs: 16
+
+    # is_psql_oriole is also (re)computed in stage2-setup-postgres.yml, but the
+    # coredump-processing import below runs in both stage1 and stage2, so the
+    # fact needs to exist before stage2-only tasks have had a chance to set it.
+    - name: Determine postgres flavor from psql_version
+      ansible.builtin.set_fact:
+        is_psql_oriole: "{{ psql_version is defined and psql_version == 'psql_orioledb-17' }}"
+
+    - name: Install tuned
+      import_tasks: tasks/setup-tuned.yml
+
+    - name: Install tmux
+      import_tasks: tasks/setup-tmux.yml
+
+    - name: Install Postgres from source
+      import_tasks: tasks/setup-postgres.yml
+
+    - name: Install PostgreSQL/OrioleDB coredump capture and processing
+      when: is_psql_oriole
+      import_tasks: tasks/setup-coredump-processing.yml
+
+    - name: Install PgBouncer
+      import_tasks: tasks/setup-pgbouncer.yml
+      tags:
+        - install-pgbouncer
+        - install-supabase-internal
+
+    - name: Install WAL-G
+      import_tasks: tasks/setup-wal-g.yml
+
+    - name: Install pgBackRest
+      import_tasks:
+        file: tasks/setup-pgbackrest.yml
+
+    - name: Install Gotrue
+      when: not stage2
+      import_tasks: tasks/setup-gotrue.yml
+      tags:
+        - install-gotrue
+        - install-supabase-internal
+
+    - name: Install PostgREST
+      when: not stage2
+      import_tasks: tasks/setup-postgrest.yml
+      tags:
+        - install-postgrest
+        - install-supabase-internal
+
+    - name: Install Envoy
+      when: not stage2
+      import_tasks: tasks/setup-envoy.yml
+      tags:
+        - install-supabase-internal
+
+    - name: Install Kong
+      when: not stage2
+      import_tasks: tasks/setup-kong.yml
+      tags:
+        - install-supabase-internal
+
+    - name: Install Supabase specific content
+      when: not stage2
+      import_tasks: tasks/setup-supabase-internal.yml
+      tags:
+        - install-supabase-internal
+
+    - name: Fix IPv6 NDisc issues (disabled)
+      when: not stage2 and not qemu
+      import_tasks: tasks/fix-ipv6-ndisc.yml
+      tags:
+        - install-supabase-internal
+
+    - name: Adjust APT update intervals
+      when: not stage2
+      copy:
+        src: files/apt_periodic
+        dest: /etc/apt/apt.conf.d/10periodic
+
+    - name: Transfer init SQL files
+      when: stage2
+      copy:
+        src: files/{{ item.source }}
+        dest: /tmp/{{ item.dest }}
+      loop: "{{ sql_files }}"
+
+    - name: Create postgres role
+      when: stage2
+      become: yes
+      become_user: postgres
+      shell:
+        cmd: /usr/lib/postgresql/bin/psql --username=supabase_admin -d postgres -c "create role postgres superuser login; alter database postgres owner to postgres;"
+
+    - name: Execute init SQL files
+      when: stage2
+      become: yes
+      become_user: postgres
+      shell:
+        cmd: /usr/lib/postgresql/bin/psql -f /tmp/{{ item.dest }}
+      loop: "{{ sql_files }}"
+
+    - name: Delete SQL scripts
+      when: stage2
+      file:
+        path: /tmp/{{ item.dest }}
+        state: absent
+      loop: "{{ sql_files }}"
+
+    - name: First boot optimizations
+      when: stage2
+      import_tasks: tasks/internal/optimizations.yml
+      tags:
+        - install-supabase-internal
+
+    - name: Finalize AMI
+      when: not stage2
+      import_tasks: tasks/finalize-ami.yml
+      tags:
+        - install-supabase-internal
+
+    - name: Enhance fail2ban
+      when: not stage2
+      import_tasks: tasks/setup-fail2ban.yml
+
+    # Install this at the end to prevent it from kicking in during the apt process, causing conflicts
+    - name: Install security tools
+      become: yes
+      apt:
+        pkg:
+          - unattended-upgrades
+
+    - name: Run migrations
+      when: stage2
+      import_tasks: tasks/setup-migrations.yml
+      tags:
+        - migrations
+
+    - name: Run unit tests
+      when: stage2
+      import_tasks: tasks/test-image.yml
+      tags:
+        - unit-tests
+
+    - name: Purge snapd
+      when: stage2
+      become: yes
+      shell: |
+        apt autoremove -y --purge snapd
+
+    - name: Run permission checks
+      when: stage2
+      become: yes
+      shell: |
+        systemctl start postgresql.service
+        /usr/bin/python3 /tmp/ansible-playbook/ansible/files/permission_check.py {{ '--qemu' if qemu else '' }}
+        systemctl stop postgresql.service
+
+    - name: Run fail2ban configuration checks
+      when: stage2
+      become: yes
+      shell: |
+        systemctl start fail2ban.service
+        /usr/bin/python3 /tmp/ansible-playbook/ansible/files/fail2ban_check.py
+        systemctl stop fail2ban.service
+
+    - name: Run supascan baseline validation
+      when: stage2
+      become: yes
+      shell: |
+        baseline={{ 'ami' if not qemu else 'qemu' }}-build-{{ platform }}
+        /bin/bash /tmp/ansible-playbook/ansible/files/supascan_ami.sh /tmp/ansible-playbook/audit-specs/baselines/$baseline
+
+    - name: Remove supascan after validation
+      when: stage2
+      become: yes
+      shell: |
+        sudo -u ubuntu bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix profile remove supascan"
+
+    - name: nix collect garbage
+      when: stage2
+      become: yes
+      shell: |
+        sudo -u ubuntu bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix-collect-garbage -d"
+
+    - name: Setup Swap
+      when: stage2 and not qemu
+      become: yes
+      import_tasks: tasks/stage2/setup-swap.yml
+
+  handlers:
+    - name: Import handlers
+      import_tasks: handlers/main.yml

@@ -1,0 +1,9 @@
+select
+  status
+from
+  pgsodium.create_key();
+ status 
+--------
+ valid
+(1 row)
+

@@ -1,0 +1,29 @@
+name: Testagram Core Forensic Audit
+
+on:
+  pull_request:
+    branches:
+      - testagram/core-platform-foundation
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  forensic-audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Run boundary audit
+        run: bash scripts/audit-core-boundary.sh
+
+      - name: Verify working tree is clean
+        run: test -z "$(git status --porcelain)"

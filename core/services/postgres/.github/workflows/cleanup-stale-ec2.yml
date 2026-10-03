@@ -1,0 +1,52 @@
+name: Cleanup Stale EC2 Instances
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    name: Delete stale packer EC2 instances
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        region: [ap-southeast-1, us-east-1]
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.DEV_AWS_ROLE }}
+          aws-region: ${{ matrix.region }}
+
+      - name: Find and terminate stale instances
+        env:
+          AWS_MAX_ATTEMPTS: 6
+        run: |
+          cutoff=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ')
+
+          echo "Looking for running packer builder instances launched before ${cutoff}..."
+
+          instance_ids=$(aws ec2 describe-instances \
+            --filters \
+              "Name=tag:appType,Values=postgres" \
+              "Name=tag:creator,Values=packer" \
+              "Name=instance-state-name,Values=running" \
+            --query "Reservations[].Instances[?LaunchTime<'${cutoff}'][].InstanceId" \
+            --output text)
+
+          if [ -z "$instance_ids" ]; then
+            echo "No stale instances found."
+            exit 0
+          fi
+
+          read -r -a instance_id_arr <<< "$instance_ids"
+          echo "Terminating instances: ${instance_id_arr[*]}"
+          aws ec2 terminate-instances --instance-ids "${instance_id_arr[@]}"
+          echo "Done."

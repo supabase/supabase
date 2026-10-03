@@ -1,0 +1,243 @@
+[workspace]
+resolver = "2"
+members = [
+  "cli",
+  "crates/base",
+  "crates/base_mem_check",
+  "crates/base_rt",
+  "crates/cpu_timer",
+  "crates/deno_facade",
+  "crates/eszip_trait",
+  "crates/fs",
+  "crates/http_utils",
+  "deno",
+  "ext/ai",
+  "ext/ai/utilities",
+  "ext/env",
+  "ext/event_worker",
+  "ext/node",
+  "ext/os",
+  "ext/runtime",
+  "ext/workers",
+]
+
+[workspace.package]
+authors = ["Supabase <team@supabase.com>"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/supabase/edge-runtime"
+
+[workspace.dependencies]
+deno = { path = "./deno" }
+
+deno_ast = { version = "=0.44.0", features = ["transpiling"] }
+deno_core = "0.324.0"
+
+deno_cache_dir = "=0.14.0"
+deno_config = { version = "=0.39.3", features = ["workspace", "sync"] }
+deno_graph = "=0.86.3"
+deno_lockfile = "=0.23.2"
+deno_media_type = { version = "0.2.0", features = ["module_specifier"] }
+deno_npm = "=0.26.0"
+deno_package_json = { version = "0.2.1", default-features = false }
+deno_path_util = "=0.2.1"
+deno_permissions = "0.42.0"
+deno_semver = "=0.6.1"
+
+# upstream exts
+deno_broadcast_channel = "0.176.0"
+deno_cache = "0.114.0"
+deno_canvas = "0.51.0"
+deno_console = "0.182.0"
+deno_crypto = "0.196.0"
+deno_fetch = "0.206.0"
+deno_fs = { version = "0.92.0", features = ["sync_fs"] }
+deno_http = "0.180.0"
+deno_io = "0.92.0"
+deno_net = "0.174.0"
+deno_telemetry = "0.17.0"
+deno_tls = "0.169.0"
+deno_url = "0.182.0"
+deno_web = "0.213.0"
+deno_webgpu = "0.149.0"
+deno_webidl = "0.182.0"
+deno_websocket = "0.187.0"
+deno_webstorage = "0.177.0"
+
+# local crates
+base = { version = "0.1.0", path = "./crates/base" }
+base_mem_check = { version = "0.1.0", path = "./crates/base_mem_check" }
+base_rt = { version = "0.1.0", path = "./crates/base_rt" }
+cli = { version = "0.1.0", path = "./cli" }
+cpu_timer = { version = "0.1.0", path = "./crates/cpu_timer" }
+deno_facade = { version = "0.1.0", path = "./crates/deno_facade" }
+eszip_trait = { version = "0.1.0", path = "./crates/eszip_trait" }
+fs = { version = "0.1.0", path = "./crates/fs" }
+http_utils = { version = "0.1.0", path = "./crates/http_utils" }
+
+# local exts
+ext_ai = { version = "0.1.0", path = "./ext/ai" }
+ext_ai_v8_utilities = { version = "0.1.0", path = "./ext/ai/utilities" }
+ext_env = { version = "0.1.0", path = "./ext/env" }
+ext_event_worker = { version = "0.1.0", path = "./ext/event_worker" }
+ext_node = { version = "0.1.0", path = "./ext/node" }
+ext_os = { version = "0.1.0", path = "./ext/os" }
+ext_runtime = { version = "0.1.0", path = "./ext/runtime" }
+ext_workers = { version = "0.1.0", path = "./ext/workers" }
+
+# local deps
+clap = { version = "4.5.16", features = ["cargo", "string", "env"] }
+ctor = "0.2.6"
+either = "1"
+enum-as-inner = "0.6.0"
+eszip = "=0.80.0"
+futures-util = "0.3.30"
+fxhash = "0.2"
+import_map = { version = "=0.20.1", features = ["ext"] }
+num-traits = "0.2"
+rkyv = "0.7"
+serial_test = "3.0.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "tracing-log"] }
+urlencoding = "2.1.2"
+xxhash-rust = "0.8"
+
+# upstream deps
+aes = "=0.8.3"
+anyhow = "1.0.57"
+async-trait = "0.1.73"
+base32 = "=0.5.1"
+base64 = "0.21.7"
+bencher = "0.1"
+brotli = "6.0.0"
+bytes = "1.11.1"
+cache_control = "=0.2.0"
+cbc = { version = "=0.1.2", features = ["alloc"] }
+# Note: Do not use the "clock" feature of chrono, as it links us to CoreFoundation on macOS.
+#       Instead use util::time::utc_now()
+chrono = { version = "0.4", default-features = false, features = ["std", "serde"] }
+dashmap = "5.5.3"
+data-encoding = "2.3.3"
+data-url = "=0.3.0"
+dotenvy = "0.15.7"
+ecb = "=0.1.2"
+elliptic-curve = { version = "0.13.4", features = ["alloc", "arithmetic", "ecdh", "std", "pem", "jwk"] }
+fast-socks5 = "0.9.6"
+faster-hex = "0.9"
+fastwebsockets = { version = "0.8", features = ["upgrade", "unstable-split"] }
+flate2 = { version = "=1.0.30", default-features = false }
+fs3 = "0.5.0"
+futures = "0.3.21"
+glob = "0.3.1"
+h2 = "0.4.4"
+hickory-resolver = { version = "0.25.0-alpha.4", features = ["tokio-runtime", "serde"] }
+http = "1.0"
+http-body = "1.0"
+http-body-util = "0.1.2"
+http_v02 = { package = "http", version = "0.2.9" }
+httparse = "1.8.0"
+hyper = { version = "1.4.1", features = ["full"] }
+hyper-rustls = { version = "0.27.2", default-features = false, features = ["http1", "http2", "tls12", "ring"] }
+hyper-util = { version = "=0.1.7", features = ["tokio", "server", "server-auto"] }
+hyper_v014 = { package = "hyper", version = "0.14.26", features = ["runtime", "http1"] }
+indexmap = { version = "2", features = ["serde"] }
+ipnet = "2.3"
+lazy-regex = "3"
+libc = "0.2.126"
+libz-sys = { version = "1.1.20", default-features = false }
+log = "0.4.20"
+memmem = "0.1.1"
+monch = "=0.5.0"
+notify = "=6.1.1"
+num-bigint = { version = "0.4", features = ["rand"] }
+once_cell = "1.17.1"
+p224 = { version = "0.13.0", features = ["ecdh"] }
+p256 = { version = "0.13.2", features = ["ecdh", "jwk"] }
+p384 = { version = "0.13.0", features = ["ecdh", "jwk"] }
+parking_lot = "0.12.0"
+percent-encoding = "2.3.0"
+phf = { version = "0.11", features = ["macros"] }
+pin-project = "1.0.11" # don't pin because they yank crates from cargo
+rand = "=0.8.5"
+regex = "^1.7.0"
+reqwest = { version = "0.12.5", default-features = false, features = ["rustls-tls", "stream", "gzip", "brotli", "socks", "json", "http2"] } # pinned because of https://github.com/seanmonstar/reqwest/pull/1955
+reqwest_v011 = { package = "reqwest", version = "0.11", features = ["stream", "json", "multipart"] }
+ring = "^0.17.14"
+rustls = { version = "0.23.11", default-features = false, features = ["logging", "std", "tls12", "ring"] }
+rustls-pemfile = "2"
+rustls-tokio-stream = "=0.3.0"
+rustls-webpki = "0.102"
+scopeguard = "1.2.0"
+sec1 = "0.7"
+serde = { version = "1.0.149", features = ["derive"] }
+serde_json = "1.0.85"
+sha1 = { version = "0.10.6", features = ["oid"] }
+sha2 = { version = "0.10.8", features = ["oid"] }
+signature = "2.1"
+smallvec = "1.8"
+spki = "0.7.2"
+tar = "=0.4.40"
+tempfile = "3.4.0"
+thiserror = "2.0.3"
+tokio = { version = "1.36.0", features = ["full"] }
+tokio-rustls = { version = "0.26.0", default-features = false, features = ["ring", "tls12"] }
+tokio-socks = "0.5.1"
+tokio-util = "0.7.4"
+tower = { version = "0.4.13", default-features = false, features = ["util"] }
+tower-http = { version = "0.6.1", features = ["decompression-br", "decompression-gzip"] }
+tower-service = "0.3.2"
+twox-hash = "=1.6.3"
+url = { version = "2.5", features = ["serde", "expose_internals"] }
+uuid = { version = "1.3.0", features = ["v4"] }
+webpki-root-certs = "0.26.5"
+webpki-roots = "0.26"
+yoke = { version = "0.7.4", features = ["derive"] }
+
+opentelemetry = "0.27.0"
+opentelemetry-http = "0.27.0"
+opentelemetry-otlp = { version = "0.27.0", features = ["logs", "trace", "http-proto", "http-json", "reqwest-client"] }
+opentelemetry-semantic-conventions = { version = "0.27.0", features = ["semconv_experimental"] }
+opentelemetry_sdk = { version = "0.27.0", features = ["rt-tokio"] }
+
+# upstream resolvers
+deno_npm_cache = "0.2.0"
+deno_resolver = "0.14.0"
+node_resolver = "0.21.0"
+
+# crypto
+hkdf = "0.12.3"
+rsa = { version = "0.9.9", default-features = false, features = ["std", "pem", "hazmat"] } # hazmat needed for PrehashSigner in ext/node
+
+# webcpu
+wgpu-core = "0.21.1"
+wgpu-types = "0.20"
+
+# unix
+nix = "=0.27.1"
+
+# windows deps
+junction = "=0.2.0"
+winapi = "=0.3.9"
+windows-sys = { version = "0.59.0", features = ["Win32_Foundation", "Win32_Media", "Win32_Storage_FileSystem"] }
+
+[patch.crates-io]
+deno_core = { git = "https://github.com/supabase/deno_core", branch = "324-supabase" }
+eszip = { git = "https://github.com/supabase/eszip", branch = "fix-pub-vis-0-80-1" }
+v8 = { git = "https://github.com/supabase/rusty_v8", tag = "v130.0.7-patch.1" }
+
+deno_unsync = { path = "./vendor/deno_unsync" }
+deno_crypto = { path = "./vendor/deno_crypto" }
+deno_fetch = { path = "./vendor/deno_fetch" }
+deno_telemetry = { path = "./vendor/deno_telemetry" }
+deno_http = { path = "./vendor/deno_http" }
+
+[profile.dind]
+inherits = "dev"
+
+[profile.no-debug-assertions]
+inherits = "dev"
+debug-assertions = false
+
+[profile.release]
+debug = true
+lto = "thin"

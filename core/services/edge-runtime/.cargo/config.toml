@@ -1,0 +1,8 @@
+[env]
+RUSTY_V8_MIRROR = "https://github.com/supabase/rusty_v8/releases/download"
+# https://supabase.com/docs/guides/functions/limits
+SUPABASE_RESOURCE_LIMIT_MEM_MB = "256"
+SUPABASE_RESOURCE_LIMIT_LOW_MEM_MULTIPLIER = "5"
+SUPABASE_RESOURCE_LIMIT_CPU_SOFT_MS = "1000"
+SUPABASE_RESOURCE_LIMIT_CPU_HARD_MS = "2000"
+SUPABASE_RESOURCE_LIMIT_TIMEOUT_MS = "400000"

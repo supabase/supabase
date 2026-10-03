@@ -1,0 +1,228 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+      - release/*
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
+  id-token: write
+
+jobs:
+  release_please:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    outputs:
+      MAIN_RELEASE_VERSION: ${{ steps.versions.outputs.MAIN_RELEASE_VERSION }}
+      RELEASE_VERSION: ${{ steps.versions.outputs.RELEASE_VERSION }}
+      RELEASE_CANDIDATE: ${{ steps.versions.outputs.RELEASE_CANDIDATE }}
+      RELEASE_NAME: ${{ steps.versions.outputs.RELEASE_NAME }}
+    steps:
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf
+        with:
+          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0
+        id: release
+        with:
+          release-type: go
+          target-branch: ${{ github.ref_name }}
+          token: ${{ steps.app-token.outputs.token }}
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        with:
+          fetch-depth: 0
+
+      - if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        id: versions
+        env:
+          MAJOR: ${{ steps.release.outputs.major }}
+          MINOR: ${{ steps.release.outputs.minor }}
+          NOT_RELEASE_CANDIDATE: '${{ steps.release.outputs.release_created }}'
+          PATCH: ${{ steps.release.outputs.patch }}
+          RELEASE_TITLE: ${{ steps.release.outputs.pr && fromJSON(steps.release.outputs.pr).title }}
+        run: |
+          set -ex
+
+          RELEASE_CANDIDATE=true
+          if [ "$NOT_RELEASE_CANDIDATE" == "true" ]
+          then
+            RELEASE_CANDIDATE=false
+          fi
+
+          MAIN_RELEASE_VERSION=x
+          RELEASE_VERSION=y
+
+          if [ "$RELEASE_CANDIDATE" == "true" ]
+          then
+            # Release please doesn't tell you the candidate version when it
+            # creates the PR, so we have to take it from the title.
+            MAIN_RELEASE_VERSION=$(node -e "
+                  const title = process.env.RELEASE_TITLE;
+                  console.log(title.split(' ').reverse().find(x => x.match(/[0-9]+[.][0-9]+[.][0-9]+/)));
+                ")
+
+            # Use git describe tags to identify the number of commits the branch
+            # is ahead of the most recent non-release-candidate tag, which is
+            # part of the rc.<commits> value.
+            GIT_DESC="$(git describe --tags --exclude 'rc*')"
+            GIT_DESC_WITHOUT_HASH="${GIT_DESC%-g*}"
+            COMMIT_COUNT="${GIT_DESC_WITHOUT_HASH##*-}"
+
+            if [[ ! "$COMMIT_COUNT" =~ ^[0-9]+$ ]]; then
+              echo "Unexpected git describe output: $GIT_DESC" >&2
+              exit 1
+            fi
+
+            RELEASE_VERSION="${MAIN_RELEASE_VERSION}-rc.${COMMIT_COUNT}"
+
+            # release-please only ignores releases that have a form like [A-Z0-9]<version>, so prefixing with rc<version>
+            RELEASE_NAME="rc$RELEASE_VERSION"
+          else
+            MAIN_RELEASE_VERSION="$MAJOR.$MINOR.$PATCH"
+            RELEASE_VERSION="$MAIN_RELEASE_VERSION"
+            RELEASE_NAME="v$RELEASE_VERSION"
+          fi
+
+          echo "MAIN_RELEASE_VERSION=${MAIN_RELEASE_VERSION}" >> "${GITHUB_ENV}"
+          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_ENV}"
+          echo "RELEASE_CANDIDATE=${RELEASE_CANDIDATE}" >> "${GITHUB_ENV}"
+          echo "RELEASE_NAME=${RELEASE_NAME}" >> "${GITHUB_ENV}"
+
+          echo "MAIN_RELEASE_VERSION=${MAIN_RELEASE_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "RELEASE_VERSION=${RELEASE_VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "RELEASE_CANDIDATE=${RELEASE_CANDIDATE}" >> "${GITHUB_OUTPUT}"
+          echo "RELEASE_NAME=${RELEASE_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        with:
+          go-version-file: go.mod
+
+      - name: Build release artifacts
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        run: |
+          set -ex
+
+          MAKE_JOBS="$(nproc 2>/dev/null || echo 4)"
+          RELEASE_VERSION=$RELEASE_VERSION make -j"$MAKE_JOBS" release
+
+      - name: Generate checksums
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        run: |
+          set -ex
+          # Function to generate checksums for a specific hash type
+          generate_checksums() {
+            local hash_type=$1
+            local hash_cmd=$2
+            echo "### ${hash_type}" >> checksums.txt
+            for file in auth-v$RELEASE_VERSION*.tar.{gz,xz}; do
+              echo "\`$file\`:" >> checksums.txt
+              echo "\`\`\`" >> checksums.txt
+              $hash_cmd "$file" | awk '{print $1}' >> checksums.txt
+              echo "\`\`\`" >> checksums.txt
+              echo "" >> checksums.txt
+            done
+          }
+
+          # Generate the checksum file to be appended to the release notes later
+          echo "## Checksums" > checksums.txt
+          generate_checksums "SHA1" "sha1sum"
+          generate_checksums "SHA256" "sha256sum"
+
+      - name: GitHub OIDC Auth
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::${{ secrets.SHARED_SERVICES_AWS_ACCOUNT_ID }}:role/supabase-github-oidc-role
+          role-session-name: shared-services-jump
+
+      - name: Assume destination role
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        with:
+          aws-region: ap-southeast-1
+          role-to-assume: arn:aws:iam::${{ secrets.SHARED_SERVICES_AWS_ACCOUNT_ID }}:role/supabase-auth-artifacts-role-7656c95
+          role-skip-session-tagging: true
+          role-session-name: upload-assets
+          role-chaining: true
+
+      - name: Upload release artifacts
+        if: ${{ steps.release.outputs.release_created == 'true' || steps.release.outputs.prs_created == 'true' }}
+        env:
+          PR_NUMBER: ${{ steps.release.outputs.pr && fromJSON(steps.release.outputs.pr).number }}
+        run: |
+          set -ex
+
+          if [ "$RELEASE_CANDIDATE" == "true" ]
+          then
+            CHECKSUM_CONTENT=$(cat checksums.txt)
+
+            RELEASE_NOTES=$(printf "This is a release candidate. See release-please PR #%s for context.\n\n%s\n" "$PR_NUMBER" "$CHECKSUM_CONTENT")
+
+            GH_TOKEN='${{ github.token }}' gh release \
+              create $RELEASE_NAME \
+              --title "v$RELEASE_VERSION" \
+              --prerelease \
+              -n "$RELEASE_NOTES"
+
+            GH_TOKEN='${{ github.token }}' gh pr comment "$PR_NUMBER" \
+              -b "Release candidate [v$RELEASE_VERSION](https://github.com/supabase/gotrue/releases/tag/$RELEASE_NAME) published."
+          else
+            if [ "$GITHUB_REF" == "refs/heads/main" ] || [ "$GITHUB_REF" == "refs/heads/master" ]
+            then
+
+              if [[ "$RELEASE_VERSION" == *.0 ]];
+              then
+                # Only create release branch if patch version is 0, as this
+                # means that the release can be patched in the future.
+
+                GH_TOKEN='${{ github.token }}' gh api \
+                  --method POST \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  /repos/supabase/gotrue/git/refs \
+                  -f "ref=refs/heads/release/${RELEASE_VERSION}" \
+                  -f "sha=$GITHUB_SHA"
+                fi
+              fi
+          fi
+
+          # Append checksums to existing release notes
+          EXISTING_NOTES=$(GH_TOKEN='${{ github.token }}' gh release view "$RELEASE_NAME" --json body -q .body)
+          CHECKSUM_CONTENT=$(cat checksums.txt)
+          FULL_NOTES=$(printf "%s\n\n%s\n" "$EXISTING_NOTES" "$CHECKSUM_CONTENT")
+          GH_TOKEN='${{ github.token }}' gh release edit "$RELEASE_NAME" -n "$FULL_NOTES"
+
+          GH_TOKEN='${{ github.token }}' gh release upload "$RELEASE_NAME" \
+            "./auth-v$RELEASE_VERSION-x86.tar.gz" \
+            "./auth-v$RELEASE_VERSION-arm64.tar.gz" \
+            "./auth-v$RELEASE_VERSION-darwin-arm64.tar.gz" \
+            "./auth-v$RELEASE_VERSION-amd64.tar.xz" \
+            "./auth-v$RELEASE_VERSION-arm64.tar.xz"
+
+          # Upload to Supabase internal bucket
+          aws s3 cp "./auth-v$RELEASE_VERSION-amd64.tar.xz" "s3://supabase-internal-artifacts/auth/$RELEASE_VERSION/"
+          aws s3 cp "./auth-v$RELEASE_VERSION-arm64.tar.xz" "s3://supabase-internal-artifacts/auth/$RELEASE_VERSION/"
+
+  publish:
+    needs:
+      - release_please
+    if: ${{ success() && needs.release_please.outputs.RELEASE_VERSION }}
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.release_please.outputs.RELEASE_VERSION }}

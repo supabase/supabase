@@ -1,0 +1,13 @@
+On NixOS we *want* stuff relative to symlinks.
+---
+--- a/src/common/exec.c
++++ b/src/common/exec.c
+@@ -218,6 +218,8 @@
+ static int
+ resolve_symlinks(char *path)
+ {
++	return 0;
++
+ #ifdef HAVE_READLINK
+ 	struct stat buf;
+ 	char		orig_wd[MAXPGPATH],

@@ -1,0 +1,50 @@
+global:
+  scrape_interval: 5s
+  scrape_timeout: 5s
+  evaluation_interval: 15s
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+      scheme: http
+      timeout: 15s
+      api_version: v2
+scrape_configs:
+  - job_name: storage_api
+    honor_timestamps: true
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    metrics_path: /metrics
+    scheme: http
+    static_configs:
+      - targets:
+          #          - storage:5000
+          #          - storage:5001
+          - otel:9200
+
+  - job_name: "postgres"
+    static_configs:
+      - targets:
+          - postgres_exporter:9187
+    metrics_path: /metrics
+
+  - job_name: supavisor
+    honor_timestamps: true
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    metrics_path: /metrics
+    scheme: http
+    bearer_token: "TEST_JWT_REDACTED"
+    static_configs:
+      - targets:
+          - supavisor:4000
+
+  - job_name: pg_bouncer_exporter
+    honor_timestamps: true
+    scrape_interval: 5s
+    scrape_timeout: 5s
+    metrics_path: /
+    scheme: http
+    static_configs:
+      - targets:
+          - pg_bouncer_exporter:9127

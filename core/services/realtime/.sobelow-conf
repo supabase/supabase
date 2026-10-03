@@ -1,0 +1,13 @@
+[
+  verbose: true,
+  private: false,
+  skip: false,
+  router: nil,
+  exit: :low,
+  format: "txt",
+  out: nil,
+  threshold: :medium,
+  ignore: ["Config.CSP", "Config.HTTPS"],
+  ignore_files: [],
+  version: false
+]

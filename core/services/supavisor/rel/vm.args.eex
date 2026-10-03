@@ -1,0 +1,24 @@
+## Customize flags given to the VM: http://erlang.org/doc/man/erl.html
+## -mode/-name/-sname/-setcookie are configured via env vars, do not set them here
+
+## Set number of processes
++P 1000000
+
+# Dist buffer busy limit in KB (2GB)
++zdbbl 2097151
+
+# This used to mean the limit of ets tables, but its the size of the
+# hashtable storing ets names. Increasing it means the table eats
+# more memory but reduces the chance of hash collisions
++e 65536
+
+# Set distribution port range
+-kernel inet_dist_listen_min 20000
+-kernel inet_dist_listen_max 21000
+
+# Distribution socket options:
+# send buffer - 256KB
+# receive buffer - 512KB
+# buffer - set to receive buffer
+-kernel inet_dist_connect_options [{sndbuf,256000},{recbuf,512000},{buffer,512000},{nodelay,true}]
+-kernel inet_dist_listen_options [{sndbuf,256000},{recbuf,512000},{buffer,512000},{nodelay,true}]

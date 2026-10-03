@@ -1,0 +1,13 @@
+{
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/github", {
+        "successComment": false,
+        "failTitle": false
+      }
+    ],
+    "@semantic-release/npm"
+  ]
+}

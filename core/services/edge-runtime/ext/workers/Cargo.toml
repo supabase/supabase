@@ -1,0 +1,37 @@
+[package]
+name = "ext_workers"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno.workspace = true
+deno_config.workspace = true
+deno_core.workspace = true
+deno_telemetry.workspace = true
+
+deno_facade.workspace = true
+fs.workspace = true
+http_utils.workspace = true
+
+base_mem_check.workspace = true
+ext_event_worker.workspace = true
+ext_runtime.workspace = true
+
+anyhow.workspace = true
+bytes.workspace = true
+enum-as-inner.workspace = true
+futures-util.workspace = true
+hyper_v014.workspace = true
+log.workspace = true
+once_cell.workspace = true
+scopeguard.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+uuid.workspace = true

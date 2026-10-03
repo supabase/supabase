@@ -1,0 +1,7 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:Error"
+  ],
+  "status": "501",
+  "detail": "The request endpoint is not implemented"
+}

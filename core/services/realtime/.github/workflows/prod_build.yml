@@ -1,0 +1,208 @@
+name: Build Production
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "forum/lib/**"
+      - "lib/**"
+      - "config/**"
+      - "priv/**"
+      - "assets/**"
+      - "rel/**"
+      - "mix.exs"
+      - "mix.lock"
+      - "Dockerfile"
+      - "run.sh"
+      - ".github/workflows/prod_build.yml"
+
+jobs:
+  release:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+    outputs:
+      published: ${{ steps.semantic.outputs.new_release_published }}
+      version: ${{ steps.semantic.outputs.new_release_version }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.GH_APP_ID }}
+          private-key: ${{ secrets.GH_APP_PRIVATE_KEY }}
+
+      - id: semantic
+        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90 # v6.0.0
+        with:
+          semantic_version: 24
+          extra_plugins: |
+            @semantic-release/exec
+            @semantic-release/git
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
+
+  docker_x86_release:
+    needs: release
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    if: needs.release.outputs.published == 'true'
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    env:
+      arch: amd64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: v${{ needs.release.outputs.version }}
+
+      - id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            supabase/realtime
+          tags: |
+            type=raw,value=v${{ needs.release.outputs.version }}_${{ env.arch }}
+            type=raw,value=latest_${{ env.arch }}
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - id: build
+        uses: useblacksmith/build-push-action@30c71162f16ea2c27c3e21523255d209b8b538c1 # v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/${{ env.arch }}
+
+  docker_arm_release:
+    needs: release
+    runs-on: blacksmith-4vcpu-ubuntu-2404-arm
+    if: needs.release.outputs.published == 'true'
+    timeout-minutes: 120
+    permissions:
+      contents: read
+    env:
+      arch: arm64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: v${{ needs.release.outputs.version }}
+
+      - id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        with:
+          images: |
+            supabase/realtime
+          tags: |
+            type=raw,value=v${{ needs.release.outputs.version }}_${{ env.arch }}
+            type=raw,value=latest_${{ env.arch }}
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - id: build
+        uses: useblacksmith/build-push-action@30c71162f16ea2c27c3e21523255d209b8b538c1 # v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          platforms: linux/${{ env.arch }}
+
+  merge_manifest:
+    needs: [release, docker_x86_release, docker_arm_release]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - name: Setup Blacksmith Builder
+        uses: useblacksmith/setup-docker-builder@ef12d5b165b596e3aa44ea8198d8fde563eab402 # v1.4.0
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Merge multi-arch manifests for versioned output
+        run: |
+          docker buildx imagetools create -t supabase/realtime:v${{ needs.release.outputs.version }} \
+          supabase/realtime@${{ needs.docker_x86_release.outputs.image_digest }} \
+          supabase/realtime@${{ needs.docker_arm_release.outputs.image_digest }}
+
+      - name: Merge multi-arch manifests for latest output
+        run: |
+          docker buildx imagetools create -t supabase/realtime:latest \
+          supabase/realtime@${{ needs.docker_x86_release.outputs.image_digest }} \
+          supabase/realtime@${{ needs.docker_arm_release.outputs.image_digest }}
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: public.ecr.aws
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mirror to ECR
+        uses: akhilerm/tag-push-action@eadeefebd39db8a47e146115649adae1fce576a6 # v2.3.0
+        with:
+          src: docker.io/supabase/realtime:v${{ needs.release.outputs.version }}
+          dst: |
+            public.ecr.aws/supabase/realtime:v${{ needs.release.outputs.version }}
+            ghcr.io/supabase/realtime:v${{ needs.release.outputs.version }}
+
+  dispatch-deploy:
+    needs: [release, merge_manifest]
+    if: needs.release.outputs.published == 'true'
+    permissions: {}
+    uses: ./.github/workflows/dispatch_deploy.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.release.outputs.version }}
+
+  update-branch-name:
+    needs: [release, docker_x86_release, docker_arm_release, merge_manifest]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: refs/heads/main
+
+      - name: Update branch name
+        run: |
+          git branch -m main releases/v${{ needs.release.outputs.version }}
+          git push origin HEAD:releases/v${{ needs.release.outputs.version }}

@@ -1,0 +1,97 @@
+- name: adminapi - system group
+  ansible.builtin.group:
+    name: adminapi
+    gid: 1011
+    state: present
+
+- name: adminapi - system user
+  ansible.builtin.user:
+    name: adminapi
+    uid: "{{ 1006 if not qemu else 1007 }}"
+    group: adminapi
+    groups: admin,envoy,gotrue,kong,pgbouncer,postgres,postgrest,root,systemd-journal,vector,wal-g
+
+- name: Move shell scripts to /root dir
+  copy:
+    src: "files/admin_api_scripts/{{ item.file }}"
+    dest: "/root/{{ item.file }}"
+    mode: "0700"
+    owner: root
+  loop:
+    - { file: "grow_fs.sh" }
+    - { file: "manage_readonly_mode.sh" }
+    - { file: "pg_egress_collect.pl" }
+    - { file: "mount-volume.sh" }
+    - { file: "unmount-volume.sh" }
+
+- name: give adminapi user permissions
+  copy:
+    src: files/adminapi.sudoers.conf
+    dest: /etc/sudoers.d/adminapi
+    mode: "0440"
+
+- name: perms for adminapi
+  shell: |
+    chmod g+w /etc
+
+- name: Download adminapi archive
+  get_url:
+    url: "{{ adminapi_artifacts[platform]['url'] }}"
+    checksum: "{{ adminapi_artifacts[platform]['checksum'] }}"
+    dest: "/tmp/adminapi.tar.gz"
+    timeout: 90
+
+- name: adminapi - unpack archive in /opt
+  unarchive:
+    remote_src: yes
+    src: /tmp/adminapi.tar.gz
+    dest: /opt
+    owner: adminapi
+
+- name: adminapi - config dir
+  file:
+    path: /etc/adminapi
+    owner: adminapi
+    state: directory
+
+- name: adminapi - pg_upgrade scripts dir
+  file:
+    path: /etc/adminapi/pg_upgrade_scripts
+    owner: adminapi
+    state: directory
+
+- name: Move shell scripts to /etc/adminapi/pg_upgrade_scripts/
+  copy:
+    src: "files/admin_api_scripts/pg_upgrade_scripts/{{ item.file }}"
+    dest: "/etc/adminapi/pg_upgrade_scripts/{{ item.file }}"
+    mode: "0755"
+    owner: adminapi
+  loop:
+    - { file: "check.sh" }
+    - { file: "complete.sh" }
+    - { file: "initiate.sh" }
+    - { file: "prepare.sh" }
+    - { file: "pgsodium_getkey.sh" }
+    - { file: "common.sh" }
+
+- name: adminapi - create service file
+  template:
+    src: files/adminapi.service.j2
+    dest: /etc/systemd/system/adminapi.service
+
+- name: adminapi - create service file for commence backup process
+  template:
+     src: files/commence-backup.service.j2
+     dest: /etc/systemd/system/commence-backup.service
+
+- name: UFW - Allow connections to adminapi ports
+  ufw:
+    rule: allow
+    port: "8085"
+
+- name: adminapi - reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: adminapi - grant extra priviliges to user
+  shell: chmod 775 /etc && chmod 775 /etc/kong

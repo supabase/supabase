@@ -1,0 +1,187 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  release:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    outputs:
+      published: ${{ steps.semantic.outputs.new_release_published }}
+      version: ${{ steps.semantic.outputs.new_release_version }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Semantic Release
+        id: semantic
+        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90 # v6.0.0
+        with:
+          semantic_version: 18
+          extra_plugins: |
+            @semantic-release/release-notes-generator@^10
+            @semantic-release/github@^8
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish_x86:
+    needs:
+      - release
+    if: needs.release.outputs.published == 'true'
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    env:
+      arch: amd64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: meta
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        with:
+          images: |
+            supabase/edge-runtime
+          tags: |
+            type=raw,value=v${{ needs.release.outputs.version }}_${{ env.arch }}
+
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - name: Login to DockerHub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: cardinalby/export-env-action@b16a08b396d047e3f9e1446e3946440e2be02a73 # 2.2.2
+        with:
+          envFile: '.env'
+      - id: build
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        with:
+          push: true
+          platforms: linux/${{ env.arch }}
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            GIT_V_TAG=${{ needs.release.outputs.version }}
+            ONNXRUNTIME_VERSION=${{ env.ONNXRUNTIME_VERSION }}
+
+  publish_arm:
+    needs:
+      - release
+    if: needs.release.outputs.published == 'true'
+    runs-on: arm-runner
+    env:
+      arch: arm64
+    outputs:
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: meta
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
+        with:
+          images: |
+            supabase/edge-runtime
+          tags: |
+            type=raw,value=v${{ needs.release.outputs.version }}_${{ env.arch }}
+
+      - name: Login to DockerHub
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+        with:
+          driver: docker
+          driver-opts: |
+            image=moby/buildkit:master
+            network=host
+
+      - uses: cardinalby/export-env-action@b16a08b396d047e3f9e1446e3946440e2be02a73 # 2.2.2
+        with:
+          envFile: '.env'
+      - id: build
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
+        with:
+          context: .
+          push: true
+          platforms: linux/${{ env.arch }}
+          tags: ${{ steps.meta.outputs.tags }}
+          no-cache: true
+          build-args: |
+            GIT_V_TAG=${{ needs.release.outputs.version }}
+            ONNXRUNTIME_VERSION=${{ env.ONNXRUNTIME_VERSION }}
+
+  merge_manifest:
+    needs: [release, publish_x86, publish_arm]
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Merge multi-arch manifests
+        run: |
+          docker buildx imagetools create -t supabase/edge-runtime:v${{ needs.release.outputs.version }} \
+          supabase/edge-runtime@${{ needs.publish_x86.outputs.image_digest }} \
+          supabase/edge-runtime@${{ needs.publish_arm.outputs.image_digest }}
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: public.ecr.aws
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mirror to ECR
+        uses: akhilerm/tag-push-action@f35ff2cb99d407368b5c727adbcc14a2ed81d509 # v2.2.0
+        with:
+          src: docker.io/supabase/edge-runtime:v${{ needs.release.outputs.version }}
+          dst: |
+            public.ecr.aws/supabase/edge-runtime:v${{ needs.release.outputs.version }}
+            ghcr.io/supabase/edge-runtime:v${{ needs.release.outputs.version }}
+
+  trigger_native_release:
+    needs: [release, merge_manifest]
+    if: needs.release.outputs.published == 'true' && needs.merge_manifest.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger native release
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release-native.yml',
+              ref: 'v${{ needs.release.outputs.version }}'
+            })

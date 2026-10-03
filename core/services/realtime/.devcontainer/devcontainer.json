@@ -1,0 +1,67 @@
+{
+  "name": "supabase/realtime",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  // mix test starts its own Postgres containers with `docker run -p <port>:5432` and then
+  // connects at 127.0.0.1:<port> (test/support/test_tenant_db/backend/docker.ex). Those
+  // published ports live on the daemon's network namespace; on a bridge they are not there.
+  "runArgs": ["--network=host"],
+
+  // The workspace must sit at its host path: bind-mount sources are resolved by the host
+  // daemon, yet compose.dbs.yml and docker.ex both hand it paths from inside here. A mismatch
+  // mounts empty dirs instead, so the Postgres init scripts never run and you get a confusing
+  // supabase_admin/_realtime failure rather than a mount error.
+  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
+  "workspaceFolder": "${localWorkspaceFolder}",
+  "remoteUser": "vscode",
+
+  "features": {
+    // moby-cli is not published for trixie; false installs upstream docker-ce-cli instead.
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": { "moby": false }
+  },
+
+  // Nothing PATH-related belongs in here: ${containerEnv:PATH} is only substituted in
+  // remoteEnv, so in containerEnv it self-references and the container loses even /usr/bin.
+  // The Dockerfile's ENV already covers every process.
+  "containerEnv": {
+    // The workspace's `mise trust`, declarative and covering nested configs
+    // (test/e2e/.tool-versions). Untrusted, every shim aborts and takes [env] down with it,
+    // so mix would boot without METRICS_JWT_SECRET. Set here rather than in post-create so
+    // tool resolution never waits on a hook - the language server may start first.
+    "MISE_TRUSTED_CONFIG_PATHS": "${localWorkspaceFolder}"
+  },
+
+  // Write-heavy, many-small-file dirs: several times slower over a macOS bind mount even
+  // under VirtioFS. All are gitignored, so keeping them out of the host tree loses nothing.
+  "mounts": [
+    "source=realtime-build-${devcontainerId},target=${containerWorkspaceFolder}/_build,type=volume",
+    "source=realtime-deps-${devcontainerId},target=${containerWorkspaceFolder}/deps,type=volume",
+    "source=realtime-node-modules-${devcontainerId},target=${containerWorkspaceFolder}/assets/node_modules,type=volume",
+    "source=realtime-plts-${devcontainerId},target=${containerWorkspaceFolder}/priv/plts,type=volume"
+  ],
+
+  "postCreateCommand": ".devcontainer/post-create.sh",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "JakeBecker.elixir-ls",
+        "phoenixframework.phoenix"
+      ],
+      // The vscode user's login shell is zsh (Dockerfile), but VS Code's terminal profile
+      // picker doesn't follow /etc/passwd, so it needs its own explicit zsh profile too.
+      // The IDE may flag "zsh" here as invalid while editing on the host - that's the
+      // *local* editor validating against shells on your machine, not the container's;
+      // it resolves once VS Code actually connects into the devcontainer.
+      "settings": {
+        "terminal.integrated.profiles.linux": {
+          "zsh": { "path": "/usr/bin/zsh" }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      }
+    }
+  }
+}

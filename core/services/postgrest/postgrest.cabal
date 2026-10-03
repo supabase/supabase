@@ -1,0 +1,481 @@
+cabal-version:      3.0
+name:               postgrest
+version:            17
+synopsis:           REST API for any Postgres database
+description:        Reads the schema of a PostgreSQL database and creates RESTful routes
+                    for tables, views, and functions, supporting all HTTP methods that security
+                    permits.
+license:            MIT
+license-file:       LICENSE
+author:             Joe Nelson, Adam Baker, Steve Chavez, Wolfgang Walther
+maintainer:         Steve Chavez <stevechavezast@gmail.com>
+category:           Executable, PostgreSQL, Network APIs
+homepage:           https://postgrest.org
+bug-reports:        https://github.com/PostgREST/postgrest/issues
+build-type:         Simple
+extra-source-files: CHANGELOG.md
+
+tested-with:
+    -- cabal on Ubuntu
+    -- stack on FreeBSD, MacOS, Ubuntu, Windows
+  , GHC == 9.10.3
+    -- cabal on Ubuntu
+    -- nix
+  , GHC == 9.12.3
+
+source-repository head
+  type:     git
+  location: https://github.com/PostgREST/postgrest.git
+
+flag dev
+  default:     False
+  manual:      True
+  description: Development flags
+
+flag hpc
+  default:     True
+  manual:      True
+  description: Enable HPC (dev only)
+
+library hasql
+  default-language:   Haskell2010
+  default-extensions: ApplicativeDo
+                      BangPatterns
+                      BlockArguments
+                      ConstraintKinds
+                      DataKinds
+                      DefaultSignatures
+                      DeriveDataTypeable
+                      DeriveFoldable
+                      DeriveFunctor
+                      DeriveGeneric
+                      DeriveTraversable
+                      DerivingVia
+                      EmptyDataDecls
+                      FlexibleContexts
+                      FlexibleInstances
+                      FunctionalDependencies
+                      GADTs
+                      GeneralizedNewtypeDeriving
+                      ImportQualifiedPost
+                      LambdaCase
+                      LiberalTypeSynonyms
+                      MultiParamTypeClasses
+                      MultiWayIf
+                      NamedFieldPuns
+                      NoImplicitPrelude
+                      NoMonomorphismRestriction
+                      NumericUnderscores
+                      OverloadedStrings
+                      PatternGuards
+                      QuasiQuotes
+                      RankNTypes
+                      RecordWildCards
+                      RoleAnnotations
+                      ScopedTypeVariables
+                      StandaloneDeriving
+                      StrictData
+                      TupleSections
+                      TypeApplications
+                      TypeFamilies
+                      TypeOperators
+  hs-source-dirs:     src/hasql
+  exposed-modules:    Hasql.Connection
+                      Hasql.Connection.Setting
+                      Hasql.Connection.Setting.Connection
+                      Hasql.Connection.Setting.Connection.Param
+                      Hasql.Decoders
+                      Hasql.DynamicStatements.Session
+                      Hasql.DynamicStatements.Snippet
+                      Hasql.DynamicStatements.Statement
+                      Hasql.Encoders
+                      Hasql.Implicits.Encoders
+                      Hasql.Notifications
+                      Hasql.Pipeline
+                      Hasql.Pool
+                      Hasql.Pool.Config
+                      Hasql.Pool.Config.Defaults
+                      Hasql.Pool.Observation
+                      Hasql.Session
+                      Hasql.Statement
+                      Hasql.Transaction
+                      Hasql.Transaction.Sessions
+  other-modules:      Hasql.Commands
+                      Hasql.Connection.Config
+                      Hasql.Connection.Config.ConnectionString
+                      Hasql.Connection.Config.ConnectionString.Params
+                      Hasql.Connection.Core
+                      Hasql.Decoders.All
+                      Hasql.Decoders.Array
+                      Hasql.Decoders.Composite
+                      Hasql.Decoders.Result
+                      Hasql.Decoders.Results
+                      Hasql.Decoders.Row
+                      Hasql.Decoders.Value
+                      Hasql.DynamicStatements.Prelude
+                      Hasql.DynamicStatements.Snippet.Defs
+                      Hasql.Encoders.All
+                      Hasql.Encoders.Array
+                      Hasql.Encoders.Params
+                      Hasql.Encoders.Value
+                      Hasql.Errors
+                      Hasql.IO
+                      Hasql.Implicits.Prelude
+                      Hasql.LibPq14
+                      Hasql.LibPq14.Ffi
+                      Hasql.LibPq14.Mappings
+                      Hasql.Pipeline.Core
+                      Hasql.Pool.Config.Config
+                      Hasql.Pool.Config.Setting
+                      Hasql.Pool.Prelude
+                      Hasql.Pool.SessionErrorDestructors
+                      Hasql.PostgresTypeInfo
+                      Hasql.Prelude
+                      Hasql.PreparedStatementRegistry
+                      Hasql.Session.Core
+                      Hasql.Transaction.Config
+                      Hasql.Transaction.Private.Prelude
+                      Hasql.Transaction.Private.SQL
+                      Hasql.Transaction.Private.Sessions
+                      Hasql.Transaction.Private.Statements
+                      Hasql.Transaction.Private.Transaction
+  build-depends:      aeson                     >= 2 && < 3
+                    , attoparsec                >= 0.10 && < 0.15
+                    , base                      >= 4.14 && < 5
+                    , bytestring                >= 0.10.8.2 && < 0.13
+                    , bytestring-strict-builder >= 0.4.5.1 && < 0.5
+                    , bytestring-tree-builder   >= 0.2.7.8 && < 0.3
+                    , containers                >= 0.6 && < 0.8
+                    , contravariant             >= 1.3 && < 2
+                    , dlist                     >= 0.8 && < 0.9 || >= 1 && < 2
+                    , hashable                  >= 1.2 && < 2
+                    , hashtables                >= 1.1 && < 2
+                    , iproute                   >= 1.7 && < 1.8
+                    , mtl                       >= 2.2 && < 3
+                    , postgresql-binary         >= 0.14.2 && < 0.15
+                    , postgresql-libpq          >= 0.10.1 && < 0.12
+                    , profunctors               >= 5.1 && < 6
+                    , ptr                       >= 0.16.7.2 && < 0.17
+                    , scientific                >= 0.3 && < 0.4
+                    , stm                       >= 2.5 && < 3
+                    , text                      >= 2 && < 3
+                    , text-builder              >= 1 && < 1.1
+                    , time                      >= 1.9 && < 2
+                    , transformers              >= 0.6 && < 0.7
+                    , uuid                      >= 1.3 && < 2
+                    , vector                    >= 0.10 && < 0.14
+                    , witherable                >= 0.5 && < 0.6
+
+library
+  default-language:   GHC2021
+  default-extensions: OverloadedStrings
+                      NoImplicitPrelude
+  hs-source-dirs:     src/library
+  exposed-modules:    PostgREST.Admin
+                      PostgREST.App
+                      PostgREST.AppState
+                      PostgREST.AppState.Pool
+                      PostgREST.AppState.Reload
+                      PostgREST.AppState.Types
+                      PostgREST.Auth
+                      PostgREST.Auth.Jwt
+                      PostgREST.Auth.JwtCache
+                      PostgREST.Auth.Types
+                      PostgREST.Cache.Sieve
+                      PostgREST.CLI
+                      PostgREST.Client
+                      PostgREST.Config
+                      PostgREST.Config.Database
+                      PostgREST.Debounce
+                      PostgREST.Config.JSPath
+                      PostgREST.Config.PgVersion
+                      PostgREST.Config.Proxy
+                      PostgREST.Cors
+                      PostgREST.SchemaCache
+                      PostgREST.Catalog.Identifiers
+                      PostgREST.Catalog.Query
+                      PostgREST.Catalog.Routine
+                      PostgREST.Catalog.Relationship
+                      PostgREST.Catalog.Representations
+                      PostgREST.Catalog.Table
+                      PostgREST.Error
+                      PostgREST.Error.Types
+                      PostgREST.Logger
+                      PostgREST.MainTx
+                      PostgREST.Logger.Apache
+                      PostgREST.MediaType
+                      PostgREST.Metrics
+                      PostgREST.Network
+                      PostgREST.Observation
+                      PostgREST.Query
+                      PostgREST.Query.PreQuery
+                      PostgREST.Query.QueryBuilder
+                      PostgREST.Query.SqlFragment
+                      PostgREST.Query.Statements
+                      PostgREST.Plan
+                      PostgREST.Plan.CallPlan
+                      PostgREST.Plan.MutatePlan
+                      PostgREST.Plan.Negotiate
+                      PostgREST.Plan.ReadPlan
+                      PostgREST.Plan.Types
+                      PostgREST.RangeQuery
+                      PostgREST.Unix
+                      PostgREST.ApiRequest
+                      PostgREST.ApiRequest.Preferences
+                      PostgREST.ApiRequest.QueryParams
+                      PostgREST.ApiRequest.Payload
+                      PostgREST.ApiRequest.Types
+                      PostgREST.Response
+                      PostgREST.Response.OpenAPI
+                      PostgREST.Response.GucHeader
+                      PostgREST.Response.Performance
+                      PostgREST.TimeIt
+                      PostgREST.Version
+  build-depends:      base                      >= 4.9 && < 4.22
+                    , HTTP                      >= 4000.3.7 && < 4000.6
+                    , Ranged-sets               >= 0.3 && < 0.6
+                    , aeson                     >= 2.0.3 && < 2.3
+                    , aeson-jsonpath            >= 0.4.2 && < 0.5
+                    , base64-bytestring         >= 1 && < 1.3
+                    , bytestring                >= 0.10.8 && < 0.13
+                    , case-insensitive          >= 1.2 && < 1.3
+                    , cassava                   >= 0.4.5 && < 0.6
+                    , configurator-pg           >= 0.2.11 && < 0.3
+                    , containers                >= 0.5.7 && < 0.8
+                    , cookie                    >= 0.4.2 && < 0.6
+                    , directory                 >= 1.2.6 && < 1.4
+                    , either                    >= 4.4.1 && < 5.1
+                    , extra                     >= 1.7.0 && < 2.0
+                    , fast-logger               >= 3.2.0 && < 3.3
+                    , fuzzyset                  >= 0.2.4 && < 0.3
+                    , postgrest:hasql
+                    , http-client               >= 0.7.19 && < 0.8
+                    , http-types                >= 0.12.2 && < 0.13
+                    , insert-ordered-containers >= 0.2.2 && < 0.3
+                    , jose-jwt                  >= 0.9.6 && < 0.12
+                    , lens                      >= 4.14 && < 5.4
+                    , lens-aeson                >= 1.0.1 && < 1.3
+                    , mtl                       >= 2.2.2 && < 2.4
+                    , neat-interpolation        >= 0.5 && < 0.6
+                    , network                   >= 2.6 && < 3.3
+                    , network-uri               >= 2.6.1 && < 2.8
+                    , optparse-applicative      >= 0.13 && < 0.20
+                    , parsec                    >= 3.1.11 && < 3.2
+                    , postgresql-libpq          >= 0.10
+                    , prometheus-client         >= 1.1.1 && < 1.2.0
+                    , prometheus-metrics-ghc    >= 1.0.1.2 && < 1.2
+                    , protolude                 >= 0.3.1 && < 0.4
+                    , regex-tdfa                >= 1.2.2 && < 1.4
+                    , retry                     >= 0.7.4 && < 0.10
+                    , scientific                >= 0.3.4 && < 0.4
+                    , streaming-commons         >= 0.2.3.1 && < 0.3
+                    , swagger2                  >= 2.4 && < 2.9
+                    , text                      >= 2.1.2 && < 2.2
+                    , time                      >= 1.6 && < 1.15
+                    , unordered-containers      >= 0.2.8 && < 0.3
+                    , unix-compat               >= 0.5.4 && < 0.8
+                    , vector                    >= 0.11 && < 0.14
+                    , wai                       >= 3.2.1 && < 3.3
+                    , wai-cors                  >= 0.2.5 && < 0.3
+                    , wai-extra                 >= 3.1.8 && < 3.2
+                    -- We already depend on wai-logger >= 2.3.7 indirectly via wai-extra,
+                    -- but we want to depend on 2.4.0 which fixes 'unknownSocket' log output
+                    -- for unix sockets; this is tested in test/io/test_log.py. See
+                    -- https://github.com/kazu-yamamoto/logger/commit/3a71ca70afdbb93d4ecf0083eeba1fbbbcab3fc3
+                    , wai-logger                >= 2.4.0
+                    , warp                      >= 3.4.14 && < 3.5
+                    , stm                       >= 2.5 && < 3
+                    , stm-hamt                  >= 1.2 && < 2
+                    , focus                     >= 1.0 && < 2
+                    , some                      >= 1.0.4.1 && < 2
+                    , uuid                      >= 1.3 && < 2
+                      -- -fno-spec-constr may help keep compile time memory use in check,
+                      --   see https://gitlab.haskell.org/ghc/ghc/issues/16017#note_219304
+                      -- -optP-Wno-nonportable-include-path
+                      --   prevents build failures on case-insensitive filesystems (macos),
+                      --   see https://github.com/commercialhaskell/stack/issues/3918
+  ghc-options:        -j -Werror -Wall -fwarn-identities
+                      -fno-spec-constr -optP-Wno-nonportable-include-path
+
+  if flag(dev)
+    ghc-options: -O0 -fwrite-ide-info
+    if flag(hpc)
+      ghc-options: -fhpc -hpcdir .hpc
+  else
+    ghc-options: -O2
+    if impl(ghc >= 9.12)
+      -- Makes GHC consider cross-module specialization for polymorphic functions
+      -- without explicitly needing to add INLINE, INLINABLE or SPECIALIZE pragmas.
+      -- Slightly increases the binary size but improves performance considerably.
+      ghc-options: -fexpose-overloaded-unfoldings -fspecialise-aggressively
+
+  if !os(windows)
+    build-depends:
+      unix
+
+executable postgrest
+  default-language:   GHC2021
+  default-extensions: OverloadedStrings
+                      NoImplicitPrelude
+  hs-source-dirs:     src/executable
+  main-is:            Main.hs
+  build-depends:      base                >= 4.9 && < 4.22
+                    , containers          >= 0.5.7 && < 0.8
+                    , postgrest
+                    , protolude           >= 0.3.1 && < 0.4
+  ghc-options:        -j -threaded -rtsopts "-with-rtsopts=-N -I0 -qg"
+                      -O2 -Werror -Wall -fwarn-identities
+                      -fno-spec-constr -optP-Wno-nonportable-include-path
+
+  if flag(dev)
+    ghc-options: -O0 -fwrite-ide-info
+                 -- https://github.com/PostgREST/postgrest/issues/387
+                 -with-rtsopts=-K1K
+    if flag(hpc)
+      ghc-options: -fhpc -hpcdir .hpc
+  else
+    ghc-options: -O2
+
+test-suite spec
+  type:               exitcode-stdio-1.0
+  default-language:   GHC2021
+  default-extensions: OverloadedStrings
+                      QuasiQuotes
+                      NoImplicitPrelude
+  hs-source-dirs:     test/spec
+  main-is:            Main.hs
+  other-modules:      Feature.Auth.AsymmetricJwtSpec
+                      Feature.Auth.AudienceJwtSecretSpec
+                      Feature.Auth.AuthSpec
+                      Feature.Auth.BinaryJwtSecretSpec
+                      Feature.Auth.JwtCacheSpec
+                      Feature.Auth.NoAnonSpec
+                      Feature.Auth.NoJwtSecretSpec
+                      Feature.ConcurrentSpec
+                      Feature.CorsSpec
+                      Feature.HttpHeaderSpec
+                      Feature.ExtraSearchPathSpec
+                      Feature.NoSuperuserSpec
+                      Feature.ObservabilitySpec
+                      Feature.OpenApi.DisabledOpenApiSpec
+                      Feature.OpenApi.IgnorePrivOpenApiSpec
+                      Feature.OpenApi.OpenApiSpec
+                      Feature.OpenApi.ProxySpec
+                      Feature.OpenApi.RootSpec
+                      Feature.OpenApi.SecurityOpenApiSpec
+                      Feature.OptionsSpec
+                      Feature.Query.AggregateFunctionsSpec
+                      Feature.Query.AndOrParamsSpec
+                      Feature.Query.ComputedRelsSpec
+                      Feature.Query.CustomMediaSpec
+                      Feature.Query.DeleteSpec
+                      Feature.Query.EmbedDisambiguationSpec
+                      Feature.Query.EmbedInnerJoinSpec
+                      Feature.Query.ErrorSpec
+                      Feature.Query.InsertSpec
+                      Feature.Query.JsonOperatorSpec
+                      Feature.Query.MultipleSchemaSpec
+                      Feature.Query.NullsStripSpec
+                      Feature.Query.PgSafeUpdateSpec
+                      Feature.Query.PlanSpec
+                      Feature.Query.PostGISSpec
+                      Feature.Query.Preferences.HandlingSpec
+                      Feature.Query.Preferences.MaxAffectedSpec
+                      Feature.Query.Preferences.TimezoneSpec
+                      Feature.Query.PreparedStatementsSpec
+                      Feature.Query.QueryLimitedSpec
+                      Feature.Query.QuerySpec
+                      Feature.Query.RangeSpec
+                      Feature.Query.RawOutputTypesSpec
+                      Feature.Query.RelatedQueriesSpec
+                      Feature.Query.RpcSpec
+                      Feature.Query.ServerTimingSpec
+                      Feature.Query.SingularSpec
+                      Feature.Query.SpreadQueriesSpec
+                      Feature.Query.UnicodeSpec
+                      Feature.Query.UpdateSpec
+                      Feature.Query.UpsertSpec
+                      Feature.RollbackSpec
+                      Feature.RpcPreRequestGucsSpec
+                      SpecHelper
+  build-depends:      base              >= 4.9 && < 4.22
+                    , aeson             >= 2.0.3 && < 2.3
+                    , aeson-qq          >= 0.8.1 && < 0.9
+                    , async             >= 2.1.1 && < 2.3
+                    , base64-bytestring >= 1 && < 1.3
+                    , bytestring        >= 0.10.8 && < 0.13
+                    , case-insensitive  >= 1.2 && < 1.3
+                    , containers        >= 0.5.7 && < 0.8
+                    , postgrest:hasql
+                    , heredoc           >= 0.2 && < 0.3
+                    , hspec             >= 2.3 && < 2.12
+                    , hspec-expectations >= 0.8.4 && < 0.9
+                    , hspec-wai         >= 0.10 && < 0.12
+                    , hspec-wai-json    >= 0.10 && < 0.12
+                    , http-types        >= 0.12.3 && < 0.13
+                    , jose-jwt          >= 0.9.6 && < 0.12
+                    , lens              >= 4.14 && < 5.4
+                    , lens-aeson        >= 1.0.1 && < 1.3
+                    , monad-control     >= 1.0.1 && < 1.1
+                    , postgrest
+                    , process           >= 1.4.2 && < 1.7
+                    , prometheus-client >= 1.1.1 && < 1.2.0
+                    , protolude         >= 0.3.1 && < 0.4
+                    , regex-tdfa        >= 1.2.2 && < 1.4
+                    , scientific        >= 0.3.4 && < 0.4
+                    , text              >= 1.2.2 && < 2.2
+                    , time              >= 1.6 && < 1.15
+                    , transformers-base >= 0.4.4 && < 0.5
+                    , wai               >= 3.2.1 && < 3.3
+                    , wai-extra         >= 3.0.19 && < 3.2
+  ghc-options:        -j -threaded -O0 -Werror -Wall -fwarn-identities
+                      -fno-spec-constr -optP-Wno-nonportable-include-path
+                      -fno-warn-missing-signatures
+                      -fwrite-ide-info
+                      -- https://github.com/PostgREST/postgrest/issues/387
+                      -with-rtsopts=-K33K
+
+test-suite observability
+  type:               exitcode-stdio-1.0
+  default-language:   GHC2021
+  default-extensions: OverloadedStrings
+                      QuasiQuotes
+                      NoImplicitPrelude
+  hs-source-dirs:     test/observability
+  main-is:            Main.hs
+  other-modules:      ObsHelper
+                      Observation.JwtCache
+                      Observation.MetricsSpec
+                      Observation.SchemaCacheSpec
+  build-depends:      base              >= 4.9 && < 4.22
+                    , base64-bytestring >= 1 && < 1.3
+                    , bytestring        >= 0.10.8 && < 0.13
+                    , postgrest:hasql
+                    , hspec             >= 2.3 && < 2.12
+                    , hspec-expectations >= 0.8.4 && < 0.9
+                    , hspec-wai         >= 0.10 && < 0.12
+                    , hspec-wai-json    >= 0.10 && < 0.12
+                    , http-types        >= 0.12.3 && < 0.13
+                    , jose-jwt          >= 0.9.6 && < 0.12
+                    , postgrest
+                    , prometheus-client >= 1.1.1 && < 1.2.0
+                    , protolude         >= 0.3.1 && < 0.4
+                    , text              >= 1.2.2 && < 2.2
+                    , wai               >= 3.2.1 && < 3.3
+  ghc-options:        -j -threaded -O0 -Werror -Wall -fwarn-identities
+                      -fno-spec-constr -optP-Wno-nonportable-include-path
+                      -fwrite-ide-info
+                      -- https://github.com/PostgREST/postgrest/issues/387
+                      -with-rtsopts=-K33K
+
+test-suite doctests
+  type:               exitcode-stdio-1.0
+  default-language:   GHC2021
+  hs-source-dirs:     test/doc
+  main-is:            Main.hs
+  build-depends:      base              >= 4.9 && < 4.22
+                    , doctest-parallel  >= 0.4
+                    , postgrest
+                    , pretty-simple
+  ghc-options:        -j -threaded -O0 -Werror -Wall -fwarn-identities
+                      -fno-spec-constr -optP-Wno-nonportable-include-path

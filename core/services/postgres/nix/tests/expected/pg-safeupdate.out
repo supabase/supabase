@@ -1,0 +1,12 @@
+load 'safeupdate';
+set safeupdate.enabled=1;
+create schema v;
+create table v.foo(
+  id int,
+  val text
+);
+update v.foo
+  set val = 'bar';
+ERROR:  UPDATE requires a WHERE clause
+drop schema v cascade;
+NOTICE:  drop cascades to table v.foo

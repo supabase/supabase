@@ -1,0 +1,19 @@
+FROM golang:1.27.0-alpine3.23
+ENV GO111MODULE=on
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+
+RUN apk add --no-cache make git bash
+
+WORKDIR /go/src/github.com/supabase/auth
+
+# Pulling dependencies
+COPY ./Makefile ./go.* ./
+COPY ./internal/forks/godotenv ./internal/forks/godotenv
+
+# Production dependencies
+RUN make deps
+
+# Development dependences
+RUN go get github.com/githubnemo/CompileDaemon
+RUN go install github.com/githubnemo/CompileDaemon

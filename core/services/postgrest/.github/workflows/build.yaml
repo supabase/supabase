@@ -1,0 +1,209 @@
+name: Build
+
+on:
+  workflow_call:
+    secrets:
+      CACHIX_AUTH_TOKEN:
+        required: false
+  pull_request:
+    branches:
+      - main
+      - v[0-9]+
+    paths:
+      - .github/workflows/build.yaml
+      - .github/actions/**
+      - .github/scripts/**
+      - .github/*
+      - '*.nix'
+      - nix/**
+      - flake.lock
+      - .cirrus.yml
+      - cabal.project*
+      - postgrest.cabal
+      - stack.yaml*
+      - '**.hs'
+      - '!**.md'
+
+permissions: {}
+
+concurrency:
+  # Terminate all previous runs of the same workflow for pull requests
+  group: build-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  static:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux aarch64
+            runs-on: ubuntu-24.04-arm
+            artifact: aarch64
+          - name: Linux x86-64
+            runs-on: ubuntu-24.04
+            artifact: x86-64
+    name: Nix - ${{ matrix.name }} static
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+
+      - name: Build static executable
+        run: nix-build -A postgrestStatic -A postgrestStatic.tests
+      - name: Save built executable as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: postgrest-linux-static-${{ matrix.artifact }}
+          path: result/bin/postgrest
+          if-no-files-found: error
+
+      - name: Build Docker image
+        run: nix-build -A docker.image --out-link postgrest-docker-${{ matrix.artifact }}.tar.gz
+      - name: Save built Docker image as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: postgrest-docker-${{ matrix.artifact }}
+          path: postgrest-docker-${{ matrix.artifact }}.tar.gz
+          if-no-files-found: error
+
+      - name: Test static executable with NixOS' VM test
+        # GHA's ARM runner does not support KVM
+        if: runner.arch == 'X64'
+        run: nix-build -A nixpkgs-nixos-test
+
+
+  macos:
+    name: Nix - MacOS
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Install nix-build-uncached
+        run: nix-env -f default.nix -iA nix-build-uncached
+
+      - name: Build everything (default.nix)
+        run: nix-build-uncached
+
+      - name: Build everything (shell.nix)
+        run: nix-build-uncached shell.nix
+
+
+  stack:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: FreeBSD x86-64
+            runs-on: ubuntu-24.04
+            vm: freebsd
+            artifact: postgrest-freebsd-x86-64
+            deps: pkg install -y git postgresql16-client hs-stack
+
+          - name: MacOS aarch64
+            runs-on: macos-14
+            artifact: postgrest-macos-aarch64
+            deps: brew link --force libpq
+
+          - name: MacOS x86-64
+            runs-on: macos-15-intel
+            artifact: postgrest-macos-x86-64
+            deps: brew link --force libpq
+
+          - name: Windows
+            runs-on: windows-2022
+            deps: Add-Content $env:GITHUB_PATH $env:PGBIN
+            artifact: postgrest-windows-x86-64
+
+    name: Stack - ${{ matrix.name }}
+    runs-on: ${{ matrix.runs-on }}
+    env:
+      # Putting .stack in the working directory helps with moving this in and out of the FreeBSD VM.
+      STACK_ROOT: ${{ github.workspace }}/.stack
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - if: ${{ !matrix.vm }}
+        uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2.12.1
+        with:
+          # This must match the version in stack.yaml's resolver
+          ghc-version: 9.10.3
+          enable-stack: true
+          stack-no-global: true
+          stack-setup-ghc: true
+      - name: Cache .stack
+        uses: ./.github/actions/cache-on-main
+        with:
+          path: .stack
+          prefix: ${{ matrix.vm }}${{ matrix.vm && '-' }}stack
+          suffix: ${{ hashFiles('postgrest.cabal', 'stack.yaml.lock') }}
+      - name: Cache .stack-work
+        uses: ./.github/actions/cache-on-main
+        with:
+          path: .stack-work
+          save-prs: true
+          prefix: ${{ matrix.vm }}${{ matrix.vm && '-' }}stack-work-${{ hashFiles('postgrest.cabal', 'stack.yaml.lock') }}
+          suffix: ${{ hashFiles('main/**/*.hs', 'src/**/*.hs') }}
+      - name: Build with Stack
+        uses: ./.github/actions/run-anywhere
+        with:
+          vm: ${{ matrix.vm }}
+          envs: STACK_ROOT
+          prepare: ${{ matrix.deps }}
+          run: |
+            stack build --lock-file error-on-write --local-bin-path result --copy-bins
+            strip result/postgrest*
+      - name: Save built executable as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            result/postgrest
+            result/postgrest.exe
+          if-no-files-found: error
+
+
+  cabal:
+    strategy:
+      matrix:
+        ghc: ['9.10.3', '9.12.3']
+      fail-fast: false
+    name: Cabal - Linux x86-64 - GHC ${{ matrix.ghc }}
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: haskell-actions/setup@0f8e8c99d88aeb3fbfd523f1ef2c6f762d10d64d # v2.12.1
+        with:
+          ghc-version: ${{ matrix.ghc }}
+      - name: Cache .cabal
+        uses: ./.github/actions/cache-on-main
+        with:
+          path: |
+            ~/.cabal/packages
+            ~/.cabal/store
+          prefix: cabal-${{ matrix.ghc }}-${{ hashFiles('cabal.project.freeze') }}
+          suffix: ${{ hashFiles('postgrest.cabal', 'cabal.project') }}
+      - name: Cache dist-newstyle
+        uses: ./.github/actions/cache-on-main
+        with:
+          path: dist-newstyle
+          save-prs: true
+          prefix: cabal-${{ matrix.ghc }}-dist-newstyle-${{ hashFiles('postgrest.cabal', 'cabal.project', 'cabal.project.freeze') }}
+          suffix: ${{ hashFiles('**/*.hs') }}
+      - name: Install dependencies
+        run: cabal build --only-dependencies --enable-tests --enable-benchmarks
+      - name: Build
+        run: cabal build --enable-tests --enable-benchmarks all

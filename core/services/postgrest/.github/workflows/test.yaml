@@ -1,0 +1,219 @@
+name: Test
+
+on:
+  workflow_call:
+    secrets:
+      CACHIX_AUTH_TOKEN:
+        required: false
+      CODECOV_TOKEN:
+        required: false
+  pull_request:
+    branches:
+      - main
+      - v[0-9]+
+    paths:
+      - .github/workflows/test.yaml
+      - .github/workflows/report.yaml
+      - .github/actions/setup-nix/**
+      - default.nix
+      - nix/**
+      - flake.lock
+      - .stylish-haskell.yaml
+      - cabal.project
+      - postgrest.cabal
+      - '**.hs'
+      - test/**
+      - '!**.md'
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  # Terminate all previous runs of the same workflow for pull requests
+  group: test-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-26.04
+    defaults:
+      run:
+        # Hack for enabling color output, see:
+        # https://github.com/actions/runner/issues/241#issuecomment-842566950
+        shell: script -qec "bash --noprofile --norc -eo pipefail {0}"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: tests.coverage.bin tests.testDoctests.bin tests.testSpecIdempotence.bin cabalTools.update.bin
+
+      - run: postgrest-cabal-update
+
+      - name: Run coverage (IO tests and Spec tests against latest supported PostgreSQL)
+        run: postgrest-coverage
+      - name: Upload coverage to codecov
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          files: ./coverage/codecov.json
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Run doctests
+        if: always()
+        run: nix-shell --run postgrest-test-doctests
+
+      - name: Check the spec tests for idempotence
+        if: always()
+        run: postgrest-test-spec-idempotence
+
+
+  postgres:
+    strategy:
+      fail-fast: false
+      matrix:
+        # Latest version is tested via `coverage` above.
+        pgVersion: [pg-14, pg-15, pg-16, pg-17, oriole-18, pg-18]
+    name: ${{ matrix.pgVersion }}
+    runs-on: ubuntu-26.04
+    defaults:
+      run:
+        # Hack for enabling color output, see:
+        # https://github.com/actions/runner/issues/241#issuecomment-842566950
+        shell: script -qec "bash --noprofile --norc -eo pipefail {0}"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: tests.testSpec.bin tests.testObservability.bin tests.testIO.bin tests.testBigSchema.bin withTools.${{ matrix.pgVersion }}.bin cabalTools.update.bin
+
+      - run: postgrest-cabal-update
+
+      - name: Run spec tests
+        if: always()
+        run: postgrest-with-${{ matrix.pgVersion }} postgrest-test-spec
+
+      - name: Run observability tests
+        if: always()
+        run: postgrest-with-${{ matrix.pgVersion }} postgrest-test-observability
+
+      - name: Run IO tests
+        if: always()
+        run: postgrest-with-${{ matrix.pgVersion }} postgrest-test-io -vv
+
+      - name: Run IO tests on a big schema
+        if: always()
+        run: postgrest-with-${{ matrix.pgVersion }} postgrest-test-big-schema -vv
+
+
+  memory:
+    name: Memory
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: tests.testMemory.bin cabalTools.update.bin
+
+      - run: postgrest-cabal-update
+
+      - name: Run memory tests
+        run: postgrest-test-memory
+
+
+  loadtest:
+    strategy:
+      fail-fast: false
+      matrix:
+        kind: ['mixed', 'jwt-cache']
+    name: Loadtest
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          tools: loadtest.loadtestAgainst.bin loadtest.report.bin loadtest.report-load.bin cabalTools.update.bin
+
+      - run: postgrest-cabal-update
+
+      - name: Run loadtest
+        env:
+          TARGET_BRANCH: ${{ github.base_ref || github.ref_name }}
+        run: |
+          if [ "$TARGET_BRANCH" = "main" ]; then
+            latest_tag=$(git tag --sort=-creatordate --list "v*" | head -n1)
+          else
+            latest_tag=$(git tag --merged HEAD --sort=-creatordate "v*" | head -n1)
+          fi
+          postgrest-loadtest-against -k ${{ matrix.kind }} "$TARGET_BRANCH" "$latest_tag"
+
+      - name: Report P50
+        # This step checks whether any red cross indicators (:x:) are present in the step summary.
+        # The loadtest reporter writes them when any of individual steps fails the performance
+        # regression threshold.
+        run: |
+          ! (postgrest-loadtest-report -g ${{ matrix.kind }} -p 50 \
+              | tee "$GITHUB_STEP_SUMMARY" \
+              | grep ':x:')
+
+      - name: Report P0
+        if: always()
+        run: |
+          postgrest-loadtest-report -g ${{ matrix.kind }} -p 0 >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report P90
+        if: always()
+        run: |
+          postgrest-loadtest-report -g ${{ matrix.kind }} -p 90 >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report P95
+        if: always()
+        run: |
+          postgrest-loadtest-report -g ${{ matrix.kind }} -p 95 >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Report CPU/MEM
+        if: always()
+        run: |
+          postgrest-loadtest-report-load -g ${{ matrix.kind }} >> "$GITHUB_STEP_SUMMARY"
+
+  flake:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs-on:
+          - macos-14 # aarch64-darwin
+          - ubuntu-24.04 # x86_64-linux
+          - ubuntu-24.04-arm # aarch64-linux
+    name: Flake Check
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup Nix Environment
+        uses: ./.github/actions/setup-nix
+        with:
+          authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+      - name: Run flake check
+        run: |
+          nix flake check

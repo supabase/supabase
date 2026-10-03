@@ -1,0 +1,115 @@
+- name: Execute wal-g things when stage1
+  when: not stage2
+  block:
+    - name: Create wal-g group
+      ansible.builtin.group:
+        name: 'wal-g'
+        gid: 1004
+        state: 'present'
+
+    - name: Create wal-g user
+      ansible.builtin.user:
+        name: 'wal-g'
+        uid: 996
+        comment: 'WAL-G user'
+        group: 'wal-g'
+        groups: 'wal-g, postgres'
+        shell: '/usr/bin/nologin'
+        system: true
+
+    - name: Create a config directory owned by wal-g
+      ansible.builtin.file:
+        group: 'wal-g'
+        mode: '0770'
+        owner: 'wal-g'
+        path: '/etc/wal-g'
+        state: 'directory'
+
+    - name: Configure tmpfiles.d rule for /run/wal-g
+      ansible.builtin.template:
+        src: 'files/postgresql_config/tmpfiles.walg.conf'
+        dest: '/etc/tmpfiles.d/wal-g-lock.conf'
+        mode: '0644'
+
+- name: Execute wal-g things when stage2
+  when: stage2
+  block:
+    - name: Install wal-g 2 from nix binary cache
+      ansible.builtin.shell:
+        cmd: sudo -u wal-g bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix profile install github:supabase/postgres/{{ git_commit_sha }}#wal-g-2"
+      become: true
+
+    # Installed alongside v2 (INDATA-904). The /usr/local/bin/wal-g symlink below
+    # only points at v3 on orioledb builds; v2 remains the default everywhere else.
+    - name: Install wal-g 3 from nix binary cache
+      ansible.builtin.shell:
+        cmd: . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix profile install github:supabase/postgres/{{ git_commit_sha }}#wal-g-3
+      become: true
+      become_user: wal-g
+
+    - name: nix collect garbage
+      ansible.builtin.shell:
+        cmd: sudo -u ubuntu bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix-collect-garbage -d"
+      become: true
+
+    - name: Create symlink to make wal-g the default (v3 on orioledb builds, v2 otherwise)
+      ansible.builtin.file:
+        dest: '/usr/local/bin/wal-g'
+        force: true
+        src: "/home/wal-g/.nix-profile/bin/wal-g-{{ '3' if is_psql_oriole else '2' }}"
+        state: 'link'
+      become: true
+
+    - name: Create /etc/wal-g/config.json
+      ansible.builtin.file:
+        group: 'wal-g'
+        mode: '0664'
+        owner: 'wal-g'
+        path: '/etc/wal-g/config.json'
+        state: 'touch'
+
+    - name: Move custom wal-g.conf file to /etc/postgresql-custom/wal-g.conf
+      ansible.builtin.template:
+        dest: '/etc/postgresql-custom/wal-g.conf'
+        group: 'postgres'
+        mode: '0664'
+        owner: 'postgres'
+        src: 'files/postgresql_config/custom_walg.conf'
+
+    - name: Add script to be run for restore_command
+      ansible.builtin.template:
+        dest: '/home/postgres/wal_fetch.sh'
+        group: 'postgres'
+        mode: '0500'
+        owner: 'postgres'
+        src: 'files/walg_helper_scripts/wal_fetch.sh'
+
+    - name: Add helper script for wal_fetch.sh
+      ansible.builtin.template:
+        dest: '/root/wal_change_ownership.sh'
+        mode: '0700'
+        owner: 'root'
+        src: 'files/walg_helper_scripts/wal_change_ownership.sh'
+
+    - name: Include /etc/postgresql-custom/wal-g.conf in postgresql.conf
+      ansible.builtin.replace:
+        path: '/etc/postgresql/postgresql.conf'
+        regexp: "#include = '/etc/postgresql-custom/wal-g.conf'"
+        replace: "include = '/etc/postgresql-custom/wal-g.conf'"
+      become: true
+
+    - name: Move custom wal-g.conf file to /etc/postgresql-custom/wal-g.conf
+      ansible.builtin.copy:
+        dest: '/etc/postgresql-custom/wal-g.conf'
+        group: 'postgres'
+        mode: '0664'
+        owner: 'postgres'
+        src: 'files/postgresql_config/custom_walg.conf'
+
+    # - name: Create symlink for admin-mgr compatibility
+    #   ansible.builtin.file:
+    #     src: '/etc/postgresql-custom/conf.d/wal-g.conf'
+    #     dest: '/etc/postgresql-custom/wal-g.conf'
+    #     state: 'link'
+    #     owner: 'postgres'
+    #     group: 'postgres'

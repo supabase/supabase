@@ -1,0 +1,11 @@
+{"2.9.6",
+ [{"2.9.4",
+   [{load_module,'Elixir.Supavisor.HotUpgrade'},
+    {apply,{'Elixir.Supavisor.HotUpgrade',apply_runtime_config,["2.9.6"]}},
+    {load_module,'Elixir.Supavisor.PromEx.Plugins.Cluster',[]},
+    {apply,{'Elixir.Supavisor.HotUpgrade',restart_prom_ex,[]}}]}],
+ [{"2.9.4",
+   [{load_module,'Elixir.Supavisor.PromEx.Plugins.Cluster',[]},
+    {apply,{'Elixir.Supavisor.HotUpgrade',restart_prom_ex,[]}},
+    {load_module,'Elixir.Supavisor.HotUpgrade'},
+    {apply,{'Elixir.Supavisor.HotUpgrade',apply_runtime_config,["2.9.4"]}}]}]}.

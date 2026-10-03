@@ -1,0 +1,53 @@
+app = "realtime-qa"
+kill_signal = "SIGTERM"
+kill_timeout = 5
+processes = []
+
+[deploy]
+  release_command = "/app/bin/migrate"
+  strategy = "rolling"
+
+[env]
+  DNS_NODES = "realtime-qa.internal"
+  ERL_CRASH_DUMP = "/data/erl_crash.dump"
+  ERL_CRASH_DUMP_SECONDS = 30
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  internal_port = 4000
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+  [services.concurrency]
+    hard_limit = 100000
+    soft_limit = 100000
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "30s"
+    interval = "15s"
+    restart_limit = 6
+    timeout = "2s"
+
+  [[services.http_checks]]
+    interval = 10000
+    grace_period = "5s"
+    method = "get"
+    path = "/"
+    protocol = "http"
+    restart_limit = 0
+    timeout = 2000
+    tls_skip_verify = false
+    [services.http_checks.headers]

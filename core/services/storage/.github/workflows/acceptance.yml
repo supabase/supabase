@@ -1,0 +1,174 @@
+name: Acceptance
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Acceptance profile to run
+        required: true
+        default: full
+        type: choice
+        options:
+          - smoke
+          - core
+          - full
+          - wire
+      acceptance_environment:
+        description: Acceptance target to run
+        required: true
+        default: local
+        type: choice
+        options:
+          - local
+          - acceptance-remote
+      allow_destructive:
+        description: Allow destructive tests against remote targets
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ inputs.acceptance_environment || 'local' }}
+  cancel-in-progress: true
+
+jobs:
+  acceptance_local:
+    name: Local / ${{ matrix.runtime }} / ${{ matrix.storage_backend }} / ${{ matrix.database }} / ${{ matrix.tenancy }}
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.acceptance_environment == 'local' }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 45
+    env:
+      POSTGRES_VERSION: "13"
+    strategy:
+      fail-fast: false
+      matrix:
+        storage_backend:
+          - s3
+          - file
+        database:
+          - pg
+          - oriole
+          - multigres
+        tenancy:
+          - single
+          - multitenant
+        runtime:
+          - direct
+        include:
+          - storage_backend: s3
+            database: pg
+            tenancy: single
+            runtime: watt
+          - storage_backend: s3
+            database: pg
+            tenancy: multitenant
+            runtime: watt
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Prepare env files
+        run: |
+          cp .env.sample .env
+          cp .env.test.sample .env.test
+          cp .env.acceptance.sample .env.acceptance
+      - name: Typecheck acceptance suite
+        run: npm run acceptance:typecheck
+      - name: Pull Multigres cluster image
+        if: ${{ matrix.database == 'multigres' }}
+        uses: ./.github/actions/pull-multigres-cluster
+      - name: Run local acceptance profile
+        env:
+          ACCEPTANCE_ADMIN_URL: ${{ matrix.tenancy == 'multitenant' && 'http://127.0.0.1:5001' || '' }}
+          ACCEPTANCE_COMMAND: ${{ matrix.runtime == 'watt' && 'acceptance:watt' || 'acceptance' }}
+          ACCEPTANCE_ENABLE_ADMIN: ${{ matrix.tenancy == 'multitenant' && 'true' || 'false' }}
+          ACCEPTANCE_ENABLE_VECTOR: "true"
+          ACCEPTANCE_INFRA_RESTART_SCRIPT: ${{ matrix.database == 'oriole' && 'infra:restart:ci:oriole:pgvector' || matrix.database == 'multigres' && 'infra:restart:ci:multigres' || 'infra:restart:ci' }}
+          ACCEPTANCE_PROFILE: ${{ inputs.profile || 'full' }}
+          ACCEPTANCE_X_FORWARDED_HOST: ${{ matrix.tenancy == 'multitenant' && 'bjhaohmqunupljrqypxz.local.dev' || '' }}
+          DATABASE_ENGINE: ${{ matrix.database == 'multigres' && 'multigres' || 'postgres' }}
+          MULTI_TENANT: ${{ matrix.tenancy == 'multitenant' && 'true' || 'false' }}
+          PG_QUEUE_ENABLE: ${{ matrix.tenancy == 'multitenant' && 'true' || 'false' }}
+          REQUEST_X_FORWARDED_HOST_REGEXP: ${{ matrix.tenancy == 'multitenant' && '^([a-z]{20})[.]local[.](?:com|dev)$' || '' }}
+          STORAGE_PUBLIC_URL: ${{ matrix.tenancy == 'multitenant' && 'http://127.0.0.1:5000' || '' }}
+          STORAGE_BACKEND: ${{ matrix.storage_backend }}
+          VECTOR_BUCKET_PROVIDER: pgvector
+          VECTOR_DATABASE_CREATE: ${{ matrix.database != 'multigres' && 'true' || 'false' }}
+          VECTOR_DATABASE_URL: ${{ matrix.tenancy == 'single' && 'postgresql://postgres:postgres@127.0.0.1:5432/postgres' || '' }}
+          VECTOR_ENABLED: "true"
+          VECTOR_STORE_MIGRATIONS_ENABLED: "true"
+          WORKERS_NUM: ${{ matrix.runtime == 'watt' && '2' || '1' }}
+        run: |
+          mkdir -p data coverage/acceptance
+          chmod -R 777 data
+          npm run "${ACCEPTANCE_COMMAND}" -- --profile "${ACCEPTANCE_PROFILE}"
+      - name: Upload acceptance artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: acceptance-local-${{ matrix.runtime }}-${{ matrix.storage_backend }}-${{ matrix.database }}-${{ matrix.tenancy }}
+          path: coverage/acceptance
+          if-no-files-found: ignore
+
+  acceptance_remote:
+    name: Remote
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.acceptance_environment != 'local' }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 20
+    environment: ${{ inputs.acceptance_environment }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Node dependencies
+        uses: ./.github/actions/setup-node-dependencies
+      - name: Typecheck acceptance suite
+        run: npm run acceptance:typecheck
+      - name: Run acceptance profile
+        env:
+          ACCEPTANCE_ALLOW_DESTRUCTIVE: ${{ inputs.allow_destructive }}
+          ACCEPTANCE_BASE_URL: ${{ vars.ACCEPTANCE_BASE_URL }}
+          ACCEPTANCE_ENABLE_ADMIN: ${{ vars.ACCEPTANCE_ENABLE_ADMIN }}
+          ACCEPTANCE_ENABLE_CDN: ${{ vars.ACCEPTANCE_ENABLE_CDN }}
+          ACCEPTANCE_ENABLE_ICEBERG: ${{ vars.ACCEPTANCE_ENABLE_ICEBERG }}
+          ACCEPTANCE_ENABLE_RENDER: ${{ vars.ACCEPTANCE_ENABLE_RENDER }}
+          ACCEPTANCE_ENABLE_RLS_SETUP: ${{ vars.ACCEPTANCE_ENABLE_RLS_SETUP }}
+          ACCEPTANCE_ENABLE_TUS: ${{ vars.ACCEPTANCE_ENABLE_TUS }}
+          ACCEPTANCE_ENABLE_VECTOR: ${{ vars.ACCEPTANCE_ENABLE_VECTOR }}
+          ACCEPTANCE_ENABLE_WIRE: ${{ vars.ACCEPTANCE_ENABLE_WIRE }}
+          ACCEPTANCE_PROFILE: ${{ inputs.profile }}
+          ACCEPTANCE_REGION: ${{ vars.ACCEPTANCE_REGION || secrets.ACCEPTANCE_REGION }}
+          ACCEPTANCE_RESOURCE_PREFIX: ${{ vars.ACCEPTANCE_RESOURCE_PREFIX || secrets.ACCEPTANCE_RESOURCE_PREFIX }}
+          ACCEPTANCE_RLS_BUCKET: ${{ vars.ACCEPTANCE_RLS_BUCKET }}
+          ACCEPTANCE_RLS_READ_OBJECT: ${{ vars.ACCEPTANCE_RLS_READ_OBJECT }}
+          ACCEPTANCE_RLS_WRITE_PREFIX: ${{ vars.ACCEPTANCE_RLS_WRITE_PREFIX }}
+          ACCEPTANCE_S3_ENDPOINT: ${{ vars.ACCEPTANCE_S3_ENDPOINT }}
+          ACCEPTANCE_S3_FORCE_PATH_STYLE: ${{ vars.ACCEPTANCE_S3_FORCE_PATH_STYLE }}
+          ACCEPTANCE_TLS_REJECT_UNAUTHORIZED: ${{ vars.ACCEPTANCE_TLS_REJECT_UNAUTHORIZED }}
+          ACCEPTANCE_TENANT_ID: ${{ vars.ACCEPTANCE_TENANT_ID || secrets.ACCEPTANCE_TENANT_ID }}
+          ACCEPTANCE_TUS_ENDPOINT: ${{ vars.ACCEPTANCE_TUS_ENDPOINT }}
+          ACCEPTANCE_X_FORWARDED_HOST: ${{ vars.ACCEPTANCE_X_FORWARDED_HOST }}
+          ACCEPTANCE_ADMIN_URL: ${{ vars.ACCEPTANCE_ADMIN_URL || secrets.ACCEPTANCE_ADMIN_URL }}
+          ACCEPTANCE_ADMIN_API_KEY: ${{ secrets.ACCEPTANCE_ADMIN_API_KEY }}
+          ACCEPTANCE_ANON_KEY: ${{ secrets.ACCEPTANCE_ANON_KEY }}
+          ACCEPTANCE_AUTHENTICATED_KEY: ${{ secrets.ACCEPTANCE_AUTHENTICATED_KEY }}
+          ACCEPTANCE_S3_ACCESS_KEY_ID: ${{ secrets.ACCEPTANCE_S3_ACCESS_KEY_ID }}
+          ACCEPTANCE_S3_SECRET_ACCESS_KEY: ${{ secrets.ACCEPTANCE_S3_SECRET_ACCESS_KEY }}
+          ACCEPTANCE_SERVICE_KEY: ${{ secrets.ACCEPTANCE_SERVICE_KEY }}
+          ACCEPTANCE_TARGET: remote
+          VECTOR_BUCKET_PROVIDER: ${{ vars.VECTOR_BUCKET_PROVIDER }}
+        run: |
+          mkdir -p coverage/acceptance
+          npm run acceptance:run
+      - name: Upload acceptance artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: acceptance-remote
+          path: coverage/acceptance
+          if-no-files-found: ignore

@@ -1,0 +1,11 @@
+--- a/src/include/pg_config_manual.h
++++ b/src/include/pg_config_manual.h
+@@ -179,7 +179,7 @@
+  * here's where to twiddle it.  You can also override this at runtime
+  * with the postmaster's -k switch.
+  */
+-#define DEFAULT_PGSOCKET_DIR  "/tmp"
++#define DEFAULT_PGSOCKET_DIR  "/run/postgresql"
+ 
+ /*
+  * This is the default event source for Windows event log.

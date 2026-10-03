@@ -1,0 +1,39 @@
+From ce195442200452ae50b63528647e3837e9f121e0 Mon Sep 17 00:00:00 2001
+From: Yvan Sraka <yvan@sraka.xyz>
+Date: Thu, 4 Dec 2025 19:33:44 +0100
+Subject: [PATCH] Fix PostgreSQL 17 compatibility in SPI_getvalue calls
+
+SPI_getvalue already returns a char* in PostgreSQL 17, so wrapping
+it in DatumGetCString (which expects a Datum) causes a compilation
+error. This patch removes the unnecessary DatumGetCString wrapper
+in both get_check_data.c and trsp.c files.
+---
+ src/common/get_check_data.c | 2 +-
+ src/trsp/trsp.c             | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/common/get_check_data.c b/src/common/get_check_data.c
+index 85ea70d..82a81d1 100644
+--- a/src/common/get_check_data.c
++++ b/src/common/get_check_data.c
+@@ -304,5 +304,5 @@ pgr_SPI_getFloat8(HeapTuple *tuple, TupleDesc *tupdesc, Column_info_t info) {
+  */
+ char*
+ pgr_SPI_getText(HeapTuple *tuple, TupleDesc *tupdesc,  Column_info_t info) {
+-    return DatumGetCString(SPI_getvalue(*tuple, *tupdesc, info.colNumber));
++    return SPI_getvalue(*tuple, *tupdesc, info.colNumber);
+ }
+diff --git a/src/trsp/trsp.c b/src/trsp/trsp.c
+index 7f9397a..52b68dd 100644
+--- a/src/trsp/trsp.c
++++ b/src/trsp/trsp.c
+@@ -114,8 +114,8 @@ fetch_restrict(HeapTuple *tuple, TupleDesc *tupdesc,
+   if (isnull)
+     elog(ERROR, "to_cost contains a null value");
+   rest->to_cost = DatumGetFloat8(binval);
+-  char *str = DatumGetCString(SPI_getvalue(*tuple, *tupdesc,
+-       restrict_columns->via_path));
++  char *str = SPI_getvalue(*tuple, *tupdesc,
++       restrict_columns->via_path);
+ 
+   // PGR_DBG("restriction: %f, %i, %s", rest->to_cost, rest->target_id, str);

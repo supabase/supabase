@@ -1,0 +1,127 @@
+{
+  "0.6.1": {
+    "hash": "sha256-O4eHVbJBudybsPab+zr2eXnfheREMqLAHAKm2GDbfrs=",
+    "rust": {
+      "1.82.0": {
+        "cargoHash": "sha256-lcnUVO8dJET5g6wM1YgTsj4uP4I3vVZy5PWBKIsvLB8="
+      }
+    }
+  },
+  "0.7.1": {
+    "hash": "sha256-t/gdlrBeP6KFkBFJiZUa8KKVJVYMf6753vQGKJdytss=",
+    "rust": {
+      "1.82.0": {
+        "cargoHash": "sha256-bLS/pKJnwgcp38wAHej6vOkzVb/E2UHRCQ/OMDI6GqU="
+      }
+    }
+  },
+  "0.9.5": {
+    "hash": "sha256-GpXQUOBuojAqPXyRR+k8AVW2XzBbn6V0+2dhP4w4Vs8=",
+    "rust": {
+      "1.70.0": {
+        "cargoHash": "sha256-TGeHOA5kRZ7KclRfYj6V+/ZbPiPx/4xUyKxNm4o7ubM="
+      }
+    }
+  },
+  "0.9.7": {
+    "hash": "sha256-uDBq7tUZ9f8h5nlRFR1mv4+Ty1OFtAk5P7OTNQPI1gI=",
+    "rust": {
+      "1.70.0": {
+        "cargoHash": "sha256-uc1/zWMLt5U0egsf3xu/5RxouSl0m+81qY+ZZd8BSxU="
+      }
+    }
+  },
+  "0.10.2": {
+    "hash": "sha256-FqjfbJmSy5UCpPPPk4bkEyvQCnaH9zYtkI7txgIn+ls=",
+    "rust": {
+      "1.70.0": {
+        "cargoHash": "sha256-VlxXXSwegKGYIO3r3XtclwdtkJNz4r5H35Tkkw0nl9c="
+      },
+      "1.76.0": {
+        "cargoHash": "sha256-VlxXXSwegKGYIO3r3XtclwdtkJNz4r5H35Tkkw0nl9c="
+      }
+    }
+  },
+  "0.11.2": {
+    "hash": "sha256-8NlpMDFaltTIA8G4JioYm8LaPJ2RGKH5o6sd6lBHmmM=",
+    "rust": {
+      "1.70.0": {
+        "cargoHash": "sha256-TMuJ7kyMckCT4JJVWuEE14HpD5uw3Vjym96GA71vOMo="
+      },
+      "1.76.0": {
+        "cargoHash": "sha256-TMuJ7kyMckCT4JJVWuEE14HpD5uw3Vjym96GA71vOMo="
+      },
+      "1.85.1": {
+        "cargoHash": "sha256-TMuJ7kyMckCT4JJVWuEE14HpD5uw3Vjym96GA71vOMo="
+      }
+    }
+  },
+  "0.11.3": {
+    "hash": "sha256-UHIfwOdXoJvR4Svha6ud0FxahP1wPwUtviUwUnTmLXU=",
+    "rust": {
+      "1.76.0": {
+        "cargoHash": "sha256-giL077I5VzWJ+fAbxqp/Oc28Qjc7ontVm7of5LQz+uY="
+      },
+      "1.85.1": {
+        "cargoHash": "sha256-giL077I5VzWJ+fAbxqp/Oc28Qjc7ontVm7of5LQz+uY="
+      }
+    }
+  },
+  "0.12.6": {
+    "hash": "sha256-7aQkrApALZe6EoQGVShGBj0UIATnfOy2DytFj9IWdEA=",
+    "rust": {
+      "1.80.0": {
+        "cargoHash": "sha256-pnMxWWfvr1/AEp8DvG4awig8zjdHizJHoZ5RJA8CL08="
+      },
+      "1.81.0": {
+        "cargoHash": "sha256-pnMxWWfvr1/AEp8DvG4awig8zjdHizJHoZ5RJA8CL08="
+      }
+    }
+  },
+  "0.12.9": {
+    "hash": "sha256-aR3DZAjeEEAjLQfZ0ZxkjLqTVMIEbU0UiZ62T4BkQq8=",
+    "rust": {
+      "1.81.0": {
+        "cargoHash": "sha256-yZpD3FriL9UbzRtdFkfIfFfYIrRPYxr/lZ5rb0YBTPc="
+      },
+      "1.84.0": {
+        "cargoHash": "sha256-yZpD3FriL9UbzRtdFkfIfFfYIrRPYxr/lZ5rb0YBTPc="
+      },
+      "1.87.0": {
+        "cargoHash": "sha256-yZpD3FriL9UbzRtdFkfIfFfYIrRPYxr/lZ5rb0YBTPc="
+      }
+    }
+  },
+  "0.14.3": {
+    "hash": "sha256-3TsNpEqNm3Uol5XPW1i0XEbP2fF2+RKB2d7lO6BDnvQ=",
+    "rust": {
+      "1.87.0": {
+        "cargoHash": "sha256-LZUXhjMxkBs3O5feH4X5NQC7Qk4Ja6M5+sAYaSCikrY="
+      }
+    }
+  },
+  "0.16.0": {
+    "hash": "sha256-emNR7fXNVD9sY/Mdno7mwpH6l/7AD28cBUsFRn9je50=",
+    "rust": {
+      "1.87.0": {
+        "cargoHash": "sha256-3eyBDWDoCzSU0tbab8qbjSnBkkN0oOgd7YbuyHLEHYw="
+      }
+    }
+  },
+  "0.16.1": {
+    "hash": "sha256-AjoBr+/sEPdzbD0wLUNVm2syCySkGaFOFQ70TST1U9w=",
+    "rust": {
+      "1.88.0": {
+        "cargoHash": "sha256-95DHq5GLnAqb3bbKwwaeBeKEmkfRh81ZTRaJ7L59DAg="
+      }
+    }
+  },
+  "0.19.2": {
+    "hash": "sha256-PANc819AhIE9yJ6NFHGJxHJHWZyR2Srmj2cEz3vQmJk=",
+    "rust": {
+      "1.97.1": {
+        "cargoHash": "sha256-cTD7x36FvFUIwVLuAqrOJ75vLDppITiDrY8Fs3RjPqU="
+      }
+    }
+  }
+}

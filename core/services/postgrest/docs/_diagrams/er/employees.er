@@ -1,0 +1,12 @@
+# Build using: -e ortho
+
+entity {font: "FreeSans"}
+relationship {font: "FreeMono"}
+
+[Employees]
+*id
+first_name
+last_name
++supervisor_id
+
+Employees 1--* Employees

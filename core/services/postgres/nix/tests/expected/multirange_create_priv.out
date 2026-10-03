@@ -1,0 +1,31 @@
+-- CVE-2026-6472: CREATE TYPE ... AS RANGE auto-creates a companion multirange
+-- type. When the multirange type name was given EXPLICITLY, the schema CREATE
+-- privilege for that name was not validated (the auto-generated-name path was
+-- already checked), letting a role create a multirange type in any schema.
+--
+-- Upstream commits: 08c397b0 (PG 15.18), c27ba08c (PG 17.10). The fix adds a
+-- pg_namespace_aclcheck(multirangeNamespace, GetUserId(), ACL_CREATE).
+--
+-- Verified as a non-superuser. Refs: PSQL-1110, PSQL-1234.
+BEGIN;
+CREATE SCHEMA allowed_ns;
+CREATE SCHEMA forbidden_ns;
+-- postgres gets CREATE on allowed_ns only; it has no rights on forbidden_ns.
+GRANT CREATE, USAGE ON SCHEMA allowed_ns TO postgres;
+SET ROLE postgres;
+-- Positive control: explicit multirange name in a schema postgres CAN create in.
+CREATE TYPE allowed_ns.okrange AS RANGE (
+  subtype = int4,
+  multirange_type_name = allowed_ns.okmultirange
+);
+-- The fix: an explicit multirange name targeting a schema where postgres lacks
+-- CREATE must now be denied.
+SAVEPOINT no_priv;
+CREATE TYPE allowed_ns.badrange AS RANGE (
+  subtype = int4,
+  multirange_type_name = forbidden_ns.badmultirange
+);
+ERROR:  permission denied for schema forbidden_ns
+ROLLBACK TO SAVEPOINT no_priv;
+RESET ROLE;
+ROLLBACK;

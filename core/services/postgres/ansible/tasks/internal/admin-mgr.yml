@@ -1,0 +1,17 @@
+- name: Download admin-mgr archive
+  get_url:
+    url: "{{ adminmgr_artifacts[platform]['url'] }}"
+    checksum: "{{ adminmgr_artifacts[platform]['checksum'] }}"
+    dest: "/tmp/admin-mgr.tar.gz"
+    timeout: 90
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: admin-mgr - unpack archive in /usr/bin/
+  unarchive:
+    remote_src: yes
+    src: /tmp/admin-mgr.tar.gz
+    dest: /usr/bin/
+    owner: root

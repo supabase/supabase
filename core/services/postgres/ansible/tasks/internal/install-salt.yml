@@ -1,0 +1,42 @@
+- name: Add apt repository for Saltstack
+  block:
+    - name: Ensure /etc/apt/keyrings directory exists
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: salt gpg key
+      ansible.builtin.get_url:
+        url: "{{salt_artifacts['url']}}"
+        checksum: "{{salt_artifacts['checksum']}}"
+        dest: /etc/apt/keyrings/salt-archive-keyring-2023.pgp
+        mode: '0644'
+      register: download_result
+      until: download_result is succeeded
+      retries: 3
+      delay: 2
+
+    - name: salt apt repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/salt-archive-keyring-2023.pgp arch={{ platform }}] https://packages.broadcom.com/artifactory/saltproject-deb/ stable main"
+        filename: "salt"
+        state: present
+
+- name: Salt minion install
+  apt:
+    name:
+      - salt-common={{ salt_release }}
+      - salt-minion={{ salt_release }}
+    state: present
+
+- name: Pin salt packages at major version
+  ansible.builtin.copy:
+    content: |
+      Package: salt-common salt-minion
+      Pin: version {{ salt_release.split('.')[0] }}.*
+      Pin-Priority: 1001
+    dest: /etc/apt/preferences.d/saltstack-pin
+    owner: root
+    group: root
+    mode: "0644"

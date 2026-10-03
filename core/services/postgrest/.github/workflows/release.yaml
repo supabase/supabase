@@ -1,0 +1,234 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - devel
+      - v*
+
+permissions: {}
+
+concurrency:
+  # Terminate all previous runs of the same workflow for the same tag.
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yaml
+    secrets:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+
+  github:
+    name: GitHub
+    permissions:
+      contents: write
+    runs-on: ubuntu-slim
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check the version to be released
+        run: |
+          cabal_version="$(grep -oP '^version:\s*\K.*' postgrest.cabal)"
+
+          if [ "${GITHUB_REF_NAME}" != "devel" ] && [ "${GITHUB_REF_NAME}" != "v$cabal_version" ]; then
+            echo "Tagged version ($GITHUB_REF_NAME) does not match the one in postgrest.cabal (v$cabal_version). Aborting release..."
+            exit 1
+          fi
+      - name: Identify changes from CHANGELOG.md
+        run: |
+          if [ "${GITHUB_REF_NAME}" == "devel" ]; then
+            echo "Getting unreleased changes..."
+            sed -n "1,/## Unreleased/d;/## \[/q;p" CHANGELOG.md > CHANGES.md
+          else
+            version="$(grep -oP '^version:\s*\K.*' postgrest.cabal)"
+            echo "Propper release, getting changes for version $version ..."
+            sed -n "1,/## \[$version\]/d;/## \[/q;p" CHANGELOG.md > CHANGES.md
+          fi
+
+          echo "Relevant extract from CHANGELOG.md:"
+          cat CHANGES.md
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: artifacts
+      - name: Create release bundle with archives for all builds
+        run: |
+          find artifacts -type f -iname postgrest -exec chmod +x {} \;
+
+          mkdir -p release-bundle
+
+          tar cJvf "release-bundle/postgrest-${GITHUB_REF_NAME}-linux-static-aarch64.tar.xz" \
+            -C artifacts/postgrest-linux-static-aarch64 postgrest
+
+          tar cJvf "release-bundle/postgrest-${GITHUB_REF_NAME}-linux-static-x86-64.tar.xz" \
+            -C artifacts/postgrest-linux-static-x86-64 postgrest
+
+          tar cJvf "release-bundle/postgrest-${GITHUB_REF_NAME}-macos-aarch64.tar.xz" \
+            -C artifacts/postgrest-macos-aarch64 postgrest
+
+          tar cJvf "release-bundle/postgrest-${GITHUB_REF_NAME}-macos-x86-64.tar.xz" \
+            -C artifacts/postgrest-macos-x86-64 postgrest
+
+          tar cJvf "release-bundle/postgrest-${GITHUB_REF_NAME}-freebsd-x86-64.tar.xz" \
+            -C artifacts/postgrest-freebsd-x86-64 postgrest
+
+          zip --junk-paths "release-bundle/postgrest-${GITHUB_REF_NAME}-windows-x86-64.zip" \
+            artifacts/postgrest-windows-x86-64/postgrest.exe
+
+      - name: Save release bundle
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-bundle
+          path: release-bundle
+          if-no-files-found: error
+
+      - name: Publish release on GitHub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Releasing version ${GITHUB_REF_NAME} on GitHub..."
+
+          if [ "${GITHUB_REF_NAME}" == "devel" ]; then
+            # To replace the existing release, we must first delete the old assets,
+            # then modify the release, then add the new assets.
+            gh release view devel --json assets \
+              | jq -r '.assets[] | .name' \
+              | xargs -rn1 \
+              gh release delete-asset -y devel
+            gh release edit devel \
+              -t devel \
+              --verify-tag \
+              -F CHANGES.md \
+              --prerelease
+            gh release upload --clobber devel release-bundle/*
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              -t "${GITHUB_REF_NAME}" \
+              --verify-tag \
+              -F CHANGES.md \
+              release-bundle/*
+          fi
+
+
+  docker:
+    name: Docker Hub
+    runs-on: ubuntu-26.04-arm
+    needs:
+      - github
+    if: |
+      vars.DOCKER_REPO && vars.DOCKER_USER
+    env:
+      DOCKER_REPO: ${{ vars.DOCKER_REPO }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download aarch64 Docker image
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: postgrest-docker-aarch64
+      - name: Download x86-64 Docker image
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: postgrest-docker-x86-64
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          username: ${{ vars.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+      - name: Publish images on Docker Hub
+        run: |
+          docker load -i postgrest-docker-aarch64.tar.gz
+          docker tag postgrest:latest "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-arm64"
+          docker push "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-arm64"
+
+          docker load -i postgrest-docker-x86-64.tar.gz
+          docker tag postgrest:latest "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-amd64"
+          docker push "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-amd64"
+
+          docker manifest create "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}" \
+            "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-arm64" \
+            "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-amd64"
+          docker manifest push "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}"
+
+          # Only tag 'latest' for full releases
+          if [ "${GITHUB_REF_NAME}" != "devel" ]; then
+            echo "Pushing to 'latest' tag for full release of ${GITHUB_REF_NAME} ..."
+            docker manifest create "$DOCKER_REPO/postgrest:latest" \
+              "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-arm64" \
+              "$DOCKER_REPO/postgrest:${GITHUB_REF_NAME}-linux-amd64"
+            docker manifest push "$DOCKER_REPO/postgrest:latest"
+          else
+            echo "Skipping push to 'latest' tag for pre-release..."
+          fi
+
+      - uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
+        if: github.ref == 'refs/tags/devel'
+        name: Docker Hub Description
+        with:
+          username: ${{ vars.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASS }}
+          repository: ${{ vars.DOCKER_REPO }}/postgrest
+          short-description: ${{ github.event.repository.description }}
+          readme-filepath: ./docker-hub-readme.md
+
+
+  ghcr:
+    name: GitHub Container Registry
+    runs-on: ubuntu-26.04-arm
+    needs:
+      - github
+    permissions:
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download aarch64 Docker image
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: postgrest-docker-aarch64
+      - name: Download x86-64 Docker image
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: postgrest-docker-x86-64
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish images on Docker Hub
+        run: |
+          docker load -i postgrest-docker-aarch64.tar.gz
+          docker tag postgrest:latest "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-arm64"
+          docker push "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-arm64"
+
+          docker load -i postgrest-docker-x86-64.tar.gz
+          docker tag postgrest:latest "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-amd64"
+          docker push "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-amd64"
+
+          docker manifest create "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}" \
+            "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-arm64" \
+            "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-amd64"
+          docker manifest push "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}"
+
+          # Only tag 'latest' for full releases
+          if [ "${GITHUB_REF_NAME}" != "devel" ]; then
+            echo "Pushing to 'latest' tag for full release of ${GITHUB_REF_NAME} ..."
+            docker manifest create "ghcr.io/${GITHUB_REPOSITORY,,}:latest" \
+              "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-arm64" \
+              "ghcr.io/${GITHUB_REPOSITORY,,}:${GITHUB_REF_NAME}-linux-amd64"
+            docker manifest push "ghcr.io/${GITHUB_REPOSITORY,,}:latest"
+          else
+            echo "Skipping push to 'latest' tag for pre-release..."
+          fi
+
+

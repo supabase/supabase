@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - v[0-9]+
+
+permissions: {}
+
+jobs:
+  check:
+    name: Check
+    uses: ./.github/workflows/check.yaml
+    secrets:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+
+  docs:
+    name: Docs
+    uses: ./.github/workflows/docs.yaml
+    secrets:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yaml
+    secrets:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+
+  build:
+    name: Build
+    uses: ./.github/workflows/build.yaml
+    secrets:
+      CACHIX_AUTH_TOKEN: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+
+  tag:
+    name: Tag
+    concurrency:
+      # Never tag outdated commits on the main branch by skipping superseded commits
+      group: ci-tag-${{ (github.ref == 'refs/heads/main' && github.ref) || github.run_id }}
+      cancel-in-progress: true
+    if: vars.RELEASE_ENABLED
+    runs-on: ubuntu-slim
+    needs:
+      - docs
+      - test
+      - build
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: true
+          ssh-key: ${{ secrets.POSTGREST_SSH_KEY }}
+      - name: Tag latest commit
+        run: |
+          cabal_version="$(grep -oP '^version:\s*\K.*' postgrest.cabal)"
+
+          if [[ "$cabal_version" == *.* ]]; then
+            git fetch --tags
+
+            if [ -z "$(git tag --list "v$cabal_version")" ]; then
+              git tag "v$cabal_version"
+              git push origin "v$cabal_version"
+            fi
+          else
+            git tag -f "devel"
+            git push -f origin "devel"
+          fi

@@ -1,0 +1,58 @@
+site_name: supavisor
+site_url: https://supabase.github.io/supavisor
+site_description: A cloud native multi-tenant connection pooler for Postgres
+
+repo_name: supabase/supavisor
+repo_url: https://github.com/supabase/supavisor
+
+nav:
+  - Welcome: "index.md"
+  - FAQ: "faq.md"
+  - Development:
+      - Installation: "development/installation.md"
+      - Setup: "development/setup.md"
+      - Docs: "development/docs.md"
+  - Deployment:
+      - Deploy with Fly.io: "deployment/fly.md"
+  - Connecting:
+      - Overview: "connecting/overview.md"
+      - Authentication: "connecting/authentication.md"
+  - Configuration:
+      - Environment Variables: "configuration/env.md"
+      - Tenants: "configuration/tenants.md"
+      - Users: "configuration/users.md"
+      - Pool Modes: "configuration/pool_modes.md"
+  - Migrating:
+      - from PgBouncer: "migrating/pgbouncer.md"
+  - Monitoring:
+      - Metrics: "monitoring/metrics.md"
+      - Logs: "monitoring/logs.md"
+  - ORMs:
+      - Prisma: "orms/prisma.md"
+
+theme:
+  name: "material"
+  favicon: "images/favicon.ico"
+  logo: "images/favicon.ico"
+  homepage: https://supabase.github.io/supavisor
+  features:
+    - navigation.expand
+  palette:
+    primary: black
+    accent: light green
+
+markdown_extensions:
+  - pymdownx.highlight:
+      linenums: true
+      guess_lang: false
+      use_pygments: true
+      pygments_style: default
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - pymdownx.tasklist
+  - admonition
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg

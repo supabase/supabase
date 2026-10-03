@@ -1,0 +1,17 @@
+{
+  "treat_no_relevant_lines_as_covered": true,
+  "skip_files": [
+    "test",
+    "lib/tasks",
+    "lib/cluster/strategy/postgres.ex",
+    "lib/supavisor/application.ex",
+    "lib/supavisor/cloak/",
+    "lib/supavisor/release.ex",
+    "lib/supavisor/repo.ex",
+    "lib/supavisor_web.ex",
+    "lib/supavisor_web/endpoint.ex",
+    "lib/supavisor_web/telemetry.ex",
+    "lib/supavisor/monitoring/phoenix.ex",
+    "lib/supavisor_web/open_api_schemas.ex"
+  ]
+}

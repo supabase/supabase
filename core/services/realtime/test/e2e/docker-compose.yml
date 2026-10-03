@@ -1,0 +1,11 @@
+# E2e testing infrastructure. Requires `supabase start` to be running first.
+# Run from test/e2e:
+#   docker compose up -d
+#   OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318 bun run realtime-check.ts --env local
+services:
+  jaeger:
+    image: jaegertracing/jaeger:2.5.0
+    container_name: e2e-jaeger
+    ports:
+      - "16686:16686"
+      - "4318:4318"

@@ -1,0 +1,10 @@
+[
+  { "label": "bee", "score": 0.986929 },
+  { "label": "fly", "score": 0.005201 },
+  { "label": "ant, emmet, pismire", "score": 0.002271 },
+  {
+    "label": "ladybug, ladybeetle, lady beetle, ladybird, ladybird beetle",
+    "score": 0.000988
+  },
+  { "label": "daisy", "score": 0.00078 }
+]

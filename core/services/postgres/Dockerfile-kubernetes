@@ -1,0 +1,24 @@
+FROM alpine:3.23
+
+ADD output-cloudimg/packer-cloudimg /disk/image.qcow2
+
+RUN set -eux; \
+    case "$(apk --print-arch)" in \
+        aarch64) \
+            apk add --no-cache qemu-system-aarch64 aavmf; \
+            truncate -s 64M /root/varstore.img; \
+            truncate -s 64M /root/efi.img; \
+            dd if=/usr/share/AAVMF/QEMU_EFI.fd of=/root/efi.img conv=notrunc; \
+            apk del --no-cache aavmf ;; \
+        x86_64) \
+            apk add --no-cache qemu-system-x86_64 ovmf; \
+            cp /usr/share/OVMF/OVMF_CODE.fd /root/efi.img; \
+            cp /usr/share/OVMF/OVMF_VARS.fd /root/varstore.img; \
+            apk del --no-cache ovmf ;; \
+        *) echo "Unsupported architecture" >&2; exit 1 ;; \
+    esac; \
+    apk add --no-cache qemu-img openssh-client virtiofsd; \
+    qemu-img create -f qcow2 /tmp/disk.qcow2 -b /disk/image.qcow2 -F qcow2; \
+    apk del --no-cache qemu-img
+
+CMD exec /bin/sh -c "trap : TERM INT; sleep 9999999999d & wait"

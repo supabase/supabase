@@ -1,0 +1,45 @@
+name: E2E Tests
+on:
+  pull_request:
+    paths:
+      - "lib/**"
+      - "priv/**"
+      - "!priv/repo/tenant_schema/**"
+      - "config/**"
+      - "rel/**"
+      - "mix.exs"
+      - "mix.lock"
+      - "Dockerfile"
+      - "run.sh"
+      - "mise.toml"
+      - "mise.lock"
+      - "test/e2e/**"
+      - ".github/workflows/e2e_tests.yml"
+
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: E2E Tests
+    runs-on: blacksmith-8vcpu-ubuntu-2404
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install bun and the Supabase CLI via mise
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
+        with:
+          working_directory: test/e2e
+          install_args: "bun supabase"
+
+      - name: Run e2e suite against a Realtime image built from this checkout
+        working-directory: test/e2e
+        run: mise run e2e-local -- --test functional --parallel --wait-time 10

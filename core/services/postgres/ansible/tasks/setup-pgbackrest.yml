@@ -1,0 +1,145 @@
+- name: Create pgBackRest group
+  when: not stage2
+  ansible.builtin.group:
+    name: pgbackrest
+    gid: 1005
+    state: present
+
+- name: Create pgBackRest user
+  when: not stage2
+  ansible.builtin.user:
+    name: pgbackrest
+    uid: 995
+    comment: pgBackRest user
+    group: pgbackrest
+    groups: pgbackrest, postgres
+    home: /var/lib/pgbackrest
+    shell: /sbin/nologin
+    system: true
+
+- name: Configure sudoers for pgBackRest
+  ansible.builtin.lineinfile:
+    create: yes
+    line: "{{ item }}"
+    mode: '0440'
+    path: '/etc/sudoers.d/pgbackrest'
+    validate: 'visudo -cf %s'
+  loop:
+    - 'postgres ALL=(pgbackrest) NOPASSWD: /var/lib/pgbackrest/.nix-profile/bin/pgbackrest'
+    - 'postgres ALL=(pgbackrest) NOPASSWD: /usr/bin/pgbackrest'
+    - 'postgres ALL=(pgbackrest) NOPASSWD: /usr/bin/bash'
+    - 'postgres ALL=(pgbackrest) NOPASSWD: /usr/bin/nix'
+    - 'pgbackrest ALL=(pgbackrest) NOPASSWD: /usr/bin/bash'
+    # Required for the NewRunnerAs() path: supabase-admin-agent runs the
+    # /usr/bin/pgbackrest wrapper as the pgbackrest user, but the wrapper
+    # internally calls "sudo -u pgbackrest <real_binary>". Without this entry
+    # that inner sudo fails even though the outer caller is already pgbackrest.
+    - 'pgbackrest ALL=(pgbackrest) NOPASSWD: /var/lib/pgbackrest/.nix-profile/bin/pgbackrest'
+
+- name: Create needed directories for pgBackRest
+  ansible.legacy.file:
+    group: postgres
+    mode: "{{ backrest_dir['mode'] | default('0770', true) }}"
+    owner: pgbackrest
+    path: "{{ backrest_dir['dir'] }}"
+    state: directory
+  loop:
+    # conf.d is setgid (02770) so files written by adminapi (postgres group)
+    # automatically inherit the postgres group. Without setgid, pgbackrest
+    # (running as the pgbackrest user) cannot read conf files created by adminapi.
+    - {dir: /etc/pgbackrest/conf.d, mode: '02770'}
+    - {dir: /var/lib/pgbackrest}
+    - {dir: /var/spool/pgbackrest}
+    - {dir: /var/log/pgbackrest}
+  loop_control:
+    loop_var: backrest_dir
+
+# supabase-admin-agent opens these log files with O_APPEND|O_WRONLY (no
+# O_CREATE). They must exist before SAA runs; a missing file causes the
+# pgBackRest enable command to fail before any backup work is attempted.
+# access_time/modification_time: preserve keeps this task idempotent.
+- name: Pre-create pgBackRest SAA log files
+  ansible.builtin.file:
+    access_time: preserve
+    group: postgres
+    mode: '0660'
+    modification_time: preserve
+    owner: pgbackrest
+    path: "{{ item }}"
+    state: touch
+  loop:
+    - /var/log/pgbackrest/saa-pgb.log
+    - /var/log/pgbackrest/wal-push.log
+    - /var/log/pgbackrest/wal-fetch.log
+
+- name: Symlink pgbackrest.conf
+  ansible.legacy.file:
+    force: true
+    path: /etc/pgbackrest/pgbackrest.conf
+    src: /etc/pgbackrest.conf
+    state: link
+
+- name: Create pgBackRest wrapper script
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+      # Sanitize dangerous arguments
+      sanitized_args=()
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --cmd=*|--cmd)
+            # Skip --cmd and its value
+            [[ "$1" == "--cmd" ]] && shift
+            shift || true
+            ;;
+          --ssh-cmd=*|--ssh-cmd)
+            # Skip --ssh-cmd and its value
+            [[ "$1" == "--ssh-cmd" ]] && shift
+            shift || true
+            ;;
+          --repo-host-cmd=*|--repo-host-cmd)
+            # Skip --repo-host-cmd and its value
+            [[ "$1" == "--repo-host-cmd" ]] && shift
+            shift || true
+            ;;
+          --config=*|--config)
+            # Skip --config and its value
+            [[ "$1" == "--config" ]] && shift
+            shift || true
+            ;;
+          *)
+            sanitized_args+=("$1")
+            shift
+            ;;
+        esac
+      done
+      exec sudo -u pgbackrest /var/lib/pgbackrest/.nix-profile/bin/pgbackrest "${sanitized_args[@]}"
+    dest: '/usr/bin/pgbackrest'
+    group: 'root'
+    mode: '0755'
+    owner: 'root'
+
+- name: Install pgBackRest
+  when: stage2
+  ansible.builtin.shell: |
+    sudo -u pgbackrest bash -c ". /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh && nix profile install github:supabase/postgres/{{ git_commit_sha }}#pg-backrest"
+  become: true
+  become_user: pgbackrest
+  changed_when: true
+
+- name: Move pgBackRest files to /etc/pgbackrest
+  when: stage2
+  ansible.legacy.copy:
+    group: postgres
+    dest: "/etc/pgbackrest/{{ conf_item['path'] }}/{{ conf_item['name'] }}"
+    mode: '0640'
+    owner: pgbackrest
+    src: "files/pgbackrest_config/{{ conf_item['name'] }}"
+  loop:
+    - {name: computed_globals.conf, path: conf.d}
+    - {name: pgbackrest.conf, path: ''}
+    - {name: repo1_async.conf, path: conf.d}
+    - {name: repo1_encrypted.conf, path: conf.d}
+    - {name: repo1.conf, path: conf.d}
+  loop_control:
+    loop_var: conf_item

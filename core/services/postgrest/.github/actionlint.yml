@@ -1,0 +1,6 @@
+# TODO: Remove this once a new actionlint release has been cut
+# and made its way to us through nixpkgs.
+self-hosted-runner:
+  labels:
+    - ubuntu-26.04
+    - ubuntu-26.04-arm

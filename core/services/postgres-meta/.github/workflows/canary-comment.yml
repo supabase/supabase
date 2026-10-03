@@ -1,0 +1,139 @@
+name: Update Canary PR Comment
+
+permissions:
+  pull-requests: write
+  actions: read
+
+on:
+  workflow_run:
+    workflows: ['Canary Deploy']
+    types: [completed]
+
+jobs:
+  update-comment:
+    # Only run on the correct repository
+    if: github.repository == 'supabase/postgres-meta'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # Get PR number from the workflow run
+      - name: Get PR info
+        id: pr-info
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            // Get the workflow run details
+            const workflowRun = context.payload.workflow_run;
+
+            // Find associated PR
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${workflowRun.head_repository.owner.login}:${workflowRun.head_branch}`
+            });
+
+            if (prs.data.length > 0) {
+              const pr = prs.data[0];
+              
+              // Check if PR has the deploy-canary label
+              const labels = pr.labels.map(label => label.name);
+              const hasCanaryLabel = labels.includes('deploy-canary');
+              
+              if (hasCanaryLabel) {
+                core.setOutput('pr_number', pr.number);
+                core.setOutput('found', 'true');
+                core.setOutput('has_canary_label', 'true');
+                console.log(`Found PR #${pr.number} with deploy-canary label`);
+              } else {
+                core.setOutput('found', 'false');
+                core.setOutput('has_canary_label', 'false');
+                console.log(`Found PR #${pr.number} but it doesn't have deploy-canary label`);
+              }
+            } else {
+              core.setOutput('found', 'false');
+              core.setOutput('has_canary_label', 'false');
+              console.log('No associated PR found');
+            }
+
+      # Extract canary info from the workflow run
+      - name: Extract canary info
+        if: ${{ steps.pr-info.outputs.found == 'true' && steps.pr-info.outputs.has_canary_label == 'true' && github.event.workflow_run.conclusion == 'success' }}
+        id: canary-info
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const workflowRun = context.payload.workflow_run;
+
+            // Extract PR number from the branch name or workflow run
+            const prNumber = '${{ steps.pr-info.outputs.pr_number }}';
+            const commitSha = workflowRun.head_sha;
+
+            // Generate the canary tag based on the pattern used in canary-deploy.yml
+            const canaryTag = `supabase/postgres-meta:canary-pr-${prNumber}-${commitSha}`;
+
+            core.setOutput('tag', canaryTag);
+            core.setOutput('found', 'true');
+            core.setOutput('commit-sha', commitSha);
+
+            console.log(`Generated canary tag: ${canaryTag}`);
+
+      # Find existing comment
+      - name: Find existing comment
+        if: ${{ steps.pr-info.outputs.found == 'true' && steps.pr-info.outputs.has_canary_label == 'true' }}
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
+        id: find-comment
+        with:
+          issue-number: ${{ steps.pr-info.outputs.pr_number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- postgres-meta-canary-status -->'
+
+      # Create or update comment based on workflow status
+      - name: Create or update canary comment
+        if: ${{ steps.pr-info.outputs.found == 'true' && steps.pr-info.outputs.has_canary_label == 'true' }}
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ steps.pr-info.outputs.pr_number }}
+          body: |
+            <!-- postgres-meta-canary-status -->
+            ## 🚀 Canary Deployment Status
+
+            ${{ github.event.workflow_run.conclusion == 'success' && steps.canary-info.outputs.found == 'true' && format('✅ **Canary image deployed successfully!**
+
+            🐳 **Docker Image:** `{0}`
+            📝 **Commit:** `{1}`
+
+            You can test this canary deployment by pulling the image:
+            ```bash
+            docker pull {0}
+            ```
+
+            You can also set the version in a supabase local project by running:
+            ```bash
+            echo "{0}" > supabase/.temp/pgmeta-version
+            ```
+
+            Or use it in your docker-compose.yml:
+            ```yaml
+            services:
+              postgres-meta:
+                image: {0}
+                # ... other configuration
+            ```
+
+            The canary image is available on:
+            - 🐳 [Docker Hub](https://hub.docker.com/r/supabase/postgres-meta)
+            - 📦 [GitHub Container Registry](https://ghcr.io/supabase/postgres-meta)
+            - ☁️ [AWS ECR Public](https://gallery.ecr.aws/supabase/postgres-meta)
+            ', steps.canary-info.outputs.tag, steps.canary-info.outputs.commit-sha) || '' }}
+
+            ${{ github.event.workflow_run.conclusion == 'failure' && '❌ **Canary deployment failed**
+
+            Please check the [workflow logs](' }}${{ github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.html_url || '' }}${{ github.event.workflow_run.conclusion == 'failure' && ') for more details.
+
+            Make sure your PR has the `deploy-canary` label and targets the `master` branch.' || '' }}
+
+            ---
+            <sub>Last updated: ${{ github.event.workflow_run.updated_at }}</sub>
+          edit-mode: replace

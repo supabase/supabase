@@ -1,0 +1,202 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 70
+    spike_limit_percentage: 20
+  batch/traces:
+    send_batch_size: 10000
+    timeout: 10s
+  batch/metrics:
+    send_batch_size: 10000
+    timeout: 10s
+  # Copy Resource attributes to metric data point attributes.
+  # This ensures all metrics have stable routing labels and a unique writer label.
+  transform/add_resource_attributes:
+    metric_statements:
+      - context: datapoint
+        statements:
+          - set(attributes["region"], resource.attributes["region"]) where resource.attributes["region"] != nil
+          - set(attributes["instance"], resource.attributes["instance"]) where resource.attributes["instance"] != nil
+          - set(attributes["service.name"], resource.attributes["service.name"]) where resource.attributes["service.name"] != nil
+          - set(attributes["service_instance_id"], resource.attributes["service.instance.id"]) where resource.attributes["service.instance.id"] != nil
+          - set(attributes["worker_id"], resource.attributes["worker.id"]) where resource.attributes["worker.id"] != nil
+          - set(attributes["platformatic_application_id"], resource.attributes["platformatic.application.id"]) where resource.attributes["platformatic.application.id"] != nil
+  # Prometheus exporter maps resource service.instance.id to the reserved
+  # instance label. Keep the explicit service_instance_id datapoint label above,
+  # but remove the resource attribute so it does not collide with host instance.
+  transform/drop_prometheus_reserved_resource_attrs:
+    metric_statements:
+      - context: resource
+        statements:
+          - delete_key(attributes, "service.instance.id")
+  # Add storage_api_otel_ prefix to all metrics
+  # Note: storage_api_ transform must be FIRST to avoid double prefix
+  metricstransform/host:
+    transforms:
+      - include: ^storage_api_(.*)$$
+        match_type: regexp
+        action: update
+        new_name: $${1}
+        # Catch-all: prefix any metric not already prefixed with storage_api_otel_
+      - include: ^(.*)$$
+        match_type: regexp
+        action: update
+        new_name: storage_api_otel_$${1}
+
+  metricstransform/prom_prefix:
+    transforms:
+      - include: ^(.*)$$
+        match_type: regexp
+        action: update
+        new_name: storage_api_$${1}
+
+  tail_sampling/storage:
+    decision_wait: 10s
+    expected_new_traces_per_sec: 10000
+    num_traces: 50000
+    policies: [
+        # Exclude probes URLs
+        {
+          name: exclude-urls,
+          type: string_attribute,
+          string_attribute:
+            {
+              key: http.route,
+              values: [\/health.*, \/metrics, \/tenants, \/version, \/status],
+              enabled_regex_matching: true,
+              invert_match: true,
+            },
+        },
+        # All error are sampled
+        {
+          name: error-status-codes,
+          type: numeric_attribute,
+          numeric_attribute: { key: http.status_code, min_value: 500, max_value: 599 },
+        },
+        # Always sample high latency traces that are not uploads
+        { name: high-latency-excluding-uploads, type: and, and: { and_sub_policy: [
+                  { type: latency, latency: { threshold_ms: 5000 } },
+                  # Exclude upload operations
+                  {
+                    type: string_attribute,
+                    string_attribute:
+                      {
+                        key: http.operation,
+                        values: [.*upload.*],
+                        enabled_regex_matching: true,
+                        invert_match: true,
+                      },
+                  },
+                ] } },
+        # Always sample high latency uploads
+        { name: high-latency-uploads, type: and, and: { and_sub_policy: [
+                  { type: latency, latency: { threshold_ms: 300000 } },
+                  # Only upload operations
+                  {
+                    type: string_attribute,
+                    string_attribute:
+                      { key: http.operation, values: [.*upload.*], enabled_regex_matching: true },
+                  },
+                ] } },
+        # Sample traces for tenants with default mode
+        # Default mode is the mode where the trace.mode attribute is set to basic
+        # and only 0.2 of traces are sampled for each tenant
+        { name: sampling-basic-tenants, type: and, and: { and_sub_policy: [
+                  {
+                    # must have tenant.ref attribute
+                    name: has-tenant-ref,
+                    type: string_attribute,
+                    string_attribute:
+                      { key: tenant.ref, values: [.*], enabled_regex_matching: true },
+                  },
+                  {
+                    # trace.mode = basic
+                    name: trace-mode-default,
+                    type: string_attribute,
+                    string_attribute: { key: trace.mode, values: [basic] },
+                  },
+                  {
+                    name: success-status-codes,
+                    type: numeric_attribute,
+                    numeric_attribute: { key: http.status_code, min_value: 200, max_value: 399 },
+                  },
+                  {
+                    name: basic-sampling,
+                    type: probabilistic,
+                    probabilistic: { sampling_percentage: 5 },
+                  },
+                ] } },
+
+        # Sample traces for tenants with premium mode
+        # Premium mode sample 100% of traces for each tenant
+        { name: sampling-premium-tenants, type: and, and: { and_sub_policy: [
+                  {
+                    # must have tenant.ref attribute
+                    name: has-tenant-ref,
+                    type: string_attribute,
+                    string_attribute:
+                      { key: tenant.ref, values: [.*], enabled_regex_matching: true },
+                  },
+                  {
+                    # trace.mode = premium
+                    name: trace-mode-default,
+                    type: string_attribute,
+                    string_attribute: { key: trace.mode, values: [full] },
+                  },
+                  {
+                    name: success-status-codes,
+                    type: numeric_attribute,
+                    numeric_attribute: { key: http.status_code, min_value: 200, max_value: 400 },
+                  },
+                  {
+                    name: full-sampling,
+                    type: probabilistic,
+                    probabilistic: { sampling_percentage: 100 },
+                  },
+                ] } },
+      ]
+
+exporters:
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: "0.0.0.0:9200"
+  prometheusremotewrite:
+    endpoint: "http://prometheus:9090/api/v1/write"
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, tail_sampling/storage, batch/traces]
+      exporters: [otlp/jaeger]
+    metrics/otel:
+      receivers: [otlp]
+      processors:
+        [
+          memory_limiter,
+          transform/add_resource_attributes,
+          transform/drop_prometheus_reserved_resource_attrs,
+          metricstransform/host,
+          batch/metrics,
+        ]
+      exporters: [prometheusremotewrite]
+    metrics/prometheus:
+      receivers: [otlp]
+      processors:
+        [
+          memory_limiter,
+          transform/add_resource_attributes,
+          transform/drop_prometheus_reserved_resource_attrs,
+          metricstransform/prom_prefix,
+          batch/metrics,
+        ]
+      exporters: [prometheus]

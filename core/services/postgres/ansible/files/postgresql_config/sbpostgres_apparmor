@@ -1,0 +1,217 @@
+#include <tunables/global>
+
+# ============================================
+# POSTGRES PROFILE - With Supabase specific restrictions
+# ============================================
+profile sbpostgres flags=(attach_disconnected) {
+    #include <abstractions/base>
+    #include <abstractions/nameservice>
+    #include <abstractions/openssl>
+
+    # Parent binary access to self
+    /var/lib/postgresql/.nix-profile/bin/postgres mr,
+    /nix/store/*/bin/.postgres-wrapped mr,
+    /nix/store/*/bin/.postgres-wrapped ix,
+
+    # Wide open permissions for parent - to be tuned
+    # some of this is managed via systemd sandboxing already
+    /** rw,
+    owner /** m,
+    / wr,
+    /nix/store/** m,
+    /etc r,
+    /usr/local r,
+    # lock permission for pgroonga
+    /data/pgdata/pgroonga.log k,
+
+    # WAL directory - needs link permission for segment recycling
+    /data/pgdata/pg_wal/** rwkl,
+    /data/pgdata/pg_wal/  rw,
+
+    # Systemd notification socket (for Type=notify services)
+    /{,var/}run/systemd/notify w,
+
+    # Full network access
+    network inet stream,
+    network inet6 stream,
+    network unix stream,
+
+    # All capabilities
+    capability,
+
+    # Libraries
+    /lib/aarch64-linux-gnu/*.so* mr,
+    /usr/lib/aarch64-linux-gnu/*.so* mr,
+    /nix/store/*/lib/*.so* mr,
+
+    # safe commands
+    /usr/bin/true  ix,
+    /usr/bin/false ix,
+    # kill needed for postgresql to reload itself
+    /bin/kill ix,
+    /usr/bin/kill ix,
+    signal (send) set=(hup) peer=unconfined,
+
+    # When parent executes shell, transition to restricted profile
+    # This accounts for popen, which postgres uses for any child process
+    # Px = discrete profile transition (child gets different profile)
+    /bin/sh Pix -> postgres_shell,
+    /bin/bash Pix -> postgres_shell,
+    /bin/dash Pix -> postgres_shell,
+    /usr/bin/sh Pix -> postgres_shell,
+    /usr/bin/dash Pix -> postgres_shell,
+    /nix/store/*/bin/bash Pix -> postgres_shell,
+    /usr/lib/postgresql/bin/pgsodium_getkey.sh Pix -> postgres_shell,
+    /usr/bin/cat Pix -> postgres_shell,
+    /bin/cat Pix -> postgres_shell,
+    /usr/bin/admin-mgr Pix -> postgres_shell,
+    /nix/store/*/bin/wal-g-2 Pix -> postgres_shell,
+    /nix/store/*/bin/wal-g-3 Pix -> postgres_shell,
+    /nix/store/*/bin/pgbackrest Pix -> postgres_shell,
+    /nix/store/*/bin/pg_dump ix,
+    /usr/bin/pgbackrest Pix -> pgbackrest_shell,
+    /usr/bin/nix Pix -> pgbackrest_shell,
+    /usr/bin/sudo Pix -> pgbackrest_shell,
+
+    # nix-built postgres popen() may use a nix store sh instead of /bin/sh
+    /nix/store/*/bin/sh Pix -> postgres_shell,
+
+    # SAA called directly from sbpostgres context (e.g. shell Pix fallback)
+    /opt/supabase-admin-agent/supabase-admin-agent Pix -> postgres_shell,
+    /opt/supabase-admin-agent/supabase-admin-agent-linux-arm64 Pix -> postgres_shell,
+    /opt/supabase-admin-agent/supabase-admin-agent-linux-amd64 Pix -> postgres_shell,
+
+  profile postgres_shell {
+        #include <abstractions/base>
+
+        /usr/bin/* m,
+        /bin/* m,
+
+        # Shell binary
+        /usr/bin/sh mr,
+        /usr/bin/bash mr,
+        /usr/bin/dash mr,
+        /nix/store/*/bin/bash mr,
+
+        # Only allow specific commands to be executed from shell
+        /usr/bin/cat ix,
+
+        # pgbackrest needs nix and sudo
+        /usr/bin/nix ix,
+        /usr/bin/sudo ix,
+
+        # backup things
+        /usr/lib/postgresql/bin/pgsodium_getkey.sh ix,
+        /usr/bin/admin-mgr ix,
+        /opt/supabase-admin-agent/supabase-admin-agent ix,
+        /opt/supabase-admin-agent/supabase-admin-agent-linux-arm64 ix,
+        /opt/supabase-admin-agent/supabase-admin-agent-linux-amd64 ix,
+        /nix/store/*/bin/.postgres-wrapped ix,
+        /nix/store/*/bin/wal-g-2 ix,
+        /nix/store/*/bin/wal-g-3 ix,
+        /nix/store/*/bin/pgbackrest ix,
+        /nix/store/*/bin/pg_dump ix,
+        /nix/store/*/bin/pg_archivecleanup ix,
+
+        # file path permissions
+        /** r,
+        /data/wal_fetch_dir/ rw,
+        /tmp/wal_fetch_dir/ rw,
+        /var/lib/postgresql/data rw,
+        /data/pgdata rw,
+        /data/pgdata/pg_wal/** rwkl,
+        /data/pgdata/pg_wal/  rw,
+        /data/latest-lsn-checkpoint-v2 rw,
+        /data/previous-lsn-checkpoint-v2 rw,
+        /var/lib/postgresql/data/recovery.signal rw,
+        /var/lib/postgresql/data/standby.signal rw,
+        /var/lib/pgbackrest rw,
+        /etc/pgbackrest/conf.d/** rw,
+        /var/spool/pgbackrest/** rw,
+        /var/log/pgbackrest/** rw,
+        /etc/** r,
+        /usr/local/** r,
+
+
+        deny /var/lib/supabase/** rwx,
+        deny /var/lib/supabase-admin-agent/** rwx,
+        deny /var/cache/supabase-admin-agent/** rwx,
+        deny /opt/saltstack/** rwx,
+        deny /etc/salt/** rwx,
+        deny /root wr,
+        deny /home/** wr,
+        # wal-g needs access to its own home directory
+        /home/wal-g/* wr,
+
+        # Libraries
+        /lib/aarch64-linux-gnu/*.so* mr,
+        /usr/lib/aarch64-linux-gnu/*.so* mr,
+        /nix/store/*/lib/*.so* mr,
+
+        # full network access
+        # could further break this up so that only backup
+        # tools have network access
+        network,
+
+    }
+
+  profile pgbackrest_shell {
+        #include <abstractions/base>
+
+        /usr/bin/* m,
+        /bin/* m,
+
+        # Shell binary
+        /usr/bin/sh mr,
+        /usr/bin/bash mr,
+        /usr/bin/dash mr,
+        /nix/store/*/bin/bash mr,
+
+        # pgbackrest needs nix and sudo
+        /usr/bin/nix ix,
+        /usr/bin/sudo ix,
+        /bin/bash ix,
+
+        /usr/bin/admin-mgr ix,
+        /nix/store/*/bin/.postgres-wrapped ix,
+        /nix/store/*/bin/pgbackrest ix,
+
+        # file path permissions
+        /** r,
+        /data/wal_fetch_dir/ rw,
+        /tmp/wal_fetch_dir/ rw,
+        /var/lib/postgresql/data rw,
+        /data/pgdata rw,
+        /data/pgdata/pg_wal/** rwkl,
+        /data/pgdata/pg_wal/  rw,
+        /data/latest-lsn-checkpoint-v2 rw,
+        /data/previous-lsn-checkpoint-v2 rw,
+        /var/lib/postgresql/data/recovery.signal rw,
+        /var/lib/postgresql/data/standby.signal rw,
+        /var/lib/pgbackrest rw,
+        /etc/pgbackrest/conf.d/** rw,
+        /var/spool/pgbackrest/** rw,
+        /var/log/pgbackrest/** rw,
+        /etc/** r,
+        /usr/local/** r,
+
+        deny /var/lib/supabase/** rwx,
+        deny /var/lib/supabase-admin-agent/** rwx,
+        deny /var/cache/supabase-admin-agent/** rwx,
+        deny /opt/saltstack/** rwx,
+        deny /etc/salt/** rwx,
+        deny /root wr,
+        deny /home/** wr,
+
+        # Libraries
+        /lib/aarch64-linux-gnu/*.so* mr,
+        /usr/lib/aarch64-linux-gnu/*.so* mr,
+        /nix/store/*/lib/*.so* mr,
+
+        # full network access
+        # could further break this up so that only backup
+        # tools have network access
+        network,
+
+    }
+}

@@ -1,0 +1,26 @@
+=== Symbol Results ===
+
+Vulnerability #1: GO-2026-4986
+    Quadratic string concatentation in consumeComment in net/mail
+  More info: https://pkg.go.dev/vuln/GO-2026-4986
+  Standard library
+    Found in: net/mail@go1.25.8
+    Fixed in: net/mail@go1.25.10
+    Example traces found:
+      #1: internal/mailer/validateclient/validateclient.go:259:30: validateclient.emailValidator.validateStatic calls mail.ParseAddress
+
+Vulnerability #2: GO-2026-4982
+    Bypass of meta content URL escaping causes XSS in html/template
+  More info: https://pkg.go.dev/vuln/GO-2026-4982
+  Standard library
+    Found in: html/template@go1.25.8
+    Fixed in: html/template@go1.25.10
+    Example traces found:
+      #1: internal/mailer/templatemailer/template.go:139:30: templatemailer.tplCacheEntry.execute calls template.Template.Execute
+      #2: internal/api/api.go:480:21: api.API.ServeHTTP calls http.HandlerFunc.ServeHTTP, which eventually calls template.Template.ExecuteTemplate
+
+Your code is affected by 2 vulnerabilities from 1 module and the Go standard library.
+This scan also found 4 vulnerabilities in packages you import and 1
+vulnerability in modules you require, but your code doesn't appear to call these
+vulnerabilities.
+Use '-show verbose' for more details.

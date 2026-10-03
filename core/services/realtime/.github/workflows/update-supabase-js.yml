@@ -1,0 +1,119 @@
+name: Update @supabase/supabase-js
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to update to"
+        required: true
+        type: string
+      source:
+        description: "Source of the update"
+        required: false
+        type: string
+        default: "manual"
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  update-supabase-js:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-supabase-update-${{ inputs.version }}
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: assets/package-lock.json
+
+      - name: Update @supabase/supabase-js in assets
+        working-directory: assets
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          npm pkg set "dependencies.@supabase/supabase-js=${VERSION}"
+          npm install --package-lock-only --ignore-scripts
+
+      - name: Update @supabase/supabase-js in test/e2e
+        working-directory: test/e2e
+        env:
+          VERSION: ${{ inputs.version }}
+        run: npm pkg set "dependencies.@supabase/supabase-js=${VERSION}"
+
+      - name: Setup Bun
+        if: ${{ hashFiles('test/e2e/bun.lock') != '' }}
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.x"
+
+      - name: Update test/e2e lockfile
+        if: ${{ hashFiles('test/e2e/bun.lock') != '' }}
+        working-directory: test/e2e
+        run: bun install --lockfile-only
+
+      - name: Fetch release notes
+        env:
+          VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CURRENT_FULL=$(git show HEAD:assets/package.json | jq -r '.dependencies["@supabase/supabase-js"] // ""' | grep -oP '[\d]+\.[\d]+\.[\d]+(-[\w.]+)?')
+          CURRENT_BASE=$(echo "$CURRENT_FULL" | grep -oP '[\d]+\.[\d]+\.[\d]+')
+          [[ "$CURRENT_FULL" == *"-"* ]] && INCLUDE_CURRENT=true || INCLUDE_CURRENT=false
+          [[ "$VERSION" == *"-"* ]] && STABLE_ONLY=false || STABLE_ONLY=true
+          RELEASES=$(gh api "repos/supabase/supabase-js/releases?per_page=100")
+          RELEASE_NOTES=$(echo "$RELEASES" | jq -r \
+            --arg current "v${CURRENT_BASE}" \
+            --arg new "v${VERSION}" \
+            --argjson stable_only "$STABLE_ONLY" \
+            --argjson include_current "$INCLUDE_CURRENT" \
+            '[.[] | select(.draft == false) | select(if $stable_only then .prerelease == false else true end)] |
+             (map(.tag_name) | index($new)) as $start |
+             (map(.tag_name) | index($current)) as $end |
+             ($end | if . != null and $include_current then . + 1 else . end) as $end_adj |
+             if $start == null then ["Target version not found in last 100 releases."]
+             elif $end_adj != null and $start >= $end_adj then ["Downgrade — no release notes available."]
+             else [.[$start:$end_adj][] | "## " + .tag_name + "\n\n" + (.body // "No release notes.")]
+             end | .[]')
+          {
+            echo "RELEASE_NOTES<<EOF"
+            echo "$RELEASE_NOTES"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: Generate token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          commit-message: "chore: update @supabase/supabase-js to v${{ inputs.version }}"
+          title: "chore: update @supabase/supabase-js to v${{ inputs.version }}"
+          body: |
+            This PR updates `@supabase/supabase-js` to v${{ inputs.version }}.
+
+            **Source**: ${{ inputs.source }}
+
+            ---
+
+            ## Release Notes
+
+            ${{ env.RELEASE_NOTES }}
+
+            This PR was created automatically.
+          branch: "gha/auto-update-supabase-js-v${{ inputs.version }}"
+          base: ${{ github.event.repository.default_branch }}

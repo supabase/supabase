@@ -1,0 +1,31 @@
+[Unit]
+Description=Envoy
+After=postgrest.service gotrue.service adminapi.service
+Wants=postgrest.service gotrue.service adminapi.service
+Conflicts=kong.service
+
+[Service]
+Type=simple
+
+ExecStartPre=sh -c 'if ss -lnt | grep -Eq ":(80|443) "; then echo "Port 80 or 443 already in use"; exit 1; fi'
+
+# Need to run via a restarter script to support hot restart when using a process
+# manager, see:
+# https://www.envoyproxy.io/docs/envoy/latest/operations/hot_restarter
+ExecStart=/opt/envoy-hot-restarter.py /opt/start-envoy.sh
+
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -TERM $MAINPID
+User=envoy
+Slice=services.slice
+Restart=always
+RestartSec=3
+LimitNOFILE=100000
+
+# The envoy user is unprivileged and thus not permitted to bind on ports < 1024
+# Via systemd we grant the process a set of privileges to bind to 80/443
+# See http://archive.vn/36zJU
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

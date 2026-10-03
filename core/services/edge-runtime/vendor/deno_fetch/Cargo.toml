@@ -1,0 +1,49 @@
+# Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
+
+[package]
+name = "deno_fetch"
+version = "0.206.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+readme = "README.md"
+repository.workspace = true
+description = "Fetch API implementation for Deno"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+base64.workspace = true
+bytes.workspace = true
+data-url.workspace = true
+deno_core.workspace = true
+deno_fs.workspace = true
+deno_io.workspace = true
+deno_path_util.workspace = true
+deno_permissions.workspace = true
+deno_tls.workspace = true
+dyn-clone = "1"
+error_reporter = "1"
+hickory-resolver.workspace = true
+http.workspace = true
+http-body-util.workspace = true
+hyper.workspace = true
+hyper-rustls.workspace = true
+hyper-util.workspace = true
+ipnet.workspace = true
+percent-encoding.workspace = true
+rustls-webpki.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-rustls.workspace = true
+tokio-socks.workspace = true
+tokio-util = { workspace = true, features = ["io"] }
+tower.workspace = true
+tower-http.workspace = true
+tower-service.workspace = true
+
+[dev-dependencies]
+fast-socks5.workspace = true

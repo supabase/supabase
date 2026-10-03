@@ -1,0 +1,22 @@
+[Unit]
+Description=connection pooler for PostgreSQL
+Documentation=man:pgbouncer(1)
+Documentation=https://www.pgbouncer.org/
+After=network.target
+{% if supabase_internal is defined %}
+Requires=database-optimizations.service
+After=database-optimizations.service
+{% endif %}
+
+[Service]
+Type=notify
+User=pgbouncer
+ExecStart=/usr/local/bin/pgbouncer /etc/pgbouncer/pgbouncer.ini
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+LimitNOFILE=65536
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

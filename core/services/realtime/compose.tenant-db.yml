@@ -1,0 +1,66 @@
+services:
+  tenant_db:
+    # Serves both images: a cluster ignores `command` and /docker-entrypoint-initdb.d,
+    # and supabase/postgres ignores MULTIGRES_*.
+    image: ${TENANT_DB_IMAGE:-${POSTGRES_IMAGE:-supabase/postgres:17.6.1.166}}
+    ports:
+      - "${TENANT_DB_PORT:-5433}:5432"
+    volumes:
+      - ./dev/postgres/za-permit-supabase-admin.sh:/docker-entrypoint-initdb.d/za-permit-supabase-admin.sh
+      - ./dev/postgres/zb-supabase-schema.sql:/docker-entrypoint-initdb.d/zb-supabase-schema.sql
+      - ./dev/postgres/zc-template1-orioledb.sql:/docker-entrypoint-initdb.d/zc-template1-orioledb.sql
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+    # A cluster forks its services and returns, so PID 1 must reap.
+    init: true
+    shm_size: "1gb"
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+      MULTIGRES_GATEWAY_PG_PORT: "5432"
+      # Minimum for the shard to elect a leader.
+      MULTIGRES_NUM_CELLS: "2"
+      # Admits the non-temporary slots some tests need.
+      MT_ENABLE_SLOT_BASED_REPLICATION: "true"
+      # Matches supabase/postgres, which the connection-budget tests assume.
+      MULTIGRES_PG_MAX_CONNECTIONS: "100"
+      # Tests exhaust the WAL senders and push a slot past its retention, so both
+      # limits stay small. max_wal_size does not: a small one starves DDL.
+      MULTIGRES_PG_EXTRA_CONF: |
+        wal_keep_size = 32MB
+        max_wal_size = 1GB
+        max_slot_wal_keep_size = 32MB
+        max_wal_senders = 10
+    healthcheck:
+      # Over TCP: a cluster's Postgres sits behind the pooler on its own socket.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      # A cluster takes about a minute to bootstrap.
+      start_period: 90s
+
+  # Does what /docker-entrypoint-initdb.d would for an image that skips it. Idempotent,
+  # so it runs either way; profiled so only `compose run` triggers it.
+  tenant_db_bootstrap:
+    profiles: ["bootstrap"]
+    image: ${TENANT_DB_IMAGE:-${POSTGRES_IMAGE:-supabase/postgres:17.6.1.166}}
+    depends_on:
+      tenant_db:
+        condition: service_healthy
+    volumes:
+      - ./dev/postgres/zb-supabase-schema.sql:/zb-supabase-schema.sql:ro
+    environment:
+      # The script reconnects over TCP, where there is no peer auth.
+      PGPASSWORD: postgres
+    entrypoint:
+      - psql
+      - --host=tenant_db
+      - --port=5432
+      - --username=supabase_admin
+      - --dbname=postgres
+      - --no-psqlrc
+      - --quiet
+      - --set=ON_ERROR_STOP=1
+      # Only POSTGRES_USER gets POSTGRES_PASSWORD; Realtime also uses `postgres`.
+      - --command=alter role postgres with password 'postgres'
+      - --file=/zb-supabase-schema.sql

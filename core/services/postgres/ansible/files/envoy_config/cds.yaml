@@ -1,0 +1,86 @@
+resources:
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: admin_api
+    load_assignment:
+      cluster_name: admin_api
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 8085
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+          retry_budget:
+            budget_percent:
+              value: 100
+            min_retry_concurrency: 100
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: gotrue
+    load_assignment:
+      cluster_name: gotrue
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 9999
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+          retry_budget:
+            budget_percent:
+              value: 100
+            min_retry_concurrency: 100
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: postgrest
+    load_assignment:
+      cluster_name: postgrest
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 3000
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+          retry_budget:
+            budget_percent:
+              value: 100
+            min_retry_concurrency: 100
+  - '@type': type.googleapis.com/envoy.config.cluster.v3.Cluster
+    name: postgrest_admin
+    load_assignment:
+      cluster_name: postgrest_admin
+      endpoints:
+        - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: 127.0.0.1
+                    port_value: 3001
+    circuit_breakers:
+      thresholds:
+        - priority: DEFAULT
+          max_connections: 10000
+          max_pending_requests: 10000
+          max_requests: 10000
+          retry_budget:
+            budget_percent:
+              value: 100
+            min_retry_concurrency: 100
+

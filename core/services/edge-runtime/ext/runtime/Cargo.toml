@@ -1,0 +1,44 @@
+[package]
+name = "ext_runtime"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno_core.workspace = true
+
+deno_fetch.workspace = true
+deno_fs.workspace = true
+deno_http.workspace = true
+deno_net.workspace = true
+deno_tls.workspace = true
+deno_websocket.workspace = true
+
+base_mem_check.workspace = true
+base_rt.workspace = true
+
+anyhow.workspace = true
+bytes.workspace = true
+dashmap.workspace = true
+enum-as-inner.workspace = true
+futures.workspace = true
+http.workspace = true
+httparse.workspace = true
+hyper.workspace = true
+hyper_v014.workspace = true
+libc.workspace = true
+log.workspace = true
+once_cell.workspace = true
+regex.workspace = true
+scopeguard.workspace = true
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true
+tracing.workspace = true
+
+memmem = "0.1"

@@ -1,0 +1,75 @@
+# CIS Ubuntu Level 2 Server Benchmark
+# Based on CIS Ubuntu 22.04 LTS Benchmark v1.0.0
+# Includes all Level 1 checks plus additional Level 2 requirements
+
+file:
+  /etc/ssh/sshd_config:
+    exists: true
+    mode: "0600"
+    owner: root
+    group: root
+    contains:
+      - "PermitRootLogin no"
+      - "Protocol 2"
+
+  /etc/passwd:
+    exists: true
+    mode: "0644"
+    owner: root
+    group: root
+
+  /etc/shadow:
+    exists: true
+    mode: "0640"
+    owner: root
+
+  /etc/login.defs:
+    exists: true
+    contains:
+      - "/PASS_MIN_LEN\\s+14/"
+      - "/PASS_MAX_DAYS\\s+90/"
+
+package:
+  aide:
+    installed: true
+
+  auditd:
+    installed: true
+
+  xinetd:
+    installed: false
+
+service:
+  ufw:
+    enabled: true
+    running: true
+
+  auditd:
+    enabled: true
+    running: true
+
+kernel-param:
+  net.ipv4.ip_forward:
+    value: 0
+
+  net.ipv6.conf.all.forwarding:
+    value: 0
+
+  net.ipv4.conf.all.accept_source_route:
+    value: 0
+
+  net.ipv4.conf.default.accept_source_route:
+    value: 0
+
+command:
+  check-password-fields:
+    exec: "awk -F: '($2 == \"\") {print}' /etc/shadow | wc -l"
+    exit-status: 0
+    stdout:
+      - "0"
+
+  check-ufw-status:
+    exec: "ufw status"
+    exit-status: 0
+    stdout:
+      - "/Status: active/"

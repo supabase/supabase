@@ -1,0 +1,53 @@
+name: Import Testagram Core Services
+
+on:
+  push:
+    branches:
+      - testagram/core-platform-foundation
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  import-core:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout foundation branch
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Normalize working tree before subtree operations
+        run: |
+          git reset --hard HEAD
+          git clean -ffd
+          test -z "$(git status --porcelain)"
+
+      - name: Configure Git
+        run: |
+          git config user.name "testagram-core-bot"
+          git config user.email "testagram-core-bot@users.noreply.github.com"
+
+      - name: Import upstream core services
+        run: bash scripts/import-supabase-core.sh
+
+      - name: Verify imported services
+        run: |
+          set -e
+          for d in postgres auth postgrest realtime storage edge-runtime supavisor postgres-meta; do
+            test -d "core/services/$d"
+            echo "verified: core/services/$d"
+          done
+
+      - name: Run forensic boundary audit
+        run: bash scripts/audit-core-boundary.sh
+
+      - name: Persist imported source
+        run: |
+          git push origin HEAD:testagram/core-platform-foundation

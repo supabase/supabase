@@ -1,0 +1,53 @@
+name: Test Database
+on:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  gen-matrix:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    outputs:
+      postgres_major_versions: ${{ steps.set-versions.outputs.postgres_major_versions }}
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+      - uses: ./.github/actions/nix-install-ephemeral
+      - name: Set PostgreSQL versions
+        id: set-versions
+        run: |
+          VERSIONS=$(nix run nixpkgs#yq-go -- -o=json -I=0 '.postgres_major' ansible/vars.yml)
+          echo "postgres_major_versions=$VERSIONS" >> $GITHUB_OUTPUT
+  verify:
+    needs: gen-matrix
+    strategy:
+      matrix:
+        postgres_major_version: ${{ fromJson(needs.gen-matrix.outputs.postgres_major_versions) }}
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    timeout-minutes: 180
+    env:
+      POSTGRES_PORT: 5478
+      POSTGRES_PASSWORD: password
+    steps:
+      - name: Checkout Repo
+        uses: supabase/postgres/.github/actions/shared-checkout@HEAD
+
+      - uses: ./.github/actions/nix-install-ephemeral
+
+      - name: Resolve git sha
+        id: resolve-git-sha
+        uses: ./.github/actions/resolve-git-sha
+        with:
+          flake_input: ${{ vars.GIT_SHA_FROM_FLAKE_INPUT }}
+
+      - name: verify schema.sql is committed
+        run: |
+          nix run github:supabase/postgres/${{ steps.resolve-git-sha.outputs.sha }}#dbmate-tool -- --version ${{ matrix.postgres_major_version }} --flake-url github:supabase/postgres/${{ steps.resolve-git-sha.outputs.sha }}
+          if ! git diff --exit-code --quiet migrations/schema-${{ matrix.postgres_major_version }}.sql; then
+            echo "Detected changes in schema.sql:"
+            git diff migrations/schema-${{ matrix.postgres_major_version }}.sql
+            exit 1
+          fi

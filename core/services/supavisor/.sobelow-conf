@@ -1,0 +1,19 @@
+[
+  verbose: false,
+  private: false,
+  skip: true,
+  router: nil,
+  exit: false,
+  format: "sarif",
+  out: nil,
+  threshold: :low,
+  ignore: [
+    "Config.HTTPS",
+    "Config.CSP"
+  ],
+  ignore_files: [
+    "lib/tasks/gen.appup.ex",
+    "lib/tasks/gen.relup.ex"
+  ],
+  version: false
+]

@@ -1,0 +1,23 @@
+dynamic_resources:
+  cds_config:
+    path_config_source:
+      path: /etc/envoy/cds.yaml
+    resource_api_version: V3
+  lds_config:
+    path_config_source:
+      path: /etc/envoy/lds.yaml
+    resource_api_version: V3
+node:
+  cluster: cluster_0
+  id: node_0
+overload_manager:
+  resource_monitors:
+    - name: envoy.resource_monitors.global_downstream_max_connections
+      typed_config:
+        '@type': >-
+          type.googleapis.com/envoy.extensions.resource_monitors.downstream_connections.v3.DownstreamConnectionsConfig
+        max_active_downstream_connections: 30000
+stats_config:
+  stats_matcher:
+    reject_all: true
+

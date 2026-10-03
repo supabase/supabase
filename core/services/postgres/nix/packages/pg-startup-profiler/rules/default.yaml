@@ -1,0 +1,35 @@
+# Default rules for PostgreSQL container startup profiling
+patterns:
+  - name: "initdb_start"
+    regex: 'running bootstrap script'
+
+  - name: "initdb_complete"
+    regex: 'syncing data to disk'
+
+  - name: "temp_server_start"
+    regex: 'database system is ready to accept connections'
+    occurrence: 1
+
+  - name: "server_shutdown"
+    regex: 'database system is shut down'
+
+  - name: "final_server_ready"
+    regex: 'database system is ready to accept connections'
+    occurrence: 2
+    marks_ready: true
+
+  - name: "extension_load"
+    regex: 'statement: CREATE EXTENSION.*"(?P<extension>[^"]+)"'
+    capture: extension
+
+  - name: "bgworker_start"
+    regex: '(?P<worker>pg_cron|pg_net).*started'
+    capture: worker
+
+  - name: "migration_file"
+    regex: 'running (?P<file>/docker-entrypoint-initdb\.d/[^\s]+)'
+    capture: file
+
+timestamp:
+  regex: '(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \w+)'
+  format: "2006-01-02 15:04:05.000 MST"

@@ -1,0 +1,39 @@
+- name: Setup Supautils
+  when: stage2
+  block:
+    - name: supautils - add supautils to session_preload_libraries
+      ansible.builtin.replace:
+        path: '/etc/postgresql/postgresql.conf'
+        regexp: "#session_preload_libraries = ''"
+        replace: "session_preload_libraries = 'supautils'"
+      become: true
+
+    - name: supautils - write custom supautils.conf
+      ansible.builtin.template:
+        dest: '/etc/postgresql-custom/supautils.conf'
+        mode: '0664'
+        group: 'postgres'
+        owner: 'postgres'
+        src: 'files/postgresql_config/supautils.conf.j2'
+
+    - name: supautils - copy extension custom scripts
+      ansible.builtin.copy:
+        dest: '/etc/postgresql-custom/extension-custom-scripts'
+        src: 'files/postgresql_extension_custom_scripts/'
+      become: true
+
+    - name: supautils - chown extension custom scripts
+      ansible.builtin.file:
+        group: 'postgres'
+        mode: '0775'
+        owner: 'postgres'
+        path: '/etc/postgresql-custom/extension-custom-scripts'
+        recurse: true
+      become: true
+
+    - name: supautils - include /etc/postgresql-custom/supautils.conf in postgresql.conf
+      ansible.builtin.replace:
+        path: '/etc/postgresql/postgresql.conf'
+        regexp: "#include = '/etc/postgresql-custom/supautils.conf'"
+        replace: "include = '/etc/postgresql-custom/supautils.conf'"
+      become: true

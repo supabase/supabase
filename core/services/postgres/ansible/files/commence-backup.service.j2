@@ -1,0 +1,12 @@
+[Unit]
+Description=Async commence physical backup
+
+[Service]
+Type=simple
+User=adminapi
+ExecStart=/usr/bin/admin-mgr commence-backup --run-as-service true
+Restart=no
+OOMScoreAdjust=-1000
+
+[Install]
+WantedBy=multi-user.target

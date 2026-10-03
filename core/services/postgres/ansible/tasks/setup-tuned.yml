@@ -1,0 +1,204 @@
+- name: 'tuned - Install and configure tuned'  # noqa: name[casing]
+  block:
+    - name: 'tuned - Install tuned'  # noqa: name[casing]
+      ansible.builtin.apt:
+        force_apt_get: true
+        name: 'tuned'
+        policy_rc_d: 101
+        state: 'present'
+      become: true
+
+    - name: 'tuned - Create a tuned profile directory'  # noqa: name[casing]
+      ansible.builtin.file:
+        group: 'root'
+        mode: '0755'
+        owner: 'root'
+        path: '/etc/tuned/profiles/postgresql'
+        state: 'directory'
+      become: true
+
+    - name: 'tuned - Create a profile symlink for older tuned versions'  # noqa: name[casing]
+      ansible.builtin.file:
+        force: true
+        group: 'root'
+        mode: '0755'
+        owner: 'root'
+        path: '/etc/tuned/postgresql'
+        src: '/etc/tuned/profiles/postgresql'
+        state: 'link'
+      become: true
+
+    - name: 'tuned - Create a tuned profile'  # noqa: name[casing]
+      community.general.ini_file:
+        create: true
+        group: 'root'
+        mode: '0644'
+        no_extra_spaces: true
+        option: 'summary'
+        path: '/etc/tuned/profiles/postgresql/tuned.conf'
+        section: 'main'
+        state: 'present'
+        value: 'Tuned profile for PostgreSQL'
+      become: true
+
+    - name: 'tuned - Disable Transparent Huge Pages (THP)'  # noqa: name[casing]
+      community.general.ini_file:
+        create: true
+        group: 'root'
+        mode: '0644'
+        no_extra_spaces: true
+        option: 'transparent_hugepages'
+        path: '/etc/tuned/profiles/postgresql/tuned.conf'
+        section: 'vm'
+        state: 'present'
+        value: 'never'
+      become: true
+
+    - name: 'tuned - Configure performance'  # noqa: name[casing]
+      community.general.ini_file:
+        create: true
+        group: 'root'
+        mode: '0644'
+        no_extra_spaces: true
+        option: 'governor'
+        path: '/etc/tuned/profiles/postgresql/tuned.conf'
+        section: 'cpu'
+        state: 'present'
+        value: 'performance'
+      become: true
+
+    - name: 'tuned - Configure Intel CPUs for maximum performance'  # noqa: name[casing]
+      when: ansible_facts['processor'][0] is search('GenuineIntel', ignorecase=True)
+      community.general.ini_file:
+        create: true
+        group: 'root'
+        mode: '0644'
+        no_extra_spaces: true
+        option: "{{ intel_item['option'] }}"
+        path: '/etc/tuned/profiles/postgresql/tuned.conf'
+        section: "{{ intel_item['section'] }}"
+        state: 'present'
+        value: "{{ intel_item['value'] }}"
+      become: true
+      loop:
+        - option: 'energy_perf_bias'
+          section: 'cpu'
+          value: 'performance'
+        - option: 'min_perf_pct'
+          section: 'cpu'
+          value: '100'
+      loop_control:
+        loop_var: 'intel_item'
+
+    - name: 'tuned - Set sysctl parameters'  # noqa: name[casing]
+      community.general.ini_file:
+        create: true
+        group: 'root'
+        mode: '0644'
+        no_extra_spaces: true
+        option: "{{ sysctl_item['option'] }}"
+        path: '/etc/tuned/profiles/postgresql/tuned.conf'
+        section: 'sysctl'
+        state: 'present'
+        value: "{{ sysctl_item['value'] }}"
+      become: true
+      loop:
+        - option: 'fs.aio-max-nr'
+          value: '1048576'
+        - option: 'fs.file-max'
+          value: '312139770'
+        - option: 'fs.suid_dumpable'
+          # PostgreSQL's AppArmor profile triggers a "secure" exec; setting this
+          # to 2 ensures it can still reliably generate core dumps.
+          value: '2'
+        - option: 'kernel.panic_on_oops'
+          value: '1'
+        - option: 'kernel.sched_autogroup_enabled'
+          value: '0'
+        - option: 'kernel.sem'
+          value: '250 512000 100 2048'
+        - option: 'kernel.shmall'
+          value: '18446744073692700000'
+        - option: 'kernel.shmmax'
+          value: '18446744073692700000'
+        - option: 'kernel.shmmni'
+          value: '4096'
+        - option: 'net.core.netdev_budget'
+          value: '1024'
+        - option: 'net.core.netdev_max_backlog'
+          value: '10000'
+        - option: 'net.core.rmem_default'
+          value: '262144'
+        - option: 'net.core.rmem_max'
+          value: '104857600'
+        - option: 'net.core.somaxconn'
+          value: '16384'
+        - option: 'net.core.wmem_default'
+          value: '262144'
+        - option: 'net.core.wmem_max'
+          value: '104857600'
+        - option: 'net.ipv4.ip_local_port_range'
+          value: '1025 65499'
+        - option: 'net.ipv4.ip_local_reserved_ports'
+          value: '3000,3001,8085,9122,9187,9999'
+        - option: 'net.ipv4.tcp_keepalive_intvl'
+          value: '60'
+        - option: 'net.ipv4.tcp_keepalive_time'
+          value: '1800'
+        - option: 'net.ipv4.tcp_max_syn_backlog'
+          value: '4096'
+        - option: 'net.ipv4.tcp_rmem'
+          value: '4096 87380 16777216'
+        - option: 'net.ipv4.tcp_timestamps'
+          value: '1'
+        - option: 'net.ipv4.tcp_tw_reuse'
+          value: '1'
+        - option: 'net.ipv4.tcp_window_scaling'
+          value: '1'
+        - option: 'net.ipv4.tcp_wmem'
+          value: '4096 65536 16777216'
+        - option: 'net.netfilter.nf_conntrack_buckets'
+          value: '62500'
+        - option: 'net.netfilter.nf_conntrack_max'
+          value: '250000'
+        - option: 'vm.dirty_background_ratio'
+          value: '10'
+        - option: 'vm.dirty_expire_centisecs'
+          value: '3000'
+        - option: 'vm.dirty_ratio'
+          value: '40'
+        - option: 'vm.dirty_writeback_centisecs'
+          value: '500'
+        - option: 'vm.panic_on_oom'
+          value: '1'
+      loop_control:
+        loop_var: 'sysctl_item'
+
+    - name: 'tuned - Set kernel.panic=10'  # noqa: name[casing]
+      when: not stage2
+      community.general.ini_file:
+        create: true
+        group: 'root'
+        mode: '0644'
+        no_extra_spaces: true
+        option: 'kernel.panic'
+        path: '/etc/tuned/profiles/postgresql/tuned.conf'
+        section: 'sysctl'
+        state: 'present'
+        value: '10'
+      become: true
+
+    - name: 'tuned - Activate the tuned service'  # noqa: name[casing]
+      ansible.builtin.systemd_service:
+        daemon_reload: true
+        enabled: true
+        name: 'tuned'
+        state: "{{ 'restarted' if stage2 else 'stopped' }}"
+      become: true
+
+    - name: 'tuned - Activate the PostgreSQL tuned profile'  # noqa: name[casing]
+      when: stage2
+      ansible.builtin.command:
+        cmd: 'tuned-adm profile postgresql'
+      become: true
+      changed_when: false

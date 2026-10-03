@@ -1,0 +1,17 @@
+[package]
+name = "base_rt"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+deno_core.workspace = true
+
+cpu_timer.workspace = true
+
+once_cell.workspace = true
+opentelemetry.workspace = true
+tokio.workspace = true
+tokio-util = { workspace = true, features = ["rt"] }
+tracing.workspace = true

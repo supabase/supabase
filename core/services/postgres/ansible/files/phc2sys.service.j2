@@ -1,0 +1,10 @@
+[Unit]
+Description=Sync system clock to KVM PTP clock
+After=dev-ptp0.device
+
+[Service]
+ExecStart=/usr/sbin/phc2sys -s /dev/ptp0 -O 0 -m
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

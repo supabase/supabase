@@ -1,0 +1,5 @@
+{
+  "workspaces": [],
+  "type": "commonjs",
+  "main": "meow.js"
+}

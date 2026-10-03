@@ -1,0 +1,15 @@
+- name: pg_egress_collect - install tcpdump and perl async lib
+  apt:
+    pkg:
+      - tcpdump
+      - libio-async-perl
+
+- name: pg_egress_collect - create service file
+  template:
+    src: files/pg_egress_collect.service.j2
+    dest: /etc/systemd/system/pg_egress_collect.service
+
+- name: pg_egress_collect - reload systemd
+  systemd:
+    daemon_reload: yes
+

@@ -1,0 +1,38 @@
+include:
+  - compose.dbs.yml
+
+services:
+  realtime:
+    depends_on:
+      - realtime_db
+      - tenant_db
+    build: .
+    environment:
+      API_JWT_SECRET: dev
+      APP_NAME: realtime
+      DASHBOARD_PASSWORD: realtime
+      DASHBOARD_USER: realtime
+      DB_AFTER_CONNECT_QUERY: SET search_path TO _realtime
+      DB_ENC_KEY: "1234567890123456"
+      DB_ENC_KEY_GCM: "12345678901234567890123456789012"
+      DB_ENC_WRITE_GCM: "true"
+      DB_HOST: realtime_db
+      DB_USER: supabase_admin
+      DNS_NODES: "''"
+      ELIXIR_ERL_OPTIONS: +hmax 1000000000
+      ERL_AFLAGS: -kernel shell_history enabled --proto_dist inet_tcp
+      GEN_RPC_TCP_CLIENT_PORT: 5469
+      GEN_RPC_TCP_SERVER_PORT: 5369
+      METRICS_JWT_SECRET: dev
+      NODE_NAME: pink
+      PORT: ${PORT:-4000}
+      REGION: us-east-1
+      RLIMIT_NOFILE: 1000000
+      RUN_JANITOR: "true"
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      SEED_SELF_HOST: "true"
+      SLOT_NAME_SUFFIX: some_sha
+    ports:
+      - "${PORT:-4000}:${PORT:-4000}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -1,0 +1,89 @@
+# Testagram Storage multi-tenant stack.
+version: "3"
+services:
+  storage:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    depends_on:
+      tenant_db:
+        condition: service_healthy
+      multitenant_db:
+        condition: service_healthy
+      supavisor:
+        condition: service_started
+      rustfs_setup:
+        condition: service_completed_successfully
+    environment:
+      SERVER_PORT: 5000
+      SERVER_REGION: ${SERVER_REGION:-local}
+      AUTH_JWT_SECRET: ${AUTH_JWT_SECRET:?set AUTH_JWT_SECRET}
+      AUTH_JWT_ALGORITHM: ${AUTH_JWT_ALGORITHM:-HS256}
+      AUTH_ENCRYPTION_KEY: ${AUTH_ENCRYPTION_KEY:?set AUTH_ENCRYPTION_KEY}
+      MULTI_TENANT: "true"
+      DATABASE_MULTITENANT_URL: ${DATABASE_MULTITENANT_URL:-postgresql://postgres:postgres@multitenant_db:5432/postgres}
+      SERVER_ADMIN_API_KEYS: ${SERVER_ADMIN_API_KEYS:?set SERVER_ADMIN_API_KEYS}
+      SERVER_ADMIN_PORT: 5001
+      REQUEST_X_FORWARDED_HOST_REGEXP: "^([a-z]{20}).local.(?:com|dev)$"
+      DB_INSTALL_ROLES: ${DB_INSTALL_ROLES:-true}
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-s3}
+      GLOBAL_S3_BUCKET: ${GLOBAL_S3_BUCKET:-supa-storage-bucket}
+      GLOBAL_S3_ENDPOINT: ${GLOBAL_S3_ENDPOINT:-http://rustfs:9000}
+      GLOBAL_S3_FORCE_PATH_STYLE: ${GLOBAL_S3_FORCE_PATH_STYLE:-true}
+      AWS_ACCESS_KEY_ID: ${STORAGE_S3_ACCESS_KEY_ID:?set STORAGE_S3_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${STORAGE_S3_SECRET_ACCESS_KEY:?set STORAGE_S3_SECRET_ACCESS_KEY}
+      REGION: ${REGION:-us-east-1}
+      S3_PROTOCOL_ENABLED: ${S3_PROTOCOL_ENABLED:-true}
+      S3_PROTOCOL_ACCESS_KEY_ID: ${S3_PROTOCOL_ACCESS_KEY_ID:?set S3_PROTOCOL_ACCESS_KEY_ID}
+      S3_PROTOCOL_ACCESS_KEY_SECRET: ${S3_PROTOCOL_ACCESS_KEY_SECRET:?set S3_PROTOCOL_ACCESS_KEY_SECRET}
+      UPLOAD_FILE_SIZE_LIMIT: ${UPLOAD_FILE_SIZE_LIMIT:-524288000}
+      UPLOAD_FILE_SIZE_LIMIT_STANDARD: ${UPLOAD_FILE_SIZE_LIMIT_STANDARD:-52428800}
+      UPLOAD_SIGNED_URL_EXPIRATION_TIME: ${UPLOAD_SIGNED_URL_EXPIRATION_TIME:-120}
+      TUS_URL_PATH: /upload/resumable
+      TUS_URL_EXPIRY_MS: ${TUS_URL_EXPIRY_MS:-3600000}
+      IMAGE_TRANSFORMATION_ENABLED: ${IMAGE_TRANSFORMATION_ENABLED:-true}
+      IMGPROXY_URL: ${IMGPROXY_URL:-http://imgproxy:8080}
+      IMGPROXY_REQUEST_TIMEOUT: ${IMGPROXY_REQUEST_TIMEOUT:-15}
+      PG_QUEUE_ENABLE: "true"
+
+  tenant_db:
+    extends:
+      service: tenant_db
+      file: ./.docker/docker-compose-infra.yml
+  multitenant_db:
+    extends:
+      service: multitenant_db
+      file: ./.docker/docker-compose-infra.yml
+  supavisor:
+    extends:
+      service: supavisor
+      file: ./.docker/docker-compose-infra.yml
+  supavisor_setup:
+    depends_on:
+      supavisor:
+        condition: service_healthy
+    extends:
+      service: supavisor_setup
+      file: ./.docker/docker-compose-infra.yml
+  rustfs:
+    extends:
+      service: rustfs
+      file: ./.docker/docker-compose-infra.yml
+  rustfs_setup:
+    extends:
+      service: rustfs_setup
+      file: ./.docker/docker-compose-infra.yml
+    depends_on:
+      rustfs:
+        condition: service_healthy
+  imgproxy:
+    extends:
+      service: imgproxy
+      file: ./.docker/docker-compose-infra.yml
+
+configs:
+  init.sql:
+    content: "CREATE SCHEMA IF NOT EXISTS _supavisor;"

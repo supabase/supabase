@@ -1,0 +1,30 @@
+- name: install ansible
+  shell:
+    cmd: |
+      apt install -y software-properties-common
+      # TODO (darora): temporarily disabling while Launchpad is under ddos attack and very frequently timing out
+      # add-apt-repository --yes --update ppa:ansible/ansible
+      apt install -y ansible
+      sed -i -e 's/#callback_whitelist.*/callback_whitelist = profile_tasks/' /etc/ansible/ansible.cfg
+
+- name: ansible pull systemd units
+  copy:
+    src: files/{{ item }}
+    dest: /etc/systemd/system/{{ item }}
+  with_items:
+    - ansible-pull.service
+    - ansible-pull.timer
+
+- name: create facts dir
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: ansible facts
+  copy:
+    src: files/supabase_facts.ini
+    dest: /etc/ansible/facts.d/supabase.fact
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes

@@ -1,0 +1,79 @@
+name: Verify migration idempotency
+description: >
+  Dump the schema, reset and rerun migrations, dump again, and diff the two
+  dumps to catch non-idempotent migrations.
+
+inputs:
+  override-file:
+    description: docker compose override file selecting the tenant_db engine; omit for vanilla Postgres
+    required: false
+    default: ""
+  label:
+    description: Engine name used in dump filenames and the mismatch message
+    required: true
+  database-url:
+    description: Connection string the idempotency script migrates against
+    default: postgresql://postgres:postgres@127.0.0.1/postgres
+  additional-exclude-table-data:
+    description: >
+      Space-separated list of extra schema.table entries to exclude from data
+      diffing, on top of storage.migrations. Use this for engine-internal
+      tables whose data legitimately changes between dumps regardless of
+      migration idempotency (e.g. multigres.heartbeat).
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Dump schema before
+      shell: bash
+      env:
+        OVERRIDE_FILE: ${{ inputs.override-file }}
+        EXTRA_EXCLUDES: ${{ inputs.additional-exclude-table-data }}
+      run: |
+        compose_files=(-f ./.docker/docker-compose-infra.yml)
+        [ -n "$OVERRIDE_FILE" ] && compose_files+=(-f "$OVERRIDE_FILE")
+        exclude_args=(--exclude-table-data=storage.migrations)
+        for t in $EXTRA_EXCLUDES; do
+          exclude_args+=("--exclude-table-data=$t")
+        done
+        docker compose --project-directory . \
+          "${compose_files[@]}" \
+          exec -T -e PGPASSWORD=postgres tenant_db \
+          pg_dump -h 127.0.0.1 -p 5432 -U postgres -d postgres \
+          "${exclude_args[@]}" \
+          --restrict-key=test \
+          > before-${{ inputs.label }}.sql
+
+    - name: Reset and rerun migrations
+      shell: bash
+      env:
+        DATABASE_URL: ${{ inputs.database-url }}
+      run: npm run migration:test-idempotency
+
+    - name: Dump schema after
+      shell: bash
+      env:
+        OVERRIDE_FILE: ${{ inputs.override-file }}
+        EXTRA_EXCLUDES: ${{ inputs.additional-exclude-table-data }}
+      run: |
+        compose_files=(-f ./.docker/docker-compose-infra.yml)
+        [ -n "$OVERRIDE_FILE" ] && compose_files+=(-f "$OVERRIDE_FILE")
+        exclude_args=(--exclude-table-data=storage.migrations)
+        for t in $EXTRA_EXCLUDES; do
+          exclude_args+=("--exclude-table-data=$t")
+        done
+        docker compose --project-directory . \
+          "${compose_files[@]}" \
+          exec -T -e PGPASSWORD=postgres tenant_db \
+          pg_dump -h 127.0.0.1 -p 5432 -U postgres -d postgres \
+          "${exclude_args[@]}" \
+          --restrict-key=test \
+          > after-${{ inputs.label }}.sql
+
+    - name: Diff schemas
+      shell: bash
+      run: |
+        diff before-${{ inputs.label }}.sql after-${{ inputs.label }}.sql \
+          || (echo '${{ inputs.label }} schema mismatch!'; exit 1)

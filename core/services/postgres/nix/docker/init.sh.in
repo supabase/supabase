@@ -1,0 +1,5 @@
+#!/bin/bash
+# shellcheck shell=bash
+/bin/initdb --locale=C -D /data/postgresql --username=supabase_admin
+ln -s /etc/postgresql.conf /data/postgresql/postgresql.conf
+/bin/postgres -p @PGSQL_DEFAULT_PORT@ -D /data/postgresql 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Postgres Egress Collector
+
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+Type=simple
+ExecStart=/bin/bash -c "tcpdump -s 128 -Q out -nn -tt -vv -p -l 'tcp and (port 5432 or port 6543)' | perl /root/pg_egress_collect.pl"
+User=root
+Slice=services.slice
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

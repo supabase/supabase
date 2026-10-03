@@ -1,0 +1,29 @@
+@startuml
+
+skinparam backgroundColor transparent
+skinparam linetype ortho
+
+skinparam node {
+  backgroundColor transparent
+  borderThickness 1
+}
+
+database "PostgreSQL" {
+  node public {
+    rectangle tables_public as "tables"
+  }
+
+  node extensions as "**extensions**" {
+  }
+
+  node API as "<size:20>api" {
+    rectangle vf_api as "views + functions"
+  }
+
+  tables_public <-- vf_api
+  extensions <-- vf_api
+}
+
+vf_api <-[thickness=3]-> () PostgREST
+
+@enduml

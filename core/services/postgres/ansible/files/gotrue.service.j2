@@ -1,0 +1,107 @@
+[Unit]
+Description=Gotrue
+
+# Avoid starting gotrue while cloud-init is running. It makes a lot of changes
+# and I would like to rule out side effects of it running concurrently along
+# side services.
+After=cloud-init.service
+Wants=cloud-init.target
+
+# Given the fact that auth uses SO_REUSEADDR, I want to rule out capabilities
+# being modified between restarts early in boot. This plugs up the scenario that
+# EADDRINUSE errors originate from a previous gotrue process starting without
+# the SO_REUSEADDR flag (due to lacking capability at that point in boot proc)
+# so when the next gotrue starts it can't re-use a slow releasing socket.
+After=apparmor.service
+
+# We want sysctl's to be applied
+After=systemd-sysctl.service
+
+# Ensure tuned is applied
+After=tuned.service
+
+# UFW Is modified by cloud init, but started non-blocking, so configuration
+# could be in-flight while gotrue is starting. I want to ensure future rules
+# that are relied on for security posture are applied before gotrue runs.
+After=ufw.service
+
+# We need networking & resolution, auth uses the Go DNS resolver (not libc)
+# so it's possible `localhost` resolution could be unstable early in startup. We
+# care about this because SO_REUSEADDR eligibility checks the tuple
+# (proto, family, addr, port) meaning the AF_INET (ipv4, ipv6) could affect the
+# binding resulting in a second way for EADDRINUSE errors to surface.
+#
+# Note: We should consider removing localhost usage given `localhost` resolution
+# can often be racey early in boot, can be difficult to debug and offers no real
+# advantage in our infra. At the very least avoiding DNS resolved binding would
+# be a good idea.
+Wants=network-online.target systemd-resolved.service
+After=network-online.target systemd-resolved.service
+
+# Auth server can't start unless postgres is online, lets remove a lot of auth
+# server noise during slow starts by requiring it.
+Wants=postgresql.service
+After=postgresql.service
+
+# The systemd default is 10s / 5 for these values with a DefaultRestartUSec of
+# 100ms. Most services set a RestartSec limit of 3, under most circumstances it
+# takes 15s to restart 5 times so the limit of 10s is not exceeded. However if
+# other system processes (salt, cloud init) restart it explicitly, or recovering
+# system services within the --before chain trigger a restart the limit can be
+# exceeded causing it to be marked as failed. Since no services mark
+# gotrue.service as required it will remain offline until the next explicit
+# restart is issued.
+#
+# Setting these values to 0 with Restart=always and RestartSec=3 will prevent
+# gotrue from being marked as failed.
+StartLimitIntervalSec=0
+StartLimitBurst=0
+
+[Service]
+Type=exec
+WorkingDirectory=/opt/gotrue
+
+# Both v2 & v3 need a config-dir for reloading support.
+ExecStart=/opt/gotrue/gotrue --config-dir /etc/auth.d
+ExecReload=/bin/kill -10 $MAINPID
+
+User=gotrue
+Restart=always
+RestartSec=3
+
+MemoryAccounting=true
+MemoryMax=50%
+
+# These are the historical location of env files. The /etc/auth.d dir will
+# override them when present.
+EnvironmentFile=-/etc/gotrue.generated.env
+EnvironmentFile=/etc/gotrue.env
+EnvironmentFile=-/etc/gotrue.overrides.env
+
+# Both v2 & v3 support reloading via signals, on linux this is SIGUSR1.
+Environment=GOTRUE_RELOADING_SIGNAL_ENABLED=true
+Environment=GOTRUE_RELOADING_SIGNAL_NUMBER=10
+
+# Both v2 & v3 disable the poller. While gotrue sets it to off by default we
+# defensively set it to false here.
+Environment=GOTRUE_RELOADING_POLLER_ENABLED=false
+
+# Determines how much idle time must pass before triggering a reload. This
+# ensures only 1 reload operation occurs during a burst of config updates.
+Environment=GOTRUE_RELOADING_GRACE_PERIOD_INTERVAL=2s
+
+{% if qemu %}
+# v3 does not use filesystem notifications for config reloads.
+Environment=GOTRUE_RELOADING_NOTIFY_ENABLED=false
+{% else %}
+# v2 currently relies on notify support, so we will enable it until both v2 / v3
+# have migrated to strictly use signals across all projects. The default is true
+# in gotrue but we will set it defensively here.
+Environment=GOTRUE_RELOADING_NOTIFY_ENABLED=true
+{% endif %}
+
+Slice=services.slice
+
+[Install]
+WantedBy=multi-user.target
+

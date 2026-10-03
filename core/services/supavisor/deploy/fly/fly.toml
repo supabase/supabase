@@ -1,0 +1,54 @@
+app = "supavisor-staging"
+kill_signal = "SIGTERM"
+kill_timeout = 5
+processes = []
+
+[deploy]
+  release_command = "/app/bin/migrate"
+
+[env]
+  DNS_POLL = "supavisor-staging.internal"
+  PHX_HOST = "supavisor-staging.fly.dev"
+  ADDR_TYPE = "inet6"  
+  PORT = "8080"
+
+[experimental]
+  auto_rollback = true
+
+[[services]]
+  http_checks = []
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+  [services.concurrency]
+    hard_limit = 16384
+    soft_limit = 16384
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
+
+[[services]]
+  internal_port = 7654
+  protocol = "tcp"
+  [services.concurrency]
+    hard_limit = 16384
+    soft_limit = 16384
+    type = "connections"
+
+  [[services.ports]]
+    port = 7654
+    protocol = "tcp"

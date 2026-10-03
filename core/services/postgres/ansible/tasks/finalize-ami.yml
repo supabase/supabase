@@ -1,0 +1,116 @@
+- name: PG logging conf
+  ansible.builtin.template:
+    dest: '/etc/postgresql/logging.conf'
+    group: 'postgres'
+    src: 'files/postgresql_config/postgresql-csvlog.conf'
+
+- name: auto_explain, pg_cron, and pg_net confs
+  ansible.builtin.template:
+    dest: "/etc/postgresql-custom/conf.d/{{ ext_item }}.conf"
+    group: 'postgres'
+    src: "files/postgresql_config/conf.d/{{ ext_item }}.conf"
+  loop:
+    - auto_explain
+    - pg_cron
+    - pg_net
+  loop_control:
+    loop_var: 'ext_item'
+
+- name: UFW - Allow SSH connections
+  community.general.ufw:
+    name: 'OpenSSH'
+    rule: 'allow'
+
+- name: UFW - Allow SSH/PostgreSQL connections
+  community.general.ufw:
+    port: '5432'
+    rule: 'allow'
+
+- name: UFW - Allow PgBouncer connections
+  community.general.ufw:
+    port: '6543'
+    rule: 'allow'
+  tags:
+    - install-pgbouncer
+
+- name: UFW - Allow HTTP/HTTPS connections
+  community.general.ufw:
+    port: "{{ port_item }}"
+    rule: 'allow'
+  loop:
+    - 'http'
+    - 'https'
+  loop_control:
+    loop_var: 'port_item'
+  tags:
+    - install-supabase-internal
+
+- name: UFW - Deny all other incoming traffic by default
+  community.general.ufw:
+    direction: 'incoming'
+    policy: 'deny'
+    state: 'enabled'
+
+- name: Move logrotate files to /etc/logrotate.d/
+  ansible.builtin.copy:
+    dest: "/etc/logrotate.d/{{ logrotate_item['file'] }}"
+    mode: '0700'
+    owner: 'root'
+    src: "files/logrotate_config/{{ logrotate_item['file'] }}"
+  loop:
+    - { file: 'logrotate-postgres.conf' }
+    - { file: 'logrotate-postgres-auth.conf' }
+    - { file: 'logrotate-postgres-csv.conf' }
+    - { file: 'logrotate-walg.conf' }
+    - { file: 'logrotate-pgbackrest.conf' }
+  loop_control:
+    loop_var: 'logrotate_item'
+
+- name: Ensure default PostgreSQL logrotate config is removed
+  ansible.builtin.file:
+    path: '/etc/logrotate.d/postgresql-common'
+    state: 'absent'
+
+- name: Disable cron access
+  copy:
+    dest: '/etc/cron.deny'
+    src: 'files/cron.deny'
+
+- name: Create logrotate.timer.d overrides dir
+  become: true
+  ansible.builtin.file:
+    group: 'root'
+    mode: '0755'
+    owner: 'root'
+    path: '/etc/systemd/system/logrotate.timer.d'
+    state: 'directory'
+
+- name: Configure logrotate.timer.d overrides
+  become: true
+  community.general.ini_file:
+    group: 'root'
+    mode: '0644'
+    no_extra_spaces: true
+    option: 'OnCalendar'
+    owner: 'root'
+    path: '/etc/systemd/system/logrotate.timer.d/override.conf'
+    section: 'Timer'
+    state: 'present'
+    value: '*:0/5'
+
+- name: Reload systemd and start logrotate timer
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+    enabled: true
+    name: 'logrotate.timer'
+    state: 'restarted'
+
+- name: import pgsodium_getkey script
+  when: stage2
+  ansible.builtin.template:
+    dest: "{{ pg_bindir }}/pgsodium_getkey.sh"
+    group: 'postgres'
+    mode: '0700'
+    owner: 'postgres'
+    src: 'files/pgsodium_getkey_readonly.sh.j2'

@@ -1,0 +1,21 @@
+Fix CMake install path
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1141,11 +1141,11 @@
+ 
+ set(prefix "${CMAKE_INSTALL_PREFIX}")
+ set(exec_prefix "\${prefix}")
+-set(bindir "\${exec_prefix}/${CMAKE_INSTALL_BINDIR}")
+-set(sbindir "\${exec_prefix}/${CMAKE_INSTALL_SBINDIR}")
+-set(libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
+-set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+-set(datarootdir "\${prefix}/${CMAKE_INSTALL_DATAROOTDIR}")
++set(bindir "${CMAKE_INSTALL_FULL_BINDIR}")
++set(sbindir "${CMAKE_INSTALL_FULL_SBINDIR}")
++set(libdir "${CMAKE_INSTALL_FULL_LIBDIR}")
++set(includedir "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
++set(datarootdir "${CMAKE_INSTALL_FULL_DATAROOTDIR}")
+ set(datadir "\${datarootdir}")
+ set(expanded_pluginsdir "${GRN_PLUGINS_DIR}")
+ set(GRN_EXPANDED_DEFAULT_DOCUMENT_ROOT "${GRN_DEFAULT_DOCUMENT_ROOT}")

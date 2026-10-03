@@ -1,0 +1,35 @@
+{
+  "typescript": {
+    "deno": true
+  },
+  "markdown": {
+    "deno": true
+  },
+  "json": {
+    "deno": true
+  },
+  "yaml": {
+    "quotes": "preferSingle"
+  },
+  "exec": {
+    "commands": [{
+      "command": "rustfmt --config imports_granularity=item",
+      "exts": ["rs"]
+    }]
+  },
+  "excludes": [
+    ".git",
+    "target",
+    "crates/base/test_cases/invalid_imports",
+    "crates/base/test_cases/ai-ort-rust-backend/**/__snapshot__",
+    "vendor/**"
+  ],
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.93.2.wasm",
+    "https://plugins.dprint.dev/json-0.19.4.wasm",
+    "https://plugins.dprint.dev/markdown-0.17.8.wasm",
+    "https://plugins.dprint.dev/toml-0.6.3.wasm",
+    "https://plugins.dprint.dev/exec-0.5.0.json@8d9972eee71fa1590e04873540421f3eda7674d0f1aae3d7c788615e7b7413d0",
+    "https://plugins.dprint.dev/g-plane/pretty_yaml-v0.5.0.wasm"
+  ]
+}

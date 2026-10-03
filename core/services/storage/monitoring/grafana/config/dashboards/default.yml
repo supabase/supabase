@@ -1,0 +1,16 @@
+apiVersion: 1
+
+providers:
+  # <string> an unique provider name. Required
+  - name: "Default Dashboard"
+    # <string> name of the dashboard folder.
+    folder: "Storage"
+    type: file
+    disableDeletion: false
+    # <int> how often Grafana will scan for changed dashboards
+    updateIntervalSeconds: 10
+    allowUiUpdates: false
+    options:
+      # <string, required> path to dashboard files on disk. Required when using the 'file' type
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true

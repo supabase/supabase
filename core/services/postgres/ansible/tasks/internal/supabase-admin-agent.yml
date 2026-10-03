@@ -1,0 +1,111 @@
+- name: supabase-admin-agent - system group
+  ansible.builtin.group:
+    name: supabase-admin-agent
+    gid: "{{ 987 if not qemu else 988 }}"
+    system: yes
+
+- name: supabase-admin-agent - system user
+  ansible.builtin.user:
+    name: supabase-admin-agent
+    uid: 990
+    group: supabase-admin-agent
+    groups: admin,salt
+    append: yes
+    system: yes
+    shell: /bin/sh
+
+- name: supabase-admin-agent - config dir
+  file:
+    path: /opt/supabase-admin-agent
+    owner: supabase-admin-agent
+    state: directory
+
+- name: supabase-admin-agent - gpg dir
+  file:
+    path: /etc/salt/gpgkeys
+    owner: root
+    group: salt
+    state: directory
+
+- name: give supabase-admin-agent user permissions
+  copy:
+    src: files/supabase_admin_agent_config/supabase-admin-agent.sudoers.conf
+    dest: /etc/sudoers.d/supabase-admin-agent
+    mode: "0440"
+
+- name: supabase-admin-agent - pgbackrest helper scripts dir
+  file:
+    path: /usr/local/lib/supabase-admin-agent
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: supabase-admin-agent - pgdata-chown script
+  copy:
+    src: files/supabase_admin_agent_config/pgdata-chown.sh
+    dest: /usr/local/lib/supabase-admin-agent/pgdata-chown
+    owner: root
+    group: root
+    # 0700: always invoked via "sudo" (as root); no other user needs execute.
+    mode: "0700"
+
+- name: supabase-admin-agent - pgdata-signal script
+  copy:
+    src: files/supabase_admin_agent_config/pgdata-signal.sh
+    dest: /usr/local/lib/supabase-admin-agent/pgdata-signal
+    owner: root
+    group: root
+    # 0755: invoked via "sudo -u postgres"; the postgres OS user needs the
+    # world-execute bit since it is neither owner nor group member.
+    mode: "0755"
+
+- name: Download supabase-admin-agent archive
+  get_url:
+    url: "{{ supabase_admin_agent_artifacts[platform]['url'] }}"
+    checksum: "{{ supabase_admin_agent_artifacts[platform]['checksum'] }}"
+    dest: "/tmp/supabase-admin-agent.tar.gz"
+    timeout: 90
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: supabase-admin-agent - unpack archive in /opt
+  unarchive:
+    remote_src: yes
+    src: /tmp/supabase-admin-agent.tar.gz
+    dest: /opt/supabase-admin-agent/
+    owner: supabase-admin-agent
+    extra_opts:
+      - --strip-components=1
+
+- name: supabase-admin-agent - create symlink
+  ansible.builtin.file:
+    path: /opt/supabase-admin-agent/supabase-admin-agent
+    src: "/opt/supabase-admin-agent/supabase-admin-agent-linux-{{ platform }}"
+    state: link
+    owner: supabase-admin-agent
+    mode: "0755"
+    force: yes
+
+- name: supabase-admin-agent - create salt systemd timer file
+  template:
+    src: files/supabase_admin_agent_config/supabase-admin-agent_salt.timer.j2
+    dest: /etc/systemd/system/supabase-admin-agent_salt.timer
+
+- name: supabase-admin-agent - create salt service file
+  template:
+    src: files/supabase_admin_agent_config/supabase-admin-agent_salt.service.j2
+    dest: /etc/systemd/system/supabase-admin-agent_salt.service
+
+- name: supabase-admin-agent - reload systemd
+  systemd:
+    daemon_reload: yes
+
+# Initially ensure supabase-admin-agent is installed but not started
+- name: supabase-admin-agent - DISABLE service
+  systemd:
+    name: supabase-admin-agent_salt
+    enabled: no
+    state: stopped

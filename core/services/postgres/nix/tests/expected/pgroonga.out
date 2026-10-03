@@ -1,0 +1,76 @@
+create schema v;
+create table v.roon(
+  id serial primary key,
+  content text
+);
+with tokenizers as (
+  select
+    x
+  from
+    jsonb_array_elements(
+      (select pgroonga_command('tokenizer_list'))::jsonb
+    ) x(val)
+  limit
+    1
+  offset
+    1 -- first record is unrelated and not stable
+)
+select
+  t.x::jsonb ->> 'name'
+from
+  jsonb_array_elements((select * from tokenizers)) t(x)
+order by
+  t.x::jsonb ->> 'name';
+                  ?column?                   
+---------------------------------------------
+ TokenBigram
+ TokenBigramIgnoreBlank
+ TokenBigramIgnoreBlankSplitSymbol
+ TokenBigramIgnoreBlankSplitSymbolAlpha
+ TokenBigramIgnoreBlankSplitSymbolAlphaDigit
+ TokenBigramSplitSymbol
+ TokenBigramSplitSymbolAlpha
+ TokenBigramSplitSymbolAlphaDigit
+ TokenDelimit
+ TokenDelimitNull
+ TokenDocumentVectorBM25
+ TokenDocumentVectorTFIDF
+ TokenMecab
+ TokenNgram
+ TokenPattern
+ TokenRegexp
+ TokenTable
+ TokenTrigram
+ TokenUnigram
+(19 rows)
+
+insert into v.roon (content)
+values
+  ('Hello World'),
+  ('PostgreSQL with PGroonga is a thing'),
+  ('This is a full-text search test'),
+  ('PGroonga supports various languages');
+-- Create default index
+create index pgroonga_index on v.roon using pgroonga (content);
+-- Create mecab tokenizer index since we had a bug with this one once
+create index pgroonga_index_mecab on v.roon using pgroonga (content) with (tokenizer='TokenMecab');
+-- Run some queries to test the index
+select * from v.roon where content &@~ 'Hello';
+ id |   content   
+----+-------------
+  1 | Hello World
+(1 row)
+
+select * from v.roon where content &@~ 'powerful';
+ id | content 
+----+---------
+(0 rows)
+
+select * from v.roon where content &@~ 'supports';
+ id |               content               
+----+-------------------------------------
+  4 | PGroonga supports various languages
+(1 row)
+
+drop schema v cascade;
+NOTICE:  drop cascades to table v.roon

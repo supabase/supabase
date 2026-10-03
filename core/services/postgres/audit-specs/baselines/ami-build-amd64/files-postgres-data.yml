@@ -1,0 +1,19 @@
+# File baseline: postgres-data
+# PostgreSQL data directory for AMI build
+# Uses string names for owner/group (not numeric IDs)
+file:
+  # PostgreSQL data directory
+  /var/lib/postgresql:
+    exists: true
+    filetype: directory
+    owner: postgres
+    group: postgres
+    mode: '0755'
+  # Note: /var/lib/postgresql/data is a symlink during AMI build (points to /data/...)
+  # The actual data directory is created at deploy time
+  /var/lib/postgresql/data:
+    exists: true
+    filetype: symlink
+    owner: root
+    group: root
+    mode: '0777'

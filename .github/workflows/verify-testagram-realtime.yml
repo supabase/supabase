@@ -1,0 +1,205 @@
+name: Verify Testagram Realtime Image
+
+on:
+  push:
+    branches:
+      - testagram/core-platform-foundation
+    paths:
+      - "core/services/realtime/**"
+      - ".github/workflows/verify-testagram-realtime.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-realtime-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-realtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout foundation branch
+        uses: actions/checkout@v4
+
+      - name: Verify Realtime source/build contract
+        shell: bash
+        working-directory: core/services/realtime
+        run: |
+          set -euo pipefail
+
+          test -s Dockerfile
+          test -s mix.exs
+          test -s mix.lock
+          test -s run.sh
+          test -d config
+          test -d lib
+          test -d priv/repo/migrations
+          test -f assets/package.json
+          test -f assets/package-lock.json
+
+          grep -Fq 'ARG ELIXIR_VERSION=' Dockerfile
+          grep -Fq 'ARG OTP_VERSION=' Dockerfile
+          grep -Fq 'ARG DEBIAN_VERSION=' Dockerfile
+          grep -Fq 'ARG PG_DELTA_COMMIT=' Dockerfile
+          grep -Fq 'COPY --from=pgdelta-builder /tmp/pgdelta.xz' Dockerfile
+          grep -Fq 'USER nobody' Dockerfile
+          grep -Fq 'ENTRYPOINT ["/usr/bin/tini", "-s", "-g", "--", "/app/run.sh"]' Dockerfile
+          grep -Fq 'CMD ["/app/bin/server"]' Dockerfile
+          ! grep -Fq 'set -x' run.sh
+
+          grep -Fq 'version: "2.' mix.exs
+          grep -Fq 'phoenix_dep()' mix.exs
+          grep -Fq ':postgrex' mix.exs
+          grep -Fq ':joken' mix.exs
+          grep -Fq ':forum, path: "./forum"' mix.exs
+
+          echo "Realtime source/build contract: GREEN"
+
+      - name: Build Realtime image
+        working-directory: core/services/realtime
+        run: |
+          set -euxo pipefail
+          docker build --pull -t testagram-realtime:${GITHUB_SHA} .
+
+      - name: Inspect Realtime image contract
+        run: |
+          set -euo pipefail
+
+          image="testagram-realtime:${GITHUB_SHA}"
+
+          user="$(docker image inspect "$image" --format '{{.Config.User}}')"
+          entrypoint="$(docker image inspect "$image" --format '{{json .Config.Entrypoint}}')"
+          cmd="$(docker image inspect "$image" --format '{{json .Config.Cmd}}')"
+
+          test "$user" = "nobody"
+          test "$entrypoint" = '["/usr/bin/tini","-s","-g","--","/app/run.sh"]'
+          test "$cmd" = '["/app/bin/server"]'
+
+          realtime_version="$(sed -nE 's/^[[:space:]]*version:[[:space:]]*\"([^\"]+)\".*/\1/p' core/services/realtime/mix.exs | head -n1)"
+          test -n "$realtime_version"
+
+          docker run --rm --entrypoint /bin/sh "$image" -ec '
+            set -eu
+            version="$1"
+            test -x /app/bin/server
+            test -x /app/bin/migrate
+            test -x /app/run.sh
+            test -x /usr/local/bin/pgdelta
+            test -s /usr/local/share/pgdelta/pgdelta.xz
+            test -d "/app/lib/realtime-${version}/priv/repo/migrations"
+            test -f "/app/releases/${version}/vm.args"
+            ! find /app -maxdepth 2 -type d -name _build | grep -q .
+            ! find /app -maxdepth 2 -type d -name .git | grep -q .
+            ! find /app -maxdepth 2 -type d -name node_modules | grep -q .
+          ' sh "$realtime_version"
+
+          echo "Realtime image metadata and contents: GREEN"
+
+      - name: Verify image history contains no runtime credentials
+        run: |
+          set -euo pipefail
+
+          image="testagram-realtime:${GITHUB_SHA}"
+          history="$(docker history --no-trunc "$image")"
+
+          if printf '%s' "$history" | grep -Eiq '(DB_PASSWORD|API_JWT_SECRET|METRICS_JWT_SECRET|SECRET_KEY_BASE)[[:space:]]*='; then
+            echo "::error::Runtime credential material found in image history"
+            printf '%s\n' "$history"
+            exit 1
+          fi
+
+          echo "Image history credential scan: GREEN"
+
+      - name: Start isolated PostgreSQL
+        run: |
+          set -euo pipefail
+
+          docker network create realtime-ci
+
+          docker run -d --name realtime-postgres --network realtime-ci \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_DB=postgres \
+            postgres:17.6-alpine
+
+          for i in {1..60}; do
+            if docker exec realtime-postgres pg_isready -U postgres -d postgres >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker logs realtime-postgres
+          exit 1
+
+      - name: Run Realtime migration and startup smoke test
+        run: |
+          set -euo pipefail
+
+          image="testagram-realtime:${GITHUB_SHA}"
+
+          docker run -d --name realtime-smoke --network realtime-ci \
+            -e APP_NAME=testagram-realtime \
+            -e DB_HOST=realtime-postgres \
+            -e DB_PORT=5432 \
+            -e DB_NAME=postgres \
+            -e DB_USER=postgres \
+            -e DB_PASSWORD=postgres \
+            -e API_JWT_SECRET=01234567890123456789012345678901 \
+            -e JWT_CLAIM_VALIDATORS='{}' \
+            -e METRICS_JWT_SECRET=01234567890123456789012345678901 \
+            -e SECRET_KEY_BASE=01234567890123456789012345678901234567890123456789012345678901 \
+            -e REGION=local \
+            -e LOG_LEVEL=info \
+            -e PORT=4000 \
+            -p 4000:4000 \
+            "$image"
+
+          for i in {1..90}; do
+            if curl -fsS http://127.0.0.1:4000/healthcheck >/tmp/realtime-health.txt 2>/dev/null; then
+              cat /tmp/realtime-health.txt
+              exit 0
+            fi
+
+            if ! docker inspect -f '{{.State.Running}}' realtime-smoke 2>/dev/null | grep -q true; then
+              echo "::error::Realtime container exited before healthcheck became ready"
+              docker logs realtime-smoke || true
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          echo "::error::Realtime healthcheck did not become ready"
+          docker logs realtime-smoke || true
+          exit 1
+
+      - name: Verify runtime identity and migration state
+        run: |
+          set -euo pipefail
+
+          test "$(docker exec realtime-smoke id -un)" = "nobody"
+
+          migration_files="$(find core/services/realtime/priv/repo/migrations -maxdepth 1 -type f -name '*.exs' ! -name '.*' | wc -l | tr -d ' ')"
+          migration_rows="$(docker exec realtime-postgres psql -U postgres -d postgres -At -v ON_ERROR_STOP=1 -c \
+            "select count(*) from public.schema_migrations;" | tr -d '[:space:]')"
+
+          echo "Migration files: $migration_files; migration ledger rows: $migration_rows"
+          test "$migration_rows" -eq "$migration_files"
+
+          unauthenticated_status="$(curl -sS -o /dev/null -w '%{http_code}' http://127.0.0.1:4000/api/tenants)"
+          test "$unauthenticated_status" = "403"
+
+          echo "Runtime identity, migration ledger, and protected API contract: GREEN"
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker logs realtime-smoke 2>/dev/null || true
+          docker logs realtime-postgres 2>/dev/null || true
+          docker rm -f realtime-smoke realtime-postgres 2>/dev/null || true
+          docker network rm realtime-ci 2>/dev/null || true

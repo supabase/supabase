@@ -1,0 +1,51 @@
+name: supavisor-jit
+
+services:
+  builder:
+    build:
+      context: ./priv/jit
+      dockerfile: Dockerfile.builder
+      target: builder
+    volumes:
+      - jitlib:/out
+    command: ["true"]
+
+  db:
+    build:
+      context: ./priv/jit/postgres
+      dockerfile: Dockerfile
+    depends_on:
+      - builder
+    volumes:
+      - jitlib:/usr/lib/security/
+      - ./priv/jit/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+      - ./priv/jit/pam.d/postgresql:/etc/pam.d/postgres
+      - ./priv/jit/pam.d/postgresql:/etc/pam.d/postgresql
+      - ./priv/jit/postgres/certs/server.crt:/tmp/server.crt
+      - ./priv/jit/postgres/certs/server.key:/tmp/server.key
+      - ./priv/jit/postgres/certs/ca.crt:/tmp/ca.crt
+      - ./priv/jit/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: postgres
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      POSTGRES_PASSWORD: postgres
+      PAM_MODULE_PATH: /usr/lib/security/pam_jit_pg.so
+    ports:
+      - "7543:5432"
+    networks:
+      - appnet
+
+  api:
+    build:
+      context: ./priv/jit/jit_api_service
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - appnet
+
+volumes:
+  jitlib:
+
+networks:
+  appnet:

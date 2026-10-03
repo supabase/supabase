@@ -1,0 +1,16 @@
+#cloud-config
+users:
+  - name: root
+    lock_passwd: false
+    ssh_redirect_user: true
+    hashed_passwd: "$6$canonical.$0zWaW71A9ke9ASsaOcFTdQ2tx1gSmLxMPrsH0rF0Yb.2AEKNPV1lrF94n6YuPJmnUy2K2/JSDtxuiBDey6Lpa/"
+  - name: ubuntu
+    lock_passwd: false
+    hashed_passwd: "$6$canonical.$0zWaW71A9ke9ASsaOcFTdQ2tx1gSmLxMPrsH0rF0Yb.2AEKNPV1lrF94n6YuPJmnUy2K2/JSDtxuiBDey6Lpa/"
+    ssh_redired_user: false
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    shell: /usr/bin/bash
+    groups: [adm, audio, cdrom, dialout, dip, floppy, lxd, netdev, plugdev, sudo, video]
+ssh_pwauth: True
+disable_root: false
+preserve_hostname: true

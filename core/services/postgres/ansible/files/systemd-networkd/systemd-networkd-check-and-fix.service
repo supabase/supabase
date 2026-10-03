@@ -1,0 +1,12 @@
+[Unit]
+Description=Check if systemd-networkd has broken NDisc routes and fix
+# Remove Requisite to prevent being killed when restarting networkd
+Requisite=systemd-networkd.service
+After=systemd-networkd.service
+
+[Service]
+Type=oneshot
+# This needs to be root for the service restart to work
+User=root
+Group=root
+ExecStart=/usr/local/bin/systemd-networkd-check-and-fix.sh

@@ -1,0 +1,109 @@
+# Package baseline for AMI build
+# Only checks that critical packages are installed - no version checks
+# Version drift is expected between builds
+package:
+  # Core system
+  bash:
+    installed: true
+  coreutils:
+    installed: true
+  systemd:
+    installed: true
+  systemd-sysv:
+    installed: true
+  apt:
+    installed: true
+  dpkg:
+    installed: true
+
+  # Security
+  apparmor:
+    installed: true
+  apparmor-utils:
+    installed: true
+  auditd:
+    installed: true
+  fail2ban:
+    installed: true
+  ufw:
+    installed: true
+  nftables:
+    installed: true
+  ca-certificates:
+    installed: true
+  openssl:
+    installed: true
+
+  # Networking
+  openssh-server:
+    installed: true
+  curl:
+    installed: true
+  wget:
+    installed: true
+  iproute2:
+    installed: true
+
+  # Cloud
+  cloud-init:
+    installed: true
+  cloud-guest-utils:
+    installed: true
+  ec2-instance-connect:
+    installed: true
+  amazon-ec2-utils:
+    installed: true
+
+  # PostgreSQL ecosystem (installed via nix, but system deps needed)
+  libpq5:
+    installed: true
+
+  # Supabase components
+  vector:
+    installed: true
+
+  # Build/runtime dependencies
+  locales:
+    installed: true
+  acl:
+    installed: true
+  sudo:
+    installed: true
+  logrotate:
+    installed: true
+  sysstat:
+    installed: true
+  acpid:
+    installed: true
+  at:
+    installed: true
+  cron:
+    installed: true
+
+  # Grub/boot
+  grub-common:
+    installed: true
+  grub-efi-arm64:
+    installed: true
+  efibootmgr:
+    installed: true
+  initramfs-tools:
+    installed: true
+
+  # Filesystem
+  e2fsprogs:
+    installed: true
+  gdisk:
+    installed: true
+
+  # Python (needed for ansible and scripts)
+  python3:
+    installed: true
+
+  # Compression
+  gzip:
+    installed: true
+  bzip2:
+    installed: true
+  xz-utils:
+    installed: true

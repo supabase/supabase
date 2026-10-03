@@ -1,0 +1,1 @@
+ALTER TABLE storage.migrations ENABLE ROW LEVEL SECURITY;

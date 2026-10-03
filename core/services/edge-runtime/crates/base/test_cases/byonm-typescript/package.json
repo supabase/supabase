@@ -1,0 +1,11 @@
+{
+  "workspaces": [],
+  "main": "meow.ts",
+  "dependencies": {
+    "is-odd": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/is-odd": "^3.0.4",
+    "@types/node": "^24.10.0"
+  }
+}

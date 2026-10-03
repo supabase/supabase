@@ -1,0 +1,23 @@
+{
+  "name": "realtime-check",
+  "version": "0.0.1",
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/context-async-hooks": "^2.7.1",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
+    "@opentelemetry/resources": "^2.7.1",
+    "@opentelemetry/sdk-trace-base": "^2.7.1",
+    "@opentelemetry/semantic-conventions": "^1.41.1",
+    "@supabase/supabase-js": "2.114.0",
+    "commander": "^14.0.3",
+    "kleur": "^4.1.5"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "scripts": {
+    "check": "bun run realtime-check.ts --",
+    "build": "bun build --compile --minify-syntax --minify-whitespace --minify-identifiers realtime-check.ts --outfile realtime-check",
+    "nix": "bash nix-build.sh"
+  }
+}

@@ -1,0 +1,277 @@
+name: Elixir tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
+  LANG: C.UTF-8
+  LC_ALL: C.UTF-8
+  MIX_ENV: test
+
+jobs:
+  deps:
+    name: Fetch deps
+    runs-on: u22-arm-runner
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Elixir
+        id: beam
+        uses: erlef/setup-beam@ee09b1e59bb240681c382eb1f0abc6a04af72764 # v1.23.0
+        with:
+          otp-version: '27.3.4'
+          elixir-version: '1.18.2'
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+      - name: Install dependencies
+        run: mix deps.get --check-locked
+
+  format:
+    name: Formatting checks
+    runs-on: u22-arm-runner
+    needs: [deps]
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Elixir
+        id: beam
+        uses: erlef/setup-beam@ee09b1e59bb240681c382eb1f0abc6a04af72764 # v1.23.0
+        with:
+          otp-version: '27.3.4'
+          elixir-version: '1.18.2'
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Run format check
+        run: mix format --check-formatted
+
+  credo:
+    name: Code style
+    runs-on: u22-arm-runner
+    needs: [deps]
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Elixir
+        id: beam
+        uses: erlef/setup-beam@ee09b1e59bb240681c382eb1f0abc6a04af72764 # v1.23.0
+        with:
+          otp-version: '27.3.4'
+          elixir-version: '1.18.2'
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Compile deps
+        run: mix deps.compile
+      - name: Credo checks
+        run: mix credo --strict --all --mute-exit-status --format=sarif > results.sarif
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@ebcb5b36ded6beda4ceefea6a8bc4cc885255bb3 # v3.34.1
+        with:
+          sarif_file: results.sarif
+          category: credo
+
+  tests:
+    name: Run tests
+    runs-on: u22-arm-runner
+    needs: [deps]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Postgres
+        run: docker-compose -f ./docker-compose.db.yml up -d
+      - name: Setup Elixir
+        id: beam
+        uses: erlef/setup-beam@ee09b1e59bb240681c382eb1f0abc6a04af72764 # v1.23.0
+        with:
+          otp-version: '27.3.4'
+          elixir-version: '1.18.2'
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: stable
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Cache native
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            _build/${{ env.MIX_ENV }}/lib/supavisor/native
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-build-native-${{ hashFiles(format('{0}{1}', github.workspace, '/native/**/Cargo.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-build-native-
+      - name: Compile deps
+        run: mix deps.compile
+      - name: Compile
+        run: mix compile
+      - name: Start epmd
+        run: epmd -daemon
+      - name: Run tests
+        run: mix coveralls.lcov
+      - name: Upload Parallel Coverage Report
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          flag-name: run-tests
+          parallel: true
+
+  integration:
+    name: Run integration tests
+    runs-on: u22-arm-runner
+    needs: [deps]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Postgres
+        run: docker-compose -f ./docker-compose.db.yml up -d
+      - name: Setup Elixir
+        id: beam
+        uses: erlef/setup-beam@ee09b1e59bb240681c382eb1f0abc6a04af72764 # v1.23.0
+        with:
+          otp-version: '27.3.4'
+          elixir-version: '1.18.2'
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: 'lts/*'
+          cache-dependency-path: 'test/integration/js/'
+      - uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282 # v2.0.4
+        with:
+          deno-version: 'v2.x'
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: '1.3.6'
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: stable
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Cache native
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            _build/${{ env.MIX_ENV }}/lib/supavisor/native
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-build-native-${{ hashFiles(format('{0}{1}', github.workspace, '/native/**/Cargo.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-build-native-
+      - name: Compile deps
+        run: mix deps.compile
+      - name: Compile
+        run: mix compile
+      - name: Start epmd
+        run: epmd -daemon
+      - name: Install Node dependencies
+        run: 'cd test/integration/js/; npm install'
+      - name: Ensure psql client
+        run: |
+          if ! command -v psql >/dev/null; then
+            echo "Installing psql client"
+            sudo apt-get update -qq
+            sudo apt-get install -qq -y postgresql-client
+          fi
+      - name: Run tests
+        run: mix coveralls.lcov --only integration --trace
+      - name: Upload Parallel Coverage Report
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          flag-name: run-integration
+          parallel: true
+
+  finish:
+    needs: [tests, integration]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close parallel build
+        uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+        with:
+          parallel-finished: true
+          carryforward: "run-tests,run-integration"
+
+  dialyzer:
+    name: Dialyze
+    runs-on: u22-arm-runner
+    needs: [deps]
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Setup Elixir
+        id: beam
+        uses: erlef/setup-beam@ee09b1e59bb240681c382eb1f0abc6a04af72764 # v1.23.0
+        with:
+          otp-version: '27.3.4'
+          elixir-version: '1.18.2'
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # v1
+        with:
+          toolchain: stable
+      - name: Cache Mix
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Cache native
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            _build/${{ env.MIX_ENV }}/lib/supavisor/native
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-build-native-${{ hashFiles(format('{0}{1}', github.workspace, '/native/**/Cargo.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-build-native-
+      - name: Compile deps
+        run: mix deps.compile
+      - name: Compile
+        run: mix compile
+      - name: Retrieve PLT Cache
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        id: plt-cache
+        with:
+          path: _build/${{ env.MIX_ENV }}/*.plt
+          key: ${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-plts-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-plts-
+
+      - name: Create PLTs
+        if: steps.plt-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p priv/plts
+          mix dialyzer.build
+      - name: Run dialyzer
+        run: mix dialyzer

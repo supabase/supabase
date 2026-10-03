@@ -1,0 +1,6 @@
+services:
+  tenant_db:
+    build:
+      context: .
+      dockerfile: .docker/orioledb-pgvector.Dockerfile
+    image: supabase-storage-orioledb-pgvector:pg17-local

@@ -1,0 +1,43 @@
+[package]
+name = "ext_ai"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+deno_core.workspace = true
+
+base_rt.workspace = true
+ext_ai_v8_utilities.workspace = true
+
+anyhow.workspace = true
+clap = { workspace = true, features = ["derive"] }
+ctor.workspace = true
+faster-hex.workspace = true
+futures.workspace = true
+futures-util = { workspace = true, features = ["io"] }
+fxhash.workspace = true
+log.workspace = true
+once_cell.workspace = true
+reqwest.workspace = true
+scopeguard.workspace = true
+serde.workspace = true
+tokio.workspace = true
+tokio-util = { workspace = true, features = ["compat"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true
+xxhash-rust = { workspace = true, features = ["std", "xxh3"] }
+
+blas-src = { version = "0.8", features = ['openblas'] }
+convert_case = "0.6"
+ndarray = { version = "0.16", features = ['blas'] }
+openblas-src = { version = "0.10", features = ['cblas', 'system'] }
+rand = "0.8"
+tokenizers = { version = ">=0.13.4", default-features = false, features = ["onig"] }
+
+ort = { version = "=2.0.0-rc.9", default-features = false, features = ["ndarray", "half", "load-dynamic", "cuda"] }
+ort-sys = "=2.0.0-rc.9"

@@ -1,0 +1,50 @@
+# AWS CLI install bundle: AWS CLI + amazon-ec2-utils.
+#
+# Used by downstream tasks under setup-supabase-internal.yml that fetch
+# binaries from S3. Container builds (supabox) skip this entire file by
+# not importing it.
+#
+# ec2-instance-connect is installed separately in playbook.yml (AWS-only).
+
+- name: AWS CLI dep
+  ansible.builtin.apt:
+    install_recommends: false
+    pkg:
+      - jq
+      - unzip
+  register: apt_result
+  until: apt_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: AWS CLI - get
+  ansible.builtin.get_url:
+    url: "{{ aws_cli_artifacts[platform]['url'] }}"
+    checksum: "{{ aws_cli_artifacts[platform]['checksum'] }}"
+    dest: '/tmp/awscliv2.zip'
+    timeout: 60
+  register: download_result
+  until: download_result is succeeded
+  retries: 3
+  delay: 2
+
+- name: AWS CLI - expand
+  ansible.builtin.unarchive:
+    dest: '/tmp'
+    remote_src: true
+    src: '/tmp/awscliv2.zip'
+
+- name: AWS CLI - install
+  ansible.builtin.command:
+    cmd: /tmp/aws/install --update
+  become: true
+
+- name: install utilities to manage Amazon EC2 instance storage
+  ansible.builtin.apt:
+    pkg:
+      - amazon-ec2-utils
+  become: true
+
+- name: AWS CLI - configure ipv6 support for s3
+  ansible.builtin.command:
+    cmd: aws configure set default.s3.use_dualstack_endpoint true

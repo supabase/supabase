@@ -1,0 +1,36 @@
+name: Setup Node dependencies
+description: Restore npm cache, set up Node and npm, and install dependencies
+
+inputs:
+  node-version:
+    description: Node.js version passed to the Node setup action
+    default: "24"
+  cache:
+    description: Restore the npm cache before installing dependencies
+    default: "true"
+  firewall-token:
+    description: Auth token for the DepthFirst dependency firewall npm registry; only pass this where the secret is guaranteed available (no pull_request trigger)
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Restore npm cache
+      if: ${{ inputs.cache == 'true' }}
+      uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ inputs.node-version }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ inputs.node-version }}-
+          ${{ runner.os }}-node-
+
+    - name: Set up Node and npm
+      uses: ./.github/actions/setup-node-npm
+      with:
+        node-version: ${{ inputs.node-version }}
+        firewall-token: ${{ inputs.firewall-token }}
+
+    - name: Install dependencies
+      shell: bash
+      run: npm ci

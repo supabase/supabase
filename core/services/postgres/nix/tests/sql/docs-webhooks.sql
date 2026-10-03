@@ -1,0 +1,262 @@
+-- testing sql found in https://supabase.com/docs/guides/database/webhooks
+
+create table profiles (
+  id serial primary key,
+  name text,
+  email text,
+  created_at timestamp default now()
+);
+
+create table webhook_logs (
+  id serial primary key,
+  webhook_name text,
+  event_type text,
+  table_name text,
+  schema_name text,
+  record_data jsonb,
+  old_record_data jsonb,
+  created_at timestamp default now()
+);
+
+create function webhook_handler()
+returns trigger
+language plpgsql
+as $$
+declare
+  payload jsonb;
+begin
+  if tg_op = 'INSERT' then
+    payload := jsonb_build_object(
+      'type', 'INSERT',
+      'table', tg_table_name,
+      'schema', tg_table_schema,
+      'record', to_jsonb(new),
+      'old_record', null
+    );
+  elsif tg_op = 'UPDATE' then
+    payload := jsonb_build_object(
+      'type', 'UPDATE',
+      'table', tg_table_name,
+      'schema', tg_table_schema,
+      'record', to_jsonb(new),
+      'old_record', to_jsonb(old)
+    );
+  elsif tg_op = 'DELETE' then
+    payload := jsonb_build_object(
+      'type', 'DELETE',
+      'table', tg_table_name,
+      'schema', tg_table_schema,
+      'record', null,
+      'old_record', to_jsonb(old)
+    );
+  end if;
+
+  insert into webhook_logs(webhook_name, event_type, table_name, schema_name, record_data, old_record_data)
+  values (tg_name, tg_op, tg_table_name, tg_table_schema, payload->'record', payload->'old_record');
+
+  return coalesce(new, old);
+end;
+$$;
+
+create trigger insert_webhook
+after insert on profiles
+for each row
+execute function webhook_handler();
+
+create trigger update_webhook
+after update on profiles
+for each row
+execute function webhook_handler();
+
+create trigger delete_webhook
+after delete on profiles
+for each row
+execute function webhook_handler();
+
+insert into profiles (name, email) values ('John Doe', 'john@example.com');
+insert into profiles (name, email) values ('Jane Smith', 'jane@example.com');
+
+select id, webhook_name, event_type, table_name, schema_name, record_data - 'created_at' from webhook_logs where event_type = 'INSERT';
+
+update profiles set email = 'john.doe@example.com' where name = 'John Doe';
+
+select id, webhook_name, event_type, table_name, schema_name, record_data - 'created_at', old_record_data - 'created_at' from webhook_logs where event_type = 'UPDATE';
+
+delete from profiles where name = 'Jane Smith';
+
+select id, webhook_name, event_type, table_name, schema_name, old_record_data - 'created_at' from webhook_logs where event_type = 'DELETE';
+
+create table orders (
+  id serial primary key,
+  customer_id integer,
+  amount numeric,
+  status text
+);
+
+create table webhook_requests (
+  id serial primary key,
+  webhook_name text,
+  url text,
+  method text,
+  headers jsonb,
+  payload jsonb,
+  response_status integer,
+  response_data jsonb,
+  created_at timestamp default now()
+);
+
+create function mock_http_response(url text)
+returns table(status integer, body jsonb)
+language plpgsql
+as $$
+begin
+  if url like '%dummyjson.com/products/1%' then
+    return query select 200, '{"id": 1, "title": "Essence Mascara Lash Princess", "price": 9.99, "category": "beauty"}'::jsonb;
+  elsif url like '%dummyjson.com/products/2%' then
+    return query select 200, '{"id": 2, "title": "Eyeshadow Palette with Mirror", "price": 19.99, "category": "beauty"}'::jsonb;
+  else
+    return query select 404, '{"error": "Product not found"}'::jsonb;
+  end if;
+end;
+$$;
+
+create function http_webhook_handler()
+returns trigger
+language plpgsql
+as $$
+declare
+  response_code integer;
+  response_body jsonb;
+begin
+  select status, body into response_code, response_body
+  from mock_http_response('https://dummyjson.com/products/1');
+  
+  insert into webhook_requests(webhook_name, url, method, headers, payload, response_status, response_data)
+  values (
+    'orders_webhook',
+    'https://dummyjson.com/products/1',
+    'GET',
+    '{"Content-Type": "application/json"}'::jsonb,
+    jsonb_build_object(
+      'type', tg_op,
+      'table', tg_table_name,
+      'schema', tg_table_schema,
+      'record', to_jsonb(new),
+      'old_record', to_jsonb(old)
+    ),
+    response_code,
+    response_body
+  );
+  
+  return coalesce(new, old);
+end;
+$$;
+
+create trigger http_webhook
+after insert or update or delete on orders
+for each row
+execute function http_webhook_handler();
+
+insert into orders (customer_id, amount, status) values (1, 100.50, 'pending');
+insert into orders (customer_id, amount, status) values (2, 250.75, 'completed');
+
+select id, webhook_name, url, method, response_status, response_data from webhook_requests;
+
+create table webhook_config (
+  id serial primary key,
+  webhook_name text,
+  url text,
+  method text default 'GET',
+  headers jsonb default '{"Content-Type": "application/json"}'::jsonb,
+  timeout_ms integer default 1000
+);
+
+insert into webhook_config (webhook_name, url, method, headers, timeout_ms) 
+values ('product_webhook', 'https://dummyjson.com/products/2', 'GET', '{"Content-Type": "application/json"}'::jsonb, 5000);
+
+create function configurable_webhook_handler()
+returns trigger
+language plpgsql
+as $$
+declare
+  config webhook_config%rowtype;
+  payload jsonb;
+  response_code integer;
+  response_body jsonb;
+begin
+  select * into config from webhook_config where webhook_name = 'product_webhook' limit 1;
+  
+  if config.id is null then
+    raise exception 'Webhook configuration not found';
+  end if;
+
+  payload := jsonb_build_object(
+    'type', tg_op,
+    'table', tg_table_name,
+    'schema', tg_table_schema,
+    'record', to_jsonb(new),
+    'old_record', to_jsonb(old)
+  );
+
+  select status, body into response_code, response_body
+  from mock_http_response(config.url);
+
+  insert into webhook_requests(webhook_name, url, method, headers, payload, response_status, response_data)
+  values (config.webhook_name, config.url, config.method, config.headers, payload, response_code, response_body);
+
+  if response_code != 200 then
+    raise exception 'Configurable webhook failed with status: %', response_code;
+  end if;
+
+  return coalesce(new, old);
+end;
+$$;
+
+create trigger product_webhook
+after insert on profiles
+for each row
+execute function configurable_webhook_handler();
+
+insert into profiles (name, email) values ('Alice Johnson', 'alice@example.com');
+
+select id, webhook_name, url, method, response_status, response_data from webhook_requests where webhook_name = 'product_webhook';
+
+create function get_webhook_logs()
+returns table (
+  webhook_name text,
+  event_type text,
+  table_name text,
+  record_count bigint
+)
+language sql
+as $$
+  select 
+    webhook_name,
+    event_type,
+    table_name,
+    count(*) as record_count
+  from webhook_logs
+  group by webhook_name, event_type, table_name
+  order by webhook_name, event_type;
+$$;
+
+select * from get_webhook_logs();
+
+drop trigger product_webhook on profiles;
+drop trigger http_webhook on orders;
+drop trigger delete_webhook on profiles;
+drop trigger update_webhook on profiles;
+drop trigger insert_webhook on profiles;
+
+drop function configurable_webhook_handler();
+drop function http_webhook_handler();
+drop function mock_http_response(text);
+drop function get_webhook_logs();
+drop function webhook_handler();
+
+drop table webhook_config;
+drop table webhook_requests;
+drop table webhook_logs;
+drop table orders;
+drop table profiles;
+ 

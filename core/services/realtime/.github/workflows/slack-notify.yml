@@ -1,0 +1,129 @@
+name: Reusable Slack Notification
+
+on:
+  workflow_call:
+    inputs:
+      title:
+        description: 'Short title (e.g., Hex Audit, Deploy)'
+        required: true
+        type: string
+      status:
+        description: 'Status for the notification (success|failure|info|partial)'
+        required: false
+        default: 'info'
+        type: string
+      details:
+        description: 'Optional extra text (e.g. a failure snippet) appended as a code block'
+        required: false
+        default: ''
+        type: string
+      details_blocks:
+        description: 'Optional pre-built Slack Block Kit blocks (JSON array), spliced in as-is instead of the details code block'
+        required: false
+        default: '[]'
+        type: string
+    secrets:
+      SLACK_WEBHOOK_URL:
+        description: 'Webhook to post to - caller decides which one'
+        required: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack notification
+        env:
+          TITLE: ${{ inputs.title }}
+          STATUS: ${{ inputs.status }}
+          DETAILS: ${{ inputs.details }}
+          DETAILS_BLOCKS: ${{ inputs.details_blocks }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_WORKFLOW: ${{ github.workflow }}
+          GITHUB_REFNAME: ${{ github.ref_name }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          STATUS_ICON=""
+          STATUS_PREFIX=""
+          case "$STATUS" in
+            success)
+              STATUS_ICON="✅";
+              STATUS_PREFIX="succeeded";
+              ;;
+            failure)
+              STATUS_ICON="❌";
+              STATUS_PREFIX="failed";
+              ;;
+            partial)
+              STATUS_ICON="⚠️";
+              STATUS_PREFIX="";
+              ;;
+            *)
+              STATUS_ICON="ℹ️";
+              STATUS_PREFIX="update";
+              ;;
+          esac
+          TITLE_SUFFIX=""
+          if [ -n "$STATUS_PREFIX" ]; then
+            TITLE_SUFFIX=" ${STATUS_PREFIX}"
+          fi
+
+          # DETAILS may contain stack traces with quotes/backslashes/newlines,
+          # so build the payload with jq rather than raw string interpolation.
+          TRUNCATED_DETAILS="$(printf '%s' "$DETAILS" | head -c 3000)"
+
+          # DETAILS_BLOCKS lets a caller pass pre-built Block Kit blocks (e.g. one block per
+          # entry, each with its own truncation budget) instead of one opaque code-fenced
+          # string. Fall back to [] if empty/not a JSON array, so a malformed input can't break
+          # the whole notification.
+          DETAILS_BLOCKS_JSON="$(printf '%s' "$DETAILS_BLOCKS" | jq -c 'if type == "array" then . else [] end' 2>/dev/null || echo '[]')"
+
+          payload=$(jq -n \
+            --arg text "${STATUS_ICON} ${TITLE}${TITLE_SUFFIX} in ${GITHUB_REPO}" \
+            --arg header_text "${STATUS_ICON} ${TITLE}${TITLE_SUFFIX}" \
+            --arg repo "$GITHUB_REPO" \
+            --arg workflow "$GITHUB_WORKFLOW" \
+            --arg ref "$GITHUB_REFNAME" \
+            --arg actor "$GITHUB_ACTOR" \
+            --arg run_url "https://github.com/${GITHUB_REPO}/actions/runs/${GITHUB_RUN_ID}" \
+            --arg commit_url "https://github.com/${GITHUB_REPO}/commit/${GITHUB_SHA}" \
+            --arg sha "$GITHUB_SHA" \
+            --arg details "$TRUNCATED_DETAILS" \
+            --argjson details_blocks "$DETAILS_BLOCKS_JSON" \
+            '{
+              text: $text,
+              blocks: (
+                [
+                  { type: "header", text: { type: "plain_text", text: $header_text, emoji: true } },
+                  { type: "section", fields: [
+                    { type: "mrkdwn", text: "*Repository*\n\($repo)" },
+                    { type: "mrkdwn", text: "*Workflow*\n\($workflow)" },
+                    { type: "mrkdwn", text: "*Ref*\n\($ref)" },
+                    { type: "mrkdwn", text: "*Actor*\n\($actor)" }
+                  ] }
+                ]
+                + (if ($details_blocks | length) > 0 then
+                    $details_blocks
+                  elif ($details | length) > 0 then
+                    [{ type: "section", text: { type: "mrkdwn", text: "```\($details)```" } }]
+                  else [] end)
+                + [
+                  { type: "actions", elements: [
+                    { type: "button", text: { type: "plain_text", text: "View Run" }, url: $run_url },
+                    { type: "button", text: { type: "plain_text", text: "View Commit" }, url: $commit_url }
+                  ] },
+                  { type: "context", elements: [ { type: "mrkdwn", text: "Commit: \($sha)" } ] }
+                ]
+              )
+            }')
+
+          # Check delivery explicitly, there is a history of access being removed and silent failures.
+          http_status=$(curl -sS -o /tmp/slack_response.txt -w "%{http_code}" \
+            -X POST -H 'Content-type: application/json' --data "$payload" "$SLACK_WEBHOOK_URL")
+          cat /tmp/slack_response.txt
+          if [ "$http_status" -ne 200 ]; then
+            echo "Slack notification failed with HTTP $http_status — webhook may be dead/rotated"
+            exit 1
+          fi

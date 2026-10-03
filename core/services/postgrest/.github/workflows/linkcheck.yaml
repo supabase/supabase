@@ -1,0 +1,47 @@
+name: Linkcheck
+
+on:
+  schedule:
+    - cron: '1 2 * * 3'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  linkcheck:
+    name: Linkcheck
+    runs-on: ubuntu-26.04
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Setup Nix Environment
+      uses: ./.github/actions/setup-nix
+      with:
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+        tools: docs.linkcheck.bin
+
+    - name: Run Linkcheck
+      id: linkcheck
+      run: postgrest-docs-linkcheck
+
+    # This actions creates the github token using the postgrest app secrets
+    - name: Create Github App Token (Runs only on linkcheck failure)
+      id: app-token
+      if: ${{ failure() && steps.linkcheck.outcome == 'failure' }} # only create the token on linkcheck failure
+      uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      with:
+        client-id: ${{ vars.POSTGREST_CI_APP_ID }}
+        private-key: ${{ secrets.POSTGREST_CI_PRIVATE_KEY }}
+        permission-issues: write # required for commenting on issues
+
+    - name: Notify on linkcheck failure by commenting on GH Issue 4106
+      if: ${{ failure() && steps.linkcheck.outcome == 'failure' }}
+      uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
+      with:
+        token: ${{ steps.app-token.outputs.token }}
+        issue-number: 4106
+        body: |
+          **Linkcheck Job Failed!**
+
+          A broken link was detected in the docs. Please check the [failed run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.

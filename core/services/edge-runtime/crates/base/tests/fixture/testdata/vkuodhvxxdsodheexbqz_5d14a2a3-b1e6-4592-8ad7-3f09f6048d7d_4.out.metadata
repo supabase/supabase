@@ -1,0 +1,4 @@
+{
+    "entrypoint": "file:///Users/lakshanperera/workspace/mikey/supabase/functions/insert-lesson/index.ts",
+    "importMap": "file:///Users/lakshanperera/workspace/mikey/supabase/functions/import_map.json"
+}

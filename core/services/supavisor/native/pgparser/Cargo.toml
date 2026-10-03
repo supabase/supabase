@@ -1,0 +1,13 @@
+[package]
+name = "pgparser"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "pgparser"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+rustler = "0.36.1"
+pg_query = "6.1.0"

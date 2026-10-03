@@ -1,0 +1,9 @@
+target/
+k6/
+examples/
+assets/
+.vscode/
+.github/
+
+scripts/*
+!scripts/install_onnx.sh

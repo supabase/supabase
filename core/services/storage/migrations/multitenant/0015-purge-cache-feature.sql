@@ -1,0 +1,1 @@
+ALTER TABLE tenants ADD COLUMN feature_purge_cache boolean DEFAULT false NOT NULL;

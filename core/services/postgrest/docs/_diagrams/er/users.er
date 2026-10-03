@@ -1,0 +1,18 @@
+# Build using: -e ortho
+
+entity {font: "FreeSans"}
+relationship {font: "FreeMono"}
+
+[Users]
+*id
+first_name
+last_name
+username
+
+[Subscriptions]
+*+subscriber_id
+*+subscribed_id
+type
+
+Users 1--* Subscriptions
+Subscriptions *--1 Users

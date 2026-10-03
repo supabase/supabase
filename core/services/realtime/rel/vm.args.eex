@@ -1,0 +1,22 @@
+## Customize flags given to the VM: http://erlang.org/doc/man/erl.html
+## -mode/-name/-sname/-setcookie are configured via env vars, do not set them here
+
+## Number of dirty schedulers doing IO work (file, sockets, and others)
+##+SDio 5
+
+## Increase number of concurrent ports/sockets
+##+Q 65536
+
+## Tweak GC to run more often
+##-env ERL_FULLSWEEP_AFTER 10
+
+## Limit process heap for all procs to 1000 MB. The number here is the number of words
++hmax <%= div(1_000_000_000, :erlang.system_info(:wordsize)) %>
+
+## Set distribution buffer busy limit (default is 1024)
++zdbbl 100000
+
+## Disable Busy Wait
++sbwt none
++sbwtdio none
++sbwtdcpu none

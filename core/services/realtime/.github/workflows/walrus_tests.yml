@@ -1,0 +1,107 @@
+name: WALRUS Tests
+
+# pg_regress suite inherited from the retired supabase/walrus repo. It exercises
+# realtime.apply_rls / subscription_check_filters end-to-end over a real logical
+# replication slot, against the tenant schema we actually ship, either from migrations
+# or loading dumps.
+on:
+  pull_request:
+    paths:
+      - "test/walrus/**"
+      - "priv/repo/tenant_db_dump_*.sql"
+      - "lib/realtime/tenants/migrations.ex"
+      - "lib/realtime/tenants/repo/migrations/**"
+      - "compose.walrus-db.yml"
+      - "dev/postgres/**"
+      - "dev/scripts/migrate_tenant_db.exs"
+      - "mix.exs"
+      - "mix.lock"
+      - ".github/workflows/walrus_tests.yml"
+
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  walrus:
+    name: WALRUS regress (${{ matrix.postgres }}, ${{ matrix.mode }})
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - postgres: pg15
+            postgres_image: supabase/postgres:15.14.1.167
+            mode: dump
+          - postgres: pg15
+            postgres_image: supabase/postgres:15.14.1.167
+            mode: migrations
+          - postgres: pg17
+            postgres_image: supabase/postgres:17.6.1.166
+            mode: dump
+          - postgres: pg17
+            postgres_image: supabase/postgres:17.6.1.166
+            mode: migrations
+          # OrioleDB we only run migrations at the moment
+          # Waiting for https://github.com/orioledb/orioledb/pull/1157
+          # - postgres: orioledb17
+          #   postgres_image: supabase/postgres:17.9.0.019-orioledb
+          #   mode: migrations
+    env:
+      POSTGRES_IMAGE: ${{ matrix.postgres_image }}
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      # Only the migrations mode needs a toolchain; the dump is loaded by psql in the container.
+      - name: Setup elixir
+        if: matrix.mode == 'migrations'
+        id: beam
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93 # v1.24.0
+        with:
+          otp-version: 28.5.0.4
+          elixir-version: 1.19.5
+
+      - name: Cache Mix
+        if: matrix.mode == 'migrations'
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: |
+            deps
+            _build
+            priv/native
+          key: ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ github.workflow }}-${{ runner.os }}-mix-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-
+
+      - name: Install dependencies
+        if: matrix.mode == 'migrations'
+        run: mix deps.get
+
+      - name: Cache Docker images
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        id: docker-cache
+        with:
+          path: /tmp/docker-images
+          key: docker-images-zstd-${{ matrix.postgres_image }}
+
+      - name: Load Docker images from cache
+        if: steps.docker-cache.outputs.cache-hit == 'true'
+        run: zstd -d --stdout /tmp/docker-images/postgres.tar.zst | docker image load
+
+      - name: Pull and save Docker images
+        if: steps.docker-cache.outputs.cache-hit != 'true'
+        run: |
+          docker pull ${{ matrix.postgres_image }}
+          mkdir -p /tmp/docker-images
+          docker image save ${{ matrix.postgres_image }} | zstd -T0 -o /tmp/docker-images/postgres.tar.zst
+
+      - name: Run WALRUS regress suite
+        run: test/walrus/run.sh --${{ matrix.mode }}

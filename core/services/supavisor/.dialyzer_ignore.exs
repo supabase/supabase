@@ -1,0 +1,3 @@
+[
+  ~r(test/support/[^.]*\.ex)
+]
