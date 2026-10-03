@@ -3818,6 +3818,23 @@ export interface ResourceExhaustionBannerTroubleshootClickedEvent {
 }
 
 /**
+ * User clicked "Resume live mode" in the notice shown after Unified Logs paused live mode
+ * because the page was visible with no user activity for 15 minutes.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/logs
+ */
+export interface UnifiedLogsLiveModeResumeButtonClickedEvent {
+  action: 'unified_logs_live_mode_resume_button_clicked'
+  properties: {
+    /** Why live mode was paused before the user resumed it. */
+    pauseReason: 'inactivity'
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked a row in the Unified Logs interface.
  *
  * @group Events
@@ -4266,6 +4283,7 @@ export type TelemetryEvent =
   | ResourceExhaustionBannerAiAssistantClickedEvent
   | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
+  | UnifiedLogsLiveModeResumeButtonClickedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
   | HeaderExceedingUsageBadgeClickedEvent
