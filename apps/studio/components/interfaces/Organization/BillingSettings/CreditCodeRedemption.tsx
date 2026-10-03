@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Calendar, PartyPopper } from 'lucide-react'
+import { Calendar, Info, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -212,15 +212,33 @@ export const CreditCodeRedemption = ({
             </div>
 
             {codeRedemptionResult.credits_expire_at && (
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
                 <Calendar className="h-4 w-4" />
                 <span>
-                  Expires on{' '}
+                  Your credits expire on{' '}
                   <TimestampInfo
                     className="text-sm"
                     utcTimestamp={codeRedemptionResult.credits_expire_at}
                     labelFormat="MMMM DD, YYYY"
                   />
+                  .
+                </span>
+              </div>
+            )}
+
+            {codeRedemptionResult.already_redeemed_partner_credits && (
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
+                <Info className="h-4 w-4 shrink-0" />
+                <span>
+                  Since you already redeemed $
+                  {codeRedemptionResult.already_redeemed_partner_credits / 100} through other deals,
+                  we couldn't grant the full $
+                  {(
+                    (codeRedemptionResult.already_redeemed_partner_credits +
+                      codeRedemptionResult.amount_cents) /
+                    100
+                  ).toFixed(0)}
+                  .
                 </span>
               </div>
             )}
