@@ -129,22 +129,39 @@ export function checkDestructiveQuery(sql: string) {
   return destructiveSqlRegex.some((regex) => regex.test(cleanedSql))
 }
 
-// Replace the contents of single-quoted string literals and double-quoted
-// identifiers with empty quotes, so a downstream `where` scan can't be fooled
-// by tokens like `UPDATE "where table" SET ...` or `SET name = 'where x'`.
-// Postgres uses doubled quotes to escape, so `''` and `""` are matched as
-// part of the same span rather than terminating it.
-const stripQuotedSpans = (sql: string) =>
-  sql.replace(/'(?:''|[^'])*'/g, "''").replace(/"(?:""|[^"])*"/g, '""')
+// Blank out the *contents* of string literals, quoted identifiers and comments
+// so that scanning for SQL structure can't be fooled by text that only looks
+// like syntax. Everything else — including the quote delimiters and every
+// character position — is left untouched, so `UPDATE "my table" SET ...` still
+// parses as an update on a quoted identifier.
+//
+// The alternation runs as a single left-to-right pass, which is what gives the
+// right precedence: a `--` inside a string literal is part of the literal, and
+// a quote inside a comment doesn't open a literal. Postgres escapes a quote by
+// doubling it, so `''` and `""` continue a span rather than ending it.
+//
+// Comments collapse to spaces (newlines kept, so statements stay on their own
+// lines) rather than being deleted, because deleting them would shift the rest
+// of the SQL and an unterminated literal would silently swallow real syntax.
+const maskLiteralsAndComments = (sql: string) =>
+  sql.replace(/'(?:''|[^'])*'|"(?:""|[^"])*"|--[^\r\n]*|\/\*[\s\S]*?\*\//g, (span) => {
+    if (span.startsWith('--') || span.startsWith('/*')) return span.replace(/[^\r\n]/g, ' ')
+    const quote = span[0]
+    return `${quote}${'x'.repeat(span.length - 2)}${quote}`
+  })
 
 // Function to check for UPDATE queries without WHERE clause
 export function isUpdateWithoutWhere(sql: string): boolean {
-  const updateStatements = sql
+  // Split and match on the masked SQL: a `;` inside a literal must not end a
+  // statement, and a `where` inside a literal or a comment must not count as a
+  // where clause. Masking preserves length and delimiters, so the statement
+  // shape the regex sees is the real one.
+  const masked = maskLiteralsAndComments(sql)
+  const updateStatements = masked
     .split(';')
     .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
   return updateStatements.some(
-    (statement) =>
-      updateWithoutWhereRegex.test(statement) && !/where\s/i.test(stripQuotedSpans(statement))
+    (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
   )
 }
 
