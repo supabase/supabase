@@ -11,6 +11,7 @@ import {
   SELECT_26_URL,
   SELECT_26_WWW_DISMISSAL_KEY,
 } from './Select26Promotion'
+import { TOS_UPDATE_WWW_DISMISSAL_KEY } from './TosUpdateBanner'
 
 const mockUsePathname = vi.fn(() => '/database')
 
@@ -106,5 +107,32 @@ describe('AnnouncementBanner', () => {
 
     expect(window.localStorage.getItem(SELECT_26_WWW_DISMISSAL_KEY)).toBe('hidden')
     await waitFor(() => expect(screen.queryByText(SELECT_26_TITLE)).not.toBeInTheDocument())
+  })
+
+  it('stays hidden after Select 2026 ends but before the ToS update date', () => {
+    vi.setSystemTime(new Date('2026-10-03T00:00:00-07:00'))
+    render(<AnnouncementBanner />)
+
+    expect(screen.queryByRole('link', { name: 'Terms of Service' })).not.toBeInTheDocument()
+  })
+
+  it('shows the ToS update notice once it is live', async () => {
+    vi.setSystemTime(new Date('2026-10-05T00:00:00-07:00'))
+    render(<AnnouncementBanner />)
+
+    expect(await screen.findByRole('link', { name: 'Terms of Service' })).toHaveAttribute(
+      'href',
+      '/terms'
+    )
+  })
+
+  it('persists ToS update dismissal under its own key, independent of the Select 2026 key', async () => {
+    vi.setSystemTime(new Date('2026-10-05T00:00:00-07:00'))
+    render(<AnnouncementBanner />)
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Dismiss announcement' }))
+
+    expect(window.localStorage.getItem(TOS_UPDATE_WWW_DISMISSAL_KEY)).toBe('hidden')
+    expect(window.localStorage.getItem(SELECT_26_WWW_DISMISSAL_KEY)).toBeNull()
   })
 })

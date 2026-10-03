@@ -78,6 +78,10 @@
       "import": "./src/Banners/Select26Promotion.tsx",
       "types": "./src/Banners/Select26Promotion.tsx"
     },
+    "./Banners/TosUpdateBanner": {
+      "import": "./src/Banners/TosUpdateBanner.tsx",
+      "types": "./src/Banners/TosUpdateBanner.tsx"
+    },
     "./Banners": {
       "import": "./src/Banners/index.ts",
       "types": "./src/Banners/index.ts"
