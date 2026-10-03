@@ -82,6 +82,20 @@ export function getRowTimestampMs(
   return null
 }
 
+/**
+ * Keeps the first row for each id, in order. Pages can overlap (rows sharing a
+ * cursor timestamp, and live mode re-reading recent logs), so the flattened
+ * pages need de-duplicating. Linear time: live mode can accumulate many pages.
+ */
+export function dedupeRowsById<T extends { id: string }>(rows: T[]): T[] {
+  const seen = new Set<string>()
+  return rows.filter((row) => {
+    if (seen.has(row.id)) return false
+    seen.add(row.id)
+    return true
+  })
+}
+
 type ComputeRawLogData = Pick<ColumnSchema, 'id' | 'event_message' | 'metadata'> & {
   timestamp: string | number
 }

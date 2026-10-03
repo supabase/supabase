@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildUnifiedLogsUrl,
+  dedupeRowsById,
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
@@ -274,5 +275,31 @@ describe('wrapIlikePattern', () => {
 
   it('leaves the value untouched when it already contains a _ wildcard', () => {
     expect(wrapIlikePattern('fo_bar')).toBe('fo_bar')
+  })
+})
+
+describe('dedupeRowsById', () => {
+  it('keeps the first row for each id, in order', () => {
+    const rows = [
+      { id: 'a', n: 1 },
+      { id: 'b', n: 2 },
+      { id: 'a', n: 3 },
+      { id: 'c', n: 4 },
+      { id: 'b', n: 5 },
+    ]
+    expect(dedupeRowsById(rows)).toEqual([
+      { id: 'a', n: 1 },
+      { id: 'b', n: 2 },
+      { id: 'c', n: 4 },
+    ])
+  })
+
+  it('returns rows unchanged when ids are unique', () => {
+    const rows = [{ id: 'a' }, { id: 'b' }]
+    expect(dedupeRowsById(rows)).toEqual(rows)
+  })
+
+  it('handles an empty list', () => {
+    expect(dedupeRowsById([])).toEqual([])
   })
 })

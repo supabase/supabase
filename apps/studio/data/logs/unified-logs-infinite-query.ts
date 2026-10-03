@@ -51,6 +51,49 @@ export const getUnifiedLogsISOStartEnd = (
   return { isoTimestampStart, isoTimestampEnd }
 }
 
+// Live mode re-reads this much before the newest row it already has, so logs
+// that are ingested late still show up. Rows it already has are de-duplicated
+// by id in UnifiedLogs.tsx.
+export const LIVE_MODE_OVERLAP_MS = 60 * 1000
+
+/**
+ * Time range for one page of the unified logs list:
+ * - First page: the selected search range.
+ * - Next page (scrolling down): from the range start up to the oldest row loaded so far.
+ * - Previous page (live mode polling): from just before the newest row loaded so far up to now.
+ *   Starting at the cursor rather than the range start keeps each poll to the new logs only,
+ *   instead of re-reading the whole range every few seconds.
+ *
+ * Cursors are row timestamps in milliseconds.
+ */
+export const getUnifiedLogsPageRange = (
+  search: QuerySearchParamsType,
+  pageParam: PageParam | null,
+  now: Date = new Date()
+): { isoTimestampStart: string; isoTimestampEnd: string } => {
+  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const cursor = pageParam?.cursor
+  const hasCursor = cursor !== null && cursor !== undefined && Number.isFinite(Number(cursor))
+
+  if (pageParam?.direction === 'prev') {
+    if (!hasCursor) return { isoTimestampStart, isoTimestampEnd: now.toISOString() }
+    const liveStartMs = Math.max(
+      new Date(isoTimestampStart).getTime(),
+      Number(cursor) - LIVE_MODE_OVERLAP_MS
+    )
+    return {
+      isoTimestampStart: new Date(liveStartMs).toISOString(),
+      isoTimestampEnd: now.toISOString(),
+    }
+  }
+
+  if (pageParam?.direction === 'next' && hasCursor) {
+    return { isoTimestampStart, isoTimestampEnd: new Date(Number(cursor)).toISOString() }
+  }
+
+  return { isoTimestampStart, isoTimestampEnd }
+}
+
 export async function getUnifiedLogs(
   {
     projectRef,
@@ -73,9 +116,7 @@ export async function getUnifiedLogs(
    * Given that the logs are ordered descending (latest logs come first, and we're fetching older logs as we scroll down)
    * Hence why the cursor is basically the last row's timestamp from the latest page
    *
-   * iso_timestamp_start will always be the current timestamp
-   * iso_timestamp_end will default to the last hour for the first page, followed by the last row's timestamp from
-   * the previous page.
+   * See getUnifiedLogsPageRange for the time range each page covers.
    *
    * However, just note that this isn't a perfect solution as there's always the edge case where by there's multiple rows
    * with identical timestamps, hence why FE will need a de-duping logic (in UnifiedLogs.tsx) unless we can figure a cleaner
@@ -83,29 +124,9 @@ export async function getUnifiedLogs(
    *
    */
 
-  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
   const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
   const sql = safeSql`${buildQuery(search)} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
-
-  const cursorValue = pageParam?.cursor
-  const cursorDirection = pageParam?.direction
-
-  let timestampEnd: string
-
-  if (cursorDirection === 'prev') {
-    // Live mode: fetch logs newer than the cursor
-    timestampEnd = new Date().toISOString()
-  } else if (cursorDirection === 'next') {
-    // Regular pagination: fetch logs older than the cursor.
-    // The cursor is stored as milliseconds (set below from `date.getTime()`),
-    // so we can convert it directly without worrying about the wire format.
-    timestampEnd =
-      cursorValue !== null && cursorValue !== undefined
-        ? new Date(Number(cursorValue)).toISOString()
-        : isoTimestampEnd
-  } else {
-    timestampEnd = isoTimestampEnd
-  }
+  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsPageRange(search, pageParam)
 
   const endpoint = logsAllEndpointUrl(useOtel)
   const data = await executeAnalyticsSql({
@@ -113,7 +134,7 @@ export async function getUnifiedLogs(
     endpoint,
     sql,
     iso_timestamp_start: isoTimestampStart,
-    iso_timestamp_end: timestampEnd,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
     headers: headersInit,
   })
