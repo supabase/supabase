@@ -140,22 +140,31 @@ const channel = supabase.channel('room:123:messages', {
 const channelRef = useRef(null)
 
 useEffect(() => {
-  // Check if already subscribed to prevent multiple subscriptions
-  if (channelRef.current?.state === 'subscribed') return
-  const channel = supabase.channel('room:123:messages', {
-    config: { private: true }
-  })
-  channelRef.current = channel
+  let cancelled = false
 
-  // Set auth before subscribing
-  await supabase.realtime.setAuth()
+  const setupChannel = async () => {
+    // Check if already subscribed to prevent multiple subscriptions
+    if (channelRef.current?.state === 'subscribed') return
+    const channel = supabase.channel('room:123:messages', {
+      config: { private: true },
+    })
+    channelRef.current = channel
 
-  channel
-    .on('broadcast', { event: 'message_created' }, handleMessage)
-    .on('broadcast', { event: 'user_joined' }, handleUserJoined)
-    .subscribe()
+    // Set auth before subscribing
+    await supabase.realtime.setAuth()
+
+    if (cancelled) return
+
+    channel
+      .on('broadcast', { event: 'message_created' }, handleMessage)
+      .on('broadcast', { event: 'user_joined' }, handleUserJoined)
+      .subscribe()
+  }
+
+  setupChannel()
 
   return () => {
+    cancelled = true
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
       channelRef.current = null
