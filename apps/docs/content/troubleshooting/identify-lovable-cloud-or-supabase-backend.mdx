@@ -16,32 +16,38 @@ Knowing which backend your project uses helps you understand where your database
 
 ## How to identify your backend
 
-In the Lovable interface, click the **Cloud icon** on the top bar of your project editor. This section shows which backend your project is currently connected to.
+In the Lovable editor, click the **layers icon** on the top bar of your project. This opens the project panel, where the left sidebar shows which backend your project is currently connected to.
 
-![Lovable Cloud icon inside Lovable](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-0.png)
+![Layers icon that opens the project panel in Lovable](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-0.png)
 
 <Admonition type="note">
 
-The Cloud icon appears for all projects, regardless of which backend type you're using. Click it to see your actual backend configuration.
+The panel appears for all projects, regardless of which backend type you're using. Open it to see your actual backend configuration.
 
 </Admonition>
 
-Once you open the Cloud settings, you see one of two interfaces depending on your backend type:
+Once the panel is open, you see one of these states depending on your backend type:
 
 ### Lovable Cloud backend
 
-If the page shows a menu and screens to manage your Database tables, and Users from within Lovable (similar to the screenshot below), then your backend is managed by **Lovable Cloud**.
+If the **Cloud** section in the sidebar expands into managed sections such as **Database**, **Users**, **Storage**, **Secrets**, **Edge functions**, and **SQL editor** (similar to the screenshot below), then your backend is managed by **Lovable Cloud**.
 
-![Lovable Cloud backend settings inside Lovable](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-1.png)
+![Lovable Cloud backend sections inside Lovable](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-1.png)
 
 Your Supabase instance in this case is **owned and managed by Lovable**, not by your personal Supabase account.
 You won’t see this project in your Supabase Dashboard, and you won’t have access to service role keys or direct database URLs.
 
 ### Connected Supabase backend
 
-If the page displays the Supabase icon, your Supabase project name, and some links that direct you to the Supabase Dashboard (similar to the screenshot below), then your Lovable project is connected to a **Supabase project you manage directly**.
+If the panel displays a **Supabase** card marked **Connected**, with your Supabase project name and links that open the Supabase Dashboard (Manage users, SQL editor, Edge functions, Manage secrets), then your Lovable project is connected to a **Supabase project you manage directly**.
 
-![Supabase backend settings inside Lovable](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-2.png)
+![Supabase connected card inside Lovable](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-2.png)
+
+### No backend enabled
+
+If the **Cloud > Overview** section shows an **Enable more features** prompt instead of managed sections, your project has no backend yet. From here you can enable Lovable Cloud, or connect a Supabase project you own through the **"Already have a Supabase project? Connect it here"** link.
+
+![Project with no backend enabled yet](/docs/img/troubleshooting/identify-lovable-cloud-or-supabase-backend-3.png)
 
 ## Summary
 
@@ -73,7 +79,9 @@ If the page displays the Supabase icon, your Supabase project name, and some lin
       id="database-api-access"
     >
 
-    No. Lovable Cloud backend is managed entirely by Lovable, and connection credentials are not exposed.
+    Not for direct access. The service role key and direct database URLs are not exposed for Lovable Cloud–managed projects, and the project can't be opened from the Supabase Dashboard.
+
+    Your app's project URL and publishable (anon) key do exist in your project's code, but they only serve your app's client-side requests. If you need full credential access (service role key, direct Postgres connections for BI or automation tools), migrate to your own Supabase project — see [Import Lovable Cloud Data into Your Own Supabase Project](/docs/guides/troubleshooting/import-lovable-cloud-data-to-supabase).
 
     </AccordionItem>
 
@@ -82,9 +90,9 @@ If the page displays the Supabase icon, your Supabase project name, and some lin
       id="switch-backend"
     >
 
-    There's no automated way to transfer your backend. You can create a new Supabase project and connect your Lovable app to it manually.
+    Yes. Export your data from **Cloud > Overview > Advanced settings**, create a new Supabase project, restore and verify the import, then remove Lovable Cloud and connect the new project.
 
-    See [Lovable's Project Migration Guide](https://docs.lovable.dev/tips-tricks/self-hosting) for detailed steps.
+    See [Can't Access Supabase Project When Using Lovable Cloud](/docs/guides/troubleshooting/cant-access-supabase-project-lovable-cloud) for the full flow, and [Import Lovable Cloud Data into Your Own Supabase Project](/docs/guides/troubleshooting/import-lovable-cloud-data-to-supabase) for the restore steps.
 
     </AccordionItem>
 
@@ -104,11 +112,9 @@ If the page displays the Supabase icon, your Supabase project name, and some lin
       id="move-to-supabase"
     >
 
-    There's no automated way to transfer your backend from Lovable Cloud to your own Supabase account.
+    Yes. Lovable Cloud provides a native data export that includes your full schema, data, RLS policies, and auth users with their password hashes. Export your data, create a new Supabase project, restore and verify the import, then remove Lovable Cloud and connect the new project.
 
-    You can create a new Supabase project and migrate your data manually.
-
-    See [Can't Access Your Supabase Project When Using Lovable Cloud](/docs/guides/troubleshooting/cant-access-supabase-project-lovable-cloud) for more details.
+    See [Can't Access Supabase Project When Using Lovable Cloud](/docs/guides/troubleshooting/cant-access-supabase-project-lovable-cloud) for the full flow, and [Import Lovable Cloud Data into Your Own Supabase Project](/docs/guides/troubleshooting/import-lovable-cloud-data-to-supabase) for the restore steps.
 
     </AccordionItem>
 
@@ -119,7 +125,7 @@ If the page displays the Supabase icon, your Supabase project name, and some lin
 
     That's expected — Lovable Cloud backend is managed by Lovable and doesn't appear in your Supabase Dashboard.
 
-    Learn more in [Can't Access Your Supabase Project When Using Lovable Cloud](/docs/guides/troubleshooting/cant-access-supabase-project-lovable-cloud).
+    Learn more in [Can't Access Supabase Project When Using Lovable Cloud](/docs/guides/troubleshooting/cant-access-supabase-project-lovable-cloud).
 
     </AccordionItem>
 
