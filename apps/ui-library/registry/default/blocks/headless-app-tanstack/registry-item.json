@@ -14,14 +14,14 @@
   ],
   "files": [
     {
-      "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp-server/tools/index.ts",
+      "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp/tools/index.ts",
       "type": "registry:file",
-      "target": "~/supabase/functions/mcp-server/tools/index.ts"
+      "target": "~/supabase/functions/mcp/tools/index.ts"
     },
     {
-      "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp-server/tools/tasks.ts",
+      "path": "registry/default/blocks/headless-app-tanstack/supabase/functions/mcp/tools/tasks.ts",
       "type": "registry:file",
-      "target": "~/supabase/functions/mcp-server/tools/tasks.ts"
+      "target": "~/supabase/functions/mcp/tools/tasks.ts"
     },
     {
       "path": "registry/default/blocks/headless-app-tanstack/routes/_protected/agents.tsx",

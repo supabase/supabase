@@ -31,7 +31,7 @@ import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
-import { trustedUserEmail } from '@/lib/server/configcat'
+import { isServerFlagEnabled, trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 300
 
@@ -153,7 +153,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+  const [explorerEnabled, useStatusPageWidget] = await Promise.all([
+    isExplorerEnabled(trustedUserEmail(claims?.email)),
+    isServerFlagEnabled('incidentIoStatusPage'),
+  ])
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
@@ -192,6 +195,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       baseUrl: getURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
+      useStatusPageWidget,
       signal: abortController.signal,
     })
 

@@ -22,7 +22,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -363,7 +363,9 @@ export const Destinations = () => {
           <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
-        {isDestinationsLoading && <GenericSkeletonLoader />}
+        {isDestinationsLoading && (
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+        )}
 
         {!isDestinationsLoading && hasDestinations && (
           <Card>

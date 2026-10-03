@@ -67,6 +67,19 @@ Here's the text formatted as a proper markdown table:
 | 42501                  | if authenticated 403, else 401 | insufficient privileges         |
 | other                  | 400                            |                                 |
 
+<Admonition type="note">
+
+Some codes in this table are triggered by platform conditions rather than application code. Seeing them in high volume usually points to an infrastructure event rather than a bug in your queries:
+
+- **25006** — The database has entered read-only mode due to disk quota. See [Read-only mode](/docs/guides/platform/database-size#read-only-mode) for causes and recovery steps.
+- **53100** — Disk is full. Supabase emits this alongside 25006 during severe disk exhaustion.
+- **53300** — Too many connections. The connection pool has reached its limit; check your [connection pool settings](/docs/guides/database/connection-management).
+- **57P03** — The database cannot accept connections, typically during a restart or failover.
+
+When you see these codes in volume, check the [Database dashboard](/dashboard/project/_/observability/database) before debugging application code.
+
+</Admonition>
+
 ## API level errors
 
 ### Connection errors

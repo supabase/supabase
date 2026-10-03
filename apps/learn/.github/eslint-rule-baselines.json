@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "shadcn/no-arbitrary-values": 7,
+    "shadcn/no-unknown-classes": 6,
+    "shadcn/no-raw-colors": 7
+  },
+  "ruleFiles": {
+    "shadcn/no-arbitrary-values": {
+      "components/command-menu.tsx": 2,
+      "components/command.tsx": 2,
+      "components/course-hero.tsx": 1,
+      "components/mdx-components.tsx": 2
+    },
+    "shadcn/no-unknown-classes": {
+      "components/mdx-components.tsx": 5,
+      "components/side-navigation-item.tsx": 1
+    },
+    "shadcn/no-raw-colors": {
+      "components/chapter-completion.tsx": 1,
+      "components/course-hero.tsx": 1,
+      "components/mdx-components.tsx": 2,
+      "components/side-navigation.tsx": 3
+    }
+  }
+}
