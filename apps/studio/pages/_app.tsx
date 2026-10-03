@@ -20,7 +20,6 @@ import {
   getFlags,
   TelemetryTagManager,
   ThemeProvider,
-  useParams,
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -103,17 +102,15 @@ const FeatureFlagProviderWithOrgContext = ({
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const cloudProvider = useDefaultProvider()
-  const { ref: projectRef } = useParams()
 
   const getConfigCatFlags = useCallback(
     (userEmail?: string) => {
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
-      if (projectRef) customAttributes.project_ref = projectRef
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider, selectedOrganization?.plan?.id, projectRef]
+    [cloudProvider, selectedOrganization?.plan?.id]
   )
 
   return (
