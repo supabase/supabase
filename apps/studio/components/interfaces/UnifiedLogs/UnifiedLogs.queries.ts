@@ -29,6 +29,7 @@ const NOT_ILIKE_OP = safeSql`NOT ILIKE`
 // at the entry point rather than letting an unsupported value reach
 // `log_attributes[…]` lookups.
 const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as const
+const MAX_FACETS_QUANTITY = 20
 
 // OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
 // adjusted in one place if the backend conventions change.
@@ -473,8 +474,6 @@ export const getFacetCountQuery = ({
     throw new Error('Invalid unified logs facet')
   }
 
-  const MAX_FACETS_QUANTITY = 20
-
   const facetExpr: SafeLogSqlFragment =
     facet === 'log_type'
       ? LOG_TYPE_EXPR
@@ -501,6 +500,7 @@ SELECT ${lit(facet)} AS facet, (${facetExpr}) AS value, count() AS count
 FROM logs
 ${whereClause(conditions)}
 GROUP BY value
+ORDER BY count DESC
 LIMIT ${lit(MAX_FACETS_QUANTITY)}
 `
 }
@@ -525,6 +525,7 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     level: LEVEL_EXPR,
     method: METHOD_EXPR,
     status: STATUS_EXPR,
+    pathname: PATHNAME_EXPR,
   }
 
   const scanBlock = (
@@ -559,11 +560,19 @@ HAVING value != ''
     if (grouped[facet]) blocks.push(scanBlock([facet], whereFor(facet)))
     else baseFacets.push(facet)
   }
-  blocks.push(scanBlock(baseFacets, whereFor()))
 
-  // pathname is high-cardinality, so it needs its own LIMIT (the endpoint
-  // rejects LIMIT BY inside the shared arrayJoin).
-  blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
+  if (grouped.pathname) {
+    // A filtered pathname excludes its own filter, so it can't share the base scan.
+    blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
+    blocks.push(scanBlock(baseFacets, whereFor()))
+  } else {
+    // Sharing the base scan avoids re-reading log_attributes in a separate pass
+    // for pathname. It's high-cardinality, so keep each facet's top values only;
+    // the client shows at most that many per facet anyway.
+    blocks.push(safeSql`(${scanBlock([...baseFacets, 'pathname'], whereFor())}ORDER BY count DESC
+LIMIT ${lit(MAX_FACETS_QUANTITY)} BY facet
+)`)
+  }
 
   return safeSql`-- unified logs: sidebar facet counts
 ${joinSqlFragments(blocks, ' UNION ALL ')}`
