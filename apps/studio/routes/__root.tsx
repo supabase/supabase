@@ -34,13 +34,7 @@ import {
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import {
-  FeatureFlagProvider,
-  getFlags,
-  TelemetryTagManager,
-  ThemeProvider,
-  useThemeSandbox,
-} from 'common'
+import { TelemetryTagManager, ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration from 'dayjs/plugin/duration'
@@ -48,15 +42,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  type ComponentProps,
-  type ErrorInfo,
-  type ReactNode,
-} from 'react'
+import { lazy, Suspense, useEffect, type ErrorInfo, type ReactNode } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
@@ -70,15 +56,15 @@ import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/Indirec
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
+import { StudioFeatureFlagProvider } from '@/components/interfaces/App/StudioFeatureFlagProvider'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
-import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { API_URL, BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
@@ -101,34 +87,6 @@ dayjs.extend(duration)
 
 interface RouterContext {
   queryClient: QueryClient
-}
-
-const FeatureFlagProviderWithOrgContext = ({
-  children,
-  ...props
-}: ComponentProps<typeof FeatureFlagProvider>) => {
-  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes: Record<string, string> = {}
-      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
-      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider, selectedOrganization?.plan?.id]
-  )
-
-  return (
-    <FeatureFlagProvider
-      {...props}
-      getConfigCatFlags={getConfigCatFlags}
-      organizationSlug={selectedOrganization?.slug ?? undefined}
-    >
-      {children}
-    </FeatureFlagProvider>
-  )
 }
 
 // Bridges the user's stored timezone preference into TimestampInfoProvider so
@@ -371,7 +329,7 @@ function RootComponent() {
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
       <NuqsAdapter>
         <AuthProvider>
-          <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
+          <StudioFeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
             <ProfileProvider>
               <TimezoneProvider>
                 <TimestampInfoTimezoneBridge>
@@ -411,7 +369,7 @@ function RootComponent() {
                 </TimestampInfoTimezoneBridge>
               </TimezoneProvider>
             </ProfileProvider>
-          </FeatureFlagProviderWithOrgContext>
+          </StudioFeatureFlagProvider>
         </AuthProvider>
       </NuqsAdapter>
       <TelemetryTagManager />

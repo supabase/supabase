@@ -15,13 +15,7 @@ import 'ui-patterns/ShimmeringLoader/index.css'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import {
-  FeatureFlagProvider,
-  getFlags,
-  TelemetryTagManager,
-  ThemeProvider,
-  useThemeSandbox,
-} from 'common'
+import { TelemetryTagManager, ThemeProvider, useThemeSandbox } from 'common'
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -33,7 +27,7 @@ import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
-import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
+import { ErrorInfo, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
@@ -46,6 +40,7 @@ import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/
 import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
+import { StudioFeatureFlagProvider } from '@/components/interfaces/App/StudioFeatureFlagProvider'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { clearBootTimeoutFallback } from '@/components/ui/BootTimeoutFallback/BootTimeoutFallback'
@@ -55,10 +50,9 @@ import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
 import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
-import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { API_URL, BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
@@ -95,34 +89,6 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
       { id: 'project-status', label: 'Project Status', content: <ProjectStatusTab /> },
     ]
   : []
-
-const FeatureFlagProviderWithOrgContext = ({
-  children,
-  ...props
-}: ComponentProps<typeof FeatureFlagProvider>) => {
-  const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
-  const cloudProvider = useDefaultProvider()
-
-  const getConfigCatFlags = useCallback(
-    (userEmail?: string) => {
-      const customAttributes: Record<string, string> = {}
-      if (cloudProvider) customAttributes.cloud_provider = cloudProvider
-      if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
-      return getFlags(userEmail, customAttributes)
-    },
-    [cloudProvider, selectedOrganization?.plan?.id]
-  )
-
-  return (
-    <FeatureFlagProvider
-      {...props}
-      getConfigCatFlags={getConfigCatFlags}
-      organizationSlug={selectedOrganization?.slug ?? undefined}
-    >
-      {children}
-    </FeatureFlagProvider>
-  )
-}
 
 const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }) => {
   const { timezone } = useTimezone()
@@ -182,7 +148,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         <NuqsAdapter>
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
-              <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
+              <StudioFeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>
@@ -247,7 +213,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                     </TimestampInfoTimezoneBridge>
                   </TimezoneProvider>
                 </ProfileProvider>
-              </FeatureFlagProviderWithOrgContext>
+              </StudioFeatureFlagProvider>
             </AuthProvider>
           </HydrationBoundary>
         </NuqsAdapter>
