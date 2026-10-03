@@ -470,8 +470,8 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/tutorials/with-vue-3' as `/${string}`,
         },
         {
-          name: 'Nuxt 3',
-          url: '/guides/getting-started/tutorials/with-nuxt-3' as `/${string}`,
+          name: 'Nuxt',
+          url: '/guides/getting-started/tutorials/with-nuxt' as `/${string}`,
         },
         {
           name: 'Angular',
