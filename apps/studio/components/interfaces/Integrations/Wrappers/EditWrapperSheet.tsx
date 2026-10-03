@@ -23,6 +23,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ForeignTableSecurityWarning } from './ForeignTableSecurityWarning'
 import InputField from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
@@ -284,6 +285,7 @@ export const EditWrapperSheet = ({
                 }
               >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  <ForeignTableSecurityWarning />
                   {tablesField.map((t, tableIndex) => {
                     // FIXME: make inference work
                     const table = t as unknown as FormattedWrapperTable
