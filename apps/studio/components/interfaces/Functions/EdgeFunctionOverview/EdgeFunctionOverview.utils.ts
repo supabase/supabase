@@ -5,6 +5,7 @@ import sumBy from 'lodash/sumBy'
 import type { ChartConfig } from 'ui'
 
 import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
+import { formatUnifiedLogsDateParam } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
@@ -162,9 +163,40 @@ export const getInvocationChartNavigationUrl = ({
   clickedTimestamp: string
 }) => {
   const { start, end } = calculateBarClickTimeRange(rangeStart, rangeEnd, clickedTimestamp)
-  const destination = isUnifiedLogsEnabled ? 'logs' : 'invocations'
 
-  return `/project/${projectRef}/functions/${functionSlug}/${destination}?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
+  if (isUnifiedLogsEnabled) {
+    return getEdgeFunctionLogsUrl({ projectRef, functionSlug, start, end })
+  }
+
+  return `/project/${projectRef}/functions/${functionSlug}/invocations?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
+}
+
+/**
+ * Links to an edge function's unified Logs tab, optionally focused on a time range, filters
+ * (e.g. `level:eq:error`) and a selected log. Uses the same URL params as the project-wide Logs page.
+ */
+export const getEdgeFunctionLogsUrl = ({
+  projectRef,
+  functionSlug,
+  start,
+  end,
+  filters,
+  logId,
+}: {
+  projectRef: string
+  functionSlug: string
+  start?: string
+  end?: string
+  filters?: readonly string[]
+  logId?: string
+}) => {
+  const params = new URLSearchParams()
+  if (start && end) params.set('date', formatUnifiedLogsDateParam(start, end))
+  if (filters?.length) params.set('filter', filters.join(','))
+  if (logId) params.set('id', logId)
+
+  const query = params.toString()
+  return `/project/${projectRef}/functions/${functionSlug}/logs${query ? `?${query}` : ''}`
 }
 
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {

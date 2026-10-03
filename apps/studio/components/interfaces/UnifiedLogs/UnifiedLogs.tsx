@@ -33,7 +33,7 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { EDGE_FUNCTION_FILTER_FIELDS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
@@ -48,6 +48,7 @@ import {
 } from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
+import { UnifiedLogsScope } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
@@ -95,8 +96,16 @@ export const CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
-export const UnifiedLogs = () => {
+interface UnifiedLogsProps {
+  /** Narrows every query, count and filter to one resource, e.g. on an edge function's Logs tab */
+  scope?: UnifiedLogsScope
+}
+
+export const UnifiedLogs = ({ scope }: UnifiedLogsProps) => {
   useResetFocus()
+
+  // A scoped view keeps its filters in the filter bar only
+  const hasFilterSideBar = !scope
 
   const { ref: projectRef } = useParams()
   const track = useTrack()
@@ -111,10 +120,13 @@ export const UnifiedLogs = () => {
   })
   const visibleSearchFilters = gateLogTypeFilters(
     search.filter,
-    getLogTypeVisibility({
-      multigres: showMultigresLogs,
-      compute: computeAvailability.preserveComputeFilter,
-    })
+    getLogTypeVisibility(
+      {
+        multigres: showMultigresLogs,
+        compute: computeAvailability.preserveComputeFilter,
+      },
+      scope
+    )
   )
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
@@ -148,22 +160,39 @@ export const UnifiedLogs = () => {
   const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
     useLogsTableColumns()
 
+  // Callers usually pass a fresh scope object each render, so key memos on its value
+  const scopeFunctionId = scope?.functionId
+
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
-    const parameters = toQuerySearchParams(search)
+    const parameters = toQuerySearchParams(
+      search,
+      scopeFunctionId ? { functionId: scopeFunctionId } : undefined
+    )
     if (parameters.filter) {
       parameters.filter =
         gateLogTypeFilters(
           parameters.filter,
-          getLogTypeVisibility({
-            multigres: showMultigresLogs,
-            compute: computeAvailability.canQueryCompute,
-          })
+          getLogTypeVisibility(
+            {
+              multigres: showMultigresLogs,
+              compute: computeAvailability.canQueryCompute,
+            },
+            parameters.scope
+          )
         ) ?? null
     }
     return parameters
-  }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [search, scopeFunctionId, showMultigresLogs, computeAvailability.canQueryCompute])
+
+  const queryableLogTypeVisibility = getLogTypeVisibility(
+    {
+      multigres: showMultigresLogs,
+      compute: computeAvailability.canQueryCompute,
+    },
+    searchParameters.scope
+  )
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
     scope: JSON.stringify([projectRef, searchParameters]),
@@ -293,12 +322,19 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
+    const scopeFilterFields: readonly string[] = EDGE_FUNCTION_FILTER_FIELDS
+    const availableFields = searchParameters.scope
+      ? defaultFilterFields.filter((field) => scopeFilterFields.includes(field.value))
+      : defaultFilterFields
     const gatedFields = gateLogTypeOptions(
-      defaultFilterFields,
-      getLogTypeVisibility({
-        multigres: showMultigresLogs,
-        compute: computeAvailability.canQueryCompute,
-      })
+      availableFields,
+      getLogTypeVisibility(
+        {
+          multigres: showMultigresLogs,
+          compute: computeAvailability.canQueryCompute,
+        },
+        searchParameters.scope
+      )
     )
 
     return gatedFields.map((field) => {
@@ -327,18 +363,12 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [facets, searchParameters.scope, showMultigresLogs, computeAvailability.canQueryCompute])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
     if (Array.isArray(update.filter)) {
-      update.filter = gateLogTypeFilters(
-        update.filter.map(String),
-        getLogTypeVisibility({
-          multigres: showMultigresLogs,
-          compute: computeAvailability.canQueryCompute,
-        })
-      )
+      update.filter = gateLogTypeFilters(update.filter.map(String), queryableLogTypeVisibility)
     }
     setSearch(update)
   }
@@ -375,6 +405,7 @@ export const UnifiedLogs = () => {
   const [isFilterBarOpen, setIsFilterBarOpen] = useState(!isMobile)
 
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
+    enabled: hasFilterSideBar,
     registerInCommandMenu: true,
   })
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
@@ -413,39 +444,55 @@ export const UnifiedLogs = () => {
       getFacetedUniqueValues={getFacetedUniqueValues(facets)}
     >
       <DataTableSideBarLayout topBarHeight={topBarHeight}>
-        <ResizablePanelGroup orientation="horizontal" autoSaveId="logs-layout">
-          <FilterSideBar
-            isFilterBarOpen={isFilterBarOpen}
-            setIsFilterBarOpen={setIsFilterBarOpen}
-            dateRangeDisabled={{ after: new Date() }}
-          />
-          <ResizableHandle withHandle />
+        <ResizablePanelGroup
+          orientation="horizontal"
+          autoSaveId={hasFilterSideBar ? 'logs-layout' : 'scoped-logs-layout'}
+        >
+          {hasFilterSideBar && (
+            <>
+              <FilterSideBar
+                isFilterBarOpen={isFilterBarOpen}
+                setIsFilterBarOpen={setIsFilterBarOpen}
+                dateRangeDisabled={{ after: new Date() }}
+              />
+              <ResizableHandle withHandle />
+            </>
+          )}
           <ResizablePanel
             id="panel-right"
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
-                <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
-                  <Button
-                    size="tiny"
-                    variant="text"
-                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
-                    onClick={() => setIsFilterBarOpen((prev) => !prev)}
-                    className="hidden w-[26px] sm:flex"
-                    aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
-                  />
-                </ShortcutTooltip>
+                {hasFilterSideBar && (
+                  <>
+                    <ShortcutTooltip
+                      shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS}
+                      side="bottom"
+                    >
+                      <Button
+                        size="tiny"
+                        variant="text"
+                        icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                        onClick={() => setIsFilterBarOpen((prev) => !prev)}
+                        className="hidden w-[26px] sm:flex"
+                        aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
+                      />
+                    </ShortcutTooltip>
 
-                <div className="h-full border-r" />
+                    <div className="h-full border-r" />
+                  </>
+                )}
 
                 <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
                   <LogsFilterBar />
                 </div>
 
-                <div className="block sm:hidden">
-                  <DataTableFilterControlsDrawer />
-                </div>
+                {hasFilterSideBar && (
+                  <div className="block sm:hidden">
+                    <DataTableFilterControlsDrawer />
+                  </div>
+                )}
 
                 <div className="ml-auto flex items-center gap-x-2">
                   <RefreshButton

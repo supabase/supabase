@@ -10,6 +10,7 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
+import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import {
   buildColumnFilterValues,
   buildFilterGroup,
@@ -41,7 +42,11 @@ const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
 export const LogsFilterBar = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { table, filterFields, columnFilters, isFetching } = useDataTable()
+  const { table, filterFields, columnFilters, isFetching, searchParameters } = useDataTable<
+    unknown,
+    unknown,
+    QuerySearchParamsType
+  >()
 
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_FOCUS_FILTER, () => filterBarRef.current?.focus(), {
     registerInCommandMenu: true,
@@ -65,11 +70,12 @@ export const LogsFilterBar = () => {
     return users.map((u) => ({ label: u.email ?? u.id, value: u.id }))
   }
 
+  // Users can only be attributed on Auth and API Gateway rows, which a scoped view never includes
   const filterProperties = buildFilterProperties({
     fields: filterFields,
     userOptions: searchUserOptions,
     timeRangeOptions: { component: TimeRangeOption },
-  })
+  }).filter((property) => !searchParameters.scope || property.name !== USER_PROPERTY)
 
   const withUserCondition = (group: FilterGroup): FilterGroup => {
     if (!user) return group
