@@ -57,7 +57,9 @@ export default function Home() {
             {Array.from({ length: 13 }).map((_, i) => (
               <div
                 key={`col-line-${i}`}
-                className="absolute top-0 bottom-0 w-px bg-border/30 z-10 first:hidden last:hidden"
+                className={`absolute top-0 bottom-0 w-px bg-border/30 z-10 ${
+                  i === 0 || i === 12 ? 'hidden' : ''
+                }`}
                 style={{
                   left: `${(i / 12) * 100}%`,
                   height: '100%',
