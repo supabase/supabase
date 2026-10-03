@@ -66,7 +66,7 @@ A Supabase egy [hosztolt platform](https://supabase.com/dashboard). Regisztrálh
 - [pg_graphql](http://github.com/supabase/pg_graphql/) egy PostgreSQL kiterjesztés, amely GraphQL API-t tesz elérhetővé
 - [Storage](https://github.com/supabase/storage-api) egy RESTful felületet biztosít az S3-ban tárolt fájlok kezeléséhez, a Postgres segítségével a jogosultságok kezeléséhez.
 - [postgres-meta](https://github.com/supabase/postgres-meta) egy RESTful API a Postgres kezeléséhez, amely lehetővé teszi a táblák lekérdezését, szerepek hozzáadását, lekérdezések futtatását stb.
-- [GoTrue](https://github.com/netlify/gotrue) egy SWT alapú API a felhasználók kezelésére és SWT tokenek kiadására.
+- [GoTrue](https://github.com/supabase/gotrue) egy JWT alapú API a felhasználók kezelésére és JWT tokenek kiadására.
 - a [Kong](https://github.com/Kong/kong) egy felhő-natív API átjáró.
 
 #### Ügyfélkönyvtárak

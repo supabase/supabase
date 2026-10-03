@@ -66,7 +66,7 @@ Puteți, de asemenea, [auto-hosting](https://supabase.com/docs/guides/hosting/ov
 - [pg_graphql](http://github.com/supabase/pg_graphql/) este o extensie PostgreSQL care expune o API GraphQL
 - [Storage](https://github.com/supabase/storage-api) oferă o interfață RESTful pentru gestionarea Fișierelor stocate în S3, utilizând Postgres pentru a gestiona permisiunile.
 - [postgres-meta](https://github.com/supabase/postgres-meta) este o API RESTful pentru gestionarea Postgres, care vă permite să accesați tabele, să adăugați roluri și să executați interogări etc.
-- [GoTrue](https://github.com/netlify/gotrue) este un API bazat pe SWT pentru gestionarea utilizatorilor și emiterea de token-uri SWT.
+- [GoTrue](https://github.com/supabase/gotrue) este un API bazat pe JWT pentru gestionarea utilizatorilor și emiterea de token-uri JWT.
 - [Kong](https://github.com/Kong/kong) este un gateway API de tip cloud-nativ.
 
 #### Biblioteci client
