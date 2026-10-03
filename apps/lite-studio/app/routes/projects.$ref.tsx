@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router'
 import {
   Badge,
@@ -37,6 +37,13 @@ export default function ProjectPage() {
   const { ref } = useParams()
   const [loading, setLoading] = useState(false)
   const [enableRls, setEnableRls] = useState(true)
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+
+  useEffect(() => {
+    return () => {
+      if (refreshTimeoutRef.current !== undefined) clearTimeout(refreshTimeoutRef.current)
+    }
+  }, [])
 
   return (
     <div className="py-8 space-y-8">
@@ -83,7 +90,10 @@ export default function ProjectPage() {
                 loading={loading}
                 onClick={() => {
                   setLoading(true)
-                  setTimeout(() => setLoading(false), 2000)
+                  if (refreshTimeoutRef.current !== undefined) {
+                    clearTimeout(refreshTimeoutRef.current)
+                  }
+                  refreshTimeoutRef.current = setTimeout(() => setLoading(false), 2000)
                 }}
               >
                 Refresh Status
@@ -91,6 +101,9 @@ export default function ProjectPage() {
             </div>
           </Card>
 
+          <span role="status" aria-live="polite" className="sr-only">
+            {loading ? 'Refreshing status…' : ''}
+          </span>
           {loading && (
             <div className="space-y-2">
               <ShimmeringLoader />
@@ -137,12 +150,13 @@ export default function ProjectPage() {
             <div className="space-y-4">
               <div className="grid gap-2">
                 <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" placeholder="my-project" defaultValue={ref} />
+                <Input key={ref} id="project-name" placeholder="my-project" defaultValue={ref} />
               </div>
 
               <div className="grid gap-2">
                 <Label htmlFor="project-url">Project URL</Label>
                 <Input
+                  key={`project-url-${ref}`}
                   id="project-url"
                   placeholder="https://xyz.supabase.co"
                   disabled
