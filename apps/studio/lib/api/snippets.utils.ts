@@ -76,6 +76,16 @@ export type FilesystemEntry = {
  */
 export type SnippetMetadata = Omit<Snippet, 'content'>
 
+const SQL_EXTENSION = '.sql'
+
+/**
+ * Removes the trailing `.sql` extension from a snippet's filename. Only the suffix is removed:
+ * `String.prototype.replace('.sql', '')` would strip the *first* occurrence instead, which
+ * mangles names such as `v1.sql migration.sql`.
+ */
+const stripSqlExtension = (filename: string): string =>
+  filename.endsWith(SQL_EXTENSION) ? filename.slice(0, -SQL_EXTENSION.length) : filename
+
 const buildSnippetMetadata = (
   filename: string,
   folderId: string | null,
@@ -85,7 +95,7 @@ const buildSnippetMetadata = (
   inserted_at: createdAt.toISOString(),
   updated_at: createdAt.toISOString(),
   type: 'sql',
-  name: filename.replace('.sql', ''),
+  name: filename,
   description: '',
   favorite: false,
   visibility: 'user',
@@ -189,7 +199,7 @@ export async function getFilesystemEntries({
           includeContent ? fs.readFile(itemPath, 'utf-8') : Promise.resolve(undefined),
           fs.stat(itemPath),
         ])
-        const snippetName = item.name.replace('.sql', '')
+        const snippetName = stripSqlExtension(item.name)
 
         entries.push({
           id: generateDeterministicUuid([folderId, `${snippetName}.sql`]),
