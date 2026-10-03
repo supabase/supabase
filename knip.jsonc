@@ -69,12 +69,9 @@
         // tables that consume it. Scoped to the remaining files rather than the whole
         // folder so everything else here stays gated.
         // TODO(FE-4330): remove — used from #50529, drop this entry in that PR.
-        "data/oauth-apps/oauth-apps-approvals-query.ts": ["files"],
         "data/oauth-apps/oauth-apps-grants-query.ts": ["files"],
-        "data/oauth-apps/oauth-apps-member-grants-query.ts": ["files"],
         "data/oauth-apps/oauth-apps-preflight-validation-query.ts": ["files"],
         "data/oauth-apps/oauth-apps-revoke-grant-mutation.ts": ["files"],
-        "data/oauth-apps/oauth-apps-revoke-mutation.ts": ["files"],
         "hooks/misc/useTrackExperimentExposure.ts": ["files"],
         // Staging-only pinned Postgres image + FDW request payload for creating
         // Warehouse test projects by hand. Nothing imports it yet — it's kept
