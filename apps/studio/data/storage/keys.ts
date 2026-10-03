@@ -58,6 +58,22 @@ export const storageKeys = {
     ['projects', projectRef, 'buckets', bucketId, 'folders'] as const,
   bucketLifecycle: (projectRef: string | undefined, bucketId: string | undefined) =>
     ['projects', projectRef, 'buckets', bucketId, 'lifecycle'] as const,
+  /** The policy is part of the key: the API derives each version's expiry from it. */
+  objectVersions: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    objectName: string | undefined,
+    lifecyclePolicy?: { expiryDays: number | null; maxVersions: number | null }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'object-versions',
+      objectName,
+      ...(lifecyclePolicy ? [lifecyclePolicy] : []),
+    ] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
