@@ -59,6 +59,11 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
   return isIcebergCatalogEnabled
 }
 
+export const useIsObjectVersioningAvailable = ({ projectRef }: { projectRef?: string }) => {
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  return !!data?.capabilities?.object_versioning
+}
+
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
   const { data } = useProjectStorageConfigQuery({ projectRef })
   const { isCli, isPlatform } = useDeploymentMode()
