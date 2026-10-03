@@ -57,12 +57,14 @@ You need:
 
 The `supabase stack` commands exist only when the `[experimental] stack` setting is on. Without it, `supabase stack` commands fail with `Unknown subcommand "stack"`.
 
-1. Add this to `supabase/config.toml` in your app directory:
+1. In `supabase/config.toml` in your app directory, add `stack = true` under the existing `[experimental]` table. If your `config.toml` doesn't have an `[experimental]` table, add one:
 
    ```toml
    [experimental]
    stack = true
    ```
+
+   Don't add a second `[experimental]` table. A duplicate table makes `config.toml` invalid. The CLI then treats the setting as off.
 
    In a directory without a `config.toml`, set the environment variable instead:
 
@@ -166,7 +168,7 @@ One app can run several local projects by name. This keeps a destructive test ru
 
 A local project started without `--stack` is the app directory's default local project. Named local projects and the default one are independent of each other.
 
-The `db`, `migration`, and other database commands use the default local project for the current branch. They can't target a named local project. See [Limitations](#limitations).
+On a local project, the `db`, `migration`, and other database commands use the default local project for the current branch. They don't accept `--stack`. Some commands, such as `supabase db dump`, target the linked project unless you pass `--local`. To reach a named local project from a command that accepts `--db-url`, pass the `DB_URL` from `supabase status --stack <name> --env`. See [Limitations](#limitations).
 
 ## Find a local project's endpoints and keys
 
@@ -253,9 +255,9 @@ supabase stack destroy --stack test --yes
 `destroy` keeps two kinds of data:
 
 - Storage upload files, which live in your app at `supabase/.temp/stack-uploads/<id>/`. Delete that directory to remove them.
-- Container engine resources, if Docker or Podman isn't running. If no process for the local project is still running, the command removes the local project's registration. It prints cleanup commands to run after the engine starts again. Otherwise it fails and asks you to start the engine and retry.
+- Container engine resources, if Docker or Podman isn't running. The command can still remove the local project's registration if no process for it is still running and your user can delete its database files on the host. It then prints cleanup commands to run after the engine starts again. Otherwise it fails, keeps the local project, and asks you to start the engine and retry. Your user might not be able to delete database files that a container wrote to a host directory. Local projects created with Docker version 25 or earlier store data that way.
 
-The printed cleanup command deletes only this local project's database data, from a Docker volume that other local projects share. Don't delete the volume itself.
+If the local project stores its database data in a Docker volume, other local projects share that volume. The printed cleanup command deletes only this local project's data from it. Don't delete the volume itself.
 
 ## Differences from the default `supabase start`
 
@@ -275,7 +277,7 @@ Keep these differences in mind when you turn the setting on for an app that used
   - Storage Analytics and Storage vector buckets
   - A custom `edge_runtime.deno_version`
   - OrioleDB, and `db.major_version` values other than 15 and 17
-- Database commands can't target a named local project. `supabase db reset`, `supabase db diff`, `supabase db pull`, `supabase db dump`, and the other local database commands use the app directory's default local project for the current branch, and don't accept `--stack`.
+- Database commands don't accept `--stack`. On a local project, `supabase db reset`, `supabase db diff`, and the other database commands use the default local project for the current branch. Commands that accept `--db-url` can reach a named local project through the `DB_URL` from `supabase status --stack <name> --env`.
 - Switching branches switches local projects. The git branch is part of the identity. After you check out another branch in the same directory, `supabase start` creates or resumes a different local project with its own data. The first branch's local project keeps running until you stop it.
 - Moving or renaming an app directory creates a new local project, because the identity includes the project root path. The previous local project's data stays until you destroy it.
 - `supabase stack logs` streams new log lines only. It has no history.
