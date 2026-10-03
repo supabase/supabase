@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircle, Archive, ChevronDown, Copy, Download, Trash2, X } from 'lucide-react'
+import { AlertCircle, Archive, ChevronDown, Copy, Download, Trash2, Upload, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,6 +18,7 @@ import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { getBucketVersioningState } from '../StorageVersioning.constants'
 import { FilePreview } from './FilePreview'
+import { pickFile } from './pickFile'
 import { PreviewSection } from './PreviewSection'
 import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
@@ -65,10 +66,13 @@ interface CurrentFilePreviewProps {
   size: string | null
   isPublicBucket: boolean
   isVersionedBucket: boolean
+  /** Pins the preview to the current version, so a new one busts the cached URL. */
+  currentVersionId?: string
   hasCurrentVersion: boolean
   canUpdateFiles: boolean
   onCopyUrl: (path: string, expiry?: number) => void
   onDownload: () => void
+  onReplace: () => void
   onCustomExpiry: () => void
   onDelete: () => void
   onPurge: () => void
@@ -81,10 +85,12 @@ const CurrentFilePreview = ({
   size,
   isPublicBucket,
   isVersionedBucket,
+  currentVersionId,
   hasCurrentVersion,
   canUpdateFiles,
   onCopyUrl,
   onDownload,
+  onReplace,
   onCustomExpiry,
   onDelete,
   onPurge,
@@ -94,7 +100,12 @@ const CurrentFilePreview = ({
       className="flex items-center justify-center overflow-hidden rounded-md border border-overlay"
       style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
     >
-      <FilePreview path={path} mimeType={mimeType} size={file.metadata?.size} />
+      <FilePreview
+        path={path}
+        mimeType={mimeType}
+        size={file.metadata?.size}
+        versionId={currentVersionId}
+      />
     </div>
 
     <div className="mt-2 flex flex-col">
@@ -128,6 +139,21 @@ const CurrentFilePreview = ({
           onClick={onDownload}
           tooltip={{ content: { side: 'top', text: 'Download current' } }}
         />
+
+        {canUpdateFiles && (
+          <ButtonTooltip
+            variant="outline"
+            className="px-2"
+            icon={<Upload size={14} />}
+            onClick={onReplace}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: isVersionedBucket ? 'Upload new version' : 'Replace file',
+              },
+            }}
+          />
+        )}
 
         {isPublicBucket ? (
           <Button
@@ -233,6 +259,7 @@ export const PreviewPane = () => {
     setSelectedItemsToDelete,
     setItemToPurge,
     refetchAllOpenedFolders,
+    replaceFile,
     setSelectedFileCustomExpiry,
     downloadFile,
   } = useStorageExplorerStateSnapshot()
@@ -305,6 +332,11 @@ export const PreviewPane = () => {
     })
   }
 
+  const onReplaceFile = async () => {
+    const newFile = await pickFile()
+    if (newFile !== undefined) await replaceFile({ file: newFile, item: file })
+  }
+
   // The compare widget replaces the top of the panel, so scroll up to show it.
   const handlePreviewVersion = (version: ObjectVersion) => {
     setPreviewedVersion(version)
@@ -348,10 +380,12 @@ export const PreviewPane = () => {
             size={size}
             isPublicBucket={!!selectedBucket?.public}
             isVersionedBucket={isVersionedBucket}
+            currentVersionId={currentVersion?.versionId}
             hasCurrentVersion={currentVersion !== undefined}
             canUpdateFiles={canUpdateFiles}
             onCopyUrl={onCopyUrl}
             onDownload={() => downloadFile(file)}
+            onReplace={onReplaceFile}
             onCustomExpiry={() => setSelectedFileCustomExpiry(file)}
             onDelete={() => setSelectedItemsToDelete([file])}
             onPurge={() => setItemToPurge(file)}

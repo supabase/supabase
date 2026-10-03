@@ -5,7 +5,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
 import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
-import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
+import { getStorageItemPath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useArchivedObjectPurgeMutation } from '@/data/storage/versioning/archived-object-purge-mutation'
 import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
@@ -33,16 +33,6 @@ export const ConfirmPurgeModal = () => {
 
   const isFolder = itemToPurge?.type === STORAGE_ROW_TYPES.FOLDER
   const isArchivedFolder = isFolder && itemToPurge.archived !== undefined
-
-  // The endpoints address an object by full path; a row only knows its leaf name.
-  const getItemPath = () => {
-    if (itemToPurge === undefined) return ''
-    const folderPath = getPathAlongOpenedFolders(
-      { openedFolders: openedFolders.slice(0, itemToPurge.columnIndex), selectedBucket },
-      false
-    )
-    return [folderPath, itemToPurge.name].filter(Boolean).join('/')
-  }
 
   /** A folder is only a prefix, so both halves of what it holds have to go. */
   const purgeFolder = async (
@@ -75,7 +65,8 @@ export const ConfirmPurgeModal = () => {
   const onConfirm = async () => {
     if (!projectRef || !selectedBucket?.id || itemToPurge === undefined) return
 
-    const path = getItemPath()
+    // The endpoints address an object by full path; a row only knows its leaf name.
+    const path = getStorageItemPath({ openedFolders }, itemToPurge)
     setIsPurging(true)
     try {
       if (isFolder) await purgeFolder(projectRef, selectedBucket.id, itemToPurge, path)
