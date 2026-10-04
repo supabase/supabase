@@ -22,7 +22,6 @@ import {
   NavigationMenuViewport,
 } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
-import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -101,7 +100,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
-      {!isStateOfStartupsPage && <AnnouncementBanner />}
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -111,7 +109,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
-        {isStateOfStartupsPage && <AnnouncementBanner />}
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
