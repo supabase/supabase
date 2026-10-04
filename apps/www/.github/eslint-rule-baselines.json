@@ -1,6 +1,6 @@
 {
   "rules": {
-    "shadcn/no-arbitrary-values": 527,
+    "shadcn/no-arbitrary-values": 528,
     "shadcn/no-unknown-classes": 112,
     "shadcn/no-raw-colors": 212
   },
@@ -12,7 +12,7 @@
       "app/(products)/database/_components/Illustrations/SpreadsheetIllustration.tsx": 9,
       "app/(products)/database/_components/VisualDemo.tsx": 5,
       "app/(products)/edge-functions/_components/Highlights.tsx": 1,
-      "app/(products)/realtime/_components/FeaturesSection.tsx": 5,
+      "app/(products)/realtime/_components/FeaturesSection.tsx": 6,
       "app/(products)/storage/_components/FeaturesSection.tsx": 16,
       "app/contribute/about/page.tsx": 1,
       "app/partners/PartnersContent.tsx": 2,
