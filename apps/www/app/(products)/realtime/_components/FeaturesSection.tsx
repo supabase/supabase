@@ -374,7 +374,7 @@ function PresenceSkeleton() {
       onMouseMove={handleMouseMove}
     >
       {/* Stacked avatars — top right (inset so box-shadow rings clear overflow-hidden) */}
-      <div className="absolute right-5 top-3.5 z-10 flex -space-x-[3px] p-1">
+      <div className="absolute right-5 top-3.5 z-10 flex -space-x-0.75 p-1">
         {PRESENCE_USERS.map((user, i) => (
           <div
             key={user.name}
