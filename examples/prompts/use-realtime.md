@@ -289,7 +289,7 @@ To write to a private channel you need to set RLS policies against `realtime.mes
 -- Simple policy with indexed columns
 CREATE POLICY "room_members_can_write" ON realtime.messages
 FOR INSERT TO authenticated
-USING (
+WITH CHECK (
   topic LIKE 'room:%' AND
   EXISTS (
     SELECT 1 FROM room_members
