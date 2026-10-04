@@ -142,20 +142,31 @@ const channelRef = useRef(null)
 useEffect(() => {
   // Check if already subscribed to prevent multiple subscriptions
   if (channelRef.current?.state === 'subscribed') return
-  const channel = supabase.channel('room:123:messages', {
-    config: { private: true }
-  })
-  channelRef.current = channel
 
-  // Set auth before subscribing
-  await supabase.realtime.setAuth()
+  let cancelled = false
 
-  channel
-    .on('broadcast', { event: 'message_created' }, handleMessage)
-    .on('broadcast', { event: 'user_joined' }, handleUserJoined)
-    .subscribe()
+  const setup = async () => {
+    const channel = supabase.channel('room:123:messages', {
+      config: { private: true }
+    })
+    channelRef.current = channel
+
+    // Set auth before subscribing
+    await supabase.realtime.setAuth()
+
+    // Bail out if the component unmounted while authenticating
+    if (cancelled) return
+
+    channel
+      .on('broadcast', { event: 'message_created' }, handleMessage)
+      .on('broadcast', { event: 'user_joined' }, handleUserJoined)
+      .subscribe()
+  }
+
+  setup()
 
   return () => {
+    cancelled = true
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
       channelRef.current = null
