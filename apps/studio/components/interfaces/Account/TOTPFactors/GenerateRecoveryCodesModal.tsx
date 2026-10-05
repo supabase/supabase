@@ -15,7 +15,7 @@ export const GenerateRecoveryCodesModal = () => {
 
   return (
     <Admonition
-      type="danger"
+      type="warning"
       layout="horizontal"
       title="No recovery codes generated"
       description="Recovery codes let you access your account if you lose access to your MFA device"

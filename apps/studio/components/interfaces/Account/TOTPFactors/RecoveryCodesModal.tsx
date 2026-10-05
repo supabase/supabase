@@ -5,6 +5,7 @@ import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Checkbox,
+  cn,
   copyToClipboard,
   Dialog,
   DialogClose,
@@ -18,6 +19,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 
 interface RecoveryCodesModalProps<T>
@@ -36,7 +38,7 @@ export const RecoveryCodesModal = <T = unknown,>({
   const [copied, setCopied] = useState(false)
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
-  const { data, status, isError, isPending, isSuccess } = mutation
+  const { data, status, error, isError, isPending, isSuccess } = mutation
   const codes = data?.codes ?? []
 
   const title = useMemo(() => {
@@ -97,12 +99,14 @@ export const RecoveryCodesModal = <T = unknown,>({
 
         <DialogSectionSeparator />
 
-        <DialogSection>
+        <DialogSection className={cn(isError && 'p-0 md:px-0')}>
           {isError && (
-            <p className="text-sm text-destructive">
-              We couldn't generate your recovery code. Please try again later or contact support if
-              the problem persists.
-            </p>
+            <AlertError
+              layout="vertical"
+              className="rounded-none border-0"
+              subject="Unable to generate recovery codes"
+              error={error}
+            />
           )}
 
           {isSuccess && (
@@ -143,7 +147,10 @@ export const RecoveryCodesModal = <T = unknown,>({
                 </div>
               </div>
 
-              <span aria-live="polite">{copiedToClipboard && 'Codes copied to clipboard'}</span>
+              <span className="sr-only" aria-live="polite">
+                {copiedToClipboard && 'Codes copied to clipboard'}
+              </span>
+
               <Admonition
                 type="warning"
                 title="You won't see these codes again"

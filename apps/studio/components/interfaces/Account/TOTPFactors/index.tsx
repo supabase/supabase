@@ -14,6 +14,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
 import { DeleteFactorModal } from './DeleteFactorModal'
@@ -73,7 +74,7 @@ export const TOTPFactors = () => {
         <PageSectionContent className="flex flex-col gap-4">
           {shouldShowLockoutWarning && (
             <Admonition
-              type="danger"
+              type="warning"
               layout="responsive"
               title="Avoid being locked out"
               description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
@@ -107,7 +108,12 @@ export const TOTPFactors = () => {
                       <div>
                         <p className="text-sm">{factor.friendly_name ?? 'No name provided'}</p>
                         <p className="text-sm text-foreground-lighter">
-                          Added on {dayjs(factor.created_at).format(DATETIME_FORMAT)}
+                          Added on{' '}
+                          <TimestampInfo
+                            className="text-sm"
+                            utcTimestamp={factor.created_at}
+                            label={dayjs(factor.created_at).format(DATETIME_FORMAT)}
+                          />
                         </p>
                       </div>
                       <Button
