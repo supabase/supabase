@@ -31,6 +31,7 @@ import {
   redirect,
   Scripts,
   type AnyRouter,
+  type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -300,7 +301,7 @@ function NotFound() {
   return <Error404 />
 }
 
-function ErrorBoundaryRoute({ error }: { error: Error }) {
+function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // Mirrors `errorBoundaryHandler` above (used by the in-tree
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
@@ -313,7 +314,7 @@ function ErrorBoundaryRoute({ error }: { error: Error }) {
         ;(error as Error & { sentryId?: string }).sentryId = eventId
       }
     })
-    console.error(error.stack)
+    console.error(error instanceof Error ? error.stack : error)
   }, [error])
 
   return <Error500 />
@@ -331,7 +332,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       isPlatform: IS_PLATFORM,
       hash: location.hash,
     })
-    if (!match) return
+    if (!match) return undefined
     // `to`/`search`/`hash`, never `href`: the router treats `href` as an
     // opaque (external) target, and preloading a Link whose beforeLoad
     // throws `redirect({ href })` recurses forever — the preload retry
