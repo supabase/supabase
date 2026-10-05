@@ -105,12 +105,6 @@ export function useBranchCommands() {
         value: 'Branch',
         route: `/project/${ref}/branches/merge-requests`,
       },
-      {
-        id: 'nav-branch-integration',
-        name: 'GitHub connection',
-        value: 'Branch integration',
-        route: `/project/${parentRef}/settings/integrations`,
-      },
     ],
     { enabled: !!selectedProject }
   )
