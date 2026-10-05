@@ -196,8 +196,8 @@ Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the pub
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@^2.0.0'
-import { pipeline } from 'npm:@supabase/middleware@^0.5.0'
-import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
+import { pipeline } from 'npm:@supabase/middleware@1'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
 import { z } from 'npm:zod@^4.3.6'
 
 import type { Database } from './database.types.ts'
@@ -254,7 +254,7 @@ Deno.serve(
 
 <Admonition type="note">
 
-Composing `withSupabase` as a `pipeline` entry is alpha and tracks `@supabase/middleware` 0.x. The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, is stable and behaves the same. Both need `@supabase/server` 1.6.0 or later.
+The nested form, `withOAuthProtectedResource(withSupabase({ auth: 'user' }, handler))`, behaves the same. Both need `@supabase/server` 1.6.0 or later.
 
 </Admonition>
 
@@ -342,6 +342,37 @@ Every client that implements the MCP authorization specification discovers your 
 | ChatGPT     | Settings > Connectors, with developer mode enabled. Requires a public HTTPS URL.      |
 
 Users can review and revoke connected clients through the [OAuth grant management](/docs/guides/auth/oauth-server/oauth-flows#managing-user-grants) endpoints. The [Headless App block](/library/docs/tanstack/headless-app) ships an `/agents` page that does this.
+
+## Use a custom domain
+
+With a [custom domain](/docs/guides/platform/custom-domains) active, clients can reach your MCP server at `https://api.example.com/functions/v1/mcp`. Supabase Auth keeps its issuer on the project domain, `https://<your-project-ref>.supabase.co/auth/v1`. `withOAuthProtectedResource()` builds the Auth URL from the domain the request arrived on, so on the custom domain it advertises `https://api.example.com/auth/v1`. That doesn't match the issuer, and MCP clients that validate the Auth metadata stop at discovery.
+
+If your clients can use the project URL, `https://<your-project-ref>.supabase.co/functions/v1/mcp` needs no changes. To serve MCP on the custom domain too, set the Auth server explicitly:
+
+1. Point `authorizationServer` at an environment variable instead of letting it default to the request's domain:
+
+   ```ts
+   [
+     withOAuthProtectedResource({ authorizationServer: Deno.env.get('MCP_AUTH_ISSUER') }),
+     withSupabase<Database>({ auth: 'user' }),
+   ],
+   ```
+
+2. Store the issuer as a secret, and redeploy:
+
+   ```bash
+   supabase secrets set MCP_AUTH_ISSUER=https://<your-project-ref>.supabase.co/auth/v1
+   supabase functions deploy mcp
+   ```
+
+Leave `MCP_AUTH_ISSUER` unset locally. An unset value falls back to the default, which is correct on the local stack. The `resource` URL still follows the domain each client uses, so the project URL and the custom domain both keep working.
+
+To confirm the fix, compare `authorization_servers` from the resource metadata with `issuer` from Auth's discovery document. They must match:
+
+```bash
+curl https://api.example.com/functions/v1/mcp/oauth-protected-resource
+curl https://<your-project-ref>.supabase.co/auth/v1/.well-known/oauth-authorization-server
+```
 
 ## Run it outside Edge Functions
 

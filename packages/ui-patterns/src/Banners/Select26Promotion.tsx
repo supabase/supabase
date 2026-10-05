@@ -144,6 +144,41 @@ type Select26FieldProps = HTMLAttributes<HTMLDivElement> & {
  * radar beam falloff. Stepped updates mirror the Select glyph-engine without
  * shipping its canvas runtime.
  */
+/**
+ * One shared, throttled rAF loop for every mounted field, so multiple fields
+ * (e.g. the mirrored www pair) paint in the same frame instead of each
+ * running its own loop.
+ */
+type FieldPainter = (timeMs: number) => void
+const fieldPainters = new Set<FieldPainter>()
+let fieldRaf = 0
+let fieldLastPaint = 0
+let fieldStarted = 0
+
+const fieldTick = (now: number) => {
+  if (now - fieldLastPaint >= FRAME_INTERVAL_MS) {
+    fieldLastPaint = now
+    const timeMs = now - fieldStarted
+    fieldPainters.forEach((paint) => paint(timeMs))
+  }
+  fieldRaf = fieldPainters.size > 0 ? requestAnimationFrame(fieldTick) : 0
+}
+
+const subscribeFieldPainter = (paint: FieldPainter) => {
+  fieldPainters.add(paint)
+  if (!fieldRaf) {
+    if (!fieldStarted) fieldStarted = performance.now()
+    fieldRaf = requestAnimationFrame(fieldTick)
+  }
+  return () => {
+    fieldPainters.delete(paint)
+    if (fieldPainters.size === 0 && fieldRaf) {
+      cancelAnimationFrame(fieldRaf)
+      fieldRaf = 0
+    }
+  }
+}
+
 export const Select26Field = ({
   cols = 10,
   rows = 6,
@@ -154,8 +189,6 @@ export const Select26Field = ({
   ...props
 }: Select26FieldProps) => {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [timeMs, setTimeMs] = useState(0)
-  const [isVisible, setIsVisible] = useState(true)
 
   const widths = useMemo(() => {
     if (rowWidths) return rowWidths
@@ -163,50 +196,62 @@ export const Select26Field = ({
   }, [rowWidths, rows, cols])
   const fieldRows = widths.length
 
+  // Static first frame for SSR / reduced motion; animation then mutates the
+  // existing spans directly instead of re-rendering through React.
+  const initialCells = useMemo(
+    () =>
+      widths.map((rowCols, y) =>
+        Array.from({ length: rowCols }, (_, x) => cellAt(x, y, rowCols, fieldRows, 0, mirror))
+      ),
+    [widths, fieldRows, mirror]
+  )
+
   useEffect(() => {
     const node = rootRef.current
-    if (!node || typeof IntersectionObserver === 'undefined') return
+    if (!node) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const spans = Array.from(node.querySelectorAll<HTMLSpanElement>('[data-cell]'))
+    const coords = widths.flatMap((rowCols, y) => Array.from({ length: rowCols }, (_, x) => [x, y]))
+    const previous = initialCells.flat()
+
+    const paint: FieldPainter = (timeMs) => {
+      for (let i = 0; i < spans.length; i++) {
+        const [x, y] = coords[i]
+        const next = cellAt(x, y, widths[y], fieldRows, timeMs, mirror)
+        const prev = previous[i]
+        const span = spans[i]
+        if (next.ch !== prev.ch) span.textContent = next.ch
+        if (next.band !== prev.band) span.dataset.band = String(next.band)
+        if (next.weight !== prev.weight) span.style.opacity = String(next.weight)
+        previous[i] = next
+      }
+    }
+
+    let unsubscribe: (() => void) | undefined
+    const start = () => {
+      if (!unsubscribe) unsubscribe = subscribeFieldPainter(paint)
+    }
+    const stop = () => {
+      unsubscribe?.()
+      unsubscribe = undefined
+    }
+
+    // Only animate while on screen (also covers `display: none` breakpoints).
+    if (typeof IntersectionObserver === 'undefined') {
+      start()
+      return stop
+    }
     const observer = new IntersectionObserver(
-      ([entry]) => setIsVisible(entry?.isIntersecting ?? false),
+      ([entry]) => (entry?.isIntersecting ? start() : stop()),
       { rootMargin: '80px' }
     )
     observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    if (!isVisible) return
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return
+    return () => {
+      observer.disconnect()
+      stop()
     }
-
-    let raf = 0
-    let lastPaint = 0
-    const started = performance.now()
-
-    const tick = (now: number) => {
-      if (now - lastPaint >= FRAME_INTERVAL_MS) {
-        lastPaint = now
-        setTimeMs(now - started)
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [isVisible])
-
-  const cellsByRow = useMemo(() => {
-    return widths.map((rowCols, y) => {
-      const rowCells: FieldCell[] = []
-      for (let x = 0; x < rowCols; x++) {
-        rowCells.push(cellAt(x, y, rowCols, fieldRows, timeMs, mirror))
-      }
-      return rowCells
-    })
-  }, [widths, fieldRows, timeMs, mirror])
+  }, [widths, fieldRows, mirror, initialCells])
 
   return (
     <div
@@ -219,7 +264,7 @@ export const Select26Field = ({
       )}
       {...props}
     >
-      {cellsByRow.map((rowCells, y) => {
+      {initialCells.map((rowCells, y) => {
         const rowCols = widths[y]
         const cellWidth = 'calc(22 / 34 * 1em)'
 
@@ -235,6 +280,7 @@ export const Select26Field = ({
             {rowCells.map((cell, index) => (
               <span
                 key={index}
+                data-cell
                 className={styles.cell}
                 data-band={cell.band}
                 style={{ opacity: cell.weight }}

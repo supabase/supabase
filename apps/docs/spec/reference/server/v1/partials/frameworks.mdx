@@ -329,7 +329,7 @@ Neither entry answers a CORS preflight, and the short-circuits carry no CORS hea
 
 `withSupabase(config, handler)` still does the verify-then-reject work for you, and it is not deprecated. It wraps a fetch handler rather than composing into a framework chain, so it does not slot into a bridge. If an endpoint is already a plain fetch handler, staying on `withSupabase()` is a legitimate end state. It is also the only way to get the full `SupabaseContext`, `userClaims` and `authMode` included, behind an auth gate.
 
-To compose other entries around it, `withSupabase({ auth: 'user' })` with no handler is a `pipeline` entry placed by position. Entries before it run ahead of the auth gate. Entries after it receive the full `SupabaseContext`. Nesting, as in `withSupabase(config, entry(handler))`, still works. The entry form is alpha and needs 1.6.0 or later.
+To compose other entries around it, `withSupabase({ auth: 'user' })` with no handler is a `pipeline` entry placed by position. Entries before it run ahead of the auth gate. Entries after it receive the full `SupabaseContext`. Nesting, as in `withSupabase(config, entry(handler))`, still works. The entry form needs 1.6.0 or later.
 
 ```ts
 import { pipeline } from '@supabase/middleware'

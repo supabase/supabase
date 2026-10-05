@@ -49,21 +49,21 @@ describe('GenerateRecoveryCodesModal', () => {
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')
     await screen.findByText('KYYF-SP3E-QJYD-J53T')
 
-    // Users have to copy the codes to close the modal, next click should fail if they managed to close it
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(1)
-    fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy to clipboard' }))
-    await waitFor(() =>
-      expect(screen.getByRole('checkbox', { name: 'I have copied the codes' })).toBeChecked()
+    // Users have to copy the codes before they can close the modal
+    expect(await screen.findByRole('button', { name: 'Done' })).toBeDisabled()
+    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
     )
     expect(mockCopyToClipboard).toHaveBeenCalledWith(
       codes.map((code) => formatRecoveryCode(code)).join('\n'),
       expect.any(Function)
     )
 
-    // We should have 2 close buttons (header icon and a standard button)
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Close' })).at(1)!)
+    // Done button is now enabled and closes the modal
+    const doneButton = await screen.findByRole('button', { name: 'Done' })
+    expect(doneButton).toBeEnabled()
+    fireEvent.click(doneButton)
     await waitFor(() => expect(screen.queryByText('Save your recovery codes')).toBeNull())
   })
 
@@ -84,13 +84,12 @@ describe('GenerateRecoveryCodesModal', () => {
       })
     customRender(<GenerateRecoveryCodesModal />)
     fireEvent.click(await screen.findByRole('button', { name: 'Generate recovery codes' }))
+    await screen.findByText('Unable to generate recovery codes')
     await screen.findByText(
-      "We couldn't generate your recovery code. Please try again later or contact support if the problem persists."
+      'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.'
     )
 
-    // We should have 2 close buttons (header icon and a standard button)
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Close' })).at(1)!)
+    fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
     await waitFor(() => expect(screen.queryByText('Save your recovery codes')).toBeNull())
 
     // Retry
