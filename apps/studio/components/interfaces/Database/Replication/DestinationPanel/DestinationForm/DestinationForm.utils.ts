@@ -332,7 +332,7 @@ const buildDucklakeConfig = (
       catalogProjectRef: normalizeRequiredString(data.ducklakeCatalogProjectRef),
       storageProjectRef: normalizeRequiredString(data.ducklakeStorageProjectRef),
       bucket: normalizeRequiredString(data.ducklakeStorageBucket),
-      poolSize: data.ducklakePoolSize,
+      poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
       metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
     }
     return supabaseConfig
@@ -341,7 +341,7 @@ const buildDucklakeConfig = (
   const manualConfig: DucklakeManualDestinationConfig = {
     catalogUrl: data.ducklakeCatalogUrl ?? '',
     dataPath: data.ducklakeDataPath ?? '',
-    poolSize: data.ducklakePoolSize,
+    poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
     s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
     s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
     s3Region: normalizeRequiredString(data.ducklakeS3Region),

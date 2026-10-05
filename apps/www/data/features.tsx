@@ -654,7 +654,7 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
+BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
 
 ## Setup
 Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
@@ -2132,6 +2132,7 @@ Supabase's Command Line Interface (CLI) tool provides developers with a powerful
 5. Environment management: Handle multiple environments (development, staging, production) efficiently.
 6. Seed data management: Populate your database with test data for consistent development and testing.
 7. CI/CD integration: Incorporate Supabase operations into your continuous integration and deployment pipelines.
+8. Parallel local projects: Run a separate local project for each app, git worktree, or named environment with the experimental \`supabase stack\` commands.
 
 ## The CLI is particularly valuable for:
 - Development teams working on Supabase projects collaboratively
@@ -2151,6 +2152,68 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Parallel local projects',
+    subtitle: 'Run a local Supabase project for every app or git worktree.',
+    description: `
+The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to its project directory and git branch. Every app or git worktree gets its own Postgres database, Auth, Storage, and other services, with separate ports and data.
+
+With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. The experimental \`supabase stack\` commands assign ports automatically and keep them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`, so a destructive test run never touches your development data.
+
+## Key benefits
+1. One local project per worktree: Run coding agents in separate git worktrees, each against its own database.
+2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or create the project with the stack commands turned on.
+3. Named environments: Start \`--stack dev\` and \`--stack test\` side by side in one app.
+4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
+5. Services start on demand: Postgres starts right away. Other services start on their first request and stop when idle, which keeps idle local projects light.
+
+## Parallel local projects are valuable for:
+- Developers running coding agents in git worktrees
+- Teams that keep separate development and test databases on one machine
+- Freelancers and consultants switching between several client apps
+- CI jobs and agent sandboxes that run without a Docker daemon
+
+The \`supabase stack\` commands are experimental. Their interface can change between releases. See the documentation for the full workflow and limitations.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'parallel-local-projects',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Native runtime for local development',
+    subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
+    description: `
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. There, \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
+
+It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
+
+## Key benefits
+1. Works without Docker: Bring up a real local Supabase project in environments that can't run a container engine.
+2. Verified binaries: The CLI downloads service archives from Supabase's GitHub releases and checks them before extracting.
+3. Same project, same services: Postgres with the full extension set, Auth, PostgREST, Realtime, Storage, Edge Functions, Studio, and more.
+
+## The native runtime is valuable for:
+- Coding agents running in sandboxes with no container engine
+- CI jobs on runners without a Docker daemon
+
+The native runtime supports Linux on amd64 and arm64 and macOS on Apple silicon. Windows and Intel Macs use Docker. For several local projects on one machine, Docker remains the recommended runtime. The \`supabase stack\` commands are experimental.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
+    slug: 'native-local-runtime',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -2834,7 +2897,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
     slug: 'orioledb',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },

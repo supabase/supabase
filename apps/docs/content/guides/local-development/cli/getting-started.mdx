@@ -247,13 +247,14 @@ supabase stop --no-backup
 
 ## Running a local Supabase project
 
-The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
+The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. On Windows and Linux, follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop).
+
+On macOS, we recommend [OrbStack](https://orbstack.dev/) instead of Docker Desktop. It's a drop-in replacement that handles extended file attributes (xattrs) on mounted volumes and container networking more reliably than Docker Desktop. It also starts faster and uses less CPU, memory, and disk, which makes a noticeable difference when running the full Supabase stack.
 
 Alternately, you can use a different container tool that offers Docker compatible APIs.
 
 - [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
 - [Podman](https://podman.io/) (macOS, Windows, Linux)
-- [OrbStack](https://orbstack.dev/) (macOS)
 - [colima](https://github.com/abiosoft/colima) (macOS)
 
 With a container runtime running, go to the folder where you want to create your project and initialize it:
@@ -403,6 +404,8 @@ When you are finished working on your Supabase project, you can stop the stack (
 ```bash
 supabase stop
 ```
+
+With the default ports, `supabase start` runs one local project per machine, because every project's `config.toml` uses the same ports. To run several local projects or git worktrees at the same time, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
 
 ## Telemetry
 
