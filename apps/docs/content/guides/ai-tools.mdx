@@ -23,4 +23,8 @@ See how these tools perform on real Supabase tasks in [Supabase Evals](/evals), 
 - **Plugin**: a single install that bundles the MCP server and Agent Skills together for a specific agent.
 - **Prompts**: static prompt files you copy into your project for agents that don't support MCP, plugins, or skills natively.
 
+## Local projects for parallel agents
+
+Agents that work in separate git worktrees or branches each need their own database. Otherwise migrations and seed data from one task affect another. With the experimental `supabase stack` commands turned on, `supabase start` gives each worktree or branch its own local Supabase project with its own ports and data. Agents that share one checkout and branch share a local project, so give each agent its own worktree. The commands also run without Docker on Linux and on macOS on Apple silicon, which covers agent sandboxes that have no container engine. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects) and [Docker and native runtimes](/docs/guides/local-development/docker-and-native-runtimes).
+
 <ContentListings id="ai-tools-building-into-app" />
