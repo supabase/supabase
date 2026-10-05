@@ -33,6 +33,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const routerReady = router.isReady
   const { auth_id, organization_slug, mock_scenario } = useParams()
   const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
+  const isScopedOAuthFlowEnabled = oauthAppScopedGrants && USE_MOCKS
 
   const mockScenario = USE_MOCKS
     ? (MOCK_SCENARIOS[mock_scenario ?? 'default'] ?? MOCK_SCENARIOS.default)
@@ -45,7 +46,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   const { data: request } = useOAuthAppsAuthorizeRequestQuery(
     { id: authId },
-    { enabled: oauthAppScopedGrants }
+    { enabled: isScopedOAuthFlowEnabled }
   )
 
   if (!routerReady) {
@@ -59,7 +60,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
-  if (oauthAppScopedGrants) {
+  if (isScopedOAuthFlowEnabled) {
     if (!authId || !request) {
       return (
         <>
