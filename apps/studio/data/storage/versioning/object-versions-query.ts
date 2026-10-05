@@ -17,6 +17,8 @@ export type ObjectVersionAction = 'initial upload' | 'overwrite' | 'delete marke
 export interface ObjectVersion {
   versionId: string
   size: number
+  /** An overwrite can change the type, so each version carries its own. */
+  mimeType?: string
   createdAt: string
   isCurrent: boolean
   action: ObjectVersionAction
@@ -49,6 +51,9 @@ export const toObjectVersions = (objects: StorageObject[]): ObjectVersion[] => {
     .map((object) => ({
       versionId: object.version as string,
       size: Number(object.metadata?.size ?? 0),
+      // `metadata` is an untyped bag, so narrow rather than trust it.
+      mimeType:
+        typeof object.metadata?.mimetype === 'string' ? object.metadata.mimetype : undefined,
       createdAt: object.created_at ?? object.updated_at ?? '',
       isCurrent: !object.archived_at,
       isDeleteMarker: !!object.is_delete_marker,

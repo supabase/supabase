@@ -73,6 +73,20 @@ describe('toObjectVersions', () => {
     expect(versions.find((version) => version.versionId === 'b')?.size).toBe(0)
   })
 
+  it('keeps each version its own mime type, since an overwrite can change it', () => {
+    const versions = toObjectVersions([
+      object({
+        version: 'a',
+        created_at: '2026-01-01T00:00:00Z',
+        metadata: { mimetype: 'image/png' },
+      }),
+      object({ version: 'b', created_at: '2026-02-01T00:00:00Z', metadata: { size: 1 } }),
+    ])
+
+    expect(versions.find((version) => version.versionId === 'a')?.mimeType).toBe('image/png')
+    expect(versions.find((version) => version.versionId === 'b')?.mimeType).toBeUndefined()
+  })
+
   it('drops rows the API returned without a version id', () => {
     expect(toObjectVersions([object({ created_at: '2026-01-01T00:00:00Z' })])).toEqual([])
   })
