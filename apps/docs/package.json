@@ -33,6 +33,7 @@
     "last-changed": "tsx scripts/last-changed.ts",
     "last-changed:reset": "pnpm run last-changed -- --reset",
     "lint": "eslint .",
+    "lint:ratchet": "tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --rules-file node_modules/eslint-config-supabase/ratchet-rules.json",
     "postbuild": "pnpm run build:sitemap && ./../../scripts/upload-static-assets.sh",
     "prebuild": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples && pnpm build:federated-content && pnpm run build:markdown && pnpm run build:gz-archive",
     "predev": "pnpm run codegen:graphql && pnpm run codegen:references && pnpm run codegen:examples",

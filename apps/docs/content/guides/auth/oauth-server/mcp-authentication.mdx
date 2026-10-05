@@ -84,8 +84,8 @@ When building your own MCP server, integrate with Supabase Auth to authenticate 
 On Supabase Edge Functions, or any runtime with a `fetch`-style handler, [`@supabase/server`](/docs/reference/server/introduction) does the OAuth plumbing for you. `withOAuthProtectedResource()` publishes the protected resource metadata and the `WWW-Authenticate` challenge that MCP clients use to find your Auth server; `withSupabase({ auth: 'user' })` verifies the token and gives your tools a client scoped to that user:
 
 ```ts
-import { pipeline } from 'npm:@supabase/middleware@^0.5.0'
-import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@^1.6.0'
+import { pipeline } from 'npm:@supabase/middleware@1'
+import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
   pipeline(
