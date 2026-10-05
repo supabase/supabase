@@ -16,6 +16,7 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ShortcutTooltip } from '../ShortcutTooltip'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -221,6 +222,12 @@ export const AIAssistantChatSelector = ({
                 <Plus size={14} strokeWidth={1.5} />
                 <span>Start a new chat</span>
               </CommandItem>
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup className="px-2 py-1.5">
+              <p className="text-xs text-foreground-lighter">
+                Chat history is saved to this browser and isn't synced across devices.
+              </p>
             </CommandGroup>
           </CommandList>
         </Command>
