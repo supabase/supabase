@@ -33,7 +33,9 @@ export const ConfirmPurgeModal = () => {
     if (!projectRef || !selectedBucket?.id || itemToPurge === undefined) return
 
     // The endpoint addresses an object by full path; a row only knows its leaf name.
-    const path = getStorageItemPath({ openedFolders }, itemToPurge)
+    // The path captured when the row was targeted beats rebuilding it from folders
+    // that may have moved on; rows synthesized without one still need the rebuild.
+    const path = itemToPurge.path ?? getStorageItemPath({ openedFolders }, itemToPurge)
 
     purgeObject({ projectRef, bucketId: selectedBucket.id, path })
   }
