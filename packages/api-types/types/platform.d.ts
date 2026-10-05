@@ -10475,6 +10475,8 @@ export interface components {
       billing_email: string | null
       /** @enum {string|null} */
       billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      /** Format: date-time */
+      created_at: string
       has_oriole_project: boolean
       id: number
       integration_source: string | null
