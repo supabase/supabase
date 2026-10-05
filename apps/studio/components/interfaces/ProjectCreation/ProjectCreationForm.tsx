@@ -14,6 +14,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
 import { AdvancedConfiguration } from './AdvancedConfiguration'
+import { RegionSummaryRow, useAdvancedRegionConfigVariant } from './AdvancedRegionConfig'
 import { ComputeSizeSelector } from './ComputeSizeSelector'
 import { DatabasePasswordInput } from './DatabasePasswordInput'
 import { DataSeeding } from './DataSeeding'
@@ -132,6 +133,10 @@ export const ProjectCreationForm = ({
     'integrations.github_connections'
   )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+  const regionVariant = useAdvancedRegionConfigVariant()
+  // Option B only applies where the advanced section actually renders — otherwise the region
+  // picker would have nowhere to live.
+  const isRegionInAdvancedConfig = regionVariant === 'option_b' && showAdvancedConfig
   const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
     'integrations.github_connections'
   )
@@ -157,6 +162,8 @@ export const ProjectCreationForm = ({
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
   const [projectCreationError, setProjectCreationError] = useState<string>()
+  const [isAdvancedConfigOpen, setIsAdvancedConfigOpen] = useState(false)
+  const advancedConfigRef = useRef<HTMLDivElement>(null)
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -324,6 +331,15 @@ export const ProjectCreationForm = ({
     },
     { enabled: currentOrg !== null }
   )
+
+  const hasPostgresTypeOption =
+    showAdvancedConfig && !!availableOrioleVersion && highAvailability !== true
+  const isAdvancedConfigVisible = hasPostgresTypeOption || isRegionInAdvancedConfig
+
+  const handleChangeRegionClick = () => {
+    setIsAdvancedConfigOpen(true)
+    advancedConfigRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
 
   const userPrimaryEmail = profile?.primary_email?.toLowerCase()
   const isUserAtFreeProjectLimit = userPrimaryEmail
@@ -777,11 +793,21 @@ export const ProjectCreationForm = ({
 
                     <DatabasePasswordInput form={form} />
 
-                    <RegionSelector
-                      form={form}
-                      hasSelectedOrganization={hasSelectedOrganization}
-                      instanceSize={instanceSize as DesiredInstanceSize}
-                    />
+                    {isRegionInAdvancedConfig ? (
+                      <RegionSummaryRow
+                        form={form}
+                        hasSelectedOrganization={hasSelectedOrganization}
+                        instanceSize={instanceSize as DesiredInstanceSize}
+                        onChangeRegionClick={handleChangeRegionClick}
+                      />
+                    ) : (
+                      <RegionSelector
+                        form={form}
+                        hasSelectedOrganization={hasSelectedOrganization}
+                        instanceSize={instanceSize as DesiredInstanceSize}
+                        variant={regionVariant}
+                      />
+                    )}
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
 
@@ -789,9 +815,25 @@ export const ProjectCreationForm = ({
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
-                    {showAdvancedConfig &&
-                      !!availableOrioleVersion &&
-                      highAvailability !== true && <AdvancedConfiguration form={form} />}
+                    {isAdvancedConfigVisible && (
+                      <div ref={advancedConfigRef}>
+                        <AdvancedConfiguration
+                          form={form}
+                          hasPostgresTypeOption={hasPostgresTypeOption}
+                          open={isAdvancedConfigOpen}
+                          onOpenChange={setIsAdvancedConfigOpen}
+                        >
+                          {isRegionInAdvancedConfig && (
+                            <RegionSelector
+                              form={form}
+                              hasSelectedOrganization={hasSelectedOrganization}
+                              instanceSize={instanceSize as DesiredInstanceSize}
+                              isEmbedded
+                            />
+                          )}
+                        </AdvancedConfiguration>
+                      </div>
+                    )}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
