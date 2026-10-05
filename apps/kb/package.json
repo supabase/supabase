@@ -11,6 +11,8 @@
     "build": "astro build",
     "fetch:federated-content": "node --experimental-strip-types --env-file-if-exists=.env.local ./scripts/federated-content/fetch-federated-content.ts",
     "generate:markdown": "node --experimental-strip-types ./scripts/generate-markdown.mjs",
+    "sync:troubleshooting-entries": "node --experimental-strip-types --env-file-if-exists=.env.local ./scripts/federated-content/sync-troubleshooting-entries.ts",
+    "sync:troubleshooting-updates": "node --experimental-strip-types --env-file-if-exists=.env.local ./scripts/federated-content/sync-troubleshooting-updates.ts",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest --run"
@@ -23,6 +25,7 @@
     "@octokit/auth-app": "^7.0.0",
     "@octokit/core": "^7.0.6",
     "@octokit/plugin-retry": "^8.1.0",
+    "@supabase/supabase-js": "catalog:",
     "astro": "^7.2.6",
     "gray-matter": "^4.0.3",
     "lucide-react": "*",

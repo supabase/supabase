@@ -3,20 +3,27 @@ import { getCollection, render } from 'astro:content'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
+import { getGithubUrlsBySlug } from '../../lib/troubleshooting-db'
 
 export async function getStaticPaths() {
 	const troubleshooting = await getCollection('troubleshooting')
+
+	// github_url lives in the DB, not the fetched frontmatter — looked up here
+	// (build time; kb is fully static, no SSR) rather than baked into the
+	// fetched files.
+	const githubUrlBySlug = await getGithubUrlsBySlug(troubleshooting.map((entry) => entry.id))
+
 	return troubleshooting.map((entry) => ({
 		params: { slug: entry.id },
-		props: { entry },
+		props: { entry, githubUrl: githubUrlBySlug.get(entry.id) },
 	}))
 }
 
-const { entry } = Astro.props
-const { title, description, topics, github_url } = entry.data
+const { entry, githubUrl } = Astro.props
+const { title, description, topics } = entry.data
 const { Content } = await render(entry)
 ---
 
-<ArticleLayout title={title} description={description} topics={topics} github_url={github_url}>
+<ArticleLayout title={title} description={description} topics={topics} github_url={githubUrl}>
 	<Content components={{ Admonition }} />
 </ArticleLayout>
