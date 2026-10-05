@@ -1,7 +1,12 @@
 import { ReactNode, useEffect, useState } from 'react'
-import { Badge, cn, controlRadiusBySize, FloatingPlate } from 'ui'
+import { Badge, cn, FloatingPlate } from 'ui'
 
 import { LastSignInType, useLastSignIn } from '@/hooks/misc/useLastSignIn'
+
+// Sign-in controls wrapped here all use Button size="large". Outline sits
+// outline-offset-4 outside that control, so add 4px to the large control radius
+// to keep the ring concentric with the button corners.
+const LAST_USED_OUTLINE_RADIUS = 'rounded-[calc(var(--radius-md)*(1+(42/26-1)*0.35)+4px)]'
 
 export function LastSignInWrapper({
   children,
@@ -36,7 +41,7 @@ export function LastSignInWrapper({
           isLastUsed &&
             cn(
               'outline outline-1 outline-offset-4 outline-foreground-lighter/50',
-              controlRadiusBySize.large
+              LAST_USED_OUTLINE_RADIUS
             )
         )}
       >
