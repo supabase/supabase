@@ -1338,5 +1338,32 @@ describe('project creation wizard', () => {
       expect(getTriggerByPlaceholder('Select a specific region...')).toBeInTheDocument()
       expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'americas' })
     })
+
+    test('option C (link) swaps the dropdown for the specific regions', async () => {
+      const onRequest = await renderVariant('option_c_link')
+
+      await selectRegion(/Americas/)
+
+      await user.click(screen.getByRole('button', { name: 'Need a specific region?' }))
+      await user.click(getTriggerByPlaceholder('Select a specific region...'))
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'us-east-1' })
+    })
+
+    test('option C (link) restores the previous general region in one click', async () => {
+      const onRequest = await renderVariant('option_c_link')
+
+      await selectRegion(/Americas/)
+
+      await user.click(screen.getByRole('button', { name: 'Need a specific region?' }))
+      await user.click(getTriggerByPlaceholder('Select a specific region...'))
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      await user.click(screen.getByRole('button', { name: 'Use a general region instead' }))
+
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'americas' })
+    })
   })
 })

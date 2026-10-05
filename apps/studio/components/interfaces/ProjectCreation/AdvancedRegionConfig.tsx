@@ -1,6 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -23,6 +23,7 @@ import {
   RegionSelectTriggerValue,
   SpecificRegionSelectItems,
   useRegionSelectorOptions,
+  type RegionSelectorOptions,
   type RegionSelectProps,
 } from './RegionSelector.shared'
 import { SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
@@ -33,8 +34,8 @@ import { usePHFlag } from '@/hooks/ui/useFlag'
 
 /**
  * Advanced region config experiment (P-PROD-4259). Everything experiment-specific lives in this
- * file: variant resolution, the instrumentation stubs, and the three treatments. Deleting this
- * file plus its two call sites in RegionSelector/ProjectCreationForm removes the experiment.
+ * file: variant resolution, the instrumentation stubs, and the treatments. Deleting this file
+ * plus its two call sites in RegionSelector/ProjectCreationForm removes the experiment.
  */
 
 export const ADVANCED_REGION_CONFIG_VARIANTS = [
@@ -42,6 +43,7 @@ export const ADVANCED_REGION_CONFIG_VARIANTS = [
   'option_a',
   'option_b',
   'option_c',
+  'option_c_link',
 ] as const
 
 export type AdvancedRegionConfigVariant = (typeof ADVANCED_REGION_CONFIG_VARIANTS)[number]
@@ -121,7 +123,22 @@ export function useAdvancedRegionConfigTelemetry(variant: AdvancedRegionConfigVa
     void variant
   }
 
-  return { trackDisclosureOpened, trackSpecificRegionSelected }
+  const trackSpecificRegionLinkClicked = () => {
+    // TODO(P-PROD-4259): "Need a specific region?" link clicked (option_c_link)
+    void variant
+  }
+
+  const trackRevertedToGeneralRegion = () => {
+    // TODO(P-PROD-4259): reverted to a general region (option_c_link)
+    void variant
+  }
+
+  return {
+    trackDisclosureOpened,
+    trackSpecificRegionSelected,
+    trackSpecificRegionLinkClicked,
+    trackRevertedToGeneralRegion,
+  }
 }
 
 const TRIGGER_CLASS =
@@ -202,6 +219,7 @@ export const RegionSelectorOptionA = ({
           {!areSpecificRegionsVisible && (
             <button
               type="button"
+              tabIndex={0}
               onClick={handleOpenDisclosure}
               className="w-full flex items-center gap-x-1 px-2 py-1.5 text-sm text-foreground-light hover:text-foreground rounded-sm hover:bg-overlay-hover transition"
             >
@@ -398,6 +416,171 @@ export const RegionSelectorOptionC = ({
             </SelectGroup>
           </SelectContent>
         </Select>
+      )}
+    </div>
+  )
+}
+
+/** Extra instrumentation Option C (link) needs on top of the shared picker props. */
+export type OptionCLinkProps = RegionSelectProps & {
+  onSpecificRegionLinkClicked: () => void
+  onRevertedToGeneralRegion: () => void
+}
+
+/**
+ * Option C (link) lets the user step back out of the specific regions, so it has to remember the
+ * general region that was selected before the switch. `dbRegion` can't be cleared (RegionSelector
+ * drops empty values), so when there is nothing to restore we fall back to the recommended general
+ * region rather than leaving the field showing a region it no longer holds.
+ */
+function useGeneralRegionFallback({
+  options,
+  value,
+}: {
+  options: RegionSelectorOptions
+  value: string | undefined
+}) {
+  const { generalRegions, specificRegions, recommendedGeneralRegionCodes } = options
+  const isSpecificRegionSelected = specificRegions.some((region) => region.name === value)
+
+  const lastGeneralRegionRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (value !== undefined && !isSpecificRegionSelected) lastGeneralRegionRef.current = value
+  }, [value, isSpecificRegionSelected])
+
+  const getGeneralRegionToRestore = () =>
+    lastGeneralRegionRef.current ??
+    generalRegions.find((region) => recommendedGeneralRegionCodes.has(region.code))?.name ??
+    generalRegions[0]?.name
+
+  return { isSpecificRegionSelected, getGeneralRegionToRestore }
+}
+
+/**
+ * Option C (link) — the general regions stay in the only visible dropdown, with a subtle link
+ * underneath that swaps it for the specific regions. The link then reverts in a single click.
+ */
+export const RegionSelectorOptionCLink = ({
+  options,
+  value,
+  onChange,
+  triggerRef,
+  onSpecificRegionSelected,
+  onSpecificRegionLinkClicked,
+  onRevertedToGeneralRegion,
+}: OptionCLinkProps) => {
+  const {
+    generalRegions,
+    specificRegions,
+    recommendedGeneralRegionCodes,
+    recommendedSpecificRegionCodes,
+    selectedRegion,
+    selectedRegionLabel,
+    specificRegionsLabel,
+    hasGeneralRegions,
+    isLoading,
+  } = options
+
+  const { isSpecificRegionSelected, getGeneralRegionToRestore } = useGeneralRegionFallback({
+    options,
+    value,
+  })
+  const [isChoosingSpecificRegion, setIsChoosingSpecificRegion] = useState(false)
+  const isSpecificSelectVisible =
+    isChoosingSpecificRegion || isSpecificRegionSelected || !hasGeneralRegions
+
+  const handleSpecificValueChange = (nextValue: string) => {
+    const specificRegion = specificRegions.find((region) => region.name === nextValue)
+    if (specificRegion !== undefined) onSpecificRegionSelected(specificRegion.code)
+    onChange(nextValue)
+  }
+
+  const handleShowSpecificRegions = () => {
+    setIsChoosingSpecificRegion(true)
+    onSpecificRegionLinkClicked()
+  }
+
+  const handleUseGeneralRegion = () => {
+    setIsChoosingSpecificRegion(false)
+    const regionToRestore = getGeneralRegionToRestore()
+    if (regionToRestore !== undefined) onChange(regionToRestore)
+    onRevertedToGeneralRegion()
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-y-1">
+      <FormControl>
+        {isSpecificSelectVisible ? (
+          <Select
+            value={isSpecificRegionSelected ? value : ''}
+            onValueChange={handleSpecificValueChange}
+            disabled={isLoading}
+          >
+            <SelectTrigger ref={triggerRef} id="region" className={TRIGGER_CLASS}>
+              <SelectValue
+                placeholder={
+                  isLoading ? 'Loading available regions...' : 'Select a specific region...'
+                }
+              >
+                {isSpecificRegionSelected && (
+                  <RegionSelectTriggerValue
+                    region={selectedRegion}
+                    label={selectedRegionLabel}
+                    isLoading={isLoading}
+                  />
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>{specificRegionsLabel}</SelectLabel>
+                <SpecificRegionSelectItems
+                  regions={specificRegions}
+                  recommendedCodes={recommendedSpecificRegionCodes}
+                />
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        ) : (
+          <Select value={value} onValueChange={onChange} disabled={isLoading}>
+            <SelectTrigger ref={triggerRef} id="region" className={TRIGGER_CLASS}>
+              <SelectValue
+                placeholder={
+                  isLoading ? 'Loading available regions...' : 'Select a region for your project..'
+                }
+              >
+                {value !== undefined && (
+                  <RegionSelectTriggerValue
+                    region={selectedRegion}
+                    label={isLoading ? 'Loading available regions...' : selectedRegionLabel}
+                    isLoading={isLoading}
+                  />
+                )}
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>General regions</SelectLabel>
+                <GeneralRegionSelectItems
+                  regions={generalRegions}
+                  recommendedCodes={recommendedGeneralRegionCodes}
+                />
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        )}
+      </FormControl>
+
+      {hasGeneralRegions && (
+        <Button
+          type="button"
+          variant="link"
+          size="tiny"
+          className="px-0 text-foreground-light hover:text-foreground"
+          onClick={isSpecificSelectVisible ? handleUseGeneralRegion : handleShowSpecificRegions}
+        >
+          {isSpecificSelectVisible ? 'Use a general region instead' : 'Need a specific region?'}
+        </Button>
       )}
     </div>
   )

@@ -9,6 +9,7 @@ describe('parseAdvancedRegionConfigVariant', () => {
   test('returns known variants', () => {
     expect(parseAdvancedRegionConfigVariant('option_a')).toBe('option_a')
     expect(parseAdvancedRegionConfigVariant('control')).toBe('control')
+    expect(parseAdvancedRegionConfigVariant('option_c_link')).toBe('option_c_link')
   })
 
   test('returns undefined for anything else', () => {
@@ -67,6 +68,16 @@ describe('resolveAdvancedRegionConfigVariant', () => {
         isProduction: true,
       })
     ).toBe('option_b')
+  })
+
+  test('resolves option_c_link from the query param', () => {
+    expect(
+      resolveAdvancedRegionConfigVariant({
+        queryParamValue: 'option_c_link',
+        flagValue: undefined,
+        isProduction: false,
+      })
+    ).toBe('option_c_link')
   })
 
   test('an unknown query param falls through to the flag', () => {

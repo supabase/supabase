@@ -16,8 +16,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   RegionSelectorOptionA,
   RegionSelectorOptionC,
+  RegionSelectorOptionCLink,
   useAdvancedRegionConfigTelemetry,
   type AdvancedRegionConfigVariant,
+  type OptionCLinkProps,
 } from './AdvancedRegionConfig'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
@@ -151,8 +153,12 @@ export const RegionSelector = ({
   isEmbedded = false,
 }: RegionSelectorProps) => {
   const options = useRegionSelectorOptions({ form, hasSelectedOrganization, instanceSize })
-  const { trackDisclosureOpened, trackSpecificRegionSelected } =
-    useAdvancedRegionConfigTelemetry(variant)
+  const {
+    trackDisclosureOpened,
+    trackSpecificRegionSelected,
+    trackSpecificRegionLinkClicked,
+    trackRevertedToGeneralRegion,
+  } = useAdvancedRegionConfigTelemetry(variant)
 
   if (options.isError) {
     return <AlertError subject="Error loading available regions" error={options.error} />
@@ -175,9 +181,17 @@ export const RegionSelector = ({
           onSpecificRegionSelected: trackSpecificRegionSelected,
         }
 
+        const optionCLinkProps: OptionCLinkProps = {
+          ...controlProps,
+          onSpecificRegionLinkClicked: trackSpecificRegionLinkClicked,
+          onRevertedToGeneralRegion: trackRevertedToGeneralRegion,
+        }
+
         const renderRegionControl = () => {
           if (variant === 'option_a') return <RegionSelectorOptionA {...controlProps} />
           if (variant === 'option_c') return <RegionSelectorOptionC {...controlProps} />
+          if (variant === 'option_c_link')
+            return <RegionSelectorOptionCLink {...optionCLinkProps} />
           return <RegionSelectControl {...controlProps} />
         }
 
