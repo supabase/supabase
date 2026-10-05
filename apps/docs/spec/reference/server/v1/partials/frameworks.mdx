@@ -11,6 +11,8 @@ The framework adapters (`@supabase/server/adapters/*`) predate the middleware en
 
 The bridges need `@supabase/server` 1.6.0 or later and Node 22 or later. `withRequiredClaims` shipped in 1.5.1 and the entry form of `withSupabase` in 1.6.0. Releases before 1.5.1 have no `/middleware/*` exports.
 
+The bridge file imports `@supabase/middleware`, so add it to your project as a direct dependency. `@supabase/server` depends on it, but a strict package manager such as pnpm does not let your code import a transitive dependency.
+
 </Admonition>
 
 ### What a bridge gives you
@@ -458,6 +460,7 @@ Do the steps in order. The auth inventory comes before any code change, because 
   <RefSubLayout.Examples>
 
     ```bash
+    npm install @supabase/middleware
     mkdir -p src/lib
     curl --fail -o src/lib/supabase-middleware.ts \
       https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
@@ -614,7 +617,8 @@ contributes jwtClaims: null and falls through, turning a 401 endpoint into a
 auth: 'user'. Never compose withClaims() and withRequiredClaims() together;
 they share the jwtClaims key and that is a compile-time conflict.
 
-STEP 3: FETCH THE BRIDGE. Download
+STEP 3: FETCH THE BRIDGE. Add @supabase/middleware as a direct dependency of
+the project; the bridge imports it. Then download
 https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
 and save it as src/lib/supabase-middleware.ts, verbatim. Do not "improve",
 condense, or drop comments from it.

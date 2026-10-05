@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 import { z } from 'zod'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
@@ -10,6 +9,7 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import {
   logsFiltersToUrlParams,
@@ -84,7 +84,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   const scopedSearch =
     facet === 'pathname'
       ? {
