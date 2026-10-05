@@ -247,9 +247,17 @@ export const SpendCapSidePanel = () => {
                   const isSelected = selectedOption === option.value
 
                   return (
-                    <div
+                    <button
                       key={option.value}
-                      className={cn('col-span-4 group space-y-1', isFreePlan && 'opacity-75')}
+                      type="button"
+                      role="radio"
+                      aria-checked={isSelected}
+                      disabled={isFreePlan}
+                      tabIndex={isFreePlan ? -1 : 0}
+                      className={cn(
+                        'col-span-4 group space-y-1 flex flex-col items-start text-left bg-transparent border-0 p-0',
+                        isFreePlan && 'opacity-75 cursor-not-allowed'
+                      )}
                       onClick={() => !isFreePlan && setSelectedOption(option.value)}
                     >
                       <Image
@@ -278,7 +286,7 @@ export const SpendCapSidePanel = () => {
                       >
                         {option.name}
                       </p>
-                    </div>
+                    </button>
                   )
                 })}
               </div>
