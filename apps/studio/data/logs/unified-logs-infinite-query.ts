@@ -13,7 +13,6 @@ import {
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
-import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
@@ -30,14 +29,7 @@ export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
-export const useUnifiedLogsBackend = () => {
-  const { hasLoaded, configcat } = useFeatureFlags()
-  const useOtel = IS_PLATFORM && configcat.otelUnifiedLogs === true
-  const isReady =
-    !IS_PLATFORM || (hasLoaded === true && typeof configcat.otelUnifiedLogs === 'boolean')
-
-  return { isReady, useOtel }
-}
+export const useUnifiedLogsBackend = () => useFeatureFlags().configcat.otelUnifiedLogs !== false
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
@@ -162,17 +154,12 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
-  const { isReady, useOtel } = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend()
   return useInfiniteQuery({
-    queryKey: [
-      ...logsKeys.unifiedLogsInfinite(projectRef, search),
-      { otel: useOtel, ready: isReady },
-    ],
-    queryFn: ({ signal, pageParam }) => {
-      if (!isReady) throw new Error('Unified Logs backend is not ready')
-      return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
-    },
-    enabled: enabled && isReady && typeof projectRef !== 'undefined',
+    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal, pageParam }) =>
+      getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     getPreviousPageParam: (firstPage) => {
       if (!firstPage.prevCursor) return null

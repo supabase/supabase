@@ -166,14 +166,11 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
-  const { isReady, useOtel } = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
-    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel, ready: isReady }],
-    queryFn: ({ signal }) => {
-      if (!isReady) throw new Error('Unified Logs backend is not ready')
-      return getUnifiedLogsChart({ projectRef, search, useOtel }, signal)
-    },
-    enabled: enabled && isReady && typeof projectRef !== 'undefined',
+    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,

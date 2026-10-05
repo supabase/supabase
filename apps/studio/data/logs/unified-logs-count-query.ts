@@ -90,14 +90,11 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) => {
-  const { isReady, useOtel } = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
-    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel, ready: isReady }],
-    queryFn: ({ signal }) => {
-      if (!isReady) throw new Error('Unified Logs backend is not ready')
-      return getUnifiedLogsCount({ projectRef, search, useOtel }, signal)
-    },
-    enabled: enabled && isReady && typeof projectRef !== 'undefined',
+    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
+    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
   })

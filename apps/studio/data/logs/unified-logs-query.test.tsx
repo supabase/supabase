@@ -9,24 +9,13 @@ import { useUnifiedLogsCountQuery } from './unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from './unified-logs-infinite-query'
 import type { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 
-const { mockExecuteAnalyticsSql, mockIsPlatform } = vi.hoisted(() => ({
+const { mockExecuteAnalyticsSql } = vi.hoisted(() => ({
   mockExecuteAnalyticsSql: vi.fn(),
-  mockIsPlatform: { value: true },
 }))
 
 vi.mock('./execute-analytics-sql', () => ({
   executeAnalyticsSql: mockExecuteAnalyticsSql,
 }))
-
-vi.mock('@/lib/constants', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
-  return {
-    ...actual,
-    get IS_PLATFORM() {
-      return mockIsPlatform.value
-    },
-  }
-})
 
 type FlagState = {
   hasLoaded: boolean
@@ -60,28 +49,29 @@ const createWrapper = (queryClient: QueryClient) => {
   }
 }
 
+const search: QuerySearchParamsType = {
+  filter: null,
+  latency: null,
+  'timing.dns': null,
+  'timing.connection': null,
+  'timing.tls': null,
+  'timing.ttfb': null,
+  'timing.transfer': null,
+  date: null,
+  sort: null,
+  size: 40,
+  start: 0,
+  direction: 'next',
+  cursor: new Date(),
+  id: null,
+  show_connection_logs: true,
+  edge_auth: true,
+  edge_storage: true,
+  edge_postgrest: true,
+  user: null,
+}
+
 const useUnifiedLogsQueries = () => {
-  const search: QuerySearchParamsType = {
-    filter: null,
-    latency: null,
-    'timing.dns': null,
-    'timing.connection': null,
-    'timing.tls': null,
-    'timing.ttfb': null,
-    'timing.transfer': null,
-    date: null,
-    sort: null,
-    size: 40,
-    start: 0,
-    direction: 'next',
-    cursor: new Date(),
-    id: null,
-    show_connection_logs: true,
-    edge_auth: true,
-    edge_storage: true,
-    edge_postgrest: true,
-    user: null,
-  }
   const variables = { projectRef: 'project-ref', search }
   return {
     chart: useUnifiedLogsChartQuery(variables),
@@ -96,7 +86,6 @@ describe('unified logs queries', () => {
   let queryClient: QueryClient
 
   beforeEach(() => {
-    mockIsPlatform.value = true
     flagState.hasLoaded = false
     flagState.otelUnifiedLogs = undefined
     flagState.unrelatedFlag = undefined
@@ -109,12 +98,10 @@ describe('unified logs queries', () => {
     vi.clearAllMocks()
   })
 
-  test('does not request analytics while flags are pending', async () => {
+  test('uses OTEL for initial and manual requests while flags are pending', async () => {
     const { result } = renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
 
-    await Promise.resolve()
-
-    expect(mockExecuteAnalyticsSql).not.toHaveBeenCalled()
+    await waitFor(() => expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3))
 
     await Promise.all([
       result.current.chart.refetch(),
@@ -122,23 +109,28 @@ describe('unified logs queries', () => {
       result.current.logs.refetch(),
     ])
 
-    expect(mockExecuteAnalyticsSql).not.toHaveBeenCalled()
+    expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(6)
+    expect(endpoints()).toEqual(
+      Array(6).fill('/platform/projects/{ref}/analytics/endpoints/logs.all.otel')
+    )
   })
 
-  test('starts only ClickHouse requests when the flag resolves enabled', async () => {
+  test('does not start or abort a legacy batch before the flag resolves enabled', async () => {
     const { rerender } = renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
+
+    await waitFor(() => expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3))
+    expect(endpoints()).toEqual(
+      Array(3).fill('/platform/projects/{ref}/analytics/endpoints/logs.all.otel')
+    )
 
     flagState.hasLoaded = true
     flagState.otelUnifiedLogs = true
     rerender()
 
-    await waitFor(() => expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3))
+    await Promise.resolve()
 
-    expect(endpoints()).toEqual([
-      '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
-      '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
-      '/platform/projects/{ref}/analytics/endpoints/logs.all.otel',
-    ])
+    expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3)
+    expect(mockExecuteAnalyticsSql.mock.calls.every(([args]) => !args.signal.aborted)).toBe(true)
   })
 
   test('allows BigQuery requests when the flag resolves disabled', async () => {
@@ -156,52 +148,26 @@ describe('unified logs queries', () => {
     ])
   })
 
-  test('does not select BigQuery when ConfigCat fails', async () => {
+  test('defaults to OTEL when ConfigCat fails', async () => {
     flagState.hasLoaded = true
 
     renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
 
-    await Promise.resolve()
-
-    expect(mockExecuteAnalyticsSql).not.toHaveBeenCalled()
+    await waitFor(() => expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3))
+    expect(endpoints()).toEqual(
+      Array(3).fill('/platform/projects/{ref}/analytics/endpoints/logs.all.otel')
+    )
   })
 
-  test('does not select BigQuery when the loaded flags omit the backend flag', async () => {
+  test('defaults to OTEL when the loaded flags omit the backend flag', async () => {
     flagState.hasLoaded = true
     flagState.unrelatedFlag = true
 
     renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
 
-    await Promise.resolve()
-
-    expect(mockExecuteAnalyticsSql).not.toHaveBeenCalled()
-  })
-
-  test('keeps BigQuery available when self-hosted flags are disabled', async () => {
-    mockIsPlatform.value = false
-
-    renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
-
     await waitFor(() => expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3))
-
-    expect(endpoints()).toEqual([
-      '/platform/projects/{ref}/analytics/endpoints/logs.all',
-      '/platform/projects/{ref}/analytics/endpoints/logs.all',
-      '/platform/projects/{ref}/analytics/endpoints/logs.all',
-    ])
-  })
-
-  test('does not start and abort a legacy batch before enabled flags resolve', async () => {
-    const { rerender } = renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
-
-    await Promise.resolve()
-    expect(mockExecuteAnalyticsSql).not.toHaveBeenCalled()
-
-    flagState.hasLoaded = true
-    flagState.otelUnifiedLogs = true
-    rerender()
-
-    await waitFor(() => expect(mockExecuteAnalyticsSql).toHaveBeenCalledTimes(3))
-    expect(endpoints()).not.toContain('/platform/projects/{ref}/analytics/endpoints/logs.all')
+    expect(endpoints()).toEqual(
+      Array(3).fill('/platform/projects/{ref}/analytics/endpoints/logs.all.otel')
+    )
   })
 })

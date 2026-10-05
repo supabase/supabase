@@ -67,10 +67,7 @@ import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelec
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import {
-  useUnifiedLogsBackend,
-  useUnifiedLogsInfiniteQuery,
-} from '@/data/logs/unified-logs-infinite-query'
+import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -96,7 +93,6 @@ export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
-  const { isReady: isLogsBackendReady } = useUnifiedLogsBackend()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
@@ -213,7 +209,6 @@ export const UnifiedLogs = () => {
   })
 
   const refetchAllData = () => {
-    if (!isLogsBackendReady) return
     refetchLogs()
     refetchCounts()
     refetchCharts()
