@@ -5,7 +5,7 @@ import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { BroomSparklesIcon } from '../BroomSparklesIcon'
 import type { ExpirationMode } from '../StorageVersioning.constants'
 
-const POLICY_CHIP_CLASSNAME = 'rounded-sm border px-1.5 py-0.5 font-mono text-[10.5px]'
+const POLICY_CHIP_CLASSNAME = 'rounded-sm border px-1.5 py-0.5 font-mono text-xs'
 
 const PolicyChip = ({ children }: { children: ReactNode }) => (
   <span className={cn(POLICY_CHIP_CLASSNAME, 'border-strong bg-surface-300 text-foreground-light')}>
@@ -86,9 +86,7 @@ export const VersionHistoryPolicyRow = ({
             {hasCap && <PolicyChip>{cap} noncurrent v. retained</PolicyChip>}
           </span>
           {hasExpiryDays && !hasCap && (
-            <span className="font-mono text-[11px] text-foreground-lighter">
-              — no retention cap
-            </span>
+            <span className="font-mono text-xs text-foreground-lighter">— no retention cap</span>
           )}
           <Info size={13} className="text-foreground-lighter" />
         </button>

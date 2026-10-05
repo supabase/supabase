@@ -99,9 +99,9 @@ const CurrentFilePreview = ({
 
     <div className="mt-2 flex flex-col">
       <div className="shrink">
-        <p className="truncate text-sm font-medium text-foreground" title={file.name}>
-          {file.name}
-        </p>
+        {/* No `title`: the explorer rows use it as their handle, and a second
+            element carrying the same one makes `getByTitle` ambiguous. */}
+        <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
         <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
           {mimeType}
           {size && <>, {size}</>}
@@ -137,7 +137,7 @@ const CurrentFilePreview = ({
             disabled={file.isCorrupted}
             onClick={() => onCopyUrl(file.path!)}
           >
-            Copy URL
+            Get URL
           </Button>
         ) : (
           <DropdownMenu>
@@ -148,9 +148,9 @@ const CurrentFilePreview = ({
                 icon={<Copy size={14} />}
                 iconRight={<ChevronDown size={14} />}
                 disabled={file.isCorrupted}
-                aria-label={`Copy URL for ${file.name}`}
+                aria-label={`Get URL for ${file.name}`}
               >
-                Copy URL
+                Get URL
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

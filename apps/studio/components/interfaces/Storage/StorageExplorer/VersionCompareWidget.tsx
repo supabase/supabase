@@ -52,7 +52,7 @@ export const VersionCompareWidget = ({
             versionId={selectedVersion.versionId}
           />
         </div>
-        <p className="truncate text-center font-mono text-[11px] text-brand">
+        <p className="truncate text-center font-mono text-xs text-brand">
           {dayjs(selectedVersion.createdAt).format('MMM D')} · {formatBytes(selectedVersion.size)}
         </p>
       </div>
@@ -62,7 +62,7 @@ export const VersionCompareWidget = ({
           {/* No `versionId`, so the endpoint resolves the current version. */}
           <FilePreview path={path} mimeType={mimeType} size={currentVersion?.size} />
         </div>
-        <p className="truncate text-center font-mono text-[11px] text-foreground-lighter">
+        <p className="truncate text-center font-mono text-xs text-foreground-lighter">
           Current{currentVersion && <> · {formatBytes(currentVersion.size)}</>}
         </p>
       </div>
