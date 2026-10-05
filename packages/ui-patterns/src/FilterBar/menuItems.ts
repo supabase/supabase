@@ -284,8 +284,7 @@ function getIsOperatorValueItems(
   const filtered = shouldFilter
     ? options.filter(
         (opt) =>
-          opt.label.toLowerCase().includes(normalizedInput) ||
-          opt.value.includes(normalizedInput)
+          opt.label.toLowerCase().includes(normalizedInput) || opt.value.includes(normalizedInput)
       )
     : options
 
