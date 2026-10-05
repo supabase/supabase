@@ -32,6 +32,30 @@ export const fetchFileUrl = async (
   }
 }
 
+/** Omit `versionId` for a prefix that matches every version's URL for one object. */
+export const fileUrlKey = ({
+  projectRef,
+  isBucketPublic,
+  bucketId,
+  path,
+  versionId,
+}: {
+  projectRef?: string
+  isBucketPublic?: boolean
+  bucketId?: string
+  path: string
+  versionId?: string
+}) =>
+  [
+    projectRef,
+    'buckets',
+    isBucketPublic,
+    bucketId,
+    'file',
+    path,
+    ...(versionId === undefined ? [] : [versionId]),
+  ] as const
+
 type UseFileUrlQueryVariables = {
   path: string
   projectRef: string
@@ -43,7 +67,12 @@ export const useFetchFileUrlQuery = (
   { ...options }: UseCustomQueryOptions<string, ResponseError> = {}
 ) => {
   return useQuery<string, ResponseError, string>({
-    queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', path],
+    queryKey: fileUrlKey({
+      projectRef,
+      isBucketPublic: bucket.public,
+      bucketId: bucket.id,
+      path,
+    }),
     queryFn: () => fetchFileUrl(path, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY),
     staleTime: DEFAULT_EXPIRY * 1000,
     ...options,
