@@ -1,7 +1,7 @@
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
+import { getStorageItemPath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -33,11 +33,7 @@ export const ConfirmPurgeModal = () => {
     if (!projectRef || !selectedBucket?.id || itemToPurge === undefined) return
 
     // The endpoint addresses an object by full path; a row only knows its leaf name.
-    const folderPath = getPathAlongOpenedFolders(
-      { openedFolders: openedFolders.slice(0, itemToPurge.columnIndex), selectedBucket },
-      false
-    )
-    const path = [folderPath, itemToPurge.name].filter(Boolean).join('/')
+    const path = getStorageItemPath({ openedFolders }, itemToPurge)
 
     purgeObject({ projectRef, bucketId: selectedBucket.id, path })
   }
