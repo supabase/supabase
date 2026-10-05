@@ -12,6 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -251,15 +253,22 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                 // whether the branch is linked to a GitHub PR.
                                 branch.review_requested_at && (
                                   <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button
-                                        aria-label="More options"
-                                        variant="text"
-                                        icon={<MoreVertical />}
-                                        className="px-1"
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                    </DropdownMenuTrigger>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            aria-label="Manage merge request"
+                                            variant="text"
+                                            className="px-1"
+                                            icon={<MoreVertical />}
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </DropdownMenuTrigger>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="bottom">
+                                        Manage merge request
+                                      </TooltipContent>
+                                    </Tooltip>
                                     <DropdownMenuContent className="w-56" side="bottom" align="end">
                                       <Tooltip>
                                         <DropdownMenuItem
