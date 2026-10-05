@@ -10,14 +10,16 @@ interface Props {
 	description?: string
 	topics?: Topic[]
 	github_url?: string
+	date: string
 }
 
-const { title, description, topics = [], github_url } = Astro.props
+const { title, description, topics = [], github_url, date } = Astro.props
 ---
 
 <Layout title={title} description={description}>
 	<article class="prose max-w-3xl mx-auto px-6 py-16">
 		<h1>{title}</h1>
+		{date && <p class="text-sm pb-4">{date}</p>}
 		{description && <p class="lead">{description}</p>}
 		{
 			topics.length > 0 && (
