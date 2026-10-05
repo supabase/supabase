@@ -23,8 +23,8 @@ import {
 } from '@/data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ChartIntervals, NextPageWithLayout } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {

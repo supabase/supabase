@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { subscriptionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
 import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrgSubscriptionVariables = {
   orgSlug?: string
@@ -39,9 +39,7 @@ export const useOrgSubscriptionQuery = <TData = OrgSubscriptionData>(
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
-    'billing_read'
-  )
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2('billing_read')
 
   return useQuery<OrgSubscriptionData, OrgSubscriptionError, TData>({
     queryKey: subscriptionKeys.orgSubscription(orgSlug),

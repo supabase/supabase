@@ -52,12 +52,12 @@ import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 

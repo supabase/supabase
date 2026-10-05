@@ -10,10 +10,10 @@ import type { CellKeyboardEvent, DataGridHandle } from 'react-data-grid'
 
 import { MAX_BULK_DELETE } from './Users.constants'
 import type { User } from '@/data/auth/users-infinite-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface UseAuthUsersShortcutsParams {
   gridRef: RefObject<DataGridHandle | null>

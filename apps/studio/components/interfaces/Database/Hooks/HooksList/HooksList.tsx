@@ -12,12 +12,12 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -42,7 +42,7 @@ export const HooksList = () => {
   const filteredHookSchemas = lodashMap(uniqBy(filteredHooks, 'schema'), 'schema')
 
   const { can: canCreateWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const searchInputRef = useRef<HTMLInputElement>(null)

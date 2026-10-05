@@ -21,8 +21,8 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
-import { DOCS_URL } from '@/lib/constants'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 const schema = z.object({
   domain: z.string().trim().min(1, 'A value for your custom domain is required'),

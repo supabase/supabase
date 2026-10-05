@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '../misc/useCheckPermissionsV2'
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -12,7 +13,6 @@ import { getAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from '@/lib/constants'
 import type { ResponseError } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '../misc/useCheckPermissionsV2'
 
 // Shared schema definition
 export const AIOptInSchema = z.object({

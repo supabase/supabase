@@ -12,10 +12,10 @@ import {
   PG_META_SCOPED_INTROSPECTION_FLAG,
   prefetchTableEditor,
 } from '@/data/table-editor/table-editor-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type GetTableRowsCountArgs = {
   table?: SupaTable

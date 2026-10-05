@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest'
 import { doPermissionsCheckV2 } from './useCheckPermissionsV2'
 import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
-function permissions(overrides?: Partial<PermissionsV2Data['organizations'][number]>): PermissionsV2Data {
+function permissions(
+  overrides?: Partial<PermissionsV2Data['organizations'][number]>
+): PermissionsV2Data {
   return {
     organizations: [
       {

@@ -35,9 +35,9 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAuthTemplateResetMutation } from '@/data/auth/auth-template-reset-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const smtpEnabledSchema = z.object({
   ENABLE_SMTP: z.literal(true),
@@ -109,9 +109,10 @@ export const SmtpForm = () => {
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const blockEditingOnReset =
     !!selectedProject?.inserted_at &&

@@ -6,8 +6,8 @@ import { EmailTemplates } from '@/components/interfaces/Auth/EmailTemplates/Emai
 import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import type { NextPageWithLayout } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const TemplatesPage: NextPageWithLayout = () => {
   const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(

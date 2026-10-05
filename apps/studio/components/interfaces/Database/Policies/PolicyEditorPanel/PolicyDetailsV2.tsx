@@ -44,8 +44,8 @@ import {
 
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PolicyDetailsV2Props {
   schema: string
@@ -77,7 +77,7 @@ export const PolicyDetailsV2 = ({
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
   const { can: canUpdatePolicies } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
@@ -318,9 +318,9 @@ export const PolicyDetailsV2 = ({
                         roles.length === 0
                           ? safeSql`public`
                           : joinSqlFragments(
-                            roles.map((r) => ident(r)),
-                            ', '
-                          )
+                              roles.map((r) => ident(r)),
+                              ', '
+                            )
                       )
                     }}
                     disabled={!canUpdatePolicies}

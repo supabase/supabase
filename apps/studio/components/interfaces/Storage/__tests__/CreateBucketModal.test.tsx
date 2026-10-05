@@ -47,7 +47,7 @@ describe(`CreateBucketModal`, () => {
   it(`renders a dialog with a form`, async () => {
     customRender(
       <ProjectContextProvider projectRef="default">
-        <CreateBucketModal open={true} onOpenChange={() => { }} />
+        <CreateBucketModal open={true} onOpenChange={() => {}} />
       </ProjectContextProvider>,
       {
         nuqs: {

@@ -22,17 +22,16 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
-import { DOCS_URL } from '@/lib/constants'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
   const computeEnabled = useFlag('compute')
   const [searchString, setSearchString] = useState('')
 
-  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ
-  )
+  const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_READ)
   const { can: canUpdateSecrets } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
   )

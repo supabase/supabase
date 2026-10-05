@@ -5,8 +5,8 @@ import { ValueContainer } from './ValueContainer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { EmptyListState } from '@/components/ui/EmptyListState'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RedirectUrlListProps {
   allowList: string[]
@@ -25,9 +25,10 @@ export const RedirectUrlList = ({
   onSelectRemoveURLs,
   onSelectClearSelection,
 }: RedirectUrlListProps) => {
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   // [Joshen] One for next time: maybe shift this into a reusable logic since it
   // seems like we can use this in multiple places for future

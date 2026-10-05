@@ -12,8 +12,8 @@ import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: vi.fn(),
   FGA_PERMISSIONS: {
-    PROJECT: {}
-  }
+    PROJECT: {},
+  },
 }))
 vi.mock('@/data/config/project-endpoint-query', () => ({
   useProjectApiUrl: vi.fn(),

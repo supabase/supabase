@@ -6,9 +6,9 @@ import { toast } from 'sonner'
 import { Button, ExpandingTextArea } from 'ui'
 
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { timeout } from '@/lib/helpers'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -92,8 +92,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         onChange={(e: any) => setValue(e.target.value)}
       />
       <div
-        className={`flex items-center gap-2 ${hasChanged ? 'opacity-100' : 'h-0 cursor-default opacity-0'
-          } ${animateCss}`}
+        className={`flex items-center gap-2 ${
+          hasChanged ? 'opacity-100' : 'h-0 cursor-default opacity-0'
+        } ${animateCss}`}
       >
         <Button
           disabled={!hasChanged}

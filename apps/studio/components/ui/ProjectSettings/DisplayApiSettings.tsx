@@ -12,7 +12,7 @@ import Panel from '@/components/ui/Panel'
 import { useApiKeysLastUsedQuery } from '@/data/analytics/api-keys-last-used-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -205,7 +205,7 @@ export const DisplayApiSettings = ({
                         ? 'Updating JWT secret...'
                         : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
-                onChange={() => { }}
+                onChange={() => {}}
               />
             </FormLayout>
 

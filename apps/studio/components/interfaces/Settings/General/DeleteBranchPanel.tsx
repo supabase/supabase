@@ -14,9 +14,9 @@ import { DeleteBranchModal } from '../../BranchManagement/DeleteBranchModal'
 import { SwitchToPreviewModal } from '../../BranchManagement/SwitchToPreviewModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useBranchesQuery } from '@/data/branches/branches-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const DeleteBranchPanel = () => {
   const router = useRouter()

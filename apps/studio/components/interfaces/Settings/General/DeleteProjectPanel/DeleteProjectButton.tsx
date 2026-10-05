@@ -11,9 +11,7 @@ export interface DeleteProjectButtonProps {
 export const DeleteProjectButton = ({ variant = 'danger' }: DeleteProjectButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
-  )
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   return (
     <>

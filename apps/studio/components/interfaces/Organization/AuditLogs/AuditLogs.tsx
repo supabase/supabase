@@ -42,10 +42,10 @@ import {
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CONTENT_PADDING = 'w-full px-6 xl:px-10'
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
@@ -67,9 +67,8 @@ export const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
-    'audit_logs_read'
-  )
+  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissionsV2('audit_logs_read')
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('security.audit_logs_days')

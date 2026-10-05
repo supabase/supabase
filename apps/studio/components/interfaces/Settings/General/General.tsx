@@ -22,10 +22,10 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const General = () => {
   const { ref } = useParams()
@@ -40,9 +40,7 @@ export const General = () => {
   const branch = branches?.find((x) => x.project_ref === ref)
   const projectName = isBranch ? branch?.name : project?.name
 
-  const { can: canUpdateProject } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
-  )
+  const { can: canUpdateProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
 

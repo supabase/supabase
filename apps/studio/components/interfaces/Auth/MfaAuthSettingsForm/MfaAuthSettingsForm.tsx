@@ -45,9 +45,9 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -126,9 +126,10 @@ export const MfaAuthSettingsForm = () => {
   const { can: canReadConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const { hasAccess: hasAccessToMFAEntitlement, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.mfa_phone')

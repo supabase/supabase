@@ -41,9 +41,9 @@ import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface FileExplorerRowProps {
   index: number
@@ -352,8 +352,9 @@ export const FileExplorerRow = ({
         )}
 
         <div
-          className={`flex items-center justify-end ${view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
-            }`}
+          className={`flex items-center justify-end ${
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
+          }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
             event.stopPropagation()

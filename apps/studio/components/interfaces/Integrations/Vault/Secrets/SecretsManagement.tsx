@@ -27,13 +27,13 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { VaultSecret } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
@@ -44,7 +44,7 @@ export const SecretsManagement = () => {
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {

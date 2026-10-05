@@ -8,8 +8,8 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useClientSecretCreateMutation } from '@/data/oauth-secrets/client-secret-create-mutation'
 import { CreatedSecret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
 import { OAuthApp } from '@/data/oauth/oauth-apps-query'
-import { DOCS_URL } from '@/lib/constants'
 import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 interface Props {
   selectedApp?: OAuthApp
@@ -18,9 +18,7 @@ interface Props {
 export const OAuthSecrets = ({ selectedApp }: Props) => {
   const { slug } = useParams()
   const [createdSecret, setCreatedSecret] = useState<CreatedSecret>()
-  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
-    'oauth_apps_write'
-  )
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2('oauth_apps_write')
 
   const { id: appId } = selectedApp ?? {}
 

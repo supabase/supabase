@@ -21,10 +21,10 @@ import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvail
 import { useBannedIPsDeleteMutation } from '@/data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import { useUserIPAddressQuery } from '@/data/misc/user-ip-address-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const HA_DISABLED_TITLE = 'Network bans unavailable on High Availability projects'
 const HA_DISABLED_DESCRIPTION =
@@ -52,7 +52,7 @@ export const BannedIPs = () => {
   const ipListLoading = isLoadingIPList || isFetchingIPList
 
   const { can: canUnbanNetworks } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_NETWORK_BANS_WRITE
   )
 
   const isSectionDisabled = isHighAvailability || isAwsK8s || !canUnbanNetworks

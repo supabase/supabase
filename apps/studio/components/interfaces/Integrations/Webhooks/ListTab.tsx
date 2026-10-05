@@ -7,7 +7,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 
 export const WebhooksListTab = () => {
   const { can: canReadWebhooks, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ
   )
 
   if (isPermissionsLoaded && !canReadWebhooks) {

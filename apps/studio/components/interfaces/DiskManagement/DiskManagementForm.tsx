@@ -53,6 +53,7 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
@@ -62,7 +63,6 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function DiskManagementForm({
   chartsClassName,
@@ -104,9 +104,7 @@ export function DiskManagementForm({
   const isHighAvailability = useIsHighAvailability()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2(
-      FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
-    )
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE)
 
   const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
     'instances.compute_update_available_sizes'

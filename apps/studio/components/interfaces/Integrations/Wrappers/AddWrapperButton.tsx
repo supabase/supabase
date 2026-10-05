@@ -2,8 +2,8 @@ import { useMemo } from 'react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const WRAPPER_REQUIRED_EXTENSION_NAMES = ['wrappers', 'supabase_vault']
 
@@ -14,7 +14,7 @@ interface AddWrapperButtonProps {
 
 export const AddWrapperButton = ({ variant = 'default', onClick }: AddWrapperButtonProps) => {
   const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: project } = useSelectedProjectQuery()

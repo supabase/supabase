@@ -33,13 +33,16 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -76,13 +79,15 @@ export function CustomReportSection() {
 
   const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
     FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
-    homeReport ? {
-      mode: 'existing',
-      type: 'report',
-      visibility: homeReport.visibility,
-      ownerId: homeReport.owner_id,
-      subjectId: profile?.id,
-    } : undefined
+    homeReport
+      ? {
+          mode: 'existing',
+          type: 'report',
+          visibility: homeReport.visibility,
+          ownerId: homeReport.owner_id,
+          subjectId: profile?.id,
+        }
+      : undefined
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()

@@ -28,9 +28,9 @@ import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-ut
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -42,9 +42,7 @@ export const BillingCustomerData = () => {
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissionsV2('billing_read')
-  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2(
-    'billing_write'
-  )
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2('billing_write')
 
   const { ref, inView } = useInView({ triggerOnce: true })
 

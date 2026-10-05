@@ -12,9 +12,9 @@ import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface ExtensionRowProps {
   extension: DatabaseExtension

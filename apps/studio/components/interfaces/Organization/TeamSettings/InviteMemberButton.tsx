@@ -105,7 +105,6 @@ export const InviteMemberButton = () => {
 
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
-
   const orgRole = getOrgRole(permissionsV2, organization?.slug)
   const rolesAddable = getAssignableRoleIds(orgRole, orgScopedRoles)
 

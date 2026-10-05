@@ -17,9 +17,9 @@ import {
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 type IndirectTaxDeclaration = 'yes' | 'no'
 type DeclarationModal = 'declaration-form' | 'submission-confirmation' | null
@@ -39,9 +39,8 @@ export const IndirectTaxDeclarationModal = () => {
     setResponse('')
   }, [organization?.slug])
 
-  const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } = useAsyncCheckPermissionsV2(
-    'billing_write'
-  )
+  const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } =
+    useAsyncCheckPermissionsV2('billing_write')
 
   const { mutate: updateCustomerProfile, isPending } = useOrganizationCustomerProfileUpdateMutation(
     {

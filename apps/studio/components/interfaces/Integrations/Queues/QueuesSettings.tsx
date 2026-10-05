@@ -26,14 +26,14 @@ import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/dat
 import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE
   )
   const [isToggling, setIsToggling] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)

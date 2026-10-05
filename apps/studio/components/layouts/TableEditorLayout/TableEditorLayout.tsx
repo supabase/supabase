@@ -7,8 +7,8 @@ import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Pre
 import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -24,9 +24,7 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
 
-  const { can: canWriteTables } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
-  )
+  const { can: canWriteTables } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
 
   useEffect(() => {
     if (!isPermissionsLoaded) return

@@ -2,7 +2,7 @@ import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const Route = createFileRoute('/project/$ref/database/triggers')({
   component: TriggersShell,

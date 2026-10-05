@@ -46,8 +46,8 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -76,7 +76,9 @@ export const EdgeFunctionDetails = () => {
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = apiKeyData ?? {}
 

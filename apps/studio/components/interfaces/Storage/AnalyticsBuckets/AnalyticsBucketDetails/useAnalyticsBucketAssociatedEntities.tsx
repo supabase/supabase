@@ -13,8 +13,8 @@ import { useReplicationPublicationQuery } from '@/data/replication/publication-q
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useS3AccessKeyDeleteMutation } from '@/data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /**
  * Returns all the data that's associated to a specified analytics bucket (e.g publications, S3 keys, etc)

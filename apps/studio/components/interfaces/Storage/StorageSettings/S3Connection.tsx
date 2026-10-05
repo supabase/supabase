@@ -50,9 +50,9 @@ import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-que
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const S3Connection = () => {
   const { ref: projectRef } = useParams()
@@ -63,8 +63,12 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ)
-  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE)
+  const { can: canReadS3Credentials, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ
+  )
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
+  )
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const {

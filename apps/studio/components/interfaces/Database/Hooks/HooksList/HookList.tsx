@@ -19,10 +19,10 @@ import {
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface HookListProps {
   schema: string
@@ -49,7 +49,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
       x.function_args.length >= 2
   )
   const { can: canUpdateWebhook } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   return (

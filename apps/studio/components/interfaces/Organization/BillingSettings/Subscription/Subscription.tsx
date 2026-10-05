@@ -17,17 +17,16 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
-    'billing_read'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
+    useAsyncCheckPermissionsV2('billing_read')
 
   const {
     data: subscription,

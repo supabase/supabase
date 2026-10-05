@@ -11,9 +11,9 @@ import {
 } from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const useS3VectorsWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()

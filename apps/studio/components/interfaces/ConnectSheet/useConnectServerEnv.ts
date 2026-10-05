@@ -4,8 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRevealedSecret } from '@/components/interfaces/APIKeys/useRevealedSecret'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useLatest } from '@/hooks/misc/useLatest'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 const AUTO_HIDE_MS = 10_000
 const SECRET_MASK = '••••••••••••••••••••'

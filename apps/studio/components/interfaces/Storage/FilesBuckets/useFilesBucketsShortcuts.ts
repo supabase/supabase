@@ -1,9 +1,9 @@
 import { Dispatch, RefObject, SetStateAction } from 'react'
 
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface UseFilesBucketsShortcutsParams {
   searchInputRef: RefObject<HTMLInputElement | null>

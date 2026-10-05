@@ -12,9 +12,9 @@ import * as z from 'zod'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import type { ResponseError } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const OrgDetailsSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),

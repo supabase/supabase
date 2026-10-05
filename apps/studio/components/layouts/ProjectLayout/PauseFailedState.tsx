@@ -24,8 +24,8 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const PauseFailedState = () => {
   const { ref } = useParams()
@@ -33,9 +33,7 @@ export const PauseFailedState = () => {
   const [visible, setVisible] = useState(false)
   const [showCliBackup, setShowCliBackup] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
-  )
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []

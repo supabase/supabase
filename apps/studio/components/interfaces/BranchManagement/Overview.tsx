@@ -39,9 +39,9 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import type { Branch } from '@/data/branches/branches-query'
 import { branchKeys } from '@/data/branches/keys'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface OverviewProps {
   isGithubConnected: boolean

@@ -42,8 +42,8 @@ import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { IS_PLATFORM } from '@/lib/constants'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { IS_PLATFORM } from '@/lib/constants'
 
 function HoursOrNeverText({ value }: { value: number }) {
   if (value === 0) {
@@ -74,9 +74,10 @@ export const SessionsAuthSettingsForm = () => {
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const { hasAccess: hasUserSessionsEntitlement, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('auth.user_sessions')

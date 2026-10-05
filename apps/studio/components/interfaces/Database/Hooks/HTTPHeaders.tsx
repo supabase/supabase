@@ -11,8 +11,8 @@ import {
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { uuidv4 } from '@/lib/helpers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { uuidv4 } from '@/lib/helpers'
 
 interface HTTPHeadersProps {
   form: UseFormReturn<WebhookFormValues>
@@ -22,7 +22,7 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
   ])
 
   const { data: apiKeyData } = useAPIKeys(
@@ -39,9 +39,9 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const addActions =
     functionType === 'supabase_function'
       ? buildEdgeFunctionHeaderAddActions({
-        apiKey,
-        createRow: (name: string, value: string) => ({ id: uuidv4(), name, value }),
-      })
+          apiKey,
+          createRow: (name: string, value: string) => ({ id: uuidv4(), name, value }),
+        })
       : []
 
   return (

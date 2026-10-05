@@ -33,9 +33,9 @@ import { TableNodeData } from './Schemas.constants'
 import { getTableDefinitionAsMarkdown } from './Schemas.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getTableDefinition } from '@/data/database/table-definition-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 // ReactFlow is scaling everything by the factor of 2
 export const TABLE_NODE_WIDTH = 320

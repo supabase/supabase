@@ -4,16 +4,14 @@ import Link from 'next/link'
 import { Button } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAppStateSnapshot } from '@/state/app-state'
 import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
-    'billing_write'
-  )
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2('billing_write')
 
   return (
     <div className="flex flex-row gap-4">

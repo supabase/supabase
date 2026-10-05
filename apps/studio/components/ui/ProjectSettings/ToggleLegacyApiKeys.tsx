@@ -19,8 +19,8 @@ import { useToggleLegacyAPIKeysMutation } from '@/data/api-keys/legacy-api-key-t
 import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
@@ -63,25 +63,25 @@ export const ToggleLegacyApiKeysPanel = () => {
 
   const appsWarning = isAuthorizedAppsError
     ? {
-      title: 'Check your OAuth apps before continuing',
-      description: (
-        <>
-          Disabling legacy API keys can break apps that integrate with Supabase. Before
-          continuing, check your organization's {oauthAppsLink} to ensure none of them depend on
-          the legacy API keys.
-        </>
-      ),
-    }
+        title: 'Check your OAuth apps before continuing',
+        description: (
+          <>
+            Disabling legacy API keys can break apps that integrate with Supabase. Before
+            continuing, check your organization's {oauthAppsLink} to ensure none of them depend on
+            the legacy API keys.
+          </>
+        ),
+      }
     : {
-      title: 'Apps using Supabase may break',
-      description: (
-        <>
-          Your project uses apps that integrate with Supabase. Disabling the legacy API keys is a
-          brand new feature and the apps you're using may not have added support for this yet. It
-          can cause them to stop functioning. Check your {oauthAppsLink} before continuing.
-        </>
-      ),
-    }
+        title: 'Apps using Supabase may break',
+        description: (
+          <>
+            Your project uses apps that integrate with Supabase. Disabling the legacy API keys is a
+            brand new feature and the apps you're using may not have added support for this yet. It
+            can cause them to stop functioning. Check your {oauthAppsLink} before continuing.
+          </>
+        ),
+      }
 
   if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess)) {
     return null
@@ -205,32 +205,32 @@ const ToggleApiKeysModal = ({
       alert={
         isLegacyKeysEnabled
           ? {
-            title: 'Ensure legacy keys are no longer in use before disabling',
-            description: (
-              <span className="prose text-sm">
-                Disabling <code>anon</code> and <code>service_role</code> keys while they are in
-                use will cause downtime for your application. Ensure they are no longer in use
-                before proceeding. If you have not created a publishable and at least one secret
-                API key, some dashboard functionality may become unavailable.
-                <br />
-                <br />
-                <span className="text-danger">
-                  This disables API keys when used in the <code>apikey</code> header. They remain
-                  valid as a JWT.
+              title: 'Ensure legacy keys are no longer in use before disabling',
+              description: (
+                <span className="prose text-sm">
+                  Disabling <code>anon</code> and <code>service_role</code> keys while they are in
+                  use will cause downtime for your application. Ensure they are no longer in use
+                  before proceeding. If you have not created a publishable and at least one secret
+                  API key, some dashboard functionality may become unavailable.
+                  <br />
+                  <br />
+                  <span className="text-danger">
+                    This disables API keys when used in the <code>apikey</code> header. They remain
+                    valid as a JWT.
+                  </span>
                 </span>
-              </span>
-            ),
-          }
+              ),
+            }
           : {
-            title: 'Publishable and secret keys are preferred',
-            description: (
-              <span className="prose text-sm">
-                Re-enabling <code>anon</code> and <code>service_role</code> keys may be
-                appropriate in certain cases, but using a publishable and secret key is more
-                secure. We recommend against re-enabling legacy API keys.
-              </span>
-            ),
-          }
+              title: 'Publishable and secret keys are preferred',
+              description: (
+                <span className="prose text-sm">
+                  Re-enabling <code>anon</code> and <code>service_role</code> keys may be
+                  appropriate in certain cases, but using a publishable and secret key is more
+                  secure. We recommend against re-enabling legacy API keys.
+                </span>
+              ),
+            }
       }
     />
   )

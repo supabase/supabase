@@ -39,9 +39,9 @@ import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface TemplateEditorProps {
   template: AuthTemplate
@@ -88,9 +88,10 @@ const getPreviewSrcDoc = (html: string) => {
 
 export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
   const canEdit = canUpdateConfig && !isReadOnly
 
   const { id, properties } = template

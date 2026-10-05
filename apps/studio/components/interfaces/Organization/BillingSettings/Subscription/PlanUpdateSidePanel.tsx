@@ -25,12 +25,12 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import type { OrgPlan } from '@/data/subscriptions/types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 import { Organization } from '@/types/base'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const getPartnerManagedResourceCta = (selectedOrganization: Organization) => {
   if (selectedOrganization.managed_by === MANAGED_BY.VERCEL_MARKETPLACE) {
@@ -135,9 +135,7 @@ export const PlanUpdateSidePanel = () => {
     []
   )
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
-    'billing_write'
-  )
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2('billing_write')
 
   const snap = useOrgSettingsPageStateSnapshot()
   const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'

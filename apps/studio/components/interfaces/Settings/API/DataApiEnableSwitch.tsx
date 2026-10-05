@@ -16,9 +16,9 @@ import { DataApiEnableSwitchError, DataApiEnableSwitchLoading } from './DataApiE
 import { UnsafeEntitiesConfirmModal } from './UnsafeEntitiesConfirmModal'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const DataApiEnableSwitch = () => {
   const { ref: projectRef } = useParams()

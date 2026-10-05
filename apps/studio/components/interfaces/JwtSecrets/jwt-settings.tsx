@@ -64,9 +64,9 @@ import { useJwtSecretUpdateMutation } from '@/data/config/jwt-secret-update-muta
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const customJwtSecretFormSchema = z.object({
   customToken: z
@@ -97,7 +97,9 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ)
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
     { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }

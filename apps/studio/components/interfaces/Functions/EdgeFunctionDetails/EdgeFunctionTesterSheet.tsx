@@ -43,11 +43,11 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { prettifyJSON } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -85,7 +85,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
   ])
   const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },

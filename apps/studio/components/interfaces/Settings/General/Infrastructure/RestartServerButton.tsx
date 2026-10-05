@@ -17,11 +17,11 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { type ResponseError } from '@/types'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const RestartServerButton = () => {
   const router = useRouter()
@@ -44,9 +44,7 @@ export const RestartServerButton = () => {
   const projectRegion = project?.region ?? ''
 
   const projectRestartDisabled = useFlag('disableProjectRestarts')
-  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
-    'project_operations_write'
-  )
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2('project_operations_write')
 
   const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {

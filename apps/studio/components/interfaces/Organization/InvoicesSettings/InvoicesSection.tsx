@@ -8,9 +8,8 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const InvoicesSection = () => {
-  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } = useAsyncCheckPermissionsV2(
-    'billing_read'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadInvoices } =
+    useAsyncCheckPermissionsV2('billing_read')
 
   return (
     <ScaffoldSection>

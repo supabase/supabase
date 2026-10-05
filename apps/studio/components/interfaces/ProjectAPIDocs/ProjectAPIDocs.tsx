@@ -18,8 +18,8 @@ import LanguageSelector from './LanguageSelector'
 import { SecondLevelNav } from './SecondLevelNav'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAppStateSnapshot } from '@/state/app-state'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature
@@ -43,7 +43,9 @@ export const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs && canReadAPIKeys }

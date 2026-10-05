@@ -17,6 +17,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsHighAvailability,
@@ -24,7 +25,6 @@ import {
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const PauseProjectButton = () => {
   const router = useRouter()
@@ -39,9 +39,7 @@ export const PauseProjectButton = () => {
 
   const projectRef = project?.ref ?? ''
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
-  const { can: canPauseProject } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canPauseProject } = useAsyncCheckPermissionsV2([FGA_PERMISSIONS.PROJECT.ADMIN_WRITE])
 
   const isFreePlan = organization?.plan.id === 'free'
   const isBranch = Boolean(project?.parent_project_ref)

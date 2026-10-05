@@ -8,9 +8,9 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const MAX_PROJECT_ACKNOWLEDGEMENTS = 10
 

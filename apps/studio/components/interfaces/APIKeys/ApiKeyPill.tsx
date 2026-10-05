@@ -19,9 +19,9 @@ export function ApiKeyPill({
 
   const isSecret = apiKey.type === 'secret'
 
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ]
-  )
+  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const {
     data: revealedKey,

@@ -19,9 +19,9 @@ import {
   usePartnerIntegrationsQuery,
 } from '@/data/partners/integration-status-query'
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   const stripeSchema = findStripeSchema(schemas)
@@ -74,13 +74,10 @@ export const useProjectOAuthIntegrationData = (
   // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
   // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
   // are unaffected by this.
-  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
-    'oauth_apps_read',
-    {
-      organizationSlug: org?.slug,
-      projectRef: null,
-    }
-  )
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_read', {
+    organizationSlug: org?.slug,
+    projectRef: null,
+  })
 
   const sharedOptions = { enabled, retryOnMount: false }
   const queries = {

@@ -1,8 +1,8 @@
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface UseStorageExplorerShortcutsParams {
   onClearSearch: () => void

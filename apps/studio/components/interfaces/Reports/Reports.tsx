@@ -26,6 +26,10 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
@@ -34,7 +38,6 @@ import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DEFAULT_CHART_COLUMN_COUNT = 1
 const DEFAULT_CHART_ROW_COUNT = 1
@@ -77,25 +80,30 @@ const Reports = () => {
   )
   const currentReportContent = currentReport?.content as Dashboards.Content
 
-  const { can: canReadReport, isLoading: isLoadingPermissions } = useAsyncCheckUserContentPermissions(
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_READ,
-    currentReport ? {
-      mode: 'existing',
-      type: 'report',
-      visibility: currentReport.visibility,
-      ownerId: currentReport.owner_id,
-      subjectId: profile?.id,
-    } : undefined
-  )
+  const { can: canReadReport, isLoading: isLoadingPermissions } =
+    useAsyncCheckUserContentPermissions(
+      FGA_PERMISSIONS.PROJECT.SNIPPETS_READ,
+      currentReport
+        ? {
+            mode: 'existing',
+            type: 'report',
+            visibility: currentReport.visibility,
+            ownerId: currentReport.owner_id,
+            subjectId: profile?.id,
+          }
+        : undefined
+    )
   const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
     FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
-    currentReport ? {
-      mode: 'existing',
-      type: 'report',
-      visibility: currentReport.visibility,
-      ownerId: currentReport.owner_id,
-      subjectId: profile?.id,
-    } : undefined
+    currentReport
+      ? {
+          mode: 'existing',
+          type: 'report',
+          visibility: currentReport.visibility,
+          ownerId: currentReport.owner_id,
+          subjectId: profile?.id,
+        }
+      : undefined
   )
 
   function handleDateRangePicker({ period_start, period_end }: any) {

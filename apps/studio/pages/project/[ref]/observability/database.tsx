@@ -39,6 +39,7 @@ import { getReportAttributesV2 } from '@/data/reports/database-charts'
 import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -48,7 +49,6 @@ import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -194,8 +194,8 @@ const DatabaseUsage = () => {
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
-    (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-    (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
@@ -356,8 +356,8 @@ const DatabaseUsage = () => {
                 syncId="database-charts"
                 showMaxValue={
                   chart.id === 'client-connections' ||
-                    chart.id === 'client-connections-basic' ||
-                    chart.id === 'pgbouncer-connections'
+                  chart.id === 'client-connections-basic' ||
+                  chart.id === 'pgbouncer-connections'
                     ? true
                     : chart.showMaxValue
                 }

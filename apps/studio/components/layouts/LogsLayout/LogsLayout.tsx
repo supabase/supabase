@@ -5,9 +5,9 @@ import { ProjectLayout } from '../ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface LogsLayoutProps {
   title: string

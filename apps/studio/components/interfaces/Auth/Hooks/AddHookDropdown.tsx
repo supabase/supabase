@@ -17,8 +17,8 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface AddHookDropdownProps {
   buttonText?: string
@@ -41,7 +41,9 @@ export const AddHookDropdown = ({
   const { data: organization } = useSelectedOrganizationQuery()
 
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
-  const { can: canUpdateAuthHook } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE)
+  const { can: canUpdateAuthHook } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+  )
   const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
   const entitledHookSet = getEntitledHookSet()
 

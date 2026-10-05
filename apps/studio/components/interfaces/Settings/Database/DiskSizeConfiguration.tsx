@@ -20,6 +20,7 @@ import Panel from '@/components/ui/Panel'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from '@/data/database/database-size-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
@@ -29,7 +30,6 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean

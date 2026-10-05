@@ -33,6 +33,10 @@ import { LogsSnippetIcon } from '@/components/ui/EntityTypeIcon'
 import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
@@ -43,7 +47,6 @@ import {
 } from '@/state/sql-editor/sql-editor-lifecycle'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-import { useAsyncCheckUserContentPermissions, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface SQLEditorTreeViewItemProps extends Omit<
   ComponentProps<typeof TreeViewItem>,

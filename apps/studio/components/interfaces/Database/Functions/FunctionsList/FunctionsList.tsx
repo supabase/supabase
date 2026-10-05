@@ -35,6 +35,7 @@ import { useDatabaseFunctionDeleteMutation } from '@/data/database-functions/dat
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -44,7 +45,6 @@ import { useEditorPanelStateSnapshot } from '@/state/editor-panel-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const createFunctionSnippet = safeSql`create function function_name()
 returns void

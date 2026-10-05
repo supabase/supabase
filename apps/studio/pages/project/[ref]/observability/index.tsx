@@ -10,15 +10,16 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from '@/data/content/content-query'
-import { useProfile } from '@/lib/profile'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import type { NextPageWithLayout } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { profile } = useProfile()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const showOverview = useFlag('observabilityOverview')
   const [showCreateReportModal, setShowCreateReportModal] = useQueryState(

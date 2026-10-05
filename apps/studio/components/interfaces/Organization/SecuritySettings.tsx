@@ -18,9 +18,9 @@ import { useOrganizationMembersQuery } from '@/data/organizations/organization-m
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -42,9 +42,7 @@ export const SecuritySettings = () => {
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
     'organization_config_read'
   )
-  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2(
-    'organization_config_write'
-  )
+  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2('organization_config_write')
   const track = useTrack()
 
   const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =

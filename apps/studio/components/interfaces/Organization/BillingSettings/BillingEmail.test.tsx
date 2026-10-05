@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -30,7 +29,6 @@ vi.mock('common', async (importOriginal) => {
     useParams: () => ({ slug: SLUG }),
   }
 })
-
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: (permission: string) => mockCheckPermissions(permission),

@@ -11,7 +11,10 @@ export const hasMultipleOwners = (members: OrganizationMember[] = [], roles: Rol
   return membersWhoAreOwners.length > 1
 }
 
-export function getOrgRole(data: PermissionsV2Data | undefined, slug?: string): PermissionsV2Data['organizations'][number]['role'] | null {
+export function getOrgRole(
+  data: PermissionsV2Data | undefined,
+  slug?: string
+): PermissionsV2Data['organizations'][number]['role'] | null {
   if (!data || !slug) return null
   return data.organizations.find((org) => org.slug === slug)?.role ?? null
 }
@@ -36,8 +39,11 @@ export function getAssignableRoleIds(
  * Same rule as assignment: administrators and owners can manage members,
  * but Owner role members can only be managed by another owner.
  */
- export function canManageRole(orgRole: PermissionsV2Data['organizations'][number]['role'] | null, targetRoleName?: string): boolean {
-   if (orgRole !== 'administrator' && orgRole !== 'owner') return false
-   if (!targetRoleName) return false
-   return targetRoleName !== 'Owner' || orgRole === 'owner'
- }
+export function canManageRole(
+  orgRole: PermissionsV2Data['organizations'][number]['role'] | null,
+  targetRoleName?: string
+): boolean {
+  if (orgRole !== 'administrator' && orgRole !== 'owner') return false
+  if (!targetRoleName) return false
+  return targetRoleName !== 'Owner' || orgRole === 'owner'
+}

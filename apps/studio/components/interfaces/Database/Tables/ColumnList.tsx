@@ -53,10 +53,10 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const getColumnTypeAffordancePresentation = (column: SafePostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
@@ -134,8 +134,8 @@ export const ColumnList = ({
     (filterString.length === 0
       ? (selectedTable?.columns ?? [])
       : selectedTable?.columns?.filter((column) =>
-        column.name.toLowerCase().includes(filterString.toLowerCase())
-      )) ?? []
+          column.name.toLowerCase().includes(filterString.toLowerCase())
+        )) ?? []
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
   const { can: canUpdateColumns } = useAsyncCheckPermissionsV2(

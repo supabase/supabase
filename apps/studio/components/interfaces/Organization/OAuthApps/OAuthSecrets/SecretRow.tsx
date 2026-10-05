@@ -21,9 +21,7 @@ export interface SecretRowProps {
 export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
-    'oauth_apps_write'
-  )
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2('oauth_apps_write')
 
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []

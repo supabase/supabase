@@ -89,7 +89,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     allRoles !== undefined ? formatMemberRoleToProjectRoleConfiguration(member, allRoles) : []
   const originalConfigurationType =
     originalConfiguration.length === 1 &&
-      !!orgScopedRoles.find((r) => r.id === originalConfiguration[0].roleId)
+    !!orgScopedRoles.find((r) => r.id === originalConfiguration[0].roleId)
       ? 'org-scope'
       : 'project-scope'
 

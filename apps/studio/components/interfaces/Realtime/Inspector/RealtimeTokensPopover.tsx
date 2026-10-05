@@ -6,11 +6,11 @@ import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonat
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface RealtimeTokensPopoverProps {
   config: RealtimeConfig

@@ -42,9 +42,9 @@ import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templa
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from '@/data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),

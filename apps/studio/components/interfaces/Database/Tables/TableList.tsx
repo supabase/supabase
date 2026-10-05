@@ -61,6 +61,7 @@ import { useMaterializedViewsQuery } from '@/data/materialized-views/materialize
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -68,7 +69,6 @@ import { onSearchInputEscape } from '@/lib/keyboard'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface TableListProps {
   onAddTable: () => void
@@ -621,8 +621,9 @@ export const TableList = ({
                   <TableCell colSpan={7} className="text-foreground-muted hover:bg-inherit">
                     {isFetchingNextTablesPage
                       ? 'Loading more tables…'
-                      : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${hasNextTablesPage ? ' loaded' : ''
-                      }`}
+                      : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${
+                          hasNextTablesPage ? ' loaded' : ''
+                        }`}
                   </TableCell>
                 </TableRow>
               </TableFooter>

@@ -21,11 +21,11 @@ import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersona
 import { BASE_MONACO_EDITOR_OPTIONS } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   title: 'Role Impersonation',
@@ -83,7 +83,7 @@ export const GraphiQLTab = () => {
 
   const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ,
-    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_SECRET_READ,
   ])
 
   const { notice, schemaComment } = usePgGraphqlIntrospectionStatus({

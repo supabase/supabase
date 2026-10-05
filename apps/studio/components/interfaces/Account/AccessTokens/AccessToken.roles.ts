@@ -1,4 +1,3 @@
-import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 import type {
   PermissionCatalogEntry,
   PermissionMode,
@@ -6,6 +5,7 @@ import type {
   ResourceAccessMode,
 } from './AccessToken.permissions'
 import { getCatalogEntry, getEntryScopes } from './AccessToken.permissions'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
 /**
  * Client-side estimation of what a scoped token can actually do, given its owner's current role.
@@ -188,7 +188,9 @@ export const getIsProjectScopedOnly = (
   organizationSlug: string
 ): boolean => {
   const org = data.organizations.find((o) => o.slug === organizationSlug)
-  return org !== undefined && (org.role === null || org.role === 'member') && org.projects.length > 0
+  return (
+    org !== undefined && (org.role === null || org.role === 'member') && org.projects.length > 0
+  )
 }
 
 /** Lowest role that holds every scope in the list. Unknown scope ids assume `owner` (warn rather than promise). */

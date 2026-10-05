@@ -38,7 +38,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     selectedOrganization,
     organizationMembersDeletionEnabled,
     onManageAccess,
-    permissionsV2
+    permissionsV2,
   } = useTeamSettingsData()
 
   const memberIsUser = member.gotrue_id == profile?.gotrue_id

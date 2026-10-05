@@ -18,9 +18,8 @@ import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 const CreditBalance = () => {
   const { slug } = useParams()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
-    'billing_read'
-  )
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
+    useAsyncCheckPermissionsV2('billing_read')
   const { ref, inView } = useInView({ triggerOnce: true })
 
   // Endpoint is expensive, so we only load it if it's in view

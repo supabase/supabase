@@ -17,12 +17,12 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CodePage = () => {
   const { ref, functionSlug } = useParams()
@@ -69,9 +69,9 @@ const CodePage = () => {
   const initialFiles = useMemo(() => {
     return !!functionBody
       ? formatFunctionBodyToFiles({
-        functionBody,
-        entrypointPath: selectedFunction?.entrypoint_path,
-      })
+          functionBody,
+          entrypointPath: selectedFunction?.entrypoint_path,
+        })
       : []
   }, [functionBody, selectedFunction?.entrypoint_path])
 

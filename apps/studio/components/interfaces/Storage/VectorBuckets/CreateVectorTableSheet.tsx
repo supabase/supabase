@@ -32,10 +32,10 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const isStagingLocal = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
@@ -110,7 +110,9 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     'newTable',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const { can: canCreateBuckets } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
+  const { can: canCreateBuckets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_WRITE
+  )
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId: bucketName })
   const schema = (wrapperInstance?.server_options ?? [])
@@ -143,7 +145,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
 
   const { mutateAsync: importForeignSchema, isPending: isImportingForeignSchema } =
     useFDWImportForeignSchemaMutation({
-      onError: () => { },
+      onError: () => {},
     })
   const isCreating = isCreatingVectorBucketTable || isImportingForeignSchema
 

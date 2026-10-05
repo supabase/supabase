@@ -28,13 +28,13 @@ import { getIsProjectScopedOnly } from '../../AccessToken.roles'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import {
   OrgProject,
   OrgProjectsResponse,
   useOrgProjectsInfiniteQuery,
 } from '@/data/projects/org-projects-infinite-query'
 import { Organization } from '@/types'
-import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 
 interface ResourceAccessStepProps {
   control: Control<TokenFormValues>
@@ -50,18 +50,18 @@ const CARD_OPTIONS: {
   description: string
   recommended?: boolean
 }[] = [
-    {
-      value: 'project',
-      name: 'Project',
-      description: 'Access select projects in a single organization.',
-      recommended: true,
-    },
-    {
-      value: 'organization',
-      name: 'Organization',
-      description: 'Access all projects in select organizations.',
-    },
-  ]
+  {
+    value: 'project',
+    name: 'Project',
+    description: 'Access select projects in a single organization.',
+    recommended: true,
+  },
+  {
+    value: 'organization',
+    name: 'Organization',
+    description: 'Access all projects in select organizations.',
+  },
+]
 
 export const ResourceAccessStep = ({
   control,

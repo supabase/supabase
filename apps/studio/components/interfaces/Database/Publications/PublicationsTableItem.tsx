@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface PublicationsTableItemProps {
   table: PGTable
@@ -28,7 +28,7 @@ export const PublicationsTableItem = ({
   )
 
   const { can: canUpdatePublications } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
@@ -43,8 +43,8 @@ export const PublicationsTableItem = ({
     const exists = publicationTables.some((x) => x.id == table.id)
     const tables = !exists
       ? [`${table.schema}.${table.name}`].concat(
-        publicationTables.map((t) => `${t.schema}.${t.name}`)
-      )
+          publicationTables.map((t) => `${t.schema}.${t.name}`)
+        )
       : publicationTables.filter((x) => x.id != table.id).map((x) => `${x.schema}.${x.name}`)
 
     updatePublications(

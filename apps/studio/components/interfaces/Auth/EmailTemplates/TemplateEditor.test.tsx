@@ -72,7 +72,9 @@ vi.mock('@/data/auth/validate-spam-mutation', () => ({
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: useAsyncCheckPermissionsMock,
-  FGA_PERMISSIONS: { PROJECT: { AUTH_CONFIG_WRITE: 'auth_config_write', ADMIN_WRITE: 'project_admin_write', } },
+  FGA_PERMISSIONS: {
+    PROJECT: { AUTH_CONFIG_WRITE: 'auth_config_write', ADMIN_WRITE: 'project_admin_write' },
+  },
 }))
 
 vi.mock('sonner', () => ({

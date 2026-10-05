@@ -7,9 +7,9 @@ import { ProjectLayout } from '../ProjectLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const useGenerateComputeMenu = (): ProductMenuGroup[] => {
   const { ref: projectRef = 'default' } = useParams()

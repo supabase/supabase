@@ -24,9 +24,9 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import type { components } from '@/data/api'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 type GoTrueConfig = components['schemas']['GoTrueConfigResponse']
 
@@ -165,7 +165,10 @@ export const PasskeysSettingsForm = () => {
     isSuccess: isPermissionsLoaded,
   } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ)
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE])
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const formValues =
     isSuccess && authConfig ? buildPasskeysFormValues(authConfig, project) : undefined

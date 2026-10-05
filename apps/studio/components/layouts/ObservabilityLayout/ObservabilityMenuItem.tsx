@@ -11,9 +11,12 @@ import {
 } from 'ui'
 
 import { ContentBase } from '@/data/content/content-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useProfile } from '@/lib/profile'
 import type { Dashboards } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface ReportMenuItemProps {
   item: {

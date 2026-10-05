@@ -19,7 +19,7 @@ interface WrapperRowProps {
 export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
   const { ref, id } = useParams()
   const { can: canManageWrappers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const [, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)

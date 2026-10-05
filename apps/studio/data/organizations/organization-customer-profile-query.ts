@@ -3,8 +3,8 @@ import { IS_PLATFORM } from 'common'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
 import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -47,10 +47,9 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const { can: canReadCustomerProfile } = useAsyncCheckPermissionsV2(
-    'billing_read',
-    { organizationSlug: slug }
-  )
+  const { can: canReadCustomerProfile } = useAsyncCheckPermissionsV2('billing_read', {
+    organizationSlug: slug,
+  })
 
   return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({
     queryKey: organizationKeys.customerProfile(slug),

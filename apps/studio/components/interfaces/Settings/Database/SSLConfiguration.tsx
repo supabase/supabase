@@ -24,9 +24,9 @@ import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
 import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const SSLConfiguration = () => {
   const { ref } = useParams()

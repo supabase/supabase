@@ -65,6 +65,7 @@ import {
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import {
   isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
@@ -80,7 +81,6 @@ import { trimSafeSqlFragment } from '@/lib/sql'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 

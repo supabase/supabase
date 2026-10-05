@@ -24,7 +24,7 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
-  FGA_PERMISSIONS: { PROJECT: { ADMIN_WRITE: 'project_admin_write', } },
+  FGA_PERMISSIONS: { PROJECT: { ADMIN_WRITE: 'project_admin_write' } },
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({

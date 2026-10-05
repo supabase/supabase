@@ -30,12 +30,12 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from '@/data/integrations/integrations.types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
 import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 import { useSidePanelsStateSnapshot } from '@/state/side-panels'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { data: project } = useSelectedProjectQuery()

@@ -22,8 +22,8 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import Panel from '@/components/ui/Panel'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { permissionKeys } from '@/data/permissions/keys'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<CreateProjectForm>

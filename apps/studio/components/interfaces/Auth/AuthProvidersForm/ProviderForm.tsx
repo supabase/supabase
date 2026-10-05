@@ -33,9 +33,9 @@ import type { components } from '@/data/api'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -56,9 +56,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const shouldDisableField = (field: string): boolean => {
     const shouldDisableSmsFields =

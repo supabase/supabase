@@ -18,7 +18,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
   ])
   const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref, reveal: true },

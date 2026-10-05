@@ -30,9 +30,9 @@ import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import { useTestAuditLogDrainMutation } from '@/data/log-drains/test-audit-log-drain-mutation'
 import { useUpdateAuditLogDrainMutation } from '@/data/log-drains/update-audit-log-drain-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function OrgAuditLogDrains() {
   const { slug } = useParams() as { slug: string }

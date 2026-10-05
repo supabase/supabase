@@ -18,9 +18,9 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { SecretTableColumn } from './Secrets.types'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { VaultSecret } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface SecretRowProps {
   row: VaultSecret
@@ -37,7 +37,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   const [, setSelectedSecretToDelete] = useQueryState('delete', parseAsString)
 
   const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: revealedValue, isFetching } = useVaultSecretDecryptedValueQuery(

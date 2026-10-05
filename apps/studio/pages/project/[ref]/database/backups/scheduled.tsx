@@ -22,6 +22,7 @@ import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailabi
 import InformationBox from '@/components/ui/InformationBox'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBackupsQuery } from '@/data/database/backups-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import {
   useIsHighAvailability,
   useIsOrioleDbInAws,
@@ -29,7 +30,6 @@ import {
 } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   return (
@@ -71,9 +71,8 @@ const ScheduledBackups = () => {
   const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const isPitrEnabled = backups?.pitr_enabled
 
-  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BACKUPS_READ
-  )
+  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.BACKUPS_READ)
 
   if (isOrioleDbInAws && orioleDbReleaseStage === 'alpha') {
     return (

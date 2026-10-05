@@ -7,11 +7,14 @@ import { cn, SQL_ICON } from 'ui'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import { SQL_TEMPLATES } from '@/components/interfaces/SQLEditor/SQLEditor.queries'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 const SQLExamples = () => {
   const router = useRouter()

@@ -1,4 +1,5 @@
 // useCheckPermissionsV2.ts
+import { permissions } from '@supabase/shared-types'
 import { useIsLoggedIn, useParams } from 'common'
 import { useMemo } from 'react'
 
@@ -6,7 +7,6 @@ import { useSelectedOrganizationQuery } from './useSelectedOrganization'
 import { useSelectedProjectQuery } from './useSelectedProject'
 import { PermissionsV2Data, usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { IS_PLATFORM } from '@/lib/constants'
-import { permissions } from '@supabase/shared-types'
 
 type ExtractIds<T> = {
   [K in keyof T]: {
@@ -32,26 +32,26 @@ export type FgaPermissions = ExistingFgaPermissions | (string & {})
  * 1. explicit project scoped role entry for projectRef (if provided)
  * 2. org level permissions (org role applies to all projects in the org)
  */
- export function doPermissionsCheckV2(
-   data: PermissionsV2Data | undefined,
-   permission: FgaPermissions | FgaPermissions[],
-   organizationSlug?: string,
-   projectRef?: string | null
- ): boolean {
-   if (!data) return false
+export function doPermissionsCheckV2(
+  data: PermissionsV2Data | undefined,
+  permission: FgaPermissions | FgaPermissions[],
+  organizationSlug?: string,
+  projectRef?: string | null
+): boolean {
+  if (!data) return false
 
-   const org = data.organizations.find((o) => o.slug === organizationSlug)
-   if (!org) return false
+  const org = data.organizations.find((o) => o.slug === organizationSlug)
+  if (!org) return false
 
-   const required = Array.isArray(permission) ? permission : [permission]
-   if (required.length === 0) return false // nothing requested: fail closed
+  const required = Array.isArray(permission) ? permission : [permission]
+  if (required.length === 0) return false // nothing requested: fail closed
 
-   const project = projectRef ? org.projects.find((p) => p.ref === projectRef) : undefined
+  const project = projectRef ? org.projects.find((p) => p.ref === projectRef) : undefined
 
-   return required.every(
-     (p) => (project?.permissions.includes(p) ?? false) || org.permissions.includes(p)
-   )
- }
+  return required.every(
+    (p) => (project?.permissions.includes(p) ?? false) || org.permissions.includes(p)
+  )
+}
 
 function useGetProjectPermissionsV2(
   permissionsOverride?: PermissionsV2Data,
@@ -190,8 +190,7 @@ export function useAsyncCheckUserContentPermissions(
   const isAtLeastDeveloper =
     role !== undefined && ['developer', 'administrator', 'owner'].includes(role)
   const isRestrictedWrite = permission === 'project_snippets_write' && !isAtLeastDeveloper
-  const isWritableBelowDeveloper =
-    content !== undefined && ['sql'].includes(content.type)
+  const isWritableBelowDeveloper = content !== undefined && ['sql'].includes(content.type)
 
   let passesContextCheck = false
   if (content === undefined) {

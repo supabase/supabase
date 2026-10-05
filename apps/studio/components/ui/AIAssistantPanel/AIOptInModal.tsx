@@ -14,7 +14,7 @@ import {
 
 import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface AIOptInModalProps {
   visible: boolean

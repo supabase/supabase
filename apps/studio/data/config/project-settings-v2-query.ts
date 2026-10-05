@@ -3,8 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { configKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type ProjectSettingsVariables = { projectRef?: string }
 

@@ -20,11 +20,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from '@/data/database/database-password-reset-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
 import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
 import { generateStrongPassword } from '@/lib/project'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type ResetDbPasswordDialogProps = {
   disabled?: boolean

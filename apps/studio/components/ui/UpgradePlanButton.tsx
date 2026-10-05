@@ -7,9 +7,9 @@ import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const PLAN_REQUEST_EMPTY_PLACEHOLDER =
   '<Specify which plan to upgrade to: Pro | Team | Enterprise>'
@@ -53,10 +53,9 @@ export const UpgradePlanButton = ({
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
-    'billing_write',
-    { organizationSlug: slug }
-  )
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2('billing_write', {
+    organizationSlug: slug,
+  })
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
   const message = `Name: ${organization?.name}\nSlug: ${slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY_PLACEHOLDER}`

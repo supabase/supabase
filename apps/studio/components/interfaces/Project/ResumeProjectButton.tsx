@@ -29,10 +29,10 @@ import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectPauseStatusQuery } from '@/data/projects/project-pause-status-query'
 import { useProjectRestoreMutation } from '@/data/projects/project-restore-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FormSchema = z.object({
   postgresVersionSelection: z.string(),
@@ -80,9 +80,7 @@ export const ResumeProjectButton = ({
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
   const [showFreeProjectLimitWarning, setShowFreeProjectLimitWarning] = useState(false)
 
-  const { can: canResumeProject } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
-  )
+  const { can: canResumeProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { mutate: restoreProject, isPending: isRestoring } = useProjectRestoreMutation({
     onSuccess: async (_, variables) => {

@@ -33,9 +33,9 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FormSchema = z.object({
   API_MAX_REQUEST_DURATION: z.coerce
@@ -70,9 +70,10 @@ export const PerformanceSettingsForm = () => {
   const { can: canReadConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const [isUpdatingRequestDurationForm, setIsUpdatingRequestDurationForm] = useState(false)
   const [isUpdatingDatabaseForm, setIsUpdatingDatabaseForm] = useState(false)
@@ -391,8 +392,8 @@ export const PerformanceSettingsForm = () => {
                             <span className="text-foreground-light">
                               {chosenUnit === 'percent'
                                 ? Math.floor(
-                                  maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                ).toString()
+                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                  ).toString()
                                 : Math.min(maxConnectionLimit, field.value!)}
                             </span>{' '}
                             / {maxConnectionLimit}

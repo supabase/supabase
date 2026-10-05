@@ -21,10 +21,13 @@ import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { ContentOfType } from '@/data/content/content-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const ObservabilityMenu = () => {
   const router = useRouter()
@@ -42,7 +45,7 @@ export const ObservabilityMenu = () => {
   const { mutateAsync: deleteReport } = useContentDeleteMutation({
     // Toasts are driven by toast.promise in onConfirmDeleteReport. This no-op keeps the hook
     // from showing its own default error toast, while its optimistic rollback still runs.
-    onError: () => { },
+    onError: () => {},
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)

@@ -10,8 +10,8 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const WebhooksContent = () => {
   const { ref: projectRef } = useParams()
@@ -28,7 +28,7 @@ const WebhooksContent = () => {
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
   const { can: canReadWebhooks, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WEBHOOKS_CONFIG_READ
   )
 
   const { mutate: enableHooks, isPending: isEnablingHooks } = useHooksEnableMutation({

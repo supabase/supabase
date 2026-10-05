@@ -18,9 +18,9 @@ import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffol
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const WrapperOverviewContent = () => {
   const { id } = useParams()
@@ -84,7 +84,7 @@ const AddNewWrapperCTA = () => {
   )
 
   const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data } = useDatabaseExtensionsQuery({

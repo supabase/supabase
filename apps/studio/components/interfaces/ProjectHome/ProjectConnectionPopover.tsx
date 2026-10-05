@@ -18,10 +18,10 @@ import { appendHighAvailabilitySslParams } from '@/components/interfaces/Connect
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
 const EMPTY_CONNECTION_INFO = {

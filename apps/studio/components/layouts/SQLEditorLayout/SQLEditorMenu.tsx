@@ -25,12 +25,15 @@ import {
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 import { type SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getErrorMessage } from '@/lib/get-error-message'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const SQLEditorMenu = () => {
   const router = useRouter()

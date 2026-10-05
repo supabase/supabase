@@ -21,9 +21,9 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { usePostgresConfigurationUpdateMutation } from '@/data/config/postgres-config-mutation'
 import { postgresConfigurationQueryOptions } from '@/data/config/postgres-config-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FormSchema = z.object({
   log_connections: z.boolean(),

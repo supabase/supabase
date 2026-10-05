@@ -47,11 +47,11 @@ import { useProjectStorageConfigQuery } from '@/data/config/project-storage-conf
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
 import { useLargestBucketSizeLimitsCheck } from '@/data/storage/buckets-max-size-limit-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const formId = 'storage-settings-form'
 
@@ -59,8 +59,11 @@ export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ)
-  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE)
+  const { can: canReadStorageSettings, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ)
+  const { can: canUpdateStorageSettings } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
+  )
 
   const {
     data: config,

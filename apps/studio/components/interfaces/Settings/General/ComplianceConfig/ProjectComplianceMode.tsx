@@ -17,8 +17,8 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from '@/data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { DOCS_URL } from '@/lib/constants'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ComplianceConfig = () => {
   const { ref } = useParams()

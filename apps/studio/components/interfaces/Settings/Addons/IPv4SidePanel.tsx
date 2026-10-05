@@ -13,11 +13,11 @@ import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addo
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsAwsCloudProvider } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 import { useAddonsPagePanel } from '@/state/addons-page'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const IPv4SidePanel = () => {
   const isAws = useIsAwsCloudProvider()

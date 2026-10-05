@@ -28,8 +28,8 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
-import { DOCS_URL } from '@/lib/constants'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 const configUrlSchema = z.object({
   id: z.string(),
@@ -111,9 +111,10 @@ export const OAuthServerSettingsForm = () => {
 
   const oauthApps = oAuthAppsData?.clients || []
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    [FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE, FGA_PERMISSIONS.PROJECT.ADMIN_WRITE]
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const form = useForm<OAuthServerSettings>({
     resolver: zodResolver(schema),

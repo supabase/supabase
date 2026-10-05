@@ -36,10 +36,10 @@ import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-co
 import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface GitHubIntegrationConnectionFormProps {
   connection?: GitHubConnection

@@ -32,8 +32,11 @@ import {
   usePrefetchTables,
   type TablesData,
 } from '@/data/tables/tables-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useAsyncCheckUserContentPermissions, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -403,11 +406,12 @@ function TableSelector() {
 
 function generateSelectStatement(table: TablesData[number] & { columns?: Array<PGColumn> }) {
   return `
-select ${!table.columns
+select ${
+    !table.columns
       ? '*'
       : `
 ${table.columns.map((column) => `\t${column.name}`).join(',\n')}`
-    }
+  }
 from ${formatTableIdentifier(table)}
 -- where
 -- order by

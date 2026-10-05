@@ -15,10 +15,10 @@ import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsL
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()

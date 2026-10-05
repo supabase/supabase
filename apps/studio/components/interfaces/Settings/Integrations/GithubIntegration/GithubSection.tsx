@@ -29,6 +29,7 @@ import {
   type GitHubConnection,
 } from '@/data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
@@ -36,7 +37,6 @@ import {
 } from '@/lib/github'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const toIntegrationProjectConnection = (
   connection: GitHubConnection

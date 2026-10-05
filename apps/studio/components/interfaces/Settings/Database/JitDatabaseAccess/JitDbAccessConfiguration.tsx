@@ -57,10 +57,10 @@ import { useJitDbAccessUpdateMutation } from '@/data/jit-db-access/jit-db-access
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
@@ -123,7 +123,7 @@ export const JitDbAccessConfiguration = () => {
           )
         }
       },
-      onError: () => { },
+      onError: () => {},
     })
 
   const { mutateAsync: enableSSLEnforcement, isPending: isEnablingSSLEnforcement } =
@@ -148,7 +148,7 @@ export const JitDbAccessConfiguration = () => {
         setSelectedUserToDelete(null)
         if (ruleIdToEdit === variables.userId) resetSheetState()
       },
-      onError: () => { },
+      onError: () => {},
     })
 
   const isMutating = isUpdatingJitDbAccess || isRevokingAccess

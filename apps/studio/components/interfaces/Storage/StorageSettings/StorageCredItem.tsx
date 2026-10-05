@@ -11,7 +11,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const StorageCredItem = ({
   description,
@@ -26,7 +26,9 @@ export const StorageCredItem = ({
   access_key: string
   onDeleteClick: (id: string) => void
 }) => {
-  const { can: canRemoveAccessKey } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE)
+  const { can: canRemoveAccessKey } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
+  )
 
   function daysSince(date: string) {
     const now = new Date()

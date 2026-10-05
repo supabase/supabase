@@ -49,10 +49,10 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface PolicyEditorPanelProps {
   visible: boolean
@@ -97,7 +97,7 @@ export const PolicyEditorPanel = memo(function ({
   const { data: selectedProject } = useSelectedProjectQuery()
 
   const { can: canUpdatePolicies } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
@@ -610,9 +610,9 @@ export const PolicyEditorPanel = memo(function ({
                                 (value.roles.length === 1 && value.roles[0] === 'public')
                                 ? safeSql`public`
                                 : joinSqlFragments(
-                                  value.roles.map((r: string) => ident(r)),
-                                  ', '
-                                )
+                                    value.roles.map((r: string) => ident(r)),
+                                    ', '
+                                  )
                             )
                             setExpOneLineCount(1)
                             setExpTwoLineCount(1)

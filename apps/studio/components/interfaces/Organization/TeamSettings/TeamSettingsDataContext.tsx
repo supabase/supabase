@@ -4,9 +4,9 @@ import { createContext, useContext, useMemo } from 'react'
 import type { OrganizationRolesResponse } from '@/data/organization-members/organization-roles-query'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { Permission } from '@/types'
-import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 
 type TeamSettingsDataContextValue = {
   members: OrganizationMember[]

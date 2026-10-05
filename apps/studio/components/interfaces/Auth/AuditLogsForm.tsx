@@ -23,8 +23,8 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
 import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const schema = z.object({
   AUDIT_LOG_DISABLE_POSTGRES: z.boolean(),

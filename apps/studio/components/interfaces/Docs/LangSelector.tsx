@@ -36,7 +36,9 @@ export const LangSelector = ({
 }: LangSelectorProps) => {
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
     {
       projectRef,

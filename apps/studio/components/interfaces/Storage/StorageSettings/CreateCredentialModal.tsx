@@ -27,8 +27,8 @@ import { z } from 'zod'
 
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
-import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 
 interface CreateCredentialModalProps {
   visible: boolean
@@ -40,7 +40,9 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const isProjectActive = useIsProjectActive()
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE)
+  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
+  )
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
   const isS3ConnectionEnabled = config?.features.s3Protocol.enabled

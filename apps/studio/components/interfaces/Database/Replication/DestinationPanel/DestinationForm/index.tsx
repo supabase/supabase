@@ -93,7 +93,7 @@ export const DestinationForm = ({
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
     // api keys reveal = true will require this perms
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
   ])
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
@@ -267,9 +267,9 @@ export const DestinationForm = ({
       pendingFormValues === null
         ? undefined
         : buildTableSyncCopyConfig({
-          mode: pendingFormValues.tableSyncCopyMode,
-          selectedTableIds: pendingFormValues.tableSyncCopyTableIds,
-        }),
+            mode: pendingFormValues.tableSyncCopyMode,
+            selectedTableIds: pendingFormValues.tableSyncCopyTableIds,
+          }),
     [pendingFormValues]
   )
   const pendingPublicationTables =

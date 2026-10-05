@@ -35,10 +35,10 @@ import {
 import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { buildDatabaseEdgeFunctionUrl, isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { uuidv4 } from '@/lib/helpers'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
@@ -53,7 +53,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
   ])
   const { data: keys = [] } = useAPIKeysQuery(
     { projectRef: ref, reveal: true },

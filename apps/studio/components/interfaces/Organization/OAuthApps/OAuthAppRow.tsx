@@ -25,12 +25,8 @@ export interface OAuthAppRowProps {
 }
 
 export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2(
-    'oauth_apps_write'
-  )
-  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2(
-    'oauth_apps_write'
-  )
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_write')
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_write')
 
   return (
     <TableRow>

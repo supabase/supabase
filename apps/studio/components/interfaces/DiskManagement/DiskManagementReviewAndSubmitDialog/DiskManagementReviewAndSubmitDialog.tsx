@@ -28,8 +28,8 @@ import {
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog.hooks'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { formatCurrency } from '@/lib/helpers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { formatCurrency } from '@/lib/helpers'
 
 interface DiskManagementReviewAndSubmitDialogProps {
   loading: boolean

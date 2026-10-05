@@ -20,12 +20,12 @@ import {
   isView,
   TableLike,
 } from '@/data/table-editor/table-editor-types'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
-import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean

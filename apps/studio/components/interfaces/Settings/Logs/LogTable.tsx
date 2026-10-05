@@ -46,10 +46,13 @@ import { MultiSelectActionBar, type LogCopyFormat } from './MultiSelectActionBar
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface Props {
   data?: LogData[]
@@ -412,7 +415,7 @@ export const LogTable = ({
     SHORTCUT_IDS.LOGS_PREVIEW_EXIT_SELECTION,
     () => {
       setSelectedRows(new Set())
-        ; (document.activeElement as HTMLElement | null)?.blur()
+      ;(document.activeElement as HTMLElement | null)?.blur()
     },
     { enabled: !selectionOpen && selectedRows.size > 0 }
   )

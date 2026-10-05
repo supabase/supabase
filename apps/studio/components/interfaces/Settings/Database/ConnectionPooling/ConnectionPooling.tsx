@@ -45,12 +45,12 @@ import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { usePgbouncerConfigurationUpdateMutation } from '@/data/database/pgbouncer-config-update-mutation'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsAwsCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const formId = 'pooling-configuration-form'
 const HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS = 100_000
@@ -109,8 +109,8 @@ export const ConnectionPooling = () => {
     computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Nano'
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
-    (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-    (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
@@ -264,172 +264,172 @@ export const ConnectionPooling = () => {
             )}
             {(isHighAvailability ||
               (isSuccessPgbouncerConfig && !connectionPoolingUnavailable)) && (
-                <>
-                  <div className="flex flex-row gap-2 justify-between w-full">
-                    <div className="flex flex-col text-sm">
-                      <h5 className="text-foreground font-normal">Connection poolers</h5>
-                      <p className="text-foreground-lighter">
-                        {isHighAvailability
-                          ? 'One pooler runs for each Postgres pod in the cluster.'
-                          : 'Configuration is shared across all connection poolers.'}
-                      </p>
-                    </div>
-                    <div className="flex flex-row gap-1 items-center">
-                      {isHighAvailability ? (
-                        <Badge>High Availability</Badge>
-                      ) : (
-                        <>
-                          <Badge>Shared</Badge>
-                          {!disablePoolModeSelection && <Badge>Dedicated</Badge>}
-                        </>
-                      )}
-                    </div>
+              <>
+                <div className="flex flex-row gap-2 justify-between w-full">
+                  <div className="flex flex-col text-sm">
+                    <h5 className="text-foreground font-normal">Connection poolers</h5>
+                    <p className="text-foreground-lighter">
+                      {isHighAvailability
+                        ? 'One pooler runs for each Postgres pod in the cluster.'
+                        : 'Configuration is shared across all connection poolers.'}
+                    </p>
                   </div>
-                  <Separator className="bg-border -mx-6 w-[calc(100%+3rem)] my-4" />
-                  <Form {...form}>
-                    <form
-                      id={formId}
-                      className="flex flex-col gap-y-4 w-full"
-                      onSubmit={form.handleSubmit(onSubmit)}
-                    >
-                      <FormField
-                        control={form.control}
-                        name="default_pool_size"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Connection pool size"
-                            description={
-                              isHighAvailability ? (
-                                <p>
-                                  Pool size is managed automatically for each Postgres pod and cannot
-                                  be changed.
-                                </p>
-                              ) : (
-                                <p>
-                                  The maximum number of connections made to the underlying Postgres
-                                  cluster, per user+db combination. Pool size has a default of{' '}
-                                  {defaultPoolSize} based on your compute size of {computeSize}.
-                                </p>
-                              )
-                            }
-                            className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
-                          >
-                            <FormControl>
-                              <InputGroup>
-                                <FormInputGroupInput
-                                  {...field}
-                                  disabled={isHighAvailability}
-                                  type="number"
-                                  className="w-full"
-                                  value={isHighAvailability ? '' : (field.value ?? '')}
-                                  placeholder={
-                                    isHighAvailability
-                                      ? 'Managed automatically'
-                                      : defaultPoolSize.toString()
-                                  }
-                                  onChange={(event) =>
-                                    field.onChange(
-                                      isNaN(event.target.valueAsNumber)
-                                        ? null
-                                        : event.target.valueAsNumber
-                                    )
-                                  }
-                                />
-                                {!isHighAvailability && (
-                                  <InputGroupAddon align="inline-end">
-                                    <InputGroupText>connections</InputGroupText>
-                                  </InputGroupAddon>
-                                )}
-                              </InputGroup>
-                            </FormControl>
-                            {!isHighAvailability &&
-                              !!maxConnData &&
-                              (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
-                                <Alert variant="warning" className="mt-2">
-                                  <AlertTitle className="text-foreground">
-                                    Pool size is greater than 80% of the max connections (
-                                    {maxConnData.maxConnections}) on your database
-                                  </AlertTitle>
-                                  <AlertDescription>
-                                    This may result in instability and unreliability with your
-                                    database connections.
-                                  </AlertDescription>
-                                </Alert>
-                              )}
-                          </FormItemLayout>
-                        )}
-                      />
-
-                      <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
-
-                      <FormField
-                        control={form.control}
-                        disabled
-                        name="max_client_conn"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="flex-row-reverse"
-                            label="Max client connections"
-                            className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
-                            description={
-                              isHighAvailability ? (
-                                <p>
-                                  Each pooler can support up to{' '}
-                                  {HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toLocaleString()} active
-                                  or passive client connections. This value is managed automatically
-                                  and cannot be changed.
-                                </p>
-                              ) : (
-                                <p>
-                                  The maximum number of concurrent client connections allowed. This
-                                  value is fixed at {defaultMaxClientConn} based on your compute size
-                                  of {computeSize} and cannot be changed.{' '}
-                                  <InlineLink
-                                    href={`${DOCS_URL}/guides/database/connection-management#configuring-supavisors-pool-size`}
-                                  >
-                                    Learn more
-                                  </InlineLink>
-                                </p>
-                              )
-                            }
-                          >
-                            <FormControl>
-                              <InputGroup>
-                                <FormInputGroupInput
-                                  {...field}
-                                  type="number"
-                                  className="w-full"
-                                  value={
-                                    isHighAvailability
-                                      ? HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS
-                                      : (pgbouncerConfig?.max_client_conn ?? '')
-                                  }
-                                  placeholder={
-                                    isHighAvailability
-                                      ? HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toString()
-                                      : defaultMaxClientConn.toString()
-                                  }
-                                  onChange={(event) =>
-                                    field.onChange(
-                                      isNaN(event.target.valueAsNumber)
-                                        ? null
-                                        : event.target.valueAsNumber
-                                    )
-                                  }
-                                />
+                  <div className="flex flex-row gap-1 items-center">
+                    {isHighAvailability ? (
+                      <Badge>High Availability</Badge>
+                    ) : (
+                      <>
+                        <Badge>Shared</Badge>
+                        {!disablePoolModeSelection && <Badge>Dedicated</Badge>}
+                      </>
+                    )}
+                  </div>
+                </div>
+                <Separator className="bg-border -mx-6 w-[calc(100%+3rem)] my-4" />
+                <Form {...form}>
+                  <form
+                    id={formId}
+                    className="flex flex-col gap-y-4 w-full"
+                    onSubmit={form.handleSubmit(onSubmit)}
+                  >
+                    <FormField
+                      control={form.control}
+                      name="default_pool_size"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Connection pool size"
+                          description={
+                            isHighAvailability ? (
+                              <p>
+                                Pool size is managed automatically for each Postgres pod and cannot
+                                be changed.
+                              </p>
+                            ) : (
+                              <p>
+                                The maximum number of connections made to the underlying Postgres
+                                cluster, per user+db combination. Pool size has a default of{' '}
+                                {defaultPoolSize} based on your compute size of {computeSize}.
+                              </p>
+                            )
+                          }
+                          className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                disabled={isHighAvailability}
+                                type="number"
+                                className="w-full"
+                                value={isHighAvailability ? '' : (field.value ?? '')}
+                                placeholder={
+                                  isHighAvailability
+                                    ? 'Managed automatically'
+                                    : defaultPoolSize.toString()
+                                }
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
+                              />
+                              {!isHighAvailability && (
                                 <InputGroupAddon align="inline-end">
-                                  <InputGroupText>clients</InputGroupText>
+                                  <InputGroupText>connections</InputGroupText>
                                 </InputGroupAddon>
-                              </InputGroup>
-                            </FormControl>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </form>
-                  </Form>
-                </>
-              )}
+                              )}
+                            </InputGroup>
+                          </FormControl>
+                          {!isHighAvailability &&
+                            !!maxConnData &&
+                            (default_pool_size ?? 15) > maxConnData.maxConnections * 0.8 && (
+                              <Alert variant="warning" className="mt-2">
+                                <AlertTitle className="text-foreground">
+                                  Pool size is greater than 80% of the max connections (
+                                  {maxConnData.maxConnections}) on your database
+                                </AlertTitle>
+                                <AlertDescription>
+                                  This may result in instability and unreliability with your
+                                  database connections.
+                                </AlertDescription>
+                              </Alert>
+                            )}
+                        </FormItemLayout>
+                      )}
+                    />
+
+                    <Separator className="bg-border -mx-6 w-[calc(100%+3rem)]" />
+
+                    <FormField
+                      control={form.control}
+                      disabled
+                      name="max_client_conn"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Max client connections"
+                          className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full"
+                          description={
+                            isHighAvailability ? (
+                              <p>
+                                Each pooler can support up to{' '}
+                                {HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toLocaleString()} active
+                                or passive client connections. This value is managed automatically
+                                and cannot be changed.
+                              </p>
+                            ) : (
+                              <p>
+                                The maximum number of concurrent client connections allowed. This
+                                value is fixed at {defaultMaxClientConn} based on your compute size
+                                of {computeSize} and cannot be changed.{' '}
+                                <InlineLink
+                                  href={`${DOCS_URL}/guides/database/connection-management#configuring-supavisors-pool-size`}
+                                >
+                                  Learn more
+                                </InlineLink>
+                              </p>
+                            )
+                          }
+                        >
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
+                                {...field}
+                                type="number"
+                                className="w-full"
+                                value={
+                                  isHighAvailability
+                                    ? HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS
+                                    : (pgbouncerConfig?.max_client_conn ?? '')
+                                }
+                                placeholder={
+                                  isHighAvailability
+                                    ? HIGH_AVAILABILITY_MAX_CLIENT_CONNECTIONS.toString()
+                                    : defaultMaxClientConn.toString()
+                                }
+                                onChange={(event) =>
+                                  field.onChange(
+                                    isNaN(event.target.valueAsNumber)
+                                      ? null
+                                      : event.target.valueAsNumber
+                                  )
+                                }
+                              />
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>clients</InputGroupText>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </form>
+                </Form>
+              </>
+            )}
           </Panel.Content>
         </Panel>
       </PageSectionContent>

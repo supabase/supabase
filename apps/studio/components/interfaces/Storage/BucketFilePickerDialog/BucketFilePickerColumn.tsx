@@ -26,9 +26,9 @@ import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/Inf
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { bucketObjectsInfiniteQueryOptions } from '@/data/storage/bucket-objects-infinite-query'
 import { storageKeys } from '@/data/storage/keys'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { noop } from '@/lib/void'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const SelectAllCheckbox = ({
   columnFiles,

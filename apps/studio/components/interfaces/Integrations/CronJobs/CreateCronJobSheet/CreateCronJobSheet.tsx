@@ -52,11 +52,11 @@ import { getDatabaseCronJob } from '@/data/database-cron-jobs/database-cron-job-
 import { useDatabaseCronJobCreateMutation } from '@/data/database-cron-jobs/database-cron-jobs-create-mutation'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 import { useTrack } from '@/lib/telemetry/track'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface CreateCronJobSheetProps {
   open: boolean
@@ -118,7 +118,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
   const isLoading = isLoadingGetCronJob || isUpserting
 
   const { can: canToggleExtensions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE,
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const cronJobValues = parseCronJobCommand(

@@ -13,8 +13,8 @@ import {
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { DOCS_URL } from '@/lib/constants'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { DOCS_URL } from '@/lib/constants'
 
 export type LogicalBackupCliInstructionsProps = {
   enabled?: boolean
@@ -44,11 +44,11 @@ export const LogicalBackupCliInstructions = ({
   const connectionUri =
     isSuccess && settings
       ? buildDirectPostgresConnectionUri({
-        db_user: settings.db_user,
-        db_host: settings.db_host,
-        db_port: settings.db_port,
-        db_name: settings.db_name,
-      })
+          db_user: settings.db_user,
+          db_host: settings.db_host,
+          db_port: settings.db_port,
+          db_name: settings.db_name,
+        })
       : null
 
   const shellScript = connectionUri ? buildLogicalBackupShellScript(connectionUri) : ''

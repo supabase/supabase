@@ -23,10 +23,10 @@ import { useUserSendMagicLinkMutation } from '@/data/auth/user-send-magic-link-m
 import { useUserSendOTPMutation } from '@/data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
 import { User } from '@/data/auth/users-infinite-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 import { timeout } from '@/lib/helpers'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -73,9 +73,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const { can: canSendRecovery } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
-  const { can: canSendOtp } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
-  )
+  const { can: canSendOtp } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE)
   const { can: canRemoveUser } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
@@ -226,19 +224,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             const enabledProperty =
               provider.name.toLowerCase() === 'web3'
                 ? (
-                  {
-                    solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
-                    ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
-                  } as const
-                )[
-                (
-                  (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
-                    ?.chain ?? ''
-                ).toLowerCase() as 'solana' | 'ethereum'
-                ]
+                    {
+                      solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
+                      ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
+                    } as const
+                  )[
+                    (
+                      (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
+                        ?.chain ?? ''
+                    ).toLowerCase() as 'solana' | 'ethereum'
+                  ]
                 : Object.keys(providerMeta?.properties ?? {}).find((x) =>
-                  x.toLowerCase().endsWith('_enabled')
-                )
+                    x.toLowerCase().endsWith('_enabled')
+                  )
             const providerName =
               provider.name === 'email'
                 ? provider.name.toLowerCase()
@@ -308,9 +306,9 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_recovery'
                     ? {
-                      title: 'Password recovery sent',
-                      description: `The link in the email is valid for ${formattedExpiry}`,
-                    }
+                        title: 'Password recovery sent',
+                        description: `The link in the email is valid for ${formattedExpiry}`,
+                      }
                     : undefined
                 }
               />
@@ -333,11 +331,11 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 success={
                   successAction === 'send_magic_link'
                     ? {
-                      title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
-                      description: isVerified
-                        ? `The link in the email is valid for ${formattedExpiry}`
-                        : 'The confirmation email has been sent to the user',
-                    }
+                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
+                        description: isVerified
+                          ? `The link in the email is valid for ${formattedExpiry}`
+                          : 'The confirmation email has been sent to the user',
+                      }
                     : undefined
                 }
               />
@@ -359,9 +357,9 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               success={
                 successAction === 'send_otp'
                   ? {
-                    title: 'OTP sent',
-                    description: `The link in the OTP SMS is valid for ${formattedExpiry}`,
-                  }
+                      title: 'OTP sent',
+                      description: `The link in the OTP SMS is valid for ${formattedExpiry}`,
+                    }
                   : undefined
               }
             />
