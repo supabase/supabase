@@ -2489,7 +2489,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/cloudflare-workers',
-    destination: '/partners/catalog/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
   },
   {
     permanent: true,
@@ -2589,7 +2589,7 @@ module.exports = [
   {
     permanent: true,
     source: '/partners/integrations/atomic_crm',
-    destination: '/partners/catalog/atomic-crm',
+    destination: '/partners/catalog',
   },
   {
     permanent: true,
@@ -3401,4 +3401,18 @@ module.exports = [
   { permanent: true, source: '/homepage.md', destination: '/index.md' },
   { permanent: true, source: '/.md', destination: '/index.md' },
   { permanent: true, source: '/index', destination: '/' },
+  { permanent: true, source: '/signup', destination: '/dashboard/sign-up' },
+  { permanent: true, source: '/about', destination: '/company' },
+  { permanent: true, source: '/startups', destination: '/solutions/startups' },
+  {
+    permanent: true,
+    source: '/legal/subprocessors',
+    destination: '/legal/customer-resources/subprocessor-list',
+  },
+  {
+    permanent: true,
+    source: '/downloads/docs/Supabase\\+DPA\\+:version.pdf',
+    destination: '/legal/customer-resources/data-processing-addendum',
+  },
+  { permanent: true, source: '/dashboar', destination: '/dashboard' },
 ]
