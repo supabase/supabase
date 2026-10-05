@@ -46,6 +46,7 @@ interface AdvisorPanelBodyProps {
   hiddenItemsCount: number
   hasAnyFilters: boolean
   hasProjectRef?: boolean
+  hasAccountAdvice?: boolean
   projectNameByRef?: ReadonlyMap<string, string>
 }
 
@@ -61,13 +62,12 @@ export const AdvisorPanelBody = ({
   hiddenItemsCount,
   hasAnyFilters,
   hasProjectRef = true,
+  hasAccountAdvice = false,
   projectNameByRef,
 }: AdvisorPanelBodyProps) => {
-  // Notifications are the only items that exist without a project, so the notice replaces
-  // the list whenever the user has narrowed to categories that need one.
   const needsProject =
     categoryFilters.length > 0 && categoryFilters.every((category) => category !== 'messages')
-  if (!hasProjectRef && needsProject) {
+  if (!hasProjectRef && needsProject && !hasAccountAdvice) {
     return <NoProjectNotice />
   }
 

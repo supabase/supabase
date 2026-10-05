@@ -59,14 +59,14 @@ export const TOTPFactors = () => {
           <PageSectionSummary>
             <PageSectionTitle>Multi-factor authentication</PageSectionTitle>
             <PageSectionDescription>
-              Use an authenticator app (like Google Authenticator or 1Password) to protect your
+              Use a multi-factor authentication app (like Google Authenticator or 1Password) to protect your
               account.
             </PageSectionDescription>
           </PageSectionSummary>
           {canAddApp && (
             <PageSectionAside>
               <Button variant="primary" icon={<Plus />} onClick={handleAddNewApp}>
-                Add app
+                Add method
               </Button>
             </PageSectionAside>
           )}
@@ -77,10 +77,10 @@ export const TOTPFactors = () => {
               type="warning"
               layout="responsive"
               title="Avoid being locked out"
-              description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
+              description="Add a backup authentication method now. Losing access to your only method will permanently lock you out of your account."
               actions={
                 <Button icon={<Plus />} onClick={handleAddNewApp}>
-                  Add another app
+                  Add another method
                 </Button>
               }
             />
@@ -99,7 +99,7 @@ export const TOTPFactors = () => {
             <Card>
               {totpFactors.length === 0 ? (
                 <CardContent>
-                  <p className="text-sm text-foreground-lighter">No authenticator apps yet.</p>
+                  <p className="text-sm text-foreground-lighter">No MFA methods yet.</p>
                 </CardContent>
               ) : (
                 <div className="divide-y">
@@ -133,13 +133,13 @@ export const TOTPFactors = () => {
       </PageSection>
 
       {shouldVerifyRecoveryCodes && (
-        <PageSection>
+        <PageSection id="recovery-codes" className="scroll-mt-6">
           <PageSectionMeta>
             <PageSectionSummary>
               <PageSectionTitle>Recovery codes</PageSectionTitle>
               <PageSectionDescription>
-                Recovery codes allow you to recover your account in case you lost access to your MFA
-                apps.
+                Recover your account in case you lose access to your MFA
+                methods.
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>

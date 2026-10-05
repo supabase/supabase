@@ -7,6 +7,7 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
 import { TOTPFactors } from '@/components/interfaces/Account/TOTPFactors'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
@@ -29,12 +30,13 @@ const Security: NextPageWithLayout = () => {
           <PageHeaderSummary>
             <PageHeaderTitle>Security</PageHeaderTitle>
             <PageHeaderDescription>
-              Manage your account security settings and authentication methods.
+              Account security settings and authentication methods.
             </PageHeaderDescription>
           </PageHeaderSummary>
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
+        <AccountIdentities />
         <TOTPFactors />
       </PageContainer>
     </>

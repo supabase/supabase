@@ -161,6 +161,7 @@ export const getAdvisorItemSecondaryText = (
   }
 
   if (item.source === 'signal') {
+    if (item.type === 'account-recovery') return 'Your account'
     return `Database · ${item.sourceData.ip}`
   }
 

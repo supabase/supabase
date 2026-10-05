@@ -104,7 +104,7 @@ describe('/account/me', () => {
     render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
-    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
+    expect(screen.queryByText('AccountIdentities')).not.toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()

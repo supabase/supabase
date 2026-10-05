@@ -106,7 +106,9 @@ export const AccountIdentities = () => {
     setLinkingProviderId(provider.id)
 
     try {
-      const redirectTo = buildPathWithParams(buildProviderAuthRedirect(provider.id, '/account/me'))
+      const redirectTo = buildPathWithParams(
+        buildProviderAuthRedirect(provider.id, '/account/security')
+      )
 
       const { error } = await auth.linkIdentity({
         provider: provider.authProvider as Provider,
@@ -135,7 +137,7 @@ export const AccountIdentities = () => {
         <PageSectionSummary>
           <PageSectionTitle>Sign-in methods</PageSectionTitle>
           <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
+            Choose how you sign in to your Supabase account.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

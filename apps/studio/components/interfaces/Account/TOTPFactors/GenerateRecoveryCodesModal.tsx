@@ -16,13 +16,13 @@ export const GenerateRecoveryCodesModal = () => {
   return (
     <Admonition
       type="warning"
-      layout="horizontal"
+      layout="responsive"
       title="No recovery codes generated"
-      description="Recovery codes let you access your account if you lose access to your MFA device"
+      description="Recovery codes let you access your account if you lose access to your above MFA methods."
       actions={
         <>
           <Button onClick={() => mutate({})} loading={isPending}>
-            {isPending ? 'Generating codes' : 'Generate recovery codes'}
+            {isPending ? 'Generating codes' : 'Generate codes'}
           </Button>
           <RecoveryCodesModal
             open={open}

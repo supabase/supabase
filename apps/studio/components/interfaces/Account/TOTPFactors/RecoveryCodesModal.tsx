@@ -153,7 +153,7 @@ export const RecoveryCodesModal = <T = unknown,>({
 
               <Admonition
                 type="warning"
-                title="You won't see these codes again"
+                title="You won’t see these codes again"
                 description="Save them somewhere safe. If you lose them, you'll need to regenerate new codes."
               >
                 <div className="flex items-center space-x-2 mt-2">

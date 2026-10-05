@@ -12,7 +12,6 @@ import {
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -21,7 +20,6 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
 import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
-import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
@@ -82,7 +80,7 @@ const PlatformPreferences = () => {
 
   return (
     <>
-      <PreferencesPageHeader description="Manage your account profile, connections, and dashboard experience." />
+      <PreferencesPageHeader description="Account profile, connections, and dashboard experience." />
       <PageContainer size="small">
         {isError && (
           <Card>
@@ -97,10 +95,7 @@ const PlatformPreferences = () => {
             {isLoading ? (
               <ProfileLoadingSections showProfileInformation={profileShowInformation} />
             ) : (
-              <>
-                {profileShowInformation ? <ProfileInformation /> : null}
-                <AccountIdentities />
-              </>
+              <>{profileShowInformation ? <ProfileInformation /> : null}</>
             )}
 
             <AccountConnections />
@@ -157,24 +152,6 @@ const ProfileLoadingSections = ({
         </PageSectionContent>
       </PageSection>
     )}
-
-    <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Sign-in methods</PageSectionTitle>
-          <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
-          </PageSectionDescription>
-        </PageSectionSummary>
-      </PageSectionMeta>
-      <PageSectionContent>
-        <Card>
-          <CardContent>
-            <ShimmeringLoader />
-          </CardContent>
-        </Card>
-      </PageSectionContent>
-    </PageSection>
   </>
 )
 
