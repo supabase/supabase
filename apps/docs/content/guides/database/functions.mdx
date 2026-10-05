@@ -1,6 +1,6 @@
 ---
 id: 'functions'
-title: 'Database Functions'
+title: 'Database functions'
 description: 'Creating and using Postgres functions.'
 video: 'https://www.youtube.com/v/MJZCCpCYEqk'
 ---
@@ -8,11 +8,24 @@ video: 'https://www.youtube.com/v/MJZCCpCYEqk'
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
 These functions live inside your database, and you can call them from your app with [`rpc()`](../../reference/javascript/rpc).
 
+- [Database functions vs Edge Functions](#database-functions-vs-edge-functions) compares the two. Start here if you aren't sure which one fits.
+- [Create a database function](#create-a-database-function) has the steps, from a one-line function to one that takes parameters.
+- [Secure a database function](#secure-a-database-function) covers which user the function runs as and who can call it.
+- [Debugging database functions](/docs/guides/database/debugging-functions) covers logging and error handling.
+
 ## Quick demo
 
 <YouTube id="MJZCCpCYEqk" title="Creating and calling Postgres functions" />
 
-## Getting started
+## Database functions vs Edge Functions
+
+For data-intensive operations, use database functions. They run inside your database, and you can call them remotely with the [REST and GraphQL API](../api).
+
+For use cases that need low latency, use [Edge Functions](../../guides/functions). They're globally distributed and you write them in TypeScript.
+
+## Create a database function
+
+### Getting started
 
 Create a database function from the Dashboard, or write the SQL yourself against a
 [direct connection](../../guides/database/connecting-to-postgres).
@@ -24,7 +37,7 @@ To use the Dashboard:
 3. Enter the SQL that creates or replaces your database function.
 4. Click **Run**. You can also press `cmd+enter` or `ctrl+enter`.
 
-## Basic functions [#simple-functions]
+### Basic functions [#simple-functions]
 
 Create a basic database function that returns the string "hello world".
 
@@ -141,7 +154,7 @@ Reference: [`Rpc()`](../../reference/csharp/rpc)
 </$Show>
 </Tabs>
 
-## Returning data sets
+### Returning data sets
 
 A database function can also return a data set from a [table](../../guides/database/tables) or a view.
 
@@ -156,7 +169,7 @@ For example, take a database holding some Star Wars data:
 >
 <TabPanel id="data" label="Data">
 
-### Planets
+#### Planets
 
 ```
 | id  | name     |
@@ -166,7 +179,7 @@ For example, take a database holding some Star Wars data:
 | 3   | Kashyyyk |
 ```
 
-### People
+#### People
 
 ```
 | id  | name             | planet_id |
@@ -291,7 +304,7 @@ data = supabase.rpc('get_planets').eq('id', 1).execute()
 </$Show>
 </Tabs>
 
-## Passing parameters
+### Passing parameters
 
 Create a function that inserts a new planet into the `planets` table and returns the new ID. This function uses the `plpgsql` language.
 
@@ -408,13 +421,7 @@ await supabase.Rpc("add_planet", new Dictionary<string, object> { { "name", "Jak
 </$Show>
 </Tabs>
 
-## Suggestions
-
-### Database Functions vs Edge Functions
-
-For data-intensive operations, use database functions. They run inside your database, and you can call them remotely with the [REST and GraphQL API](../api).
-
-For use cases that need low latency, use [Edge Functions](../../guides/functions). They're globally distributed and you write them in TypeScript.
+## Secure a database function
 
 ### Security `definer` vs `invoker`
 
@@ -469,174 +476,6 @@ By default, any role can run a database function. You can restrict execution in 
     grant execute on function public.hello_world to authenticated;
     ```
 
-### Debugging functions
-
-Add logs to help you debug a function. Logs matter most in a complex function.
-
-Good targets to log include:
-
-- Values of (non-sensitive) variables
-- Returned results from queries
-
-#### General logging
-
-Use the `raise` keyword to write custom logs to the [Postgres logs](/dashboard/project/_/logs/postgres-logs) in the Dashboard. Three severity levels appear by default:
-
-- `log`
-- `warning`
-- `exception` (error level)
-
-```sql
-create function logging_example(
-  log_message text,
-  warning_message text,
-  error_message text
-)
-returns void
-language plpgsql
-as $$
-begin
-  raise log 'logging message: %', log_message;
-  raise warning 'logging warning: %', warning_message;
-
-  -- immediately ends function and reverts transaction
-  raise exception 'logging error: %', error_message;
-end;
-$$;
-
-select logging_example('LOGGED MESSAGE', 'WARNING MESSAGE', 'ERROR MESSAGE');
-```
-
-#### Error handling
-
-You can create custom errors with the `raise exception` keywords.
-
-A common pattern is to throw an error when a variable doesn't meet a condition:
-
-```sql
-create or replace function error_if_null(some_val text)
-returns text
-language plpgsql
-as $$
-begin
-  -- error if some_val is null
-  if some_val is null then
-    raise exception 'some_val should not be NULL';
-  end if;
-  -- return some_val if it is not null
-  return some_val;
-end;
-$$;
-
-select error_if_null(null);
-```
-
-Value checking is common, so Postgres provides the `assert` keyword as a shorthand. It takes the following format:
-
-```sql
--- throw error when condition is false
-assert <some condition>, 'message';
-```
-
-For example:
-
-```sql
-create function assert_example(name text)
-returns uuid
-language plpgsql
-as $$
-declare
-  student_id uuid;
-begin
-  -- save a user's id into the user_id variable
-  select
-    id into student_id
-  from attendance_table
-  where student = name;
-
-  -- throw an error if the student_id is null
-  assert student_id is not null, 'assert_example() ERROR: student not found';
-
-  -- otherwise, return the user's id
-  return student_id;
-end;
-$$;
-
-select assert_example('Harry Potter');
-```
-
-You can also capture and modify an error message with the `exception` keyword:
-
-```sql
-create function error_example()
-returns void
-language plpgsql
-as $$
-begin
-  -- fails: cannot read from nonexistent table
-  select * from table_that_does_not_exist;
-
-  exception
-      when others then
-          raise exception 'An error occurred in function <function name>: %', sqlerrm;
-end;
-$$;
-```
-
-#### Advanced logging
-
-For a more complex function, or for harder debugging, log the following:
-
-- Formatted variables
-- Individual rows
-- Start and end of function calls
-
-```sql
-create or replace function advanced_example(num int default 10)
-returns text
-language plpgsql
-as $$
-declare
-    var1 int := 20;
-    var2 text;
-begin
-    -- Logging start of function
-    raise log 'logging start of function call: (%)', (select now());
-
-    -- Logging a variable from a SELECT query
-    select
-      col_1 into var1
-    from some_table
-    limit 1;
-    raise log 'logging a variable (%)', var1;
-
-    -- It is also possible to avoid using variables, by returning the values of your query to the log
-    raise log 'logging a query with a single return value(%)', (select col_1 from some_table limit 1);
-
-    -- If necessary, you can even log an entire row as JSON
-    raise log 'logging an entire row as JSON (%)', (select to_jsonb(some_table.*) from some_table limit 1);
-
-    -- When using INSERT or UPDATE, the new value(s) can be returned
-    -- into a variable.
-    -- When using DELETE, the deleted value(s) can be returned.
-    -- All three operations use "RETURNING value(s) INTO variable(s)" syntax
-    insert into some_table (col_2)
-    values ('new val')
-    returning col_2 into var2;
-
-    raise log 'logging a value from an INSERT (%)', var2;
-
-    return var1 || ',' || var2;
-exception
-    -- Handle exceptions here if needed
-    when others then
-        raise exception 'An error occurred in function <advanced_example>: %', sqlerrm;
-end;
-$$;
-
-select advanced_example();
-```
-
 ## Resources
 
 - Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Flutter](../../reference/dart/rpc)
@@ -644,16 +483,14 @@ select advanced_example();
 - Postgres Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
 - Postgres Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)
 
-## Deep dive
-
-### Create Database Functions
+### Create a database function in the Dashboard
 
 <YouTube id="MJZCCpCYEqk" title="Creating a Postgres function in the dashboard" />
 
-### Call Database Functions using JavaScript
+### Call a database function from JavaScript
 
 <YouTube id="I6nnp9AINJk" title="Calling a Postgres function from JavaScript" />
 
-### Using Database Functions to call an external API
+### Call an external API from a database function
 
 <YouTube id="rARgrELRCwY" title="Calling an external API from a Postgres function" />
