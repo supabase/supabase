@@ -5,7 +5,7 @@ title: Frameworks
 
 `@supabase/server` middleware runs inside Hono, H3, Elysia, NestJS, and TanStack Start through a bridge: one file you copy into your project. The bridge runs a `@supabase/middleware` entry array in the framework's own middleware slot. Your route handlers then read `supabase`, `jwtClaims`, and any other key the entries contribute from the place your framework keeps per-request state.
 
-The framework adapters (`@supabase/server/adapters/*`) predate the middleware engine. We are moving off them, and they will be deprecated soon. The bridges on this page replace them. If you use an adapter today, read "Moving off the adapters" below before you change anything. One step in that migration can open an endpoint up without an error.
+The framework adapters (`@supabase/server/adapters/*`) predate the middleware engine. They are deprecated and will be removed on December 1, 2026. The bridges on this page replace them. If you use an adapter today, read "Moving off the adapters" below before you change anything. One step in that migration can open an endpoint up without an error.
 
 <Admonition type="note" title="Versions">
 
@@ -270,7 +270,7 @@ The bridge files live in the server repository under [`examples/frameworks`](htt
 
 Each adapter solved the same problem in a framework-specific way: build a `SupabaseContext` and stash it where the handler can reach it. That meant a published entry point, a peer dependency range, and a release cycle per framework, all to wrap one call. The engine replaced the model. A middleware is now an entry, a `(handler) => handler` wrapper over the Web `Request` and `Response` pair, and `withSupabaseClient()`, `withSupabaseAdminClient()`, `withRequiredClaims()`, and the rest are ordinary entries you compose. What remains is the bridge, and it belongs in your project, not in a package that has to track your framework's major versions.
 
-The adapters still work in v1 and will be deprecated soon. They will be removed in a future major. `withSupabase(config, handler)` from `@supabase/server` is not part of this change.
+The adapters are deprecated. They still work today and will be removed on December 1, 2026. `withSupabase(config, handler)` from `@supabase/server` is not part of this change.
 
 Three changes come with the migration. The first can open an endpoint up.
 
