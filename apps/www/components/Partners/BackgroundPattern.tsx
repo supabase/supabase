@@ -35,7 +35,7 @@ const BackgroundPattern = ({ className, variant = 'center' }: BackgroundPatternP
       {variant === 'edges' && (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-y-0 left-1/2 w-[min(64rem,62vw)] -translate-x-1/2 bg-alternative [-webkit-mask-image:radial-gradient(ellipse_at_center,black_48%,transparent_78%)] [mask-image:radial-gradient(ellipse_at_center,black_48%,transparent_78%)]"
+          className="pointer-events-none absolute inset-y-0 left-1/2 w-[min(88rem,84vw)] -translate-x-1/2 bg-alternative [-webkit-mask-image:radial-gradient(ellipse_at_center,black_62%,transparent_88%)] [mask-image:radial-gradient(ellipse_at_center,black_62%,transparent_88%)]"
         />
       )}
       {/* Soft brand-green radial glow from the top */}

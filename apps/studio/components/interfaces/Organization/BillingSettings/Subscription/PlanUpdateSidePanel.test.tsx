@@ -279,7 +279,7 @@ describe('PlanUpdateSidePanel', () => {
     it('renders the full-screen shell instead of the sheet', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/ })).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
       expect(screen.queryByRole('link', { name: 'Pricing' })).not.toBeInTheDocument()
     })
@@ -296,8 +296,8 @@ describe('PlanUpdateSidePanel', () => {
     it('offers AWS Marketplace as a separate purchasing route', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByText('Purchase through AWS Marketplace')).toBeInTheDocument()
-      expect(screen.getByRole('link', { name: 'View purchase options' })).toHaveAttribute(
+      expect(screen.getByText('Prefer purchasing through AWS Marketplace?')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View options' })).toHaveAttribute(
         'href',
         'https://supabase.com/aws-marketplace'
       )
@@ -331,7 +331,7 @@ describe('PlanUpdateSidePanel', () => {
     it('renders gap rows inside the full-screen shell', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/ })).toBeInTheDocument()
       expect(screen.getByText('Daily backups')).toBeInTheDocument()
       expect(screen.getByText('1-day log retention')).toBeInTheDocument()
       // Free has a `lesser` item → "Plan limits"; Pro has only `missing` items → "Not included"
@@ -352,7 +352,7 @@ describe('PlanUpdateSidePanel', () => {
     it('opens neither shell, so the fullscreen variant cannot flash the sheet', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Back/ })).not.toBeInTheDocument()
       expect(screen.queryByRole('button', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
     })
 
@@ -377,8 +377,8 @@ describe('PlanUpdateSidePanel', () => {
       render(<PlanUpdateSidePanel />)
 
       expect(screen.getByRole('link', { name: 'Pricing' })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /Go back to Studio/ })).not.toBeInTheDocument()
-      expect(screen.getByText('Purchase through AWS Marketplace')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Back/ })).not.toBeInTheDocument()
+      expect(screen.getByText('Prefer purchasing through AWS Marketplace?')).toBeInTheDocument()
     })
   })
 

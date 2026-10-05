@@ -62,7 +62,7 @@ export function PlanUpdateFullScreenShell({
         onClick={onClose}
         className="fixed top-4 left-4 z-10"
       >
-        Go back to Studio
+        Back
       </Button>
       <div className="fixed top-4 right-4 z-10 flex items-center gap-2">
         <Button
@@ -82,12 +82,12 @@ export function PlanUpdateFullScreenShell({
         </Button>
       </div>
       <motion.div
-        className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16"
+        className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-6 py-16 items-center"
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: contentDelay, duration: 0.3, ease: 'easeOut' }}
       >
-        <h1 className="text-2xl text-center">Change subscription plan for {organizationName}</h1>
+        <h1 className="text-2xl text-center text-balance max-w-2/3">Change subscription plan for {organizationName}</h1>
         {notice}
         {children}
       </motion.div>

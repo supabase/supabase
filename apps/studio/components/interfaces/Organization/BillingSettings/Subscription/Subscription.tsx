@@ -1,12 +1,12 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../Restriction'
-import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -22,6 +22,9 @@ import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
+
+const COMPARE_PLANS_URL = 'https://supabase.com/pricing#compare-plans'
+const AWS_MARKETPLACE_URL = 'https://supabase.com/aws-marketplace'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -66,6 +69,25 @@ const Subscription = () => {
                 usage quotas.
               </p>
             </div>
+            <div className="space-y-2">
+              <p className="text-sm text-foreground-light m-0">More information</p>
+              <div className="space-y-1">
+                <Link href={COMPARE_PLANS_URL} target="_blank" rel="noreferrer">
+                  <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                    <p className="m-0 text-sm">Compare plans</p>
+                    <ExternalLink size={16} strokeWidth={1.5} />
+                  </div>
+                </Link>
+                {canPurchaseThroughAws && (
+                  <Link href={AWS_MARKETPLACE_URL} target="_blank" rel="noreferrer">
+                    <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                      <p className="m-0 text-sm">AWS Marketplace</p>
+                      <ExternalLink size={16} strokeWidth={1.5} />
+                    </div>
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
@@ -100,14 +122,12 @@ const Subscription = () => {
                         </Button>
                         {currentPlan && currentPlan.id !== 'free' && (
                           <InitiateCancellationFlowButton variant="danger">
-                            Cancel Subscription
+                            Cancel subscription
                           </InitiateCancellationFlowButton>
                         )}
                       </div>
                     )}
                   </div>
-
-                  {canPurchaseThroughAws && <AwsMarketplacePurchaseCallout />}
 
                   {!canChangeTier && (
                     <div>
