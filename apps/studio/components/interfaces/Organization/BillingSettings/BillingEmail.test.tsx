@@ -12,7 +12,7 @@ import { organizationKeys } from '@/data/organizations/keys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type CustomerResponse = components['schemas']['CustomerResponse']
+type CustomerResponse = components['schemas']['CustomerResponse_Output']
 
 // The additional-emails control renders a Radix Popover when adding a recipient.
 mockAnimationsApi()
@@ -72,7 +72,13 @@ const mockUpdateCustomerProfile = () => {
 }
 
 const addRecipient = async (email: string) => {
-  const input = screen.getByPlaceholderText('Add additional recipients')
+  const input = screen
+    .getAllByRole('combobox')
+    .find((element): element is HTMLInputElement => element instanceof HTMLInputElement)
+
+  expect(input).toBeDefined()
+  if (!input) return
+
   await userEvent.click(input)
   await waitFor(() => expect(input).toHaveAttribute('aria-expanded', 'true'))
   // fireEvent.change (rather than userEvent.type) avoids racing the popover's open-state
@@ -88,7 +94,6 @@ const removeRecipient = (email: string) => {
 
 describe('BillingEmail', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockCheckPermissions.mockImplementation(() => ({ can: true, isSuccess: true }))
   })
 

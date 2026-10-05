@@ -49,13 +49,16 @@ export const pricingTooltips: PricingTooltips = {
     main: 'The maximum number of users your project can have',
   },
   'auth.maus': {
-    main: 'Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
+    main: 'Users who log in or refresh their token count toward MAU. This includes users who sign in through your OAuth 2.1 server.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.',
+  },
+  'auth.oauthServer': {
+    main: 'Use your project as an OAuth 2.1 and OpenID Connect identity provider. There is no separate charge. Users who sign in through your OAuth server count toward MAU.',
   },
   'auth.userDataOwnership': {
     main: 'Full ownership and access to the underlying user data including encrypted passwords.',
   },
   'auth.anonSignIns': {
-    main: 'Anonymous user requests count towards MAU, just like a permanent user.',
+    main: 'Anonymous user requests count toward MAU, just like a permanent user.',
   },
 
   'auth.basicMFA': {
@@ -85,13 +88,13 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Billing is based on the sum of all invocations, independent of response status, throughout your billing period.',
   },
   'realtime.concurrentConnections': {
-    main: 'Total number of successful connections. Connections attempts are not counted towards usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
+    main: 'Total number of successful connections. Connections attempts are not counted toward usage.\nBilling is based on the maximum amount of concurrent peak connections throughout your billing period.',
   },
   'realtime.messagesPerMonth': {
     main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
   },
   'security.logDrain': {
-    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count towards usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
+    main: 'Only events processed and sent to destinations are counted. Egress required to export logs count toward usage.\nEgress through Log Drains is rolled up into the unified egress and benefits from the unified egress quota.',
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
@@ -148,6 +151,35 @@ export const pricingTooltips: PricingTooltips = {
         automatically for auditing and security purposes. Includes actions such as creating a new
         project, inviting members or changing project settings. Read more in our{' '}
         <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'platform.logIngestion': {
+    main: (
+      <span className="prose text-xs">
+        You are charged for the total volume of log data that Supabase ingests across all your
+        project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and
+        others) during the billing cycle. Read more in our{' '}
+        <Link href="/docs/guides/platform/manage-your-usage/logs-ingest" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
+  },
+
+  'platform.logQuery': {
+    main: (
+      <span className="prose text-xs">
+        Logs Query usage isn't billed directly. Instead, your organization gets a log query
+        allowance that scales with how much log data you ingest. The allowance covers the volume of
+        log data scanned when you read logs through the Studio UI, the Management API, the CLI, or
+        any other interface. Read more in our{' '}
+        <Link href="/docs/guides/platform/manage-your-usage/logs-query" target="_blank">
           docs
         </Link>
         .

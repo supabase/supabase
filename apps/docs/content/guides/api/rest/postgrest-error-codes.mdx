@@ -67,6 +67,19 @@ Here's the text formatted as a proper markdown table:
 | 42501                  | if authenticated 403, else 401 | insufficient privileges         |
 | other                  | 400                            |                                 |
 
+<Admonition type="note">
+
+Some codes in this table are triggered by platform conditions rather than application code. Seeing them in high volume usually points to an infrastructure event rather than a bug in your queries:
+
+- **25006** — The database has entered read-only mode due to disk quota. See [Read-only mode](/docs/guides/platform/database-size#read-only-mode) for causes and recovery steps.
+- **53100** — Disk is full. Supabase emits this alongside 25006 during severe disk exhaustion.
+- **53300** — Too many connections. The connection pool has reached its limit; check your [connection pool settings](/docs/guides/database/connection-management).
+- **57P03** — The database cannot accept connections, typically during a restart or failover.
+
+When you see these codes in volume, check the [Database dashboard](/dashboard/project/_/observability/database) before debugging application code.
+
+</Admonition>
+
 ## API level errors
 
 ### Connection errors
@@ -145,7 +158,7 @@ Data API error unspecified
 
 ## Viewing errors in the logs
 
-One can filter for API errors in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs**. Below are useful queries for filtering and analyzing API errors:
+One can filter for API errors in the [Explorer](/dashboard/project/_/explorer) after selecting **Run SQL**, query source **Logs**, and a time range. Below are useful queries for filtering and analyzing API errors:
 
 ### Find all API errors that occurred at the database level
 
@@ -231,30 +244,5 @@ where
   and match(log_attributes['request.path'], '^/rest/v1/')
 group by hour, path
 order by hour desc
-limit 100;
-```
-
-### Find data API request from specific authenticated user
-
-```sql
-select
-  timestamp,
-  event_message,
-  log_attributes['request.headers.cf_connecting_ip'] as requesters_ip,
-  log_attributes['request.url'] as request_url,
-  log_attributes['request.method'] as request_method,
-  log_attributes['request.sb.jwt.authorization.payload.subject'] as user_id,
-  log_attributes['request.sb.jwt.apikey.payload.role'] as apikey_role,
-  log_attributes['request.sb.jwt.authorization.payload.role'] as authorization_token_role,
-  log_attributes['request.headers.user_agent'] as user_agent,
-  log_attributes['request.cf.city'] as city,
-  log_attributes['request.cf.country'] as country,
-  log_attributes['request.cf.postalCode'] as postalCode
-from logs
-where
-  source = 'edge_logs'
-  and match(log_attributes['request.path'], '^/rest/v1/')
-  and log_attributes['request.sb.jwt.authorization.payload.subject'] = 'SOME_USER_ID' -- <---ADD USER_ID from auth.users table
-order by timestamp desc
 limit 100;
 ```

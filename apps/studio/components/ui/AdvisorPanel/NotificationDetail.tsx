@@ -79,7 +79,7 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
                 ? action.url.replace('[slug]', organization?.slug ?? data.org_slug ?? '_')
                 : action.url
             return (
-              <Button key={key} variant="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
+              <Button key={key} icon={<ExternalLink strokeWidth={1.5} />} asChild>
                 <Link href={url} target="_blank" rel="noreferrer">
                   {action.label}
                 </Link>
@@ -87,11 +87,7 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
             )
           } else if (action.action_type !== undefined) {
             return (
-              <Button
-                key={key}
-                variant="default"
-                onClick={() => onButtonAction(action.action_type)}
-              >
+              <Button key={key} onClick={() => onButtonAction(action.action_type)}>
                 {action.label}
               </Button>
             )
@@ -101,7 +97,6 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
         })}
         {notification.status === 'archived' ? (
           <Button
-            variant="default"
             icon={<ArchiveRestoreIcon size={14} strokeWidth={1.5} />}
             onClick={() => onUpdateStatus(notification.id, 'seen')}
           >
@@ -109,7 +104,6 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
           </Button>
         ) : (
           <Button
-            variant="default"
             icon={<Archive size={14} strokeWidth={1.5} />}
             onClick={() => onUpdateStatus(notification.id, 'archived')}
           >

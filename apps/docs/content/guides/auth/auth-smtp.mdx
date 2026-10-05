@@ -143,7 +143,7 @@ If you are planning on having a large surge of users coming at a specific time, 
 Consider implementing additional protections for such events:
 
 - Build a queuing or waitlist system instead of allowing direct sign-up, which will help you control the number of messages being sent from the email sending service.
-- Disable email-based sign ups for the event and use social login only. Alternatively you can deprioritize the email-based sign-up flows for the event by hiding them in the UI or making them harder to reach.
+- Disable email-based sign-ups for the event and use social login only. Alternatively you can deprioritize the email-based sign-up flows for the event by hiding them in the UI or making them harder to reach.
 
 **Use the Send Email Auth Hook for more control.**
 
@@ -161,6 +161,6 @@ If you need more control over the sending process, instead of using a SMTP serve
 
 **Increase the duration of user sessions.**
 
-Having short lived [user sessions](/docs/guides/auth/sessions) can be problematic for email sending, as it forces active users to sign-in frequently, increasing the number of messages needed to be sent. Consider increasing the maximum duration of user sessions. If you do see an unnecessary increase in logins without a clear cause, check your frontend application for bugs.
+Having short-lived [user sessions](/docs/guides/auth/sessions) can be problematic for email sending, as it forces active users to sign in frequently, increasing the number of messages needed to be sent. Consider increasing the maximum duration of user sessions. If you do see an unnecessary increase in sign-ins without a clear cause, check your frontend application for bugs.
 
-If you are using a [SSR](/docs/guides/auth/server-side) framework on the frontend and are seeing an increased number of user logins without a clear cause, check your set up. Make sure to keep the `@supabase/ssr` package up to date and closely follow the guides we publish. Make sure that the middleware components of your SSR frontend works as intended and matches the guides we've published. Sometimes a misplaced `return` or conditional can cause early session termination.
+If you are using a [SSR](/docs/guides/auth/server-side) framework on the frontend and are seeing an increased number of user sign-ins without a clear cause, check your set up. Make sure to keep the `@supabase/ssr` package up to date and closely follow the guides we publish. Make sure that the middleware components of your SSR frontend works as intended and matches the guides we've published. Sometimes a misplaced `return` or conditional can cause early session termination.

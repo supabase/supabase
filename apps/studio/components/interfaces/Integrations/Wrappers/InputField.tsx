@@ -1,8 +1,7 @@
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import type { Control, FieldPath, FieldValues } from 'react-hook-form'
-import { cn, FormControl, FormField, Input, Textarea } from 'ui'
+import { cn, FormControl, FormField, Input, InputVariants, Textarea } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -12,15 +11,19 @@ interface InputFieldProps<TFieldValues extends FieldValues = FieldValues> {
   option: ServerOption
   control: Control<TFieldValues>
   loading?: boolean
+  placeholder?: string
+  layout?: 'vertical' | 'horizontal'
 }
 
-const InputField = <
+export const InputField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   control,
   option,
   loading = false,
+  layout = 'horizontal',
+  placeholder,
 }: InputFieldProps<TFieldValues>) => {
   return (
     <FormField
@@ -29,7 +32,7 @@ const InputField = <
       defaultValue={(option.defaultValue ?? '') as any}
       render={({ field }) => (
         <FormItemLayout
-          layout="vertical"
+          layout={layout}
           label={
             <div className="flex items-center space-x-2">
               <p>{option.label}</p>
@@ -58,7 +61,7 @@ const InputField = <
             ) : option.secureEntry ? (
               <PasswordInput copy reveal {...field} />
             ) : (
-              <Input {...field} />
+              <Input {...field} placeholder={placeholder} />
             )}
           </FormControl>
         </FormItemLayout>
@@ -66,5 +69,3 @@ const InputField = <
     />
   )
 }
-
-export default InputField

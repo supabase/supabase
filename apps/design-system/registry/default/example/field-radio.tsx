@@ -1,5 +1,4 @@
-import { Field, FieldDescription, FieldLabel, FieldSet } from 'ui/src/components/shadcn/ui/field'
-import { RadioGroup, RadioGroupItem } from 'ui/src/components/shadcn/ui/radio-group'
+import { Field, FieldDescription, FieldLabel, FieldSet, RadioGroup, RadioGroupItem } from 'ui'
 
 export default function FieldRadio() {
   return (

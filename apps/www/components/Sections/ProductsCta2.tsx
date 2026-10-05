@@ -31,7 +31,7 @@ function ProductsCta(props: Props) {
           <StartYourProjectButton size="small" className="h-full" variant="primary">
             Start for free
           </StartYourProjectButton>
-          <Button asChild variant="default" size="small">
+          <Button asChild size="small">
             <Link href="https://forms.supabase.com/enterprise">Contact Enterprise</Link>
           </Button>
         </div>

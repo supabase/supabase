@@ -168,7 +168,7 @@ export function PermissionsSectionClient({ examples }: { examples: PermissionExa
             </motion.div>
           </AnimatePresence>
           <Link
-            href="/docs/reference/javascript/storage-createbucket"
+            href="/docs/reference/javascript/file-buckets-createbucket"
             className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
           >
             Documentation

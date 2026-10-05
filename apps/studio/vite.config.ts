@@ -4,14 +4,16 @@ import fs from 'node:fs'
 import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import remapping, { type SourceMapInput } from '@jridgewell/remapping'
 import { sentryTanstackStart } from '@sentry/tanstackstart-react/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
-import MagicString from 'magic-string'
+import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
+
+import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
+import { getSecurityHeaders } from './security-headers'
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 const compatRoot = path.resolve(rootDir, 'compat/next')
@@ -269,9 +271,8 @@ function ssrStubGraphiql(): Plugin {
 // back, ES module live-bindings can be undefined at the point the
 // chunk that evaluates first tries to use them.
 //
-// Cycles are matched by chunk basename prefix (stripping the
-// `assets/` directory and the `-<hash>.js` suffix), so the allowlist
-// stays stable across builds even as Rolldown reassigns hashes.
+// Cycles are matched by chunk basename prefix (directory and `-<hash>.js`
+// suffix stripped), so the allowlist stays stable across builds.
 const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
   // `ui` ↔ `TreeView` chunk cycle. `cva` lives in the `ui` chunk
   // (Rolldown pools it there because many ui files use it), TreeView
@@ -289,8 +290,8 @@ const KNOWN_CHUNK_CYCLES: ReadonlyArray<ReadonlyArray<string>> = [
 
 function chunkPrefix(name: string): string {
   return name
-    .replace(/^assets\//, '')
-    .replace(/-[A-Za-z0-9_-]{6,10}\.js$/, '')
+    .replace(/^.*\//, '')
+    .replace(/-[A-Za-z0-9_-]{6,}\.js$/, '')
     .replace(/\.js$/, '')
 }
 
@@ -369,155 +370,17 @@ function assertNoChunkCycles(): Plugin {
   }
 }
 
-// Skew protection (vercel.com/docs/skew-protection): bake `?dpl=<deployment
-// id>` into every asset URL the client bundle can request, so every hashed
-// chunk resolves against the deployment that referenced it. Vercel's edge
-// routes any request carrying `?dpl=` to that exact deployment, so a
-// long-lived dashboard session keeps loading its own deployment's hashed
-// chunks after a redeploy, while document navigations (which carry no pin)
-// always land on the latest deployment. If the pinned deployment ages out of
-// Skew Protection's Maximum Age, Vercel 404s the chunk and the
-// `vite:preloadError` backstop in router.tsx reloads onto the latest deploy.
-// API / server-function fetches are deliberately unpinned — that is what
-// lets use-check-latest-deploy detect newer deploys mid-session.
-//
-// Three mechanisms are needed for full coverage:
-//   1. `experimental.renderBuiltUrl` (in the config below) — asset and
-//      public-file URLs referenced from JS/CSS/HTML, including the
-//      `__vite__mapDeps` preload lists for dynamic imports.
-//   2. The `generateBundle` hook here — chunk-to-chunk `import`/`from`
-//      specifiers. Rolldown renders these as bare relative paths that
-//      `renderBuiltUrl` never sees (vitejs/vite#13834), and they're what the
-//      browser actually fetches; the preload list alone would just warm a
-//      cache entry under a different URL. Module identity is keyed by URL, so
-//      the rewrite must cover EVERY specifier or a chunk could load twice
-//      (pinned + unpinned) and break singleton module state.
-//   3. The `buildApp` hook here — `_shell.html` is prerendered by TanStack's
-//      own post-order `buildApp` hook from the router manifest, outside
-//      Vite's asset pipeline, so its <script>/<link> URLs and the embedded
-//      route-preload manifest are patched on disk afterwards. Without this,
-//      the shell's unpinned modulepreload URLs and the pinned import URLs are
-//      different cache keys and the whole entry graph downloads twice.
-function skewProtectionDpl(opts: { dplSearch: string; assetsUrlPrefix: string }): Plugin {
-  const { dplSearch, assetsUrlPrefix } = opts
+// Vite bundles `?worker` modules (Monaco's workers via graphiql) with the ROOT
+// `build.assetsDir`, while Nitro only rewrites the client environment's (to
+// `_vercel/immutable/<salt>/nitro` on Vercel). Keep the workers in the same
+// directory so they land in the immutable store too.
+function workersFollowClientAssetsDir(): Plugin {
   return {
-    name: 'studio-skew-protection-dpl',
+    name: 'studio-workers-follow-client-assets-dir',
     apply: 'build',
-    // TanStack's `tanstack-start-core:post-build` plugin is `enforce: 'post'`;
-    // matching it keeps THIS plugin sorted after it (same enforce group,
-    // registration order wins), which the buildApp hook below relies on.
-    enforce: 'post',
-    transform: {
-      handler(code, id) {
-        if (id !== '\0vite/preload-helper.js') return
-        // Vite's preload helper decides stylesheet-vs-modulepreload with
-        // `dep.endsWith(".css")`. The `?dpl=` suffix makes that false for
-        // every CSS dep, so lazy chunks' CSS would be injected as a script
-        // modulepreload — a console MIME error, and the stylesheet never
-        // applies. Make the check query-aware. Hard-fail if the helper's
-        // shape ever changes so a Vite upgrade can't silently regress this.
-        const cssCheck = 'dep.endsWith(".css")'
-        if (!code.includes(cssCheck)) {
-          this.error(
-            `studio-skew-protection-dpl: expected \`${cssCheck}\` in vite's preload helper — ` +
-              `vite changed its preload-helper shape; update this patch to match.`
-          )
-        }
-        return { code: code.replaceAll(cssCheck, '/\\.css(\\?|$)/.test(dep)'), map: null }
-      },
-    },
-    generateBundle: {
-      // `order: 'post'` so this runs AFTER `vite:build-import-analysis`'s
-      // normal-order generateBundle. That hook maps each dynamic-import
-      // specifier back to a bundle key — with no query stripping — to collect
-      // the chunk's CSS/preload deps; a `?dpl` suffix added any earlier makes
-      // the lookup miss and silently drops CSS preloading for lazy chunks.
-      order: 'post',
-      handler(_options, bundle) {
-        // Server chunks import each other via Node's filesystem resolution —
-        // only the browser-facing client build gets the query pin.
-        if (this.environment.name !== 'client') return
-        for (const chunk of Object.values(bundle)) {
-          if (chunk.type !== 'chunk') continue
-          const importees = new Set([...chunk.imports, ...chunk.dynamicImports])
-          if (importees.size === 0) continue
-          const chunkDir = path.posix.dirname(chunk.fileName)
-          let edits: MagicString | undefined
-          for (const importee of importees) {
-            const rel = path.posix.relative(chunkDir, importee)
-            const spec = rel.startsWith('.') ? rel : `./${rel}`
-            // Rolldown quotes static import specifiers with `"` and dynamic
-            // ones with backticks; cover `'` too for safety. Matching the
-            // exact quoted specifier of a known importee (hashed filename)
-            // can't collide with app string literals.
-            for (const quote of ['"', "'", '`']) {
-              const target = `${quote}${spec}${quote}`
-              for (
-                let at = chunk.code.indexOf(target);
-                at !== -1;
-                at = chunk.code.indexOf(target, at + target.length)
-              ) {
-                edits ??= new MagicString(chunk.code)
-                edits.appendLeft(at + target.length - 1, dplSearch)
-              }
-            }
-          }
-          if (!edits) continue
-          chunk.code = edits.toString()
-          // Recombine the sourcemap so the columns Sentry maps stay accurate
-          // — every insertion shifts the rest of the minified line. Like
-          // vite:build-import-analysis's own generateBundle edits, updating
-          // `chunk.map` isn't enough: the `.js.map` file already exists in
-          // the bundle as an emitted asset by this point, so the combined map
-          // has to be written into that asset too.
-          if (chunk.map) {
-            const editMap = edits.generateMap({ source: chunk.fileName, hires: 'boundary' })
-            const original = chunk.map as unknown as SourceMapInput & {
-              file?: string
-              debugId?: string
-            }
-            const combined = {
-              ...remapping([editMap as SourceMapInput, original], () => null),
-              // Preserve fields remapping drops but the toolchain relies on
-              // (`debugId` is how Sentry pairs the uploaded map to the chunk).
-              file: original.file,
-              ...(original.debugId && { debugId: original.debugId }),
-            }
-            chunk.map = combined as unknown as typeof chunk.map
-            const mapAsset = bundle[`${chunk.fileName}.map`]
-            if (mapAsset && mapAsset.type === 'asset') {
-              mapAsset.source = JSON.stringify(combined)
-            }
-          }
-        }
-      },
-    },
-    buildApp: {
-      // TanStack's `tanstack-start-core:post-build` prerenders `_shell.html`
-      // in its own post-order buildApp hook. This hook must run after it, so
-      // this plugin must sort after that one: same hook order + same plugin
-      // `enforce` group (see above) + registered after `tanstackStart()` in
-      // the plugins array.
-      order: 'post',
-      async handler(builder) {
-        const clientEnv = builder.environments.client
-        if (!clientEnv) return
-        const outDir = path.resolve(builder.config.root, clientEnv.config.build.outDir)
-        const escapedPrefix = assetsUrlPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-        // Quoted `/assets/...` URLs: <script src>/<link href> attributes and
-        // the serialized router manifest's preload lists. `[^"'`?]` keeps the
-        // match inside one URL and skips any that already carry a query.
-        const assetUrl = new RegExp(`(["'\`])(${escapedPrefix}[^"'\`?]+)\\1`, 'g')
-        for (const entry of fs.readdirSync(outDir, { recursive: true, withFileTypes: true })) {
-          if (!entry.isFile() || !entry.name.endsWith('.html')) continue
-          const filePath = path.join(entry.parentPath, entry.name)
-          const html = fs.readFileSync(filePath, 'utf-8')
-          const patched = html.replace(assetUrl, (_match, quote, url) => {
-            return `${quote}${url}${dplSearch}${quote}`
-          })
-          if (patched !== html) fs.writeFileSync(filePath, patched)
-        }
-      },
+    configResolved(config) {
+      const clientAssetsDir = config.environments.client?.build.assetsDir
+      if (clientAssetsDir) config.build.assetsDir = clientAssetsDir
     },
   }
 }
@@ -602,6 +465,26 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  // Pin server-function calls to the build that created them, without a
+  // session cookie that also pins document reloads and the update check.
+  publicEnvDefines['process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID'] =
+    JSON.stringify(
+      env.VERCEL_SKEW_PROTECTION_ENABLED === '1' ? env.VERCEL_DEPLOYMENT_ID : undefined
+    ) ?? 'undefined'
+
+  // `MAINTENANCE_MODE` gates the "redirect everything to /maintenance" rule.
+  // It's deliberately unprefixed, and the other two consumers both read it at
+  // BUILD time: `next.config.ts` reads it in `redirects()`, which Next bakes
+  // into `routes-manifest.json` during `next build`, and `vercel.ts` reads it
+  // while emitting `vercel.json`. So flipping maintenance has always meant a
+  // rebuild/redeploy, never just a server restart. Inline it here on the same
+  // terms so the isomorphic `beforeLoad` in `routes/__root.tsx` — which
+  // mirrors those rules for the TanStack runtime — can read it on the client
+  // too, without self-hosters having to set a second, NEXT_PUBLIC_-prefixed
+  // var. Falls back to `''` (not left undefined) so the browser bundle never
+  // ends up with a bare `process.env` reference.
+  publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
+
   // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
   // these at runtime in the browser. When a var is unset it gets no define
   // entry above, which would leave a literal `process.env.*` in the built
@@ -616,36 +499,19 @@ export default defineConfig(({ command, mode }) => {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
-  // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
-  // Start has no single knob — the prefix has to be declared in three places
-  // (see BASE_PATH_REDIRECT_GUIDE.md):
-  //   - Vite `base`               — bakes the prefix into asset URLs in the
-  //                                  built bundle.
-  //   - tanstackStart router.basepath — must be passed explicitly. If
-  //                                  omitted, the plugin's internal
-  //                                  `deriveRouterBasepath` derives a value
-  //                                  from `publicBase` and strips both
-  //                                  leading and trailing slashes
-  //                                  (`/dashboard` → `dashboard`), which then
-  //                                  surfaces in `useRouter().basePath`
-  //                                  consumers as relative URLs (e.g.
-  //                                  `${BASE_PATH}/img/...` becomes
-  //                                  `dashboard/img/...` and the browser
-  //                                  resolves it against the current path).
-  //                                  See planning.js:14 in
-  //                                  @tanstack/start-plugin-core.
-  //   - createRouter({ basepath }) — runtime navigation prefix; configured
-  //                                  in router.tsx off the same env var
-  //                                  (inlined via `define` above).
-  // Leaving the var empty keeps the app at `/` as today.
+  // Vite's public base keeps asset requests under www's `/dashboard` proxy.
+  // Nitro's baseURL stays `/`: its immutable manifest must use the reserved
+  // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
+  // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
 
-  // Skew protection — see the skewProtectionDpl comment above. Both are
-  // build-time system env vars on Vercel; unset on local/self-hosted builds,
-  // which disables the whole mechanism.
-  const skewDeploymentId =
-    env.VERCEL_SKEW_PROTECTION_ENABLED === '1' ? env.VERCEL_DEPLOYMENT_ID : undefined
-  const dplSearch = skewDeploymentId ? `?dpl=${encodeURIComponent(skewDeploymentId)}` : ''
+  // Self-hosted responses get next.config.ts's security headers via Nitro
+  // route rules. On Vercel they come from vercel.ts: a `/**` header route in
+  // the Build Output config would stop matching before Nitro's asset and
+  // skew-cookie rules.
+  const securityHeaders = Object.fromEntries(
+    getSecurityHeaders().map(({ key, value }) => [key, value])
+  )
 
   // Substitutions that have to apply to *both* our app source (via Vite's
   // `define`) and any pre-bundled dependencies (via esbuild's optimizeDeps).
@@ -700,19 +566,6 @@ export default defineConfig(({ command, mode }) => {
       ],
     },
     ...(basePath && { base: basePath }),
-    // Skew protection part 1 (see skewProtectionDpl above): every asset /
-    // public-file URL rendered into the bundle — CSS url()s, images, worker
-    // URLs, `__vite__mapDeps` preload lists — gets the `?dpl=` pin. Returning
-    // a string opts out of Vite's base handling, so the base path is joined
-    // here. Left unset when the pin is off so Vite keeps its default
-    // base-relative URL rendering.
-    ...(dplSearch && {
-      experimental: {
-        renderBuiltUrl(filename: string) {
-          return `${basePath ?? ''}/${filename}${dplSearch}`
-        },
-      },
-    }),
     optimizeDeps: {
       // graphiql's Vite worker setup (swapped in for the webpack one by the
       // `graphiqlViteWorkers` plugin above) imports Monaco's workers with
@@ -757,6 +610,30 @@ export default defineConfig(({ command, mode }) => {
     //   with `c is not a function` because its `styleHandler` import
     //   came in through the now-too-large `lucide-react` chunk). Pin
     //   React explicitly so it stays a leaf vendor chunk.
+    //
+    //   `packages/ui/src/components/shadcn/ui/field.tsx` — its only
+    //   non-barrel importer is Storage's `FileExplorerHeader`, so
+    //   Rolldown pools it into the storage bucket page chunk while the
+    //   `ui` package barrel (`packages/ui/index.tsx`) re-exports it —
+    //   `ui` ends up importing `FieldDescription` back from the page
+    //   chunk it's itself imported by.
+    //
+    //   `packages/ui/src/components/shadcn/ui/drawer.tsx` — same shape,
+    //   its only non-barrel importer sits inside the Logs Explorer page
+    //   tree (`DataTableFilterControlsDrawer`), so it gets pooled into
+    //   the `logs` page chunk while `ui`'s barrel re-exports it too.
+    //
+    //   `packages/ui/src/components/shadcn/ui/form.tsx` and
+    //   `packages/ui/src/components/shadcn/ui/sidebar.tsx` (+
+    //   `use-mobile.tsx`) — same shape again: each gets pooled into
+    //   whichever page/feature chunk happens to be its only non-barrel
+    //   importer (a form page, `components/interfaces/Sidebar.tsx`)
+    //   while `ui`'s barrel re-exports them too.
+    //
+    //   `packages/ui/src/components/shadcn/ui/slider.tsx` — same shape
+    //   again: its only non-barrel importer is the Appearance settings'
+    //   `ThemeColorSettings`, so Rolldown pools it into the `/account/me`
+    //   page chunk while `ui`'s barrel re-exports it too.
     build: {
       rollupOptions: {
         output: {
@@ -777,6 +654,24 @@ export default defineConfig(({ command, mode }) => {
             }
             if (id.includes('node_modules/lucide-react/')) {
               return 'lucide-react'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/field.tsx')) {
+              return 'ui-field'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/drawer.tsx')) {
+              return 'ui-drawer'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/form.tsx')) {
+              return 'ui-form'
+            }
+            if (
+              id.includes('packages/ui/src/components/shadcn/ui/sidebar.tsx') ||
+              id.includes('packages/ui/src/components/hooks/use-mobile.tsx')
+            ) {
+              return 'ui-sidebar'
+            }
+            if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
+              return 'ui-slider'
             }
             return undefined
           },
@@ -820,7 +715,16 @@ export default defineConfig(({ command, mode }) => {
       // above rewrites it to the `@sentry/react`-backed shim before SSR
       // resolution ever sees the id, and `@sentry/react` ships real ESM
       // ("import" condition → build/esm), so plain externalization works.
-      noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use', 'awesome-debounce-promise'],
+      // `tslib` is inlined for the BUILD only: Nitro's dev runner has no CJS
+      // interop for the `tslib.js` that its ESM wrapper default-imports, and
+      // every SSR request would 500. Left external in dev, Node loads it.
+      noExternal: [
+        'lodash',
+        /^next(\/|$)/,
+        ...(command === 'build' ? ['tslib'] : []),
+        'react-use',
+        'awesome-debounce-promise',
+      ],
     },
     plugins: [
       nextCompat(),
@@ -830,8 +734,39 @@ export default defineConfig(({ command, mode }) => {
       ssrLodashEs(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
+      workersFollowClientAssetsDir(),
       devtools(),
       tailwindcss(),
+      // Nitro builds and hosts the server for every target: the Vercel
+      // function (`.vercel/output`, preset auto-detected from `VERCEL`) and
+      // the self-hosted node server (`.output`).
+      nitro({
+        // `server.ts` is TanStack Start's SSR entry, not a Nitro entry;
+        // without this Nitro's scan picks it up as both and warns.
+        serverEntry: false,
+        // Nitro bundles dependencies. libpg-query's emscripten glue reads
+        // `__dirname` and loads its `.wasm` from disk, so keep it external
+        // and fully copied (`*`).
+        traceDeps: ['libpg-query*'],
+        vercel: {
+          // Content-addressed chunks under `/_vercel/immutable/`, shared
+          // across deployments, so a tab opened before a redeploy keeps
+          // loading its lazy chunks.
+          immutableStaticFiles: true,
+          // Nitro uses a session-wide __vdpl cookie, which pins reloads too.
+          // Keep Skew Protection ENABLED in the Vercel dashboard: this flag
+          // only disables Nitro's cookie integration, not Vercel's routing.
+          // start.ts pins only server functions using Vercel's request header.
+          skewProtection: false,
+          // One function serves every API route, so the timeout must cover
+          // the longest one (integrations/stripe-sync).
+          functions: { maxDuration: 300 },
+        },
+        // Documents from the static shell; only /api/* and /_serverFn/*
+        // invoke the function.
+        modules: [vercelSpaRoutes({ basePath })],
+        ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),
+      }),
       tanstackStart({
         srcDirectory: './',
         spa: {
@@ -842,12 +777,6 @@ export default defineConfig(({ command, mode }) => {
         ...(basePath && { router: { basepath: basePath } }),
       }),
       viteReact(),
-      // Skew protection parts 2 + 3. Registered after tanstackStart() so the
-      // shell-patching buildApp hook runs after TanStack's prerender — see
-      // the skewProtectionDpl comment.
-      ...(dplSearch
-        ? [skewProtectionDpl({ dplSearch, assetsUrlPrefix: `${basePath ?? ''}/assets/` })]
-        : []),
       // Sentry's TanStack Start plugin(s) MUST be last so source maps reflect
       // every prior transform. `sentryTanstackStart` returns an ARRAY of
       // plugins (route patterns, source-map upload, middleware auto-wrap), so

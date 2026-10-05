@@ -56,7 +56,6 @@ vi.mock('./DeletePaymentMethodModal', () => ({
 
 describe('PaymentMethods', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',

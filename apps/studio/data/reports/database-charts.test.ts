@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { getReportAttributesV2 } from './database-charts'
+import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
+import { RESOURCE_WARNING_MESSAGES } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { Project } from '@/data/projects/project-detail-query'
 
 const PROJECT: Project = {
@@ -77,6 +78,29 @@ describe('getReportAttributesV2 dedicated pooler chart', () => {
   })
 })
 
+const getSupavisorChart = (project: Project) =>
+  getReportAttributesV2(ENTITLED_FEATURES, project).find(
+    (chart) => chart.id === 'supavisor-connections-active'
+  )
+
+describe('getReportAttributesV2 shared pooler chart', () => {
+  it('shows the chart for standard projects', () => {
+    expect(getSupavisorChart(buildProject())?.hide).toBe(false)
+  })
+
+  it('hides the chart for high availability projects', () => {
+    expect(getSupavisorChart(buildProject({ high_availability: true }))?.hide).toBe(true)
+  })
+
+  it('hides the chart when the database entitlement is missing', () => {
+    expect(
+      getReportAttributesV2([], buildProject()).find(
+        (chart) => chart.id === 'supavisor-connections-active'
+      )?.hide
+    ).toBe(true)
+  })
+})
+
 describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
   it('shows the chart for burstable non high availability projects', () => {
     expect(getBurstBalanceChart(buildProject())?.hide).toBe(false)
@@ -92,5 +116,49 @@ describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
 
   it('hides the chart for non burstable compute sizes', () => {
     expect(getBurstBalanceChart(buildProject({ infra_compute_size: '16xlarge' }))?.hide).toBe(true)
+  })
+})
+
+describe('shouldShowDiskIOBurstBalanceChart', () => {
+  it('shows the chart for burstable non high availability projects when the flag is on', () => {
+    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), true)).toBe(true)
+  })
+
+  it('hides the chart when the flag is off', () => {
+    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), false)).toBe(false)
+  })
+
+  it('hides the chart for non burstable compute sizes', () => {
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject({ infra_compute_size: '4xlarge' }), true)
+    ).toBe(false)
+  })
+
+  it('hides the chart for high availability projects', () => {
+    expect(
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ high_availability: true, infra_compute_size: 'large' }),
+        true
+      )
+    ).toBe(false)
+  })
+
+  it('hides the chart when the project is unknown', () => {
+    expect(shouldShowDiskIOBurstBalanceChart(undefined, true)).toBe(false)
+  })
+})
+
+describe('resource warning metrics chart IDs', () => {
+  it('keeps every configured chart target visible in the database report', () => {
+    const visibleChartIds = new Set(
+      getReportAttributesV2(ENTITLED_FEATURES, buildProject())
+        .filter((chart) => !chart.hide)
+        .map((chart) => chart.id)
+    )
+    const missingChartIds = Object.values(RESOURCE_WARNING_MESSAGES)
+      .flatMap((message) => message.metricsChartId ?? [])
+      .filter((chartId) => !visibleChartIds.has(chartId))
+
+    expect(missingChartIds).toEqual([])
   })
 })

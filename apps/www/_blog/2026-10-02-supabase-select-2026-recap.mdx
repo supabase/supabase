@@ -1,0 +1,99 @@
+---
+title: 'Supabase Select 2026 Recap'
+description: 'Build anything, operate with confidence, scale without limits. Supabase carries your application from prototype to petabyte.'
+author: oli_rice, inian, jonny
+date: '2026-10-02T10:50:00'
+categories:
+  - product
+tags:
+  - ai
+  - mcp
+  - postgres
+imgSocial: 'supabase-select-2026-recap/og.png'
+imgThumb: 'supabase-select-2026-recap/thumb.png'
+toc_depth: 2
+---
+
+Today at Supabase Select, we showed how Supabase works for your app from day one to millions of users, and how your agent builds and runs it with you.
+
+Your coding agent already writes your application code. Setting up the backend is still your job. So is watching it in production and fixing it when it breaks. That work happens in the dashboard and the docs, and your agent can't do it end to end.
+
+Supabase now works code first. Schema and config can live in code, so your agent can set up and change a project the same way you do. It can also check the project and report the problems it finds. You decide what gets fixed and merged.
+
+You can build anything, because your agent works in the same code you do. You can operate with confidence, because your agent finds problems and you decide what merges. And you can scale without limits, because when the app grows, the same Postgres carries it from prototype to petabyte.
+
+## Build anything
+
+### Local development without Docker
+
+Local Supabase can now run as native processes, so it starts on machines without a Docker daemon, like Claude Code's sandbox. You can also run multiple local Supabase instances, one per directory, so several checkouts of the same repo run at the same time. In alpha, off by default. Update the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started) to try it.
+
+### Declarative Schemas 2.0
+
+Write your schema as SQL files and pg-delta generates the migration, so the schema lives in your repo. Project settings live in code too, and a dashboard change comes back into the file with `supabase config pull`. [Docs](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
+
+### Supabase Compute
+
+Run web services and agents in any language next to your database, with no limit on how long they run. Each service gets a full Linux environment and the same default environment variables as your Edge Functions. Private alpha. [Join the waitlist](https://supabase.com/compute).
+
+### Your app's MCP server
+
+Let your users connect their own agents to your app. The server runs as an Edge Function next to your data, users sign in through your existing Auth flow, and every tool call runs as that user, with your RLS policies deciding what it can reach. It's separate from the official Supabase MCP server, and it's built on `@supabase/server` and the new Supabase Middleware, which also work on their own in any server code that needs to know who is signed in. [Add the MCP server block](https://supabase.com/library/docs/headless/mcp).
+
+Learn more in [Build anything: Supabase from code, and an MCP server for your app](https://supabase.com/blog/select-2026-build-anything).
+
+## Operate with confidence
+
+### Agent prompts
+
+Pick a prompt and suggested schedule for health, security, performance, or resource checks, and run it in Claude, Codex, or Cursor. Your agent reads your project through the Supabase MCP server, connected read-only, and reports what it finds. [Pick a prompt](https://supabase.com/docs/guides/observability/automate-with-agents).
+
+### Health Check Advisors
+
+Advisors now flag elevated error rates in the Data API, Auth, Storage, and Edge Functions, next to the security and performance issues they already catch. Open the Health tab on your project's Advisors page. [Changelog](https://supabase.com/changelog/50577-health-check-advisors).
+
+### Database Connections
+
+See which sessions hold connections, run long, or are blocked, and who holds the lock, then cancel the query or terminate the connection. On by default for every project, including self-hosted. [Open it in the dashboard](https://supabase.com/dashboard/project/_/observability/connections).
+
+### `query_logs` and the Supabase agent skill
+
+A new MCP tool lets your agent query your logs directly, and the Supabase agent skill now points to a living document of the health, security, performance, and resource signals your agent should watch for. [Install the Supabase plugin](https://supabase.com/docs/guides/ai-tools/plugins).
+
+### Explorer and Notebooks
+
+Explorer is the next version of the SQL editor. Query your logs or your database in one workspace, and save the investigation as a Notebook anyone on your team can rerun. Rolling out to every project through October 12. Once it reaches your project, turn it on under Feature Previews. [Open Explorer](https://supabase.com/dashboard/project/_/explorer).
+
+### Enterprise-Managed Auth for MCP
+
+Your company decides who can connect to the Supabase MCP server through its identity provider, starting with Okta. Each token is bound to the member who signs in. Generally available. [Set it up](https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authentication) on a Team or Enterprise plan with SSO configured.
+
+### Scoped Personal Access Tokens
+
+Limit a token to the organizations, projects, and permissions you choose. Generally available, and the default for new tokens created in the dashboard. Create one at [Account, Access Tokens](https://supabase.com/dashboard/account/tokens).
+
+### MCP Elicitations
+
+Before your agent creates a paid project or branch, or runs SQL that could delete data, the Supabase MCP server asks you to confirm first. It helps prevent unwanted charges and data loss, but it isn't a guarantee. On by default. [MCP docs](https://supabase.com/docs/guides/ai-tools/mcp).
+
+### Supabase Pipelines, new destinations
+
+Stream Postgres data to BigQuery, ClickHouse, DuckLake, or Snowflake in near real time, so analytics queries run there instead of on your production database. Public alpha on the Pro, Team, and Enterprise plans. [Docs](https://supabase.com/docs/guides/database/replication/pipelines).
+
+Learn more in [Operate with confidence](https://supabase.com/blog/select-2026-operate-with-confidence).
+
+## Scale without limits
+
+### Multigres
+
+Multi-node high availability for Postgres, built by the team behind Vitess. When a node fails, Multigres promotes a replica in seconds and committed writes survive, with no changes to your application. Connection pooling is built in. The Multigres project is open source. On Supabase, it's in private alpha, by invite. [Request access](https://supabase.com/go/multigres-early-access).
+
+### OrioleDB
+
+A storage engine that replaces the default heap with an undo log, avoids table bloat and VACUUM, and keeps familiar Postgres behavior. Public beta. Choose it at project creation. [Docs](https://supabase.com/docs/guides/database/orioledb).
+
+### dbarena
+
+Open, reproducible database benchmarks. The benchmark code, the data, absolute throughput, and throughput per dollar are all published, so you can inspect the method and rerun the result. [Visit the website](https://dbarena.com).
+
+Learn more in [Scale without limits: Multigres, OrioleDB, and dbarena](https://supabase.com/blog/select-2026-scale-without-limits).

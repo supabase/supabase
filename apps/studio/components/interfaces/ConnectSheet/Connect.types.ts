@@ -57,7 +57,7 @@ export type ConditionalValue<T> =
 // Schema Types - Modes
 // ============================================================================
 
-export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp', 'server'] as const
+export const CONNECT_MODES = ['framework', 'direct', 'orm', 'mcp', 'server', 'warehouse'] as const
 export type ConnectMode = (typeof CONNECT_MODES)[number]
 
 export interface ModeDefinition {
@@ -73,7 +73,7 @@ export interface ModeDefinition {
 // Schema Types - Fields
 // ============================================================================
 
-type FieldType = 'select' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
+type FieldType = 'select' | 'combobox' | 'radio-grid' | 'radio-list' | 'switch' | 'multi-select'
 
 export interface FieldOption {
   value: string
@@ -87,6 +87,12 @@ interface FieldDefinition {
   type: FieldType
   label: string
   description?: string
+  // Copy for `combobox` fields, which need their own trigger, search and empty-state text
+  combobox?: {
+    placeholder: string
+    searchPlaceholder: string
+    emptyMessage: string
+  }
   // Options can be static, or reference a data source, or be conditional
   options?: FieldOption[] | { source: string } | ConditionalValue<FieldOption[]>
   // Only show this field when these state conditions are met

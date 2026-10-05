@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { setCellSql } from '../QueryCell/QueryCell.utils'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
+import { ExplorerProvider } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
@@ -18,8 +19,11 @@ import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 import type { Notebooks } from '@/types'
 
 const testContext = vi.hoisted(() => ({
+  track: vi.fn(),
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
 }))
+
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => testContext.track }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -84,7 +88,9 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
 const renderNotebookTab = (tabsState = createTabsState('default')) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
-      <ExplorerNotebookTab />
+      <ExplorerProvider>
+        <ExplorerNotebookTab />
+      </ExplorerProvider>
     </TabsStateContext.Provider>
   )
 
@@ -116,6 +122,7 @@ const mockDatabaseQueryRequests = () => {
 }
 
 beforeEach(() => {
+  testContext.track.mockClear()
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
   for (const id of Object.keys(notebooksState.notebooks)) {
@@ -131,12 +138,15 @@ afterEach(() => {
 })
 
 describe('ExplorerNotebookTab', () => {
-  it('hides SQL by default for saved notebooks and caps query cells at 6xl', () => {
+  it('hides SQL by default for saved notebooks and caps query cells from their sortable row', () => {
     renderNotebookTab()
 
     const queryCells = Array.from(document.querySelectorAll('[data-slot="explorer-query"]'))
     expect(queryCells).toHaveLength(2)
-    queryCells.forEach((cell) => expect(cell).toHaveClass('max-w-6xl'))
+    queryCells.forEach((cell) => {
+      expect(cell).not.toHaveClass('max-w-6xl')
+      expect(cell.closest('[style*="max-width"]')).not.toBeNull()
+    })
 
     expect(screen.queryByRole('textbox', { name: 'SQL editor' })).not.toBeInTheDocument()
   })
@@ -185,6 +195,26 @@ describe('ExplorerNotebookTab', () => {
     await waitFor(() => expect(dbRequests).toHaveLength(1))
     await waitFor(() => expect(logRequests).toHaveLength(1))
     await waitFor(() => expect(runNotebookButton).toBeEnabled())
+    const queryEvents = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(queryEvents.filter(([action]) => action === 'explorer_query_submitted')).toHaveLength(2)
+    expect(queryEvents.filter(([action]) => action === 'explorer_query_completed')).toHaveLength(2)
+    for (const [, properties] of queryEvents) {
+      expect(properties).toMatchObject({ surface: 'notebook_cell', notebookId: NOTEBOOK_ID })
+      expect(properties.cellId).toBeDefined()
+      expect(properties).not.toHaveProperty('sql')
+    }
+    const submittedRuns = queryEvents.filter(([action]) => action === 'explorer_query_submitted')
+    const completedRuns = queryEvents.filter(([action]) => action === 'explorer_query_completed')
+    expect(new Set(submittedRuns.map(([, properties]) => properties.runId)).size).toBe(2)
+    for (const [, properties] of submittedRuns) {
+      expect(completedRuns).toContainEqual([
+        'explorer_query_completed',
+        properties,
+        expect.objectContaining({ project: 'default' }),
+      ])
+    }
   })
 
   describe('mutation confirmation on "Run notebook"', () => {
@@ -228,19 +258,60 @@ describe('ExplorerNotebookTab', () => {
       expect(queries).toHaveLength(0)
     })
 
-    it('runs every cell, including the mutating one, when confirmed with "Run all cells"', async () => {
+    it('labels destructive queries and runs all cells after one confirmation', async () => {
       const queries = mockDatabaseQueryRequests()
 
       renderNotebookTab()
 
       await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-      await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
+      expect(queries).toHaveLength(0)
 
-      await userEvent.click(screen.getByRole('button', { name: 'Run all cells' }))
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
 
       await waitFor(() => expect(queries).toHaveLength(2))
       expect(queries.some((query) => query.includes('select 1'))).toBe(true)
       expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
+    })
+
+    it('runs no cells when the combined confirmation is cancelled', async () => {
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
+        ).not.toBeInTheDocument()
+      )
+      expect(queries).toHaveLength(0)
+    })
+
+    it('does not label non-destructive mutations', async () => {
+      seedNotebook([
+        readOnlyCell,
+        createQueryCellSkeleton({
+          title: 'Add signup',
+          sql: "insert into signups values ('test')",
+        }),
+      ])
+      const queries = mockDatabaseQueryRequests()
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
+      expect(within(dialog).queryByText('Destructive')).not.toBeInTheDocument()
+
+      await userEvent.click(within(dialog).getByRole('button', { name: 'Run all cells' }))
+
+      await waitFor(() => expect(queries).toHaveLength(2))
     })
 
     it('picks up a SQL commit that lands after this render but before the click handler runs', async () => {
@@ -291,6 +362,8 @@ describe('ExplorerNotebookTab', () => {
       const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
       expect(within(dialog).getByText('Read-only query')).toBeInTheDocument()
       expect(queries).toHaveLength(0)
+
+      expect(within(dialog).getByText('Destructive')).toBeInTheDocument()
     })
 
     it('runs only the read-only cells when "Skip these queries" is checked', async () => {
@@ -316,7 +389,7 @@ describe('ExplorerNotebookTab', () => {
     renderNotebookTab()
 
     const runNotebookButton = await screen.findByRole('button', { name: 'Run notebook' })
-    expect(runNotebookButton).toBeDisabled()
+    expect(runNotebookButton).toBeAriaDisabled()
   })
 
   it('toggles and persists the Intellisense enabled preference from "More options"', async () => {
@@ -355,6 +428,56 @@ describe('ExplorerNotebookTab', () => {
     await userEvent.click(saveButton)
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
+
+  it('tracks confirmed creation once and later saves as updates', async () => {
+    seedNotebook([databaseCell], 'new')
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ id: NOTEBOOK_ID }),
+    })
+
+    renderNotebookTab()
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+    await waitFor(() =>
+      expect(testContext.track).toHaveBeenCalledWith(
+        'explorer_notebook_created',
+        { notebookId: NOTEBOOK_ID },
+        { project: 'default' }
+      )
+    )
+
+    notebooksState.insertCellAfter({ id: NOTEBOOK_ID, cell: createMarkdownCellSkeleton() })
+    await userEvent.click(saveButton)
+    await waitFor(() =>
+      expect(testContext.track).toHaveBeenCalledWith(
+        'explorer_notebook_updated',
+        { notebookId: NOTEBOOK_ID },
+        { project: 'default' }
+      )
+    )
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action === 'explorer_notebook_created')
+    ).toHaveLength(1)
+  })
+
+  it('does not track an unsaved draft or a failed first save', async () => {
+    seedNotebook([databaseCell], 'new')
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ message: 'Save failed' }, { status: 500 }),
+    })
+
+    renderNotebookTab()
+    expect(testContext.track).not.toHaveBeenCalled()
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_notebook_'))
+    ).toEqual([])
   })
 
   it('does not mark a newer edit as saved when an earlier save resolves after it', async () => {

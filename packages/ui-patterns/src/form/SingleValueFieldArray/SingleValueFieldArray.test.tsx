@@ -57,7 +57,9 @@ const ValueForm = ({
           removeLabel="Remove URL"
           minimumRows={1}
         />
-        <Button type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   )
@@ -84,7 +86,9 @@ const NameForm = ({ onSubmit = vi.fn() }: { onSubmit?: (values: NameFormValues) 
           removeLabel="Remove domain"
           minimumRows={1}
         />
-        <Button type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   )

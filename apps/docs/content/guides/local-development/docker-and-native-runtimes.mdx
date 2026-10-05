@@ -1,0 +1,112 @@
+---
+id: 'docker-and-native-runtimes'
+title: 'Docker and native runtimes'
+description: 'How the experimental supabase stack commands run a local Supabase project in Docker or as native processes, how the CLI picks a runtime, and what the native runtime needs.'
+subtitle: 'Run a local Supabase project in containers or as processes on your machine without Docker'
+---
+
+This guide explains the two runtimes the experimental `supabase stack` commands use, how the CLI picks one, and which to choose. The Docker runtime runs each service in a container, with Docker or Podman. The native runtime runs each service as a process on your machine, with no container engine, on Linux and on macOS on Apple silicon.
+
+Both runtimes run the same local Supabase project with the same services. The default `supabase start` command always uses Docker. The runtime choice exists only after you turn on the `[experimental] stack` setting. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands) for how to turn it on.
+
+<Admonition type="caution" title="Experimental">
+
+The `supabase stack` commands are experimental. Their flags and output can change between releases, and the CLI compatibility promise doesn't cover them.
+
+</Admonition>
+
+## Which runtime to choose
+
+Use Docker when Docker or Podman is available. Containers give each local project its own network namespace and file system. That isolation matters most when you run several local projects on one machine.
+
+Use the native runtime where no container engine is available, such as coding agent sandboxes and CI runners. The native runtime is intended for one local project per environment. Native processes share the host's process table and file locks. Several native local projects on one machine are less isolated from each other than containers are.
+
+## How the two runtimes differ
+
+The following table compares how each runtime runs services, what it needs, and where it stores data.
+
+|                                  | Docker runtime                                                                    | Native runtime                                                                         |
+| -------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Flag                             | `--runtime docker` or `--runtime podman`                                          | `--runtime native`                                                                     |
+| How services run                 | One container per service, from images the CLI pulls                              | One process per service, from archives the CLI downloads and verifies                  |
+| Requires                         | A running Docker or Podman engine                                                 | A supported platform, `tar` on the host, and, on first start, network access to the archive download hosts |
+| Database data                    | A Docker volume when the Docker client and daemon are both version 26 or later, or a host directory otherwise | `~/.supabase/stacks/<id>/` in your home directory                                      |
+| Downloaded artifacts             | The engine's image cache                                                          | `~/.supabase/cache/stack` in your home directory, shared by all local projects         |
+| Isolation between local projects | Separate network namespaces and file systems                                      | Shared host process table and file locks                                               |
+
+Both runtimes keep each local project's saved settings under `~/.supabase/stacks/<id>/`. The native runtime keeps its database data there too. If you set `SUPABASE_HOME`, the CLI uses that directory instead of `~/.supabase`.
+
+In both runtimes, Postgres starts right away and other services start on their first request. By default, services that started this way stop again after 60 seconds idle, and Studio after 5 minutes. Functions doesn't stop on its own. A service also stays up while a running service depends on it, such as pgmeta while Studio runs. Pass `--eager` to start every enabled service before the command returns and turn off idle stops.
+
+Starting a service on demand doesn't mean downloading it on demand. By default, the first `supabase start` pulls or downloads every enabled service before it returns. Pass `--preparation on-demand` to defer each download until the service's first request.
+
+## How the CLI picks a runtime
+
+When you don't pass `--runtime`, a new local project uses the first of these that responds:
+
+1. Docker, when the Docker daemon answers `docker version`
+2. Podman, when the Podman engine answers `podman info`
+3. Native, on Linux `amd64` and `arm64` and on macOS on Apple silicon
+
+Each check waits up to 10 seconds. Having the `docker` command installed isn't enough. If the Docker daemon is stopped, the CLI moves on to Podman or native. It prints a notice that it skipped Docker, with the steps to switch. With no responding engine on a platform without native support, the start fails and asks you to start Docker or Podman.
+
+Passing `--runtime docker`, `--runtime podman`, or `--runtime native` requires that runtime, and the CLI never falls back to another one. If Docker isn't reachable with `--runtime docker`, the start fails and suggests starting Docker, or `--runtime native` for a new local project on a supported platform. With `--runtime native` on an unsupported platform, the start fails before the CLI creates the local project.
+
+The CLI records the runtime when it creates a local project and reuses it on every later start, without checking again. Passing a different `--runtime` to a local project that you already created fails. To move an app to another runtime, start a new named local project, or destroy the local project and start it again. The CLI doesn't convert data between runtimes.
+
+Different apps on one machine can use different runtimes.
+
+## Native runtime requirements
+
+The native runtime runs on these platforms:
+
+| Platform                    | Support                                                                                                                                           |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Linux on `amd64` or `arm64` | Supported on Ubuntu 22.04 or later, or another distribution with glibc 2.35 or later. Some services use the host's glibc. |
+| macOS on Apple silicon      | Supported on macOS 14 or later. |
+| Windows                     | Not supported. Use Docker.                                                                                                                        |
+| macOS on Intel              | Not supported. Use Docker.                                                                                                                        |
+
+The native runtime doesn't run as `root`, because Postgres `initdb` can't. To run it as `root`, such as in a CI container, set `SUPABASE_NATIVE_POSTGRES_USER` to a non-root account. Create the account first if it doesn't exist. The CLI then runs Postgres as that user. In some supported coding agent sandboxes, the CLI finds a suitable non-root account without the variable.
+
+On first start, the CLI downloads service archives from the [`supabase/slim-services` GitHub releases](https://github.com/supabase/slim-services/releases), with `supabase-cli-artifacts.s3.us-east-1.amazonaws.com` as a fallback. It verifies their checksums and extracts them with the system `tar`, so install `tar` in minimal sandbox images. In a sandbox with an allowlist, allow `github.com` or that S3 host. Allowing only `ghcr.io` isn't enough.
+
+To download the archives ahead of time without starting any services, such as when you build a sandbox image, run:
+
+```bash
+supabase stack prepare --runtime native
+```
+
+If the local project doesn't exist, `prepare` creates it, so it appears in `supabase stack list` and you can remove it with `supabase stack destroy`.
+
+The cache in `~/.supabase/cache/stack` is shared by every local project on the machine, and `supabase stack destroy` leaves it in place. Delete that directory to reclaim its disk space and force a fresh download.
+
+## Start with a specific runtime
+
+Start a local project in the native runtime:
+
+```bash
+supabase start --runtime native
+```
+
+Require Docker for a new local project:
+
+```bash
+supabase start --runtime docker
+```
+
+Check which runtime a local project uses:
+
+```bash
+supabase stack status --output-format json
+```
+
+The `runtime` field is `docker`, `podman`, or `native`. The text output of `supabase status` and `supabase stack list` shows the runtime too.
+
+## Limitations
+
+- A local project keeps the runtime it was created with, and the CLI doesn't move data between runtimes. See [How the CLI picks a runtime](#how-the-cli-picks-a-runtime).
+- Running several native local projects on one machine works, but they share host resources without the isolation containers provide. Use Docker for that case.
+- If Postgres takes too long to become ready on a cold start, raise `health_timeout` under `[db]` in `config.toml`. Both runtimes use that setting.
+
+<ContentListings id="local-development-runtimes-learn-more" />

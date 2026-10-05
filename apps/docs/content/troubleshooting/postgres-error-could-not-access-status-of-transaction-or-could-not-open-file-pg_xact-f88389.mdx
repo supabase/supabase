@@ -1,0 +1,37 @@
+---
+title = "Postgres error: 'could not access status of transaction' when PostgREST runs LISTEN"
+date_created = "2026-07-29T09:05:06+00:00"
+topics = [ "database" ]
+keywords = [ "postgrest" ]
+---
+
+## The error
+
+You'll see this in your database logs:
+
+- **Error:** `could not access status of transaction`
+- **Detail:** `Could not open file "pg_xact/[ID]": No such file or directory`
+- **Application:** PostgREST (shown as `PostgREST 13.0.5` or similar)
+- **Command:** `LISTEN`
+
+If you see the first error message without the pg_xact detail, or outside PostgREST, it may be a different issue.
+
+## What's happening
+
+This is an upstream Postgres [bug](http://postgresql.org/message-id/flat/VE1PR03MB531295B1BDCFE422441B15FD92499%40VE1PR03MB5312.eurprd03.prod.outlook.com) but affects PostgREST. The notification queue gets stuck and tries to access old transaction IDs that no longer exist.
+
+## Fix
+
+Run this command in the [SQL editor](/dashboard/project/_/sql/new):
+
+```sql
+select pg_notification_queue_usage();
+```
+
+This clears the stuck queue. Your Data API will become responsive again, and the errors should stop.
+
+## If it happens again
+
+Run the command above again.
+
+If you upgrade to PostgREST v14.8+, the logs will include a `HINT` that tells you to run `SELECT pg_notification_queue_usage();`. You can upgrade PostgREST and Postgres in [Infrastructure Settings](/dashboard/project/_/settings/infrastructure).

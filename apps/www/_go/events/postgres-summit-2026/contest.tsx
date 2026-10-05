@@ -48,7 +48,7 @@ const page: GoPageInput = {
             <p className="text-foreground-light font-medium">Brian Brennglass</p>
             <p className="text-foreground-lighter text-sm">Supabase</p>
           </div>
-          <Button asChild variant="default" size="medium">
+          <Button asChild size="medium">
             <Link
               href="https://postgresql.us/events/postgressummitus2026/schedule/session/2406-everything-to-know-about-postgres-locks/"
               target="_blank"
@@ -74,7 +74,7 @@ const page: GoPageInput = {
               Complete these steps by the contest deadline, Monday October 12, 2026 at 12:00 PM PDT
             </li>
           </ol>
-          <Button asChild variant="default" size="medium">
+          <Button asChild size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

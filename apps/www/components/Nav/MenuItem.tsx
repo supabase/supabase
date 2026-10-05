@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
@@ -10,6 +10,10 @@ const MenuItem = React.forwardRef<
     icon?: string
     hasChevron?: boolean
     hoverColor?: 'foreground' | 'brand'
+    badge?: {
+      label: string
+      variant?: 'default' | 'warning' | 'success' | 'destructive' | 'secondary'
+    }
   }
 >(
   (
@@ -22,6 +26,7 @@ const MenuItem = React.forwardRef<
       hasChevron,
       children,
       hoverColor = 'foreground',
+      badge,
       ...props
     },
     ref
@@ -63,11 +68,12 @@ const MenuItem = React.forwardRef<
                 <p
                   className={cn(
                     'leading-snug text-foreground',
-                    hoverColor === 'brand' && 'group-hover/menu-item:text-brand-link'
+                    hoverColor === 'brand' && 'group-hover/menu-item:text-primary'
                   )}
                 >
                   {title}
                 </p>
+                {badge && <Badge variant={badge.variant}>{badge.label}</Badge>}
                 {hasChevron && (
                   <ChevronRight
                     strokeWidth={2}

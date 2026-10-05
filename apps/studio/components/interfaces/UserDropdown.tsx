@@ -68,7 +68,6 @@ export function UserDropdown({
     >
       <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
-          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Account settings' } }}
         >
@@ -200,7 +199,7 @@ export function UserDropdown({
                   router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

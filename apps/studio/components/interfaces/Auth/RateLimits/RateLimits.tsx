@@ -270,7 +270,7 @@ export const RateLimits = () => {
                                     Enable email-based logins to update this rate limit
                                   </p>
                                   <div className="mt-3">
-                                    <Button asChild variant="default" size="tiny">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/providers`}>
                                         View auth providers
                                       </Link>
@@ -289,12 +289,12 @@ export const RateLimits = () => {
                                     your email rate limit
                                   </p>
                                   <div className="mt-3 flex gap-2">
-                                    <Button asChild variant="default" size="tiny">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/smtp`}>
                                         View SMTP settings
                                       </Link>
                                     </Button>
-                                    <Button asChild variant="default" size="tiny">
+                                    <Button asChild size="tiny">
                                       <Link href={`/project/${projectRef}/auth/hooks`}>
                                         View hooks
                                       </Link>
@@ -345,7 +345,7 @@ export const RateLimits = () => {
                                 Enable phone-based logins to update this rate limit
                               </p>
                               <div className="mt-3">
-                                <Button asChild variant="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth providers
                                   </Link>
@@ -488,7 +488,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild variant="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth settings
                                   </Link>
@@ -583,7 +583,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild variant="default" size="tiny">
+                                <Button asChild size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View Auth provider settings
                                   </Link>
@@ -599,9 +599,7 @@ export const RateLimits = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {rateLimitForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => rateLimitForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => rateLimitForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"
@@ -664,9 +662,7 @@ export const RateLimits = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {ipForwardingForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => ipForwardingForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => ipForwardingForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"

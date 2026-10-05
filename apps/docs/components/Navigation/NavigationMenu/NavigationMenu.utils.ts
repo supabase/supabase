@@ -135,7 +135,9 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.LocalDevelopment
     case pathname.startsWith('ai-tools'):
       return MenuId.AiTools
-    case pathname.startsWith('monitoring-and-debugging'):
+    case pathname.startsWith('observability'):
+      return MenuId.Telemetry
+    case pathname.startsWith('troubleshooting'):
       return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform

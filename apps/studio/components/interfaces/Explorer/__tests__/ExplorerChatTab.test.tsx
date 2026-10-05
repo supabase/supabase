@@ -79,7 +79,6 @@ vi.mock('@/components/ui/AIAssistantPanel/AssistantChat', () => ({
 
 describe('ExplorerChatTab', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mocks.useParams.mockReturnValue({ ref: 'default', id: 'chat-1' })
     mocks.assistantSnapshot.mockReturnValue({
       isInitialized: true,

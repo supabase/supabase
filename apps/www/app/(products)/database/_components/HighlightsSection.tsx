@@ -67,14 +67,14 @@ export function HighlightsSection() {
                 <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
                   {highlight.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
+                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-primary" />
                       <span>{feature}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               <div className="mt-6">
-                <Button variant="default" size="small" asChild>
+                <Button size="small" asChild>
                   <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
                 </Button>
               </div>

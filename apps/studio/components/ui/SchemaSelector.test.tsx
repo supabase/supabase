@@ -74,6 +74,14 @@ const renderAndOpenSelector = async () => {
 }
 
 describe('SchemaSelector', () => {
+  it('gives the combobox an accessible name for the selected schema', async () => {
+    mockProjectAndSchemas({ highAvailability: false })
+
+    customRender(<SchemaSelector selectedSchemaName="public" onSelectSchema={vi.fn()} />)
+
+    expect(await screen.findByRole('combobox', { name: 'Schema public' })).toBeInTheDocument()
+  })
+
   it('hides the multigres schema on high availability projects', async () => {
     mockProjectAndSchemas({ highAvailability: true })
 

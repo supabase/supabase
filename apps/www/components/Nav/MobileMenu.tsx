@@ -63,6 +63,11 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               description={component.description_short}
               icon={component.icon}
               onClick={() => setOpen(false)}
+              badge={
+                component.name === 'Compute'
+                  ? { label: 'Private Alpha', variant: 'default' }
+                  : undefined
+              }
             />
           ))}
           <div>
@@ -275,7 +280,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                           })
                         }
                       >
-                        <Button block variant="default" asChild>
+                        <Button block asChild>
                           <a type={undefined} className="h-10 py-4">
                             Sign in
                           </a>
@@ -292,7 +297,7 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                           })
                         }
                       >
-                        <Button block asChild>
+                        <Button variant="primary" block asChild>
                           <a type={undefined} className="h-10 py-4">
                             Start your project
                           </a>

@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Search } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -20,6 +20,7 @@ import { EditSecretSheet } from './EditSecretSheet'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -27,6 +28,7 @@ import { DOCS_URL } from '@/lib/constants'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
+  const computeEnabled = useFlag('compute')
   const [searchString, setSearchString] = useState('')
 
   const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
@@ -180,14 +182,11 @@ export const EdgeFunctionSecrets = () => {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        <TableRow className="[&>td]:hover:bg-inherit">
-                          <TableCell colSpan={headers.length}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{searchString}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults
+                          className="[&>td]:hover:bg-inherit"
+                          colSpan={headers.length}
+                          search={searchString}
+                        />
                       )}
                     </TableBody>
                   </Table>
@@ -231,10 +230,18 @@ export const EdgeFunctionSecrets = () => {
           }
         }}
       >
-        <p className="text-sm">
-          Ensure none of your edge functions are actively using this secret before deleting it. This
-          action cannot be undone.
-        </p>
+        {computeEnabled ? (
+          <p className="text-sm">
+            Ensure none of your <span className="font-medium">edge functions</span> or{' '}
+            <span className="font-medium">compute instances</span> are actively using this secret
+            before deleting it. This action cannot be undone.
+          </p>
+        ) : (
+          <p className="text-sm">
+            Ensure none of your edge functions are actively using this secret before deleting it.
+            This action cannot be undone.
+          </p>
+        )}
       </ConfirmationModal>
     </>
   )

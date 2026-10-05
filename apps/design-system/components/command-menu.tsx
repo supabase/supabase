@@ -108,10 +108,6 @@ export function CommandMenu({ ...props }: DialogProps) {
               <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               Dark
             </CommandItem>
-            <CommandItem onSelect={() => runCommand(() => setTheme('classic-dark'))}>
-              <MoonIcon className="mr-2 h-4 w-4" strokeWidth={1} />
-              Classic dark
-            </CommandItem>
             <CommandItem onSelect={() => runCommand(() => setTheme('system'))}>
               <LaptopIcon className="mr-2 h-4 w-4" strokeWidth={1} />
               System

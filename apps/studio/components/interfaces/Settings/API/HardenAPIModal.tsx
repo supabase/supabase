@@ -118,7 +118,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             generate API routes. In some cases, it's better to use a custom schema. This is
             important if you use tools that generate tables in the{' '}
             <code className="text-code-inline">public</code> schema to{' '}
-            <span className="text-brand">prevent accidental exposure of data</span>.
+            <span className="text-primary">prevent accidental exposure of data</span>.
           </p>
           <DocsButton
             abbrev={false}
@@ -135,7 +135,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               1. Create a custom <code className="text-code-inline">api</code> schema and expose it
             </p>
             {hasAPISchema && isAPISchemaExposed ? (
-              <Check size={16} className="text-brand" />
+              <Check size={16} className="text-primary" />
             ) : (
               <ChevronDown
                 size={16}
@@ -219,7 +219,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               schemas
             </p>
             {!isPublicSchemaExposed ? (
-              <Check size={16} className="text-brand" />
+              <Check size={16} className="text-primary" />
             ) : (
               <ChevronDown
                 size={16}

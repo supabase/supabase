@@ -353,7 +353,7 @@ export const OAuthServerSettingsForm = () => {
                 )}
 
                 <CardFooter className="justify-end space-x-2">
-                  <Button variant="default" onClick={() => form.reset()} disabled={isPending}>
+                  <Button onClick={() => form.reset()} disabled={isPending}>
                     Cancel
                   </Button>
                   <Button

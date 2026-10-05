@@ -70,7 +70,7 @@ export const PROVIDERS = {
 } as const
 
 export const PROJECT_STATUS: {
-  [key: string]: components['schemas']['ProjectDetailResponse']['status']
+  [key: string]: components['schemas']['ProjectDetailResponse_Output']['status']
 } = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
@@ -121,8 +121,6 @@ export type InstanceSpecs = {
   baseline_disk_io_mbs: number
   connections_direct: number
   connections_pooler: number
-  cpu_cores: number | 'Shared'
-  cpu_dedicated: boolean
   max_disk_io_mbs: number
   memory_gb: number
 }
@@ -131,8 +129,6 @@ export const INSTANCE_NANO_SPECS: InstanceSpecs = {
   baseline_disk_io_mbs: 43,
   connections_direct: 30,
   connections_pooler: 200,
-  cpu_cores: 'Shared',
-  cpu_dedicated: false,
   max_disk_io_mbs: 2085,
   memory_gb: 0.5,
 }
@@ -141,8 +137,6 @@ export const INSTANCE_MICRO_SPECS: InstanceSpecs = {
   baseline_disk_io_mbs: 87,
   connections_direct: 60,
   connections_pooler: 200,
-  cpu_cores: 2,
-  cpu_dedicated: false,
   max_disk_io_mbs: 2085,
   memory_gb: 1,
 }

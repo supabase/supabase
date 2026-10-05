@@ -1,12 +1,21 @@
-import { Check, Database, Eye, EyeOff, Loader2, Plus, SlidersHorizontal } from 'lucide-react'
+import { Check, Eye, EyeOff, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
   cn,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -15,19 +24,37 @@ import {
   FormControl,
   FormField,
   Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
+  ScrollArea,
   Select,
   SelectContent,
   SelectGroup,
   SelectItem,
   SelectTrigger,
-  WarningIcon,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { SelectionListState } from 'ui-patterns/SelectionListState'
 
-import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
+import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  DUCKLAKE_BUCKET_FIELD_COPY,
+  DUCKLAKE_CATALOG_PROJECT_FIELD_COPY,
+  DUCKLAKE_CATALOG_URL_FIELD_COPY,
+  DUCKLAKE_DATA_PATH_FIELD_COPY,
+  DUCKLAKE_STORAGE_PROJECT_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
+import {
+  isMetadataListErrorVisible,
+  isMetadataListLoading,
+  useRefreshOnOpen,
+} from '../useRefreshOnOpen'
 import {
   DUCKLAKE_MODE_CUSTOM,
   DUCKLAKE_MODE_SUPABASE,
@@ -43,16 +70,15 @@ import { PROJECT_STATUS } from '@/lib/constants'
 const DUCKLAKE_MODE_OPTIONS = [
   {
     value: DUCKLAKE_MODE_SUPABASE,
-    icon: Database,
-    label: 'Use Supabase',
+    label: 'Select Supabase projects',
     description:
-      'Create or use a DuckLake backed by your Supabase projects. Catalog and storage are managed for you.',
+      'Choose projects for the Postgres catalog and Storage bucket. They can be the same project; Pipelines creates credentials.',
   },
   {
     value: DUCKLAKE_MODE_CUSTOM,
-    icon: SlidersHorizontal,
-    label: 'Custom parameters',
-    description: 'Bring your own PostgreSQL catalog and S3-compatible object storage credentials.',
+    label: 'Enter connection details',
+    description:
+      'Provide a Postgres catalog URL and S3-compatible storage details and credentials.',
   },
 ] as const
 
@@ -64,44 +90,20 @@ const DuckLakeModeSelector = ({
   onChange: (value: DucklakeMode) => void
 }) => {
   return (
-    <div
-      role="radiogroup"
-      aria-label="DuckLake configuration mode"
-      className="grid grid-cols-2 gap-3"
+    <RadioGroupStacked
+      aria-label="Configuration method"
+      value={value}
+      onValueChange={(nextValue) => onChange(nextValue as DucklakeMode)}
     >
-      {DUCKLAKE_MODE_OPTIONS.map((option) => {
-        const Icon = option.icon
-        const selected = value === option.value
-        return (
-          <button
-            key={option.value}
-            type="button"
-            tabIndex={0}
-            role="radio"
-            aria-checked={selected}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              'relative flex flex-col gap-y-3 rounded-md border p-4 text-left transition',
-              'hover:border-control-hover',
-              selected ? 'border-control-hover bg-surface-300' : 'border-default bg-surface-100'
-            )}
-          >
-            <div className="flex items-start justify-between">
-              <Icon size={18} strokeWidth={1.5} className="text-foreground-light" />
-              {selected ? (
-                <Check size={16} className="text-brand" />
-              ) : (
-                <span className="h-4 w-4 rounded-full border border-strong" />
-              )}
-            </div>
-            <div className="flex flex-col gap-y-1">
-              <span className="text-sm text-foreground">{option.label}</span>
-              <span className="text-xs text-foreground-light">{option.description}</span>
-            </div>
-          </button>
-        )
-      })}
-    </div>
+      {DUCKLAKE_MODE_OPTIONS.map((option) => (
+        <RadioGroupStackedItem
+          key={option.value}
+          value={option.value}
+          label={option.label}
+          description={option.description}
+        />
+      ))}
+    </RadioGroupStacked>
   )
 }
 
@@ -134,6 +136,11 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     () => new Map(projects.map((project) => [project.ref, project])),
     [projects]
   )
+  const storageProjectName =
+    projectsByRef.get(ducklakeStorageProjectRef ?? '')?.name ??
+    (ducklakeStorageProjectRef === sourceProject?.ref
+      ? sourceProject?.name
+      : ducklakeStorageProjectRef)
 
   const regionForRef = (ref?: string) => {
     if (!ref) return undefined
@@ -182,7 +189,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          The selected project's Postgres database is used as the PostgreSQL DuckLake catalog
+          DuckLake metadata is stored in the selected project’s Postgres database.
         </p>
       </div>
 
@@ -192,14 +199,11 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Catalog project"
+            label={DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.label}
             description={
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
-                <span>
-                  Pipelines connects to this project's Postgres instance to store the DuckLake
-                  catalog
-                </span>
+                <span>{DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.description}</span>
               </div>
             }
           >
@@ -216,37 +220,12 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
 
       <FormField
         control={form.control}
-        name="ducklakePoolSize"
-        render={({ field }) => (
-          <FormItemLayout
-            layout="horizontal"
-            label="Pool size"
-            description="Number of concurrent DuckDB connections to the catalog"
-          >
-            <FormControl>
-              <Input
-                type="number"
-                min={1}
-                max={6}
-                value={field.value ?? ''}
-                placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
-                onChange={(event) =>
-                  field.onChange(event.target.value === '' ? undefined : Number(event.target.value))
-                }
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
-
-      <FormField
-        control={form.control}
         name="ducklakeMetadataSchema"
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
             label="Metadata schema"
-            description="Schema used for DuckLake metadata tables in the catalog's Postgres"
+            description="New schema where DuckLake metadata will be stored."
           >
             <FormControl>
               <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -268,11 +247,11 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Storage project"
+            label={DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.label}
             description={
               <div className="flex flex-col gap-y-2">
                 {renderRegionWarning(field.value)}
-                <span>The project whose object storage holds the DuckLake data files</span>
+                <span>{DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.description}</span>
               </div>
             }
           >
@@ -297,33 +276,28 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         render={({ field }) => (
           <FormItemLayout
             layout="horizontal"
-            label="Bucket"
-            description="The bucket in which DuckLake data files will be stored."
+            label={DUCKLAKE_BUCKET_FIELD_COPY.label}
+            description={DUCKLAKE_BUCKET_FIELD_COPY.description}
           >
-            <div className="flex items-center gap-x-2">
-              <div className="grow">
-                <FormControl>
-                  <BucketSelection form={form} value={field.value} onChange={field.onChange} />
-                </FormControl>
-              </div>
-              <Button
-                type="button"
-                variant="default"
-                icon={<Plus />}
-                disabled={!ducklakeStorageProjectRef}
-                onClick={() => setShowNewBucketDialog(true)}
-              >
-                New bucket
-              </Button>
-            </div>
+            <FormControl>
+              <BucketSelection
+                form={form}
+                value={field.value}
+                onChange={field.onChange}
+                onCreateBucket={() => setShowNewBucketDialog(true)}
+              />
+            </FormControl>
           </FormItemLayout>
         )}
       />
 
       <Dialog open={showNewBucketDialog} onOpenChange={setShowNewBucketDialog}>
-        <DialogContent>
+        <DialogContent size="small">
           <DialogHeader>
-            <DialogTitle>Create a new file bucket</DialogTitle>
+            <DialogTitle>New bucket</DialogTitle>
+            <DialogDescription>
+              Creates a private bucket in the selected Storage project ({storageProjectName}).
+            </DialogDescription>
           </DialogHeader>
           <DialogSectionSeparator />
           <DialogSection className="flex flex-col gap-y-2">
@@ -340,13 +314,13 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           <DialogFooter>
             <Button
               type="button"
-              variant="default"
               disabled={isCreatingBucket}
               onClick={() => setShowNewBucketDialog(false)}
             >
               Cancel
             </Button>
             <Button
+              variant="primary"
               type="button"
               loading={isCreatingBucket}
               disabled={!newBucketName.trim()}
@@ -376,7 +350,7 @@ const DuckLakeCustomFields = ({
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          Configure the PostgreSQL DuckLake catalog and S3-compatible storage for replicated data
+          Configure the Postgres DuckLake catalog and S3-compatible storage for replicated data.
         </p>
       </div>
 
@@ -387,32 +361,34 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Catalog URL"
+              label={DUCKLAKE_CATALOG_URL_FIELD_COPY.label}
               description={
                 editMode
-                  ? 'Stored catalog URL is hidden. Enter a new URL to replace it.'
-                  : 'A PostgreSQL connection string for the DuckLake catalog'
+                  ? DUCKLAKE_CATALOG_URL_FIELD_COPY.editDescription
+                  : DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription
               }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showCatalogUrl ? 'text' : 'password'}
+                  type={showCatalogUrl && !editMode ? 'text' : 'password'}
                   placeholder={
                     editMode
                       ? STORED_SECRET_PLACEHOLDER
-                      : 'postgres://user:pass@host:5432/ducklake_catalog'
+                      : 'postgresql://user:password@host:5432/database'
                   }
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        variant="default"
-                        className="w-7"
-                        icon={showCatalogUrl ? <Eye /> : <EyeOff />}
-                        onClick={() => setShowCatalogUrl(!showCatalogUrl)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
+                          icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                          onClick={() => setShowCatalogUrl(!showCatalogUrl)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>
@@ -426,38 +402,11 @@ const DuckLakeCustomFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Data path"
-              description="An S3 path where DuckLake data files will be written"
+              label={DUCKLAKE_DATA_PATH_FIELD_COPY.label}
+              description={DUCKLAKE_DATA_PATH_FIELD_COPY.description}
             >
               <FormControl>
                 <Input {...field} placeholder="s3://bucket/path" value={field.value ?? ''} />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ducklakePoolSize"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="Pool size"
-              description="Number of concurrent DuckDB connections to use"
-            >
-              <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  max={6}
-                  value={field.value ?? ''}
-                  placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
-                  onChange={(event) =>
-                    field.onChange(
-                      event.target.value === '' ? undefined : Number(event.target.value)
-                    )
-                  }
-                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -467,7 +416,7 @@ const DuckLakeCustomFields = ({
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Object storage</p>
         <p className="text-sm text-foreground-light">
-          Optional credentials and endpoint settings for S3-compatible storage providers.
+          Connection settings and credentials for your S3-compatible object storage.
         </p>
       </div>
 
@@ -482,14 +431,19 @@ const DuckLakeCustomFields = ({
               description={
                 editMode
                   ? 'Stored access key ID is hidden. Enter a new key ID to replace it.'
-                  : 'Required access key ID for the object storage provider'
+                  : 'Required access key ID for the object storage provider.'
               }
             >
               <FormControl>
                 <Input
                   {...field}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-access-key'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   value={field.value ?? ''}
+                  autoComplete="off"
+                  data-1p-ignore
+                  data-lpignore="true"
+                  data-form-type="other"
+                  data-bwignore
                 />
               </FormControl>
             </FormItemLayout>
@@ -506,39 +460,31 @@ const DuckLakeCustomFields = ({
               description={
                 editMode
                   ? 'Stored secret access key is hidden. Enter a new secret to replace it.'
-                  : 'Required secret access key for the object storage provider'
+                  : 'Required secret access key for the object storage provider.'
               }
-              className="relative"
             >
               <FormControl>
-                <Input
+                <PasswordInput
                   {...field}
-                  type={showSecretAccessKey ? 'text' : 'password'}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-secret-key'}
+                  type={showSecretAccessKey && !editMode ? 'text' : 'password'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   value={field.value ?? ''}
+                  autoComplete="off"
+                  actions={
+                    !editMode && (
+                      <Button
+                        className="w-7"
+                        aria-label={
+                          showSecretAccessKey
+                            ? 'Hide S3 secret access key'
+                            : 'Show S3 secret access key'
+                        }
+                        icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                        onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
+                      />
+                    )
+                  }
                 />
-              </FormControl>
-              <Button
-                variant="default"
-                icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
-                className="w-7 absolute right-6 top-[4px]"
-                onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
-              />
-            </FormItemLayout>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="ducklakeS3Region"
-          render={({ field }) => (
-            <FormItemLayout
-              layout="horizontal"
-              label="S3 region"
-              description="Required region for the object storage provider"
-            >
-              <FormControl>
-                <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -551,10 +497,30 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 endpoint"
-              description="Required endpoint without the protocol scheme, for example `127.0.0.1:5000/s3`"
+              description="Public address of your storage provider, without the HTTP or HTTPS prefix."
             >
               <FormControl>
-                <Input {...field} placeholder="127.0.0.1:5000/s3" value={field.value ?? ''} />
+                <Input
+                  {...field}
+                  placeholder="s3.us-east-1.amazonaws.com"
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="ducklakeS3Region"
+          render={({ field }) => (
+            <FormItemLayout
+              layout="horizontal"
+              label="S3 region"
+              description="Required region for the object storage provider."
+            >
+              <FormControl>
+                <Input {...field} placeholder="us-east-1" value={field.value ?? ''} />
               </FormControl>
             </FormItemLayout>
           )}
@@ -567,14 +533,26 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="S3 URL style"
-              description="Choose `path` for MinIO/Supabase-style endpoints or `vhost` for AWS-style virtual host addressing"
+              description="Controls where the bucket name appears in requests to your storage provider."
             >
               <FormControl>
                 <Select value={field.value ?? 'path'} onValueChange={field.onChange}>
-                  <SelectTrigger>{field.value ?? 'path'}</SelectTrigger>
+                  <SelectTrigger>
+                    {field.value === 'vhost' ? 'Virtual-host style' : 'Path style'}
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="path">path</SelectItem>
-                    <SelectItem value="vhost">vhost</SelectItem>
+                    <SelectItem value="path" className="[&>span]:top-2.5">
+                      <p>Path style</p>
+                      <p className="text-foreground-lighter">
+                        Bucket name appears in the URL path.
+                      </p>
+                    </SelectItem>
+                    <SelectItem value="vhost" className="[&>span]:top-2.5">
+                      <p>Virtual-host style</p>
+                      <p className="text-foreground-lighter">
+                        Bucket name appears in the hostname.
+                      </p>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -589,17 +567,25 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Use SSL"
-              description="Whether to use SSL when connecting to the S3-compatible endpoint"
+              description="Controls whether connections to your storage provider use HTTPS."
             >
               <FormControl>
                 <Select
                   value={field.value === false ? 'false' : 'true'}
                   onValueChange={(value) => field.onChange(value === 'true')}
                 >
-                  <SelectTrigger>{field.value === false ? 'false' : 'true'}</SelectTrigger>
+                  <SelectTrigger>{field.value === false ? 'Off' : 'On'}</SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="true">true</SelectItem>
-                    <SelectItem value="false">false</SelectItem>
+                    <SelectItem value="true" className="[&>span]:top-2.5">
+                      <p>On</p>
+                      <p className="text-foreground-lighter">Encrypts the connection with HTTPS.</p>
+                    </SelectItem>
+                    <SelectItem value="false" className="[&>span]:top-2.5">
+                      <p>Off</p>
+                      <p className="text-foreground-lighter">
+                        Uses HTTP if your provider requires it.
+                      </p>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -623,7 +609,11 @@ const DuckLakeCustomFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Metadata schema"
-              description="Schema used for DuckLake metadata tables in PostgreSQL"
+              description={
+                editMode
+                  ? 'Schema containing this destination’s DuckLake metadata tables.'
+                  : 'New schema where DuckLake metadata will be stored.'
+              }
             >
               <FormControl>
                 <Input {...field} placeholder="ducklake" value={field.value ?? ''} />
@@ -652,20 +642,19 @@ export const DuckLakeFields = ({
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
-      <p className="text-sm font-medium text-foreground">DuckLake settings</p>
-
-      {!editMode && (
-        <div className="flex flex-col gap-y-3">
-          <p className="text-xs uppercase tracking-wider text-foreground-lighter">
-            How should this DuckLake be configured?
-          </p>
-          <DuckLakeModeSelector
-            value={effectiveMode}
-            onChange={(value) =>
-              form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
-            }
-          />
-        </div>
+      {editMode ? (
+        <p className="text-sm font-medium text-foreground">DuckLake settings</p>
+      ) : (
+        <FormItemLayout layout="horizontal" label="Configuration method">
+          <FormControl>
+            <DuckLakeModeSelector
+              value={effectiveMode}
+              onChange={(value) =>
+                form.setValue('ducklakeMode', value, { shouldValidate: true, shouldDirty: true })
+              }
+            />
+          </FormControl>
+        </FormItemLayout>
       )}
 
       {effectiveMode === DUCKLAKE_MODE_SUPABASE ? (
@@ -690,8 +679,10 @@ const ProjectSelection = ({
 
   const {
     data: projectsData,
-    isPending: isLoadingProjects,
+    isPending: isPendingProjects,
+    isFetching: isFetchingProjects,
     isError: isErrorProjects,
+    refetch: refetchProjects,
   } = useOrgProjectsInfiniteQuery(
     { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
     { enabled: !!organization?.slug }
@@ -704,6 +695,7 @@ const ProjectSelection = ({
       ),
     [projectsData]
   )
+  const isProjectsErrorVisible = isMetadataListErrorVisible(isErrorProjects, projects.length)
 
   const projectsByRef = useMemo(
     () => new Map(projects.map((project) => [project.ref, project])),
@@ -715,54 +707,40 @@ const ProjectSelection = ({
     const project = projectsByRef.get(ref)
     return project ? `${project.name} · ${project.ref}` : ref
   }
+  const { handleOpenChange: handleRefreshProjectsOnOpen } = useRefreshOnOpen({
+    isEnabled: !!organization?.slug,
+    refetch: refetchProjects,
+  })
 
-  if (isLoadingProjects) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-between"
-        size="small"
-        iconRight={<Loader2 className="animate-spin" />}
-      >
-        Retrieving projects
-      </Button>
-    )
-  }
-  if (isErrorProjects) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-start"
-        size="small"
-        icon={<WarningIcon />}
-      >
-        Failed to retrieve projects
-      </Button>
-    )
-  }
   return (
-    <Select value={value || ''} onValueChange={onChange}>
+    <Select value={value || ''} onValueChange={onChange} onOpenChange={handleRefreshProjectsOnOpen}>
       <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {projects.length === 0 ? (
-            <SelectItem value="__no_projects__" disabled>
-              No active projects available
+          <SelectionListState
+            isLoading={isMetadataListLoading(
+              isPendingProjects || isFetchingProjects,
+              projects.length
+            )}
+            isError={isProjectsErrorVisible}
+            isEmpty={
+              !isMetadataListLoading(isPendingProjects || isFetchingProjects, projects.length) &&
+              !isProjectsErrorVisible &&
+              projects.length === 0
+            }
+            emptyLabel="No active projects available"
+            errorLabel="Unable to load projects"
+          />
+          {projects.map((project) => (
+            <SelectItem key={project.ref} value={project.ref}>
+              <div className="flex flex-col">
+                <span>{project.name}</span>
+                <span className="text-foreground-lighter">
+                  {project.ref} · {project.region}
+                </span>
+              </div>
             </SelectItem>
-          ) : (
-            projects.map((project) => (
-              <SelectItem key={project.ref} value={project.ref}>
-                <div className="flex flex-col">
-                  <span>{project.name}</span>
-                  <span className="text-foreground-lighter">
-                    {project.ref} · {project.region}
-                  </span>
-                </div>
-              </SelectItem>
-            ))
-          )}
+          ))}
         </SelectGroup>
       </SelectContent>
     </Select>
@@ -773,11 +751,15 @@ const BucketSelection = ({
   form,
   value,
   onChange,
+  onCreateBucket,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   value: string | undefined
   onChange: (value: string) => void
+  onCreateBucket: () => void
 }) => {
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const ducklakeStorageProjectRef = useWatch({
     control: form.control,
     name: 'ducklakeStorageProjectRef',
@@ -785,8 +767,10 @@ const BucketSelection = ({
 
   const {
     data: bucketsData,
-    isPending: isLoadingBuckets,
+    isPending: isPendingBuckets,
+    isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
+    refetch: refetchBuckets,
   } = usePaginatedBucketsQuery(
     { projectRef: ducklakeStorageProjectRef },
     { enabled: !!ducklakeStorageProjectRef }
@@ -799,64 +783,106 @@ const BucketSelection = ({
       ),
     [bucketsData]
   )
+  const isBucketsErrorVisible = isMetadataListErrorVisible(isErrorBuckets, buckets.length)
+  const isBucketsLoading = isMetadataListLoading(
+    isPendingBuckets || isFetchingBuckets,
+    buckets.length
+  )
+  const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
+    isEnabled: !!ducklakeStorageProjectRef,
+    refetch: refetchBuckets,
+  })
 
   if (!ducklakeStorageProjectRef) {
     return (
-      <Button disabled variant="default" className="w-full justify-start" size="small">
+      <ComboboxTrigger size="small" disabled>
         Select a storage project first
-      </Button>
-    )
-  }
-  if (isLoadingBuckets) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-between"
-        size="small"
-        iconRight={<Loader2 className="animate-spin" />}
-      >
-        Retrieving buckets
-      </Button>
-    )
-  }
-  if (isErrorBuckets) {
-    return (
-      <Button
-        disabled
-        variant="default"
-        className="w-full justify-start"
-        size="small"
-        icon={<WarningIcon />}
-      >
-        Failed to retrieve buckets
-      </Button>
+      </ComboboxTrigger>
     )
   }
 
   return (
-    <Select
-      value={value || ''}
-      onValueChange={(e) => {
-        if (e) onChange(e)
+    <Popover
+      modal={false}
+      open={isDropdownOpen}
+      onOpenChange={(open) => {
+        setIsDropdownOpen(open)
+        handleRefreshBucketsOnOpen(open)
+        if (!open) setSearchTerm('')
       }}
     >
-      <SelectTrigger>{value || 'Select a bucket'}</SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          {buckets.length === 0 ? (
-            <SelectItem value="__no_buckets__" disabled>
-              No buckets available
-            </SelectItem>
-          ) : (
-            buckets.map((bucket) => (
-              <SelectItem key={bucket.id} value={bucket.id}>
-                {bucket.name}
-              </SelectItem>
-            ))
-          )}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
+      <PopoverTrigger asChild>
+        <ComboboxTrigger
+          size="small"
+          aria-expanded={isDropdownOpen}
+          data-state={isDropdownOpen ? 'open' : 'closed'}
+          className={cn(!value && 'text-foreground-muted')}
+        >
+          {value || 'Select a bucket'}
+        </ComboboxTrigger>
+      </PopoverTrigger>
+      <PopoverContent sameWidthAsTrigger className="p-0" align="start" side="bottom">
+        <Command>
+          <CommandInput
+            placeholder="Find bucket..."
+            className="text-xs"
+            value={searchTerm}
+            onValueChange={setSearchTerm}
+          />
+          <CommandList>
+            {!isBucketsLoading && !isBucketsErrorVisible && buckets.length > 0 && (
+              <CommandEmpty>No buckets found</CommandEmpty>
+            )}
+            <SelectionListState
+              isLoading={isBucketsLoading}
+              isError={isBucketsErrorVisible}
+              isEmpty={!isBucketsLoading && !isBucketsErrorVisible && buckets.length === 0}
+              emptyLabel="No buckets available"
+              errorLabel="Unable to load buckets"
+              skeletonVariant="command"
+            />
+            {buckets.length > 0 && (
+              <CommandGroup>
+                <ScrollArea
+                  className={buckets.length > 7 ? 'h-[210px]' : ''}
+                  onWheel={(event) => event.stopPropagation()}
+                >
+                  {buckets.map((bucket) => (
+                    <CommandItem
+                      key={bucket.id}
+                      value={bucket.name}
+                      className="cursor-pointer flex items-center justify-between gap-x-2 w-full"
+                      onSelect={() => {
+                        onChange(bucket.id)
+                        setIsDropdownOpen(false)
+                      }}
+                    >
+                      <span>{bucket.name}</span>
+                      {value === bucket.id && (
+                        <Check className="text-primary" strokeWidth={2} size={13} />
+                      )}
+                    </CommandItem>
+                  ))}
+                </ScrollArea>
+              </CommandGroup>
+            )}
+            <CommandSeparator />
+            <CommandGroup forceMount>
+              <CommandItem
+                forceMount
+                className="cursor-pointer w-full"
+                onSelect={() => {
+                  setIsDropdownOpen(false)
+                  onCreateBucket()
+                }}
+              >
+                <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                New bucket
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

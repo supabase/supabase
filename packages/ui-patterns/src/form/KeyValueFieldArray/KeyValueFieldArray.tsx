@@ -165,7 +165,6 @@ export const KeyValueFieldArray = <
             />
 
             <Button
-              variant="default"
               size="tiny"
               type="button"
               icon={<Trash size={12} />}
@@ -180,7 +179,6 @@ export const KeyValueFieldArray = <
 
       <div className="flex items-center">
         <Button
-          variant="default"
           size="tiny"
           type="button"
           icon={<Plus />}
@@ -199,7 +197,6 @@ export const KeyValueFieldArray = <
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="default"
                 size="tiny"
                 type="button"
                 icon={<ChevronDown size={14} />}

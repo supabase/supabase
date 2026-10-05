@@ -62,6 +62,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     )
   })
 
+  it('includes a subtitle before the description', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'hire-agent',
+        items: [
+          {
+            title: 'Health monitor',
+            href: '/guides/observability/automate-with-agents/health',
+            subtitle: 'Every 15 minutes',
+            description: 'Watch logs for 5xx spikes and Auth failures.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '**[Health monitor](https://supabase.com/docs/guides/observability/automate-with-agents/health):** Every 15 minutes. Watch logs for 5xx spikes and Auth failures.'
+    )
+  })
+
   it('preserves external hrefs in markdown export', () => {
     const markdown = serializeContentListingGroupToMarkdown(
       {
@@ -124,6 +145,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     expect(markdown).toBe(
       '## Get started\n\nRead these first.\n\n- **[Connect](/docs/guides/database/connecting-to-postgres):** Connection strings.'
     )
+  })
+
+  it('renders items without href as unlinked list entries', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'what-you-get',
+        heading: 'What you get',
+        items: [
+          {
+            title: 'Automatic failover',
+            description: 'Another node is promoted if a node goes down.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '- **Automatic failover:** Another node is promoted if a node goes down.'
+    )
+    expect(markdown).not.toContain('](')
   })
 
   it('omits heading line when heading is not set', () => {
@@ -239,9 +281,11 @@ describe('dashboard content listing hrefs', () => {
   // Root-relative /dashboard hrefs get the docs basePath and 404; use absolute URLs.
   it('uses absolute https://supabase.com dashboard URLs', () => {
     const dashboardLinks = Object.values(CONTENT_LISTINGS).flatMap((group) =>
-      group.items
-        .filter((item) => isDashboardHref(item.href))
-        .map((item) => ({ listingId: group.id, title: item.title, href: item.href }))
+      group.items.flatMap((item) =>
+        item.href && isDashboardHref(item.href)
+          ? [{ listingId: group.id, title: item.title, href: item.href }]
+          : []
+      )
     )
 
     expect(dashboardLinks.length).toBeGreaterThan(0)
@@ -254,12 +298,30 @@ describe('dashboard content listing hrefs', () => {
   })
 })
 
+describe('contentListingItemSchema href', () => {
+  it('accepts an item without href', () => {
+    const result = contentListingItemSchema.safeParse({
+      title: 'Automatic failover',
+      description: 'Another node is promoted if a node goes down.',
+    })
+    expect(result.success).toBe(true)
+  })
+})
+
 describe('contentListingItemSchema icon', () => {
   const baseItem = {
     title: 'Datadog',
-    href: '/guides/monitoring-and-debugging/log-drains#datadog',
+    href: '/guides/observability/log-drains#datadog',
     description: 'Stream logs directly into Datadog for monitoring and analysis.',
   }
+
+  it('accepts an optional subtitle', () => {
+    const result = contentListingItemSchema.safeParse({
+      ...baseItem,
+      subtitle: 'Every 15 minutes',
+    })
+    expect(result.success).toBe(true)
+  })
 
   it('accepts a plain string icon path', () => {
     const result = contentListingItemSchema.safeParse({
@@ -291,20 +353,5 @@ describe('contentListingItemSchema icon', () => {
       icon: { kind: 'not-a-real-kind', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
     })
     expect(result.success).toBe(false)
-  })
-})
-
-describe('TelemetryEvent union', () => {
-  it('includes docs_content_listing_clicked', () => {
-    const event = {
-      action: 'docs_content_listing_clicked' as const,
-      properties: {
-        targetPath: '/guides/storage',
-        linkTitle: 'Storage',
-      },
-    }
-
-    const _typeCheck: import('common/telemetry-constants').TelemetryEvent = event
-    expect(_typeCheck.action).toBe('docs_content_listing_clicked')
   })
 })

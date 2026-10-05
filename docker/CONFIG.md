@@ -788,7 +788,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 |---|---|---|---|---|
 | `PGRST_ADMIN_SERVER_HOST` | string | Self-hosted | Hostname for the PostgREST admin server. | Defaults to `server-host` value |
 | `PGRST_ADMIN_SERVER_PORT` | integer | Both | Port for the PostgREST admin server. The admin server is disabled unless a port is set, and it must differ from `PGRST_SERVER_PORT`. | No default (admin server disabled when unset) |
-| `PGRST_APP_SETTINGS_*` | string | Self-hosted | Arbitrary settings exposed to PostgreSQL via `current_setting('app.settings.<name>')`. The suffix after `PGRST_APP_SETTINGS_` becomes the setting name (case-insensitive). | Used for `PGRST_APP_SETTINGS_JWT_SECRET` and `PGRST_APP_SETTINGS_JWT_EXP` in self-hosted |
+| `PGRST_APP_SETTINGS_*` | string | Self-hosted | Arbitrary settings exposed to PostgreSQL via `current_setting('app.settings.<name>')`. The suffix after `PGRST_APP_SETTINGS_` becomes the setting name (case-insensitive). | Used for `PGRST_APP_SETTINGS_JWT_EXP` in self-hosted |
 | `PGRST_CLIENT_ERROR_VERBOSITY` | enum | Self-hosted | Controls verbosity of client-facing error responses. | Default: `verbose` (other value: `minimal`) |
 | `PGRST_DB_AGGREGATES_ENABLED` | boolean | Self-hosted | Allows the use of aggregate functions (`max`, `sum`, etc.) in queries. Disabled by default due to potential performance risks. | Default: `false` |
 | `PGRST_DB_ANON_ROLE` | string | Both | Database role used for unauthenticated requests. When unset, anonymous access is blocked. | No default |
@@ -1380,7 +1380,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `JWT_SECRET` | string | Both | HS256 secret stored as `app.settings.jwt_secret` on the `postgres` database. Read by `volumes/db/jwt.sql`. PostgREST and pgjwt-using functions read it via `current_setting()`. | Required. Sourced from `JWT_SECRET` in `.env.example` |
+| `JWT_SECRET` | string | Both | HS256 secret used by GoTrue, PostgREST, and other services to sign and verify JWTs. Not exposed to SQL; store it in [Vault](https://supabase.com/docs/guides/database/vault) if a database function needs it. | Required. Sourced from `JWT_SECRET` in `.env.example` |
 | `JWT_EXP` | integer (seconds) | Both | Default JWT expiry (seconds) stored as `app.settings.jwt_exp` on the `postgres` database. Read by `volumes/db/jwt.sql`. | Sourced from `JWT_EXPIRY` in `.env.example` |
 
 ---

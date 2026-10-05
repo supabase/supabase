@@ -33,7 +33,7 @@ export function DiskManagementPanelForm() {
           title="Disk management has moved"
           description="Disk configuration is now managed alongside project compute on the Infrastructure page."
           actions={
-            <Button variant="default" asChild>
+            <Button asChild>
               <Link href={getInfrastructurePath(projectRef)}>Go to Infrastructure</Link>
             </Button>
           }
