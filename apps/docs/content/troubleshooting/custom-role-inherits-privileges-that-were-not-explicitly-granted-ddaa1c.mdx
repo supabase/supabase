@@ -16,11 +16,11 @@ A role you create can use objects without an explicit grant. For example, it can
 
 The role receives these privileges from `PUBLIC`, which stands for every role in the database, including roles you create later.
 
-A role you create to limit what a service or a person can do can therefore do more than you intended. When `pg_net` is enabled, any role can read the request headers that `pg_net` queues, which can include API keys, and can call `net.http_post` to send HTTP requests from your database. Any role can also use disk space by creating temporary tables and large objects.
+A role you create to limit what a service or a person can do can therefore do more than you intended. When `pg_net` is enabled, any role that can connect to your database can read the request headers that `pg_net` queues, which can include API keys, and can call `net.http_post` to send HTTP requests from your database. Any role can also use disk space by creating temporary tables and large objects.
 
 ## Find privileges you didn't grant
 
-To find privileges you didn't grant, list everything the role can access and compare it with your own grants. To list the schemas a role can use, replace `app_svc` and run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+To find privileges you didn't grant, list what the role can access and compare it with your own grants. The following queries check schema `usage` and the table and sequence privileges they name. They don't check column-level grants or `execute` on functions. To list the schemas a role can use, replace `app_svc` and run the following in the [SQL Editor](/dashboard/project/_/sql/new):
 
 ```sql
 select nspname as schema
