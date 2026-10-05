@@ -112,7 +112,9 @@ export const DiskUsage = ({
               hasReplicas && (
                 <Alert variant="warning">
                   <CriticalIcon />
-                  <AlertTitle>Projects exceeding quota</AlertTitle>
+                  <AlertTitle>
+                    Read replicas add disk usage beyond your plan's included quota
+                  </AlertTitle>
                   <AlertDescription>
                     You have read replicas in your projects, but do not allow any overages with the
                     Spend Cap on. Remove the read replicas or disable the spend cap.
