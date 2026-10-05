@@ -53,6 +53,7 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
             <div className="flex flex-row items-center justify-between text-sm w-full">
               <span className="text-foreground-light text-xs">This component uses shadcn/ui</span>
               <Button
+                asChild
                 variant="outline"
                 className="rounded-full"
                 icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
