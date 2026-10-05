@@ -121,7 +121,6 @@ function useGetProjectPermissionsV2(
   }
 }
 
-// Useful when you want to avoid layout changes while waiting for permissions to load
 export function useAsyncCheckPermissionsV2(
   permission: FgaPermissions | FgaPermissions[],
   overrides?: {

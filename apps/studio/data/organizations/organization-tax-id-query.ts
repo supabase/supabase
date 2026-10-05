@@ -1,11 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type OrganizationTaxIdVariables = {
   slug?: string
@@ -36,9 +35,8 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     ...options
   }: UseCustomQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.tax_ids'
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    'billing_read'
   )
 
   return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>({

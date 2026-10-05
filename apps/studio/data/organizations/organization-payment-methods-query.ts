@@ -1,11 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
 export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse_Output']['data'][0]
@@ -48,9 +47,8 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     TData
   > = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.payment_methods'
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    'billing_read'
   )
   return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>({
     queryKey: organizationKeys.paymentMethods(slug),

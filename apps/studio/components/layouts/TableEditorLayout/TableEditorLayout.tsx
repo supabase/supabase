@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { PropsWithChildren, useEffect } from 'react'
 
@@ -8,8 +7,8 @@ import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Pre
 import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const { ref } = useParams()
@@ -21,14 +20,12 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     false
   )
 
-  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'tables'
+  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
 
-  const { can: canWriteTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canWriteTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   useEffect(() => {

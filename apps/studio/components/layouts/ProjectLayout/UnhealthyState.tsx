@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertTriangle } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -9,9 +8,9 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectDetailQuery, useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const UnhealthyState = () => {
   const router = useRouter()
@@ -20,9 +19,8 @@ export const UnhealthyState = () => {
   const { setProjectStatus } = useSetProjectStatus()
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const { can: canRestartProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'reboot'
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    'project_operations_write'
   )
 
   useProjectDetailQuery(

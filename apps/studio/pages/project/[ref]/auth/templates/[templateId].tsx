@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -59,11 +58,11 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const TemplatePage: NextPageWithLayout = () => {
   return <RedirectToTemplates />
@@ -74,14 +73,12 @@ const RedirectToTemplates = () => {
   const { templateId, ref } = router.query
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
@@ -132,16 +129,16 @@ const RedirectToTemplates = () => {
   // Create form schema for security templates
   const TemplateFormSchema = templateEnabledKey
     ? z.object({
-        [templateEnabledKey]: z.boolean(),
-      })
+      [templateEnabledKey]: z.boolean(),
+    })
     : z.object({})
 
   const defaultValues = templateEnabledKey
     ? {
-        [templateEnabledKey]: authConfig
-          ? Boolean(authConfig[templateEnabledKey as keyof typeof authConfig])
-          : false,
-      }
+      [templateEnabledKey]: authConfig
+        ? Boolean(authConfig[templateEnabledKey as keyof typeof authConfig])
+        : false,
+    }
     : {}
 
   const templateForm = useForm<z.infer<typeof TemplateFormSchema>>({

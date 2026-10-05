@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
@@ -40,7 +39,6 @@ import { getReportAttributesV2 } from '@/data/reports/database-charts'
 import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -50,6 +48,7 @@ import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -195,19 +194,13 @@ const DatabaseUsage = () => {
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
-      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
+    (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+    (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const { getEntitlementSetValues, isLoading: isEntitlementLoading } = useCheckEntitlements(
@@ -363,8 +356,8 @@ const DatabaseUsage = () => {
                 syncId="database-charts"
                 showMaxValue={
                   chart.id === 'client-connections' ||
-                  chart.id === 'client-connections-basic' ||
-                  chart.id === 'pgbouncer-connections'
+                    chart.id === 'client-connections-basic' ||
+                    chart.id === 'pgbouncer-connections'
                     ? true
                     : chart.showMaxValue
                 }
@@ -432,7 +425,7 @@ const DatabaseUsage = () => {
                   </div>
 
                   <div className="ml-auto">
-                    {/* 
+                    {/*
                       [Joshen] TODO: Check if this check is still relevant
                       The DiskSizeConfigurationModal is old and might be obsolete
                      */}

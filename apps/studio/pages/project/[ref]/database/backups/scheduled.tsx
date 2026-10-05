@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { DatabaseBackup, Info } from 'lucide-react'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -23,10 +22,10 @@ import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailabi
 import InformationBox from '@/components/ui/InformationBox'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBackupsQuery } from '@/data/database/backups-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsHighAvailability, useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   return (
@@ -67,9 +66,8 @@ const ScheduledBackups = () => {
   const isHighAvailability = useIsHighAvailability()
   const isPitrEnabled = backups?.pitr_enabled
 
-  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'back_ups'
+  const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_READ
   )
 
   if (isOrioleDbInAws) {

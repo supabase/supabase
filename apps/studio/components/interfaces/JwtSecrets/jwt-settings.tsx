@@ -86,7 +86,7 @@ export const JWTSettings = () => {
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
   const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_SECRET_READ
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
   const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
@@ -97,7 +97,7 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ)
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
     { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }

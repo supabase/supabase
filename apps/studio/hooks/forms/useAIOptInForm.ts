@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { useForm } from 'react-hook-form'
@@ -8,12 +7,12 @@ import * as z from 'zod'
 
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { getAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from '@/lib/constants'
 import type { ResponseError } from '@/types'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '../misc/useCheckPermissionsV2'
 
 // Shared schema definition
 export const AIOptInSchema = z.object({
@@ -31,9 +30,8 @@ export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
 export const useAIOptInForm = (onSuccessCallback?: () => void) => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const [, setUpdatedOptInSinceMCP] = useLocalStorageQuery(

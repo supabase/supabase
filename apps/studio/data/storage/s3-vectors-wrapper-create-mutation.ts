@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 
 import { useLocalS3KeysQuery } from '../misc/local-s3-keys-query'
@@ -12,9 +11,9 @@ import {
 } from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const useS3VectorsWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -39,9 +38,8 @@ export const useS3VectorsWrapperCreateMutation = () => {
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 's3_vectors_wrapper')
 
-  const { can: canCreateCredentials } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =

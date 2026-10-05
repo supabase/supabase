@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
@@ -13,7 +12,7 @@ import Panel from '@/components/ui/Panel'
 import { useApiKeysLastUsedQuery } from '@/data/analytics/api-keys-last-used-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const DisplayApiSettings = ({
   showTitle = true,
@@ -38,9 +37,8 @@ export const DisplayApiSettings = ({
   } = useJwtSecretUpdatingStatusQuery({ projectRef })
   const jwtSecretUpdateStatus = data?.jwtSecretUpdateStatus
 
-  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const isLoading = isProjectSettingsLoading || isLoadingPermissions
@@ -207,7 +205,7 @@ export const DisplayApiSettings = ({
                         ? 'Updating JWT secret...'
                         : (x?.api_key ?? 'You need additional permissions to view API keys')
                 }
-                onChange={() => {}}
+                onChange={() => { }}
               />
             </FormLayout>
 

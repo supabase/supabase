@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
 import dayjs, { Dayjs } from 'dayjs'
 import maxBy from 'lodash/maxBy'
@@ -24,8 +23,8 @@ import {
 } from '@/data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { ChartIntervals, NextPageWithLayout } from '@/types'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {
@@ -121,9 +120,8 @@ const LegacyEdgeFunctionOverview = () => {
     endDate: endDate.toISOString(),
   })
 
-  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_READ,
-    functionSlug as string
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
   if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />

@@ -65,7 +65,7 @@ export const JWTSecretKeysTable = () => {
   const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
   const now = useRef(new Date()).current
   const {
