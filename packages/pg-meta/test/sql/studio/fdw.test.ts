@@ -19,6 +19,7 @@ test('unencrypted server option values are passed as format() %L arguments', () 
   const sql = getCreateFDWSql({
     ...baseArgs,
     wrapperMeta: {
+      name: 'wasm_fdw',
       handlerName: 'wasm_fdw_handler',
       validatorName: 'wasm_fdw_validator',
       server: { options: [{ name: 'api_key', encrypted: false }] },
@@ -43,6 +44,7 @@ test('encrypted server options still resolve their value through Vault unchanged
   const sql = getCreateFDWSql({
     ...baseArgs,
     wrapperMeta: {
+      name: 'wasm_fdw',
       handlerName: 'wasm_fdw_handler',
       validatorName: 'wasm_fdw_validator',
       server: { options: [{ name: 'api_secret', encrypted: true }] },
@@ -57,8 +59,14 @@ test('encrypted server options still resolve their value through Vault unchanged
 
 test('deleting a wrapper row drops its server and preserves shared wrapper dependencies', () => {
   const sql = getDeleteFDWSql({
-    wrapper: { id: 42, name: 'bigquery_fdw', server_name: 'selected_bigquery_server' },
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'selected_bigquery_server',
+      server_options: ['sa_key_id=123e4567-e89b-12d3-a456-426614174000'],
+    },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'sa_key_id', encrypted: true }] },
@@ -73,10 +81,63 @@ test('deleting a wrapper row drops its server and preserves shared wrapper depen
   expect(sql).toContain("where w.fdwname = 'bigquery_fdw'")
   expect(sql).toContain("execute format('drop foreign data wrapper if exists %I cascade'")
   expect(sql).not.toContain('drop foreign data wrapper if exists "bigquery_fdw" cascade')
-  expect(sql).toContain("where fdwname = 'bigquery_fdw'")
+  // Secrets are deleted by the id already stored on the server's own option
+  // value - never by a guessed name, since that naming convention has changed
+  // more than once across this feature's history (see next two tests).
+  expect(sql).toContain(
+    "delete from vault.secrets where id = '123e4567-e89b-12d3-a456-426614174000'::uuid"
+  )
+  expect(sql).toContain(
+    "delete from vault.secrets where key_id = '123e4567-e89b-12d3-a456-426614174000'"
+  )
+  expect(sql).not.toContain('where name =')
 })
 
-test('editing a shared wrapper fails before any other statement runs', () => {
+test('skips secret cleanup entirely when an encrypted option was never set', () => {
+  const sql = getDeleteFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'selected_bigquery_server',
+      server_options: [],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [{ name: 'sa_key_id', encrypted: true }] },
+    },
+  })
+
+  expect(sql).not.toContain('vault.secrets')
+  expect(sql).not.toContain('pgsodium')
+})
+
+test('secret cleanup is deterministic regardless of which era the wrapper was created in', () => {
+  // Older wrappers may have named their secrets after the FDW or a
+  // wrapper_name-based convention that no longer exists in the app - this must
+  // not matter, since cleanup never guesses a name.
+  const sql = getDeleteFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'some_legacy_custom_fdw_name',
+      server_name: 'some_legacy_custom_fdw_name_server',
+      server_options: ['sa_key_id=123e4567-e89b-12d3-a456-426614174000'],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [{ name: 'sa_key_id', encrypted: true }] },
+    },
+  })
+
+  expect(sql).toContain(
+    "delete from vault.secrets where id = '123e4567-e89b-12d3-a456-426614174000'::uuid"
+  )
+})
+
+test('editing a server does not raise even when other servers share the same FDW', () => {
   const sql = getUpdateFDWSql({
     wrapper: {
       id: 42,
@@ -85,6 +146,7 @@ test('editing a shared wrapper fails before any other statement runs', () => {
       server_options: ['project_id=old-project'],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'project_id', encrypted: false }] },
@@ -97,8 +159,13 @@ test('editing a shared wrapper fails before any other statement runs', () => {
     tables: [],
   })
 
-  expect(sql).toContain("s.srvname <> 'selected_bigquery_server'")
-  expect(sql.indexOf('raise exception')).toBeLessThan(sql.indexOf('alter server'))
+  // A server can be edited regardless of whether other servers share its FDW -
+  // the update only ever targets this server's own name, options, and tables.
+  expect(sql).not.toContain('raise exception')
+  expect(sql).not.toContain('cannot be edited here')
+  expect(sql).toContain(
+    "alter server selected_bigquery_server\n          options (set project_id 'new-project')"
+  )
 })
 
 test('updating a wrapper alters the server and FDW instead of dropping and recreating them', () => {
@@ -111,6 +178,7 @@ test('updating a wrapper alters the server and FDW instead of dropping and recre
       tables: [],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'project_id', encrypted: false }] },
@@ -131,29 +199,62 @@ test('updating a wrapper alters the server and FDW instead of dropping and recre
   expect(sql).not.toContain('create foreign data wrapper')
 })
 
-test('renaming the wrapper name only renames the FDW, not the server', () => {
+test('the FDW is never renamed or recreated, since it is shared across every server of its type', () => {
   const sql = getUpdateFDWSql({
     wrapper: {
       id: 42,
-      name: 'old_wrapper',
-      server_name: 'old_wrapper_server',
+      name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
       server_options: [],
       tables: [],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [] },
     },
     formState: {
-      wrapper_name: 'new_wrapper',
-      server_name: 'old_wrapper_server',
+      wrapper_name: 'bigquery_fdw',
+      server_name: 'bigquery_server',
     },
     tables: [],
   })
 
-  expect(sql).toContain('alter foreign data wrapper old_wrapper rename to new_wrapper')
-  expect(sql).not.toContain('rename to new_wrapper_server')
+  expect(sql).not.toContain('rename to')
+  expect(sql).not.toContain('create foreign data wrapper')
+  expect(sql).not.toContain('drop foreign data wrapper')
+})
+
+test('renaming a server emits a rename statement before any clause targeting the new name', () => {
+  const sql = getUpdateFDWSql({
+    wrapper: {
+      id: 42,
+      name: 'bigquery_fdw',
+      server_name: 'old_server_name',
+      server_options: ['project_id=old-project'],
+      tables: [],
+    },
+    wrapperMeta: {
+      name: 'bigquery_fdw',
+      handlerName: 'big_query_fdw_handler',
+      validatorName: 'big_query_fdw_validator',
+      server: { options: [{ name: 'project_id', encrypted: false }] },
+    },
+    formState: {
+      wrapper_name: 'bigquery_fdw',
+      server_name: 'new_server_name',
+      project_id: 'new-project',
+    },
+    tables: [],
+  })
+
+  expect(sql).toContain('alter server old_server_name rename to new_server_name')
+  expect(sql).toContain(
+    "alter server new_server_name\n          options (set project_id 'new-project')"
+  )
+  expect(sql).not.toContain('alter server old_server_name\n          options')
+  expect(sql.indexOf('rename to')).toBeLessThan(sql.indexOf('options (set project_id'))
 })
 
 test('adding a server option not previously set uses ADD, not SET', () => {
@@ -166,6 +267,7 @@ test('adding a server option not previously set uses ADD, not SET', () => {
       tables: [],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'project_id', encrypted: false }] },
@@ -191,6 +293,7 @@ test('clearing a server option uses DROP', () => {
       tables: [],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'project_id', encrypted: false }] },
@@ -216,6 +319,7 @@ test('an encrypted option that already has a secret is updated in place via vaul
       tables: [],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'sa_key_id', encrypted: true }] },
@@ -258,6 +362,7 @@ test('foreign table diffing: creates new tables, drops removed tables, and skips
       ],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [] },
@@ -308,6 +413,7 @@ test('foreign table diffing: retyping a column drops and re-adds it, since ALTER
       ],
     },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [] },
@@ -334,6 +440,7 @@ test('editing an existing foreign table excludes catalog fields from its options
   const sql = getUpdateFDWSql({
     wrapper: { id: 42, name: 'bigquery_fdw', server_name: 'bigquery_server' },
     wrapperMeta: {
+      name: 'bigquery_fdw',
       handlerName: 'big_query_fdw_handler',
       validatorName: 'big_query_fdw_validator',
       server: { options: [{ name: 'project_id', encrypted: false }] },
