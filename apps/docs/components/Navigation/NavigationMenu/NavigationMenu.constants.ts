@@ -1168,6 +1168,10 @@ export const database: NavMenuConstant = {
           name: 'Customizing Postgres config',
           url: '/guides/database/custom-postgres-config' as `/${string}`,
         },
+        {
+          name: 'Vacuum management',
+          url: '/guides/database/postgres/vacuum-management' as `/${string}`,
+        },
       ],
     },
     {
