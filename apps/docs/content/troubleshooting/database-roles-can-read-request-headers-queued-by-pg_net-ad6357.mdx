@@ -27,7 +27,7 @@ order by created desc
 limit 20;
 ```
 
-`net._http_response` keeps the status code, response headers, and response body for the time set by `pg_net.ttl`, which is 6 hours by default. It doesn't store request headers. Check the response bodies too, because an API can return sensitive data of its own.
+`net._http_response` keeps the status code, response headers, and response body for at least the time set by `pg_net.ttl`, which is 6 hours by default. The worker deletes expired responses while it processes requests, so responses can stay longer when no requests are being sent. It doesn't store request headers. Check the response bodies too, because an API can return sensitive data of its own.
 
 ## Credentials in request headers
 

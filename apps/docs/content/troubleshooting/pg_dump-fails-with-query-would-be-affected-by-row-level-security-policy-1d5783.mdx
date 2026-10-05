@@ -10,6 +10,10 @@ message = "query would be affected by row-level security policy for table"
 [[errors]]
 code = "42501"
 message = "permission denied to set role \"postgres\""
+
+[[errors]]
+code = "42501"
+message = "permission denied for large object"
 ---
 
 When you run `pg_dump` as a role you created, the export stops at the first table that uses Row Level Security:
@@ -36,18 +40,35 @@ Each statement does one job:
 - `pg_read_all_data` is a predefined Postgres role. It lets `backup_reader` read every table, view, and sequence in every schema, including `auth` and `storage`.
 - `default_transaction_read_only` makes the role's sessions read-only by default, which prevents accidental writes.
 
+`pg_read_all_data` doesn't cover large objects. If your database has large objects, the export fails with `permission denied for large object`. To export without them, add `--no-large-objects` to the `pg_dump` command. To include them, grant `select` on each large object to `backup_reader`, running as the role that owns them:
+
+```sql
+do $$
+declare
+  r record;
+begin
+  for r in select oid from pg_largeobject_metadata loop
+    execute format('grant select on large object %s to backup_reader', r.oid);
+  end loop;
+end
+$$;
+```
+
 To give another role you created the same access, run `alter role <role_name> bypassrls;` and `grant pg_read_all_data to <role_name>;`.
 
 ## Run the export
 
 1. Open the [**Connect** panel](/dashboard/project/_?showConnect=true) and copy the session pooler or direct connection string.
-2. Change the username in the connection string. For the shared pooler, change `postgres.<project-ref>` to `backup_reader.<project-ref>`. For a direct connection, change `postgres` to `backup_reader`.
+2. Change the username in the connection string, and remove the password from it. For the shared pooler, change `postgres.<project-ref>` to `backup_reader.<project-ref>`. For a direct connection, change `postgres` to `backup_reader`.
 3. Run `pg_dump` with the connection string. Use `pg_dump` from the same major Postgres version as your project, or a later one.
 
    ```bash
-   pg_dump "postgresql://backup_reader.<project-ref>:<password>@<pooler-host>:5432/postgres" \
+   pg_dump "postgresql://backup_reader.<project-ref>@<pooler-host>:5432/postgres" \
+     --password \
      --file backup.sql
    ```
+
+   `--password` prompts for the password. For a scheduled export, leave out `--password` and store the password in a [password file](https://www.postgresql.org/docs/current/libpq-pgpass.html).
 
 To export specific schemas, add a `--schema` option for each one, for example `--schema=public --schema=auth --schema=storage`.
 

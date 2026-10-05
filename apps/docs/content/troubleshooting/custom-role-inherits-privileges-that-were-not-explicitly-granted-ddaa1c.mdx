@@ -40,17 +40,35 @@ select
 from pg_class c
 join pg_namespace n on n.oid = c.relnamespace
 cross join unnest(
-  array['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']
+  array['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'USAGE']
 ) as p(privilege)
 where c.relkind in ('r', 'p', 'v', 'm', 'f', 'S')
   and n.nspname not in ('pg_catalog', 'information_schema')
   and has_schema_privilege('app_svc', n.oid, 'usage')
-  and has_table_privilege('app_svc', c.oid, p.privilege)
+  and case
+    when c.relkind = 'S' then
+      case
+        when p.privilege in ('USAGE', 'SELECT', 'UPDATE')
+          then has_sequence_privilege('app_svc', c.oid, p.privilege)
+        else false
+      end
+    else
+      case
+        when p.privilege = 'USAGE' then false
+        else has_table_privilege('app_svc', c.oid, p.privilege)
+      end
+  end
 group by 1, 2
 order by 1, 2;
 ```
 
-Objects you didn't grant come from `PUBLIC`.
+The results are the role's effective privileges. Access you didn't grant directly can come from `PUBLIC`, from a role it's a member of, or from owning the object. To see who holds privileges on an object, check its access control list:
+
+```sql
+select relacl from pg_class where oid = 'net.http_request_queue'::regclass;
+```
+
+An entry that starts with `=`, such as `=arwdDxtm/supabase_admin`, is a grant to `PUBLIC`.
 
 ## What every role receives from PUBLIC
 
@@ -91,7 +109,15 @@ alter default privileges for role postgres
   revoke execute on functions from public;
 ```
 
-A default privilege set with `in schema` can't remove the `PUBLIC` default for functions, because Postgres adds schema defaults to the global ones. `anon`, `authenticated`, and `service_role` keep their own grants on functions in `public`, so the Data API isn't affected. Functions in other schemas don't get those grants. If a Row Level Security policy calls a helper function outside `public`, grant `execute` on it to the roles the policy applies to:
+A default privilege set with `in schema` can't remove the `PUBLIC` default for functions, because Postgres adds schema defaults to the global ones. On a Supabase project, the default privileges also grant `execute` to `anon`, `authenticated`, and `service_role` on functions that `postgres` creates in `public`, so those roles keep their access. If you changed those defaults, or create functions as another role, grant `execute` to the API roles that need it. To check the default privileges for functions, run:
+
+```sql
+select defaclrole::regrole as owner, defaclnamespace::regnamespace as schema, defaclacl
+from pg_default_acl
+where defaclobjtype = 'f';
+```
+
+Functions in other schemas don't get those grants. If a Row Level Security policy calls a helper function outside `public`, grant `execute` on it to the roles the policy applies to:
 
 ```sql
 grant execute on function private.is_admin() to authenticated;
@@ -124,7 +150,7 @@ grant select, insert on app.orders to app_svc;
 grant usage on sequence app.orders_id_seq to app_svc;
 ```
 
-A role you create is subject to Row Level Security unless you give it the `bypassrls` attribute. Don't grant the role membership in `postgres` or in other Supabase roles, because a member role inherits all of their privileges. For more information about roles, see [Postgres Roles](/docs/guides/database/postgres/roles).
+A role you create is subject to Row Level Security on tables it doesn't own, unless you give it the `bypassrls` attribute. A table's owner bypasses its policies unless you run `alter table <table_name> force row level security`. Don't grant the role membership in `postgres` or in other Supabase roles, because a member role inherits all of their privileges. For more information about roles, see [Postgres Roles](/docs/guides/database/postgres/roles).
 
 ## Settings that don't restrict a role
 

@@ -72,10 +72,10 @@ A grant to `PUBLIC` applies to every role, including roles you create later. Pos
 
 The following table shows how each kind of role can reach the `net` schema.
 
-| Role                                            | Can use pg_net | Reason                                                                                                                          |
-| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `anon`, `authenticated`, `service_role`         | No             | These roles can't connect to the database directly. The Data API serves only the schemas you expose, and `net` isn't a default. |
-| `postgres` and any role you create with `login` | Yes            | The role can read and change rows in `net.http_request_queue` and `net._http_response`. The worker sends each row in the queue. |
+| Role                                            | Can use pg_net | Reason                                                                                                                                                                                                                                                  |
+| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `anon`, `authenticated`, `service_role`         | No, by default | These roles can't connect to the database directly, and the Data API doesn't expose `net` by default. If you add `net` to the exposed schemas, these roles can read `net.http_request_queue` through the `PUBLIC` grants, including queued credentials. |
+| `postgres` and any role you create with `login` | Yes            | The role can read and change rows in `net.http_request_queue` and `net._http_response`. The worker sends each row in the queue.                                                                                                                         |
 
 On some projects, only specific roles can call `net.http_get` and `net.http_post`. A role you create can still add rows to the queue, and the worker sends them. To check a role, run the `has_function_privilege` query from [Check which roles have access](#check-which-roles-have-access).
 
