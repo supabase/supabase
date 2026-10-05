@@ -6,7 +6,6 @@ import CTABanner from 'components/CTABanner/index'
 import { Download } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
@@ -90,12 +89,12 @@ const Index = () => {
                     <h3 className="h3">Supabase Integrations</h3>
                     <p className="text-foreground-lighter text-sm">
                       When building a{' '}
-                      <Link
+                      <a
                         className="text-primary underline"
                         href="/docs/guides/platform/oauth-apps/build-a-supabase-integration"
                       >
                         Supabase Integration
-                      </Link>
+                      </a>
                       , use this "Connect Supabase" button to initiate the OAuth redirect.
                     </p>
                     <p className="text-foreground-lighter text-sm">

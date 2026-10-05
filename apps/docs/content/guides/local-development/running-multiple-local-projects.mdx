@@ -1,0 +1,285 @@
+---
+id: 'running-multiple-local-projects'
+title: 'Running multiple local projects'
+description: 'Run more than one local Supabase project on the same machine, one per app, git worktree, or named environment, with the experimental supabase stack commands.'
+subtitle: 'Run a local Supabase project for every app, git worktree, or environment on one machine'
+---
+
+This guide explains how to run more than one local Supabase project on one machine with the experimental `supabase stack` commands. Use it when you switch between apps, work in several git worktrees, run coding agents in parallel, or want separate `dev` and `test` environments for one app.
+
+In this guide, a local project is the set of Supabase services running on your machine for one app, the same thing `supabase start` gives you. Your app is your own code, in the directory where you ran `supabase init`.
+
+With the default ports, `supabase start` runs one local project per machine. Every app's generated `config.toml` uses the same ports, so a second local project fails with a port conflict. The `supabase stack` commands assign each local project its own ports and keep its data separate.
+
+This guide covers:
+
+- [How local projects stay isolated](#how-local-projects-stay-isolated) explains which directories, branches, and names get their own local project. Read it first if you use a monorepo or run several agents.
+- [Turn on the stack commands](#turn-on-the-stack-commands) and [Remove fixed ports from config.toml](#remove-fixed-ports-from-configtoml) are one-time setup for each app.
+- [Start a local project in each app directory or worktree](#start-a-local-project-in-each-app-directory-or-worktree) through [Stop and destroy local projects](#stop-and-destroy-local-projects) cover day-to-day use.
+- [Differences from the default `supabase start`](#differences-from-the-default-supabase-start) and [Limitations](#limitations) list what changes when you switch.
+
+<Admonition type="caution" title="Experimental">
+
+The `supabase stack` commands are experimental. Their flags and output can change between releases, and the CLI compatibility promise doesn't cover them. Local projects started with these commands keep their own data, separate from any local project started with the default `supabase start`.
+
+</Admonition>
+
+## How local projects stay isolated
+
+Every local project has an identity made from three parts:
+
+- **Project root**: the nearest directory, starting from your current directory and walking up, that contains `supabase/config.toml`. Without a config file, the project root is the current directory.
+- **Git branch**: if the project root is in a git repository, the current branch is part of the identity. The CLI reads it from the `.git` metadata, so git doesn't need to be installed.
+- **Name**: an optional name that you pass with `--stack`.
+
+Two local projects with different identities never share containers, processes, ports, database data, or Storage data. You get a separate local project for each:
+
+- App with its own `supabase/` directory
+- Git worktree, because each worktree is a different directory
+- Git branch, when you check out a different branch in the same directory
+- Name you pass with `--stack`, so one app can run `dev` and `test` side by side
+
+Everything else shares one local project. Packages in a monorepo get separate local projects only if each one has its own `supabase/` directory. Two packages under one `supabase/` directory share a local project. So do two coding agents working in the same checkout on the same branch. To isolate them, use separate git worktrees or different `--stack` names.
+
+Local projects for the same project root also share the project files in its `supabase/` directory. For example, Studio saves SQL snippets to `supabase/snippets`, so the `dev` and `test` local projects of one app see the same snippets.
+
+The CLI assigns ports for each local project from the range 20000 to 32767 and keeps them stable across restarts. Ports written in `config.toml` are used as written, so see [Remove fixed ports from config.toml](#remove-fixed-ports-from-configtoml) first.
+
+## Before you begin
+
+You need:
+
+- Supabase CLI v2.119.0 or later. See [Install and run the CLI](/docs/guides/local-development/cli/getting-started).
+- A container engine or a supported platform. The Docker runtime needs a running Docker or Podman engine, and is the recommended runtime for several local projects at the same time. The native runtime needs no container engine but runs only on macOS on Apple silicon and on Linux for `amd64` and `arm64`. See [Choose a runtime](#choose-a-runtime).
+- An app directory initialized with `supabase init`, or a directory without a `supabase/config.toml`. Without a config file, the local project starts with default settings and doesn't create a config file.
+
+## Turn on the stack commands
+
+The `supabase stack` commands exist only when the `[experimental] stack` setting is on. Without it, `supabase stack` commands fail with `Unknown subcommand "stack"`.
+
+1. In `supabase/config.toml` in your app directory, add `stack = true` under the existing `[experimental]` table. If your `config.toml` doesn't have an `[experimental]` table, add one:
+
+   ```toml
+   [experimental]
+   stack = true
+   ```
+
+   Don't add a second `[experimental]` table. A duplicate table makes `config.toml` invalid. The stack commands then stay off. Commands that read the config fail with `failed to load config`.
+
+   In a directory without a `config.toml`, set the environment variable instead:
+
+   ```bash
+   export SUPABASE_EXPERIMENTAL_STACK=1
+   ```
+
+2. Confirm that the commands are available:
+
+   ```bash
+   supabase stack --help
+   ```
+
+   The help starts with `Manage an experimental, unstable local Supabase stack`. If you see the general `Supabase CLI` help instead, the setting isn't on.
+
+With the setting on, `supabase start`, `supabase status`, and `supabase stop` run the stack commands. The rest of this guide uses those top-level commands. `supabase stack start`, `supabase stack status`, and `supabase stack stop` do the same thing. Commands that only exist under `supabase stack`, such as `list` and `destroy`, keep the prefix.
+
+The setting also routes the local targets of the `db`, `migration`, `test`, `gen`, `inspect`, `pull`, `storage`, `seed`, and `services` commands, and `functions serve`, to the stack.
+
+The environment variable takes precedence over the config file. Set `SUPABASE_EXPERIMENTAL_STACK=0` to use the default commands for one session without editing the file.
+
+## Remove fixed ports from config.toml
+
+`supabase init` writes fixed ports into `config.toml`. The CLI treats a port in the file as an exact request. Two local projects that both request port `54321` can't run at the same time.
+
+For a new app, run `init` with the setting turned on. The CLI writes `[experimental] stack = true` and leaves the port keys out:
+
+```bash
+SUPABASE_EXPERIMENTAL_STACK=1 supabase init
+```
+
+For an app that already has a `config.toml`, remove the port lines from each app that you want to run in parallel:
+
+1. Open `supabase/config.toml` in your app directory.
+2. Delete or comment out these keys:
+   - `port` under `[api]`, `[db]`, `[db.pooler]`, `[studio]`, `[local_smtp]`, and `[analytics]`
+   - `shadow_port` under `[db]`
+   - `inspector_port` under `[edge_runtime]`
+   - `smtp_port` and `pop3_port` under `[local_smtp]`, and `vector_port` under `[analytics]`, if you set them. `supabase init` writes the SMTP ports commented out.
+3. Save the file and commit it, so everyone on the team gets the same behavior.
+
+Remove the ports before the app's first `supabase start` with the setting on. A local project keeps the ports it was created with. If you already started one with the fixed ports, removing them afterward makes `supabase start` fail with `cannot change on the saved stack`. Start a new local project with a different `--stack` name, or run `supabase stack destroy` and start again. Destroying deletes the local project's data.
+
+The CLI also treats ports you set with an environment variable, such as `SUPABASE_API_PORT` or `SUPABASE_DB_PORT`, as exact requests. If another process already listens on that port, the start fails. When the port belongs to another local project, the error names that local project.
+
+## Start a local project in each app directory or worktree
+
+The following steps start two independent local projects from two app directories. The same steps work for git worktrees of one repository.
+
+1. Open a terminal in the first app directory and start its local project:
+
+   ```bash
+   supabase start
+   ```
+
+   When the local project is ready, the command prints `Stack is ready.` and a connection summary. The summary lists the API, REST, Functions, Studio, MCP, Mailpit, and database URLs, the publishable and secret keys, the state of each service, and the runtime.
+
+2. Open a second terminal in the other app directory or worktree and run the same command:
+
+   ```bash
+   supabase start
+   ```
+
+   The second local project gets its own ports and its own database. Both keep running after the commands return.
+
+3. Point each app at the Project URL of its own local project. The ports stay the same the next time you start it. To write the URLs and keys to a dotenv file, see [Find a local project's endpoints and keys](#find-a-local-projects-endpoints-and-keys).
+
+The first start in each runtime takes longer. By default, the command downloads or pulls every enabled service before it returns. Later starts reuse the cache. To defer each download until the service's first request, pass `--preparation on-demand`.
+
+Postgres starts right away. Other services start on their first request. By default, they stop again after 60 seconds idle, and Studio after 5 minutes. Functions doesn't stop on its own. A service also stays up while a running service depends on it, such as pgmeta while Studio runs. To start every enabled service before the command returns and turn off idle stops, pass `--eager`.
+
+To leave services out, pass `--exclude` with one or more of `rest`, `auth`, `realtime`, `storage`, `functions`, `studio`, `mail`, `analytics`, and `pooler`:
+
+```bash
+supabase start --exclude studio,mail
+```
+
+The database can't be excluded. Studio needs the REST API, so to exclude `rest`, exclude `studio` too. Excluding `studio` also removes the MCP server, because Studio serves `/mcp`.
+
+Running `supabase start` again on a running local project keeps its current settings and prints `Stack is already running with its current services`. To apply a change to `config.toml`, `--exclude`, or `--eager`, stop the local project and start it again. Starting without `--exclude` restores the services enabled in `config.toml`.
+
+Stopping and starting doesn't apply changes to ports or to the Postgres major version. For those, start a new local project with a different `--stack` name, or run `supabase stack destroy` and start again.
+
+## Run named local projects for one app
+
+One app can run several local projects by name. This keeps a destructive test run away from your development data.
+
+1. Start a `dev` local project:
+
+   ```bash
+   supabase start --stack dev
+   ```
+
+2. Start a `test` local project in the same directory:
+
+   ```bash
+   supabase start --stack test
+   ```
+
+3. Pass the same `--stack` name to `supabase status`, `supabase stop`, and `supabase stack destroy` to target that local project later.
+
+A local project started without `--stack` is the app directory's default local project. Named local projects and the default one are independent of each other.
+
+The `db`, `migration`, and other database commands don't accept `--stack`. When they run against a local database, they use the default local project for the current branch. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project from a command that accepts `--db-url`, pass the `DB_URL` from `supabase status --stack <name> --env`. See [Limitations](#limitations).
+
+## Find a local project's endpoints and keys
+
+Ports differ between local projects, so don't assume the defaults from the CLI documentation. To see the URLs, keys, and service states of a local project, run this in its app directory:
+
+```bash
+supabase status
+```
+
+Pass `--stack <name>` for a named local project. The local database password is `postgres`, so the database URL in the output works with `psql` and `--db-url`.
+
+To export the connection details as environment variables, pass `--env`:
+
+```bash
+supabase status --env --output-format text > .env.local
+```
+
+The file includes `API_URL`, `DB_URL`, `PUBLISHABLE_KEY`, `SECRET_KEY`, `ANON_KEY`, and `SERVICE_ROLE_KEY`, plus the URLs of the other available services. To match the variable names your framework expects, pass `--override-name`:
+
+```bash
+supabase status --env --override-name API_URL=NEXT_PUBLIC_SUPABASE_URL,ANON_KEY=NEXT_PUBLIC_SUPABASE_ANON_KEY
+```
+
+For scripts and agents, request JSON from `supabase start` or `supabase status`:
+
+```bash
+supabase start --output-format json
+```
+
+The `start` JSON includes the local project's `id`, its `runtime`, `lazy_services` that start on their first request, and the same `env` map that `--env` exports. Its `endpoints` object is keyed by service and endpoint, such as `database.sql`, and each entry has a `protocol`, `address`, `port`, and `url`.
+
+To list every local project on the machine, across all apps, run:
+
+```bash
+supabase stack list
+```
+
+The list shows each local project's name, project root, branch, runtime, and a short ID. Pass `--output-format json` to get the full ID that `--stack-id` accepts.
+
+To stream live logs from a local project, run `supabase stack logs`. Pass `--service database` to limit the output to one service.
+
+## Choose a runtime
+
+A local project runs in the Docker runtime or the native runtime. The Docker runtime runs each service in a container, with Docker or Podman. The native runtime runs each service as a process on your machine, with no container engine. It runs on macOS on Apple silicon and on Linux `amd64` and `arm64`. Both runtimes run the same services.
+
+For several local projects on one machine, use Docker. Containers give each local project its own network namespace and file system. Native local projects share the host's process table and file locks. Use the native runtime where no container engine is available, such as coding agent sandboxes and CI runners.
+
+When you don't pass `--runtime`, a new local project uses Docker if the Docker daemon responds, then Podman, then native on supported platforms. Having the `docker` command installed isn't enough. The runtime is fixed for the life of a local project. For details, platform requirements, and what the native runtime downloads, see [Docker and native runtimes](/docs/guides/local-development/docker-and-native-runtimes).
+
+## Stop and destroy local projects
+
+Stopping a local project keeps its data and ports. Destroying it deletes its data.
+
+To stop the app directory's default local project, run this in that directory:
+
+```bash
+supabase stop
+```
+
+To stop a named local project, pass its name:
+
+```bash
+supabase stop --stack test
+```
+
+To stop every local project on the machine, across all apps, pass `--all`. If any local project fails to stop, the command exits with an error that lists the failed local projects:
+
+```bash
+supabase stack stop --all
+```
+
+To permanently delete one local project and its data, run `supabase stack destroy`. The command asks for confirmation. Pass `--yes` to skip the prompt in scripts:
+
+```bash
+supabase stack destroy --stack test --yes
+```
+
+<Admonition type="danger">
+
+`supabase stack destroy` deletes the local project's database data and frees its ports. There is no backup and no undo. There is also no bulk destroy, so one command removes one local project.
+
+</Admonition>
+
+`destroy` keeps two kinds of data:
+
+- Storage upload files, which live in your app at `supabase/.temp/stack-uploads/<id>/`. Delete that directory to remove them.
+- Container engine resources, if Docker or Podman isn't running. The command can still remove the local project's registration if no process for it is still running and your user can delete its database files on the host. It then prints cleanup commands to run after the engine starts again. Otherwise it fails, keeps the local project, and asks you to start the engine and retry. Your user might not be able to delete database files that a container wrote to a host directory. Local projects created with Docker version 25 or earlier store data that way.
+
+If the local project stores its database data in a Docker volume, other local projects share that volume. The printed cleanup command deletes only this local project's data from it. Don't delete the volume itself.
+
+## Differences from the default `supabase start`
+
+Keep these differences in mind when you turn the setting on for an app that used the default `supabase start`:
+
+- Local projects started this way keep separate data. Turning on the setting doesn't copy the database from a local project you started with the default `supabase start`. It also doesn't stop that local project.
+- `supabase stop --no-backup` and `supabase stop --project-id` aren't available. Use `supabase stack destroy` to remove data and `supabase stack stop --all` to stop every local project.
+- The `-o` and `--output` flags aren't available. Use `--output-format` instead, and `--env` in place of `-o env`.
+- `functions serve` needs a running local project. Start one with `supabase start` first.
+
+## Limitations
+
+- Some `config.toml` settings aren't supported. `supabase start` fails with a message that names the setting. The unsupported settings are:
+  - `api.tls`
+  - The Analytics GCP settings, and Analytics backends other than Postgres
+  - Custom Auth email templates with `content_path`
+  - Storage Analytics and Storage vector buckets
+  - A custom `edge_runtime.deno_version`
+  - OrioleDB, and `db.major_version` values other than 15 and 17
+- Database commands don't accept `--stack`. `supabase db reset` and `supabase db diff` run against the current branch's default local project. `supabase db pull`, `supabase db push`, and `supabase db dump` target the linked project unless you pass `--local`. To reach a named local project, pass the `DB_URL` from `supabase status --stack <name> --env` to a command that accepts `--db-url`.
+- Switching branches switches local projects. The git branch is part of the identity. After you check out another branch in the same directory, `supabase start` creates or resumes a different local project with its own data. The first branch's local project keeps running until you stop it.
+- Moving or renaming an app directory creates a new local project, because the identity includes the project root path. The previous local project's data stays until you destroy it.
+- `supabase stack logs` streams new log lines only. It has no history.
+
+<ContentListings id="local-development-parallel-projects-learn-more" />
