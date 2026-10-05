@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { TooltipProvider } from 'ui'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
+import { MCP_CLIENT_GROUPS } from './clients.data'
+import { MCP_CLIENTS } from './mcpClients'
 import { McpConfigPanel } from './McpConfigPanel'
 
 const props = {
@@ -76,5 +78,48 @@ describe('McpConfigPanel opt-out transitions', () => {
 
     fireEvent.click(screen.getByRole('option', { name: new RegExp(`^${feature}`) }))
     expect(container.textContent).not.toContain('skip_elicitations=')
+  })
+})
+
+describe('MCP client key lookup parity', () => {
+  it('renders every client across groups (map preserves find behavior)', () => {
+    const { container } = render(<McpConfigPanel {...props} />, {
+      wrapper: TooltipProvider,
+    })
+    // open the client dropdown: the trigger button shows the selected client label
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(MCP_CLIENTS[0].label) }))
+    for (const group of MCP_CLIENT_GROUPS) {
+      expect(container.textContent).toContain(group.heading)
+    }
+    const labels = MCP_CLIENTS.map((c) => c.label)
+    expect(new Set(labels).size).toBe(MCP_CLIENTS.length)
+    for (const label of labels) {
+      expect(screen.getAllByText(label).length).toBeGreaterThanOrEqual(1)
+    }
+  })
+
+  it('switches selected client on known key', () => {
+    const onClientSelect = vi.fn()
+    render(<McpConfigPanel {...props} onClientSelect={onClientSelect} />, {
+      wrapper: TooltipProvider,
+    })
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(MCP_CLIENTS[0].label) }))
+    fireEvent.click(screen.getByText(MCP_CLIENTS[1].label))
+    expect(onClientSelect).toHaveBeenLastCalledWith(MCP_CLIENTS[1])
+  })
+
+  it('ignores unknown client key (no crash, selection unchanged)', () => {
+    const onClientSelect = vi.fn()
+    render(<McpConfigPanel {...props} onClientSelect={onClientSelect} />, {
+      wrapper: TooltipProvider,
+    })
+    fireEvent.click(screen.getByRole('button', { name: new RegExp(MCP_CLIENTS[0].label) }))
+    // search text matching nothing: exercises the `if (client)` guard path —
+    // before fix .find returns undefined → ignored; after fix .get returns undefined → ignored
+    const search = screen.getByPlaceholderText('Search...')
+    fireEvent.change(search, { target: { value: 'no-such-client-xyz' } })
+    expect(screen.getByText('No results found.')).toBeTruthy()
+    fireEvent.keyDown(search, { key: 'Enter' })
+    expect(onClientSelect).toHaveBeenLastCalledWith(MCP_CLIENTS[0])
   })
 })

@@ -25,11 +25,14 @@ import { MCP_CLIENTS } from './mcpClients'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl, type McpSkipElicitation } from './utils/getMcpUrl'
 
+const MCP_CLIENT_BY_KEY = new Map<string, (typeof MCP_CLIENTS)[number]>(
+  MCP_CLIENTS.map((c) => [c.key, c])
+)
 const CLIENT_GROUPS = MCP_CLIENT_GROUPS.map((group) => ({
   heading: group.heading,
   clients: group.keys
-    .map((key) => MCP_CLIENTS.find((c) => c.key === key))
-    .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
+    .map((key) => MCP_CLIENT_BY_KEY.get(key))
+    .filter((c): c is (typeof MCP_CLIENTS)[number] => c !== undefined),
 }))
 
 export interface McpConfigPanelProps {
@@ -108,7 +111,7 @@ export function McpConfigPanel({
   })
 
   const handleClientChange = (clientKey: string) => {
-    const client = MCP_CLIENTS.find((c) => c.key === clientKey)
+    const client = MCP_CLIENT_BY_KEY.get(clientKey)
     if (client) {
       setSelectedClient(client)
     }
