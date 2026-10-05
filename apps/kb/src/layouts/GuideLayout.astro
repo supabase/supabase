@@ -1,5 +1,5 @@
 ---
-import { Github } from 'lucide-react'
+import { ExternalLink, Github } from 'lucide-react'
 import { Badge } from 'ui'
 
 import Layout from './Layout.astro'
@@ -10,9 +10,10 @@ interface Props {
 	description?: string
 	topics?: Topic[]
 	github_url?: string
+	editLink?: string
 }
 
-const { title, description, topics = [], github_url } = Astro.props
+const { title, description, topics = [], github_url, editLink } = Astro.props
 ---
 
 <Layout title={title} description={description}>
@@ -41,6 +42,20 @@ const { title, description, topics = [], github_url } = Astro.props
 						<Github size={16} /> Go to the GitHub discussion
 					</a>
 				</p>
+			)
+		}
+		{
+			editLink && (
+				<footer class="mt-16 not-prose">
+					<a
+						href={editLink}
+						target="_blank"
+						rel="noreferrer noopener edit"
+						class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
+					>
+						Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+					</a>
+				</footer>
 			)
 		}
 	</article>
