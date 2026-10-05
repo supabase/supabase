@@ -267,6 +267,7 @@ export const PlanUpdateSidePanel = () => {
       selectedOrganization={selectedOrganization}
       variant={presentation}
       entryDelay={isFullScreen ? contentDelay : undefined}
+      showAwsMarketplacePurchase={isPlanPresentationEligible}
       onSelectTier={setSelectedTier}
     />
   )

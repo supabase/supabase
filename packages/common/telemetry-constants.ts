@@ -1468,7 +1468,7 @@ export interface SqlEditorQueryRunButtonClickedEvent {
 }
 
 /**
- * User clicked on the "Cancel Subscription" Button on the billing settings page.
+ * User clicked on the "Cancel subscription" Button on the billing settings page.
  *
  * @group Events
  * @source studio

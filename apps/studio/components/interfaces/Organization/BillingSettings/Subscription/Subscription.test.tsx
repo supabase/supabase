@@ -5,9 +5,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Subscription from './Subscription'
 import { render } from '@/tests/helpers'
 
-const { mockSubscription, mockSetPanelKey } = vi.hoisted(() => ({
+const { mockSubscription, mockSetPanelKey, mockSelectedOrganization } = vi.hoisted(() => ({
   mockSubscription: vi.fn(),
   mockSetPanelKey: vi.fn(),
+  mockSelectedOrganization: vi.fn(),
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -25,6 +26,12 @@ vi.mock('@/data/subscriptions/org-subscription-query', () => ({
 
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+}))
+
+vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
+  useSelectedOrganizationQuery: () => ({
+    data: mockSelectedOrganization(),
+  }),
 }))
 
 vi.mock('@/state/organization-settings', () => ({
@@ -47,6 +54,7 @@ vi.mock('./PlanUpdateSidePanel', () => ({
 
 describe('Subscription', () => {
   beforeEach(() => {
+    mockSelectedOrganization.mockReturnValue({ managed_by: 'supabase' })
     mockSubscription.mockReturnValue({
       data: {
         plan: { id: 'free', name: 'Free' },
@@ -70,6 +78,20 @@ describe('Subscription', () => {
     expect(mockSetPanelKey).toHaveBeenCalledWith('subscriptionPlan')
   })
 
+  it('links to Compare plans and AWS Marketplace under More information', () => {
+    render(<Subscription />)
+
+    expect(screen.getByText('More information')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Compare plans/ })).toHaveAttribute(
+      'href',
+      'https://supabase.com/pricing#compare-plans'
+    )
+    expect(screen.getByRole('link', { name: /AWS Marketplace/ })).toHaveAttribute(
+      'href',
+      'https://supabase.com/aws-marketplace'
+    )
+  })
+
   it('shows the support fallback when plan changes are not available', () => {
     mockSubscription.mockReturnValue({
       data: {
@@ -88,5 +110,7 @@ describe('Subscription', () => {
       screen.queryByRole('button', { name: 'Change subscription plan' })
     ).not.toBeInTheDocument()
     expect(screen.getByText('Unable to update plan from Enterprise')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /AWS Marketplace/ })).not.toBeInTheDocument()
   })
 })
