@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@shadcn/lint": "0.1.5",
@@ -15,6 +16,8 @@
     "eslint-config-next": "^16.0.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-config-turbo": "^2.5.0",
-    "typescript": "catalog:"
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   }
 }
