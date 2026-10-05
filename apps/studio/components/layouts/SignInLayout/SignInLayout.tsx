@@ -42,6 +42,12 @@ type SignInLayoutProps = {
    * ("Sign in" vs "Sign up").
    */
   inboundFlow?: 'sign-in' | 'sign-up'
+  /**
+   * Set only on pages wrapped in `AuthenticationLayout`, which is the only place that actually
+   * mounts the status banner above this layout. Elsewhere there's nothing rendered to reserve
+   * space for, so the nav shouldn't shift down even if an incident is ongoing.
+   */
+  hasStatusBanner?: boolean
 }
 
 const TermsText = () => (
@@ -59,13 +65,14 @@ export const SignInLayout = ({
   showDisclaimer = true,
   logoLinkToMarketingSite = false,
   inboundFlow,
+  hasStatusBanner = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
   const statusBanner = useStatusBanner({ signedOut: true })
-  const showIncidentBanner = statusBanner.type !== 'hidden'
+  const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
 
   const { destination, focusProvider } = useInboundBranding(inboundFlow)
   const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
