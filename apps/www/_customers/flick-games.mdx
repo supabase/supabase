@@ -31,9 +31,9 @@ supabase_products: ['database', 'auth']
 ---
 
 <Quote img="ian-masters-flick.jpg" caption="Ian Masters, Founder and CEO, Flick Games">
-  When you run a game as a service, you worry about what's going to break while you're not at
-  work, over a weekend or on holiday. Just knowing how battle-tested Supabase is takes a level of
-  stress off.
+  When you run a game as a service, you worry about what's going to break while you're not at work,
+  over a weekend or on holiday. Just knowing how battle-tested Supabase is takes a level of stress
+  off.
 </Quote>
 
 [Flick](https://flick.games) is an indie games studio based in the UK. Ian Masters, the studio's founder, has been making video games for close to three decades. Alongside engineer Alan Thomson, he now runs two live products on Supabase: Art of Solitaire, a card game on iOS, Android, and Steam Early Access, and Goalman, a very silly penalty shootout browser game that launched in time for the World Cup.
@@ -45,8 +45,8 @@ Art of Solitaire has built an audience that differs from the typical solitaire c
 Before landing on its current setup, Flick pieced together a different backend service for each platform, and none of them held up. Google Play Game Services and Game Center covered authentication on mobile, but treated Android and iOS as separate identities entirely, with no way to recognize the same player moving between them.
 
 <Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
-  Android users could only authenticate on Android. If they also had an iOS device, tough. We
-  don't know that they're the same person, and that's a pretty big problem.
+  Android users could only authenticate on Android. If they also had an iOS device, tough. We don't
+  know that they're the same person, and that's a pretty big problem.
 </Quote>
 
 Flick used ChilliConnect for backups and save data until Unity acquired it and shut the service down, forcing a move. The team evaluated Firebase, but it didn't fit how they worked, so they settled on each platform's native option: iCloud on iOS and Google Play on Android. That held up while Flick was mobile-only, but it was never cross-platform, and once Steam arrived as a third platform it stopped making sense.
@@ -72,10 +72,10 @@ Art of Solitaire's authentication now runs on a passwordless email flow through 
 Rather than adopt a separate SDK for each platform, Flick built one lightweight Lua wrapper around Supabase's REST endpoints and reused it across iOS, Android, and Steam, so adding a platform never means maintaining another SDK in parallel.
 
 <Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
-  Supabase having REST endpoints is massive. There are some tools where they're SDK only, and
-  that's problematic when you're cross-platform, because you're suddenly managing two, three, four
-  SDKs, and they're not always kept in sync. Whereas REST endpoints with our Lua code base means we
-  just write a very lightweight wrapper and we're done. It's very easy for us to expand to other
+  Supabase having REST endpoints is massive. There are some tools where they're SDK only, and that's
+  problematic when you're cross-platform, because you're suddenly managing two, three, four SDKs,
+  and they're not always kept in sync. Whereas REST endpoints with our Lua code base means we just
+  write a very lightweight wrapper and we're done. It's very easy for us to expand to other
   platforms.
 </Quote>
 
