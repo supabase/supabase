@@ -31,6 +31,7 @@ import {
   redirect,
   Scripts,
   type AnyRouter,
+  type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -308,7 +309,7 @@ function NotFound() {
   return <Error404 />
 }
 
-function ErrorBoundaryRoute({ error }: { error: Error }) {
+function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // Mirrors `errorBoundaryHandler` above (used by the in-tree
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
@@ -321,7 +322,7 @@ function ErrorBoundaryRoute({ error }: { error: Error }) {
         ;(error as Error & { sentryId?: string }).sentryId = eventId
       }
     })
-    console.error(error.stack)
+    console.error(error instanceof Error ? error.stack : error)
   }, [error])
 
   return <Error500 />
@@ -419,6 +420,8 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
   return (
     // suppressHydrationWarning is for next-themes: it writes data-theme and
     // color-scheme onto <html> from localStorage pre-hydration, which the
@@ -429,19 +432,21 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[
-            {
-              name: 'TanStack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            {
-              name: 'TanStack Query',
-              render: <ReactQueryDevtoolsPanel />,
-            },
-          ]}
-        />
+        {!isTestEnv && (
+          <TanStackDevtools
+            config={{ position: 'bottom-right' }}
+            plugins={[
+              {
+                name: 'TanStack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              {
+                name: 'TanStack Query',
+                render: <ReactQueryDevtoolsPanel />,
+              },
+            ]}
+          />
+        )}
         <Scripts />
       </body>
     </html>

@@ -430,6 +430,8 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
     groups: 'groups' in event ? { ...event.groups } : {},
   }
 
+  if (event.action.startsWith('explorer_')) body.page_title = 'Explorer'
+
   if (body.groups?.project === 'Unknown') {
     delete body.groups.project
     if (body.groups?.organization === 'Unknown') {

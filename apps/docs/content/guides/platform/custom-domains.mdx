@@ -102,6 +102,7 @@ Before you activate your domain, prepare your applications and integrations for 
 - Supabase Auth will use the custom domain immediately once activated.
   - OAuth flows will advertise the custom domain as a callback URL.
   - SAML will use the custom domain instead. This means that the `EntityID` of your project has changed, and this may cause SAML with existing identity providers to stop working.
+- MCP servers that use Supabase Auth need `authorizationServer` set explicitly to the project Auth issuer, not the custom domain. See [Use a custom domain](/docs/guides/ai-tools/byo-mcp#use-a-custom-domain) in the BYO-MCP guide.
 
 To prevent issues for your users, follow these steps:
 

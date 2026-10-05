@@ -25,29 +25,29 @@ export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
 
 export const DUCKLAKE_CATALOG_PROJECT_FIELD_COPY = {
   label: 'Catalog project',
-  description:
-    "Pipelines connects to this project's Postgres instance to store the DuckLake catalog.",
+  description: 'Postgres project that stores this DuckLake’s metadata.',
 } as const
 
 export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
   label: 'Storage project',
-  description: 'The project whose object storage holds the DuckLake data files.',
+  description: 'Supabase project that stores the DuckLake data files.',
 } as const
 
 export const DUCKLAKE_BUCKET_FIELD_COPY = {
   label: 'Bucket',
-  description: 'The bucket in which DuckLake data files will be stored.',
+  description: 'Files bucket for DuckLake data.',
 } as const
 
 export const DUCKLAKE_CATALOG_URL_FIELD_COPY = {
   label: 'Catalog URL',
-  createDescription: 'A Postgres connection string for the DuckLake catalog.',
+  createDescription:
+    'Postgres URL for an existing database. Add TLS settings to the URL if required.',
   editDescription: 'Stored catalog URL is hidden. Enter a new URL to replace it.',
 } as const
 
 export const DUCKLAKE_DATA_PATH_FIELD_COPY = {
   label: 'Data path',
-  description: 'An S3 path where DuckLake data files will be written.',
+  description: 'S3 path for DuckLake data files.',
 } as const
 
 export const SNOWFLAKE_ACCOUNT_ID_FIELD_COPY = {
@@ -66,16 +66,16 @@ export const SNOWFLAKE_SCHEMA_FIELD_COPY = {
 } as const
 
 export const CLICKHOUSE_URL_FIELD_COPY = {
-  label: 'HTTPS URL',
-  description: 'The HTTPS endpoint for your ClickHouse server, including port.',
+  label: 'HTTPS endpoint',
+  description: 'Public ClickHouse HTTPS endpoint, including port.',
 } as const
 
 export const CLICKHOUSE_DATABASE_FIELD_COPY = {
   label: 'Database',
-  description: 'The ClickHouse database where replicated tables will be created.',
+  description: 'ClickHouse database where replicated tables are created.',
 } as const
 
 export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
-  description: 'Defaults to ReplacingMergeTree.',
+  description: 'Controls how ClickHouse stores and queries replicated changes.',
 } as const

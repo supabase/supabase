@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { Table, TableBody } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationRow as DestinationRowComponent } from './DestinationRow'
@@ -68,12 +69,13 @@ const addDestinationMock = () =>
       }),
   })
 
-const addPipelinesMock = () =>
+const addPipelinesMock = (waitForResponse?: Promise<void>) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () =>
-      HttpResponse.json<ReplicationPipelinesResponse>({
+    response: async () => {
+      await waitForResponse
+      return HttpResponse.json<ReplicationPipelinesResponse>({
         pipelines: [
           {
             id: PIPELINE_ID,
@@ -89,7 +91,8 @@ const addPipelinesMock = () =>
             },
           },
         ],
-      }),
+      })
+    },
   })
 
 const addPipelineStatusMock = (statusName: ReplicationPipelineStatusResponse['status']['name']) =>
@@ -144,6 +147,38 @@ describe('DestinationRow', () => {
     addReplicationStatusMock(0)
     addVersionMock()
   }
+
+  test('shows the destination before its pipeline details load', async () => {
+    let finishPipelineRequest = () => {}
+    const pendingPipeline = new Promise<void>((resolve) => {
+      finishPipelineRequest = resolve
+    })
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock(pendingPipeline)
+    addPipelineStatusMock('started')
+    addReplicationStatusMock(0)
+    addVersionMock()
+
+    customRender(
+      <Table>
+        <TableBody>
+          <DestinationRow destinationId={DESTINATION_ID} />
+        </TableBody>
+      </Table>
+    )
+
+    const row = (await screen.findByText('My BigQuery Destination')).closest('tr')
+    expect(row).toBeInTheDocument()
+    expect(row).not.toHaveAttribute('tabindex')
+    expect(screen.queryByRole('button', { name: 'Pipeline options' })).not.toBeInTheDocument()
+
+    await act(async () => finishPipelineRequest())
+
+    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
+    expect(row).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('button', { name: 'Pipeline options' })).toBeInTheDocument()
+  })
 
   test('waits for asynchronous shutdown before deleting the pipeline', async () => {
     addAllMocks()
