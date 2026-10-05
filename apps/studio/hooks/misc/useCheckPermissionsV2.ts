@@ -168,11 +168,11 @@ export function useAsyncCheckUserContentPermissions(
   content:
     | {
         mode: 'create'
-        type: 'report' | 'sql' | 'log_sql'
+        type: 'report' | 'sql' | 'log_sql' | 'notebook'
       }
     | {
         mode: 'existing'
-        type: 'report' | 'sql' | 'log_sql'
+        type: 'report' | 'sql' | 'log_sql' | 'notebook'
         visibility: 'project' | 'user' | 'public' | 'org'
         ownerId: number
         subjectId?: number
