@@ -74,8 +74,8 @@ function getBannerDescription({
  * in-progress maintenance, or upcoming maintenance, in that priority order.
  * Replaces the legacy StatusPageBanner while `incidentIoStatusPage` is on.
  */
-export const StatusBanner = () => {
-  const state = useStatusBanner()
+export const StatusBanner = ({ signedOut = false }: { signedOut?: boolean } = {}) => {
+  const state = useStatusBanner({ signedOut })
 
   if (state.type === 'hidden') return null
 

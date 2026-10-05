@@ -22,7 +22,10 @@ const LogsAllDeprecationExpiry = dayjs('2026-09-24T00:00:00Z')
 // setTimeout overflows above ~24.8 days; re-arm until the real expiry.
 const MAX_TIMEOUT_MS = 2_147_483_647
 
-export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
+export const AppBannerWrapper = ({
+  children,
+  signedOut = false,
+}: PropsWithChildren<{ signedOut?: boolean }>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
   const useStatusPageWidget = useFlag('incidentIoStatusPage')
@@ -119,7 +122,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="flex flex-col">
       <div className="shrink-0">
-        {useStatusPageWidget ? <StatusBanner /> : <StatusPageBanner />}
+        {useStatusPageWidget ? <StatusBanner signedOut={signedOut} /> : <StatusPageBanner />}
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}
