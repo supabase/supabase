@@ -953,8 +953,16 @@ function extractServiceLabelFromSql(sql: string): string | null {
 
 export function buildLogsPrompt(
   rows: LogExportData[],
-  queryType?: string,
-  sqlQuery?: string
+  {
+    queryType,
+    sqlQuery,
+    omittedCount = 0,
+  }: {
+    queryType?: string
+    sqlQuery?: string
+    /** Matching logs left out of `rows`, noted after the entries (e.g. a preview of the latest few) */
+    omittedCount?: number
+  } = {}
 ): string {
   const serviceLabel =
     (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
@@ -963,9 +971,14 @@ export function buildLogsPrompt(
   const sqlContext = sqlQuery ? `\n\n**Query used:**\n\`\`\`sql\n${sqlQuery.trim()}\n\`\`\`` : ''
   const header = `I have ${rows.length} Supabase log entr${rows.length === 1 ? 'y' : 'ies'}${serviceContext} I'd like help debugging:\n\n`
   const body = formatLogsAsMarkdown(rows)
+  const omittedContext =
+    omittedCount > 0
+      ? `\n\n+${omittedCount.toLocaleString('en-US')} more matching log entr${omittedCount === 1 ? 'y' : 'ies'} not included.`
+      : ''
   return (
     header +
     body +
+    omittedContext +
     sqlContext +
     '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
   )
