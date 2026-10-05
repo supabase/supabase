@@ -18,7 +18,7 @@ vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
-    useFlag: (name: string) => mockUseFlag(name),
+    useFlag: mockUseFlag,
   }
 })
 
@@ -104,6 +104,18 @@ describe('ThemeColorSettings', () => {
 
     expect(screen.queryByRole('slider', { name: 'Spot color' })).not.toBeInTheDocument()
     expect(screen.getByRole('slider', { name: 'Surface tint' })).toBeInTheDocument()
+  })
+
+  it('cancels a queued hue preview when the flag turns off', async () => {
+    const { rerender } = customRender(<ThemeColorSettings />)
+    fireEvent.click(screen.getByRole('slider', { name: 'Spot color' }))
+
+    mockUseFlag.mockReturnValue(false)
+    rerender(<ThemeColorSettings />)
+
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+    expect(document.documentElement.style.getPropertyValue('--primary-hue')).toBe('')
+    expect(screen.queryByRole('slider', { name: 'Spot color' })).not.toBeInTheDocument()
   })
 
   it('resets the active mode', () => {

@@ -1,7 +1,8 @@
 import { useFlag } from 'common'
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Button, CardContent, cn, Slider } from 'ui'
 
+import { sliderTrackStyle } from './ThemeColorSettings.utils'
 import { useThemeOverrides } from '@/hooks/misc/useThemeOverrides'
 import {
   APPEARANCE_SPOT_COLOR_FLAG,
@@ -14,18 +15,9 @@ import {
   THEME_OVERRIDE_KNOBS,
   ThemeOverrideKey,
   ThemeOverrideKnob,
-  ThemeOverrideMode,
   ThemeOverrides,
   themeOverrideToSliderValue,
 } from '@/lib/theme-overrides'
-
-/** Full-hue OKLCH spectrum for the spot color track. */
-const HUE_SPECTRUM_TRACK =
-  'linear-gradient(to right, oklch(0.7 0.14 0), oklch(0.7 0.14 60), oklch(0.7 0.14 120), oklch(0.7 0.14 180), oklch(0.7 0.14 240), oklch(0.7 0.14 300), oklch(0.7 0.14 360))'
-
-type SliderTrackStyle = CSSProperties & {
-  '--slider-track-fill': string
-}
 
 const PRIMARY_SWATCHES = [
   { label: 'Solid', variable: '--primary-solid' },
@@ -36,48 +28,10 @@ const PRIMARY_SWATCHES = [
 // `background` shorthand (not transparent + background-image) avoids a dark
 // hairline at rounded caps in dark mode.
 const SPECTRUM_SLIDER_CLASS = cn(
+  // eslint-disable-next-line shadcn/no-arbitrary-values -- Dynamic theme preview gradient uses the background shorthand for rounded caps.
   '[&_[data-slot=slider-track]]:[background:var(--slider-track-fill)]',
   '[&_[data-slot=slider-range]]:invisible'
 )
-
-function sliderTrackStyle(
-  key: ThemeOverrideKey,
-  mode: ThemeOverrideMode
-): SliderTrackStyle | undefined {
-  switch (key) {
-    case 'primaryHue':
-      return { '--slider-track-fill': HUE_SPECTRUM_TRACK }
-    case 'chroma':
-      // Grey → tinted at the live surface hue (follows spot via CSS offset).
-      return {
-        '--slider-track-fill':
-          mode === 'dark'
-            ? 'linear-gradient(to right, oklch(0.4 0 var(--surface-hue)), oklch(0.4 0.07 var(--surface-hue)))'
-            : 'linear-gradient(to right, oklch(0.9 0 var(--surface-hue)), oklch(0.9 0.05 var(--surface-hue)))',
-      }
-    case 'contrast':
-      return {
-        '--slider-track-fill':
-          mode === 'dark'
-            ? 'linear-gradient(to right, oklch(0.35 0 0), oklch(0.9 0 0))'
-            : 'linear-gradient(to right, oklch(0.82 0 0), oklch(0.2 0 0))',
-      }
-    case 'surface':
-      // Chroma 0 at the ends avoids out-of-gamut flashes at the caps.
-      return {
-        '--slider-track-fill':
-          'linear-gradient(to right, oklch(0.14 0 0), oklch(0.5 0.015 var(--surface-hue)), oklch(0.97 0 0))',
-      }
-    case 'elevationStep':
-      // Flat → stronger lift between layers (smooth ramp, not hard bands).
-      return {
-        '--slider-track-fill':
-          mode === 'dark'
-            ? 'linear-gradient(to right, oklch(0.28 0 var(--surface-hue)), oklch(0.55 0 var(--surface-hue)))'
-            : 'linear-gradient(to right, oklch(0.92 0 var(--surface-hue)), oklch(0.99 0 var(--surface-hue)))',
-      }
-  }
-}
 
 export const ThemeColorSettings = () => {
   const isSpotColorEnabled = useFlag(APPEARANCE_SPOT_COLOR_FLAG)
@@ -87,9 +41,11 @@ export const ThemeColorSettings = () => {
   const draftRef = useRef<ThemeOverrides>({})
   const interactionRafRef = useRef<number | null>(null)
   const pendingPreviewRef = useRef<{ knob: ThemeOverrideKnob; raw: number } | null>(null)
+  const isSpotColorEnabledRef = useRef(isSpotColorEnabled)
   const modeRef = useRef(mode)
   const overridesRef = useRef(visibleOverrides)
 
+  isSpotColorEnabledRef.current = isSpotColorEnabled
   modeRef.current = mode
   overridesRef.current = visibleOverrides
 
@@ -123,11 +79,15 @@ export const ThemeColorSettings = () => {
       setDraft(draftRef.current)
       const pending = pendingPreviewRef.current
       if (pending === null) return
+      if (pending.knob.key === 'primaryHue' && !isSpotColorEnabledRef.current) return
       previewThemeOverride(pending.knob, modeRef.current, pending.raw)
     })
   }, [])
 
-  useEffect(() => flushDraft({}), [mode, flushDraft])
+  useEffect(() => {
+    flushDraft({})
+    applyThemeOverrides(document.documentElement, modeRef.current, overridesRef.current)
+  }, [mode, isSpotColorEnabled, flushDraft])
 
   useEffect(
     () => () => {
