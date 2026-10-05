@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -21,12 +20,12 @@ import {
   isView,
   TableLike,
 } from '@/data/table-editor/table-editor-types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface TableGridEditorProps {
   isLoadingSelectedTable?: boolean
@@ -51,14 +50,8 @@ export const TableGridEditor = ({
 
   const [selectedView] = useQueryState('view', parseAsString.withDefault('data'))
 
-  const { can: canEditTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
-  )
-  const { can: canEditColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
-  )
+  const { can: canEditTables } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
+  const { can: canEditColumns } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
   const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))

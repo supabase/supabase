@@ -13,7 +13,7 @@ import {
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const useNewQuery = () => {
   const router = useRouter()
@@ -22,8 +22,9 @@ export const useNewQuery = () => {
   const { data: project } = useSelectedProjectQuery()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'sql' }
   )
 
   const newQuery = async (sql: string, name: string, shouldRedirect: boolean = true) => {

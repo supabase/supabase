@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { differenceInDays } from 'date-fns'
 import { MoreVertical, TrashIcon } from 'lucide-react'
 import {
@@ -12,7 +11,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const StorageCredItem = ({
   description,
@@ -27,10 +26,7 @@ export const StorageCredItem = ({
   access_key: string
   onDeleteClick: (id: string) => void
 }) => {
-  const { can: canRemoveAccessKey } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
-  )
+  const { can: canRemoveAccessKey } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE)
 
   function daysSince(date: string) {
     const now = new Date()

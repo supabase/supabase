@@ -149,8 +149,70 @@ export function useAsyncCheckPermissionsV2(
     return doPermissionsCheckV2(allPermissions, permission, _organizationSlug, _projectRef)
   }, [isLoggedIn, isPermissionsSuccess, allPermissions, permission, _organizationSlug, _projectRef])
 
+  // project scoped role wins over org role
+  const role = useMemo<PermissionsV2Data['organizations'][number]['role'] | undefined>(() => {
+    if (!allPermissions || !_organizationSlug) return undefined
+    const org = allPermissions.organizations.find((o) => o.slug === _organizationSlug)
+    if (!org) return undefined
+    const project = _projectRef ? org.projects.find((p) => p.ref === _projectRef) : undefined
+    return project?.role ?? org.role
+  }, [allPermissions, _organizationSlug, _projectRef])
+
   const isLoading = !IS_PLATFORM ? false : !isLoggedIn ? true : isPermissionsLoading
   const isSuccess = !IS_PLATFORM ? true : !isLoggedIn ? false : isPermissionsSuccess
 
-  return { isLoading, isSuccess, can }
+  return { isLoading, isSuccess, can, role }
+}
+
+export function useAsyncCheckUserContentPermissions(
+  permission: 'project_snippets_read' | 'project_snippets_write',
+  content:
+    | {
+        mode: 'create'
+        type: 'report' | 'sql' | 'log_sql'
+      }
+    | {
+        mode: 'existing'
+        type: 'report' | 'sql' | 'log_sql'
+        visibility: 'project' | 'user' | 'public' | 'org'
+        ownerId: number
+        subjectId?: number
+      }
+    | undefined,
+  overrides?: {
+    organizationSlug?: string
+    projectRef?: string | null
+    permissions?: PermissionsV2Data
+  }
+) {
+  const { isLoading, isSuccess, can, role } = useAsyncCheckPermissionsV2(permission, overrides)
+  const isResolved =
+    content !== undefined && (content.mode === 'create' || content.subjectId !== undefined)
+  const isAtLeastDeveloper =
+    role !== undefined && ['developer', 'administrator', 'owner'].includes(role)
+  const isRestrictedWrite = permission === 'project_snippets_write' && !isAtLeastDeveloper
+  const isWritableBelowDeveloper =
+    content !== undefined && ['sql'].includes(content.type)
+
+  let passesContextCheck = false
+  if (content === undefined) {
+    // content not loaded yet
+    passesContextCheck = false
+  } else if (content.mode === 'create') {
+    passesContextCheck = !isRestrictedWrite || isWritableBelowDeveloper
+  } else {
+    const isOwner = content.ownerId === content.subjectId
+    const isUserVisibility = content.visibility === 'user'
+    if (isRestrictedWrite) {
+      passesContextCheck = isWritableBelowDeveloper && isOwner
+    } else {
+      passesContextCheck = !isUserVisibility || isOwner
+    }
+  }
+
+  return {
+    isLoading: isLoading || !isResolved,
+    isSuccess: isSuccess && isResolved,
+    can: can && passesContextCheck,
+  }
 }

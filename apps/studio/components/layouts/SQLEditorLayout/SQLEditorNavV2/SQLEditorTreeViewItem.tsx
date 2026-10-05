@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
@@ -34,7 +33,6 @@ import { LogsSnippetIcon } from '@/components/ui/EntityTypeIcon'
 import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
@@ -45,6 +43,7 @@ import {
 } from '@/state/sql-editor/sql-editor-lifecycle'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+import { useAsyncCheckUserContentPermissions, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface SQLEditorTreeViewItemProps extends Omit<
   ComponentProps<typeof TreeViewItem>,
@@ -119,12 +118,11 @@ export const SQLEditorTreeViewItem = ({
   const isEditing = isFolderEditing(status)
   const isSaving = isFolderSaving(status)
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'sql',
     }
   )
 

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -22,34 +21,28 @@ import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { ContentOfType } from '@/data/content/content-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from '@/lib/constants'
-import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const ObservabilityMenu = () => {
   const router = useRouter()
-  const { profile } = useProfile()
   const { ref, id } = useParams()
   const pageKey = (id || router.pathname.split('/')[4] || 'observability') as string
 
   const menuItems = useGenerateObservabilityMenu()
   const { data: customReportItems, isLoading } = useGenerateCustomReportsMenu()
 
-  const { can: canCreateCustomReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    {
-      resource: { type: 'report', owner_id: profile?.id },
-      subject: { id: profile?.id },
-    }
+  const { can: canCreateCustomReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'report' }
   )
 
   const { mutateAsync: deleteReport } = useContentDeleteMutation({
     // Toasts are driven by toast.promise in onConfirmDeleteReport. This no-op keeps the hook
     // from showing its own default error toast, while its optimistic rollback still runs.
-    onError: () => {},
+    onError: () => { },
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)

@@ -1,16 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download, Move, Trash2, X } from 'lucide-react'
 import { Button } from 'ui'
 
 import { bulkActionBarClassName } from './storageExplorerChrome'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const FileExplorerHeaderSelection = () => {
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   const {
     selectedItems,

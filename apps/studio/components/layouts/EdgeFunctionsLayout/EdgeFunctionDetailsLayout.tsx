@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
 import dayjs from 'dayjs'
@@ -48,11 +47,11 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 dayjs.extend(relativeTime)
 
@@ -68,9 +67,8 @@ const EdgeFunctionDetailsLayout = ({
   const track = useTrack()
   const { functionSlug, ref } = useParams()
 
-  const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_READ,
-    '*'
+  const { isLoading, can: canReadFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
 
   const [isOpen, setIsOpen] = useState(false)

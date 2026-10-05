@@ -39,7 +39,7 @@ import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import type { Dashboards } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function CustomReportSection() {
   const startDate = dayjs().subtract(7, 'day').toISOString()
@@ -69,12 +69,20 @@ export function CustomReportSection() {
   )
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
-  const { can: canCreateReport } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
+  const { can: canCreateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'report' }
   )
 
-  const { can: canUpdateReport } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
+  const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    homeReport ? {
+      mode: 'existing',
+      type: 'report',
+      visibility: homeReport.visibility,
+      ownerId: homeReport.owner_id,
+      subjectId: profile?.id,
+    } : undefined
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()

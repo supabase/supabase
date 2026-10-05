@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useContext, useEffect, useMemo, type PropsWithChildren } from 'react'
@@ -8,9 +7,9 @@ import { ProjectLayout } from '../ProjectLayout'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 const useGenerateComputeMenu = (): ProductMenuGroup[] => {
   const { ref: projectRef = 'default' } = useParams()
@@ -57,9 +56,8 @@ const ComputeLayoutContent = ({ children, title }: PropsWithChildren<ComputeLayo
   const computeEnabled = useFlag('compute')
   // The v2 compute routes require the FGA workers_read permission, which shared-types does not
   // expose yet; they reuse the Edge Functions OAuth scope, so gate on the same product here.
-  const { isLoading: isLoadingPermissions, can: canReadCompute } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_READ,
-    '*'
+  const { isLoading: isLoadingPermissions, can: canReadCompute } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.WORKERS_READ
   )
 
   useEffect(() => {

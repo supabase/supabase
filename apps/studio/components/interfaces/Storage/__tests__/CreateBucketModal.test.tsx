@@ -8,9 +8,13 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
-vi.mock(`hooks/misc/useCheckPermissions`, () => ({
-  useCheckPermissions: vi.fn(),
-  useAsyncCheckPermissions: vi.fn().mockImplementation(() => ({ can: true })),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      STORAGE_WRITE: 'storage_write',
+    },
+  },
 }))
 
 describe(`CreateBucketModal`, () => {
@@ -43,7 +47,7 @@ describe(`CreateBucketModal`, () => {
   it(`renders a dialog with a form`, async () => {
     customRender(
       <ProjectContextProvider projectRef="default">
-        <CreateBucketModal open={true} onOpenChange={() => {}} />
+        <CreateBucketModal open={true} onOpenChange={() => { }} />
       </ProjectContextProvider>,
       {
         nuqs: {

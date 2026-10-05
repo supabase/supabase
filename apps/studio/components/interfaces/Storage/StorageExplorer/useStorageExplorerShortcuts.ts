@@ -1,10 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface UseStorageExplorerShortcutsParams {
   onClearSearch: () => void
@@ -32,7 +30,7 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
 
   const { clearPreviewedFile } = useStorageExplorerNavigation()
 
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH, () => {
     refreshAll()

@@ -11,7 +11,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 const SQLExamples = () => {
   const router = useRouter()
@@ -23,8 +23,9 @@ const SQLExamples = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const track = useTrack()
 
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'sql' }
   )
 
   const handleNewQuery = async (sql: string, name: string) => {

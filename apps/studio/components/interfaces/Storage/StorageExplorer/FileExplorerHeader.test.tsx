@@ -26,8 +26,13 @@ vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => mockUseStorageExplorerStateSnapshot(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => mockUseAsyncCheckPermissions(),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      STORAGE_WRITE: 'storage_write',
+    },
+  },
 }))
 
 vi.mock('./StorageExplorerNavigation', () => ({

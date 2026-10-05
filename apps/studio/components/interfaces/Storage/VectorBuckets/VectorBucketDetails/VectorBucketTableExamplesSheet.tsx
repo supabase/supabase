@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { ChevronDown, ListPlus } from 'lucide-react'
@@ -30,9 +29,9 @@ import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
+import { useAsyncCheckPermissionsV2, FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface VectorBucketTableExamplesSheetProps {
   index: VectorBucketIndex
@@ -139,10 +138,7 @@ function VectorBucketIndexExamples({
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef, bucketId } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ)
   const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { secretKey } = apiKeysData ?? {}
 

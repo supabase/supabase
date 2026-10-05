@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
@@ -42,9 +41,9 @@ import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface FileExplorerRowProps {
   index: number
@@ -94,7 +93,7 @@ export const FileExplorerRow = ({
   const isOpened =
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
@@ -353,9 +352,8 @@ export const FileExplorerRow = ({
         )}
 
         <div
-          className={`flex items-center justify-end ${
-            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
-          }`}
+          className={`flex items-center justify-end ${view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
+            }`}
           onClick={(event) =>
             // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
             event.stopPropagation()

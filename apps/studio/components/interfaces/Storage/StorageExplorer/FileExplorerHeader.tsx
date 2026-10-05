@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, isEqual, noop } from 'lodash'
 import {
   ArrowLeft,
@@ -49,10 +48,10 @@ import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts
 import { useStoragePreference } from './useStoragePreference'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },
@@ -177,7 +176,7 @@ export const FileExplorerHeader = ({
   const searchPlaceholder = isBucketRoot
     ? 'Search in root directory...'
     : `Search in ${currentFolderName}...`
-  const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateStorage } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   useFileExplorerHeaderShortcuts({
     uploadButtonRef,

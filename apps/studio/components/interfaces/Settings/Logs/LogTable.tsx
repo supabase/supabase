@@ -44,7 +44,7 @@ import { useSelectedLog } from '@/hooks/analytics/useSelectedLog'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { ResponseError } from '@/types'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckUserContentPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface Props {
   data?: LogData[]
@@ -129,8 +129,9 @@ export const LogTable = ({
     )
   }, [])
 
-  const { can: canCreateLogQuery } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE
+  const { can: canCreateLogQuery } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'report' }
   )
 
   const firstRow = data[0]
@@ -422,7 +423,7 @@ export const LogTable = ({
     () => {
       setSelectedRows(new Set())
       selectionAnchorRef.current = null
-      ;(document.activeElement as HTMLElement | null)?.blur()
+        ; (document.activeElement as HTMLElement | null)?.blur()
     },
     { enabled: !selectionOpen && selectedRows.size > 0 }
   )
