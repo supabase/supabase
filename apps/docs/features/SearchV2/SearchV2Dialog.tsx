@@ -4,11 +4,7 @@ import { LoadingBeam } from '~/features/ui/LoadingBeam'
 import { useDocsSearchV2, type DocsSearchV2Result } from 'common'
 import { useRouter } from 'next/navigation'
 import { VisuallyHidden } from 'radix-ui'
-<<<<<<< HEAD
-import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react'
-=======
-import { useRef, useState, type KeyboardEvent } from 'react'
->>>>>>> e9a773621a (fix(docs): keep search v2 result order and initial selection)
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import {
   Command,
   CommandEmpty,
@@ -23,13 +19,9 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
-<<<<<<< HEAD
-import { formatHeadingPath, highlightMatches } from './SearchV2.utils'
-import { useSendTelemetryEvent } from '@/lib/telemetry'
-=======
 import { getIsSearching } from './SearchV2.utils'
 import { SearchV2Result } from './SearchV2Result'
->>>>>>> e9a773621a (fix(docs): keep search v2 result order and initial selection)
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface SearchV2DialogProps {
   open: boolean
