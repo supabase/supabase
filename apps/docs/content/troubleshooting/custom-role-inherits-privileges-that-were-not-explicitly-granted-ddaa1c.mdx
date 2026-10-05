@@ -16,9 +16,11 @@ A role you create can use objects without an explicit grant. For example, it can
 
 The role receives these privileges from `PUBLIC`, which stands for every role in the database, including roles you create later.
 
-## Check what the role can do
+A role you create to limit what a service or a person can do can therefore do more than you intended. When `pg_net` is enabled, any role can read the request headers that `pg_net` queues, which can include API keys, and can call `net.http_post` to send HTTP requests from your database. Any role can also use disk space by creating temporary tables and large objects.
 
-To list the schemas a role can use, replace `app_svc` and run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+## Find privileges you didn't grant
+
+To find privileges you didn't grant, list everything the role can access and compare it with your own grants. To list the schemas a role can use, replace `app_svc` and run the following in the [SQL Editor](/dashboard/project/_/sql/new):
 
 ```sql
 select nspname as schema
@@ -92,7 +94,9 @@ The `postgres` role can revoke only the grants it made, on objects it owns. Supa
 
 Extensions you enable can grant more privileges to `PUBLIC`. Check a role again after you enable one.
 
-## Revoke the privileges you own
+## Revoke PUBLIC privileges on objects you own
+
+You can revoke the `PUBLIC` grants on functions you create and the `temporary` grant on the `postgres` database. Supabase roles own the objects behind the other grants in the table, so `postgres` can't revoke those.
 
 <Admonition type="danger">
 
@@ -138,6 +142,18 @@ revoke temporary on database postgres from public;
 ```
 
 Grant `temporary` back to each role that needs it. If your Data API functions create temporary tables, also grant it to `authenticated`. Test the change on a [branch](/docs/guides/deployment/branching) before you apply it to production.
+
+### Confirm the change
+
+To confirm that the role lost the privileges you revoked, replace `app_svc` and `public.my_function()` and run:
+
+```sql
+select
+  has_database_privilege('app_svc', 'postgres', 'temporary') as can_create_temp_tables,
+  has_function_privilege('app_svc', 'public.my_function()', 'execute') as can_run_my_function;
+```
+
+Both columns return `false` unless the role still receives the privilege from its own grant or from a role it's a member of.
 
 ## Grant only what a service needs
 
