@@ -2,10 +2,15 @@ import { type Table as TTable } from '@tanstack/react-table'
 import { createLoader } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import {
+  EDGE_FUNCTION_LOG_TYPES,
+  LOG_TYPES,
+  LOG_TYPES_LABELS,
+  SEARCH_PARAMS_PARSER,
+} from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
-import type { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import type { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 
@@ -29,15 +34,33 @@ export function getComputeLogsAvailability({
   }
 }
 
+/**
+ * Resolves which log types a view may filter on and query. A scoped view only offers its own
+ * log types; the project-wide view hides edge function runtime rows, which it surfaces inside
+ * each invocation's detail panel instead.
+ */
+export function getLogTypeVisibility(
+  visibility: Partial<Record<UnifiedLogType, boolean>>,
+  scope?: UnifiedLogsScope
+): Partial<Record<UnifiedLogType, boolean>> {
+  if (!scope) return { ...visibility, 'edge function runtime': false }
+
+  const scopeLogTypes: readonly UnifiedLogType[] = EDGE_FUNCTION_LOG_TYPES
+  return Object.fromEntries(LOG_TYPES.map((logType) => [logType, scopeLogTypes.includes(logType)]))
+}
+
 /** Reads unified logs URL params, applying the same defaults as the Logs page. */
 export const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)
 
 /**
  * Turns URL search state into the search every unified logs query takes. Drops view-only params
- * (`id`, `live`) and empty values so they don't churn query keys.
+ * (`id`, `live`) and empty values so they don't churn query keys, and attaches the scope.
  */
-export function toQuerySearchParams(search: SearchParamsType): QuerySearchParamsType {
-  return Object.entries(search).reduce(
+export function toQuerySearchParams(
+  search: SearchParamsType,
+  scope?: UnifiedLogsScope
+): QuerySearchParamsType {
+  const parameters = Object.entries(search).reduce(
     (acc, [key, value]) => {
       if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
         acc[key] = value
@@ -46,6 +69,9 @@ export function toQuerySearchParams(search: SearchParamsType): QuerySearchParams
     },
     {} as Record<string, unknown>
   ) as QuerySearchParamsType
+
+  if (scope) parameters.scope = scope
+  return parameters
 }
 
 /**
@@ -201,6 +227,7 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
   // Handle special cases
   const specialCases: Record<string, string> = {
     'edge function': 'Edge Function',
+    'edge function runtime': 'Edge Function runtime',
     postgrest: 'PostgREST',
     postgres: 'Postgres',
     auth: 'Auth',

@@ -1,12 +1,16 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
+import {
+  DEFAULT_LOG_TYPES,
+  EDGE_FUNCTION_LOG_TYPES,
+  LOG_TYPE_TO_SOURCE,
+} from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
-import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
@@ -91,6 +95,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'edge_logs' THEN 'edge'
       WHEN source = 'postgres_logs' THEN 'postgres'
       WHEN source = 'function_edge_logs' THEN 'edge function'
+      WHEN source = 'function_logs' THEN 'edge function runtime'
       WHEN source = 'auth_logs' THEN 'auth'
       WHEN source = 'realtime_logs' THEN 'realtime'
       WHEN source = 'supavisor_logs' THEN 'supavisor'
@@ -111,7 +116,9 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
 
 const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
 const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_PATH_EXPR})`
-const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, log_attributes, map())`
+// Edge function runtime rows carry their detail (event_type, level, execution_id)
+// only in log_attributes, so surface it alongside the compute streams.
+const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION} OR source = 'function_logs', log_attributes, map())`
 
 // SQL expression for derived `level`. Used inline (not as alias reference)
 // because the OTEL endpoint can't resolve aliases inside countIf when the
@@ -120,9 +127,12 @@ const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITI
 // HTTP status is checked first so gateway and auth rows (which carry a
 // `severity_text` of `INFO` regardless of response code) bucket as
 // success/warning/error by status. Postgres-style severity is the
-// fallback for rows without a status code.
+// fallback for rows without a status code. Edge function runtime rows record
+// their console level in `log_attributes['level']`.
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
+      WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'
+      WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('warn','warning') THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
@@ -240,6 +250,15 @@ const translateFilter = (
   }
 }
 
+/**
+ * Restricts rows to one edge function: its invocations and runtime output. Applied to every
+ * query, facet scans included, so a scoped view never counts rows from outside the scope.
+ */
+const scopeCondition = (scope?: UnifiedLogsScope): SafeLogSqlFragment | null => {
+  if (!scope) return null
+  return safeSql`(${logTypeWhereCondition([...EDGE_FUNCTION_LOG_TYPES])} AND log_attributes['function_id'] = ${lit(scope.functionId)})`
+}
+
 const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
@@ -325,13 +344,17 @@ const buildBaseWhere = (
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
-    } else if (!userFilterValue(search)) {
+    } else if (!search.scope && !userFilterValue(search)) {
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
       // and the default would otherwise exclude auth_logs, the primary attributable source.
+      // A scope brings its own source restriction.
       parts.push(logTypeWhereCondition([...DEFAULT_LOG_TYPES]))
     }
   }
+
+  const scope = scopeCondition(search.scope)
+  if (scope) parts.push(scope)
 
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeField) continue

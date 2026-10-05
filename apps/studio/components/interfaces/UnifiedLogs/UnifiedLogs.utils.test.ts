@@ -7,6 +7,7 @@ import {
   getComputeLogsAvailability,
   getEventMessageDisplay,
   getLogRowClassName,
+  getLogTypeVisibility,
   getRawLogData,
   getUniqueLogRows,
   loadUnifiedLogsSearchParams,
@@ -207,7 +208,49 @@ describe('gateLogTypeFilters', () => {
   })
 })
 
+describe('getLogTypeVisibility', () => {
+  it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {
+    expect(getLogTypeVisibility({ compute: false })).toEqual({
+      compute: false,
+      'edge function runtime': false,
+    })
+  })
+
+  it('only shows the edge function log types in a function-scoped view', () => {
+    const visibility = getLogTypeVisibility({ compute: true }, { functionId: 'fn-123' })
+    const visibleLogTypes = Object.entries(visibility)
+      .filter(([, isVisible]) => isVisible)
+      .map(([logType]) => logType)
+
+    expect(visibleLogTypes).toEqual(['edge function', 'edge function runtime'])
+    expect(visibility.compute).toBe(false)
+    expect(visibility.postgres).toBe(false)
+  })
+
+  it('drops out-of-scope log type filters from a function-scoped view', () => {
+    expect(
+      gateLogTypeFilters(
+        ['log_type:eq:postgres', 'log_type:eq:edge function runtime', 'level:eq:error'],
+        getLogTypeVisibility({}, { functionId: 'fn-123' })
+      )
+    ).toEqual(['log_type:eq:edge function runtime', 'level:eq:error'])
+  })
+})
+
 describe('toQuerySearchParams', () => {
+  it('attaches the scope', () => {
+    const search = toQuerySearchParams(loadUnifiedLogsSearchParams(new URLSearchParams()), {
+      functionId: 'fn-123',
+    })
+    expect(search.scope).toEqual({ functionId: 'fn-123' })
+  })
+
+  it('leaves the scope off unscoped searches', () => {
+    expect(
+      toQuerySearchParams(loadUnifiedLogsSearchParams(new URLSearchParams()))
+    ).not.toHaveProperty('scope')
+  })
+
   it('drops view-only and empty params and keeps defaults', () => {
     const search = toQuerySearchParams(
       loadUnifiedLogsSearchParams(new URLSearchParams('filter=level:eq:error&id=log-1&live=true'))

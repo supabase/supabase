@@ -3808,6 +3808,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'auth'
       | 'storage'
       | 'edge function'
+      | 'edge function runtime'
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
