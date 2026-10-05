@@ -443,6 +443,17 @@ Prefer `security invoker`, which is also the default. When you use `security def
 
 With an empty search path, `search_path = ''`, name the schema for every relation in the function body, such as `from public.table`. An empty search path limits the damage when the function can reach a schema you don't want the calling user to reach.
 
+<Admonition type="danger">
+
+A `security definer` function can return rows the caller isn't allowed to read. It runs with its creator's privileges. A function created in the Dashboard or by a migration is owned by `postgres`, which bypasses Row Level Security. Any role can call it by default, including `anon`, the role that serves requests carrying no user session.
+
+Pinning the `search_path` doesn't change who can call the function. When a `security definer` function reads per-user data:
+
+- **Check ownership in the function body.** An execute grant controls which roles can call the function. It doesn't limit the rows a permitted role gets back, so granting to `authenticated` still returns any user's row to every signed-in caller.
+- **Narrow the execute privilege as well.** Revoke it from `public` and from each role holding a direct grant, such as `anon`. Then grant it to the roles that need it. See the [Function privileges](#function-privileges) section of this page.
+
+</Admonition>
+
 ### Function privileges
 
 By default, any role can run a database function. You can restrict execution in two ways:
@@ -470,11 +481,11 @@ By default, any role can run a database function. You can restrict execution in 
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
 
-    You can then regrant permissions for a specific function to a specific role:
+You can then regrant permissions for a specific function to a specific role:
 
-    ```sql
-    grant execute on function public.hello_world to authenticated;
-    ```
+```sql
+grant execute on function public.hello_world to authenticated;
+```
 
 ## Resources
 
