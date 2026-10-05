@@ -311,6 +311,16 @@ const baseClickHouseFormData = {
 }
 
 describe('DestinationForm.utils DuckLake', () => {
+  it('uses the default pool size when the advanced field is cleared', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: { ...baseDucklakeFormData, ducklakePoolSize: '' },
+    })
+
+    expect(config).toMatchObject({ ducklake: { poolSize: undefined } })
+  })
+
   it('builds DuckLake validation config with required fields trimmed and blank optionals removed', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
