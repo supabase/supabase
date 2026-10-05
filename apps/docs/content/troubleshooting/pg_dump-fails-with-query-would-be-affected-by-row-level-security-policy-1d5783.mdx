@@ -40,18 +40,27 @@ Each statement does one job:
 - `pg_read_all_data` is a predefined Postgres role. It lets `backup_reader` read every table, view, and sequence in every schema, including `auth` and `storage`.
 - `default_transaction_read_only` makes the role's sessions read-only by default, which prevents accidental writes.
 
-`pg_read_all_data` doesn't cover large objects. If your database has large objects, the export fails with `permission denied for large object`. To export without them, add `--no-large-objects` to the `pg_dump` command. To include them, grant `select` on each large object to `backup_reader`, running as the role that owns them:
+`pg_read_all_data` doesn't cover large objects. If your database has large objects, a full export fails with `permission denied for large object`. To export without them, add `--no-large-objects` to the `pg_dump` command. To include them, grant `select` on each large object to `backup_reader`. Only a large object's owner, or a role that holds `select` on it with the grant option, can grant access to it. Run the following block once as each role that owns large objects:
 
 ```sql
 do $$
 declare
   r record;
 begin
-  for r in select oid from pg_largeobject_metadata loop
+  for r in
+    select oid from pg_largeobject_metadata
+    where lomowner = current_user::regrole
+  loop
     execute format('grant select on large object %s to backup_reader', r.oid);
   end loop;
 end
 $$;
+```
+
+To list the roles that own large objects, run:
+
+```sql
+select distinct lomowner::regrole as owner from pg_largeobject_metadata;
 ```
 
 To give another role you created the same access, run `alter role <role_name> bypassrls;` and `grant pg_read_all_data to <role_name>;`.
@@ -70,7 +79,7 @@ To give another role you created the same access, run `alter role <role_name> by
 
    `--password` prompts for the password. For a scheduled export, leave out `--password` and store the password in a [password file](https://www.postgresql.org/docs/current/libpq-pgpass.html).
 
-To export specific schemas, add a `--schema` option for each one, for example `--schema=public --schema=auth --schema=storage`.
+To export specific schemas, add a `--schema` option for each one, for example `--schema=public --schema=auth --schema=storage`. An export with `--schema` leaves out large objects. To include them, also add `--large-objects`, which is `--blobs` in `pg_dump` 15 and earlier.
 
 Run `pg_dump` directly rather than `supabase db dump`. The CLI command switches to the `postgres` role during the export, so it fails for `backup_reader` with `permission denied to set role "postgres"`.
 
