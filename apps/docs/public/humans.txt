@@ -38,6 +38,7 @@ Artyom Borissov
 Aziz Quadri
 Barco Fourie
 Barry Roodt
+Ben Fritsch
 Beng Eu
 Benjamin Coenen
 Beth Long
@@ -168,6 +169,7 @@ Johan Bergström
 John Pena
 John Schaeffer
 Jon M
+Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
 Jordi Enric

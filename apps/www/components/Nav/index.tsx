@@ -21,7 +21,6 @@ import {
   NavigationMenuViewport,
 } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
-import { AnnouncementBanner } from 'ui-patterns/Banners/AnnouncementBanner'
 
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
@@ -100,7 +99,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
 
   return (
     <>
-      {!isStateOfStartupsPage && <AnnouncementBanner />}
       <div
         className={cn(
           'sticky top-0 z-40 transform',
@@ -110,7 +108,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
         style={{ transform: 'translate3d(0,0,999px)' }}
         data-nav-transparent={isTransparent ? '' : undefined}
       >
-        {isStateOfStartupsPage && <AnnouncementBanner />}
         <div
           className={cn(
             'absolute inset-0 h-full w-full bg-background/90 dark:bg-background/95 transition-all duration-300',
@@ -191,9 +188,11 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     forceMount
                     data-open={activeDropdown !== ''}
                     data-switching={isSwitchingDropdown}
-                    containerProps={{ className: 'inset-x-0' }}
+                    // The wrapper keeps the last menu's height while closed, so it must
+                    // not capture pointer events over the page below the nav.
+                    containerProps={{ className: 'inset-x-0 pointer-events-none' }}
                     className={cn(
-                      'group/viewport origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
+                      'group/viewport pointer-events-auto origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
                       'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
                       'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
                       'data-[open=false]:invisible data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',

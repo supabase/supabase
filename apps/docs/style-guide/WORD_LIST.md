@@ -539,6 +539,10 @@ Write _microservices_, not _micro-services_.
 
 Use _might_ for possibility or an uncertain outcome.
 
+### Multigres
+
+Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
+
 ### must
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.
@@ -977,6 +981,10 @@ Don't use these phrases:
 
 Don't use _tl;dr_, _ymmv_, _rtfm_, _imo_, or _fwiw_. Write out the
 meaning or remove the aside.
+
+## Further reference
+
+- [Microsoft Writing Style Guide](https://learn.microsoft.com/style-guide/welcome/)
 
 ## Attribution
 
