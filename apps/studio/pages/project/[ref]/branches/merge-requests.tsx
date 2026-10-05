@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
 import {
   BranchManagementSection,
   BranchRow,
@@ -252,6 +253,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                   <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                       <Button
+                                        aria-label="More options"
                                         variant="text"
                                         icon={<MoreVertical />}
                                         className="px-1"
@@ -369,11 +371,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
             variant="text"
             icon={<MessageCircle className="text-muted" strokeWidth={1} />}
           >
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://github.com/orgs/supabase/discussions/18937"
-            >
+            <a target="_blank" rel="noreferrer" href={BRANCHING_GITHUB_DISCUSSION_LINK}>
               Branching feedback
             </a>
           </Button>
