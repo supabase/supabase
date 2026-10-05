@@ -1,8 +1,9 @@
 import { screen, waitFor } from '@testing-library/react'
+import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { FilePreview } from '@/components/interfaces/Storage/StorageExplorer/FilePreview'
-import { fileUrlKey } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
+import { storageKeys } from '@/data/storage/keys'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -23,7 +24,7 @@ const mockSignEndpoint = () => {
     path: '/platform/storage/:ref/buckets/:id/objects/sign',
     response: async ({ request }) => {
       bodies.push((await request.json()) as Record<string, unknown>)
-      return Response.json({ signedUrl: SIGNED_URL })
+      return HttpResponse.json<{ signedUrl: string }>({ signedUrl: SIGNED_URL })
     },
   })
 
@@ -67,7 +68,7 @@ describe('FilePreview', () => {
   })
 
   it('keys each version separately, so a new one cannot reuse the cached URL', () => {
-    const current = fileUrlKey({
+    const current = storageKeys.fileUrl({
       projectRef: 'abcdef',
       isBucketPublic: false,
       bucketId: 'my-bucket',
@@ -75,7 +76,7 @@ describe('FilePreview', () => {
     })
 
     expect(
-      fileUrlKey({
+      storageKeys.fileUrl({
         projectRef: 'abcdef',
         isBucketPublic: false,
         bucketId: 'my-bucket',
@@ -86,13 +87,15 @@ describe('FilePreview', () => {
 
     // The version-less key is a prefix of every version's, so one invalidation clears all.
     expect(
-      fileUrlKey({
-        projectRef: 'abcdef',
-        isBucketPublic: false,
-        bucketId: 'my-bucket',
-        path: 'photo.png',
-        versionId: 'v-new',
-      }).slice(0, current.length)
+      storageKeys
+        .fileUrl({
+          projectRef: 'abcdef',
+          isBucketPublic: false,
+          bucketId: 'my-bucket',
+          path: 'photo.png',
+          versionId: 'v-new',
+        })
+        .slice(0, current.length)
     ).toEqual(current)
   })
 

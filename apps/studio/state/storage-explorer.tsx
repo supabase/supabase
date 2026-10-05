@@ -42,10 +42,7 @@ import {
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
-import {
-  fetchFileUrl,
-  fileUrlKey,
-} from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
+import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -1560,7 +1557,7 @@ export function createStorageExplorerState({
           // The preview URL is cached for a week against the path, so without this the
           // panel keeps rendering the bytes from before the replace.
           getQueryClient().invalidateQueries({
-            queryKey: fileUrlKey({
+            queryKey: storageKeys.fileUrl({
               projectRef: state.projectRef,
               isBucketPublic: state.selectedBucket.public,
               bucketId: state.selectedBucket.id,
