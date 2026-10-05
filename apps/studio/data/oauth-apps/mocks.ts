@@ -1,3 +1,5 @@
+import dayjs from 'dayjs'
+
 import type { OAuthAppsAuthorizeIdentity } from './oauth-apps-authorize-organizations-query'
 import type {
   ListOAuthApprovalsResponse,
@@ -85,7 +87,7 @@ const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
   domain: 'vercel.com',
   redirect_uri: 'https://vercel.com/api/integrations/supabase/callback',
   registration_type: 'manual',
-  expires_at: '2026-09-17T12:00:00.000Z',
+  expires_at: dayjs().add(1, 'month'),
   grant_kind: 'member_bound',
   project_scoping_mode: true,
   scopes: VERCEL_SCOPES,
@@ -125,7 +127,7 @@ const KEMAL_BOT_REQUEST: OAuthAppsAuthorizeRequest = {
   domain: 'kemal.lol',
   redirect_uri: 'https://kemal.lol/hollerback',
   registration_type: 'manual',
-  expires_at: '2026-09-17T12:00:00.000Z',
+  expires_at: dayjs().add(1, 'month'),
   grant_kind: 'organization_bound',
   project_scoping_mode: true,
   scopes: ['projects:read'],
