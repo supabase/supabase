@@ -2,11 +2,6 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import dayjs from 'dayjs'
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import {
-  SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY,
-  SELECT_26_STUDIO_DISMISSAL_KEY,
-  useSelect26PromotionPhase,
-} from 'ui-patterns/Banners/Select26Promotion'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
 import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBannerWrapper.utils'
@@ -16,11 +11,6 @@ import { StatusBanner } from '@/components/layouts/AppLayout/StatusBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
 import { BannerPrivacyPolicyUpdate } from '@/components/ui/BannerStack/Banners/BannerPrivacyPolicyUpdate'
-import { BannerSelect2026 } from '@/components/ui/BannerStack/Banners/BannerSelect2026'
-import {
-  SELECT_26_BANNER_PRIORITY,
-  shouldShowSelect26Banner,
-} from '@/components/ui/BannerStack/Banners/BannerSelect2026.utils'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
@@ -43,46 +33,6 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   const [privacyPolicyUpdateAcknowledged, , { isSuccess: isPrivacyPolicyDismissalLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.PRIVACY_POLICY_UPDATE, false)
-
-  const [isSelect26BannerDismissed, , { isSuccess: isSelect26DismissalLoaded }] =
-    useLocalStorageQuery(SELECT_26_STUDIO_DISMISSAL_KEY, false)
-  const [isSelect26LivestreamDismissed, , { isSuccess: isSelect26LivestreamDismissalLoaded }] =
-    useLocalStorageQuery(SELECT_26_LIVESTREAM_STUDIO_DISMISSAL_KEY, false)
-  const select26PromotionPhase = useSelect26PromotionPhase()
-
-  useEffect(() => {
-    const isLivestream = select26PromotionPhase === 'livestream'
-    const dismissalLoaded = isLivestream
-      ? isSelect26LivestreamDismissalLoaded
-      : isSelect26DismissalLoaded
-    if (!dismissalLoaded) return
-
-    const shouldShow = shouldShowSelect26Banner({
-      isPlatform: IS_PLATFORM,
-      dismissalLoaded,
-      isActive: select26PromotionPhase !== 'ended',
-      isDismissed: isLivestream ? isSelect26LivestreamDismissed : isSelect26BannerDismissed,
-    })
-
-    if (shouldShow) {
-      addBanner({
-        id: BANNER_ID.SELECT_26,
-        isDismissed: false,
-        content: <BannerSelect2026 />,
-        priority: SELECT_26_BANNER_PRIORITY,
-      })
-    } else {
-      dismissBanner(BANNER_ID.SELECT_26)
-    }
-  }, [
-    isSelect26DismissalLoaded,
-    isSelect26LivestreamDismissalLoaded,
-    select26PromotionPhase,
-    isSelect26BannerDismissed,
-    isSelect26LivestreamDismissed,
-    addBanner,
-    dismissBanner,
-  ])
 
   useEffect(() => {
     if (!isPrivacyPolicyDismissalLoaded || pathname == null) return

@@ -12,15 +12,17 @@ interface InputFieldProps<TFieldValues extends FieldValues = FieldValues> {
   control: Control<TFieldValues>
   loading?: boolean
   placeholder?: string
+  layout?: 'vertical' | 'horizontal'
 }
 
-const InputField = <
+export const InputField = <
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   control,
   option,
   loading = false,
+  layout = 'horizontal',
   placeholder,
 }: InputFieldProps<TFieldValues>) => {
   return (
@@ -30,7 +32,7 @@ const InputField = <
       defaultValue={(option.defaultValue ?? '') as any}
       render={({ field }) => (
         <FormItemLayout
-          layout="vertical"
+          layout={layout}
           label={
             <div className="flex items-center space-x-2">
               <p>{option.label}</p>
@@ -67,5 +69,3 @@ const InputField = <
     />
   )
 }
-
-export default InputField
