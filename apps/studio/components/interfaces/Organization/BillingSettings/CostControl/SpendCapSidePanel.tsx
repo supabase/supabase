@@ -162,7 +162,7 @@ export const SpendCapSidePanel = () => {
         </SheetHeader>
 
         <SheetSection className="overflow-auto grow">
-          <div className="py-6 space-y-4">
+          <div className="space-y-4">
             <p className="text-sm">
               Use the spend cap to manage project usage and costs, and control whether the project
               can exceed the included quota allowance of any billed line item in a billing cycle
