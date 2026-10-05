@@ -283,7 +283,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   const isOwnerRole = role.name === 'Owner'
                                   const disabledForStripe = isStripeProjectsOrg && isOwnerRole
 
-                                  const isNoAccessRole = role.name === 'None'
+                                  const isNoAccessRole = role.name === 'No-access'
                                   const disabledForProjectRole =
                                     !isApplyingRoleToAllProjects && isNoAccessRole
                                   const disabled =

@@ -359,7 +359,7 @@ export const InviteMemberButton = () => {
                           const isOwnerRole = role.name === 'Owner'
                           const disabledForStripe = isStripeProjectsOrg && isOwnerRole
 
-                          const isNoAccessRole = role.name === 'None'
+                          const isNoAccessRole = role.name === 'No-access'
                           const isApplyingProjectRole = !applyToOrg
                           const disabledForProjectRole = isApplyingProjectRole && isNoAccessRole
 
