@@ -288,11 +288,18 @@ const DEFAULT_FLAGS = {
   freeTierGeneralRegionSelection: false,
 }
 
-async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
+async function renderWizard(
+  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
-      value={{ configcat: { ...DEFAULT_FLAGS, ...options.flags }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: { ...DEFAULT_FLAGS, ...options.flags },
+        posthog: {},
+        hasLoaded: true,
+        isConfigCatStale: options.isConfigCatStale,
+      }}
     >
       <Wizard dehydratedState={undefined} />
     </FeatureFlagContext.Provider>,
@@ -505,6 +512,24 @@ describe('project creation wizard', () => {
     })
 
     describe('free tier general region experiment', () => {
+      test('keeps the region selector loading while flags are being re-evaluated', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+          isConfigCatStale: true,
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        expect(await screen.findByText('Loading available regions...')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toBeDisabled()
+      })
+
       test('restricts the picker to general regions with an upgrade footer for a free-plan org in the test arm', async () => {
         mockWizardEndpoints({
           organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],

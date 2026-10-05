@@ -139,7 +139,7 @@ export const ProjectCreationForm = ({
     'integrations.github_connections'
   )
 
-  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const { hasLoaded: flagsLoaded, isConfigCatStale } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
@@ -208,7 +208,9 @@ export const ProjectCreationForm = ({
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   const isResolvingFreeTierGeneralRegionExperiment =
-    isFreePlan && smartRegionEnabled && (!flagsLoaded || isPendingOrganizationCreatedAt)
+    isFreePlan &&
+    smartRegionEnabled &&
+    (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
   const freeTierGeneralRegionEnrollment = useFlag('freeTierGeneralRegionEnrollment')
   const freeTierGeneralRegionSelection = useFlag('freeTierGeneralRegionSelection')
   const freeTierGeneralRegionExperimentVariant = getFreeTierGeneralRegionExperimentVariant({
