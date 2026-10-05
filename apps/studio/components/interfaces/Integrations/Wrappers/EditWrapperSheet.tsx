@@ -265,8 +265,7 @@ export const EditWrapperSheet = ({
                   <FormItemLayout
                     layout="horizontal"
                     label="Foreign tables"
-                    labelOptional="You can query your data from these foreign tables after the wrapper is
-                                          created"
+                    labelOptional="You can query your data from these foreign tables after the wrapper is created"
                     isReactForm={false}
                     className={cn(
                       '[&>div>span]:text-balance',
