@@ -168,7 +168,7 @@ export const getInvocationChartNavigationUrl = ({
     return getEdgeFunctionLogsUrl({ projectRef, functionSlug, start, end })
   }
 
-  return `/project/${projectRef}/functions/${functionSlug}/invocations?its=${encodeURIComponent(start)}&ite=${encodeURIComponent(end)}`
+  return getLegacyEdgeFunctionLogsUrl({ projectRef, functionSlug, tab: 'invocations', start, end })
 }
 
 /**
@@ -197,6 +197,36 @@ export const getEdgeFunctionLogsUrl = ({
 
   const query = params.toString()
   return `/project/${projectRef}/functions/${functionSlug}/logs${query ? `?${query}` : ''}`
+}
+
+/**
+ * Links to an edge function's Invocations or Logs tab from before unified logs, optionally focused
+ * on a time range and a selected log. Uses those tabs' own URL params.
+ */
+export const getLegacyEdgeFunctionLogsUrl = ({
+  projectRef,
+  functionSlug,
+  tab,
+  start,
+  end,
+  logId,
+}: {
+  projectRef: string
+  functionSlug: string
+  tab: 'invocations' | 'logs'
+  start?: string
+  end?: string
+  logId?: string
+}) => {
+  const params = new URLSearchParams()
+  if (start && end) {
+    params.set('its', start)
+    params.set('ite', end)
+  }
+  if (logId) params.set('log', logId)
+
+  const query = params.toString()
+  return `/project/${projectRef}/functions/${functionSlug}/${tab}${query ? `?${query}` : ''}`
 }
 
 export const formatChartTimestamp = (value: Date | string | number | undefined, format: string) => {

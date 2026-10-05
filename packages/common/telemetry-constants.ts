@@ -3091,6 +3091,7 @@ export type AiAssistantSource =
   | 'error_code'
   | 'advisor_signal_detail'
   | 'database_connections'
+  | 'edge_function_errors'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
