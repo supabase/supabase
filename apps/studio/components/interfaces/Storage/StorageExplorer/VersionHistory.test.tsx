@@ -9,7 +9,12 @@ import { addAPIMock } from '@/tests/lib/msw'
 const refetchAllOpenedFolders = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('@/state/storage-explorer', () => ({
-  useStorageExplorerStateSnapshot: () => ({ refetchAllOpenedFolders }),
+  useStorageExplorerStateSnapshot: () => ({
+    refetchAllOpenedFolders,
+    // The thumbnails resolve an image version's own bytes through the bucket.
+    projectRef: 'abcdef',
+    selectedBucket: { id: 'my-bucket', name: 'my-bucket', public: true },
+  }),
 }))
 // The versions query is platform-only, and `IS_PLATFORM` is false under vitest.
 vi.mock('@/lib/constants', async (importOriginal) => {
@@ -69,6 +74,11 @@ describe('VersionHistory', () => {
       method: 'post',
       path: '/platform/storage/:ref/buckets/:id/objects/move',
       response: () => Response.json({ message: 'ok' }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/public-url',
+      response: () => Response.json({ publicUrl: 'https://example.com/photo.png' }),
     })
 
     renderHistory()

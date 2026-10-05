@@ -47,7 +47,8 @@ export const VersionCompareWidget = ({
         <div className="flex h-24 items-center justify-center overflow-hidden rounded-md border border-brand-400 bg-surface-200">
           <FilePreview
             path={path}
-            mimeType={mimeType}
+            // This half shows the older bytes, which an overwrite may have retyped.
+            mimeType={selectedVersion.mimeType ?? mimeType}
             size={selectedVersion.size}
             versionId={selectedVersion.versionId}
           />

@@ -182,6 +182,9 @@ export const VersionHistory = ({
   const { mutate: restoreVersion, isPending: isRestoring } = useObjectVersionRestoreMutation({
     onSuccess: async () => {
       toast.success('Version restored as the current version')
+      // The restored version is the current one now, so the widget would be offering
+      // to restore the file to what it already is.
+      clearPreview()
       // The object's size, type and modified date all change with it, and the row
       // showing them is the explorer's own state.
       await refetchAllOpenedFolders()
@@ -191,6 +194,8 @@ export const VersionHistory = ({
   const { mutate: deleteVersion, isPending: isDeleting } = useObjectVersionDeleteMutation({
     onSuccess: () => {
       toast.success('Version permanently deleted')
+      // Nothing left to compare against if the widget was showing this one.
+      if (previewedVersionId === versionToDelete?.versionId) clearPreview()
       setVersionToDelete(undefined)
     },
   })
@@ -267,7 +272,8 @@ export const VersionHistory = ({
             const rowContent = (
               <>
                 <VersionThumbnail
-                  mimeType={mimeType}
+                  // Falls back to the file's own type only for the version that is it.
+                  mimeType={version.mimeType ?? (version.isCurrent ? mimeType : undefined)}
                   isCurrent={version.isCurrent}
                   isDeleteMarker={isDeleteMarker}
                   path={path}
