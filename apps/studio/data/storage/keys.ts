@@ -74,6 +74,29 @@ export const storageKeys = {
       objectName,
       ...(lifecyclePolicy ? [lifecyclePolicy] : []),
     ] as const,
+  /** Omit `versionId` for a prefix that matches every version's URL for one object. */
+  fileUrl: ({
+    projectRef,
+    isBucketPublic,
+    bucketId,
+    path,
+    versionId,
+  }: {
+    projectRef?: string
+    isBucketPublic?: boolean
+    bucketId?: string
+    path: string
+    versionId?: string
+  }) =>
+    [
+      projectRef,
+      'buckets',
+      isBucketPublic,
+      bucketId,
+      'file',
+      path,
+      ...(versionId === undefined ? [] : [versionId]),
+    ] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
