@@ -29,7 +29,10 @@ export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 
-export const useUnifiedLogsBackend = () => useFeatureFlags().configcat.otelUnifiedLogs !== false
+export const useUnifiedLogsBackend = () => {
+  const { otelUnifiedLogs = true } = useFeatureFlags().configcat
+  return typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+}
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,

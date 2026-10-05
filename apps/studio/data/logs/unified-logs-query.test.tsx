@@ -19,8 +19,7 @@ vi.mock('./execute-analytics-sql', () => ({
 
 type FlagState = {
   hasLoaded: boolean
-  otelUnifiedLogs?: boolean
-  unrelatedFlag?: boolean
+  otelUnifiedLogs?: boolean | null
 }
 
 const flagState: FlagState = { hasLoaded: false }
@@ -30,7 +29,6 @@ const createWrapper = (queryClient: QueryClient) => {
     const otelUnifiedLogs = flagState.otelUnifiedLogs
     const configcat: FeatureFlagContextType['configcat'] = {
       ...(otelUnifiedLogs === undefined ? {} : { otelUnifiedLogs }),
-      ...(flagState.unrelatedFlag ? { unrelatedFlag: true } : {}),
     }
 
     return (
@@ -88,7 +86,6 @@ describe('unified logs queries', () => {
   beforeEach(() => {
     flagState.hasLoaded = false
     flagState.otelUnifiedLogs = undefined
-    flagState.unrelatedFlag = undefined
     mockExecuteAnalyticsSql.mockResolvedValue({ result: [] })
     queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   })
@@ -159,9 +156,9 @@ describe('unified logs queries', () => {
     )
   })
 
-  test('defaults to OTEL when the loaded flags omit the backend flag', async () => {
+  test('defaults to OTEL when the backend flag is null', async () => {
     flagState.hasLoaded = true
-    flagState.unrelatedFlag = true
+    flagState.otelUnifiedLogs = null
 
     renderHook(useUnifiedLogsQueries, { wrapper: createWrapper(queryClient) })
 
