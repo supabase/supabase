@@ -44,7 +44,10 @@ import { PipelineCostDialog } from './PipelineCostDialog'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
-import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
+import {
+  getSnowflakeValidationIssues,
+  SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE,
+} from './Snowflake/Snowflake.utils'
 import { TableCopySelection } from './TableCopySelection'
 import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
@@ -226,11 +229,12 @@ export const DestinationForm = ({
             }
           )
         } else if (selectedType === 'Snowflake') {
-          getSnowflakeValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getSnowflakeValidationIssues(data, {
+            secretsOptional: editMode,
+            validatePrivateKeyFormat: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'ClickHouse') {
           getClickHouseValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
@@ -286,10 +290,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start pipeline anyway'
+        return 'Start pipeline anyway'
       }
 
-      return 'Create and start pipeline'
+      return 'Start pipeline'
     }
   }
 
@@ -344,6 +348,16 @@ export const DestinationForm = ({
       )
       if (jsonIssue) {
         form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
+    }
+
+    if (selectedType === 'Snowflake') {
+      const privateKeyIssue = getSnowflakeValidationIssues(data, {
+        secretsOptional: editMode,
+      }).find((issue) => issue.message === SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE)
+      if (privateKeyIssue) {
+        form.setError(privateKeyIssue.path, { message: privateKeyIssue.message })
         return
       }
     }
@@ -463,7 +477,7 @@ export const DestinationForm = ({
                   <p className="text-sm font-medium text-foreground">Destination details</p>
 
                   <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} />
+                    <DestinationNameInput form={form} destinationType={selectedType} />
                     <PublicationSelection
                       form={form}
                       onSelectNewPublication={() => setPublicationPanelVisible(true)}

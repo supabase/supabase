@@ -51,6 +51,7 @@
     "setup:cli": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generateLocalEnv.js",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts",
     "api:codegen": "cd packages/api-types && pnpm run codegen",
+    "api:codegen:prod": "pnpm --filter=api-types run codegen:prod",
     "api:verify-types": "pnpm --filter=api-types run verify-production-types",
     "knip": "knip",
     "authorize-vercel-deploys": "tsx scripts/authorizeVercelDeploys.ts"
@@ -59,6 +60,7 @@
     "@aws-sdk/client-secrets-manager": "^3.1041.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@types/node": "catalog:",
+    "cn": "catalog:",
     "eslint": "^9.0.0",
     "jsdom": "^28.1.0",
     "knip": "6.32.3",

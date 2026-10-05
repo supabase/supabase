@@ -1235,7 +1235,7 @@ export interface components {
            * @example developer
            * @enum {string}
            */
-          role: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
         }
         /**
          * @description Resource type.
@@ -1428,11 +1428,11 @@ export interface components {
           }[]
           require_sso?: boolean
           /**
-           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @description Role name to assign. Must be on an Enterprise plan to use the read-only or no-access roles. no-access grants no project visibility until project-scoped roles are assigned separately.
            * @example developer
            * @enum {string}
            */
-          role: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
         }
         /**
          * @description Resource type.
@@ -1922,6 +1922,8 @@ export interface components {
           account_name?: string
           /** @description The AWS account ID this PrivateLink share is associated with. */
           aws_account_id: string
+          /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+          custom_dns_name: string
           /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
           database_identifier: string
           /**
@@ -2237,6 +2239,8 @@ export interface components {
           account_name?: string
           /** @description The AWS account ID this PrivateLink share is associated with. */
           aws_account_id: string
+          /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+          custom_dns_name: string
           /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
           database_identifier: string
           /**

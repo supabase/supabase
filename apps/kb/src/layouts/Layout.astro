@@ -59,6 +59,7 @@ const { title, description } = Astro.props
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
 		/>
+		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
 		<title>{title} | Supabase Knowledge Base</title>
 	</head>
 	<body>

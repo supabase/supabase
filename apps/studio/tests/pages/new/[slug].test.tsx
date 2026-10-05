@@ -132,7 +132,7 @@ const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
     {
       postgres_engine: '17-oriole',
-      release_channel: 'alpha',
+      release_channel: 'beta',
       version: 'supabase-postgres-17.9.9.999-orioledb',
     },
   ],
@@ -617,7 +617,7 @@ describe('project creation wizard', () => {
       ).not.toBeInTheDocument()
     })
 
-    test('selecting orioledb shows the alpha warning and submits the oriole engine/channel', async () => {
+    test('selecting orioledb shows the beta warning and submits the oriole engine/channel', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
@@ -638,7 +638,7 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       const body = onRequest.mock.calls[0][0]
       expect(body.postgres_engine).toBe('17-oriole')
-      expect(body.release_channel).toBe('alpha')
+      expect(body.release_channel).toBe('beta')
     })
 
     test('hides advanced configuration only while high availability is enabled', async () => {

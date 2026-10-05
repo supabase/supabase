@@ -125,7 +125,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
           const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
 
-          if (projectScopedRole !== undefined) {
+          if (projectScopedRole !== undefined && projectScopedRole.base_role_id) {
             const projects = projectScopedRole.projects.map(({ ref }) => ref)
             inviteMember({
               slug,
