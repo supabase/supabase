@@ -11,8 +11,6 @@ const badgeVariants = cva(
         default: 'bg-surface-75 text-foreground-light border border-strong',
         warning: 'bg-warning/10 text-warning-600 border border-warning-500',
         success: 'bg-brand-default/10 text-brand-600 border border-brand-500',
-        // Solid primary plate — matches Button variant="primary" (primary-solid).
-        primary: 'bg-primary-solid text-primary-solid-foreground border-transparent',
         destructive: 'bg-destructive/10 text-destructive border border-border-destructive',
         // Secondary is invisible
         secondary:

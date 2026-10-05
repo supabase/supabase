@@ -147,7 +147,7 @@ export function PITRForm({
                   'rounded-none'
                 ),
                 day_button: 'w-full rounded-none',
-                selected: 'bg-primary-bright/70! dark:bg-primary-bright/25!',
+                selected: 'bg-brand-500!',
               }}
             />
             {availableDates.length > 1 && (

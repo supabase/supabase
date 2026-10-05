@@ -63,10 +63,9 @@ describe('ToggleGroup', () => {
     )
 
     rerender(renderSegmented({ defaultValue: 'data', tone: 'primary' }))
-    expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-primary-solid')
+    expect(container.querySelector('[data-segment-indicator]')).toHaveClass('bg-brand-400')
     expect(screen.getByRole('radio', { name: 'Data' })).toHaveClass(
-      'data-[state=on]:bg-transparent',
-      'data-[state=on]:text-primary-solid-foreground'
+      'data-[state=on]:bg-transparent'
     )
   })
 

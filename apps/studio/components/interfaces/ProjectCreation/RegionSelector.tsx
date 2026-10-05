@@ -71,8 +71,8 @@ const getDisplayNameForSmartRegion = (name: string): string => {
 const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
 const BestAvailableRegionIcon = () => (
-  <div className="w-5 border border-primary-bright h-4.5 rounded-[3px] bg-primary-bright/20 flex items-center justify-center">
-    <ThumbsUp size={10} className="text-primary" />
+  <div className="w-5 border border-brand-500 h-4.5 rounded-[3px] bg-brand-300 flex items-center justify-center">
+    <ThumbsUp size={10} className="text-brand" />
   </div>
 )
 

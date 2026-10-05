@@ -69,7 +69,7 @@ export const AIOnboarding = ({
                 <ActionCard
                   icon={<template.icon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                   title={template.title}
-                  bgColor="bg-primary-bright/20"
+                  bgColor="bg-brand-400"
                 />
               </button>
             ))}

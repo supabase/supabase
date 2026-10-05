@@ -26,9 +26,7 @@ const ServerLightCell = memo(function ServerLightCell({
       <span
         className={cn(
           'block h-1 w-1 rounded-full motion-safe:transition-all motion-safe:duration-150',
-          isActive
-            ? 'bg-primary-bright shadow-[0_0_6px_1px] shadow-primary-bright/50'
-            : 'bg-foreground/15'
+          isActive ? 'bg-brand-500 shadow-[0_0_6px_1px] shadow-brand-500/50' : 'bg-foreground/15'
         )}
       />
     </div>

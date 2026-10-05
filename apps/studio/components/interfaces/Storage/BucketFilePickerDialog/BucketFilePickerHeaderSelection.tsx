@@ -7,7 +7,7 @@ export const BucketFilePickerHeaderSelection = () => {
   const { selectedItems, clearSelectedItems } = useBucketFilePickerStateSnapshot()
 
   return (
-    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-primary-bright/70 px-2 py-1 shadow dark:bg-primary-bright/25">
+    <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow in-data-[theme*=dark]:bg-brand-500">
       <Button
         icon={<X size={16} strokeWidth={2} />}
         variant="text"
@@ -20,7 +20,7 @@ export const BucketFilePickerHeaderSelection = () => {
           selected
         </p>
 
-        <div className="border-r border-primary-bright/40 py-3" />
+        <div className="border-r border-green-900 py-3 opacity-50" />
       </div>
     </div>
   )
