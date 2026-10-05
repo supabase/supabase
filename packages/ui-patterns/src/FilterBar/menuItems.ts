@@ -94,11 +94,12 @@ export function buildPropertyItems(params: {
     })
   }
 
-  items.push(
-    ...availableProperties
-      .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
-      .map((prop) => ({ value: prop.name, label: prop.label }))
-  )
+  const normalizedInput = inputValue.toLowerCase()
+
+  for (const prop of availableProperties) {
+    if (!prop.label.toLowerCase().includes(normalizedInput)) continue
+    items.push({ value: prop.name, label: prop.label })
+  }
 
   if (supportsOperators) {
     items.push({ value: '__new_group__', label: 'New Group' })
@@ -126,12 +127,15 @@ export function buildPropertyChangeItems(params: {
   inputValue: string
 }): MenuItem[] {
   const { filterProperties, currentPropertyName, inputValue } = params
+  const normalizedInput = inputValue.toLowerCase()
 
-  return filterProperties
-    .filter((property) => property.isAvailable !== false)
-    .filter((prop) => prop.name !== currentPropertyName)
-    .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
-    .map((prop) => ({ value: prop.name, label: prop.label }))
+  const items: MenuItem[] = []
+  for (const p of filterProperties) {
+    if (p.isAvailable === false || p.name === currentPropertyName) continue
+    if (!p.label.toLowerCase().includes(normalizedInput)) continue
+    items.push({ value: p.name, label: p.label })
+  }
+  return items
 }
 
 export function buildValueItems(
@@ -275,14 +279,14 @@ function getIsOperatorValueItems(
     options.push({ value: 'true', label: 'TRUE' }, { value: 'false', label: 'FALSE' })
   }
 
+  const normalizedInput = inputValue.toLowerCase()
   const shouldFilter = hasTypedSinceFocus && inputValue.length > 0
   const filtered = shouldFilter
-    ? options.filter((opt) => {
-        const normalizedInput = inputValue.toLowerCase()
-        return (
-          opt.label.toLowerCase().includes(normalizedInput) || opt.value.includes(normalizedInput)
-        )
-      })
+    ? options.filter(
+        (opt) =>
+          opt.label.toLowerCase().includes(normalizedInput) ||
+          opt.value.includes(normalizedInput)
+      )
     : options
 
   return filtered.map((opt) => ({ ...opt, disabled: usedValues?.has(opt.value) || undefined }))

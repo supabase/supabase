@@ -321,3 +321,52 @@ describe('buildPropertyItems', () => {
     expect(groupPropertyItem?.value).not.toBe(newGroupItem?.value)
   })
 })
+
+describe('needle-hoist parity', () => {
+  const properties: FilterProperty[] = [
+    { label: 'Name', name: 'name', type: 'string', operators: ['='] },
+    { label: 'Status', name: 'status', type: 'string', operators: ['='] },
+  ]
+
+  it('buildPropertyItems matches case-insensitively like before', () => {
+    const items = buildPropertyItems({ filterProperties: properties, inputValue: 'NAM' })
+    expect(items).toEqual([{ value: 'name', label: 'Name' }])
+  })
+
+  it('empty input matches all (match-all preserved)', () => {
+    const items = buildPropertyItems({ filterProperties: properties, inputValue: '' })
+    expect(items.map((i) => i.value)).toEqual(['name', 'status'])
+  })
+
+  it('keeps freeform → properties → New Group → actions push order', () => {
+    const freeform: FilterProperty = {
+      label: 'Name',
+      name: 'name',
+      type: 'string',
+      operators: ['='],
+    }
+    const items = buildPropertyItems({
+      filterProperties: properties,
+      inputValue: 'n',
+      supportsOperators: true,
+      actions: [{ value: 'act', label: 'Act', onSelect: () => {} }],
+      freeformDefaultProperty: freeform,
+    })
+    expect(items[0].isFreeformSearch).toBe(true)
+    expect(items[items.length - 1].isAction).toBe(true)
+    expect(items.some((i) => i.value === '__new_group__')).toBe(true)
+  })
+
+  it('buildPropertyChangeItems keeps !==false + excludes current + case-insensitive', () => {
+    const props: FilterProperty[] = [
+      ...properties,
+      { label: 'Hidden', name: 'hidden', type: 'string', isAvailable: false, operators: ['='] },
+    ]
+    const items = buildPropertyChangeItems({
+      filterProperties: props,
+      currentPropertyName: 'name',
+      inputValue: 'STAT',
+    })
+    expect(items).toEqual([{ value: 'status', label: 'Status' }])
+  })
+})
