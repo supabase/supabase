@@ -654,7 +654,7 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
+BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
 
 ## Setup
 Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.

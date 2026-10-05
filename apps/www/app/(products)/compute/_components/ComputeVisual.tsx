@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from 'components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Database } from 'icons'
 import type { LucideIcon } from 'lucide-react'
@@ -7,7 +8,6 @@ import { Bot, User } from 'lucide-react'
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { cn } from 'ui'
 
-import SectionContainerWithCn from '../../../../components/Layouts/SectionContainerWithCn'
 import styles from './compute-visual.module.css'
 import { ComputeLogo } from './ComputeLogo'
 
@@ -185,6 +185,7 @@ function ComputeCardHeader({
         <ComputeIcon />
         <div className="flex min-w-0 flex-col leading-tight">
           <span className="truncate text-xs text-foreground">{name}</span>
+          {/* eslint-disable-next-line shadcn/no-arbitrary-values -- 11px is a deliberate micro-size for this diagram's dense card header, not a token gap */}
           <span className="truncate font-mono text-[11px] text-foreground-muted">{runtime}</span>
         </div>
       </div>
@@ -513,9 +514,9 @@ function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Con
   const box = (key: NodeKey) => boxes[key] as Box
   const top = (key: NodeKey) => box(key).y
   const bottom = (key: NodeKey) => box(key).y + box(key).height
-  const cx = (key: NodeKey) => box(key).x + box(key).width / 2
-  const cy = (key: NodeKey) => box(key).y + box(key).height / 2
-  const center = (key: NodeKey): Point => ({ x: cx(key), y: cy(key) })
+  const centerX = (key: NodeKey) => box(key).x + box(key).width / 2
+  const centerY = (key: NodeKey) => box(key).y + box(key).height / 2
+  const center = (key: NodeKey): Point => ({ x: centerX(key), y: centerY(key) })
   const at = (x: number, y: number): Point => ({ x, y })
 
   // Horizontal bands: the empty strips above and below the card grid, where
@@ -533,16 +534,16 @@ function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Con
     // Each source feeds its own column.
     connector('human-embeddings', [
       center('human'),
-      at(cx('human'), sourceBand),
-      at(cx('embeddings'), sourceBand),
+      at(centerX('human'), sourceBand),
+      at(centerX('embeddings'), sourceBand),
       center('embeddings'),
     ]),
     connector(
       'agent1-sandboxBottomMid',
       [
         center('agent1'),
-        at(cx('agent1'), sourceBand),
-        at(cx('sandboxBottomMid'), sourceBand),
+        at(centerX('agent1'), sourceBand),
+        at(centerX('sandboxBottomMid'), sourceBand),
         center('sandboxBottomMid'),
       ],
       live.sandboxBottomMid
@@ -551,8 +552,8 @@ function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Con
       'agent2-sandboxBottomRight',
       [
         center('agent2'),
-        at(cx('agent2'), sourceBand),
-        at(cx('sandboxBottomRight'), sourceBand),
+        at(centerX('agent2'), sourceBand),
+        at(centerX('sandboxBottomRight'), sourceBand),
         center('sandboxBottomRight'),
       ],
       live.sandboxBottomRight
@@ -561,8 +562,8 @@ function buildConnectors(geometry: Geometry, live: Record<string, boolean>): Con
     // The always-on column serves the application.
     connector('api-app', [
       center('api'),
-      at(cx('api'), appBand),
-      at(cx('app'), appBand),
+      at(centerX('api'), appBand),
+      at(centerX('app'), appBand),
       center('app'),
     ]),
   ]
@@ -592,6 +593,7 @@ function ConnectorLayer({
       aria-hidden="true"
     >
       <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width={width} height={height}>
+        {/* eslint-disable-next-line shadcn/no-raw-colors -- SVG mask luminance requires literal white, not a theme color */}
         <rect x="0" y="0" width={width} height={height} fill="white" />
         {Object.entries(boxes).map(([key, node]) => (
           <rect
@@ -601,6 +603,7 @@ function ConnectorLayer({
             width={node.width}
             height={node.height}
             rx={CARD_RADIUS}
+            // eslint-disable-next-line shadcn/no-raw-colors -- SVG mask luminance requires literal black, not a theme color
             fill="black"
           />
         ))}

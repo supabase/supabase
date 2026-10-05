@@ -7,7 +7,6 @@ import {
   Pause,
   Server,
   Shield,
-  Terminal,
   TrendingUp,
 } from 'lucide-react'
 
@@ -89,7 +88,8 @@ export function WorkloadsSection() {
                     className="flex items-start gap-2 text-foreground-light text-sm"
                   >
                     <Icon
-                      className="w-4 h-4 text-brand shrink-0 mt-0.5 stroke-[1.5px]"
+                      className="w-4 h-4 text-brand shrink-0 mt-0.5"
+                      strokeWidth={1.5}
                       aria-hidden
                     />
                     {feature.text}

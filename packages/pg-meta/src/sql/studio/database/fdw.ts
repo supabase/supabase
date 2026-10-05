@@ -8,6 +8,7 @@ import {
 } from '../../../pg-format'
 
 type SimplifiedWrapperMeta = {
+  name: string
   handlerName: string
   validatorName: string
   server: { options: { name: string; encrypted: boolean }[] }
@@ -255,6 +256,26 @@ export const getFDWsSql = (): SafeSqlFragment => {
   return sql
 }
 
+export function getCreateForeignDataWrapperSql(
+  wrapperMeta: SimplifiedWrapperMeta
+): SafeSqlFragment {
+  return safeSql`
+    do $$
+    begin
+      if not exists (
+        select 1 from pg_catalog.pg_foreign_data_wrapper where fdwname = ${literal(wrapperMeta.name)}
+      ) then
+        execute format(
+          'create foreign data wrapper %I handler %I validator %I',
+          ${literal(wrapperMeta.name)},
+          ${literal(wrapperMeta.handlerName)},
+          ${literal(wrapperMeta.validatorName)}
+        );
+      end if;
+    end $$;
+  `
+}
+
 export function getCreateFDWSql({
   wrapperMeta,
   formState,
@@ -270,12 +291,7 @@ export function getCreateFDWSql({
   }
   // If mode is skip, the wrapper will skip the last step, binding the schema/tables to foreign data. This could be done later.
   mode: 'tables' | 'schema' | 'skip'
-  tables: {
-    is_new_schema: boolean
-    schema_name: string
-    table_name: string
-    columns: { name: string; type: string }[]
-  }[]
+  tables: WrapperFormTable[]
   sourceSchema: string
   targetSchema: string
   schemaOptions?: SafeSqlFragment[]
@@ -287,17 +303,11 @@ export function getCreateFDWSql({
     '\n'
   )
 
-  const createWrapperSql = safeSql`
-    create foreign data wrapper ${ident(formState.wrapper_name)}
-    handler ${ident(wrapperMeta.handlerName)}
-    validator ${ident(wrapperMeta.validatorName)};
-  `
-
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
   const unencryptedOptions = wrapperMeta.server.options.filter((option) => !option.encrypted)
 
   const createEncryptedKeysSqlArray = encryptedOptions.map((option) => {
-    const key = `${formState.wrapper_name}_${option.name}`
+    const key = `${formState.server_name}_${option.name}`
     const quotedValue = literal(formState[option.name] || '')
 
     return safeSql`
@@ -359,9 +369,9 @@ export function getCreateFDWSql({
         encryptedOptions.map(
           (option) => safeSql`
               if is_using_old_wrappers then
-                select id into ${ident(`v_${option.name}`)} from pgsodium.valid_key where name = ${literal(`${formState.wrapper_name}_${option.name}`)} limit 1;
+                select id into ${ident(`v_${option.name}`)} from pgsodium.valid_key where name = ${literal(`${formState.server_name}_${option.name}`)} limit 1;
               else
-                select id into ${ident(`v_${option.name}`)} from vault.secrets where name = ${literal(`${formState.wrapper_name}_${option.name}`)} limit 1;
+                select id into ${ident(`v_${option.name}`)} from vault.secrets where name = ${literal(`${formState.server_name}_${option.name}`)} limit 1;
               end if;
             `
         ),
@@ -399,8 +409,6 @@ export function getCreateFDWSql({
   const sql = safeSql`
     ${newSchemasSql}
 
-    ${createWrapperSql}
-
     ${createEncryptedKeysSql}
 
     ${createServerSql}
@@ -417,31 +425,33 @@ export const getDeleteFDWSql = ({
   wrapper,
   wrapperMeta,
 }: {
-  wrapper: { id: number; name: string; server_name: string }
+  wrapper: { id: number; name: string; server_name: string; server_options?: string[] | null }
   wrapperMeta: SimplifiedWrapperMeta
 }): SafeSqlFragment => {
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
+  const currentServerOptions = parseOptionsArray(wrapper.server_options)
 
-  const deleteEncryptedSecretsSqlArray = encryptedOptions.map((option) => {
-    const key = `${wrapper.name}_${option.name}`
+  // Secrets are looked up by the id already stored in the server's own option
+  // value, never by a guessed name - the naming convention for new secrets has
+  // changed more than once across this feature's history, but the stored id is
+  // stable regardless of when the wrapper was created.
+  const deleteEncryptedSecretsSqlArray = encryptedOptions
+    .filter((option) => currentServerOptions[option.name] !== undefined)
+    .map((option) => {
+      const existingSecretId = currentServerOptions[option.name]
 
-    return safeSql`
-      do $$
-      begin
-        if not exists (
-          select 1 from pg_catalog.pg_foreign_data_wrapper where fdwname = ${literal(wrapper.name)}
-        ) then
+      return safeSql`
+        do $$
+        begin
           if ${isUsingOldWrappersSql} then
-            delete from vault.secrets where key_id = (select id from pgsodium.valid_key where name = ${literal(key)});
-
-            delete from pgsodium.key where name = ${literal(key)};
+            delete from vault.secrets where key_id = ${literal(existingSecretId)};
+            delete from pgsodium.key where id = ${literal(existingSecretId)};
           else
-            delete from vault.secrets where name = ${literal(key)};
+            delete from vault.secrets where id = ${literal(existingSecretId)}::uuid;
           end if;
-        end if;
-      end $$;
-    `
-  })
+        end $$;
+      `
+    })
 
   const deleteEncryptedSecretsSql = joinSqlFragments(deleteEncryptedSecretsSqlArray, '\n')
 
@@ -500,29 +510,18 @@ export const getUpdateFDWSql = ({
   formState: { [k: string]: string }
   tables: WrapperFormTable[]
 }): SafeSqlFragment => {
-  const ensureWrapperIsNotSharedSql = safeSql`
-    do $$
-    begin
-      if exists (
-        select 1
-        from pg_catalog.pg_foreign_server s
-        join pg_catalog.pg_foreign_data_wrapper w on w.oid = s.srvfdw
-        where w.fdwname = ${literal(wrapper.name)}
-          and s.srvname <> ${literal(wrapper.server_name)}
-      ) then
-        raise exception 'This wrapper is used by another server and cannot be edited here.';
-      end if;
-    end $$;
-  `
+  // wrapperMeta.name is fixed per wrapper type and shared across every server
+  // that uses it, so it's never user-editable here - only the server itself
+  // (formState.server_name / wrapper.server_name) can be configured per connection.
+  const newServerName = formState.server_name || wrapper.server_name
+  const isRenamingServer = newServerName !== wrapper.server_name
 
-  const nameChanged = formState.wrapper_name !== wrapper.name
-  const renameWrapperSql = nameChanged
-    ? safeSql`alter foreign data wrapper ${ident(wrapper.name)} rename to ${ident(formState.wrapper_name)};`
+  // Runs before every other statement so the rest of this transaction can
+  // target the server by its new name.
+  const renameServerSql = isRenamingServer
+    ? safeSql`alter server ${ident(wrapper.server_name)} rename to ${ident(newServerName)};`
     : safeSql``
 
-  // formState.server_name is never actually re-derived from wrapper_name before
-  // submit (see EditWrapperSheet), so the server itself is never renamed here -
-  // wrapper.server_name (the real, current name) is the only name we alter/target.
   const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
   const unencryptedOptions = wrapperMeta.server.options.filter((option) => !option.encrypted)
   const currentServerOptions = parseOptionsArray(wrapper.server_options)
@@ -548,11 +547,10 @@ export const getUpdateFDWSql = ({
   for (const option of encryptedOptions) {
     const existingSecretId = currentServerOptions[option.name]
     const newValue = formState[option.name]
-    const newSecretName = `${formState.wrapper_name}_${option.name}`
+    const newSecretName = `${newServerName}_${option.name}`
 
     if (newValue && existingSecretId !== undefined) {
-      // Secret already exists: update its value (and name, in case the wrapper
-      // was renamed) in place instead of deleting and recreating it.
+      // Secret already exists: update its value in place instead of deleting and recreating it.
       encryptedOptionSqlArray.push(safeSql`
         do $$
         declare
@@ -604,7 +602,7 @@ export const getUpdateFDWSql = ({
             select id::text into v_secret_ref from vault.secrets where name = ${literal(newSecretName)} limit 1;
           end if;
 
-          execute format('alter server ${ident(wrapper.server_name)} options (add ${ident(option.name)} %L)', v_secret_ref);
+          execute format('alter server ${ident(newServerName)} options (add ${ident(option.name)} %L)', v_secret_ref);
         end $$;
       `)
     } else if (!newValue && existingSecretId !== undefined) {
@@ -627,7 +625,7 @@ export const getUpdateFDWSql = ({
   const alterServerOptionsSql =
     serverOptionClauses.length > 0
       ? safeSql`
-          alter server ${ident(wrapper.server_name)}
+          alter server ${ident(newServerName)}
           options (${joinSqlFragments(serverOptionClauses, ', ')});
         `
       : safeSql``
@@ -655,7 +653,7 @@ export const getUpdateFDWSql = ({
     '\n'
   )
   const createTablesSql = joinSqlFragments(
-    tablesToCreate.map((table) => buildCreateForeignTableSql(table, wrapper.server_name)),
+    tablesToCreate.map((table) => buildCreateForeignTableSql(table, newServerName)),
     '\n'
   )
   const dropTablesSql = joinSqlFragments(
@@ -676,8 +674,7 @@ export const getUpdateFDWSql = ({
   )
 
   const sql = safeSql`
-    ${ensureWrapperIsNotSharedSql}
-    ${renameWrapperSql}
+    ${renameServerSql}
     ${alterServerOptionsSql}
     ${encryptedOptionsSql}
     ${newSchemasSql}
