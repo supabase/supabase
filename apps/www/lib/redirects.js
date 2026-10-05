@@ -1480,16 +1480,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime#broadcast',
-    destination: '/docs/guides/realtime/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime#presence',
-    destination: '/docs/guides/realtime/presence',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/realtime/postgres-cdc',
     destination: '/docs/guides/realtime/postgres-changes',
   },
@@ -1754,16 +1744,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/functions/auth#understanding-authorization-headers',
-    destination: '/docs/guides/functions/auth-headers',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
-    destination: '/docs/guides/functions/auth-headers',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
@@ -1802,75 +1782,6 @@ module.exports = [
     source: '/project/:path+',
     destination: 'https://supabase.com/dashboard/project/:path+',
   },
-  // Reorganizing pooler docs:-----------------------------
-
-  //external libraries
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#integrations',
-    destination: '/docs/guides/database/connecting-to-postgres#quickstart-connection-guides',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
-    destination: '/docs/guides/database/drizzle',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-prisma',
-    destination: '/docs/guides/database/prisma',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-postgresjs',
-    destination: '/docs/guides/database/postgres-js',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-pgadmin',
-    destination: '/docs/guides/database/pgadmin',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-psql',
-    destination: '/docs/guides/database/psql',
-  },
-
-  // pooling
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connection-pooler',
-    destination: '/docs/guides/database/connecting-to-postgres#connection-pooling-in-depth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#troubleshooting-supavisor',
-    destination: '/docs/guides/database/supavisor',
-  },
-
-  //IPv4/IPv6
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#finding-your-database-hostname',
-    destination: '/docs/guides/platform/ipv4-address#finding-your-databases-ip-address',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#managing-your-ip-address',
-    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#ipv6-address',
-    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#ipv4-address',
-    destination: '/docs/guides/platform/ipv4-address',
-  },
-  //--------------------------------------------------------
-
   // START docs 2.0, moving pages in to structure
   {
     permanent: true,
@@ -3363,61 +3274,6 @@ module.exports = [
     destination: '/docs/guides/platform/billing-on-supabase',
   },
   {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#how-billing-is-organized',
-    destination: '/docs/guides/platform/billing-on-supabase#organization-based-billing',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#quotas-and-features',
-    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#usage-items',
-    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
-    destination: '/docs/guides/platform/manage-your-usage/compute',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#compute-pricing',
-    destination: '/docs/guides/platform/manage-your-usage/compute#pricing',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#compute-credits',
-    destination: '/docs/guides/platform/manage-your-usage/compute#compute-credits',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#read-replicas',
-    destination: '/docs/guides/platform/manage-your-usage/read-replicas',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#project-add-ons',
-    destination: '/docs/guides/platform/manage-your-usage',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#unified-egress',
-    destination: '/docs/guides/platform/manage-your-usage/egress',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#included-egress-quota',
-    destination: '/docs/guides/platform/manage-your-usage/egress#pricing',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#egress-dashboards',
-    destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
-  },
-  {
     permanent: true,
     source: '/docs/guides/platform/manage-your-usage/log-ingest',
     destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
@@ -3426,31 +3282,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/manage-your-usage/log-query',
     destination: '/docs/guides/platform/manage-your-usage/logs-query',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#disk-size',
-    destination: '/docs/guides/platform/manage-your-usage/disk-size',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#free-plan',
-    destination: '/docs/guides/platform/billing-on-supabase#free-plan',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#billing-examples',
-    destination: '/docs/guides/platform/billing-on-supabase',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-free-plan-organization',
-    destination: '/docs/guides/platform/billing-on-supabase',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-pro-plan-organization',
-    destination: '/docs/guides/platform/billing-on-supabase',
   },
   {
     permanent: false,
