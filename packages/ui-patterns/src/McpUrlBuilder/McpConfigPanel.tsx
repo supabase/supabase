@@ -25,6 +25,11 @@ import { MCP_CLIENTS } from './mcpClients'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl, type McpSkipElicitation } from './utils/getMcpUrl'
 
+/**
+ * Key-indexed client lookup so group construction and selection resolve in
+ * O(1) instead of scanning MCP_CLIENTS per key. Keys are unique and group
+ * `keys` order drives the output, so behavior is unchanged.
+ */
 const MCP_CLIENT_BY_KEY = new Map<string, (typeof MCP_CLIENTS)[number]>(
   MCP_CLIENTS.map((c) => [c.key, c])
 )
