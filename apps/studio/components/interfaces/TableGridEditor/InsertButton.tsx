@@ -123,8 +123,8 @@ export const InsertButton = () => {
                     <FileText size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
                     <ArrowUp
                       className={cn(
-                        'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
-                        'group-data-highlighted:translate-y-0 group-data-highlighted:text-primary group-data-highlighted:opacity-100'
+                        'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-primary-solid rounded-full',
+                        'group-data-highlighted:translate-y-0 group-data-highlighted:text-primary-solid-foreground group-data-highlighted:opacity-100'
                       )}
                       strokeWidth={3}
                       size={12}

@@ -35,8 +35,7 @@ const segmentedIndicatorToneVariants = cva('', {
     tone: {
       outline: 'bg-overlay-hover border border-strong shadow-sm',
       text: 'bg-accent',
-      primary:
-        'bg-brand-400 dark:bg-brand-500 border border-brand-500/75 dark:border-brand-default/30',
+      primary: 'bg-primary-solid border border-primary-solid/75',
     },
   },
   defaultVariants: { tone: 'text' },
@@ -56,7 +55,10 @@ const toggleGroupVariants = cva('flex items-center justify-center', {
 })
 
 const ToggleGroupContext = React.createContext<
-  VariantProps<typeof toggleVariants> & { hasIndicator?: boolean }
+  VariantProps<typeof toggleVariants> & {
+    hasIndicator?: boolean
+    tone?: VariantProps<typeof segmentedToneVariants>['tone']
+  }
 >({
   size: 'default',
   variant: 'default',
@@ -112,7 +114,7 @@ const ToggleGroup = React.forwardRef<
         onValueChange={handleValueChange}
       >
         {hasIndicator && <ToggleGroupIndicator tone={tone} />}
-        <ToggleGroupContext.Provider value={{ variant, size, hasIndicator }}>
+        <ToggleGroupContext.Provider value={{ variant, size, hasIndicator, tone }}>
           {children}
         </ToggleGroupContext.Provider>
       </ToggleGroupPrimitive.Root>
@@ -153,6 +155,7 @@ const ToggleGroupItem = React.forwardRef<
 >(({ className, children, variant, size, ...props }, ref) => {
   const context = React.useContext(ToggleGroupContext)
   const resolvedVariant = context.variant || variant
+  const isPrimaryTone = resolvedVariant === 'segmented' && context.tone === 'primary'
 
   return (
     <ToggleGroupPrimitive.Item
@@ -163,6 +166,8 @@ const ToggleGroupItem = React.forwardRef<
           size: context.size || size,
         }),
         resolvedVariant === 'segmented' && !context.hasIndicator && segmentedSelfPaint,
+        isPrimaryTone &&
+          'data-[state=on]:text-primary-solid-foreground aria-checked:text-primary-solid-foreground',
         className
       )}
       {...props}
