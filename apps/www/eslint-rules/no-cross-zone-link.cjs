@@ -19,11 +19,20 @@ const crossZonePrefixes = loadProductionRewrites()
   .filter(({ destination }) => !destination.startsWith('/'))
   .map(({ source }) => source.replace(/\/(:path\*)?$/, ''))
 
+function parseHref(href) {
+  try {
+    return new URL(href, SUPABASE_ORIGIN)
+  } catch {
+    return null
+  }
+}
+
 function isCrossZonePath(href) {
-  const path = href.startsWith(SUPABASE_ORIGIN) ? href.slice(SUPABASE_ORIGIN.length) : href
-  const pathname = path.split(/[?#]/)[0]
+  const url = parseHref(href)
+  if (url?.origin !== SUPABASE_ORIGIN) return false
+
   return crossZonePrefixes.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+    (prefix) => url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)
   )
 }
 
