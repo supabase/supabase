@@ -44,7 +44,7 @@ const ThumbnailImage = ({
   return (
     <span
       role="presentation"
-      className="h-full w-full rounded-[5px] bg-cover bg-center bg-no-repeat"
+      className="h-full w-full rounded-sm bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url('${url}')` }}
     />
   )
