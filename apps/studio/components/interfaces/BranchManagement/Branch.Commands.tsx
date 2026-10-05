@@ -19,6 +19,7 @@ export function useBranchCommands() {
 
   const { data: selectedProject } = useSelectedProjectQuery()
   const ref = selectedProject?.ref || '_'
+  const parentRef = selectedProject?.parent_project_ref ?? ref
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { can: canCreateBranches } = useAsyncCheckPermissions(
@@ -90,24 +91,31 @@ export function useBranchCommands() {
     }
   )
 
+  useRegisterCommands(
+    COMMAND_MENU_SECTIONS.NAVIGATE,
+    [
+      {
+        id: 'nav-branch-management',
+        name: 'Branch management',
+        route: `/project/${ref}/branches`,
+      },
+      {
+        id: 'nav-branch-merge-requests',
+        name: 'Merge requests',
+        value: 'Branch',
+        route: `/project/${ref}/branches/merge-requests`,
+      },
+      {
+        id: 'nav-branch-integration',
+        name: 'GitHub connection',
+        value: 'Branch integration',
+        route: `/project/${parentRef}/settings/integrations`,
+      },
+    ],
+    { enabled: !!selectedProject }
+  )
+
   useRegisterCommands(COMMAND_MENU_SECTIONS.NAVIGATE, [
-    {
-      id: 'nav-branch-management',
-      name: 'Branch management',
-      route: `/project/${ref}/branches`,
-    },
-    {
-      id: 'nav-branch-merge-requests',
-      name: 'Merge requests',
-      value: 'Branch',
-      route: `/project/${ref}/branches/merge-requests`,
-    },
-    {
-      id: 'nav-branch-integration',
-      name: 'GitHub connection',
-      value: 'Branch integration',
-      route: `/project/${ref}/settings/integrations`,
-    },
     {
       id: 'nav-branch-feedback',
       name: 'Branching feedback',
