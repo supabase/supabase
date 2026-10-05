@@ -4,7 +4,7 @@ topics = [ "database" ]
 keywords = [ "pg_net", "net", "http_request_queue", "_http_response", "http_post", "headers", "Authorization", "bearer token", "secret key", "service_role", "Vault", "credentials", "Row Level Security" ]
 ---
 
-When you call `net.http_get`, `net.http_post`, or `net.http_delete`, pg_net stores the request as a row in `net.http_request_queue`. The row holds the URL, headers, and body until the pg_net worker sends the request. Any role that can use pg_net can read the row while it waits, including an `Authorization` or `apikey` header. For which roles can use pg_net, see [Revoking access to pg_net objects has no effect](/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16).
+When you call `net.http_get`, `net.http_post`, or `net.http_delete`, pg_net stores the request as a row in `net.http_request_queue`. The row holds the URL, headers, and body until the pg_net worker sends the request. Any role that can use pg_net can read the row while it waits, including an `Authorization` or `apikey` header. For which roles can use pg_net, see [Revoking access to pg_net objects has no effect](/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16#which-roles-can-use-pg_net).
 
 ## Check what your requests expose
 

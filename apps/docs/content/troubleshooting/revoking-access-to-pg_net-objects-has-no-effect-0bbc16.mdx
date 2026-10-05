@@ -62,9 +62,9 @@ select
 
 Supabase creates the pg_net extension as the `supabase_admin` role, so `supabase_admin` owns the `net` schema and everything in it. In Postgres, a role can revoke only the privileges that it granted. For more information, see the Postgres documentation on [`REVOKE`](https://www.postgresql.org/docs/current/sql-revoke.html).
 
-The extension grants `usage` on the schema and all privileges on its tables and sequences to `PUBLIC`. Its functions are executable by `PUBLIC`, because that's the Postgres default for functions. When the extension is created, Supabase also grants `usage` on `net` to `postgres`, `anon`, `authenticated`, and `service_role`.
+The extension grants `usage` on the schema and all privileges on its tables and sequences to `PUBLIC`. On most projects, its functions are also executable by `PUBLIC`, which is the Postgres default for functions. For the projects where they aren't, see [Which roles can use pg_net](#which-roles-can-use-pg_net). When the extension is created, Supabase also grants `usage` on `net` to `postgres`, `anon`, `authenticated`, and `service_role`.
 
-The `postgres` role made none of these grants, so its `revoke` finds nothing to remove. It also holds the privileges without the grant option, so its `grant` to another role also does nothing, and Postgres reports `no privileges were granted`.
+The `postgres` role made none of these grants, so its `revoke` finds nothing to remove. It holds the privileges without the grant option, so its `grant` to another role does nothing either, and Postgres reports `no privileges were granted`.
 
 A grant to `PUBLIC` applies to every role, including roles you create later. Postgres has no way to exclude a single role from a `PUBLIC` grant.
 
@@ -72,31 +72,31 @@ A grant to `PUBLIC` applies to every role, including roles you create later. Pos
 
 The following table shows how each kind of role can reach the `net` schema.
 
-| Role                                            | Can use pg_net | Reason                                                                                                                                                                                                                                                  |
-| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `anon`, `authenticated`, `service_role`         | No, by default | These roles can't connect to the database directly, and the Data API doesn't expose `net` by default. If you add `net` to the exposed schemas, these roles can read `net.http_request_queue` through the `PUBLIC` grants, including queued credentials. |
-| `postgres` and any role you create with `login` | Yes            | The role can read and change rows in `net.http_request_queue` and `net._http_response`. The worker sends each row in the queue.                                                                                                                         |
+| Role                                            | Can use pg_net | Reason                                                                                                                          |
+| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `anon`, `authenticated`, `service_role`         | No, by default | These roles can't connect to the database directly, and the Data API doesn't expose `net` by default.                           |
+| `postgres` and any role you create with `login` | Yes            | The role can read and change rows in `net.http_request_queue` and `net._http_response`. The worker sends each row in the queue. |
 
-On some projects, only specific roles can call `net.http_get` and `net.http_post`. A role you create can still add rows to the queue, and the worker sends them. To check a role, run the `has_function_privilege` query from [Check which roles have access](#check-which-roles-have-access).
+On some projects, only `postgres`, `anon`, `authenticated`, `service_role`, and `supabase_functions_admin` can call `net.http_get` and `net.http_post`. For the events that revoke `execute` from `PUBLIC`, see [When the default grants are applied](#when-the-default-grants-are-applied). A role you create can still add rows to the queue, and the worker sends them. To check a role, run the `has_function_privilege` query from [Check which roles have access](#check-which-roles-have-access).
 
-A row in `net.http_request_queue` holds the request's URL, headers, and body until the pg_net worker sends it. A role that can connect to the database can read the `Authorization` header of a queued request. For ways to limit what a queued request exposes, see [Database roles can read request headers queued by pg_net](/docs/guides/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357).
+A row in `net.http_request_queue` holds the request's URL, headers, and body until the pg_net worker sends it. To check what a queued request exposes, see [Database roles can read request headers queued by pg_net](/docs/guides/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357).
 
 ## Limit pg_net access on your project
 
 Supabase doesn't support changing the grants on pg_net objects for individual projects, so treat the default grants as a platform constraint.
 
-Removing the `PUBLIC` grants on the `net` tables breaks pg_net. The `postgres` role reaches those tables only through them, and the pg_net background worker connects as `postgres`. Without the grants, a request function called as `postgres` fails with `permission denied for table http_request_queue`, which also breaks pg_cron jobs that call pg_net.
+Removing the `PUBLIC` grants on the `net` tables breaks pg_net, because the `postgres` role reaches those tables only through them. Without the grants, a request function called as `postgres` fails with `permission denied for table http_request_queue`, which also breaks pg_cron jobs that call pg_net.
 
 To reduce what pg_net exposes:
 
 - Give the `login` attribute only to roles for services that you trust to send HTTP requests from your database.
 - Treat any credential you send in request headers as readable by every role that can connect to your database.
-- Keep `net` out of the exposed schemas in your [API settings](/dashboard/project/_/settings/api).
+- Keep `net` out of the exposed schemas in your [API settings](/dashboard/project/_/settings/api). If you expose it, `anon` and `authenticated` can read `net.http_request_queue` through the `PUBLIC` grants, including queued credentials.
 - If your project doesn't use pg_net, drop the extension. Dropping it removes the `net` schema and all of its grants.
 
 <Admonition type="danger">
 
-Dropping pg_net deletes unsent requests and stored responses, and stops Database Webhooks, which send their requests through pg_net.
+Dropping pg_net deletes unsent requests and stored responses, and stops Database Webhooks, which send their requests through pg_net. Before you drop it, check that `net.http_request_queue` is empty and that your project has no Database Webhooks.
 
 </Admonition>
 
@@ -110,5 +110,7 @@ drop extension pg_net;
 
 Dropping and re-creating the extension doesn't remove the grants, because `create extension pg_net` applies all of them again. Two other events grant `usage` on `net` to `anon`, `authenticated`, and `service_role` again:
 
-- A major Postgres version upgrade, which also grants `execute` on `net.http_get` and `net.http_post` to these roles.
-- Enabling Database Webhooks.
+- A major Postgres version upgrade.
+- Turning on Database Webhooks.
+
+A major Postgres version upgrade also revokes `execute` on `net.http_get` and `net.http_post` from `PUBLIC`, and grants it to `postgres`, `anon`, `authenticated`, `service_role`, and `supabase_functions_admin`. The same happens when pg_net 0.11 or earlier is enabled on a project.
