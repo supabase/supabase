@@ -83,13 +83,14 @@ describe('McpConfigPanel opt-out transitions', () => {
 
 describe('MCP client key lookup parity', () => {
   it('renders every client across groups (map preserves find behavior)', () => {
-    const { container } = render(<McpConfigPanel {...props} />, {
+    render(<McpConfigPanel {...props} />, {
       wrapper: TooltipProvider,
     })
     // open the client dropdown: the trigger button shows the selected client label
+    // (popover content renders in a portal, so query the document via screen)
     fireEvent.click(screen.getByRole('button', { name: new RegExp(MCP_CLIENTS[0].label) }))
     for (const group of MCP_CLIENT_GROUPS) {
-      expect(container.textContent).toContain(group.heading)
+      expect(screen.getByText(group.heading)).toBeTruthy()
     }
     const labels = MCP_CLIENTS.map((c) => c.label)
     expect(new Set(labels).size).toBe(MCP_CLIENTS.length)
