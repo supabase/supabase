@@ -19,7 +19,6 @@ export function useBranchCommands() {
 
   const { data: selectedProject } = useSelectedProjectQuery()
   const ref = selectedProject?.ref || '_'
-  const parentRef = selectedProject?.parent_project_ref ?? ref
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { can: canCreateBranches } = useAsyncCheckPermissions(
