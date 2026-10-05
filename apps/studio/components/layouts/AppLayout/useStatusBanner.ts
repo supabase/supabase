@@ -61,5 +61,5 @@ export function useStatusBanner(): StatusBannerState {
     )
   }
 
-  return { type: 'shown', selection, pageUrl: data?.pageUrl ?? DEFAULT_STATUS_PAGE_URL, onDismiss }
+  return { type: 'shown', selection, pageUrl: DEFAULT_STATUS_PAGE_URL, onDismiss }
 }

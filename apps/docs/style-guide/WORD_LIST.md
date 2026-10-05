@@ -539,6 +539,10 @@ Write _microservices_, not _micro-services_.
 
 Use _might_ for possibility or an uncertain outcome.
 
+### Multigres
+
+Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
+
 ### must
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.

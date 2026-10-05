@@ -440,6 +440,8 @@ If you have any Supabase containers running locally, stop them and delete their 
    supabase stop --no-backup
    ```
 
+With the default ports, `supabase start` runs one local project per machine, because every project's `config.toml` uses the same ports. To run several local projects or git worktrees at the same time, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+
 ## Telemetry
 
 The Supabase CLI collects telemetry data about general usage. Participating in this program is optional, and you can opt out at any time.
