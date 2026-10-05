@@ -16,7 +16,6 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import { ShortcutTooltip } from '../ShortcutTooltip'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
