@@ -1,5 +1,4 @@
 import { forwardRef, type SVGAttributes } from 'react'
-import { cn } from 'ui'
 
 interface BroomSparklesIconProps extends Omit<SVGAttributes<SVGSVGElement>, 'children'> {
   size?: number | string
@@ -22,7 +21,7 @@ export const BroomSparklesIcon = forwardRef<SVGSVGElement, BroomSparklesIconProp
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cn('lucide lucide-broom-sparkles', className)}
+      className={className}
       {...props}
     >
       <path d="M11 2v2" />
