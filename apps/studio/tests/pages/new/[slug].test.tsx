@@ -333,10 +333,31 @@ const getSelectTriggerByLabel = (labelText: string) => {
   return trigger as HTMLElement
 }
 
+// The picker shows either the general or the specific regions; the link under it swaps the two.
+const toggleRegionGroup = async () => {
+  const link = await screen.findByRole('button', {
+    name: /Need a specific region\?|Use a general region instead/,
+  })
+  await user.click(link)
+}
+
+// Opens the dropdown on the group that holds `optionName`, whichever one that is.
 // Region is selected explicitly because the smart-region auto-fill is unreliable (FE-3884).
 const selectRegion = async (optionName: string | RegExp) => {
   await user.click(getSelectTriggerByLabel('Region'))
+
+  if (screen.queryByRole('option', { name: optionName }) === null) {
+    await user.keyboard('{Escape}')
+    await toggleRegionGroup()
+    await user.click(getSelectTriggerByLabel('Region'))
+  }
+
   await user.click(await screen.findByRole('option', { name: optionName }))
+}
+
+const openSpecificRegions = async () => {
+  await toggleRegionGroup()
+  await user.click(getSelectTriggerByLabel('Region'))
 }
 
 const fillProjectName = async (name: string) => {
@@ -485,6 +506,46 @@ describe('project creation wizard', () => {
       expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ name: 'Americas' })
     })
 
+    test('keeps the specific regions behind a link until they are asked for', async () => {
+      mockWizardEndpoints()
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      await user.click(getSelectTriggerByLabel('Region'))
+
+      expect(await screen.findByText('General regions')).toBeInTheDocument()
+      expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+
+      await user.keyboard('{Escape}')
+      await openSpecificRegions()
+
+      expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+      expect(screen.queryByText('General regions')).not.toBeInTheDocument()
+    })
+
+    test('restores the previously selected general region in one click', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Region Revert Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Americas/)
+      await selectRegion(/East US/)
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('East US (North Virginia)')
+
+      await user.click(screen.getByRole('button', { name: 'Use a general region instead' }))
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ name: 'Americas' })
+    })
+
     test('shows an error state when available regions fail to load', async () => {
       mockWizardEndpoints({ availableRegions: 'error' })
 
@@ -510,7 +571,7 @@ describe('project creation wizard', () => {
       ) => {
         await fillProjectName('Restricted Region Project')
         await generateAndWaitForStrongPassword()
-        await user.click(getSelectTriggerByLabel('Region'))
+        await openSpecificRegions()
 
         const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
         expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')

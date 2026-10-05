@@ -1,6 +1,6 @@
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -13,7 +13,6 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
   Tooltip,
@@ -38,7 +37,7 @@ import {
 } from './RegionSelector.utils'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
@@ -172,6 +171,23 @@ export const RegionSelector = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbRegion, form])
 
+  // The specific regions sit behind a link rather than in the same list as the general regions, so
+  // the picker shows one group at a time.
+  const hasGeneralRegions = smartRegionEnabled && !highAvailability
+  const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
+  const [isChoosingSpecificRegion, setIsChoosingSpecificRegion] = useState(false)
+  const isSpecificSelectVisible =
+    isChoosingSpecificRegion || isSpecificRegionSelected || !hasGeneralRegions
+  const isShowingPlaceholder = isSpecificSelectVisible && !isSpecificRegionSelected
+
+  // Going back to the general regions restores whatever was selected before the switch. `dbRegion`
+  // can't be cleared, so with nothing to restore we fall back to the recommended general region
+  // rather than leaving the field showing a region the form no longer holds.
+  const lastGeneralRegionRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (dbRegion !== undefined && !isSpecificRegionSelected) lastGeneralRegionRef.current = dbRegion
+  }, [dbRegion, isSpecificRegionSelected])
+
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
   }
@@ -197,6 +213,15 @@ export const RegionSelector = ({
               ? getRegionRestrictionCopy(selectedRestriction)
               : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
+
+          const handleUseGeneralRegion = () => {
+            setIsChoosingSpecificRegion(false)
+            const regionToRestore =
+              lastGeneralRegionRef.current ??
+              smartRegions.find((region) => recommendedSmartRegions.has(region.code))?.name ??
+              smartRegions[0]?.name
+            if (regionToRestore !== undefined) field.onChange(regionToRestore)
+          }
 
           const affectingIncidents = incidents.filter((incident) => {
             const affectedRegions = incident.cache?.affected_regions ?? []
@@ -236,41 +261,43 @@ export const RegionSelector = ({
                   ) : undefined
                 }
               >
-                <FormControl>
-                  <Select
-                    value={dbRegion}
-                    onValueChange={(value) => {
-                      if (value === '') return
-                      field.onChange(value)
-                    }}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger
-                      ref={field.ref}
-                      id="region"
-                      className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
+                <div className="flex flex-col items-start gap-y-1">
+                  <FormControl>
+                    <Select
+                      value={isShowingPlaceholder ? '' : dbRegion}
+                      onValueChange={(value) => {
+                        if (value === '') return
+                        field.onChange(value)
+                      }}
+                      disabled={isLoading}
                     >
-                      <SelectValue
-                        placeholder={
-                          isLoading
-                            ? 'Loading available regions...'
-                            : 'Select a region for your project..'
-                        }
+                      <SelectTrigger
+                        ref={field.ref}
+                        id="region"
+                        className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
                       >
-                        {dbRegion !== undefined && (
-                          <div className="flex items-center gap-x-3">
-                            {isLoading && <Loader2 size={14} className="animate-spin" />}
-                            {selectedRegion?.code && (
-                              <RegionFlag className="w-5" region={selectedRegion.code} />
-                            )}
-                            <span className="text-foreground">{triggerLabel}</span>
-                          </div>
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {smartRegionEnabled && !highAvailability && (
-                        <>
+                        <SelectValue
+                          placeholder={
+                            isLoading
+                              ? 'Loading available regions...'
+                              : isSpecificSelectVisible
+                                ? 'Select a specific region...'
+                                : 'Select a region for your project..'
+                          }
+                        >
+                          {!isShowingPlaceholder && dbRegion !== undefined && (
+                            <div className="flex items-center gap-x-3">
+                              {isLoading && <Loader2 size={14} className="animate-spin" />}
+                              {selectedRegion?.code && (
+                                <RegionFlag className="w-5" region={selectedRegion.code} />
+                              )}
+                              <span className="text-foreground">{triggerLabel}</span>
+                            </div>
+                          )}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {!isSpecificSelectVisible && (
                           <SelectGroup>
                             <SelectLabel>General regions</SelectLabel>
                             {smartRegions.map((value) => {
@@ -300,63 +327,83 @@ export const RegionSelector = ({
                               )
                             })}
                           </SelectGroup>
-                          <SelectSeparator />
-                        </>
-                      )}
+                        )}
 
-                      <SelectGroup>
-                        <SelectLabel>
-                          {highAvailability ? 'High Availability Regions' : 'Specific regions'}
-                        </SelectLabel>
-                        {regionOptionsWithRestriction.map((value) => {
-                          const restrictionCopy =
-                            value.restriction !== undefined
-                              ? getRegionRestrictionCopy(value.restriction)
-                              : undefined
-                          return (
-                            <SelectItem
-                              key={value.code}
-                              value={value.name}
-                              className={cn(
-                                'w-full [&>:nth-child(2)]:w-full',
-                                restrictionCopy !== undefined && 'pointer-events-auto!'
-                              )}
-                            >
-                              <div className="flex flex-row items-center justify-between w-full gap-x-2">
-                                <div className="flex items-center gap-x-3">
-                                  <RegionFlag className="w-5" region={value.code} />
-                                  <div className="flex items-center gap-x-2">
-                                    <span className="text-foreground">{value.name}</span>
-                                    <span className="text-xs text-foreground-lighter font-mono">
-                                      {value.code}
-                                    </span>
-                                  </div>
-                                </div>
+                        {isSpecificSelectVisible && (
+                          <SelectGroup>
+                            <SelectLabel>
+                              {highAvailability ? 'High Availability Regions' : 'Specific regions'}
+                            </SelectLabel>
+                            {regionOptionsWithRestriction.map((value) => {
+                              const restrictionCopy =
+                                value.restriction !== undefined
+                                  ? getRegionRestrictionCopy(value.restriction)
+                                  : undefined
+                              return (
+                                <SelectItem
+                                  key={value.code}
+                                  value={value.name}
+                                  className={cn(
+                                    'w-full [&>:nth-child(2)]:w-full',
+                                    restrictionCopy !== undefined && 'pointer-events-auto!'
+                                  )}
+                                >
+                                  <div className="flex flex-row items-center justify-between w-full gap-x-2">
+                                    <div className="flex items-center gap-x-3">
+                                      <RegionFlag className="w-5" region={value.code} />
+                                      <div className="flex items-center gap-x-2">
+                                        <span className="text-foreground">{value.name}</span>
+                                        <span className="text-xs text-foreground-lighter font-mono">
+                                          {value.code}
+                                        </span>
+                                      </div>
+                                    </div>
 
-                                {recommendedSpecificRegions.has(value.code) && (
-                                  <Badge variant="success" className="mr-1">
-                                    Recommended
-                                  </Badge>
-                                )}
-
-                                {restrictionCopy !== undefined && (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Badge variant="warning" className="mr-1">
-                                        {restrictionCopy.badge}
+                                    {recommendedSpecificRegions.has(value.code) && (
+                                      <Badge variant="success" className="mr-1">
+                                        Recommended
                                       </Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </SelectItem>
-                          )
-                        })}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
+                                    )}
+
+                                    {restrictionCopy !== undefined && (
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <Badge variant="warning" className="mr-1">
+                                            {restrictionCopy.badge}
+                                          </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
+                                      </Tooltip>
+                                    )}
+                                  </div>
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectGroup>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  {hasGeneralRegions && (
+                    <p className="text-sm text-foreground-lighter">
+                      <button
+                        type="button"
+                        tabIndex={0}
+                        className={InlineLinkClassName}
+                        onClick={
+                          isSpecificSelectVisible
+                            ? handleUseGeneralRegion
+                            : () => setIsChoosingSpecificRegion(true)
+                        }
+                      >
+                        {isSpecificSelectVisible
+                          ? 'Use a general region instead'
+                          : 'Need a specific region?'}
+                      </button>
+                    </p>
+                  )}
+                </div>
               </FormItemLayout>
 
               {isStatusPageEnabled ? (
