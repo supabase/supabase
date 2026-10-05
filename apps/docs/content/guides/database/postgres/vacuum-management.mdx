@@ -7,7 +7,7 @@ footerHelpType: 'postgres'
 
 Autovacuum is Postgres's garbage collector. It mainly removes stale and unnecessary row versions from your tables in the background.
 
-The default settings work for most projects, but under intensive workloads, autovacuum can fall behind or impose a disruptive overhead.
+The default settings work for most projects, but under intensive workloads, autovacuum might fall behind or impose a disruptive overhead.
 
 Use this guide in the order that matches your situation:
 
@@ -18,7 +18,7 @@ Use this guide in the order that matches your situation:
 
 ## How autovacuum works
 
-If you're already familiar with the vacuum, skip to [Monitor autovacuum](#monitoring-autovacuum). Otherwise, expand the sections below for more context about the tool.
+If you're already familiar with the vacuum, skip to [Monitor autovacuum](#monitoring-autovacuum). Otherwise, expand the following sections for more context about the tool.
 
 <Accordion
   type="default"
@@ -47,14 +47,14 @@ Old row versions that no transaction can see anymore are called _dead rows_, whi
 
 Dead rows create two problems:
 
-1. **Bloat**: A dead row still takes up disk space, known as `bloat`. Beyond claiming storage, Postgres has to scan past dead rows during queries, which degrades performance.
+1. **Bloat**: A dead row still takes up disk space, known as _bloat_. Beyond claiming storage, Postgres has to scan past dead rows during queries, which degrades performance.
 
 2. **Transaction ID wraparound**: Postgres tells new and old row versions apart by assigning them transaction IDs, drawn from a counter with roughly 2.1 billion usable values. The database must recycle IDs before the counter runs out, or it will enter a protective read-only state to preserve data integrity.
 
 Autovacuum addresses both issues by:
 
 1. **Freeing bloat**: frees the space held by dead rows so new rows can reuse it.
-2. **Freezing old rows (wraparound management)**: Once a row version is old enough, autovacuum recycles (_freezes_) its transaction ID, preventing transaction ID wraparound.
+2. **Freezing old rows (wraparound management)**: Once a row version is old enough, autovacuum recycles, or _freezes_, its transaction ID, preventing transaction ID wraparound.
 
   </AccordionItem>
   <AccordionItem
@@ -62,7 +62,7 @@ Autovacuum addresses both issues by:
     id="background-statistics"
   >
 
-Postgres collects statistics about the data in each table, such as its most common values, average column width, and natural ordering. The statistics help the database decide on the optimal retreival strategies, such as whether to use an index or not, when executing queries.
+Postgres collects statistics about the data in each table, such as its most common values, average column width, and natural ordering. The statistics help the database decide on the optimal retrieval strategies, such as whether to use an index or not, when executing queries.
 
 To keep statistics accurate, Postgres needs to resample tables as their data changes. Since the autovacuum system already monitors row changes, it also handles this periodic resampling.
 
@@ -71,11 +71,11 @@ To keep statistics accurate, Postgres needs to resample tables as their data cha
 
 ## Monitoring autovacuum
 
-This section helps you measure the main symptoms of an unhealthy vacuum: bloat, wraparound risk, and disruptive vacuum activity.
+This section helps you measure the main symptoms of a poorly tuned vacuum: bloat, wraparound risk, and disruptive vacuum activity.
 
 ### Checking table bloat
 
-There's no universal healthy range for bloat, but levels above 20% are often a sign of a poorly tuned vacuum. For tables with tens of millions of rows, consider stricter thresholds, such as 5% to 15%. If you identify a problem table, review [Vacuum frequency](#vacuum-frequency) to make it vacuum more often.
+There's no universal healthy range for bloat, but levels above 20% are often a sign of a poorly tuned vacuum. For tables with tens of millions of rows, consider stricter thresholds, such as 5% to 15%. If you identify a problem table, review [Vacuum frequency configurations](#vacuum-frequency-configurations) to make it vacuum more often.
 
 Measuring bloat precisely requires scanning an entire table, which becomes expensive as it grows. Start with an estimate across all tables, then confirm any outliers with a precise check.
 
@@ -93,7 +93,7 @@ Measuring bloat precisely requires scanning an entire table, which becomes expen
     id="bloat-estimate-advanced"
   >
 
-Jehan-Guillaume (ioguix) de Rorthais's [pgsql-bloat-estimation](https://github.com/ioguix/pgsql-bloat-estimation/tree/master#bloat-in-tables) query is commonly used to estimate bloat. The version below is modified to also estimate underutilized table space, which can come from dead rows or space reserved for page overhead.
+Jehan-Guillaume (ioguix) de Rorthais's [pgsql-bloat-estimation](https://github.com/ioguix/pgsql-bloat-estimation/tree/master#bloat-in-tables) query is commonly used to estimate bloat. The following version is modified to also estimate underutilized table space, which can come from dead rows or space reserved for page overhead.
 
 ```sql
 select
@@ -187,7 +187,7 @@ order by schemaname, tblname;
     id="bloat-estimate-index"
   >
 
-Indexes accumulate bloat too. The query below is from [pgsql-bloat-estimation](https://github.com/ioguix/pgsql-bloat-estimation/tree/master#bloat-in-tables).
+Indexes accumulate bloat too. The following query is from [pgsql-bloat-estimation](https://github.com/ioguix/pgsql-bloat-estimation/tree/master#bloat-in-tables).
 
 ```sql
 -- warning: executed with a non-superuser role, the query inspects only indexes on tables you are granted to read.
@@ -336,7 +336,7 @@ create extension "pgstattuple"
 with schema extensions;
 ```
 
-Once installed, you can get a **close** approximation of bloat. This is more intensive than the estimation queries, but much more precise:
+Once installed, you can get a close approximation of bloat. This is more intensive than the estimation queries, but much more precise:
 
 ```sql
 select
@@ -407,7 +407,7 @@ These views only show the most recent or currently active vacuum per table. For 
 
 #### Log autovacuum runs
 
-The `log_autovacuum_min_duration` setting logs every vacuum that takes longer than the configured duration. The below drop down explains how to update the setting.
+The `log_autovacuum_min_duration` setting logs every vacuum that takes longer than the configured duration. The following section explains how to update the setting.
 
 <Accordion
   type="default"
@@ -423,7 +423,7 @@ The `log_autovacuum_min_duration` setting logs every vacuum that takes longer th
 
 <Admonition type="caution">
 
-To avoid noise and logging overheads, it is not advised to log runs that take less than `1s` to complete.
+Don't log runs that take less than `1s` to complete. Logging short runs adds noise and logging overhead without surfacing useful information.
 
 </Admonition>
 
@@ -484,7 +484,7 @@ When a table's `transaction_ids_used` passes `autovacuum_freeze_max_age` (defaul
 automatic aggressive vacuum to prevent wraparound of table "TABLE_NAME"...
 ```
 
-These aggressive vacuums are more intensive than normal vacuum activity and can introduce greater disk and CPU strain. If `transaction_ids_used` regularly climbs toward 200 million, [tuning autovacuum](#tuning-autovacuum) to run more often rather than paying the cost of repeated aggressive vacuums.
+These aggressive vacuums are more intensive than normal vacuum activity and can introduce greater disk and CPU strain. If `transaction_ids_used` regularly climbs toward 200 million, consider [tuning autovacuum](#tuning-autovacuum) to run more often rather than paying the cost of repeated aggressive vacuums.
 
 #### Signs of imminent wraparound
 
@@ -529,7 +529,7 @@ dead_rows > autovacuum_vacuum_threshold + (autovacuum_vacuum_scale_factor * pg_c
 | -------------------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `autovacuum_vacuum_threshold`    | 50      | Minimum number of dead rows before a vacuum can trigger.                                                                                                                                                                      |
 | `autovacuum_vacuum_scale_factor` | 0.2     | Fraction of the table's rows that must be dead before a vacuum triggers.                                                                                                                                                      |
-| `pg_class.reltuples`             | N/A     | An estimation of the number of live rows in a table. This number is refreshed after vacuum runs. The value is stored in tge [`pg_class`](https://www.postgresql.org/docs/current/catalog-pg-class.html#CATALOG-PG-CLASS) view |
+| `pg_class.reltuples`             | N/A     | An estimation of the number of live rows in a table. This number is refreshed after vacuum runs. The value is stored in the [`pg_class`](https://www.postgresql.org/docs/current/catalog-pg-class.html#CATALOG-PG-CLASS) view |
 
 As an example, consider a table with **1 million rows** (`pg_class.reltuples`):
 
@@ -548,7 +548,7 @@ The calculation is:
     id="insert-threshold"
   >
 
-Insert-heavy tables, like ones used for archiving, produce little bloat. They still need vacuuming to freeze rows and avoid [wraparound](#check-wraparound-risk), so inserts have their own trigger:
+Insert-heavy tables, like ones used for archiving, produce little bloat. They still need vacuuming to freeze rows and avoid [wraparound](#uncovering-wraparound-risks), so inserts have their own trigger:
 
 ```
 inserted_rows > autovacuum_vacuum_insert_threshold + (autovacuum_vacuum_insert_scale_factor * pg_class.reltuples)
@@ -588,7 +588,7 @@ rows_changed_since_last_analyze > autovacuum_analyze_threshold + (autovacuum_ana
 | --------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `autovacuum_analyze_threshold`    | 50      | Minimum number of inserted, updated, or deleted rows before an analyze can trigger.                                                                                                                                          |
 | `autovacuum_analyze_scale_factor` | 0.1     | Fraction of the table's rows that must have changed before an analyze triggers.                                                                                                                                              |
-| `pg_class.reltuples`              | N/A     | An estimation of the number of live rows in a table. This number is refreshed after vacuum runs. The value is stored in tge `pg_class`](https://www.postgresql.org/docs/current/catalog-pg-class.html#CATALOG-PG-CLASS) view |
+| `pg_class.reltuples`              | N/A     | An estimation of the number of live rows in a table. This number is refreshed after vacuum runs. The value is stored in the [`pg_class`](https://www.postgresql.org/docs/current/catalog-pg-class.html#CATALOG-PG-CLASS) view |
 
 As an example, consider a table with **1 million rows** (`pg_class.reltuples`):
 
@@ -636,7 +636,7 @@ alter table public.mytable set (
 
 ### Throttle vacuum resource usage
 
-Vacuuming a large table can cause CPU and disk spikes. The first lever is [vacuum frequency](#vacuum-frequency): lowering the scale factors trades infrequent, aggressive runs for frequent, low-intensity ones.
+Vacuuming a large table can cause CPU and disk spikes. The first lever is [vacuum frequency configurations](#vacuum-frequency-configurations): lowering the scale factors trades infrequent, aggressive runs for frequent, low-intensity ones.
 
 The second lever is cost-based throttling. The vacuum scores each page it touches and pauses when the accumulated cost reaches a limit:
 
@@ -645,12 +645,12 @@ The second lever is cost-based throttling. The vacuum scores each page it touche
 | `vacuum_cost_page_hit`         | 1       | Cost of vacuuming a page (8KB chunk of a table) that is already in memory.                                     |
 | `vacuum_cost_page_miss`        | 2       | Cost of vacuuming a page that has to be read from disk.                                                        |
 | `vacuum_cost_page_dirty`       | 20      | Cost of modifying a page that wasn't already pending a write to disk.                                          |
-| `vacuum_cost_limit` | 200      | Accumulated cost that makes an vacuum job sleep. |
+| `vacuum_cost_limit` | 200      | Accumulated cost that makes a vacuum job sleep. |
 | `autovacuum_vacuum_cost_delay` | 2ms     | How long the worker sleeps when the cost limit is reached. `0` disables throttling.                            |
 
-As an example, a vacuum that dirties 9 previously clean pages (cost of 180) and reads 10 pages from disk (cost of 20) reaches the cost limit of 200 and sleeps for 2 ms before continuing.
+As an example, a vacuum that makes 9 previously clean pages dirty, costing 180, and reads 10 pages from disk, costing 20, reaches the cost limit of 200 and sleeps for 2 ms before continuing.
 
-One can change the setting at the database level:
+You can change the setting at the database level:
 
 ```sql
 alter database postgres set vacuum_cost_page_hit = 400;
@@ -672,7 +672,7 @@ However, the `autovacuum_vacuum_cost_delay` can only be set with the CLI or mana
 
 <Admonition type="caution">
 
-To avoid noise and logging overheads, it is not advised to log runs that take less than `1s` to complete.
+Setting `autovacuum_vacuum_cost_delay` to `1ms` or `0` removes most or all throttling. Vacuums finish faster, but they compete harder with your app for CPU and disk I/O while they run.
 
 </Admonition>
 
@@ -761,11 +761,11 @@ For compute sizes above XL, `1GB` is an appropriate value. Memory claimed by vac
 
 ### Vacuum workers
 
-By default, up to 3 autovacuum workers run simultaneously, each vacuuming a single table per wake up cycle. If many tables stay bloated despite [lower scale factors](#lower-the-thresholds-for-a-busy-table), consider raising `autovacuum_max_workers` to ensure there are enough for your instance..
+By default, up to 3 autovacuum workers run simultaneously, each vacuuming a single table per wake-up cycle. If many tables stay bloated despite [lowering the thresholds](#lowering-the-thresholds-for-a-busy-table), consider raising `autovacuum_max_workers` to ensure there are enough for your instance.
 
 Two settings interact with the worker count:
 
-- Each worker can claim up to `autovacuum_work_mem`, so more workers means more total memory use. One should review [system memory usage](dashboard/project/_/observability/database) before incrementing the setting.
+- Each worker can claim up to `autovacuum_work_mem`, so more workers means more total memory use. Review [system memory usage](/dashboard/project/_/observability/database) before incrementing the setting.
 - All workers share one [`autovacuum_vacuum_cost_limit`](#throttle-vacuum-resource-usage) budget. When you add workers, raise the cost limit too, or each worker gets throttled harder.
 
 <Accordion
@@ -777,7 +777,7 @@ Two settings interact with the worker count:
 >
   <AccordionItem
     header="Configure autovacuum_work_mem"
-    id="configure-max-workers"
+    id="configure-autovacuum-work-mem"
   >
 
 You can change `autovacuum_work_mem` with the [Supabase CLI](/docs/guides/local-development/cli/getting-started):
@@ -805,9 +805,9 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
 
 ### Wraparound thresholds
 
-When a table's oldest unfrozen transaction ID grows older than `autovacuum_freeze_max_age` (default: 200 million transactions), Postgres launches an [aggressive anti-wraparound vacuum](#check-wraparound-risk), which can be expensive on large tables.
+When a table's oldest unfrozen transaction ID grows older than `autovacuum_freeze_max_age` (default: 200 million transactions), Postgres launches an [aggressive anti-wraparound vacuum](#uncovering-wraparound-risks), which can be expensive on large tables.
 
-The most effective way to avoid these runs is to make routine vacuums happen more often by [lowering the scale factors](#lower-the-thresholds-for-a-busy-table), so transaction IDs are recycled before the table ever approaches the limit.
+The most effective way to avoid these runs is to make routine vacuums happen more often by [lowering the scale factors](#lowering-the-thresholds-for-a-busy-table), so transaction IDs are recycled before the table ever approaches the limit.
 
 You can also set `autovacuum_freeze_max_age` per table, but only to a _lower_ value: Postgres ignores per-table values that are larger than the system-wide setting. Lowering it makes anti-wraparound vacuums more frequent but smaller:
 
@@ -821,7 +821,7 @@ This section covers correcting problems that monitoring surfaced: a table at ris
 
 ### Recovering from wraparound risk
 
-First, confirm the risk with the [wraparound check query](#check-wraparound-risk). If a table's `transaction_ids_used` is past 200 million and still climbing, something is likely preventing the vacuum from freezing rows. Remove potential blockers by reviewing the below checklist:
+First, confirm the risk with the [wraparound check query](#uncovering-wraparound-risks). If a table's `transaction_ids_used` is past 200 million and still climbing, something is likely preventing the vacuum from freezing rows. Remove potential blockers by reviewing the following checklist:
 
 1. Remove dead replication slots. These are the most common blocker:
 
@@ -849,22 +849,22 @@ First, confirm the risk with the [wraparound check query](#check-wraparound-risk
 
    ```sql
    -- find old transactions
-select
-  pid,
-  query,
-  datname,
-  usename,
-  state,
-  backend_xmin,
-  backend_xid,
-  now() - xact_start as time_running
-from pg_stat_activity
-where
- (backend_xmin is not null or backend_xid is not null)
-   or
- (now() - xact_start <= interval '30 minutes' and state <> 'idle')
-order by greatest(age(backend_xmin), age(backend_xid)) desc
-limit 10;
+   select
+     pid,
+     query,
+     datname,
+     usename,
+     state,
+     backend_xmin,
+     backend_xid,
+     now() - xact_start as time_running
+   from pg_stat_activity
+   where
+     (backend_xmin is not null or backend_xid is not null)
+     or
+     (now() - xact_start <= interval '30 minutes' and state <> 'idle')
+   order by greatest(age(backend_xmin), age(backend_xid)) desc
+   limit 10;
 
    -- if a transaction is unusually old or referenced in the xmin warning logs, kill it
    select pg_terminate_backend(pid)
@@ -952,6 +952,6 @@ Instead of `vacuum full`, consider the [`pg_repack` extension](/docs/guides/data
 
 <Admonition type="caution">
 
-Both `vacuum full` and `pg_repack` create a full copy of the table, potentially doubling the disk space the table claims for the duration of the operation. Check your [I/O and storage charts](/dashboard/project/_/observability/database) beforehand. If your system is constrained, consider modifying your [disk settings](/dashboard/project/_/settings/infrastructure) prior to cleanup.
+Both `vacuum full` and `pg_repack` create a full copy of the table, potentially doubling the disk space the table claims for the duration of the operation. Check your [I/O and storage charts](/dashboard/project/_/observability/database) beforehand. If your system is constrained, consider modifying your [disk settings](/dashboard/project/_/settings/infrastructure) before cleanup.
 
 </Admonition>
