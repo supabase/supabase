@@ -177,7 +177,7 @@ export const LogTable = ({
 
   const { can: canCreateLogQuery } = useAsyncCheckUserContentPermissions(
     FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
-    { mode: 'create', type: 'report' }
+    { mode: 'create', type: 'log_sql' }
   )
 
   const firstRow = data[0]

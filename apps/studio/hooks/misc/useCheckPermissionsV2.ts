@@ -90,7 +90,7 @@ function useGetProjectPermissionsV2(
     enabled: getProjectDataFromParamsRef,
   })
   const project =
-    projectRefOverride === undefined || projectData?.parent_project_ref
+    projectRefOverride === undefined
       ? projectData
       : { ref: projectRefOverride, parent_project_ref: undefined }
 
