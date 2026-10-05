@@ -301,7 +301,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useFlag('otelUnifiedLogs')
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
     queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
     queryFn: ({ signal }) =>
