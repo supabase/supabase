@@ -941,16 +941,16 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
       bInheritance := False;
       IF v_pgversion < 100000 THEN
         -- Issue#11: handle parent schema
-        SELECT c2.relname parent, c2.relnamespace::regnamespace INTO v_parent, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2
-        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r';
+        SELECT c2.relname parent, n2.nspname INTO v_parent, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2, pg_namespace n2
+        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r' and n2.oid = c2.relnamespace;
         IF (v_parent IS NOT NULL) THEN
           bPartition   := True;
           bInheritance := True;
         END IF;
       ELSE
         -- Issue#11: handle parent schema
-        SELECT c2.relname parent, c1.relispartition, pg_get_expr(c1.relpartbound, c1.oid, true), c2.relnamespace::regnamespace INTO v_parent, bRelispartition, v_partbound, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2
-        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r';
+        SELECT c2.relname parent, c1.relispartition, pg_get_expr(c1.relpartbound, c1.oid, true), n2.nspname INTO v_parent, bRelispartition, v_partbound, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2, pg_namespace n2
+        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r' and n2.oid = c2.relnamespace;
         IF (v_parent IS NOT NULL) THEN
           bPartition   := True;
           IF bRelispartition THEN

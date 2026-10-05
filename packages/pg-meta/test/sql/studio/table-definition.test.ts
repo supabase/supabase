@@ -38,3 +38,30 @@ test('getTableDefinitionSql (scoped): escapes double quotes in schema, table, co
     await db.cleanup()
   }
 })
+
+test('getTableDefinitionSql (scoped): quotes the parent schema for an inherited table', async () => {
+  const db = await createTestDatabase()
+  try {
+    await db.executeQuery(`
+      create schema "par""ent1";
+      create table "par""ent1"."par""ent_tbl" (id bigint primary key);
+      create schema "chi""ld1";
+      create table "chi""ld1"."chi""ld_tbl" () inherits ("par""ent1"."par""ent_tbl");
+    `)
+
+    const [{ id }] = await db.executeQuery<{ id: number }[]>(
+      `select '"chi""ld1"."chi""ld_tbl"'::regclass::oid::int8 as id;`
+    )
+
+    const sql = getTableDefinitionSql({ id, scoped: true })
+    const [{ definition }] = await db.executeQuery<{ definition: string }[]>(sql)
+
+    expect(definition).toContain('INHERITS ("par""ent1"."par""ent_tbl")')
+
+    // the generated DDL must itself be valid, executable SQL
+    await db.executeQuery(`drop table "chi""ld1"."chi""ld_tbl";`)
+    await db.executeQuery(definition)
+  } finally {
+    await db.cleanup()
+  }
+})
