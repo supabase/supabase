@@ -1140,6 +1140,20 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'Multigres',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/multigres' as `/${string}`,
+        },
+        {
+          name: 'Compatibility',
+          url: '/guides/database/multigres/compatibility' as `/${string}`,
+        },
+      ],
+    },
+    {
       name: 'Access and security',
       url: undefined,
       items: [
@@ -2520,6 +2534,14 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
         {
+          name: 'Running multiple local projects',
+          url: '/guides/local-development/running-multiple-local-projects' as `/${string}`,
+        },
+        {
+          name: 'Docker and native runtimes',
+          url: '/guides/local-development/docker-and-native-runtimes' as `/${string}`,
+        },
+        {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
         },
@@ -3093,16 +3115,16 @@ export const telemetry: NavMenuConstant = {
       ],
     },
     {
-      name: 'Hire an agent',
+      name: 'Agent prompts',
       items: [
-        { name: 'Set up an agent', url: '/guides/observability/automate-with-agents' },
-        { name: 'Health monitor', url: '/guides/observability/automate-with-agents/health' },
-        { name: 'Security monitor', url: '/guides/observability/automate-with-agents/security' },
+        { name: 'Overview', url: '/guides/observability/automate-with-agents' },
+        { name: 'Health', url: '/guides/observability/automate-with-agents/health' },
+        { name: 'Security', url: '/guides/observability/automate-with-agents/security' },
         {
-          name: 'Performance monitor',
+          name: 'Performance',
           url: '/guides/observability/automate-with-agents/performance',
         },
-        { name: 'Resource monitor', url: '/guides/observability/automate-with-agents/usage' },
+        { name: 'Resources', url: '/guides/observability/automate-with-agents/usage' },
       ],
     },
     {
