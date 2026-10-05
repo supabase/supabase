@@ -939,13 +939,28 @@ The `ids` array on incoming `postgres_changes` payloads must match the subscript
 
 ### Broadcast errors
 
-Broadcast errors only affect **private channels**. When `config.broadcast.ack` is `false` (the default), all push failures — including size violations and RLS write denials — are silently dropped. RLS denials are always silent regardless of `ack`.
+Broadcast errors only affect **private channels**. When `config.broadcast.ack` is `false` (the default), all push failures — including size violations and RLS write denials — are silently dropped.
 
 When `ack` is `true`, the server replies on error with `response.error` (an atom string), not `response.reason`:
 
 ```json
 { "status": "error", "response": { "error": "payload_size_exceeded" } }
 ```
+
+| Error code                               | Description                                                                                              |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `unauthorized`                           | Unauthorized access to Realtime channel                                                                  |
+| `payload_size_exceeded`                  | The broadcast payload is larger than the tenant's maximum payload size                                   |
+| `rls_policy_error`                       | Error on RLS policy used for authorization                                                               |
+| `query_canceled`                         | A database query was canceled, usually due to a statement timeout                                        |
+| `missing_partition`                      | Realtime was unable to find the expected messages partition                                              |
+| `unable_to_connect_to_project`           | Unable to connect to the project database                                                                |
+| `increase_connection_pool`               | The number of connections set for Realtime is not enough for your current use case                       |
+| `unable_to_set_policies`                 | Error when setting up authorization policies                                                             |
+| `unable_to_handle_broadcast`             | Error when handling a broadcast message                                                                  |
+| `database_lack_of_connections`           | Realtime was not able to connect to the tenant's database due to not having enough available connections |
+| `database_connection_rate_limit_reached` | The rate of attempts to connect to the tenant's database has reached the limit                           |
+| `initializing_project_connection`        | The connection to the tenant's database is still starting                                                |
 
 Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers.
 
