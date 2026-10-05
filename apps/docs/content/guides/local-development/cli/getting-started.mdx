@@ -269,6 +269,8 @@ When you finish working, stop the stack. Stopping doesn't reset your local datab
 supabase stop
 ```
 
+With the default ports, `supabase start` runs one local project per machine, because every project's `config.toml` uses the same ports. To run several local projects or git worktrees at the same time, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+
 ## Connect to a hosted project
 
 The stack you started in [Run a local Supabase project](#running-a-local-supabase-project) runs only on your machine. Nothing reaches a hosted project until you sign in to the CLI and link your local directory to one.
@@ -439,8 +441,6 @@ If you have any Supabase containers running locally, stop them and delete their 
    ```sh
    supabase stop --no-backup
    ```
-
-With the default ports, `supabase start` runs one local project per machine, because every project's `config.toml` uses the same ports. To run several local projects or git worktrees at the same time, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
 
 ## Telemetry
 
