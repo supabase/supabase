@@ -23,7 +23,10 @@ export function LastSignInWrapper({
   return (
     <div className="flex items-center relative">
       {isLastUsed && (
-        <Badge variant="success" className="absolute -right-4 -top-3 shadow-sm z-10 pointer-events-none">
+        <Badge
+          variant="success"
+          className="absolute -right-4 -top-3 shadow-sm z-10 pointer-events-none"
+        >
           Last used
         </Badge>
       )}
