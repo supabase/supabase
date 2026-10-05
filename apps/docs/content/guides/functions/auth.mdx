@@ -7,9 +7,13 @@ subtitle: 'Authentication patterns for Edge Functions'
 
 Secure an Edge Function by declaring which credentials it accepts. The `withSupabase` wrapper from the [`@supabase/server` package](https://github.com/supabase/server) on GitHub checks each caller against the `auth` mode you set. Your handler receives a preconfigured Supabase client on `ctx`.
 
-For how authorization headers and the `verify_jwt` platform check work, see [Authorization headers](/docs/guides/functions/auth-headers).
+- [Choose an auth mode](#choose-an-auth-mode) compares the four modes. Start here if you aren't sure which one your function needs.
+- [Secure your function](#secure-your-function) has an example for each mode, plus how to combine modes and shape your own error response.
+- [Environment variables](#environment-variables) lists what `@supabase/server` reads from the environment.
 
-The wrapper accepts four `auth` modes:
+## Choose an auth mode
+
+Each mode names the credential a caller must present. `withSupabase` accepts four:
 
 | Mode            | Accepts                                    |
 | --------------- | ------------------------------------------ |
@@ -18,7 +22,13 @@ The wrapper accepts four `auth` modes:
 | `'publishable'` | A publishable key on `apikey`              |
 | `'none'`        | Any caller, no check (for signed webhooks) |
 
-## Authenticated user calls
+For how authorization headers and the `verify_jwt` platform check work, see [Authorization headers](/docs/guides/functions/auth-headers).
+
+## Secure your function
+
+Each of the following sections covers one mode, then how to combine modes and shape your own error response. Every example wraps the handler in `withSupabase` and reads its Supabase client from `ctx`.
+
+### Authenticated user calls
 
 When a signed-in user calls a function, the request carries the user's session JWT on the `Authorization` header. Your app usually makes that call through `supabase.functions.invoke`. The default is `verify_jwt = true`. The platform validates the JWT before your handler runs. Use `auth: 'user'` to get a `ctx.supabase` scoped to the caller's Row Level Security (RLS) policies.
 
@@ -40,7 +50,7 @@ export default {
 }
 ```
 
-## Service-to-service calls
+### Service-to-service calls
 
 Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against any secret key in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
 
@@ -63,7 +73,7 @@ To accept only one specific key, use `auth: 'secret:<name>'`. For example, `auth
 
 </Admonition>
 
-## Public functions
+### Public functions
 
 For a genuinely public function, such as a health check, use `auth: 'none'` with `verify_jwt = false` so anonymous callers can reach the handler.
 
@@ -85,7 +95,7 @@ export default {
 
 `auth: 'none'` accepts every caller. For a function that authenticates callers itself, see the [External webhooks](#external-webhooks) section of this page.
 
-## External webhooks
+### External webhooks
 
 External providers such as Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Use `auth: 'none'` to skip the wrapper's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
 
@@ -131,7 +141,7 @@ export default {
 
 </Admonition>
 
-## Combining modes
+### Combining modes
 
 Functions that answer both users and internal callers take an array on `auth`. The wrapper tries each mode in order and uses the first one that matches. `ctx.authMode` tells you which mode matched.
 
@@ -151,7 +161,7 @@ export default {
 }
 ```
 
-## Custom error responses
+### Custom error responses
 
 To shape the 401 response yourself, use `createSupabaseContext` instead of `withSupabase`. It returns a `{ data, error }` tuple instead of rejecting the request for you.
 
