@@ -28,7 +28,7 @@ import {
   WarningIcon,
 } from 'ui'
 
-import { getOverrideRoleName, ROLE_DESCRIPTIONS } from '../Roles.constants'
+import { ROLE_DESCRIPTIONS } from '../Roles.constants'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
@@ -304,7 +304,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       disabled={disabled}
                                     >
                                       <div className="flex flex-col gap-0.5 max-w-xs">
-                                        <span>{getOverrideRoleName(role.name)}</span>
+                                        <span>{role.name}</span>
                                         <span className="text-xs text-foreground-lighter">
                                           {ROLE_DESCRIPTIONS[role.name] ??
                                             'Permissions are based on the configured organization role.'}

@@ -43,7 +43,7 @@ import {
   emailSchema,
   parseEmails,
 } from './InviteMemberButton.utils'
-import { getOverrideRoleName, ROLE_DESCRIPTIONS } from './Roles.constants'
+import { ROLE_DESCRIPTIONS } from './Roles.constants'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -379,7 +379,7 @@ export const InviteMemberButton = () => {
                                 <RadioGroupStackedItem
                                   value={role.id.toString()}
                                   disabled={disabled}
-                                  label={getOverrideRoleName(role.name)}
+                                  label={role.name}
                                   description={
                                     <>
                                       {ROLE_DESCRIPTIONS[role.name] ??

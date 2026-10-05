@@ -50,8 +50,17 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
           .sort((a, b) => {
             return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
           })
-          .filter((role) => FIXED_ROLE_ORDER.includes(role.name)),
+          .filter((role) => FIXED_ROLE_ORDER.includes(role.name))
+          .map((role) => ({...role, name: getOverrideRoleName(role.name)})),
       } as TData
     },
     ...options,
   })
+
+const OVERRIDE_ROLE_NAMES: Record<string, string> = {
+  None: 'No-access',
+}
+
+export function getOverrideRoleName(rolename: string) {
+  return OVERRIDE_ROLE_NAMES[rolename] ?? rolename
+}
