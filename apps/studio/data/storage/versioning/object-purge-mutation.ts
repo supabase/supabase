@@ -29,22 +29,42 @@ export const useObjectPurgeMutation = ({
     if (!bucketId) throw new Error('bucketId is required')
     if (!path) throw new Error('path is required')
 
-    const versions = await queryClient.fetchQuery(
-      objectVersionsQueryOptions({ projectRef, bucketId, path })
-    )
+    const listVersions = () =>
+      queryClient.fetchQuery({
+        ...objectVersionsQueryOptions({ projectRef, bucketId, path }),
+        // Each round has to see what the last one left behind, not the cached first page.
+        staleTime: 0,
+      })
+
+    const deleteVersions = async (paths: ({ path: string; versionId: string } | string)[]) => {
+      const { error } = await del('/platform/storage/{ref}/buckets/{id}/objects', {
+        params: { path: { ref: projectRef, id: bucketId } },
+        body: { paths },
+      })
+
+      if (error) handleError(error)
+    }
+
+    let versions = await listVersions()
 
     // A never-versioned bucket has no version ids, so the bare path is the only address.
-    const paths =
-      versions.length > 0
-        ? versions.map((version) => ({ path, versionId: version.versionId }))
-        : [path]
+    if (versions.length === 0) {
+      await deleteVersions([path])
+      return
+    }
 
-    const { error } = await del('/platform/storage/{ref}/buckets/{id}/objects', {
-      params: { path: { ref: projectRef, id: bucketId } },
-      body: { paths },
-    })
+    // The list endpoint returns one capped page, so a longer history takes several rounds.
+    // Deleting only the first would report a purge that left versions behind.
+    while (versions.length > 0) {
+      await deleteVersions(versions.map((version) => ({ path, versionId: version.versionId })))
 
-    if (error) handleError(error)
+      const remaining = await listVersions()
+      // Nothing went away, so another round would spin rather than make progress.
+      if (remaining.length >= versions.length) {
+        throw new Error(`Some versions of ${path} could not be deleted`)
+      }
+      versions = remaining
+    }
   }
 
   return useMutation<void, ResponseError, ObjectPurgeVariables>({
