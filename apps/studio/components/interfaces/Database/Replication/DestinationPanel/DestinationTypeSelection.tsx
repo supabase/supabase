@@ -25,7 +25,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
+  stage: 'Public Alpha' | 'Deprecated' | null
   enabled: boolean
 }
 
@@ -78,30 +78,25 @@ export const DestinationTypeSelection = () => {
           stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
-      ],
-    },
-    {
-      label: 'Early Access',
-      options: [
         {
           value: 'DuckLake',
           label: 'DuckLake',
           description: 'Replicate changes to DuckLake for open lakehouse storage',
-          stage: 'Early Access',
+          stage: 'Public Alpha',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
           description: 'Replicate changes to Snowflake for cloud data warehousing',
-          stage: 'Early Access',
+          stage: 'Public Alpha',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
           description: 'Replicate changes to ClickHouse for real-time analytics',
-          stage: 'Early Access',
+          stage: 'Public Alpha',
           enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
       ],
@@ -132,7 +127,6 @@ export const DestinationTypeSelection = () => {
     (type: DestinationType) => string
   > = {
     'Public Alpha': (type) => `${type} support is in public alpha.`,
-    'Early Access': (type) => `${type} support is in early access.`,
     Deprecated: (type) => `${type} is deprecated.`,
   }
 

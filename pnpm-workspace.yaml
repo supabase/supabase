@@ -19,8 +19,8 @@ catalog:
   '@supabase/realtime-js': 2.116.0
   '@supabase/ssr': 0.12.7
   '@supabase/supabase-js': 2.116.0
-  '@tanstack/react-router': ^1.169.2
-  '@tanstack/react-start': ^1.167.65
+  '@tanstack/react-router': ^1.170.41
+  '@tanstack/react-start': ^1.168.60
   '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
@@ -38,7 +38,7 @@ catalog:
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
-  next: ^16.3.5
+  next: ^16.3.6
   next-themes: ^0.4.6
   postcss: ^8.5.18
   radix-ui: ^1.4.3
@@ -94,16 +94,20 @@ minimumReleaseAgeExclude:
   - react-use
   - '@astrojs/markdown-satteri@0.3.8'
   - astro@7.2.6
-  - next@16.3.5
-  - '@next/env@16.3.5'
-  - '@next/swc-darwin-arm64@16.3.5'
-  - '@next/swc-darwin-x64@16.3.5'
-  - '@next/swc-linux-arm64-gnu@16.3.5'
-  - '@next/swc-linux-arm64-musl@16.3.5'
-  - '@next/swc-linux-x64-gnu@16.3.5'
-  - '@next/swc-linux-x64-musl@16.3.5'
-  - '@next/swc-win32-arm64-msvc@16.3.5'
-  - '@next/swc-win32-x64-msvc@16.3.5'
+  - '@tanstack/react-router@1.170.41'
+  - '@tanstack/react-start-client@1.168.39'
+  - '@tanstack/react-start-rsc@0.1.59'
+  - '@tanstack/react-start-server@1.167.46'
+  - '@tanstack/react-start@1.168.60'
+  - '@tanstack/react-store@0.11.2'
+  - '@tanstack/router-core@1.171.34'
+  - '@tanstack/router-generator@1.167.40'
+  - '@tanstack/router-plugin@1.168.42'
+  - '@tanstack/start-client-core@1.170.34'
+  - '@tanstack/start-plugin-core@1.171.49'
+  - '@tanstack/start-server-core@1.169.39'
+  - '@tanstack/start-storage-context@1.167.36'
+  - '@tanstack/store@0.11.2'
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
