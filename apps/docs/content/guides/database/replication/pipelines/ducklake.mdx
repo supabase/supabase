@@ -8,8 +8,6 @@ sidebar_label: 'DuckLake'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-The DuckLake destination is in private alpha and available only to approved organizations. [Request access](/go/supabase-pipelines-new-destinations) before following this guide.
-
 Replicate Postgres tables to [DuckLake](https://ducklake.select/) for current-state lakehouse queries. [Prepare resources](#understand-the-ducklake-components), [configure the destination](#choose-a-configuration-mode), then [query replicated data](#query-the-destination).
 
 ## Source table requirements
@@ -102,7 +100,7 @@ select *
 from my_ducklake.public.orders;
 ```
 
-See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during private alpha, [contact support](/dashboard/support/new).
+See the [DuckDB connection guide](https://ducklake.select/docs/stable/duckdb/usage/connecting) for the current `ducklake` extension and `ATTACH` syntax. If your query client can't read a Supabase-backed catalog during public alpha, [contact support](/dashboard/support/new).
 
 ## Replica identity
 

@@ -12,7 +12,7 @@
     "jsx-a11y/anchor-is-valid": 6,
     "jsx-a11y/heading-has-content": 2,
     "valtio/state-snapshot-rule": 1,
-    "shadcn/no-arbitrary-values": 212,
+    "shadcn/no-arbitrary-values": 199,
     "shadcn/no-unknown-classes": 151,
     "shadcn/no-raw-colors": 64
   },
@@ -1091,7 +1091,6 @@
       "components/ui/AIEditor/AskAIWidget.tsx": 1,
       "components/ui/AiAssistantDropdown.tsx": 2,
       "components/ui/BannerStack/Banners/BannerExplorer.tsx": 3,
-      "components/ui/BannerStack/Banners/BannerSelect2026.tsx": 13,
       "components/ui/Charts/BarChart.tsx": 1,
       "components/ui/Charts/ComposedChart.utils.tsx": 2,
       "components/ui/DataTable/DataTableFilters/DataTableFilterCheckbox.tsx": 2,
