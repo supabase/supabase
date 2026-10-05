@@ -59,6 +59,7 @@ describe('matchRedirect moved Studio routes', () => {
     [`/project/${ref}/auth/emails`, `/project/${ref}/auth/templates`],
     [`/project/${ref}/logs/edge-functions`, `/project/${ref}/logs/edge-functions-logs`],
     [`/project/${ref}/settings/vault`, `/project/${ref}/integrations/vault/secrets`],
+    [`/project/${ref}/database/hooks`, `/project/${ref}/integrations/webhooks/overview`],
     [`/project/${ref}/settings/billing`, '/org/_/billing'],
     ['/account', '/account/me'],
     ['/org/my-org/projects', '/org/my-org'],
