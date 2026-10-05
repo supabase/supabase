@@ -192,9 +192,11 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                     forceMount
                     data-open={activeDropdown !== ''}
                     data-switching={isSwitchingDropdown}
-                    containerProps={{ className: 'inset-x-0' }}
+                    // The wrapper keeps the last menu's height while closed, so it must
+                    // not capture pointer events over the page below the nav.
+                    containerProps={{ className: 'inset-x-0 pointer-events-none' }}
                     className={cn(
-                      'group/viewport origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
+                      'group/viewport pointer-events-auto origin-top scale-100 rounded-xl bg-surface-75 md:w-[960px]',
                       'data-[state=open]:animate-none! data-[state=closed]:animate-none!',
                       'data-[state=open]:duration-200 data-[state=open]:ease-out data-[state=closed]:duration-200',
                       'data-[open=false]:invisible data-[open=false]:scale-[0.97] data-[open=false]:opacity-0',

@@ -156,8 +156,8 @@ export default function PartnersContent({ featuredPartners }: Props) {
             description="Open to companies building real integrations on Postgres."
           />
           <ul role="list" className="flex flex-col gap-3">
-            {pageData.benefits.items.map((item: any) => (
-              <li key={item} className="flex items-start gap-3">
+            {pageData.benefits.items.map((item, index) => (
+              <li key={index} className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
                   className="bg-surface-200 text-foreground-light mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"

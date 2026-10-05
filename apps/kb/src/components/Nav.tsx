@@ -11,7 +11,7 @@ import {
 
 import { TOPICS, topicToSlug } from '../lib/topics'
 
-const topics = TOPICS.map((topic) => ({
+const visibleTopics = TOPICS.filter((topic) => topic.visible).map((topic) => ({
   label: topic.name,
   href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
 }))
@@ -26,7 +26,7 @@ const resources = [
 ]
 
 const menus = [
-  { label: 'Topics', items: topics },
+  { label: 'Topics', items: visibleTopics },
   { label: 'Resources', items: resources },
 ]
 
