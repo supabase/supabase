@@ -108,7 +108,7 @@ function buildComputeSection(): string {
 const DISK_TYPES = [
   {
     name: 'General Purpose',
-    maxSize: '16 TB',
+    maxSize: '64 TB',
     size: '8 GB included, then $0.125 per GB',
     iops: '3,000 IOPS included, then $0.024 per IOPS',
     throughput: '125 MB/s included, then $0.095 per MB/s',

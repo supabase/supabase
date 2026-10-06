@@ -30,9 +30,11 @@ The following table compares how each runtime runs services, what it needs, and 
 | Flag                             | `--runtime docker` or `--runtime podman`                                          | `--runtime native`                                                                     |
 | How services run                 | One container per service, from images the CLI pulls                              | One process per service, from archives the CLI downloads and verifies                  |
 | Requires                         | A running Docker or Podman engine                                                 | A supported platform, `tar` on the host, and, on first start, network access to the archive download hosts |
-| Database data                    | A Docker volume when the Docker client and daemon are both version 26 or later, or a host directory otherwise | `~/.supabase/stacks/<id>/` in your home directory                                      |
+| Database data                    | Set when the local project is created. A Docker volume if the Docker client and daemon are both version 26 or later, otherwise a host directory | `~/.supabase/stacks/<id>/` in your home directory                                      |
 | Downloaded artifacts             | The engine's image cache                                                          | `~/.supabase/cache/stack` in your home directory, shared by all local projects         |
 | Isolation between local projects | Separate network namespaces and file systems                                      | Shared host process table and file locks                                               |
+
+A Docker local project keeps the database storage it was created with. A local project created on Docker 25 keeps its host directory after you upgrade to Docker 26.
 
 Both runtimes keep each local project's saved settings under `~/.supabase/stacks/<id>/`. The native runtime keeps its database data there too. If you set `SUPABASE_HOME`, the CLI uses that directory instead of `~/.supabase`.
 
@@ -69,7 +71,7 @@ The native runtime runs on these platforms:
 
 The native runtime doesn't run as `root`, because Postgres `initdb` can't. To run it as `root`, such as in a CI container, set `SUPABASE_NATIVE_POSTGRES_USER` to a non-root account. Create the account first if it doesn't exist. The CLI then runs Postgres as that user. In some supported coding agent sandboxes, the CLI finds a suitable non-root account without the variable.
 
-On first start, the CLI downloads service archives from the [`supabase/slim-services` GitHub releases](https://github.com/supabase/slim-services/releases), with `supabase-cli-artifacts.s3.us-east-1.amazonaws.com` as a fallback. It verifies their checksums and extracts them with the system `tar`, so install `tar` in minimal sandbox images. In a sandbox with an allowlist, allow `github.com` or that S3 host. Allowing only `ghcr.io` isn't enough.
+On first start, the CLI downloads service archives from the [`supabase/slim-services` GitHub releases](https://github.com/supabase/slim-services/releases), with `supabase-cli-artifacts.s3.us-east-1.amazonaws.com` as a fallback. It verifies their checksums and extracts them with the system `tar`, so install `tar` in minimal sandbox images. In a sandbox with an allowlist, allow the S3 host. To use GitHub instead, allow both `github.com` and `release-assets.githubusercontent.com`, because GitHub redirects release downloads to that host. Allowing only `ghcr.io` isn't enough.
 
 To download the archives ahead of time without starting any services, such as when you build a sandbox image, run:
 
