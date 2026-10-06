@@ -14,8 +14,8 @@ import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interface
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
-// Trimmed client-side because the OTEL endpoint rejects LIMIT BY, so the count
-// query can't cap rows per facet in SQL.
+// The count query only caps the shared scan in SQL (via LIMIT BY); facets
+// counted in their own scans are trimmed here.
 const MAX_FACET_ROWS = 20
 
 export async function getUnifiedLogsCount(
