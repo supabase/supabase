@@ -258,6 +258,7 @@ describe('PlatformWebhooksEndpointSheet', () => {
           { key: 'X-Webhook-Secret', value: 'super-secret' },
           { key: '', value: '' },
         ],
+        signingSecret: 'whsec_example',
       })
     ).toEqual(
       expect.objectContaining({

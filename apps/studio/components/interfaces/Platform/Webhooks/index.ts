@@ -1,5 +1,4 @@
 export { PlatformWebhooksPage } from './PlatformWebhooksPage'
-export { usePlatformWebhooksMockStore } from './PlatformWebhooks.store'
 export {
   generateWebhookEndpointName,
   getWebhookEndpointDisplayName,
