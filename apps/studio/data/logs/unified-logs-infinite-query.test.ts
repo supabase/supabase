@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
 import { act, waitFor } from '@testing-library/react'
 import { platformComponents } from 'api-types'
+import * as common from 'common'
 import { HttpResponse } from 'msw'
 import { createLoader } from 'nuqs/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -77,6 +78,10 @@ const mockLogs = (
       )?.[1]
       const cursorTimestamp = numericCursor ?? isoCursor
       const cursorId = body.sql.match(/(?:id|toString\(id\)) < '([^']+)'/)?.[1]
+      const boundaryTimestamp =
+        body.sql.match(/timestamp > (?:TIMESTAMP_MICROS|fromUnixTimestamp64Micro)\((\d+)\)/)?.[1] ??
+        body.sql.match(/timestamp > (?:CAST|parseDateTime64BestEffort)\('([^']+)'/)?.[1]
+      const boundaryId = body.sql.match(/(?:id|toString\(id\)) >= '([^']+)'/)?.[1]
       const start = timestampToNanos(body.iso_timestamp_start)
       const end = timestampToNanos(body.iso_timestamp_end)
       return HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
@@ -84,6 +89,12 @@ const mockLogs = (
           .filter((row) => {
             const timestamp = timestampToNanos(row.timestamp)
             if (timestamp <= start || timestamp > end) return false
+            if (boundaryTimestamp && boundaryId) {
+              const boundary = timestampToNanos(boundaryTimestamp)
+              if (timestamp < boundary || (timestamp === boundary && row.id < boundaryId)) {
+                return false
+              }
+            }
             if (!cursorTimestamp || !cursorId) return true
             const cursor = timestampToNanos(cursorTimestamp)
             return timestamp < cursor || (timestamp === cursor && row.id < cursorId)
@@ -103,7 +114,10 @@ const getLiveLogs = (cursor: number) =>
     pageParam: { cursor, direction: 'prev' },
   })
 
-afterEach(() => vi.useRealTimers())
+afterEach(() => {
+  vi.useRealTimers()
+  vi.restoreAllMocks()
+})
 
 describe('getUnifiedLogs live polling', () => {
   it('uses the previous poll time minus the overlap for successive polls', async () => {
@@ -241,6 +255,7 @@ describe('getUnifiedLogs live polling', () => {
     })
     await waitFor(() => expect(result.current.data?.pages).toHaveLength(3))
     expect(result.current.data?.pages[0].data).toEqual([])
+    expect(result.current.hasNextPage).toBe(false)
 
     await act(async () => {
       await result.current.refetch()
@@ -290,6 +305,111 @@ describe('getUnifiedLogs live polling', () => {
     expect(new Set(displayed.map((row) => row.id))).toEqual(
       new Set([...originalIds, 'aaa-late', 'zzz-late'])
     )
+  })
+
+  it.each([
+    { useOtel: false, hasOverlap: false },
+    { useOtel: true, hasOverlap: false },
+    { useOtel: false, hasOverlap: true },
+    { useOtel: true, hasOverlap: true },
+  ])(
+    'retains Live bursts across refreshes with otel=$useOtel and overlap=$hasOverlap',
+    async ({ useOtel, hasOverlap }) => {
+      vi.spyOn(common, 'useFlag').mockReturnValue(useOtel)
+      const timestamp = Date.now() - (hasOverlap ? 30 * 1000 : 10 * 60 * 1000)
+      const rows = Array.from({ length: 110 }, (_, index) =>
+        createRow(`old-${String(index).padStart(3, '0')}`, (timestamp - index * 1000) * 1000 + 123)
+      )
+      mockLogs(rows, useOtel)
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      const { result } = customRenderHook(
+        () => useUnifiedLogsInfiniteQuery({ projectRef: 'default', search }),
+        { queryClient }
+      )
+      const displayedIds = () =>
+        deduplicateUnifiedLogs(result.current.data?.pages.flatMap((page) => page.data) ?? []).map(
+          (row) => row.id
+        )
+      await waitFor(() => expect(result.current.isSuccess).toBe(true))
+      expect(displayedIds()).toHaveLength(50)
+      await act(async () => {
+        const response = await result.current.fetchNextPage()
+        expect(response.error).toBeNull()
+      })
+      await waitFor(() => expect(displayedIds()).toHaveLength(100))
+      const olderIds = displayedIds()
+
+      const liveTimestamp = Date.now() - 1000
+      const burst = Array.from({ length: 120 }, (_, index) => {
+        const timestamp = useOtel
+          ? new Date(liveTimestamp).toISOString().replace('Z', '000123Z')
+          : liveTimestamp * 1000 + 123
+        return createRow(`live-${String(index).padStart(3, '0')}`, timestamp)
+      })
+      rows.push(...burst)
+      await act(async () => {
+        await result.current.fetchPreviousPage()
+      })
+      await waitFor(() => expect(displayedIds()).toHaveLength(220))
+      expect(result.current.data?.pages[0].data.length).toBeGreaterThanOrEqual(120)
+      await act(async () => {
+        await result.current.fetchPreviousPage()
+      })
+      await waitFor(() => expect(result.current.data?.pages).toHaveLength(4))
+      expect(displayedIds()).toHaveLength(220)
+      expect(result.current.hasNextPage).toBe(true)
+
+      const arrivals = Array.from({ length: 60 }, (_, index) =>
+        createRow(`new-${String(index).padStart(3, '0')}`, burst[0].timestamp)
+      )
+      rows.push(...arrivals)
+      const expectedIds = [...arrivals, ...burst].sort(compareRows).map((row) => row.id)
+      expectedIds.push(...olderIds)
+      for (let refresh = 0; refresh < 2; refresh++) {
+        await act(async () => {
+          const response = await result.current.refetch()
+          expect(response.error).toBeNull()
+        })
+        await waitFor(() => expect(displayedIds()).toEqual(expectedIds))
+        expect(result.current.hasNextPage).toBe(true)
+      }
+
+      await act(async () => {
+        await result.current.fetchNextPage()
+      })
+      await waitFor(() => expect(displayedIds()).toHaveLength(290))
+      expect(new Set(displayedIds())).toEqual(new Set(rows.map((row) => row.id)))
+    }
+  )
+
+  it('allows older pagination immediately after an empty Live poll', async () => {
+    const timestamp = Date.now() - 10 * 60 * 1000
+    const rows = Array.from({ length: 110 }, (_, index) =>
+      createRow(`old-${String(index).padStart(3, '0')}`, (timestamp - index * 1000) * 1000)
+    )
+    mockLogs(rows)
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const { result } = customRenderHook(
+      () => useUnifiedLogsInfiniteQuery({ projectRef: 'default', search }),
+      { queryClient }
+    )
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.data?.pages[0].data).toHaveLength(50)
+
+    await act(async () => {
+      await result.current.fetchPreviousPage()
+    })
+    await waitFor(() => expect(result.current.data?.pages).toHaveLength(2))
+    expect(result.current.data?.pages[0].data).toEqual([])
+    expect(result.current.hasNextPage).toBe(true)
+
+    await act(async () => {
+      await result.current.fetchNextPage()
+    })
+    await waitFor(() => expect(result.current.data?.pages).toHaveLength(3))
+    expect(
+      deduplicateUnifiedLogs(result.current.data?.pages.flatMap((page) => page.data) ?? [])
+    ).toHaveLength(100)
   })
 
   it('preserves nanosecond ISO cursors on OTEL', async () => {

@@ -1,4 +1,9 @@
-import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
+import {
+  InfiniteData,
+  keepPreviousData,
+  useInfiniteQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
@@ -21,6 +26,13 @@ import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
 const LIVE_LOGS_OVERLAP_MS = 2 * 60 * 1000
+
+type RowCursor = Pick<UnifiedLogsQueryRow, 'id' | 'timestamp'>
+type RefreshBoundary = { row: RowCursor; hasMore: boolean }
+type UnifiedLogsPageParam =
+  | (NonNullable<PageParam> & { row?: RowCursor; refreshThrough?: RefreshBoundary })
+  | null
+  | undefined
 
 export const UNIFIED_LOGS_QUERY_OPTIONS = {
   refetchOnWindowFocus: false,
@@ -62,7 +74,12 @@ export async function getUnifiedLogs(
     search,
     pageParam,
     useOtel = false,
-  }: UnifiedLogsVariables & { pageParam: PageParam | null; useOtel?: boolean },
+    refreshThrough = pageParam?.refreshThrough,
+  }: UnifiedLogsVariables & {
+    pageParam: UnifiedLogsPageParam
+    useOtel?: boolean
+    refreshThrough?: RefreshBoundary
+  },
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
@@ -81,7 +98,7 @@ export async function getUnifiedLogs(
   if (cursorDirection === 'prev' && !search.date) {
     timestampStart = new Date(Number(cursorValue) - LIVE_LOGS_OVERLAP_MS).toISOString()
     timestampEnd = new Date().toISOString()
-  } else if (cursorDirection === 'next') {
+  } else if (cursorDirection === 'next' && !pageParam?.row) {
     timestampEnd =
       cursorValue !== null && cursorValue !== undefined
         ? new Date(Number(cursorValue)).toISOString()
@@ -90,22 +107,33 @@ export async function getUnifiedLogs(
 
   const endpoint = logsAllEndpointUrl(useOtel)
   const idColumn = useOtel ? safeSql`toString(id)` : safeSql`id`
-  const fetchPage = async (cursor?: UnifiedLogsQueryRow) => {
+  const cursorTimestamp = (cursor: RowCursor) => {
+    const rawTimestamp = String(cursor.timestamp)
+    const isIsoTimestamp = /[T-]/.test(rawTimestamp)
+    let timestamp
+    if (isIsoTimestamp) {
+      timestamp = useOtel
+        ? safeSql`parseDateTime64BestEffort(${analyticsLiteral(rawTimestamp)}, 9, 'UTC')`
+        : safeSql`CAST(${analyticsLiteral(rawTimestamp)} AS TIMESTAMP)`
+    } else {
+      timestamp = useOtel
+        ? safeSql`fromUnixTimestamp64Micro(${analyticsLiteral(Number(rawTimestamp))})`
+        : safeSql`TIMESTAMP_MICROS(${analyticsLiteral(Number(rawTimestamp))})`
+    }
+    return timestamp
+  }
+  const fetchPage = async (cursor?: RowCursor) => {
     let paginationFilter
     if (cursor) {
-      const rawTimestamp = String(cursor.timestamp)
-      const isIsoTimestamp = /[T-]/.test(rawTimestamp)
-      let timestamp
-      if (isIsoTimestamp) {
-        timestamp = useOtel
-          ? safeSql`parseDateTime64BestEffort(${analyticsLiteral(rawTimestamp)}, 9, 'UTC')`
-          : safeSql`CAST(${analyticsLiteral(rawTimestamp)} AS TIMESTAMP)`
-      } else {
-        timestamp = useOtel
-          ? safeSql`fromUnixTimestamp64Micro(${analyticsLiteral(Number(rawTimestamp))})`
-          : safeSql`TIMESTAMP_MICROS(${analyticsLiteral(Number(rawTimestamp))})`
-      }
+      const timestamp = cursorTimestamp(cursor)
       paginationFilter = safeSql`(timestamp < ${timestamp} OR (timestamp = ${timestamp} AND ${idColumn} < ${analyticsLiteral(cursor.id)}))`
+    }
+    if (refreshThrough) {
+      const timestamp = cursorTimestamp(refreshThrough.row)
+      const boundaryFilter = safeSql`(timestamp > ${timestamp} OR (timestamp = ${timestamp} AND ${idColumn} >= ${analyticsLiteral(refreshThrough.row.id)}))`
+      paginationFilter = paginationFilter
+        ? safeSql`${paginationFilter} AND ${boundaryFilter}`
+        : boundaryFilter
     }
     const sql = safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
     const data = await executeAnalyticsSql({
@@ -122,10 +150,10 @@ export async function getUnifiedLogs(
     return parseUnifiedLogsQueryRows(data?.result)
   }
 
-  let page = await fetchPage()
+  let page = await fetchPage(pageParam?.row)
   const rows = [...page]
 
-  if (cursorDirection === 'prev') {
+  if (cursorDirection === 'prev' || refreshThrough) {
     while (page.length === LOGS_PAGE_LIMIT) {
       page = await fetchPage(page[page.length - 1])
       rows.push(...page)
@@ -134,15 +162,17 @@ export async function getUnifiedLogs(
   const result = rows.map(mapUnifiedLogRow)
 
   const lastRow = result.length > 0 ? result[result.length - 1] : null
-  const hasMore = result.length >= LOGS_PAGE_LIMIT - 1
+  const lastQueryRow = rows.length > 0 ? rows[rows.length - 1] : pageParam?.row
+  const hasMore = refreshThrough?.hasMore ?? result.length >= LOGS_PAGE_LIMIT - 1
 
-  const nextCursor = lastRow ? lastRow.date.getTime() : null
+  const nextCursor = lastRow ? lastRow.date.getTime() : (pageParam?.cursor ?? null)
   const prevCursor = new Date(timestampEnd).getTime()
 
   return {
     data: result,
     nextCursor: hasMore ? nextCursor : null,
     prevCursor,
+    nextRow: lastQueryRow ? { id: lastQueryRow.id, timestamp: lastQueryRow.timestamp } : null,
   }
 }
 
@@ -156,16 +186,37 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     UnifiedLogsError,
     InfiniteData<TData>,
     readonly unknown[],
-    PageParam | null
+    UnifiedLogsPageParam
   > = {}
 ) => {
   const useOtel = useFlag('otelUnifiedLogs')
+  const queryClient = useQueryClient()
+  const queryKey = [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }]
+  const getCachedPages = () =>
+    queryClient.getQueryData<InfiniteData<Awaited<ReturnType<typeof getUnifiedLogs>>>>(queryKey)
+      ?.pages ?? []
+  const getRefreshBoundary = (page: Awaited<ReturnType<typeof getUnifiedLogs>> | undefined) =>
+    page?.nextRow ? { row: page.nextRow, hasMore: page.nextCursor !== null } : undefined
   return useInfiniteQuery({
-    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
+    queryKey,
     queryFn: ({ signal, pageParam, direction }) => {
       const effectivePageParam =
         pageParam?.direction === 'prev' && direction !== 'backward' ? null : pageParam
-      return getUnifiedLogs({ projectRef, search, pageParam: effectivePageParam, useOtel }, signal)
+      const isRefreshingFirstPage =
+        direction !== 'backward' &&
+        (effectivePageParam === null || effectivePageParam === undefined)
+      return getUnifiedLogs(
+        {
+          projectRef,
+          search,
+          pageParam: effectivePageParam,
+          useOtel,
+          refreshThrough: isRefreshingFirstPage
+            ? getRefreshBoundary(getCachedPages().find((page) => page.data.length > 0))
+            : effectivePageParam?.refreshThrough,
+        },
+        signal
+      )
     },
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
@@ -174,9 +225,18 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
       return { cursor: firstPage.prevCursor, direction: 'prev' } as const
     },
     initialPageParam: null,
-    getNextPageParam(lastPage) {
-      if (!lastPage.nextCursor || lastPage.data.length === 0) return null
-      return { cursor: lastPage.nextCursor, direction: 'next' } as const
+    getNextPageParam(lastPage, pages) {
+      if (!lastPage.nextCursor || !lastPage.nextRow) return null
+      const cachedPages = getCachedPages()
+      const isRefreshing = pages[0] !== cachedPages[0]
+      const loadedPages = cachedPages.filter((page) => page.data.length > 0)
+      if (isRefreshing && pages.length >= loadedPages.length) return null
+      return {
+        cursor: lastPage.nextCursor,
+        direction: 'next',
+        row: lastPage.nextRow ?? undefined,
+        refreshThrough: isRefreshing ? getRefreshBoundary(loadedPages[pages.length]) : undefined,
+      } as const
     },
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
