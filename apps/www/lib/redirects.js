@@ -2458,6 +2458,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/catalog/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/clickhouse-clickpipes',
+    destination: '/partners/catalog/clickhouse',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations',
     destination: '/partners/catalog',
   },
@@ -2590,6 +2600,16 @@ module.exports = [
     permanent: true,
     source: '/partners/integrations/atomic_crm',
     destination: '/partners/catalog',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/clickhouse-clickpipes',
+    destination: '/partners/catalog/clickhouse',
   },
   {
     permanent: true,
