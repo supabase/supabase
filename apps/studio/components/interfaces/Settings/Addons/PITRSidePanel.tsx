@@ -115,6 +115,11 @@ const PITRSidePanel = () => {
       // If the project is HIPAA, we don't allow the user to downgrade below 28 days
       selectedPitr?.identifier !== 'pitr_28')
 
+  // HIPAA projects can't disable PITR, so don't offer the option at all
+  const categoryOptions = hasHipaaAddon
+    ? PITR_CATEGORY_OPTIONS.filter((option) => option.id !== 'off')
+    : PITR_CATEGORY_OPTIONS
+
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
@@ -130,6 +135,9 @@ const PITRSidePanel = () => {
       if (subscriptionPitr !== undefined) {
         setSelectedCategory('on')
         setSelectedOption(subscriptionPitr.variant.identifier)
+      } else if (hasHipaaAddon) {
+        setSelectedCategory('on')
+        setSelectedOption('pitr_28')
       } else {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
@@ -178,7 +186,7 @@ const PITRSidePanel = () => {
 
           <div className="mt-8! pb-4">
             <div className="flex gap-3">
-              {PITR_CATEGORY_OPTIONS.map((option) => {
+              {categoryOptions.map((option) => {
                 const isSelected = selectedCategory === option.id
                 return (
                   <div

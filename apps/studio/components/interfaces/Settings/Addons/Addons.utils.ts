@@ -120,10 +120,9 @@ export const getPitrAlertState = ({
   hasHipaaCompliantPitr = true,
   sufficientPgVersion,
   isOrioleDbInAws,
-}: Pick<
-  PitrDisabledReasonOptions,
-  'hasHipaaAddon' | 'sufficientPgVersion' | 'isOrioleDbInAws'
-> & { hasHipaaCompliantPitr?: boolean }): PitrAlertState => {
+}: Pick<PitrDisabledReasonOptions, 'hasHipaaAddon' | 'sufficientPgVersion' | 'isOrioleDbInAws'> & {
+  hasHipaaCompliantPitr?: boolean
+}): PitrAlertState => {
   if (hasHipaaAddon) {
     return hasHipaaCompliantPitr ? 'hipaa' : 'hipaa-non-compliant'
   }
