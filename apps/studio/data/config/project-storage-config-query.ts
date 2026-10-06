@@ -53,21 +53,13 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
     ...options,
   })
 
-export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
-  const { data } = useProjectStorageConfigQuery({ projectRef })
-  const isIcebergCatalogEnabled = !!data?.features.icebergCatalog?.enabled
-  return isIcebergCatalogEnabled
-}
-
-export const useIsObjectVersioningAvailable = ({ projectRef }: { projectRef?: string }) => {
-  const { data } = useProjectStorageConfigQuery({ projectRef })
-  return !!data?.capabilities?.object_versioning
-}
-
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
-  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const { data: isVectorBucketsEnabledData } = useProjectStorageConfigQuery(
+    { projectRef },
+    { select: (data) => data?.features.vectorBuckets?.enabled }
+  )
   const { isCli, isPlatform } = useDeploymentMode()
 
-  const isVectorBucketsEnabled = isCli || (isPlatform && !!data?.features.vectorBuckets?.enabled)
+  const isVectorBucketsEnabled = isCli || (isPlatform && !!isVectorBucketsEnabledData)
   return isVectorBucketsEnabled
 }

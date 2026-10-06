@@ -19,7 +19,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
-import { useIsObjectVersioningAvailable } from '@/data/config/project-storage-config-query'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -166,7 +166,8 @@ export const useIsStorageVersioningEnabled = () => {
   const { ref } = useParams()
   const { flags } = useFeaturePreviewContext()
   const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
-  const isObjectVersioningAvailable = useIsObjectVersioningAvailable({ projectRef: ref })
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
   return (
     isStorageVersioningEnabled &&
     isObjectVersioningAvailable &&
