@@ -5,11 +5,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
+  STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
+  formatFolderItemsV2,
+  getListV2EntryName,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
   getStorageExplorerUrlForItem,
@@ -17,6 +21,7 @@ import {
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
   serializeStoragePath,
+  sortStorageItems,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 
@@ -180,6 +185,7 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         name: `col-${i}`,
         path: `col-${i}`,
         status: STORAGE_ROW_STATUS.READY,
+        cursor: null,
         items: columnItems.map((overrides) => ({
           id: 'file-id',
           name: 'file.txt',
@@ -450,5 +456,147 @@ describe('clipboard helpers', () => {
 
     onCopied?.()
     expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
+  })
+})
+
+describe('getListV2EntryName', () => {
+  it('returns a bare file name unchanged', () => {
+    expect(getListV2EntryName('file.png')).toBe('file.png')
+  })
+
+  it('strips the trailing slash off a folder and takes the last segment', () => {
+    expect(getListV2EntryName('outer/inner/')).toBe('inner')
+  })
+
+  it('takes the last segment of a full-path file name', () => {
+    expect(getListV2EntryName('a/b/file.png')).toBe('file.png')
+  })
+})
+
+describe('sortStorageItems', () => {
+  function makeSortable(name: string, date: string | null = null) {
+    return { name, created_at: date, updated_at: date, last_accessed_at: date }
+  }
+
+  it('sorts by name ascending by default direction', () => {
+    const items = [makeSortable('zebra'), makeSortable('apple')]
+    expect(
+      sortStorageItems(items, {
+        column: STORAGE_SORT_BY.NAME,
+        order: STORAGE_SORT_BY_ORDER.ASC,
+      }).map((i) => i.name)
+    ).toEqual(['apple', 'zebra'])
+  })
+
+  it('sorts descending when requested', () => {
+    const items = [makeSortable('apple'), makeSortable('zebra')]
+    expect(
+      sortStorageItems(items, {
+        column: STORAGE_SORT_BY.NAME,
+        order: STORAGE_SORT_BY_ORDER.DESC,
+      }).map((i) => i.name)
+    ).toEqual(['zebra', 'apple'])
+  })
+
+  it('sorts by created_at, treating a null value as empty', () => {
+    const items = [makeSortable('has-date', '2024-01-01T00:00:00Z'), makeSortable('no-date', null)]
+    expect(
+      sortStorageItems(items, {
+        column: STORAGE_SORT_BY.CREATED_AT,
+        order: STORAGE_SORT_BY_ORDER.ASC,
+      }).map((i) => i.name)
+    ).toEqual(['no-date', 'has-date'])
+  })
+
+  it('does not mutate the input array', () => {
+    const items = [makeSortable('zebra'), makeSortable('apple')]
+    sortStorageItems(items, { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.ASC })
+    expect(items.map((i) => i.name)).toEqual(['zebra', 'apple'])
+  })
+})
+
+describe('formatFolderItemsV2', () => {
+  const NAME_ASC = { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.ASC }
+
+  it('tags folders with id: null', () => {
+    const items = formatFolderItemsV2({ folders: [{ name: 'a/inner/' }], objects: [] }, NAME_ASC)
+
+    expect(items).toEqual([
+      expect.objectContaining({ name: 'inner', type: STORAGE_ROW_TYPES.FOLDER, id: null }),
+    ])
+  })
+
+  it('sorts folders and files together by the given column, interleaving rather than grouping folders first', () => {
+    const items = formatFolderItemsV2(
+      {
+        folders: [{ name: 'banana/' }],
+        objects: [
+          {
+            id: 'apple-id',
+            name: 'apple.png',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: null,
+          },
+          {
+            id: 'cherry-id',
+            name: 'cherry.png',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: null,
+          },
+        ],
+      },
+      NAME_ASC
+    )
+
+    expect(items.map((item) => ({ name: item.name, type: item.type }))).toEqual([
+      { name: 'apple.png', type: STORAGE_ROW_TYPES.FILE },
+      { name: 'banana', type: STORAGE_ROW_TYPES.FOLDER },
+      { name: 'cherry.png', type: STORAGE_ROW_TYPES.FILE },
+    ])
+  })
+
+  it('sorts descending when requested', () => {
+    const items = formatFolderItemsV2(
+      { folders: [{ name: 'banana/' }], objects: [] },
+      { column: STORAGE_SORT_BY.NAME, order: STORAGE_SORT_BY_ORDER.DESC }
+    )
+
+    expect(items.map((item) => item.name)).toEqual(['banana'])
+  })
+
+  it('drops the empty-folder placeholder and builds path from the given prefix', () => {
+    const items = formatFolderItemsV2(
+      {
+        folders: [],
+        objects: [
+          {
+            id: 'placeholder-id',
+            name: 'a/b/.emptyFolderPlaceholder',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: null,
+          },
+          {
+            id: 'file-id',
+            name: 'a/b/file.png',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            last_accessed_at: '2024-01-01T00:00:00Z',
+            metadata: { size: 1, mimetype: 'image/png' },
+          },
+        ],
+      },
+      NAME_ASC,
+      'a/b'
+    )
+
+    expect(items.map((item) => ({ name: item.name, path: item.path }))).toEqual([
+      { name: 'file.png', path: 'a/b/file.png' },
+    ])
   })
 })

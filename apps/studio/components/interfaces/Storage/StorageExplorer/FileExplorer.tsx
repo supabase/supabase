@@ -52,7 +52,14 @@ export const FileExplorer = ({
     >
       {isLoading ? (
         <FileExplorerColumn
-          column={{ id: '', name: '', path: '', items: [], status: STORAGE_ROW_STATUS.LOADING }}
+          column={{
+            id: '',
+            name: '',
+            path: '',
+            items: [],
+            status: STORAGE_ROW_STATUS.LOADING,
+            cursor: null,
+          }}
         />
       ) : view === STORAGE_VIEWS.COLUMNS ? (
         <div className="flex">

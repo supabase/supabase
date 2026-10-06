@@ -26,6 +26,8 @@ export interface StorageColumn {
   items: StorageItem[]
   hasMoreItems?: boolean
   isLoadingMoreItems?: boolean
+  /** list-v2 cursor for the next page; null once exhausted or before the first page loads */
+  cursor: string | null
 }
 
 export interface StorageItem {
@@ -57,3 +59,7 @@ export interface StorageItemMetadata {
 /** A folder entry as returned by the storage list-v2 endpoint's `folders` array */
 export type StorageObjectV2Folder =
   components['schemas']['StorageListResponseV2_Output']['folders'][number]
+
+/** A file entry as returned by the storage list-v2 endpoint's `objects` array */
+export type StorageObjectV2Object =
+  components['schemas']['StorageListResponseV2_Output']['objects'][number]

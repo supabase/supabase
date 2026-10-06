@@ -49,6 +49,17 @@ type ListBucketObjectsV2Params = {
   options?: Omit<components['schemas']['GetObjectsV2Body'], 'prefix' | 'cursor' | 'with_delimiter'>
 }
 
+/**
+ * A trailing slash is required to browse a folder's contents with v2's `with_delimiter: true` —
+ * without it, v2 treats e.g. "docs" as a partial name match against siblings like "docs-old"
+ * rather than descending into the folder. Folding `search` onto the end turns the browse into
+ * a prefix search within that folder (v2 has no separate `search` field yet).
+ */
+export const toListV2Prefix = (path: string, search?: string) => {
+  const browsePrefix = path ? `${path}/` : ''
+  return search ? `${browsePrefix}${search}` : browsePrefix
+}
+
 export const listBucketObjectsV2 = async (
   { projectRef, bucketId, prefix, cursor, options }: ListBucketObjectsV2Params,
   signal?: AbortSignal

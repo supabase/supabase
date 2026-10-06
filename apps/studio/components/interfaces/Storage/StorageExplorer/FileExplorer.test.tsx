@@ -32,6 +32,7 @@ function makeColumns(count: number): StorageColumn[] {
     path: '',
     status: STORAGE_ROW_STATUS.READY,
     items: [],
+    cursor: null,
   }))
 }
 
