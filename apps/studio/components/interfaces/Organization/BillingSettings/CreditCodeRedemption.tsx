@@ -32,7 +32,7 @@ import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
 import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 
 const FORM_ID = 'credit-code-redemption'
@@ -65,7 +65,7 @@ export const CreditCodeRedemption = ({
   const combinedCreditBalanceCents = orgBalance?.total_balance_cents
 
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    'billing_write',
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
     { organizationSlug: slug }
   )
 

@@ -10,6 +10,7 @@ import BillingEmail from './BillingEmail'
 import { organizationKeys } from '@/data/organizations/keys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 type CustomerResponse = components['schemas']['CustomerResponse_Output']
 
@@ -111,7 +112,7 @@ describe('BillingEmail', () => {
 
   test('shows a permission notice when the user cannot read billing data', async () => {
     mockCheckPermissions.mockImplementation((permission) => ({
-      can: permission !== 'billing_read',
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
       isSuccess: true,
     }))
 
@@ -123,7 +124,7 @@ describe('BillingEmail', () => {
 
   test('disables the email controls when the user cannot update billing data', async () => {
     mockCheckPermissions.mockImplementation((permission) => ({
-      can: permission !== 'billing_write',
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
       isSuccess: true,
     }))
     mockCustomerProfile({ email: 'billing@example.com', additional_emails: [] })

@@ -44,7 +44,7 @@ import { useOrganizationCreditTopUpMutation } from '@/data/organizations/organiz
 import { useCreditTopUpPreview } from '@/data/organizations/organization-credit-top-up-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
@@ -74,7 +74,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   }>(null)
 
   const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2('billing_write')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
 
   const {
     mutateAsync: topUpCredits,
@@ -107,9 +107,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const parsedAmount = Number(debouncedAmount)
   const validAmount =
     !Number.isNaN(parsedAmount) &&
-    Number.isInteger(parsedAmount) &&
-    parsedAmount >= MIN_TOP_UP_AMOUNT &&
-    parsedAmount <= MAX_TOP_UP_AMOUNT
+      Number.isInteger(parsedAmount) &&
+      parsedAmount >= MIN_TOP_UP_AMOUNT &&
+      parsedAmount <= MAX_TOP_UP_AMOUNT
       ? parsedAmount
       : undefined
 
@@ -396,9 +396,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     tax={
                       creditPreview.tax
                         ? {
-                            amount: creditPreview.tax.tax_amount,
-                            percentage: creditPreview.tax.tax_rate_percentage,
-                          }
+                          amount: creditPreview.tax.tax_amount,
+                          percentage: creditPreview.tax.tax_rate_percentage,
+                        }
                         : undefined
                     }
                     taxStatus={creditPreview.tax_status}

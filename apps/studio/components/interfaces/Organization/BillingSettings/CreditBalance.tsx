@@ -13,13 +13,13 @@ import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CreditBalance = () => {
   const { slug } = useParams()
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
   const { ref, inView } = useInView({ triggerOnce: true })
 
   // Endpoint is expensive, so we only load it if it's in view

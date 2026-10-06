@@ -14,7 +14,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { getDocument } from '@/data/documents/document-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -24,7 +24,7 @@ export const SOC2 = () => {
 
   const track = useTrack()
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
   const { hasAccess: hasAccessToSoc2Report, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.soc2_report')
 

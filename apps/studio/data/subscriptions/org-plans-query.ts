@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { subscriptionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { UseCustomQueryOptions } from '@/types'
 
 export type OrgPlansVariables = {
@@ -27,7 +27,7 @@ export const useOrgPlansQuery = <TData = OrgPlansData>(
   { orgSlug }: OrgPlansVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2('billing_read')
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   return useQuery<OrgPlansData, OrgPlansError, TData>({
     queryKey: subscriptionKeys.orgPlans(orgSlug),

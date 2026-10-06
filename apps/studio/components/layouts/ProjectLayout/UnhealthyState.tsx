@@ -8,7 +8,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectDetailQuery, useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
@@ -19,7 +19,7 @@ export const UnhealthyState = () => {
   const { setProjectStatus } = useSetProjectStatus()
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const { can: canRestartProject } = useAsyncCheckPermissionsV2('project_operations_write')
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE)
 
   useProjectDetailQuery(
     { ref },

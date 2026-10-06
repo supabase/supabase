@@ -33,7 +33,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from '@/lib/constants'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
@@ -73,7 +73,7 @@ export const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const { can: canUpdateSpendCap } = useAsyncCheckPermissionsV2('billing_write')
+  const { can: canUpdateSpendCap } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'costControl'

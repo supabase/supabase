@@ -31,7 +31,7 @@ import { OrganizationProjectSelector } from '@/components/ui/OrganizationProject
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 
@@ -50,7 +50,7 @@ export const Usage = () => {
   const canLoadUsage = !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
 
   const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   const {
     data: subscription,

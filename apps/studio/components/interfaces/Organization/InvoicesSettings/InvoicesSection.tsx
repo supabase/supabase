@@ -5,11 +5,11 @@ import {
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const InvoicesSection = () => {
   const { isSuccess: isPermissionsLoaded, can: canReadInvoices } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   return (
     <ScaffoldSection>

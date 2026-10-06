@@ -20,7 +20,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -35,7 +35,7 @@ export const CostControl = () => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   const {
     data: subscription,

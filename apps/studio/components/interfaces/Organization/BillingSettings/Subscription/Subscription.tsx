@@ -17,7 +17,7 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
@@ -26,7 +26,7 @@ const Subscription = () => {
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   const {
     data: subscription,

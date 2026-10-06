@@ -3,7 +3,7 @@ import { components } from 'api-types'
 
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationTaxIdVariables = {
@@ -35,7 +35,7 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     ...options
   }: UseCustomQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2('billing_read')
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>({
     queryKey: organizationKeys.taxId(slug),

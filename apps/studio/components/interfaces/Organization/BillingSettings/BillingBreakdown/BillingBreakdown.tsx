@@ -13,7 +13,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -24,7 +24,7 @@ const BillingBreakdown = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckPermissionsV2('billing_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
 
   const {
     data: subscription,

@@ -42,7 +42,7 @@ import {
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -68,7 +68,7 @@ export const AuditLogs = () => {
   })
 
   const { can: canReadAuditLogs, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('audit_logs_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.AUDIT_LOGS_READ)
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('security.audit_logs_days')

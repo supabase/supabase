@@ -26,7 +26,7 @@ import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
@@ -49,8 +49,8 @@ const PaymentMethods = () => {
   } = useOrganizationPaymentMethodsQuery({ slug }, { enabled: inView })
 
   const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2('billing_read')
-  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2('billing_write')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )

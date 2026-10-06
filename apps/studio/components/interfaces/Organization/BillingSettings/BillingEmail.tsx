@@ -26,7 +26,7 @@ import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSecti
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const FORM_ID = 'org-billing-email'
 const formSchema = z.object({
@@ -38,8 +38,8 @@ const BillingEmail = () => {
   const { slug } = useParams()
 
   const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2('billing_read')
-  const { can: canUpdateBillingData } = useAsyncCheckPermissionsV2('billing_write')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canUpdateBillingData } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
 
   const { ref, inView } = useInView({ triggerOnce: true })
 

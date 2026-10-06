@@ -28,7 +28,7 @@ import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-ut
 import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
 import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax-id-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 
@@ -41,8 +41,8 @@ export const BillingCustomerData = () => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2('billing_read')
-  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2('billing_write')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
 
   const { ref, inView } = useInView({ triggerOnce: true })
 
