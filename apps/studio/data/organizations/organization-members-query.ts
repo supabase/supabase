@@ -50,21 +50,7 @@ export async function getOrganizationMembers(
     return { ...member, role_ids: [invite.role_id] }
   })
 
-  // TEMP (perf repro, do not commit): append fake members
-  const mockCount = 1000
-  const roleIdPool = orgMembers.flatMap((m) => m.role_ids)
-  const mockMembers = Array.from({ length: mockCount }, (_, i) => ({
-    avatar_url: null,
-    gotrue_id: `mock-user-${i}`,
-    is_sso_user: i % 10 === 0,
-    metadata: {},
-    mfa_enabled: i % 3 === 0,
-    primary_email: `mock.user.${i}@example.com`,
-    role_ids: [roleIdPool[i % roleIdPool.length]],
-    username: `mockuser${i}`,
-  }))
-
-  return [...orgMembers, ...mockMembers, ...invitedMembers] as OrganizationMember[]
+  return [...orgMembers, ...invitedMembers] as OrganizationMember[]
 }
 
 export type OrganizationMembersData = Awaited<ReturnType<typeof getOrganizationMembers>>
