@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -9,6 +8,7 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import { getFacetCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
@@ -65,7 +65,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [
       ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),

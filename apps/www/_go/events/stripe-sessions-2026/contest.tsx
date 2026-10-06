@@ -62,12 +62,12 @@ stripe projects env --sync`}</code>
               Connect your Stripe account to Supabase and sync your payments, customers, and
               subscriptions into a live Postgres schema.
             </p>
-            <Link
+            <a
               href="https://supabase.com/dashboard/project/_/integrations"
               className="text-foreground underline"
             >
               Install the Stripe Sync Engine →
-            </Link>
+            </a>
           </div>
 
           <p className="text-foreground-light text-sm">

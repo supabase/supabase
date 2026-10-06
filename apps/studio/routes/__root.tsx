@@ -341,7 +341,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       maintenanceMode: IS_MAINTENANCE_MODE,
       hash: location.hash,
     })
-    if (!match) return
+    if (!match) return undefined
     // `to`/`search`/`hash`, never `href`: the router treats `href` as an
     // opaque (external) target, and preloading a Link whose beforeLoad
     // throws `redirect({ href })` recurses forever — the preload retry
