@@ -1,6 +1,7 @@
 'use client'
 
-import { useFeatureFlags, useSearchParamsShallow } from 'common'
+import { hasConsented, posthogClient, useFeatureFlags, useSearchParamsShallow } from 'common'
+import { useEffect } from 'react'
 
 import { SEARCH_V2_FLAG, type SearchV2Variant } from './constants'
 
@@ -15,10 +16,26 @@ export function useSearchV2Variant(): SearchV2Variant {
   const { posthog } = useFeatureFlags()
   const searchParams = useSearchParamsShallow()
   const override = searchParams.get(SEARCH_V2_FLAG)
+  const isOverridden = VARIANTS.includes(override as SearchV2Variant)
 
-  if (VARIANTS.includes(override as SearchV2Variant)) {
+  const flagValue = posthog[SEARCH_V2_FLAG]
+  const isFlagResolved = flagValue !== undefined
+  const flagVariant: SearchV2Variant =
+    flagValue === 'search-v2-active' ? 'search-v2-active' : 'control'
+
+  useEffect(() => {
+    if (isOverridden || !isFlagResolved) return
+
+    posthogClient.captureExperimentExposure(
+      SEARCH_V2_FLAG,
+      { variant: flagVariant },
+      hasConsented()
+    )
+  }, [isOverridden, isFlagResolved, flagVariant])
+
+  if (isOverridden) {
     return override as SearchV2Variant
   }
 
-  return posthog[SEARCH_V2_FLAG] === 'search-v2-active' ? 'search-v2-active' : 'control'
+  return flagVariant
 }
