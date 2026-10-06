@@ -509,7 +509,7 @@ select
     payload => jsonb_build_object('hello', 'world'),
     event => 'event',
     topic => 'topic',
-    private => false -- Public channel; set to true for a private channel (default)
+    private => true -- Private channel (default); set to false for a public channel
   );
 ```
 
