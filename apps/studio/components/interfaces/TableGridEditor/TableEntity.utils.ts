@@ -43,11 +43,13 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
 
   const valuesSets = rows
     .map((row) => {
-      const filteredRow = { ...row }
-      if ('idx' in filteredRow) delete filteredRow.idx
-
-      const values = Object.entries(filteredRow).map(([key, val]) => {
-        const { dataType, format } = table.columns.find((col) => col.name === key) ?? {}
+      // Map values through the table's column list so each value lands under
+      // its own column: enumerating the row object instead would reorder
+      // integer-like column names ahead of the others, and synthetic row keys
+      // (e.g. the grid's `idx`) are excluded by not being real columns.
+      const values = table.columns.map((col) => {
+        const val = row[col.name]
+        const { dataType, format } = col
 
         // We only check for NULL, array and JSON types, everything else we stringify
         // given that Postgres can implicitly cast the right type based on the column type

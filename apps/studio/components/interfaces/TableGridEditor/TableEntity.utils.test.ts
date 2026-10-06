@@ -174,6 +174,49 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should order values by the table columns, not by object key enumeration', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+        { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      ],
+      name: 'yearly_totals',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    // Rows arrive as parsed JSON: integer-like keys enumerate before all other
+    // keys (in ascending numeric order), regardless of the column order
+    const rows = [JSON.parse('{"id":7,"2024":99,"2023":42}')]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO public.yearly_totals (id, "2024", "2023") VALUES (7, 99, 42);`
+    expect(result).toBe(expected)
+  })
+
+  it('should keep the value of a real column named idx', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'idx', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'name', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'people',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [{ idx: 5, name: 'Person 1' }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO public.people (idx, name) VALUES (5, 'Person 1');`
+    expect(result).toBe(expected)
+  })
+
   it('should remove the idx property', () => {
     const table: SupaTable = {
       id: 1,
