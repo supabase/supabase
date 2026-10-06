@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
-import { ComboboxTrigger } from './select-trigger'
+import { ComboboxTrigger } from './combobox-trigger'
 
 describe('ComboboxTrigger', () => {
   it('matches the raised select trigger styling', () => {
@@ -10,8 +10,8 @@ describe('ComboboxTrigger', () => {
     const trigger = screen.getByRole('combobox')
     expect(trigger).toHaveTextContent('Select publication')
     expect(trigger).toHaveClass(
-      'bg-control-raised',
-      'border-strong',
+      'raised-control-surface',
+      'control-surface-shadows',
       'cursor-pointer',
       'focus-ring',
       'text-left'
