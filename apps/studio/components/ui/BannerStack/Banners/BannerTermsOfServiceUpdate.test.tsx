@@ -24,7 +24,7 @@ describe('BannerTermsOfServiceUpdate', () => {
   it('reveals the explanation and agreement link only after Learn more', async () => {
     const user = userEvent.setup()
     renderNotice()
-    expect(screen.getByText("We’ve updated our Terms of Service")).toBeInTheDocument()
+    expect(screen.getByText('We’ve updated our Terms of Service')).toBeInTheDocument()
     expect(screen.queryByText(/Clarify which Supabase entity/)).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Learn more' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
