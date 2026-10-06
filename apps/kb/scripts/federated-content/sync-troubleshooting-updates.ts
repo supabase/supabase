@@ -1,9 +1,11 @@
-// Backfills `slug` for any troubleshooting_entries row that has a github_url
-// but no slug yet (matched by discussion title against an unclaimed local
-// guide), then pushes title/content updates to discussions whose local guide
-// has changed. Diffs against the discussion's live content each run — no
-// stored checksum. Run after sync-troubleshooting-entries.ts, from CI only.
-// Pass --dry-run to log without writing anything.
+// Pushes title/content updates to already-synced GitHub Discussions when the
+// local troubleshooting guide has changed. Compares a stored checksum against
+// a freshly computed one — never the discussion's live content — so this is
+// immune to whatever GitHub does internally to stored title/body. A null
+// checksum (a row created before this column existed) always counts as
+// changed. Run after sync-troubleshooting-entries.ts, from CI only. Pass
+// --dry-run to log without writing anything.
+import { createHash } from 'node:crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -37,7 +39,11 @@ async function readLocalGuides(): Promise<Array<{ slug: string; title: string; b
   )
 }
 
-type Discussion = { id: string; url: string; title: string; body: string }
+function computeChecksum(title: string, body: string): string {
+  return createHash('sha256').update(JSON.stringify({ title, body })).digest('hex')
+}
+
+type Discussion = { id: string; url: string }
 
 async function listTroubleshootingDiscussions(): Promise<Discussion[]> {
   const query = `
@@ -45,7 +51,7 @@ async function listTroubleshootingDiscussions(): Promise<Discussion[]> {
       repository(owner: "${REPOSITORY_OWNER}", name: "${REPOSITORY_NAME}") {
         discussions(first: 100, after: $cursor, categoryId: "${TROUBLESHOOTING_CATEGORY_ID}") {
           pageInfo { hasNextPage endCursor }
-          nodes { id url title body }
+          nodes { id url }
         }
       }
     }
@@ -91,61 +97,34 @@ async function syncDiscussionUpdates() {
 
   const { data: rows, error } = await db
     .from('troubleshooting_entries')
-    .select('id, slug, github_url')
+    .select('slug, github_url, checksum')
+    .in(
+      'slug',
+      guides.map((guide) => guide.slug)
+    )
   if (error) throw error
 
+  const rowBySlug = new Map((rows ?? []).map((row) => [row.slug, row]))
   const discussionByUrl = new Map(discussions.map((discussion) => [discussion.url, discussion]))
-  const claimedSlugs = new Set((rows ?? []).map((row) => row.slug).filter(Boolean))
-
-  for (const row of rows ?? []) {
-    if (row.slug || !row.github_url) continue
-    const discussion = discussionByUrl.get(row.github_url)
-    const match =
-      discussion &&
-      guides.find((guide) => guide.title === discussion.title && !claimedSlugs.has(guide.slug))
-    if (!match) continue
-
-    console.log(
-      `[sync-troubleshooting-updates] Backfilling slug for row ${row.id}: ${match.slug}${DRY_RUN ? ' (dry run)' : ''}`
-    )
-    if (DRY_RUN) continue
-
-    const { error: updateError } = await db
-      .from('troubleshooting_entries')
-      .update({ slug: match.slug })
-      .eq('id', row.id)
-    if (updateError) {
-      console.error(
-        `[sync-troubleshooting-updates] Failed to backfill slug for row ${row.id}:`,
-        updateError
-      )
-      continue
-    }
-    row.slug = match.slug
-    claimedSlugs.add(match.slug)
-  }
-
-  const githubUrlBySlug = new Map(
-    (rows ?? []).filter((row) => row.slug).map((row) => [row.slug as string, row.github_url])
-  )
 
   let updatedCount = 0
   const failures: string[] = []
 
   for (const guide of guides) {
-    const githubUrl = githubUrlBySlug.get(guide.slug)
-    if (!githubUrl) continue // not synced yet — sync-troubleshooting-entries.ts handles that
+    const row = rowBySlug.get(guide.slug)
+    if (!row) continue // not synced yet — sync-troubleshooting-entries.ts handles that
 
-    const discussion = discussionByUrl.get(githubUrl)
+    const newChecksum = computeChecksum(guide.title, guide.body)
+    if (row.checksum !== null && row.checksum === newChecksum) continue
+
+    const discussion = discussionByUrl.get(row.github_url)
     if (!discussion) {
       console.error(
-        `[sync-troubleshooting-updates] No discussion found for ${guide.slug} (${githubUrl})`
+        `[sync-troubleshooting-updates] No discussion found for ${guide.slug} (${row.github_url})`
       )
       failures.push(guide.slug)
       continue
     }
-
-    if (discussion.title === guide.title && discussion.body === guide.body) continue
 
     console.log(
       `[sync-troubleshooting-updates] Content changed for ${guide.slug}${DRY_RUN ? ' (dry run)' : ''}`
@@ -157,6 +136,11 @@ async function syncDiscussionUpdates() {
 
     try {
       await updateDiscussion(discussion.id, guide.title, guide.body)
+      const { error: updateError } = await db
+        .from('troubleshooting_entries')
+        .update({ checksum: newChecksum })
+        .eq('slug', guide.slug)
+      if (updateError) throw updateError
       updatedCount++
     } catch (err) {
       console.error(`[sync-troubleshooting-updates] Failed to update ${guide.slug}:`, err)
