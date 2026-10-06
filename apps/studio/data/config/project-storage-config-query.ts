@@ -53,6 +53,12 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
     ...options,
   })
 
+export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
+  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const isIcebergCatalogEnabled = !!data?.features.icebergCatalog?.enabled
+  return isIcebergCatalogEnabled
+}
+
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
   const { data: isVectorBucketsEnabledData } = useProjectStorageConfigQuery(
     { projectRef },
