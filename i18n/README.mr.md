@@ -1,6 +1,6 @@
 <p align="center">
-<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only">
-<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only">
+<img src="https://user-images.githubusercontent.com/8291514/213727234-cda046d6-28c6-491a-b284-b86c5cede25d.png#gh-light-mode-only" alt="">
+<img src="https://user-images.githubusercontent.com/8291514/213727225-56186826-bee8-43b5-9b15-86e839d89393.png#gh-dark-mode-only" alt="">
 </p>
 
 # Supabase
@@ -59,7 +59,7 @@ Supabase (सुपाबेस) हे एक [होस्ट केलेल�
 - [postgres-meta (पोस्टग्रेस मेटा)](https://github.com/supabase/postgres-meta) हा तुमचे Postgres (पोस्टग्रेस) व्यवस्थापित करण्यासाठीचा RESTful (रेस्टफुल) API (एपीआय) आहे. तो टेबल्सची माहिती मिळवणे, भूमिका (रोल्स) जोडणे आणि क्वेरी चालवणे यांसारखी कामे करू देतो.
 - [Envoy (एन्व्हॉय)](https://github.com/envoyproxy/envoy) हा क्लाउडसाठी तयार केलेला, उच्च कार्यक्षमतेचा (हाय-परफॉर्मन्स) एज आणि सर्व्हिस प्रॉक्सी आहे.
 
-#### क्लायंट लायब्ररी
+### क्लायंट लायब्ररी
 
 आमच्या क्लायंट लायब्ररींची रचना स्वतंत्र घटकांवर आधारित (मॉड्युलर) आहे. प्रत्येक उपलायब्ररी (सब-लायब्ररी) एका बाह्य प्रणालीसाठी (एक्स्टर्नल सिस्टिम) स्वतंत्रपणे काम करते. विद्यमान साधनांना पाठिंबा देण्याचा हा आमचा एक मार्ग आहे.
 
@@ -200,7 +200,7 @@ Supabase (सुपाबेस) हे एक [होस्ट केलेल�
 
 ## Badges (बॅज)
 
-![Made with Supabase](./apps/www/public/badge-made-with-supabase.svg)
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
@@ -217,7 +217,7 @@ Supabase (सुपाबेस) हे एक [होस्ट केलेल�
 </a>
 ```
 
-![Made with Supabase (dark)](./apps/www/public/badge-made-with-supabase-dark.svg)
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
 
 ```md
 [![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
