@@ -33,6 +33,7 @@ const baseOrganizationResponse = {
 const baseOrganizationSlugResponse = {
   billing_email: 'billing@example.com',
   billing_partner: null,
+  created_at: '2026-01-01T00:00:00.000Z',
   has_oriole_project: false,
   id: 1,
   integration_source: null,
