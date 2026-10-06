@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
 import Link from 'next/link'
 import { memo, useMemo } from 'react'
@@ -8,29 +9,34 @@ import {
   HoverCardContent,
   HoverCardTrigger,
   ScrollArea,
-  TableCell,
-  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import { MEMBERS_GRID_CLASS } from './MembersList.constants'
 import { useTeamSettingsData } from './TeamSettingsDataContext'
+import { type RowComponentBaseProps } from '@/components/ui/InfiniteList'
+import { InlineLink } from '@/components/ui/InlineLink'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { OrganizationRole } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
 import { useProfile } from '@/lib/profile'
 
-interface MemberRowProps {
-  member: OrganizationMember
-}
-
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
   vercel: 'vercel-marketplace',
 } as const
 
-export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
+export const MemberRow = memo(function MemberRow({
+  item: member,
+  index,
+  style,
+}: RowComponentBaseProps<OrganizationMember>) {
+  const { slug } = useParams()
   const { profile } = useProfile()
   const { roles, isLoadingRoles, orgProjects } = useTeamSettingsData()
 
@@ -69,27 +75,32 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
   }, [member.role_ids, roleById, orgProjects, projectNameByRef])
 
   return (
-    <TableRow>
-      <TableCell>
+    <div
+      role="row"
+      aria-rowindex={index + 2}
+      style={style}
+      className={cn(MEMBERS_GRID_CLASS, 'border-b hover:bg-surface-200 transition-colors')}
+    >
+      <div role="cell" className="min-w-0">
         <div className="flex items-center gap-x-4">
           <ProfileImage
             alt={member.primary_email ?? member.username ?? ''}
             src={profileImageUrl}
-            className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
+            className="border rounded-full w-6 h-6 md:w-8 md:h-8"
             placeholder={
               <div
                 className={cn(
-                  'w-[32px] h-[32px] md:w-[40px] md:h-[40px]',
+                  'w-6 h-6 md:w-8 md:h-8 text-xs',
                   'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
                 )}
               >
-                <User size={20} strokeWidth={1.5} />
+                {member.primary_email?.[0].toUpperCase()}
               </div>
             }
           />
           <div className="flex items-center gap-x-3">
-            <p className="text-foreground-light truncate">{member.primary_email}</p>
-            <div className="flex items-center gap-x-2">
+            <p className="text-foreground-light truncate text-sm">{member.primary_email}</p>
+            <div className="flex items-center gap-x-2 text-sm">
               {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
               {isInvitedUser && member.invited_at && (
                 <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
@@ -111,30 +122,39 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
             </div>
           </div>
         </div>
-      </TableCell>
+      </div>
 
-      <TableCell>
-        <div className="flex items-center gap-x-1.5">
-          {member.mfa_enabled ? (
-            <>
-              <span className="text-foreground-lighter">Enabled</span>
-              <Check className="text-primary" strokeWidth={2} size={16} />
-            </>
-          ) : (
-            <>
-              <span className="text-foreground-lighter">Disabled</span>
-              <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
-            </>
-          )}
+      <div role="cell">
+        <div className="flex items-center ml-1">
+          <Tooltip>
+            <TooltipTrigger>
+              {member.mfa_enabled ? (
+                <Check className="text-primary" strokeWidth={2} size={16} />
+              ) : (
+                <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
+              )}
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="max-w-70 text-center">
+              {member.mfa_enabled ? (
+                'Member has MFA enabled'
+              ) : (
+                <span className="text-balance">
+                  Member does not have MFA enabled. You can enforce MFA from your organization's{' '}
+                  <InlineLink href={`/org/${slug}/security`}>security settings</InlineLink>,
+                  restricting access until members enable it.
+                </span>
+              )}
+            </TooltipContent>
+          </Tooltip>
         </div>
-      </TableCell>
+      </div>
 
-      <TableCell className="max-w-64">
+      <div role="cell" className="min-w-0">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
         ) : (
           roleRows.map(({ id, roleName, appliesToAllProjects, projectsApplied }) => (
-            <div key={`role-${id}`} className="flex items-center gap-x-2">
+            <div key={`role-${id}`} className="flex items-center gap-x-2 text-sm">
               <p className="text-foreground-light">{roleName}</p>
               {hasProjectScopedRoles && (
                 <>
@@ -185,11 +205,11 @@ export const MemberRow = memo(function MemberRow({ member }: MemberRowProps) {
             </div>
           ))
         )}
-      </TableCell>
+      </div>
 
-      <TableCell>
+      <div role="cell">
         <MemberActions member={member} />
-      </TableCell>
-    </TableRow>
+      </div>
+    </div>
   )
 })

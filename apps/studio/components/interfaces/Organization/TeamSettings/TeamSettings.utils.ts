@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
+import { MEMBER_ROLE_LINE_HEIGHT, MEMBER_ROW_MIN_HEIGHT } from './MembersList.constants'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 import { doPermissionsCheck } from '@/hooks/misc/useCheckPermissions'
 import type { Permission, Role } from '@/types'
@@ -48,3 +49,7 @@ export const hasMultipleOwners = (members: OrganizationMember[] = [], roles: Rol
   })
   return membersWhoAreOwners.length > 1
 }
+
+/** Each role renders on its own line, so members with several roles need taller rows */
+export const getMemberRowHeight = (member: Pick<OrganizationMember, 'role_ids'>) =>
+  Math.max(MEMBER_ROW_MIN_HEIGHT, (member.role_ids?.length ?? 0) * MEMBER_ROLE_LINE_HEIGHT)
