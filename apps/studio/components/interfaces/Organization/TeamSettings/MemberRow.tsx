@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
+import { ArrowRight, Check, ChevronRight, X } from 'lucide-react'
 import Link from 'next/link'
 import { memo, useMemo } from 'react'
 import {
@@ -82,25 +82,30 @@ export const MemberRow = memo(function MemberRow({
       className={cn(MEMBERS_GRID_CLASS, 'border-b hover:bg-surface-200 transition-colors')}
     >
       <div role="cell" className="min-w-0">
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-4 min-w-0">
           <ProfileImage
             alt={member.primary_email ?? member.username ?? ''}
             src={profileImageUrl}
-            className="border rounded-full w-6 h-6 md:w-8 md:h-8"
+            className="border rounded-full w-6 h-6 md:w-8 md:h-8 shrink-0"
             placeholder={
               <div
                 className={cn(
-                  'w-6 h-6 md:w-8 md:h-8 text-xs',
+                  'w-6 h-6 md:w-8 md:h-8 text-xs shrink-0',
                   'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
                 )}
               >
-                {member.primary_email?.[0].toUpperCase()}
+                {member.primary_email?.[0]?.toUpperCase()}
               </div>
             }
           />
-          <div className="flex items-center gap-x-3">
-            <p className="text-foreground-light truncate text-sm">{member.primary_email}</p>
-            <div className="flex items-center gap-x-2 text-sm">
+          <div className="flex items-center gap-x-3 min-w-0">
+            <p
+              title={member.primary_email ?? ''}
+              className="text-foreground-light truncate text-sm"
+            >
+              {member.primary_email}
+            </p>
+            <div className="flex items-center gap-x-2 shrink-0 text-sm">
               {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
               {isInvitedUser && member.invited_at && (
                 <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
@@ -154,11 +159,11 @@ export const MemberRow = memo(function MemberRow({
           <ShimmeringLoader className="w-32" />
         ) : (
           roleRows.map(({ id, roleName, appliesToAllProjects, projectsApplied }) => (
-            <div key={`role-${id}`} className="flex items-center gap-x-2 text-sm">
-              <p className="text-foreground-light">{roleName}</p>
+            <div key={`role-${id}`} className="flex items-center gap-x-2 min-w-0 text-sm">
+              <p className="text-foreground-light whitespace-nowrap">{roleName}</p>
               {hasProjectScopedRoles && (
                 <>
-                  <ChevronRight className="text-foreground-muted/50" size={14} />
+                  <ChevronRight className="text-foreground-muted/50 shrink-0" size={14} />
                   {projectsApplied.length === 1 ? (
                     <span
                       className="text-foreground-light truncate"
@@ -169,7 +174,7 @@ export const MemberRow = memo(function MemberRow({
                   ) : (
                     <HoverCard openDelay={200}>
                       <HoverCardTrigger asChild>
-                        <span className="text-foreground-light">
+                        <span className="text-foreground-light truncate">
                           {appliesToAllProjects
                             ? 'Organization'
                             : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
