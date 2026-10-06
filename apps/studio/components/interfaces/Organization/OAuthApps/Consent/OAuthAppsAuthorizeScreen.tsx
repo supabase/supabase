@@ -252,6 +252,8 @@ export const OAuthAppsAuthorizeScreen = ({
       ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
+  const cannotApprove = preflightQuery.data?.status === 'error' || hasRoleFailure || hasNoSelection
+
   return (
     <InterstitialLayout
       logo={<LogoPair left={<DestinationLogo name={request.name} />} right={<SupabaseLogo />} />}
@@ -337,7 +339,7 @@ export const OAuthAppsAuthorizeScreen = ({
               block
               variant={primaryActionVariant}
               loading={isSubmitting}
-              disabled={hasNoSelection}
+              disabled={cannotApprove}
               aria-label={primaryActionLabel}
               onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
             >
