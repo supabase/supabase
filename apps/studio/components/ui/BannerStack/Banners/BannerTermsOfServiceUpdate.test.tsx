@@ -34,7 +34,7 @@ describe('BannerTermsOfServiceUpdate', () => {
       'https://supabase.com/terms'
     )
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE)).toBeNull()
-    await user.click(screen.getByRole('button', { name: 'Understood' }))
+    await user.click(screen.getByRole('button', { name: 'Got it' }))
     await waitFor(() =>
       expect(localStorage.getItem(LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE)).toBe('true')
     )
