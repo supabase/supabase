@@ -24,6 +24,7 @@ import { DestinationType } from '../DestinationPanel.types'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
@@ -91,6 +92,32 @@ export const AdvancedSettings = ({
               flush && 'px-(--card-padding-x)'
             )}
           >
+            {showConnection && type === 'DuckLake' && (
+              <FormField
+                control={form.control}
+                name="ducklakePoolSize"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Pool size"
+                    description="Maximum concurrent connections this pipeline opens to the catalog. Choose 1 to 6."
+                  >
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min={1}
+                        max={6}
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder={String(DEFAULT_DUCKLAKE_POOL_SIZE)}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            )}
+
             {showConnection && (
               <FormField
                 control={form.control}
@@ -99,7 +126,7 @@ export const AdvancedSettings = ({
                   <FormItemLayout
                     layout="horizontal"
                     label="Batch wait time"
-                    description="Maximum time before sending a partially filled batch. Default: 10,000 milliseconds."
+                    description="Maximum time before sending a partially filled batch."
                   >
                     <FormControl>
                       <InputGroup>
@@ -142,7 +169,7 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
+                            placeholder={String(DEFAULT_MAX_TABLE_SYNC_WORKERS)}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>workers</InputGroupText>
@@ -171,7 +198,7 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
+                            placeholder={String(DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE)}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>

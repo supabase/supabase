@@ -3,6 +3,8 @@ import { Check } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 const BUCKET_TYPES = [
   {
     title: 'Files buckets',
@@ -22,7 +24,7 @@ const BUCKET_TYPES = [
       'Historical and time-series data',
       'Optionally expose via Postgres',
     ],
-    cta: { label: 'Learn more', href: '/docs/guides/storage/analytics-buckets' },
+    cta: { label: 'Learn more', href: '/docs/guides/storage/analytics/introduction' },
   },
   {
     title: 'Vector buckets',
@@ -32,7 +34,7 @@ const BUCKET_TYPES = [
       'Metadata filtering and similarity queries',
       'RAG systems and AI-powered search',
     ],
-    cta: { label: 'Learn more', href: '/docs/guides/storage/vector-buckets' },
+    cta: { label: 'Learn more', href: '/docs/guides/storage/vector/introduction' },
   },
 ]
 
@@ -65,7 +67,11 @@ export function BucketTypesSection() {
               </div>
               <div className="mt-6">
                 <Button size="small" asChild>
-                  <Link href={bucket.cta.href}>{bucket.cta.label}</Link>
+                  {isCrossZoneHref(bucket.cta.href) ? (
+                    <a href={bucket.cta.href}>{bucket.cta.label}</a>
+                  ) : (
+                    <Link href={bucket.cta.href}>{bucket.cta.label}</Link>
+                  )}
                 </Button>
               </div>
             </div>

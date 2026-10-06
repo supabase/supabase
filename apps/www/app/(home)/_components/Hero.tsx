@@ -27,7 +27,7 @@ export function Hero() {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="primary" asChild size="medium">
-            <Link
+            <a
               href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
                 sendTelemetryEvent({
@@ -37,7 +37,7 @@ export function Hero() {
               }
             >
               Start your project
-            </Link>
+            </a>
           </Button>
           <Button asChild size="medium">
             <Link

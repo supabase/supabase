@@ -65,7 +65,7 @@ describe('PipelineReviewSummary', () => {
 
     expect(
       screen.getByText(
-        'Destination type cannot be changed after creation. Snowflake support is in early access.'
+        'Destination type cannot be changed after creation. Snowflake support is in public alpha.'
       )
     ).toBeInTheDocument()
     expect(container.querySelector('img')).toHaveAttribute(

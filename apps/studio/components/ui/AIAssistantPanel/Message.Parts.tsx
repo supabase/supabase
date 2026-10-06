@@ -1,22 +1,28 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import {
-  isToolUIPart,
-  type DynamicToolUIPart,
-  type ReasoningUIPart,
-  type TextUIPart,
-  type ToolUIPart,
-} from 'ai'
-import { BrainIcon, CheckIcon, CircleStop, Loader2 } from 'lucide-react'
+import { isToolUIPart, type TextUIPart, type ToolUIPart } from 'ai'
+import { BrainIcon, CheckIcon, CircleStop, Loader2, XIcon } from 'lucide-react'
 import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
+import { Markdown } from 'ui-patterns/Markdown'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
 import { toAssistantQueryResult } from './AssistantQueryCell.utils'
 import { getManualToolApprovalHandlers } from './Confirm.utils'
 import { EdgeFunctionRenderer } from './EdgeFunctionRenderer'
 import { Tool } from './elements/Tool'
+import { ToolGroup } from './elements/ToolGroup'
 import { useMessageActionsContext, useMessageInfoContext } from './Message.Context'
-import { areMessagePartsEqual } from './Message.Parts.utils'
+import {
+  areMessagePartsEqual,
+  getCompactPartLabel,
+  getCompactPartStatus,
+  getToolGroupSummary,
+  INTERRUPTED_LABEL,
+  isCompactToolCall,
+  isRunningToolCall,
+  type CompactPart,
+  type CompactPartStatus,
+} from './Message.Parts.utils'
 import {
   deployEdgeFunctionInputSchema,
   deployEdgeFunctionOutputSchema,
@@ -27,6 +33,7 @@ import { MessagePartQueryLogs } from './MessagePartQueryLogs'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
 import { NotebookRunRenderer } from './NotebookRunRenderer'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
+import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -52,59 +59,33 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   )
 }
 
-function MessagePartDynamicTool({ toolPart }: { toolPart: DynamicToolUIPart }) {
-  return (
-    <Tool
-      icon={
-        toolPart.state === 'input-streaming' ? (
-          <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
-        ) : (
-          <CheckIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
-        )
-      }
-      label={
-        <div>
-          {toolPart.state === 'input-streaming' ? 'Running ' : 'Ran '}
-          <span className="text-foreground-lighter">{`${toolPart.toolName}`}</span>
-        </div>
-      }
-    />
-  )
+const COMPACT_STATUS_ICONS: Record<CompactPartStatus, ReactNode> = {
+  running: <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />,
+  done: <CheckIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />,
+  failed: <XIcon strokeWidth={1.5} size={12} className="text-destructive" />,
 }
 
-function MessagePartTool({ toolPart }: { toolPart: ToolUIPart }) {
-  return (
-    <Tool
-      icon={
-        toolPart.state === 'input-streaming' ? (
-          <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
-        ) : (
-          <CheckIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
-        )
-      }
-      label={
-        <div>
-          {toolPart.state === 'input-streaming' ? 'Running ' : 'Ran '}
-          <span className="text-foreground-lighter">{`${toolPart.type.replace('tool-', '')}`}</span>
-        </div>
-      }
-    />
-  )
-}
+function MessagePartCompact({ part, isActive }: { part: CompactPart; isActive?: boolean }) {
+  const status = getCompactPartStatus(part)
+  const isReasoning = part.type === 'reasoning'
 
-function MessagePartReasoning({ reasoningPart }: { reasoningPart: ReasoningUIPart }) {
   return (
     <Tool
+      isActive={isActive}
       icon={
-        reasoningPart.state === 'streaming' ? (
-          <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />
-        ) : (
+        isReasoning && status === 'done' ? (
           <BrainIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />
+        ) : (
+          COMPACT_STATUS_ICONS[status]
         )
       }
-      label={reasoningPart.state === 'streaming' ? 'Thinking...' : 'Reasoned'}
+      label={getCompactPartLabel(part)}
     >
-      {reasoningPart.text}
+      {isReasoning ? (
+        <Markdown className="text-xs text-foreground-lighter [&>p]:m-0 flex flex-col gap-y-1">
+          {part.text}
+        </Markdown>
+      ) : undefined}
     </Tool>
   )
 }
@@ -293,9 +274,7 @@ function MessagePartNotebookRun({ toolPart }: { toolPart: ToolUIPart }) {
 
 const MessagePart = {
   Text: MessagePartText,
-  Dynamic: MessagePartDynamicTool,
-  Tool: MessagePartTool,
-  Reasoning: MessagePartReasoning,
+  Compact: MessagePartCompact,
   ExecuteSql: MessagePartExecuteSql,
   QueryLogs: MessagePartQueryLogs,
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
@@ -332,16 +311,15 @@ const isWideMessagePart = (part: NonNullable<VercelMessage['parts']>[number]) =>
   // Unlabelled code fences resolve to SQL in MessageMarkdown, too.
   (part.type === 'text' && /```(?:sql)?(?:\s|$)/i.test(part.text))
 
-const isCompactToolPart = (part: NonNullable<VercelMessage['parts']>[number]) =>
-  part.type === 'reasoning' ||
-  (part.type === 'dynamic-tool' && part.toolName !== 'query_logs') ||
-  part.type === 'tool-list_policies' ||
-  part.type === 'tool-search_docs' ||
-  part.type === 'tool-get_active_incidents' ||
-  part.type === 'tool-load_knowledge'
-
 export const MessagePartSwitcher = memo(
-  function MessagePartSwitcher({ part }: { part: NonNullable<VercelMessage['parts']>[number] }) {
+  function MessagePartSwitcher({
+    part,
+    isActive,
+  }: {
+    part: NonNullable<VercelMessage['parts']>[number]
+    /** Marks the in-progress call within a running tool group. */
+    isActive?: boolean
+  }) {
     const { isLoading, isLastMessage } = useMessageInfoContext()
     const isActiveMessage = isLoading && isLastMessage
     // Compact rows and query_logs run on the server, so `input-available` means the tool never
@@ -349,7 +327,7 @@ export const MessagePartSwitcher = memo(
     const isServerToolAwaitingOutput =
       isToolUIPart(part) &&
       part.state === 'input-available' &&
-      (isCompactToolPart(part) ||
+      (isCompactToolCall(part) ||
         part.type === 'tool-query_logs' ||
         (part.type === 'dynamic-tool' && part.toolName === 'query_logs'))
     const isIncompletePart =
@@ -361,29 +339,23 @@ export const MessagePartSwitcher = memo(
       return (
         <Tool
           icon={<CircleStop strokeWidth={1.5} size={12} className="text-foreground-muted" />}
-          label="Response interrupted"
+          label={INTERRUPTED_LABEL}
         >
           {part.type === 'reasoning' ? part.text : undefined}
         </Tool>
       )
     }
 
+    // Tool rows depend on being direct siblings to share their compact spacing and dividers.
+    if (part.type === 'reasoning' || (isToolUIPart(part) && isCompactToolCall(part))) {
+      return <MessagePart.Compact part={part} isActive={isActive} />
+    }
+
     const content = (() => {
       switch (part.type) {
         case 'dynamic-tool': {
-          if (part.toolName === 'query_logs') {
-            return <MessagePart.QueryLogs toolPart={part} />
-          }
-          return <MessagePart.Dynamic toolPart={part} />
+          return <MessagePart.QueryLogs toolPart={part} />
         }
-        case 'tool-list_policies':
-        case 'tool-search_docs':
-        case 'tool-get_active_incidents':
-        case 'tool-load_knowledge': {
-          return <MessagePart.Tool toolPart={part} />
-        }
-        case 'reasoning':
-          return <MessagePart.Reasoning reasoningPart={part} />
         case 'text':
           return <MessagePart.Text textPart={part} />
 
@@ -418,10 +390,42 @@ export const MessagePartSwitcher = memo(
     })()
 
     if (content === null) return null
-    // Tool rows depend on being direct siblings to share their compact spacing and dividers.
-    if (isCompactToolPart(part)) return content
-
     return <MessagePartContainer isWide={isWideMessagePart(part)}>{content}</MessagePartContainer>
   },
-  (previous, next) => areMessagePartsEqual(previous.part, next.part)
+  (previous, next) =>
+    previous.isActive === next.isActive && areMessagePartsEqual(previous.part, next.part)
 )
+
+// Long enough to read a short label before the next one replaces it
+const MIN_HEADER_DISPLAY_MS = 1000
+
+export function MessagePartToolGroup({
+  parts,
+  isRunning,
+}: {
+  parts: CompactPart[]
+  isRunning: boolean
+}) {
+  // A tool call leads the header only while it executes. The rest of the time the model is thinking.
+  const runningIndex = useMinimumDisplayTime(
+    parts.findLastIndex(isRunningToolCall),
+    MIN_HEADER_DISPLAY_MS
+  )
+  const runningToolCall: CompactPart | undefined = parts[runningIndex]
+
+  let header = runningToolCall ? getCompactPartLabel(runningToolCall, 'running') : 'Thinking...'
+  if (!isRunning) header = getToolGroupSummary(parts)
+
+  return (
+    <ToolGroup label={header} isActive={isRunning}>
+      {parts.map((part, idx) => {
+        // Some models don't share their reasoning, leaving finished rows with nothing to expand
+        if (part.type === 'reasoning' && part.state === 'done' && !part.text.trim()) return null
+
+        // Parallel calls can leave several rows in progress at once
+        const isActive = isRunning && getCompactPartStatus(part) === 'running'
+        return <MessagePartSwitcher key={idx} part={part} isActive={isActive} />
+      })}
+    </ToolGroup>
+  )
+}

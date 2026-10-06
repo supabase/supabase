@@ -7,7 +7,8 @@ import Layout from '../layouts/Layout.astro'
 import { TOPICS, topicToSlug } from '../lib/topics'
 
 const guides = await getCollection('guides')
-const pinnedTopics = TOPICS.filter((topic) => topic.pinned)
+const visibleTopics = TOPICS.filter((topic) => topic.visible)
+const pinnedTopics = visibleTopics.filter((topic) => topic.pinned)
 const featuredGuides = guides.filter((guide) => guide.data.pinned)
 ---
 
@@ -63,7 +64,7 @@ const featuredGuides = guides.filter((guide) => guide.data.pinned)
 		<section>
 			<h2 class="mb-6 text-2xl font-medium text-foreground">All Topics</h2>
 			<ul class="flex flex-col gap-2">
-				{TOPICS.map((topic) => (
+				{visibleTopics.map((topic) => (
 					<li>
 						<a
 							href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`}

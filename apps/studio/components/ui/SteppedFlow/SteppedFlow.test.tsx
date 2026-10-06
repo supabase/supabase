@@ -107,9 +107,7 @@ describe('SteppedFlow', () => {
       </SteppedFlow>
     )
 
-    expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toHaveClass(
-      'bg-warning-300'
-    )
+    expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toHaveClass('bg-warning')
   })
 
   test('renders a step header heading', () => {

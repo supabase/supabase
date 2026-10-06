@@ -34,8 +34,7 @@ const IsolatedMobileNavigationBar = ({ headerTitle }: { headerTitle?: string }) 
       <nav
         className={cn(
           'group pr-3 pl-2 z-10 w-full h-12 gap-2',
-          'border-b bg-dash-sidebar border-default shadow-[0_0_30px_0_rgba(0,0,0,0.07)]',
-          'transition-width duration-200',
+          'border-b bg-dash-sidebar border-default shadow-sm',
           'hide-scrollbar flex flex-row items-center justify-between overflow-x-auto'
         )}
       >

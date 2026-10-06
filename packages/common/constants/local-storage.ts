@@ -15,6 +15,7 @@ export const LOCAL_STORAGE_KEYS = {
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
   INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
+  STATUS_BANNER_DISMISSED_KEYS: 'status-banner-dismissed-keys',
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
@@ -79,7 +80,6 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  PRIVACY_POLICY_UPDATE: 'privacy-policy-update-2026-09-16-dismissed',
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,

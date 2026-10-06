@@ -29,6 +29,7 @@ import {
   ConversationScrollButton,
 } from './elements/Conversation'
 import { Message } from './Message'
+import { groupMessageParts } from './Message.Parts.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useRateMessageMutation } from '@/data/ai/rate-message-mutation'
@@ -293,7 +294,14 @@ export const AssistantChat = ({
     (error.message?.includes('context_length_exceeded') ||
       error.message?.includes('exceeds the context window'))
 
-  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(chatMessages.at(-1))
+  const lastMessage = chatMessages.at(-1)
+  // A running tool group shimmers already, so the cursor would be a second loading indicator
+  const isToolGroupRunning =
+    isChatLoading &&
+    lastMessage?.role === 'assistant' &&
+    groupMessageParts(lastMessage.parts).at(-1)?.type === 'tool-group'
+
+  const isTimedOut = !error && !isChatLoading && isTimedOutMessage(lastMessage)
   let displayError = IS_PLATFORM ? ASSISTANT_ERRORS['default'] : error
   if (isContextExceededError) displayError = ASSISTANT_ERRORS['context-exceeded']
   if (isTimedOut) displayError = { message: ASSISTANT_TIMEOUT_MESSAGE }
@@ -620,7 +628,7 @@ export const AssistantChat = ({
                     }
                   />
                 )}
-                {isChatLoading && (
+                {isChatLoading && !isToolGroupRunning && (
                   <motion.span
                     animate={shouldReduceMotion ? { opacity: 1 } : { opacity: [1, 0] }}
                     transition={

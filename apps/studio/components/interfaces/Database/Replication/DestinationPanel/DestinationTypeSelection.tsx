@@ -32,7 +32,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
+  stage: 'Public Alpha' | 'Deprecated' | null
   enabled: boolean
 }
 
@@ -94,30 +94,25 @@ export const DestinationTypeSelection = ({
           stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
-      ],
-    },
-    {
-      label: 'Early Access',
-      options: [
         {
           value: 'DuckLake',
           label: 'DuckLake',
           description: 'Replicate changes to DuckLake for open lakehouse storage',
-          stage: 'Early Access',
+          stage: 'Public Alpha',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
           description: 'Replicate changes to Snowflake for cloud data warehousing',
-          stage: 'Early Access',
+          stage: 'Public Alpha',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
           description: 'Replicate changes to ClickHouse for real-time analytics',
-          stage: 'Early Access',
+          stage: 'Public Alpha',
           enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
       ],
@@ -137,7 +132,12 @@ export const DestinationTypeSelection = ({
   ]
 
   const visibleGroups = groups
-    .map((group) => ({ ...group, options: group.options.filter((option) => option.enabled) }))
+    .map((group) => ({
+      ...group,
+      options: group.options.filter(
+        (option) => option.enabled && (variant !== 'radio' || option.value !== 'Analytics Bucket')
+      ),
+    }))
     .filter((group) => group.options.length > 0)
 
   const allVisibleOptions = visibleGroups.flatMap((group) => group.options)
@@ -145,7 +145,9 @@ export const DestinationTypeSelection = ({
 
   const STAGE_DESCRIPTIONS = DESTINATION_TYPE_STAGE_DESCRIPTIONS
 
-  const stageDescription = selectedOption?.stage ? STAGE_DESCRIPTIONS[selectedOption.stage] : null
+  const stageDescription = selectedOption?.stage
+    ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
+    : null
 
   if (variant === 'radio') {
     return (

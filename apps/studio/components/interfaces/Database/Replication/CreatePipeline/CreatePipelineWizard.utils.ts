@@ -274,7 +274,14 @@ const PIPELINE_CREATE_CONNECTION_STEP_FIELDS: Record<
   PipelineDestinationType,
   (keyof DestinationPanelSchemaType)[]
 > = {
-  BigQuery: ['name', 'projectId', 'datasetId', 'serviceAccountKey'],
+  BigQuery: [
+    'name',
+    'projectId',
+    'datasetId',
+    'serviceAccountKey',
+    'connectionPoolSize',
+    'maxStalenessMins',
+  ],
   DuckLake: [
     'name',
     'ducklakeMode',
@@ -284,24 +291,39 @@ const PIPELINE_CREATE_CONNECTION_STEP_FIELDS: Record<
     'ducklakeS3SecretAccessKey',
     'ducklakeS3Region',
     'ducklakeS3Endpoint',
+    'ducklakeS3UrlStyle',
+    'ducklakeS3UseSsl',
     'ducklakeMetadataSchema',
     'ducklakeCatalogProjectRef',
     'ducklakeStorageProjectRef',
     'ducklakeStorageBucket',
+    'ducklakePoolSize',
   ],
   Snowflake: [
     'name',
     'snowflakeAccountId',
     'snowflakeUser',
     'snowflakePrivateKey',
+    'snowflakePrivateKeyPassphrase',
+    'snowflakeRole',
     'snowflakeDatabase',
     'snowflakeSchema',
   ],
-  ClickHouse: ['name', 'clickhouseUrl', 'clickhouseUser', 'clickhouseDatabase'],
+  ClickHouse: [
+    'name',
+    'clickhouseUrl',
+    'clickhouseUser',
+    'clickhousePassword',
+    'clickhouseDatabase',
+    'clickhouseEngine',
+  ],
 }
 
 export const getPipelineCreateConnectionStepFieldNames = (type: PipelineDestinationType) =>
-  PIPELINE_CREATE_CONNECTION_STEP_FIELDS[type]
+  [
+    ...PIPELINE_CREATE_CONNECTION_STEP_FIELDS[type],
+    'maxFillMs',
+  ] satisfies (keyof DestinationPanelSchemaType)[]
 
 export const PIPELINE_CREATE_DATA_STEP_FIELD_NAMES = [
   'publicationName',

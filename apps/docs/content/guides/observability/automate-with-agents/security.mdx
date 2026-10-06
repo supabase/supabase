@@ -1,6 +1,6 @@
 ---
 id: 'automate-with-agents-security'
-title: 'Security monitor'
+title: 'Security'
 subtitle: 'A read-only agent that reviews Security Advisor findings and authentication and authorization failures each day.'
 description: 'Daily review of security findings and access failures'
 ---
@@ -29,7 +29,7 @@ It uses `get_advisors` and `query_logs` on project-scoped, read-only [Supabase M
 
 ## What it will output
 
-Security monitor reports new or changed advisor findings and access-failure spikes, with the affected object or service and a next investigation step. A spike is a review signal, not proof of an attack. See [what triggers a security report](/docs/guides/observability/detecting#security).
+This prompt reports new or changed advisor findings and access-failure spikes, with the affected object or service and a next investigation step. A spike is a review signal, not proof of an attack. See [what triggers a security report](/docs/guides/observability/detecting#security).
 
 If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 

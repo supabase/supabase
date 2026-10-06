@@ -90,6 +90,7 @@ import { useRegisterIsolatedStudioFlowClose } from '@/components/layouts/Navigat
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
@@ -99,6 +100,7 @@ import {
   useReplicationSourceId,
   useReplicationSourcesQuery,
 } from '@/data/replication/sources-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
@@ -115,6 +117,7 @@ export const CreatePipelineWizard = () => {
   const { isLoading: isOrgLoading } = useSelectedOrganizationQuery()
   const { configcat: flagStore } = useFeatureFlags()
   const isFlagStoreLoaded = Object.keys(flagStore).length > 0
+  const { hasAccess } = useCheckEntitlements('replication.etl')
   const enablePgReplicate = useIsETLPrivateAlpha()
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
@@ -154,7 +157,7 @@ export const CreatePipelineWizard = () => {
     })
   )
 
-  const selectedType = isPipelineDestinationType(urlDestinationType) ? urlDestinationType : null
+  const requestedType = isPipelineDestinationType(urlDestinationType) ? urlDestinationType : null
   const previousSelectedTypeRef = useRef<PipelineDestinationType | null>(null)
 
   const listHref = `/project/${projectRef}/database/pipelines`
@@ -182,6 +185,8 @@ export const CreatePipelineWizard = () => {
     return destinations
   }, [etlEnableBigQuery, etlEnableDucklake, etlEnableSnowflake, etlEnableClickHouse])
   const hasNoAvailableDestinations = availableDestinations.length === 0
+  const selectedType =
+    requestedType && availableDestinations.includes(requestedType) ? requestedType : null
 
   const sourceId = useReplicationSourceId({ projectRef })
   const {
@@ -246,6 +251,8 @@ export const CreatePipelineWizard = () => {
       })
     ),
     defaultValues,
+    values: defaultValues,
+    resetOptions: { keepDirtyValues: true },
   })
 
   const { isDirty } = form.formState
@@ -518,13 +525,6 @@ export const CreatePipelineWizard = () => {
   }, [defaultValues, form, resetValidation, selectedType])
 
   useEffect(() => {
-    if (!isDirty) {
-      form.reset(defaultValues)
-      resetValidation()
-    }
-  }, [defaultValues, form, isDirty, resetValidation])
-
-  useEffect(() => {
     if (projectRef && sourceId) refetchPublications()
   }, [projectRef, refetchPublications, sourceId])
 
@@ -585,6 +585,7 @@ export const CreatePipelineWizard = () => {
             if (projectRef) createTenantSource({ projectRef })
           }}
           isEnabling={isEnablingPipelines}
+          hasAccess={hasAccess}
           onCancel={goToList}
         />
         {discardChangesDialog}
@@ -779,10 +780,12 @@ export const CreatePipelineWizard = () => {
 function EnablePipelinesAlertDialog({
   onEnable,
   isEnabling,
+  hasAccess,
   onCancel,
 }: {
   onEnable: () => void
   isEnabling: boolean
+  hasAccess: boolean
   onCancel: () => void
 }) {
   return (
@@ -799,9 +802,13 @@ function EnablePipelinesAlertDialog({
           <AlertDialogCancel disabled={isEnabling} onClick={onCancel}>
             Cancel
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onEnable} disabled={isEnabling}>
-            Enable
-          </AlertDialogAction>
+          {hasAccess ? (
+            <AlertDialogAction onClick={onEnable} disabled={isEnabling}>
+              Enable
+            </AlertDialogAction>
+          ) : (
+            <UpgradePlanButton source="replication" featureProposition="use replication" />
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

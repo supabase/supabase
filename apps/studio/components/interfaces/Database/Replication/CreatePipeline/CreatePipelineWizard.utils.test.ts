@@ -295,12 +295,28 @@ describe('getPipelineCreateStepDocsUrl', () => {
 })
 
 describe('getPipelineCreateConnectionStepFieldNames', () => {
+  it.each([
+    [
+      'DuckLake',
+      ['ducklakePoolSize', 'ducklakeMode', 'ducklakeCatalogProjectRef', 'ducklakeStorageBucket'],
+    ],
+    ['Snowflake', ['snowflakePrivateKeyPassphrase', 'snowflakeRole']],
+    ['ClickHouse', ['clickhousePassword', 'clickhouseEngine']],
+  ] as const)('includes settings that require retesting %s', (type, fields) => {
+    expect(getPipelineCreateConnectionStepFieldNames(type)).toEqual(
+      expect.arrayContaining([...fields, 'maxFillMs'])
+    )
+  })
+
   it('returns BigQuery connection fields', () => {
     expect(getPipelineCreateConnectionStepFieldNames('BigQuery')).toEqual([
       'name',
       'projectId',
       'datasetId',
       'serviceAccountKey',
+      'connectionPoolSize',
+      'maxStalenessMins',
+      'maxFillMs',
     ])
   })
 })

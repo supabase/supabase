@@ -3,7 +3,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -13,9 +12,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
@@ -49,7 +48,7 @@ export const EnablePipelinesModal = ({
   const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
       onSuccess: () => {
-        toast.success('Pipelines has been successfully enabled!')
+        toast.success('Pipelines enabled')
         setOpen(false)
         onSuccess?.()
       },
@@ -67,9 +66,7 @@ export const EnablePipelinesModal = ({
     <Dialog open={open} onOpenChange={setOpen}>
       {!hideTrigger && (
         <DialogTrigger asChild>
-          <Button variant="primary" className="w-min">
-            Enable Pipelines
-          </Button>
+          <Button variant="primary">Enable</Button>
         </DialogTrigger>
       )}
       <DialogContent size="small">
@@ -78,25 +75,22 @@ export const EnablePipelinesModal = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-3">
-          <p className="text-sm text-foreground-light">
-            {hasAccess
-              ? 'Pipelines creates resources in this project to replicate database changes to external destinations.'
-              : 'Pipelines requires the Pro plan.'}
-          </p>
-          {hasAccess && (
+          {hasAccess ? (
             <>
               <p className="text-sm text-foreground-light">
-                Pipelines is in public alpha and may change as we refine it.
-              </p>
-              <p className="text-sm text-foreground-light">
-                You’ll be billed for configured pipeline hours and for Postgres row data processed
-                during initial sync and ongoing replication. Review{' '}
+                Pipelines bills for configured pipeline hours and Postgres row data processed during
+                initial sync and ongoing replication. Review{' '}
                 <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
                   Pipelines pricing
                 </InlineLink>{' '}
                 before enabling.
               </p>
+              <p className="text-sm text-foreground-light">
+                Pipelines is in public alpha and may change.
+              </p>
             </>
+          ) : (
+            <p className="text-sm text-foreground-light">Pipelines requires the Pro plan.</p>
           )}
         </DialogSection>
         <DialogFooter>
@@ -123,33 +117,26 @@ export const EnablePipelinesModal = ({
   )
 }
 
-export const EnablePipelinesCallout = ({
-  type,
-  className,
-}: {
-  type?: DestinationType | null
-  className?: string
-}) => {
+export const EnablePipelinesCallout = ({ type }: { type?: DestinationType | null }) => {
   const { hasAccess } = useCheckEntitlements('replication.etl')
 
   return (
-    <div className={cn('border rounded-md p-4 md:p-12 flex flex-col gap-y-4', className)}>
-      <div className="flex flex-col gap-y-1">
-        <h4>Enable Pipelines</h4>
-        <p className="text-sm text-foreground-light">
-          Pipelines replicates database changes to{' '}
-          {type ?? 'data warehouses and analytics platforms'}.{' '}
-          {hasAccess ? 'Enable it for this project.' : 'Upgrade to Pro to get started.'}
-        </p>
-      </div>
-      <div className="flex gap-x-2">
-        {hasAccess ? (
+    <Admonition
+      type="note"
+      layout="responsive"
+      title={hasAccess ? 'Enable Pipelines' : 'Upgrade to Pro for Pipelines'}
+      description={
+        hasAccess
+          ? `Pipelines must be enabled before this project can replicate database changes to ${type ?? 'external destinations'}.`
+          : `The Pro plan is required to replicate database changes to ${type ?? 'external destinations'} with Pipelines.`
+      }
+      actions={
+        hasAccess ? (
           <EnablePipelinesModal />
         ) : (
           <UpgradePlanButton source="replication" featureProposition="use replication" />
-        )}
-        <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
-      </div>
-    </div>
+        )
+      }
+    />
   )
 }
