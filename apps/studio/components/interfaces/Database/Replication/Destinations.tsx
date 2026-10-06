@@ -122,6 +122,7 @@ export const Destinations = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [, setDestinationType] = useQueryState(
@@ -210,7 +211,13 @@ export const Destinations = () => {
     return sortDirection === 'asc' ? comparison : -comparison
   })
 
-  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+  const {
+    data: sourcesData,
+    isSuccess: isSourcesSuccess,
+    isError: isSourcesError,
+    error: sourcesError,
+    refetch: refetchSources,
+  } = useReplicationSourcesQuery({
     projectRef,
   })
   const externalReplicationSource = useMemo(
@@ -230,9 +237,29 @@ export const Destinations = () => {
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
+  const canCreate =
+    !!newDestinationDefaultType &&
+    (newDestinationDefaultType === 'Analytics Bucket' || isSourcesSuccess)
+
   const openDestinationPanel = () => {
-    if (!newDestinationDefaultType) return
+    if (!canCreate) return
+    if (replicationNotEnabled && newDestinationDefaultType !== 'Analytics Bucket') {
+      pendingCreationTypeRef.current = newDestinationDefaultType
+      setShowEnablePipelinesDialog(true)
+      return
+    }
     setDestinationType(newDestinationDefaultType)
+  }
+
+  const handleEnableDialogOpenChange = (open: boolean) => {
+    setShowEnablePipelinesDialog(open)
+    if (!open) pendingCreationTypeRef.current = null
+  }
+
+  const handlePipelinesEnabled = () => {
+    const type = pendingCreationTypeRef.current
+    pendingCreationTypeRef.current = null
+    if (type) setDestinationType(type)
   }
 
   useShortcut(
@@ -311,7 +338,12 @@ export const Destinations = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {replicationNotEnabled ? (
-                <DropdownMenuItem onClick={() => setShowEnablePipelinesDialog(true)}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    pendingCreationTypeRef.current = null
+                    setShowEnablePipelinesDialog(true)
+                  }}
+                >
                   Enable Pipelines
                 </DropdownMenuItem>
               ) : (
@@ -338,13 +370,13 @@ export const Destinations = () => {
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add pipeline"
             onTrigger={openDestinationPanel}
-            options={{ enabled: !!newDestinationDefaultType }}
+            options={{ enabled: canCreate }}
             side="bottom"
           >
             <Button
               variant="primary"
               icon={<Plus />}
-              disabled={!newDestinationDefaultType}
+              disabled={!canCreate}
               onClick={openDestinationPanel}
             >
               Add pipeline
@@ -358,6 +390,24 @@ export const Destinations = () => {
         <p role="status" aria-live="polite" className="sr-only">
           {isDestinationsLoading ? 'Loading pipelines' : ''}
         </p>
+
+        {isSourcesError && newDestinationDefaultType !== 'Analytics Bucket' && (
+          <AlertError
+            projectRef={projectRef}
+            error={sourcesError}
+            subject={
+              checkLocalETLNotSetUp(sourcesError)
+                ? 'Replication unavailable locally'
+                : 'Failed to retrieve pipeline enablement status'
+            }
+            description={
+              checkLocalETLNotSetUp(sourcesError)
+                ? 'Configure the replication API to manage pipelines in local development.'
+                : undefined
+            }
+            additionalActions={<Button onClick={() => refetchSources()}>Retry</Button>}
+          />
+        )}
 
         {hasErrorsFetchingData && (
           <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
@@ -422,7 +472,7 @@ export const Destinations = () => {
             <Button
               variant="default"
               icon={<Plus />}
-              disabled={!newDestinationDefaultType}
+              disabled={!canCreate}
               onClick={openDestinationPanel}
             >
               Add pipeline
@@ -435,7 +485,8 @@ export const Destinations = () => {
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}
-        onOpenChange={setShowEnablePipelinesDialog}
+        onOpenChange={handleEnableDialogOpenChange}
+        onSuccess={handlePipelinesEnabled}
       />
 
       <DisablePipelinesDialog
