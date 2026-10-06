@@ -188,19 +188,23 @@ describe('PipelineReviewSummary', () => {
   })
 })
 
-test('never renders custom DuckLake catalog credentials on Review', () => {
-  const catalogUrl =
-    'postgresql://admin:private-password@catalog.example/db?password=another-secret'
-  const { container } = customRender(
+test('masks the whole catalog URL and lets users reveal and hide it', () => {
+  const catalogUrl = 'postgresql://admin:dummy-password@catalog.example/db?sslmode=require'
+  customRender(
     <PipelineReviewSummary
       type="DuckLake"
       values={{ ...values, ducklakeMode: 'custom', ducklakeCatalogUrl: catalogUrl }}
       onGoToStep={vi.fn()}
     />
   )
-  expect(screen.getByDisplayValue('Configured (credentials hidden)')).toBeInTheDocument()
-  expect(container.innerHTML).not.toContain('private-password')
-  expect(container.innerHTML).not.toContain('another-secret')
+  const input = screen.getByLabelText('Catalog URL')
+  expect(input).toHaveValue(catalogUrl)
+  expect(input).toHaveAttribute('type', 'password')
+  expect(input).toHaveAttribute('readonly')
+  fireEvent.click(screen.getByRole('button', { name: 'Show catalog URL' }))
+  expect(input).toHaveAttribute('type', 'text')
+  fireEvent.click(screen.getByRole('button', { name: 'Hide catalog URL' }))
+  expect(input).toHaveAttribute('type', 'password')
 })
 
 test('shows advanced settings and the consequences of recreating a slot', () => {
@@ -246,3 +250,39 @@ test.each([
   )
   expect(screen.getByDisplayValue(expected)).toBeInTheDocument()
 })
+
+test.each(['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse'] as const)(
+  'omits default advanced settings for %s',
+  (type) => {
+    customRender(
+      <PipelineReviewSummary
+        type={type}
+        values={{
+          ...values,
+          maxFillMs: 10000,
+          maxTableSyncWorkers: 4,
+          maxCopyConnectionsPerTable: 4,
+          connectionPoolSize: 4,
+          ducklakePoolSize: 4,
+          invalidatedSlotBehavior: 'error',
+          snowflakeRole: '',
+          tableOptions: [{ tableId: 101, clusterBy: [] }],
+        }}
+        onGoToStep={vi.fn()}
+      />
+    )
+    for (const label of [
+      'Batch wait time',
+      'Table sync workers',
+      'Initial sync connections per table',
+      'Invalidated slot behavior',
+      'Connection pool size',
+      'Maximum staleness',
+      'Pool size',
+      'Role',
+      'Table layout: Table 101',
+    ]) {
+      expect(screen.queryByText(label)).not.toBeInTheDocument()
+    }
+  }
+)

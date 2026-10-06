@@ -1,7 +1,8 @@
-import { Pencil } from 'lucide-react'
-import { Fragment, type ReactNode } from 'react'
+import { Eye, EyeOff, Pencil } from 'lucide-react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { Button, CardContent, Input } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationLogo } from '../DestinationLogo'
@@ -53,6 +54,29 @@ import type { TableSyncCopyConfig } from '@/data/replication/types'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const tableLabel = ({ schema, name }: { schema: string; name: string }) => `${schema}.${name}`
+
+const CatalogUrlReview = ({ value }: { value: string }) => {
+  const [isVisible, setIsVisible] = useState(false)
+  return (
+    <PasswordInput
+      aria-label="Catalog URL"
+      value={value}
+      readOnly
+      type={isVisible ? 'text' : 'password'}
+      actions={
+        <div className="flex items-center justify-center">
+          <Button
+            type="button"
+            className="w-7"
+            aria-label={isVisible ? 'Hide catalog URL' : 'Show catalog URL'}
+            icon={isVisible ? <Eye /> : <EyeOff />}
+            onClick={() => setIsVisible(!isVisible)}
+          />
+        </div>
+      }
+    />
+  )
+}
 
 type ReviewRow = {
   label: string
@@ -136,27 +160,32 @@ export const PipelineReviewSummary = ({
     })
   }
 
-  dataRows.push(
-    {
-      label: 'Table sync workers',
-      value: String(values.maxTableSyncWorkers ?? DEFAULT_MAX_TABLE_SYNC_WORKERS),
-    },
-    {
+  if (
+    typeof values.maxTableSyncWorkers === 'number' &&
+    values.maxTableSyncWorkers !== DEFAULT_MAX_TABLE_SYNC_WORKERS
+  ) {
+    dataRows.push({ label: 'Table sync workers', value: String(values.maxTableSyncWorkers) })
+  }
+  if (
+    typeof values.maxCopyConnectionsPerTable === 'number' &&
+    values.maxCopyConnectionsPerTable !== DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE
+  ) {
+    dataRows.push({
       label: 'Initial sync connections per table',
-      value: String(values.maxCopyConnectionsPerTable ?? DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE),
-    },
-    {
+      value: String(values.maxCopyConnectionsPerTable),
+    })
+  }
+  if (values.invalidatedSlotBehavior === 'recreate') {
+    dataRows.push({
       label: 'Invalidated slot behavior',
-      value: values.invalidatedSlotBehavior === 'recreate' ? 'Recreate slot' : 'Block startup',
-      description:
-        values.invalidatedSlotBehavior === 'recreate'
-          ? 'Replaces destination tables and runs a new, billable initial sync.'
-          : 'Blocks startup for manual recovery.',
-    }
-  )
+      value: 'Recreate slot',
+      description: 'Replaces destination tables and runs a new, billable initial sync.',
+    })
+  }
 
   if (type === 'BigQuery') {
     for (const option of values.tableOptions ?? []) {
+      if (!option.partitionBy && !option.clusterBy?.length) continue
       const table = publicationTables.find(({ id }) => id === option.tableId)
       dataRows.push({
         label: `Table layout: ${table ? tableLabel(table) : `Table ${option.tableId}`}`,
@@ -165,32 +194,36 @@ export const PipelineReviewSummary = ({
     }
   }
 
-  const connectionRows: ReviewRow[] = [
-    { label: 'Batch wait time', value: `${values.maxFillMs ?? DEFAULT_MAX_FILL_MS} milliseconds` },
-  ]
+  const connectionRows: ReviewRow[] = []
+  if (typeof values.maxFillMs === 'number' && values.maxFillMs !== DEFAULT_MAX_FILL_MS) {
+    connectionRows.push({ label: 'Batch wait time', value: `${values.maxFillMs} milliseconds` })
+  }
   if (type === 'BigQuery') {
-    connectionRows.push(
-      {
+    if (
+      typeof values.connectionPoolSize === 'number' &&
+      values.connectionPoolSize !== DEFAULT_CONNECTION_POOL_SIZE
+    ) {
+      connectionRows.push({
         label: 'Connection pool size',
-        value: String(values.connectionPoolSize ?? DEFAULT_CONNECTION_POOL_SIZE),
-      },
-      {
+        value: String(values.connectionPoolSize),
+      })
+    }
+    if (typeof values.maxStalenessMins === 'number') {
+      connectionRows.push({
         label: 'Maximum staleness',
-        value:
-          typeof values.maxStalenessMins === 'number'
-            ? `${values.maxStalenessMins} minutes`
-            : 'Freshest results',
-      }
-    )
+        value: `${values.maxStalenessMins} minutes`,
+      })
+    }
   }
-  if (type === 'DuckLake') {
-    connectionRows.push({
-      label: 'Pool size',
-      value: String(values.ducklakePoolSize ?? DEFAULT_DUCKLAKE_POOL_SIZE),
-    })
+  if (
+    type === 'DuckLake' &&
+    typeof values.ducklakePoolSize === 'number' &&
+    values.ducklakePoolSize !== DEFAULT_DUCKLAKE_POOL_SIZE
+  ) {
+    connectionRows.push({ label: 'Pool size', value: String(values.ducklakePoolSize) })
   }
-  if (type === 'Snowflake') {
-    connectionRows.push({ label: 'Role', value: values.snowflakeRole || 'Service user default' })
+  if (type === 'Snowflake' && values.snowflakeRole?.trim()) {
+    connectionRows.push({ label: 'Role', value: values.snowflakeRole })
   }
 
   const sections: ReviewSection[] = [
@@ -346,7 +379,7 @@ const getDestinationRows = (
       return [
         {
           label: DUCKLAKE_CATALOG_URL_FIELD_COPY.label,
-          value: values.ducklakeCatalogUrl ? 'Configured (credentials hidden)' : 'Not configured',
+          content: <CatalogUrlReview value={values.ducklakeCatalogUrl ?? ''} />,
           description: DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription,
         },
         {
