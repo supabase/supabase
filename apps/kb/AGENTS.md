@@ -90,3 +90,7 @@ to `GH_TOKEN`/`GITHUB_TOKEN` for local dev — see `.env.example`.
 Syncing guides to GitHub Discussions (`scripts/federated-content/sync-troubleshooting-entries.ts` and
 `sync-troubleshooting-updates.ts`) is a separate concern from fetching — see `.github/workflows/kb-troubleshooting-sync.yml`
 and the README's "Workflows" section. Those scripts are CI-only, never part of `prebuild`.
+
+`backfill-legacy-slugs.ts` is a one-time migration aid for the 278 pre-existing (apps/docs-origin) rows in
+`troubleshooting_entries` — safe to delete (with its JSON file, package.json script, and workflow step) once
+those rows are all backfilled; see the comment at the top of that file.

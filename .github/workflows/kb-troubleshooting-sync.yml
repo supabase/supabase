@@ -43,6 +43,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Backfill legacy troubleshooting slugs
+        run: pnpm run --filter kb sync:legacy-slugs
+
       - name: Fetch federated troubleshooting content
         run: pnpm run --filter kb fetch:federated-content
 

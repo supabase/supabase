@@ -2,6 +2,7 @@
 // have a troubleshooting_entries row yet. Run after fetch-federated-content.ts,
 // from CI only (never kb's own prebuild — this has real side effects). Pass
 // --dry-run to log what would be created without creating anything.
+import { createHash } from 'node:crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -32,6 +33,10 @@ async function readLocalGuides(): Promise<Array<{ slug: string; title: string; b
       return { slug: filename.replace(/\.md$/, ''), title: data.title as string, body }
     })
   )
+}
+
+function computeChecksum(title: string, body: string): string {
+  return createHash('sha256').update(JSON.stringify({ title, body })).digest('hex')
 }
 
 async function createDiscussion(title: string, body: string): Promise<{ id: string; url: string }> {
@@ -76,9 +81,11 @@ async function createNewGuides(
         if (DRY_RUN) return
 
         const discussion = await createDiscussion(guide.title, guide.body)
-        const { error } = await db
-          .from('troubleshooting_entries')
-          .insert({ slug: guide.slug, github_url: discussion.url })
+        const { error } = await db.from('troubleshooting_entries').insert({
+          slug: guide.slug,
+          github_url: discussion.url,
+          checksum: computeChecksum(guide.title, guide.body),
+        })
         if (error) {
           console.error(
             `[sync-troubleshooting-entries] DB insert failed for ${guide.slug}, rolling back discussion`
