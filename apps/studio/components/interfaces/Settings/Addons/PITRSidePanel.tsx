@@ -305,11 +305,12 @@ const PITRSidePanel = () => {
                   />
                 ))}
               </RadioGroupCard>
-              <TaxDisclaimer className="mt-3" />
+
+              {availableOptions.some((it) => it.price > 0) && <TaxDisclaimer className="mt-3" />}
             </div>
           )}
 
-          {hasChanges && selectedOption !== 'pitr_0' && (
+          {hasChanges && selectedOption !== 'pitr_0' && selectedPitr?.price !== 0 && (
             <p className="text-sm text-foreground-light">
               There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.

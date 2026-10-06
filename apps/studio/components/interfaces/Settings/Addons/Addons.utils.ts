@@ -108,18 +108,24 @@ export const getCustomDomainDisabledReason = ({
   return undefined
 }
 
-export type PitrAlertState = 'hipaa' | 'legacy-project' | 'orioledb' | undefined
+export type PitrAlertState =
+  | 'hipaa'
+  | 'hipaa-non-compliant'
+  | 'legacy-project'
+  | 'orioledb'
+  | undefined
 
 export const getPitrAlertState = ({
   hasHipaaAddon,
+  hasHipaaCompliantPitr = true,
   sufficientPgVersion,
   isOrioleDbInAws,
 }: Pick<
   PitrDisabledReasonOptions,
   'hasHipaaAddon' | 'sufficientPgVersion' | 'isOrioleDbInAws'
->) => {
+> & { hasHipaaCompliantPitr?: boolean }): PitrAlertState => {
   if (hasHipaaAddon) {
-    return 'hipaa'
+    return hasHipaaCompliantPitr ? 'hipaa' : 'hipaa-non-compliant'
   }
 
   if (!sufficientPgVersion) {
