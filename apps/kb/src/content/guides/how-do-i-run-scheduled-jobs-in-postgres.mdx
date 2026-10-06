@@ -1,0 +1,43 @@
+---
+title: 'How do I run scheduled jobs in Postgres?'
+description: 'Use pg_cron, which Supabase provides as Supabase Cron, to run SQL, database functions, or HTTP requests on a cron schedule from inside the database.'
+topics: ['Database']
+---
+
+Use the `pg_cron` extension to schedule jobs inside the database. Supabase provides it as Supabase Cron, which you manage with SQL or from the dashboard.
+
+## What a job can do
+
+- Run a SQL statement, such as deleting expired rows
+- Call a database function
+- Make an HTTP request, for example to trigger a serverless function
+
+Schedules use standard cron syntax and can run anywhere from every second to once a year.
+
+## Create a job with SQL
+
+```sql
+select cron.schedule(
+  'delete-expired-sessions',
+  '0 * * * *',
+  $$ delete from sessions where expires_at < now() $$
+);
+```
+
+This runs at the start of every hour. Unschedule a job with `cron.unschedule('delete-expired-sessions')`.
+
+## Or from the dashboard
+
+Open **Integrations**, then **Cron**, to create jobs, change schedules, and review past runs and their status.
+
+See [Supabase Cron](https://supabase.com/docs/guides/cron).
+
+## Why schedule in the database
+
+- There's no separate scheduler or server to keep running.
+- Jobs run next to the data they touch.
+- Run history is stored in Postgres, so you can query it.
+
+## When to use something else
+
+Long-running work, such as processing video or calling slow APIs, shouldn't block a database connection. Schedule a job that enqueues the work instead, and process it elsewhere. See [Can I use Postgres as a message queue?](/kb/guides/can-i-use-postgres-as-a-message-queue)
