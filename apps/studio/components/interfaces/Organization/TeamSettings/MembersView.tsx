@@ -26,6 +26,7 @@ import {
   type OrganizationMember,
 } from '@/data/organizations/organization-members-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -41,6 +42,7 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
+  const { data: permissionsV2 } = usePermissionsQueryV2()
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
 
   const [memberForRoleUpdate, setMemberForRoleUpdate] = useState<OrganizationMember>()
@@ -119,6 +121,7 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
       isLoadingRoles={isLoadingRoles}
       orgProjects={orgProjects}
       permissions={permissions}
+      permissionsV2={permissionsV2}
       selectedOrganization={selectedOrganization}
       organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
       onManageAccess={handleManageAccess}

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect } from 'react'
@@ -38,7 +37,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 const CAPTCHA_PROVIDERS = [
@@ -93,14 +92,13 @@ export const ProtectionAuthSettingsForm = () => {
     },
   })
 
-  const { can: canReadConfig } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const protectionForm = useForm<FormSchema>({
     resolver: zodResolver(formSchema),

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertCircle, Info, Search } from 'lucide-react'
 import Link from 'next/link'
@@ -27,7 +26,7 @@ import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -74,9 +73,8 @@ export const PublicationsList = () => {
     },
   })
 
-  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'publications'
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const publicationEvents: PublicationEvent[] = [

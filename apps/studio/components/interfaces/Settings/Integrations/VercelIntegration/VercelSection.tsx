@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -31,7 +30,7 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
@@ -46,14 +45,12 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   const isBranch = project?.parent_project_ref !== undefined
 
   const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
-  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.vercel_connections'
+    useAsyncCheckPermissionsV2('organization_integrations_read')
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissionsV2(
+    'organization_integrations_write'
   )
-  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'integrations.vercel_connections'
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissionsV2(
+    'organization_integrations_write'
   )
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(

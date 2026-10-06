@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useMemo, useState } from 'react'
 import {
@@ -28,7 +27,7 @@ import { RevokeAppModal } from './RevokeAppModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { AuthorizedApp, useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 type AuthorizedAppsSort = 'authorized:asc' | 'authorized:desc'
 type AuthorizedAppsSortColumn = 'authorized'
@@ -39,10 +38,8 @@ export const AuthorizedApps = () => {
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
   const [authorizedAppsSort, setAuthorizedAppsSort] = useState<AuthorizedAppsSort>('authorized:asc')
 
-  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'approved_oauth_apps'
-  )
+  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissionsV2('oauth_apps_read')
 
   const {
     data: authorizedApps,

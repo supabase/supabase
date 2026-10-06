@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Loader2 } from 'lucide-react'
@@ -37,7 +36,7 @@ import {
   ThirdPartyAuthIntegration,
   thirdPartyAuthIntegrationsQueryOptions,
 } from '@/data/third-party-auth/integrations-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -63,10 +62,10 @@ export const ThirdPartyAuthForm = () => {
   })
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   if (isError) {
     return (

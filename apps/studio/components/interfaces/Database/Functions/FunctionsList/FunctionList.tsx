@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
@@ -29,7 +28,7 @@ import {
   useDatabaseFunctionsQuery,
   type SavedDatabaseFunction,
 } from '@/data/database-functions/database-functions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -73,9 +72,8 @@ export const FunctionList = ({
     [functions, filterString, returnTypeFilter, schema, securityFilter]
   )
 
-  const { can: canUpdateFunctions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'functions'
+  const { can: canUpdateFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   if (_functions.length === 0 && filterString.length === 0) {

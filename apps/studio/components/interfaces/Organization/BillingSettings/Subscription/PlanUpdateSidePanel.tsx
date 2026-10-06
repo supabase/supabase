@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
@@ -26,7 +25,7 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import type { OrgPlan } from '@/data/subscriptions/types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
@@ -136,9 +135,8 @@ export const PlanUpdateSidePanel = () => {
     []
   )
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const snap = useOrgSettingsPageStateSnapshot()

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Filter, Plus } from 'lucide-react'
@@ -31,7 +30,7 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { getTableEditor, useTableEditorQuery } from '@/data/table-editor/table-editor-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -95,9 +94,8 @@ export const TableEditorMenu = () => {
     { enabled: Boolean(selectedSchema && entityNames.length > 0) }
   )
 
-  const { can: canCreateTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canCreateTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })

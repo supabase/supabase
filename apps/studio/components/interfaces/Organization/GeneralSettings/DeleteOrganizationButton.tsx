@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,7 +8,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useOrganizationDeleteMutation } from '@/data/organizations/organization-delete-mutation'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -91,9 +90,8 @@ export const DeleteOrganizationButton = () => {
 
   const { setLastVisitedOrganization } = useLastVisitedOrganization()
 
-  const { can: canDeleteOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canDeleteOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const { mutate: deleteOrganization, isPending: isDeleting } = useOrganizationDeleteMutation({

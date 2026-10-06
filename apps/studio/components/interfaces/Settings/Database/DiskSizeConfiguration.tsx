@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
@@ -21,7 +20,7 @@ import Panel from '@/components/ui/Panel'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from '@/data/database/database-size-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
@@ -50,14 +49,8 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
     parseAsBoolean.withDefault(false)
   )
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({

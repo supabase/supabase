@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
@@ -14,7 +13,7 @@ import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -30,10 +29,8 @@ export const PublicationsTables = () => {
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdatePublications, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'publications'
-  )
+  const { can: canUpdatePublications, isLoading: isLoadingPermissions } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,

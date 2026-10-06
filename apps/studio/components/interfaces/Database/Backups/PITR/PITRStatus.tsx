@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
@@ -9,7 +8,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -41,9 +40,8 @@ const PITRStatus = ({
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
-  const { can: canTriggerPhysicalBackup } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.walg.prepare_restore'
+  const { can: canTriggerPhysicalBackup } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE
   )
 
   return (

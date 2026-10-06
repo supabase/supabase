@@ -19,8 +19,15 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: true, isLoading: false }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isLoading: false, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      AUTH_CONFIG_READ: 'auth_config_read',
+      AUTH_CONFIG_WRITE: 'auth_config_write',
+      ADMIN_WRITE: 'project_admin_write',
+    },
+  },
 }))
 
 function mockAuthConfig(overrides: Record<string, unknown>) {

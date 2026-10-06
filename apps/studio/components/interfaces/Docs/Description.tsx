@@ -1,5 +1,4 @@
 import { ident, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Loader } from 'lucide-react'
 import { useState } from 'react'
@@ -7,7 +6,7 @@ import { toast } from 'sonner'
 import { Button, ExpandingTextArea } from 'ui'
 
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { timeout } from '@/lib/helpers'
 
@@ -42,9 +41,8 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
   const hasChanged = value != contentText
   const animateCss = `transition duration-150`
 
-  const { can: canUpdateDescription } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_QUERY,
-    '*'
+  const { can: canUpdateDescription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const updateDescription = async () => {

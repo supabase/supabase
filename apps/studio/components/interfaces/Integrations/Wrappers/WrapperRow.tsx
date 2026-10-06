@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
@@ -10,7 +9,7 @@ import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { FDW } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface WrapperRowProps {
   wrapper: FDW
@@ -18,9 +17,8 @@ interface WrapperRowProps {
 
 export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const { ref, id } = useParams()
-  const { can: canManageWrappers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
+  const { can: canManageWrappers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const [, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)

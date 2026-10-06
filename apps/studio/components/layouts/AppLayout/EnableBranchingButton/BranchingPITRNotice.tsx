@@ -1,20 +1,18 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Clock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useAppStateSnapshot } from '@/state/app-state'
 
 export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   return (

@@ -7,7 +7,6 @@ import {
   useSensors,
 } from '@dnd-kit/core'
 import { arrayMove, rectSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -34,7 +33,10 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -70,23 +72,22 @@ export function CustomReportSection() {
   )
   const [isDraggingOver, setIsDraggingOver] = useState(false)
 
-  const { can: canCreateReport } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
-    { resource: { type: 'report', owner_id: profile?.id }, subject: { id: profile?.id } }
+  const { can: canCreateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    { mode: 'create', type: 'report' }
   )
 
-  const { can: canUpdateReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
-    {
-      resource: {
-        type: 'report',
-        visibility: homeReport?.visibility,
-        owner_id: homeReport?.owner_id,
-      },
-      subject: { id: profile?.id },
-    }
+  const { can: canUpdateReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
+    homeReport
+      ? {
+          mode: 'existing',
+          type: 'report',
+          visibility: homeReport.visibility,
+          ownerId: homeReport.owner_id,
+          subjectId: profile?.id,
+        }
+      : undefined
   )
 
   const { mutate: upsertContent } = useContentUpsertMutation()

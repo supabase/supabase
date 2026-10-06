@@ -1,9 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Trash2 } from 'lucide-react'
 
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
@@ -11,9 +10,8 @@ interface APIKeyDeleteDialogProps {
 }
 
 export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialogProps) => {
-  const { can: canDeleteAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    '*'
+  const { can: canDeleteAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_WRITE
   )
 
   return (

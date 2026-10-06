@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
@@ -33,7 +32,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabaseEventTriggerDeleteMutation } from '@/data/database-event-triggers/database-event-trigger-delete-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -67,9 +66,8 @@ export const EventTriggersList = () => {
     setInitialPrompt: setEditorPanelInitialPrompt,
   } = useEditorPanelStateSnapshot()
 
-  const { can: canUpdateEventTriggers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'triggers'
+  const { can: canUpdateEventTriggers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {

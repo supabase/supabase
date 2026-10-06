@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { QUEUES_SCHEMA } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -27,15 +26,14 @@ import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/dat
 import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 export const QueuesSettings = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_postgrest'
+  const { can: canUpdatePostgrestConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE
   )
   const [isToggling, setIsToggling] = useState(false)
   const [rlsConfirmModalOpen, setRlsConfirmModalOpen] = useState(false)

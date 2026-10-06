@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo } from 'react'
 import type { OrganizationRolesResponse } from '@/data/organization-members/organization-roles-query'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { Permission } from '@/types'
 
@@ -13,6 +14,7 @@ type TeamSettingsDataContextValue = {
   isLoadingRoles: boolean
   orgProjects: OrgProject[]
   permissions: Permission[] | undefined
+  permissionsV2: PermissionsV2Data | undefined
   selectedOrganization: OrganizationBase | undefined
   organizationMembersDeletionEnabled: boolean
   onManageAccess: (member: OrganizationMember) => void
@@ -35,6 +37,7 @@ export const TeamSettingsDataProvider = ({
   isLoadingRoles,
   orgProjects,
   permissions,
+  permissionsV2,
   selectedOrganization,
   organizationMembersDeletionEnabled,
   onManageAccess,
@@ -46,6 +49,7 @@ export const TeamSettingsDataProvider = ({
       isLoadingRoles,
       orgProjects,
       permissions,
+      permissionsV2,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,
@@ -56,6 +60,7 @@ export const TeamSettingsDataProvider = ({
       isLoadingRoles,
       orgProjects,
       permissions,
+      permissionsV2,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,

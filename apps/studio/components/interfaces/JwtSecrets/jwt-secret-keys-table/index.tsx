@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AnimatePresence } from 'framer-motion'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
@@ -50,7 +49,7 @@ import {
 } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -65,9 +64,8 @@ export const JWTSecretKeysTable = () => {
   const [shownDialog, setShownDialog] = useState<DialogType>()
   const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
-  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
+  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
   const now = useRef(new Date()).current
   const {

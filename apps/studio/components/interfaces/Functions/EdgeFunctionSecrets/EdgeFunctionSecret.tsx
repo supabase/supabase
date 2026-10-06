@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit2, MoreVertical, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -19,7 +18,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { ProjectSecret } from '@/data/secrets/secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -28,7 +27,9 @@ interface EdgeFunctionSecretProps {
 }
 
 const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFunctionSecretProps) => {
-  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { can: canUpdateSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
+  )
 
   return (
     <TableRow>

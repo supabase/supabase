@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -62,7 +61,7 @@ import { useMaterializedViewsQuery } from '@/data/materialized-views/materialize
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -98,9 +97,8 @@ export const TableList = ({
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdateTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {

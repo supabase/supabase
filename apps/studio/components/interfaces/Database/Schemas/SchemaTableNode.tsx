@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Handle, Node, NodeProps } from '@xyflow/react'
 import { TableEditor } from 'icons'
 import {
@@ -34,7 +33,7 @@ import { TableNodeData } from './Schemas.constants'
 import { getTableDefinitionAsMarkdown } from './Schemas.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getTableDefinition } from '@/data/database/table-definition-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
 
@@ -56,9 +55,8 @@ const TableNodeComponent = ({
   const hiddenNodeConnector = 'h-px! w-px! min-w-0! min-h-0! cursor-grab! border-0! opacity-0!'
   const schemaGraphContext = useSchemaGraphContext()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canUpdateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
+  const { can: canUpdateColumns } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
   const router = useRouter()
   const itemHeight = 'h-[22px]'

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState } from 'react'
@@ -31,7 +30,7 @@ import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import { useTestAuditLogDrainMutation } from '@/data/log-drains/test-audit-log-drain-mutation'
 import { useUpdateAuditLogDrainMutation } from '@/data/log-drains/update-audit-log-drain-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
@@ -39,9 +38,8 @@ export function OrgAuditLogDrains() {
   const { slug } = useParams() as { slug: string }
   const track = useTrack()
 
-  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.ANALYTICS_ADMIN_WRITE,
-    'logflare'
+  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ANALYTICS_CONFIG_WRITE
   )
 
   const { hasAccess: hasAccessToLogDrains, isLoading: isLoadingEntitlement } = useCheckEntitlements(

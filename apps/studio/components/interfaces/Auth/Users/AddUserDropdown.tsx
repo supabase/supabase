@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
@@ -7,20 +6,19 @@ import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const AddUserDropdown = () => {
   const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
 
-  const { can: canInviteUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'invite_user'
+  const { can: canInviteUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
-  const { can: canCreateUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'create_user'
+
+  const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const [inviteVisible, setInviteVisible] = useQueryState(

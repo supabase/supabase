@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Download } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -13,7 +12,7 @@ import {
 import { NoPermission } from '@/components/ui/NoPermission'
 import { getDocument } from '@/data/documents/document-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -22,9 +21,8 @@ export const SecurityQuestionnaire = () => {
   const slug = organization?.slug
 
   const track = useTrack()
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
   const { hasAccess: hasAccessToQuestionnaire, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.questionnaire')

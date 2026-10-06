@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useMemo } from 'react'
 import { Separator } from 'ui'
@@ -16,7 +15,7 @@ import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsL
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
@@ -24,7 +23,9 @@ import type { NextPageWithLayout } from '@/types'
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { isCli, isSelfHosted } = useDeploymentMode()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeysData = [] } = useAPIKeysQuery(
     {
       projectRef,

@@ -1,5 +1,4 @@
 import type { PGColumn } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AlertTriangle, Code, Loader2, Table2 } from 'lucide-react'
@@ -33,9 +32,11 @@ import {
   usePrefetchTables,
   type TablesData,
 } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProfile } from '@/lib/profile'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
   let { ref } = useParams()
@@ -101,13 +102,11 @@ function RunSnippetPage() {
 
   const snippets = snippetPages?.pages.flatMap((page) => page.contents)
 
-  const { profile } = useProfile()
-  const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'user_content',
+  const { can: canCreateSQLSnippet } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: { type: 'sql', owner_id: profile?.id },
-      subject: { id: profile?.id },
+      mode: 'create',
+      type: 'sql',
     }
   )
 

@@ -43,8 +43,9 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: mockSelectedOrganization() }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isSuccess: true }),
+  FGA_PERMISSIONS: {},
 }))
 
 vi.mock('@/data/organizations/organization-customer-profile-query', () => ({

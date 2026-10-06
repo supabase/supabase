@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -30,7 +29,7 @@ import {
 } from '@/data/analytics/functions-combined-stats-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const EdgeFunctionOverview = () => {
   const router = useRouter()
@@ -166,9 +165,8 @@ export const EdgeFunctionOverview = () => {
     },
   })
 
-  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_READ,
-    functionSlug as string
+  const { isLoading: permissionsLoading, can: canReadFunction } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
 
   useEffect(() => {

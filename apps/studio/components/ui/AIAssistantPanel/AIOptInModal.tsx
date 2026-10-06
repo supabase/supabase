@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
 import {
   Button,
@@ -15,7 +14,7 @@ import {
 
 import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
 import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface AIOptInModalProps {
   visible: boolean
@@ -24,9 +23,8 @@ interface AIOptInModalProps {
 
 export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm(onCancel)
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const onOpenChange = (open: boolean) => {

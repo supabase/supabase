@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import { MessageCircle } from 'lucide-react'
@@ -19,7 +18,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -42,9 +41,8 @@ const BranchesPage: NextPageWithLayout = () => {
   const projectRef =
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
-  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'preview_branches'
+  const { can: canReadBranches, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_READ
   )
 
   const {
@@ -157,12 +155,8 @@ const BranchesPage: NextPageWithLayout = () => {
 // content as `children` instead of capturing it from a closure.
 export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
   const snap = useAppStateSnapshot()
-  const { can: canCreateBranches } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches',
-    {
-      resource: { is_default: false },
-    }
+  const { can: canCreateBranches } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE
   )
 
   const primaryActions = (

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,7 +17,7 @@ import {
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrganizationCustomerProfileUpdateMutation } from '@/data/organizations/organization-customer-profile-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -40,9 +39,8 @@ export const IndirectTaxDeclarationModal = () => {
     setResponse('')
   }, [organization?.slug])
 
-  const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.customer'
+  const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const { mutate: updateCustomerProfile, isPending } = useOrganizationCustomerProfileUpdateMutation(

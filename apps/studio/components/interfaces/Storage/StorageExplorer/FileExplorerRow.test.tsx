@@ -34,8 +34,13 @@ vi.mock('@/components/interfaces/Storage/StorageExplorer/StorageExplorerNavigati
     clearPreviewedFile: vi.fn(),
   }),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      STORAGE_WRITE: 'storage_write',
+    },
+  },
 }))
 vi.mock('@/components/interfaces/Storage/StorageExplorer/useCopyUrl', () => ({
   useCopyUrl: () => ({ onCopyUrl: vi.fn() }),

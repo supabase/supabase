@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { template } from 'lodash'
 import { Download, Loader2 } from 'lucide-react'
@@ -25,14 +24,12 @@ import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
 import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const SSLConfiguration = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
@@ -61,14 +58,8 @@ export const SSLConfiguration = () => {
       },
     })
 
-  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateSSLEnforcement } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_SSL_CONFIG_WRITE
   )
 
   // Derived directly from the query so a refetch triggered elsewhere (e.g.

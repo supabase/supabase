@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -8,16 +7,15 @@ import JWTKeysLayout from '@/components/layouts/JWTKeys/JWTKeysLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const JWTSigningKeysPage: NextPageWithLayout = () => {
   const { isCli, isSelfHosted } = useDeploymentMode()
-  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'auth_signing_keys'
+  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
 
   if (!IS_PLATFORM) {

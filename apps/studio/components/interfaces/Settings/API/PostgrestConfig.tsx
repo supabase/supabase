@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { safeSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Lock } from 'lucide-react'
@@ -53,7 +52,7 @@ import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -164,7 +163,7 @@ export const PostgrestConfig = () => {
   const formId = 'project-postgres-config'
 
   const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE)
   // PostgREST config (exposed schemas, extra search path, max rows, pool size) is persisted via
   // the platform API, which isn't available self-hosted (the values come from env vars there).
   const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission

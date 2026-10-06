@@ -1,5 +1,4 @@
 import type { PGSchema } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   Background,
   BackgroundVariant,
@@ -63,7 +62,7 @@ import { useDatabasePoliciesQuery } from '@/data/database-policies/database-poli
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -161,9 +160,8 @@ export const SchemaGraph = () => {
     {}
   )
 
-  const { can: canUpdateTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdateTables } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })

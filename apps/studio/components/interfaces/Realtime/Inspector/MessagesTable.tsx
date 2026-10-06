@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
@@ -16,7 +15,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -36,9 +35,8 @@ const NoResultAlert = ({
 }) => {
   const { ref } = useParams()
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const broadcastButton = <Button onClick={showSendMessage}>Broadcast a message</Button>

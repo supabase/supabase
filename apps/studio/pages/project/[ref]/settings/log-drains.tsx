@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { cloneElement, useState, type ReactElement } from 'react'
@@ -31,16 +30,15 @@ import {
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from '@/data/log-drains/update-log-drain-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.ANALYTICS_ADMIN_WRITE,
-    'logflare'
+  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ANALYTICS_CONFIG_WRITE
   )
 
   const track = useTrack()

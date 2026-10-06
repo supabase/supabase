@@ -34,8 +34,8 @@ vi.mock('@/data/organizations/organization-payment-methods-query', () => ({
   useOrganizationPaymentMethodsQuery: () => mockPaymentMethodsQuery(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isSuccess: true }),
 }))
 
 vi.mock('@/components/ui/PartnerManagedResource', () => ({

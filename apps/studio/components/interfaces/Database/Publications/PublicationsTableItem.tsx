@@ -1,11 +1,10 @@
 import type { PGPublication, PGTable } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 
@@ -28,9 +27,8 @@ export const PublicationsTableItem = ({
     selectedPublication.tables?.find((x) => x.id == table.id) != undefined
   )
 
-  const { can: canUpdatePublications } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'publications'
+  const { can: canUpdatePublications } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()

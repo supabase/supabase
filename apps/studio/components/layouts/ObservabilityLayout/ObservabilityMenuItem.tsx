@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Edit2, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import {
@@ -12,7 +11,10 @@ import {
 } from 'ui'
 
 import { ContentBase } from '@/data/content/content-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
 import { useProfile } from '@/lib/profile'
 import type { Dashboards } from '@/types'
 
@@ -41,16 +43,14 @@ export const ObservabilityMenuItem = ({
   onSelectDelete,
 }: ReportMenuItemProps) => {
   const { profile } = useProfile()
-  const { can: canUpdateCustomReport } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'user_content',
+  const { can: canUpdateCustomReport } = useAsyncCheckUserContentPermissions(
+    FGA_PERMISSIONS.PROJECT.SNIPPETS_WRITE,
     {
-      resource: {
-        type: 'report',
-        visibility: item.report.visibility,
-        owner_id: item.report.owner_id,
-      },
-      subject: { id: profile?.id },
+      mode: 'existing',
+      type: 'report',
+      visibility: item.report.visibility,
+      ownerId: item.report.owner_id,
+      subjectId: profile?.id,
     }
   )
 

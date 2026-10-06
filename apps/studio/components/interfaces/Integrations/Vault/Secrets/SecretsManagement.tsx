@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { RefreshCw, Search, X } from 'lucide-react'
@@ -28,7 +27,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -44,9 +43,8 @@ export const SecretsManagement = () => {
   const [, setShowAddSecretModal] = useQueryState('new', parseAsBoolean.withDefault(false))
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {

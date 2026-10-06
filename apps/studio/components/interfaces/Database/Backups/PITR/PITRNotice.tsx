@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Calendar } from 'lucide-react'
 import Link from 'next/link'
@@ -7,16 +6,15 @@ import { getPITRRetentionDuration } from './PITR.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const PITRNotice = () => {
   const { ref: projectRef } = useParams()
   const { data: addonsResponse } = useProjectAddonsQuery({ projectRef })
   const retentionPeriod = getPITRRetentionDuration(addonsResponse?.selected_addons ?? [])
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
 
   return (

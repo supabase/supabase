@@ -19,8 +19,15 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({ data: { ref: 'default', inserted_at: null } }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isLoading: false, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      AUTH_CONFIG_READ: 'auth_config_read',
+      AUTH_CONFIG_WRITE: 'auth_config_write',
+      ADMIN_WRITE: 'project_admin_write',
+    },
+  },
 }))
 
 const SMTP_CONFIGURED_CONFIG = {

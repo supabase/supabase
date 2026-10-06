@@ -1,4 +1,4 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Download, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
@@ -24,7 +24,7 @@ import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import { useDownloadableBackupQuery } from '@/data/database/backup-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const RestoreFailedState = () => {
@@ -33,9 +33,7 @@ export const RestoreFailedState = () => {
   const [visible, setVisible] = useState(false)
   const [showCliBackup, setShowCliBackup] = useState(false)
 
-  const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: { project_id: project?.id },
-  })
+  const { can: canDeleteProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []

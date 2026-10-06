@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,7 +20,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { useUserInviteMutation } from '@/data/auth/user-invite-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export type InviteUserModalProps = {
   visible: boolean
@@ -49,9 +48,8 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
       setVisible(false)
     },
   })
-  const { can: canInviteUsers } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'invite_user'
+  const { can: canInviteUsers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const onInviteUser: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {

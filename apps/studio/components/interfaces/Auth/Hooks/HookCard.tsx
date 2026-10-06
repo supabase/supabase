@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BookOpen, Check, Edit, MoreVertical, Trash, Webhook } from 'lucide-react'
 import {
   Badge,
@@ -13,7 +12,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { Hook } from './hooks.constants'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 interface HookCardProps {
@@ -23,7 +22,9 @@ interface HookCardProps {
 }
 
 export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) => {
-  const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canUpdateAuthHook } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+  )
 
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">

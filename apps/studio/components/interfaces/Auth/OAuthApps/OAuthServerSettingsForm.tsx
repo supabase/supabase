@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -29,7 +28,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 const configUrlSchema = z.object({
@@ -106,16 +105,16 @@ export const OAuthServerSettingsForm = () => {
     can: canReadConfig,
     isLoading: isLoadingPermissions,
     isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ)
 
   const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
 
   const oauthApps = oAuthAppsData?.clients || []
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const form = useForm<OAuthServerSettings>({
     resolver: zodResolver(schema),

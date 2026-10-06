@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import type { editor } from 'monaco-editor'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -40,7 +39,7 @@ import type { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -89,10 +88,10 @@ const getPreviewSrcDoc = (html: string) => {
 
 export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
   const canEdit = canUpdateConfig && !isReadOnly
 
   const { id, properties } = template

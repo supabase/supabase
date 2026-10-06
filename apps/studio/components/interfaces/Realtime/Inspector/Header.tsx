@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction, useCallback } from 'react'
@@ -11,7 +10,7 @@ import { RealtimeConfig } from './useRealtimeMessages'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -35,9 +34,8 @@ export const Header = ({
 }: HeaderProps) => {
   const track = useTrack()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const canToggleListening = canReadAPIKeys && config.channelName.length > 0

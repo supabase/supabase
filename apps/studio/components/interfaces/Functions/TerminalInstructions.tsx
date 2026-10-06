@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -11,7 +10,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
@@ -28,7 +27,9 @@ export const TerminalInstructions = forwardRef<
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = apiKeyData ?? {}
 

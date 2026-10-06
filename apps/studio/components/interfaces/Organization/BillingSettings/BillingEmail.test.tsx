@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -9,6 +8,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import BillingEmail from './BillingEmail'
 import { organizationKeys } from '@/data/organizations/keys'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -31,8 +31,9 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: (action: string) => mockCheckPermissions(action),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: (permission: string) => mockCheckPermissions(permission),
+  FGA_PERMISSIONS: {},
 }))
 
 vi.mock('react-intersection-observer', () => ({
@@ -110,8 +111,8 @@ describe('BillingEmail', () => {
   })
 
   test('shows a permission notice when the user cannot read billing data', async () => {
-    mockCheckPermissions.mockImplementation((action: string) => ({
-      can: action !== PermissionAction.BILLING_READ,
+    mockCheckPermissions.mockImplementation((permission) => ({
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
       isSuccess: true,
     }))
 
@@ -122,8 +123,8 @@ describe('BillingEmail', () => {
   })
 
   test('disables the email controls when the user cannot update billing data', async () => {
-    mockCheckPermissions.mockImplementation((action: string) => ({
-      can: action !== PermissionAction.BILLING_WRITE,
+    mockCheckPermissions.mockImplementation((permission) => ({
+      can: permission !== FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
       isSuccess: true,
     }))
     mockCustomerProfile({ email: 'billing@example.com', additional_emails: [] })

@@ -28,8 +28,9 @@ const {
   mockUseDatabasePoliciesQuery: vi.fn(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { REALTIME_CONFIG_WRITE: 'realtime_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({

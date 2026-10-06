@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertCircle, ChevronDown, Copy, Download, LoaderCircle, Trash2, X } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 import {
@@ -16,7 +15,7 @@ import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { BASE_PATH } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -126,7 +125,7 @@ export const PreviewPane = () => {
   const { clearPreviewedFile } = useStorageExplorerNavigation()
   const { onCopyUrl } = useCopyUrl()
 
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   if (!file) return null
 

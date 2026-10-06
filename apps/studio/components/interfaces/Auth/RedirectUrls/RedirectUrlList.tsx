@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Globe, Trash } from 'lucide-react'
 import { Button, Checkbox } from 'ui'
 
@@ -6,7 +5,7 @@ import { ValueContainer } from './ValueContainer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { EmptyListState } from '@/components/ui/EmptyListState'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RedirectUrlListProps {
@@ -26,10 +25,10 @@ export const RedirectUrlList = ({
   onSelectRemoveURLs,
   onSelectClearSelection,
 }: RedirectUrlListProps) => {
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   // [Joshen] One for next time: maybe shift this into a reusable logic since it
   // seems like we can use this in multiple places for future

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
@@ -61,7 +60,7 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const formId = 'destination-editor'
 
@@ -91,7 +90,11 @@ export const DestinationForm = ({
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    // api keys reveal = true will require this perms
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)

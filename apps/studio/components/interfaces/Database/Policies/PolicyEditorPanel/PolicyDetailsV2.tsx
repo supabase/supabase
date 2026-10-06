@@ -4,7 +4,6 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from '@supabase/pg-meta/src/pg-format'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -45,7 +44,7 @@ import {
 
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface PolicyDetailsV2Props {
@@ -77,9 +76,8 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { data: project } = useSelectedProjectQuery()
   const [open, setOpen] = useState(false)
-  const { can: canUpdatePolicies } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canUpdatePolicies } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({

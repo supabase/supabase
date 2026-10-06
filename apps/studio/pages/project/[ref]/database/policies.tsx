@@ -1,6 +1,5 @@
 import type { PGTable } from '@supabase/pg-meta'
 import { ident, safeSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -42,7 +41,7 @@ import { Shortcut } from '@/components/ui/Shortcut'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -182,9 +181,8 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   )
   const exposedSchemas = getExposedSchemas(dbSchema)
 
-  const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_READ,
-    'policies'
+  const { can: canReadPolicies, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
 
   const handleSelectCreatePolicy = useCallback(

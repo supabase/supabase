@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
 import {
   AlertCircle,
@@ -42,7 +41,7 @@ import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { copyStorageExplorerUrl, copyStoragePath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -94,7 +93,7 @@ export const FileExplorerRow = ({
   const isOpened =
     openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down

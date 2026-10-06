@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -19,7 +18,7 @@ import { SparkBar } from '@/components/ui/SparkBar'
 import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -34,10 +33,7 @@ export const RolesList = () => {
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
   const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const { can: canUpdateRoles } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'roles'
-  )
+  const { can: canUpdateRoles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,

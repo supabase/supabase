@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { EyeOff, Key } from 'lucide-react'
 import { useMemo } from 'react'
@@ -18,7 +17,7 @@ import {
 
 import type { ShowApiKey } from '@/components/interfaces/Docs/Docs.types'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
@@ -37,7 +36,9 @@ export const LangSelector = ({
 }: LangSelectorProps) => {
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
   const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
     {
       projectRef,

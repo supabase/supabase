@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
@@ -65,7 +64,7 @@ import { useJwtSecretUpdateMutation } from '@/data/config/jwt-secret-update-muta
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -86,13 +85,11 @@ export const JWTSettings = () => {
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
-  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'field.jwt_secret'
+  const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
-  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.projects.update_jwt'
+  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef }, { enabled: IS_PLATFORM })
@@ -100,7 +97,9 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
     { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }

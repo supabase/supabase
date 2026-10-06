@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -34,7 +33,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -68,14 +67,13 @@ export const PerformanceSettingsForm = () => {
   const { data: project } = useSelectedProjectQuery()
   const { hasAccess: hasAccessToPerformance, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.performance_settings')
-  const { can: canReadConfig } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
-  )
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+  ])
 
   const [isUpdatingRequestDurationForm, setIsUpdatingRequestDurationForm] = useState(false)
   const [isUpdatingDatabaseForm, setIsUpdatingDatabaseForm] = useState(false)

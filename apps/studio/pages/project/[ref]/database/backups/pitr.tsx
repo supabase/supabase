@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertCircle, DatabaseBackup } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from 'ui'
@@ -26,7 +25,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import {
   useIsOrioleDbInAws,
@@ -88,10 +87,8 @@ const PITR = () => {
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'physical_backups'
-  )
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.BACKUPS_READ)
 
   if (isPermissionsLoaded && !canReadPhysicalBackups) {
     return <NoPermission resourceText="view PITR backups" />

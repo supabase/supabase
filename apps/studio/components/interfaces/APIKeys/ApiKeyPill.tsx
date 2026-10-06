@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -8,7 +7,7 @@ import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } fr
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function ApiKeyPill({
   apiKey,
@@ -20,10 +19,9 @@ export function ApiKeyPill({
 
   const isSecret = apiKey.type === 'secret'
 
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
+  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const {
     data: revealedKey,

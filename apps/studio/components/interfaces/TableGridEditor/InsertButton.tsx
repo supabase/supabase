@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ArrowUp, ChevronDown, FileText } from 'lucide-react'
 import {
   Button,
@@ -10,7 +9,7 @@ import {
 } from 'ui'
 
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -22,9 +21,8 @@ export const InsertButton = () => {
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
-  const { can: canCreateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
+  const { can: canCreateColumns } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const onAddRow =

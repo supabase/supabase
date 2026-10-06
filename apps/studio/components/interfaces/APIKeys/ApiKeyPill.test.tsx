@@ -15,8 +15,9 @@ type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 const { mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_SECRET_READ: 'api_gateway_keys_secret_read' } },
 }))
 
 // CopyButton writes via copyToClipboard from 'ui'. Stub just that export so we can

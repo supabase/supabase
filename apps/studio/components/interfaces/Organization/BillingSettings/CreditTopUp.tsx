@@ -2,7 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { AlertCircle, Info } from 'lucide-react'
@@ -44,7 +44,7 @@ import { useOrganizationCreditTopUpMutation } from '@/data/organizations/organiz
 import { useCreditTopUpPreview } from '@/data/organizations/organization-credit-top-up-preview'
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { formatCurrency } from '@/lib/helpers'
 
@@ -73,9 +73,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     validateBillingProfile: () => Promise<boolean>
   }>(null)
 
-  const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canTopUpCredits, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const {

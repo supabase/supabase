@@ -3,7 +3,6 @@ import './graphiql-styles.css'
 
 import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
 import { User as IconUser } from 'lucide-react'
@@ -22,7 +21,7 @@ import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersona
 import { BASE_MONACO_EDITOR_OPTIONS } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
@@ -82,10 +81,10 @@ export const GraphiQLTab = () => {
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
-  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'field.jwt_secret'
-  )
+  const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_READ,
+    FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_SECRET_READ,
+  ])
 
   const { notice, schemaComment } = usePgGraphqlIntrospectionStatus({
     projectRef,

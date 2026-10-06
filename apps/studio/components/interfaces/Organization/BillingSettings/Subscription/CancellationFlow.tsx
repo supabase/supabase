@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 
@@ -9,7 +8,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -123,9 +122,8 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isAwsManaged = selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const { data: subscription } = useOrgSubscriptionQuery({

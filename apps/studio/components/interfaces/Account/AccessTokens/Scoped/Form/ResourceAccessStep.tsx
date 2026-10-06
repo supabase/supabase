@@ -28,7 +28,7 @@ import { getIsProjectScopedOnly } from '../../AccessToken.roles'
 import type { TokenFormValues } from './NewScopedTokenForm.utils'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import {
   OrgProject,
   OrgProjectsResponse,
@@ -114,7 +114,7 @@ export const ResourceAccessStep = ({
   // org-wide token. Skipped while permissions are still loading so nothing gets disabled by
   // mistake. The project list itself needs no permission filter — the org projects endpoint is
   // already scoped server-side to what the user can access.
-  const { data: permissions } = usePermissionsQuery()
+  const { data: permissions } = usePermissionsQueryV2()
   const projectScopedOrgSlugs = useMemo(() => {
     if (permissions === undefined) return new Set<string>()
     return new Set(

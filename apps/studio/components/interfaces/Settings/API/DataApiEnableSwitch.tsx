@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useCallback, useEffect, useEffectEvent, useReducer } from 'react'
 import { useForm } from 'react-hook-form'
@@ -17,7 +16,7 @@ import { DataApiEnableSwitchError, DataApiEnableSwitchLoading } from './DataApiE
 import { UnsafeEntitiesConfirmModal } from './UnsafeEntitiesConfirmModal'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -25,7 +24,7 @@ export const DataApiEnableSwitch = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { can: canUpdatePostgrestConfig, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATA_API_CONFIG_WRITE)
 
   const {
     data: config,

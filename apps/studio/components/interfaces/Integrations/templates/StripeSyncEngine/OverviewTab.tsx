@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -43,7 +42,7 @@ import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templa
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from '@/data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -77,9 +76,8 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
   } = useStripeSyncStatus()
 
   // Check permissions for managing function secrets
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
   )
 
   const installed = isInstalled(installationStatus)
