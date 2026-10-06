@@ -66,6 +66,8 @@ interface CurrentFilePreviewProps {
   size: string | null
   isPublicBucket: boolean
   isVersionedBucket: boolean
+  /** Replacing a file is part of the versioning work, so it rides the same flag. */
+  isStorageVersioningEnabled: boolean
   /** Pins the preview to the current version, so a new one busts the cached URL. */
   currentVersionId?: string
   hasCurrentVersion: boolean
@@ -85,6 +87,7 @@ const CurrentFilePreview = ({
   size,
   isPublicBucket,
   isVersionedBucket,
+  isStorageVersioningEnabled,
   currentVersionId,
   hasCurrentVersion,
   canUpdateFiles,
@@ -140,7 +143,7 @@ const CurrentFilePreview = ({
           tooltip={{ content: { side: 'top', text: 'Download current' } }}
         />
 
-        {canUpdateFiles && (
+        {canUpdateFiles && isStorageVersioningEnabled && (
           <ButtonTooltip
             variant="outline"
             className="px-2"
@@ -380,6 +383,7 @@ export const PreviewPane = () => {
             size={size}
             isPublicBucket={!!selectedBucket?.public}
             isVersionedBucket={isVersionedBucket}
+            isStorageVersioningEnabled={isStorageVersioningEnabled}
             currentVersionId={currentVersion?.versionId}
             hasCurrentVersion={currentVersion !== undefined}
             canUpdateFiles={canUpdateFiles}
