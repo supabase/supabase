@@ -118,7 +118,7 @@ describe('APIAuthorizationPage', () => {
       profileContext: DEFAULT_PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
+    expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     expect(screen.getByText('Want this scoped to one member?')).toBeInTheDocument()
   })
@@ -132,7 +132,7 @@ describe('APIAuthorizationPage', () => {
       profileContext: DEFAULT_PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
+    expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     expect(screen.queryByText('Want this scoped to one member?')).not.toBeInTheDocument()
   })
