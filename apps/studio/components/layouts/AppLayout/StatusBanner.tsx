@@ -27,7 +27,7 @@ function getBannerDescription({
   if (selection.kind === 'incident') {
     return (
       <>
-        {description} <InlineLink href={pageUrl}>Status page</InlineLink>
+        Follow the <InlineLink href={pageUrl}>status page</InlineLink> for updates
       </>
     )
   }
