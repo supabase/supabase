@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import type { ExpirationMode } from './StorageVersioning.constants'
+import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 
 /** Empty drops the condition from the policy, which is distinct from zero. */
 const versioningNumberField = z.union([z.literal(''), z.coerce.number().int()])

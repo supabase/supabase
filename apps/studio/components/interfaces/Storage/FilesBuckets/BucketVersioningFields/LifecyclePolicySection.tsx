@@ -16,7 +16,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
-import type { ExpirationMode } from './StorageVersioning.constants'
+import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 

@@ -26,8 +26,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { z } from 'zod'
 
+import { EditBucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -44,17 +44,6 @@ export interface EditBucketModalProps {
   bucket: Bucket
   onClose: () => void
 }
-
-const BucketSchema = z.object({
-  name: z.string(),
-  public: z.boolean().default(false),
-  has_file_size_limit: z.boolean().default(false),
-  formatted_size_limit: z.coerce
-    .number()
-    .min(0, 'File size upload limit has to be at least 0')
-    .optional(),
-  allowed_mime_types: z.string().trim().default(''),
-})
 
 const formId = 'edit-storage-bucket-form'
 
@@ -113,8 +102,8 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     allowed_mime_types: (bucket?.allowed_mime_types ?? []).join(', '),
   }
 
-  const form = useForm<z.infer<typeof BucketSchema>>({
-    resolver: zodResolver(BucketSchema),
+  const form = useForm<BucketFormValues>({
+    resolver: zodResolver(EditBucketFormSchema),
     defaultValues,
     values: defaultValues,
     mode: 'onSubmit',
@@ -136,7 +125,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
     onClose()
   }
 
-  const onSubmit: SubmitHandler<z.infer<typeof BucketSchema>> = async (values) => {
+  const onSubmit: SubmitHandler<BucketFormValues> = async (values) => {
     if (bucket === undefined) return console.error('Bucket is required')
     if (ref === undefined) return console.error('Project ref is required')
 
