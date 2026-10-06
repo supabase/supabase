@@ -44,7 +44,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
         id: BANNER_ID.TERMS_OF_SERVICE_UPDATE,
         isDismissed: false,
         content: <BannerTermsOfServiceUpdate />,
-        priority: 0,
+        priority: 3,
       })
     } else {
       dismissBanner(BANNER_ID.TERMS_OF_SERVICE_UPDATE)

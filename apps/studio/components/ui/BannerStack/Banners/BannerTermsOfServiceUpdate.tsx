@@ -55,7 +55,7 @@ export const BannerTermsOfServiceUpdate = () => {
             </DialogHeader>
             <DialogSectionSeparator />
             <DialogSection className="text-sm flex flex-col gap-y-2">
-              <p>We’ve updated our Terms of Service and Enterprise SaaS Subscription Agreement.</p>
+              <p>We’ve updated our Terms of Service.</p>
               <p>The updated terms:</p>
               <ul className="list-disc pl-5 space-y-1">
                 <li>Clarify which Supabase entity you contract with.</li>
@@ -68,11 +68,7 @@ export const BannerTermsOfServiceUpdate = () => {
               </ul>
               <p>
                 Read the updated{' '}
-                <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink> and{' '}
-                <InlineLink href="https://supabase.com/enterprise-terms">
-                  Enterprise SaaS Subscription Agreement
-                </InlineLink>
-                .
+                <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink>.
               </p>
             </DialogSection>
             <DialogFooter>
