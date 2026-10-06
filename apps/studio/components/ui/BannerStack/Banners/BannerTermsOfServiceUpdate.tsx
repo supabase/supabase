@@ -5,9 +5,10 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
 } from 'ui'
@@ -35,28 +36,48 @@ export const BannerTermsOfServiceUpdate = () => {
         <Badge variant="default" className="w-min -ml-0.5 uppercase inline-flex items-center mb-2">
           Notice
         </Badge>
-        <p className="text-sm font-medium mb-2">We've updated our Terms of Service.</p>
+        <div className="flex flex-col gap-y-1 mb-2">
+          <p className="text-sm font-medium">We’ve updated our Terms of Service</p>
+          <p className="text-xs text-foreground-lighter text-balance">
+            The new terms cover who you contract with, alpha and beta features, and cloud
+            marketplace purchases.
+          </p>
+        </div>
         <Dialog>
           <DialogTrigger asChild>
             <Button size="tiny" className="w-min">
               Learn more
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>Terms of Service update</DialogTitle>
-              <DialogDescription>
-                The new terms say which Supabase entity you contract with, add Supplemental Terms
-                for certain features we may release or local law compliance, set new terms for alpha
-                and beta features, and make accommodations for cloud marketplace transactions.
-              </DialogDescription>
             </DialogHeader>
-            <div className="px-6 pb-6 text-sm">
-              <InlineLink href="https://supabase.com/terms">Read the Terms of Service</InlineLink>
-            </div>
+            <DialogSectionSeparator />
+            <DialogSection className="text-sm flex flex-col gap-y-2">
+              <p>We’ve updated our Terms of Service and Enterprise SaaS Subscription Agreement.</p>
+              <p>The updated terms:</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Clarify which Supabase entity you contract with.</li>
+                <li>
+                  Add Supplemental Terms for certain features we may release or to comply with local
+                  laws.
+                </li>
+                <li>Set new terms for alpha and beta features.</li>
+                <li>Make accommodations for purchases through cloud marketplaces.</li>
+              </ul>
+              <p>
+                Read the updated{' '}
+                <InlineLink href="https://supabase.com/terms">Terms of Service</InlineLink> and{' '}
+                <InlineLink href="https://supabase.com/enterprise-terms">
+                  Enterprise SaaS Subscription Agreement
+                </InlineLink>
+                .
+              </p>
+            </DialogSection>
             <DialogFooter>
               <DialogClose asChild>
-                <Button onClick={acknowledgeUpdate}>Understood</Button>
+                <Button onClick={acknowledgeUpdate}>Got it</Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>
