@@ -274,8 +274,10 @@ export function getDefaultPrivilegesStateSql({
       and exists (
         select 1
         from aclexplode(d.defaclacl) acl
-        join pg_roles gr on gr.oid = acl.grantee
-        where gr.rolname in ('anon', 'authenticated', 'service_role')
+        -- acl.grantee = 0 is PUBLIC, which applies to all roles; left join
+        -- preserves that row since PUBLIC has no pg_roles entry
+        left join pg_roles gr on gr.oid = acl.grantee
+        where gr.rolname in ('anon', 'authenticated', 'service_role') or acl.grantee = 0
       )
   `
 }
