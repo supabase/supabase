@@ -7,7 +7,7 @@ import { SEARCH_V2_FLAG } from './constants'
 import { useSearchV2Variant } from './useSearchV2Variant'
 
 vi.mock('common', () => ({
-  hasConsented: vi.fn(() => true),
+  useConsentState: vi.fn(() => ({ hasAccepted: true })),
   posthogClient: { captureExperimentExposure: vi.fn() },
   useFeatureFlags: vi.fn(),
   useSearchParamsShallow: vi.fn(),
