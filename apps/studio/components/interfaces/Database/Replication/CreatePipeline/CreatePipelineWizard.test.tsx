@@ -8,6 +8,7 @@ import { CreatePipelineWizard } from './CreatePipelineWizard'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
 
@@ -179,9 +180,10 @@ test('a disabled destination in the URL cannot bypass selection', async () => {
   expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
 })
 
-test.each(['data', 'connection'] as const)(
-  'keeps final %s validation failures on Review with an edit path',
+test.each(['data', 'connection', 'created', 'start-failed', 'create-failed'] as const)(
+  'handles final submission recovery: %s',
   async (failureStep) => {
+    routerMock.setCurrentUrl('/project/default/database/pipelines/new')
     addAPIMock({
       method: 'get',
       path: '/platform/replication/v2/:ref/sources/:source_id/publications',
@@ -246,6 +248,34 @@ test.each(['data', 'connection'] as const)(
               : [],
         }),
     })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations-pipelines',
+      response: () =>
+        failureStep === 'create-failed'
+          ? HttpResponse.json<APIErrorBody>({ message: 'Creation unavailable' }, { status: 503 })
+          : HttpResponse.json<components['schemas']['CreateDestinationPipelineResponse_Output']>({
+              pipeline_id: 8,
+              destination_id: 7,
+            }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/start',
+      response: () =>
+        failureStep === 'start-failed'
+          ? HttpResponse.json<APIErrorBody>({ message: 'Start unavailable' }, { status: 503 })
+          : HttpResponse.json<Record<string, never>>({}),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: () =>
+        HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
+          pipeline_id: 8,
+          status: { name: 'stopped' },
+        }),
+    })
     customRender(
       <PipelineRequestStatusProvider>
         <CreatePipelineWizard />
@@ -278,6 +308,20 @@ test.each(['data', 'connection'] as const)(
       expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
     )
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    if (failureStep === 'created' || failureStep === 'start-failed') {
+      await waitFor(() => expect(routerMock.asPath).toBe('/project/default/database/pipelines'))
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      return
+    }
+    if (failureStep === 'create-failed') {
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+      )
+      expect(routerMock.asPath).toBe('/project/default/database/pipelines/new')
+      expect(screen.getByRole('heading', { name: 'Review and create' })).toBeInTheDocument()
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      return
+    }
     await screen.findByText(failureStep === 'data' ? 'Invalid publication' : 'Access revoked')
     expect(screen.getByRole('heading', { name: 'Review and create' })).toBeInTheDocument()
     await waitFor(() =>

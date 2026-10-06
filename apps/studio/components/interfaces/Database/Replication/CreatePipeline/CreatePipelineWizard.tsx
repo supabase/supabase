@@ -434,7 +434,7 @@ export const CreatePipelineWizard = () => {
     await submitPipeline({
       data,
       onSuccess: () => form.reset(defaultValues),
-      onClose: goToList,
+      onClose: leaveWizard,
     })
   }
 
