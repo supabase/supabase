@@ -226,7 +226,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_READ_ONLY, CONTOSO_LABS, FABRIKAM_OWNER],
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS, FABRIKAM_OWNER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: {
     email: 'admin@example.com',
@@ -314,7 +314,7 @@ const MOCK_APPS_BY_ID: Record<string, OAuthAppsAuthorizeRequest> = {
 
 // The current member's org-level role, keyed by org slug — same reasoning as MOCK_APPS_BY_ID.
 const MOCK_ORGANIZATIONS_BY_SLUG: Record<string, OAuthOrganizationRole> = {
-  'northwind-traders': NORTHWIND_TRADERS_READ_ONLY,
+  'northwind-traders': NORTHWIND_TRADERS_DEVELOPER,
   'tailspin-toys': TAILSPIN_TOYS_ADMIN,
   'fabrikam-industries': FABRIKAM_OWNER,
   'contoso-labs': CONTOSO_LABS,
