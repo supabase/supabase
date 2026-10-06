@@ -1,6 +1,6 @@
 import { RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
-import type { ExpirationMode } from './StorageVersioning.constants'
+import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 
 interface ExpirationModeToggleProps {
   mode: ExpirationMode

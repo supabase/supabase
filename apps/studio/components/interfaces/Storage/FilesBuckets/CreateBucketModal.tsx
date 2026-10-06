@@ -26,56 +26,20 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import z from 'zod'
 
-import { inverseValidBucketNameRegex, validBucketNameRegex } from './CreateBucketModal.utils'
-import { convertFromBytes, convertToBytes } from './StorageSettings/StorageSettings.utils'
+import { BucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
-const FormSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(1, 'Please provide a name for your bucket')
-      .max(100, 'Bucket name should be below 100 characters')
-      .refine(
-        (value) => !value.endsWith(' '),
-        'The name of the bucket cannot end with a whitespace'
-      )
-      .refine(
-        (value) => value !== 'public',
-        '"public" is a reserved name. Please choose another name'
-      ),
-    public: z.boolean().default(false),
-    has_file_size_limit: z.boolean().default(false),
-    formatted_size_limit: z.coerce
-      .number()
-      .min(0, 'File size upload limit has to be at least 0')
-      .optional(),
-    allowed_mime_types: z.string().trim().default(''),
-  })
-  .superRefine((data, ctx) => {
-    if (!validBucketNameRegex.test(data.name)) {
-      const [match] = data.name.match(inverseValidBucketNameRegex) ?? []
-      ctx.addIssue({
-        path: ['name'],
-        code: z.ZodIssueCode.custom,
-        message: !!match
-          ? `Bucket name cannot contain the "${match}" character`
-          : 'Bucket name contains an invalid special character',
-      })
-    }
-  })
-
 const formId = 'create-storage-bucket-form'
-
-export type CreateBucketForm = z.infer<typeof FormSchema>
 
 interface CreateBucketModalProps {
   open: boolean
@@ -97,8 +61,8 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
     onError: () => {},
   })
 
-  const form = useForm<CreateBucketForm>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<BucketFormValues>({
+    resolver: zodResolver(BucketFormSchema),
     defaultValues: {
       name: '',
       public: false,
@@ -111,7 +75,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
   const isPublicBucket = useWatch({ control: form.control, name: 'public' })
   const hasFileSizeLimit = useWatch({ control: form.control, name: 'has_file_size_limit' })
 
-  const onSubmit: SubmitHandler<CreateBucketForm> = async (values) => {
+  const onSubmit: SubmitHandler<BucketFormValues> = async (values) => {
     if (!ref) return console.error('Project ref is required')
 
     // [Joshen] Should shift this into superRefine in the form schema

@@ -12,7 +12,7 @@ import {
   superRefineBucketVersioning,
   type BucketVersioningFormValues,
 } from './BucketVersioningFields.schema'
-import type { BucketVersioningState } from './StorageVersioning.constants'
+import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 

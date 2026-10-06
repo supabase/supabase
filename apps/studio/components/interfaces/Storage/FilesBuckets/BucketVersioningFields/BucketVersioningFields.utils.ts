@@ -1,4 +1,4 @@
-import type { BucketVersioningState } from './StorageVersioning.constants'
+import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 
 export type RetentionTightening = 'none' | 'days' | 'versions' | 'both'
 
