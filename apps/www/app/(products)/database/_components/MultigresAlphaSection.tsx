@@ -1,5 +1,6 @@
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { MarketingForm } from 'marketing/forms'
+import { Button } from 'ui'
 
 import { getGoPageBySlug } from '@/lib/go'
 
@@ -30,6 +31,13 @@ export function MultigresAlphaSection() {
           </h3>
           <p className="text-foreground-light">{hero.description}</p>
           <p className="text-foreground-lighter text-sm">{form.description}</p>
+          <div>
+            <Button size="small" asChild>
+              <a href="https://multigres.com" target="_blank" rel="noreferrer">
+                Learn about Multigres
+              </a>
+            </Button>
+          </div>
         </div>
         <MarketingForm
           fields={form.fields}
