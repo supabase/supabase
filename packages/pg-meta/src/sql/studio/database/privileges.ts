@@ -24,23 +24,23 @@ function getTableGrantsCTEs({
         c.relname as name,
         c.relkind as kind,
 
-        -- Anon Privileges (acl.grantee = 0 is PUBLIC, which applies to all roles)
-        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'SELECT') as anon_select,
-        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'INSERT') as anon_insert,
-        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'UPDATE') as anon_update,
-        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'DELETE') as anon_delete,
+        -- Anon Privileges
+        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'SELECT') as anon_select,
+        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'INSERT') as anon_insert,
+        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'UPDATE') as anon_update,
+        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'DELETE') as anon_delete,
 
-        -- Authenticated Privileges (acl.grantee = 0 is PUBLIC, which applies to all roles)
-        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'SELECT') as auth_select,
-        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'INSERT') as auth_insert,
-        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'UPDATE') as auth_update,
-        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'DELETE') as auth_delete,
+        -- Authenticated Privileges
+        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'SELECT') as auth_select,
+        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'INSERT') as auth_insert,
+        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'UPDATE') as auth_update,
+        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'DELETE') as auth_delete,
 
-        -- Service Role Privileges (acl.grantee = 0 is PUBLIC, which applies to all roles)
-        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'SELECT') as srv_select,
-        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'INSERT') as srv_insert,
-        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'UPDATE') as srv_update,
-        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'DELETE') as srv_delete
+        -- Service Role Privileges
+        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'SELECT') as srv_select,
+        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'INSERT') as srv_insert,
+        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'UPDATE') as srv_update,
+        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'DELETE') as srv_delete
 
       from pg_class c
       join pg_namespace n
