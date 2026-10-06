@@ -27,7 +27,7 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { BucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
+import { EditBucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
@@ -103,7 +103,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
   }
 
   const form = useForm<BucketFormValues>({
-    resolver: zodResolver(BucketFormSchema),
+    resolver: zodResolver(EditBucketFormSchema),
     defaultValues,
     values: defaultValues,
     mode: 'onSubmit',
