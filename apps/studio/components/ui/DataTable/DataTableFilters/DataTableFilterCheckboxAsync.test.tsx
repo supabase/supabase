@@ -219,6 +219,27 @@ describe('pathname facet filter', () => {
     expect(requests).toBe(2)
   })
 
+  it('clears search on Escape before blurring the input', () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+
+    customRender(<PathnameFilter search={pathnameSearch()} />)
+    fireEvent.click(screen.getByText('Pathname'))
+    const searchInput = screen.getByPlaceholderText('Search')
+    searchInput.focus()
+    fireEvent.change(searchInput, { target: { value: '/api' } })
+
+    fireEvent.keyDown(searchInput, { key: 'Escape' })
+    expect(searchInput).toHaveValue('')
+    expect(searchInput).toHaveFocus()
+
+    fireEvent.keyDown(searchInput, { key: 'Escape' })
+    expect(searchInput).not.toHaveFocus()
+  })
+
   it('replaces options on URL time-range and filter changes without syncing local filters', async () => {
     let requests = 0
     addAPIMock({

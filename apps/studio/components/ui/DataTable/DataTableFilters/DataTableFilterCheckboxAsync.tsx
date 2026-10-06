@@ -1,21 +1,12 @@
-import { useDebounce } from '@uidotdev/usehooks'
-import { useFeatureFlags, useParams } from 'common'
 import { Loader2, Search } from 'lucide-react'
-import { useState } from 'react'
 import { Checkbox, cn, Label } from 'ui'
 
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
-import { useDataTable } from '../providers/DataTableProvider'
-import {
-  columnFiltersToLogsFilters,
-  isLogsFilterColumnValue,
-  logsFiltersToUrlParams,
-} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
-import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { useUnifiedLogsPathnameOptions } from '@/components/interfaces/UnifiedLogs/useUnifiedLogsPathnameOptions'
 import { AlertError } from '@/components/ui/AlertError'
-import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 export function DataTableFilterCheckboxAsync<TData>({
   value: _value,
@@ -23,70 +14,18 @@ export function DataTableFilterCheckboxAsync<TData>({
   component: Component,
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
-  const [inputValue, setInputValue] = useState('')
-
-  const { table, searchParameters, columnFilters, filterFields, hasPendingFilterChange } =
-    useDataTable<TData, unknown, QuerySearchParamsType>()
-
-  // [Joshen] JFYI for simplicity currently, i'm adding UnifiedLogs logic into this file
-  // despite this supposedly being a reusable component - tbh really, this doesn't need to
-  // be reusable perhaps unless we plan for this to be used in another area of the dashboard
-  // but its too early to say for sure atm.
-  const { ref: projectRef } = useParams()
-  const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const debouncedSearch = useDebounce(inputValue, 700)
-  const filterableNames = new Set(
-    filterFields.filter((field) => field.type !== 'timerange').map((field) => String(field.value))
-  )
-  const dateValue = columnFilters.find((filter) => filter.id === 'date')?.value
-  const date =
-    Array.isArray(dateValue) &&
-    dateValue.length === 2 &&
-    dateValue.every((value) => value instanceof Date)
-      ? dateValue
-      : null
-  const scopedSearch = hasPendingFilterChange
-    ? {
-        ...searchParameters,
-        filter: logsFiltersToUrlParams(columnFiltersToLogsFilters(columnFilters, filterableNames)),
-        date,
-      }
-    : searchParameters
   const {
-    data: facetOptions,
+    column,
     error,
-    isPending,
+    filterOptions,
+    inputValue,
     isError,
-    isFetching: isFetchingFacetCount,
-  } = useUnifiedLogsFacetCountQuery(
-    {
-      projectRef,
-      search: scopedSearch,
-      facet: value,
-      facetSearch: debouncedSearch,
-    },
-    {
-      enabled: flagsLoaded,
-    }
-  )
-
-  const column = table.getColumn(value)
-  const filterValue = columnFilters.find((i) => i.id === value)?.value
-  const filters = isLogsFilterColumnValue(filterValue) ? filterValue.values : []
-  const visibleFacetOptions = inputValue === debouncedSearch ? (facetOptions ?? []) : []
-  const selectedOptions = filters.map(
-    (selected) =>
-      visibleFacetOptions.find((option) => option.value === selected) ??
-      options?.find((option) => option.value === selected) ?? {
-        label: selected,
-        value: selected,
-      }
-  )
-  const filterOptions = [
-    ...selectedOptions,
-    ...visibleFacetOptions.filter((option) => !filters.includes(option.value)),
-  ]
-  const isLoading = !flagsLoaded || isPending || inputValue !== debouncedSearch
+    isFetching,
+    isLoading,
+    projectRef,
+    selectedValues,
+    setInputValue,
+  } = useUnifiedLogsPathnameOptions(value, options)
 
   return (
     <div className="grid gap-2">
@@ -95,8 +34,9 @@ export function DataTableFilterCheckboxAsync<TData>({
         leading={<Search size={14} className="text-foreground-lighter" />}
         containerClassName="h-8 rounded-sm"
         value={inputValue}
-        trailing={isFetchingFacetCount ? <Loader2 size={12} className="animate-spin" /> : undefined}
+        trailing={isFetching ? <Loader2 size={12} className="animate-spin" /> : undefined}
         onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={onSearchInputEscape(inputValue, setInputValue)}
       />
 
       {isError && (
@@ -117,7 +57,7 @@ export function DataTableFilterCheckboxAsync<TData>({
           </div>
         ) : (
           filterOptions.map((option, index) => {
-            const checked = filters.includes(option.value)
+            const checked = selectedValues.includes(option.value)
 
             return (
               <div
@@ -132,8 +72,8 @@ export function DataTableFilterCheckboxAsync<TData>({
                   checked={checked}
                   onCheckedChange={(checked) => {
                     const newValues = checked
-                      ? [...filters, option.value]
-                      : filters.filter((value) => option.value !== value)
+                      ? [...selectedValues, option.value]
+                      : selectedValues.filter((value) => option.value !== value)
                     column?.setFilterValue(
                       newValues.length ? { operator: '=', values: newValues } : undefined
                     )
