@@ -187,3 +187,62 @@ describe('PipelineReviewSummary', () => {
     expect(screen.getAllByLabelText('Warning')).toHaveLength(2)
   })
 })
+
+test('never renders custom DuckLake catalog credentials on Review', () => {
+  const catalogUrl =
+    'postgresql://admin:private-password@catalog.example/db?password=another-secret'
+  const { container } = customRender(
+    <PipelineReviewSummary
+      type="DuckLake"
+      values={{ ...values, ducklakeMode: 'custom', ducklakeCatalogUrl: catalogUrl }}
+      onGoToStep={vi.fn()}
+    />
+  )
+  expect(screen.getByDisplayValue('Configured (credentials hidden)')).toBeInTheDocument()
+  expect(container.innerHTML).not.toContain('private-password')
+  expect(container.innerHTML).not.toContain('another-secret')
+})
+
+test('shows advanced settings and the consequences of recreating a slot', () => {
+  customRender(
+    <PipelineReviewSummary
+      type="BigQuery"
+      values={{
+        ...values,
+        maxFillMs: 500,
+        maxTableSyncWorkers: 8,
+        maxCopyConnectionsPerTable: 2,
+        invalidatedSlotBehavior: 'recreate',
+        connectionPoolSize: 6,
+        maxStalenessMins: 15,
+        tableOptions: [
+          { tableId: 101, partitionBy: { kind: 'ingestion_time' }, clusterBy: ['id'] },
+        ],
+      }}
+      onGoToStep={vi.fn()}
+    />
+  )
+  for (const value of ['500 milliseconds', '8', '2', '6', '15 minutes', 'Recreate slot']) {
+    expect(screen.getByDisplayValue(value)).toBeInTheDocument()
+  }
+  expect(
+    screen.getByText('Replaces destination tables and runs a new, billable initial sync.')
+  ).toBeInTheDocument()
+  expect(
+    screen.getByDisplayValue('Partition by ingestion time (day); Cluster by id')
+  ).toBeInTheDocument()
+})
+
+test.each([
+  {
+    type: 'Snowflake' as const,
+    fields: { snowflakeRole: 'PIPELINES_ROLE' },
+    expected: 'PIPELINES_ROLE',
+  },
+  { type: 'DuckLake' as const, fields: { ducklakePoolSize: 3 }, expected: '3' },
+])('shows $type connection overrides', ({ type, fields, expected }) => {
+  customRender(
+    <PipelineReviewSummary type={type} values={{ ...values, ...fields }} onGoToStep={vi.fn()} />
+  )
+  expect(screen.getByDisplayValue(expected)).toBeInTheDocument()
+})

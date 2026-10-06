@@ -420,10 +420,7 @@ export const CreatePipelineWizard = () => {
         }, 100)
       },
     })
-    if (!validationResult.canContinue) {
-      setVerifiedConnectionSignature(null)
-      return
-    }
+    if (!validationResult.canContinue) return
 
     const hasWarnings = validationResult.warnings.length > 0
     const warningsUnchanged =

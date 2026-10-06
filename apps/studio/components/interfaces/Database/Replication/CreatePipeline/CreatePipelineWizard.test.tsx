@@ -178,3 +178,119 @@ test('a disabled destination in the URL cannot bypass selection', async () => {
   expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
 })
+
+test.each(['data', 'connection'] as const)(
+  'keeps final %s validation failures on Review with an edit path',
+  async (failureStep) => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+          publications: [{ name: 'analytics' }],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        HttpResponse.json<components['schemas']['PublicationDetailsResponse_Output']>({
+          name: 'analytics',
+          config: {
+            type: 'all_tables',
+            operations: ['insert', 'update', 'delete', 'truncate'],
+            publish_via_partition_root: false,
+          },
+          tables: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 }),
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async ({ request }) => {
+        const body = await request.json()
+        const isFinalValidation = typeof body === 'object' && body !== null && 'source_id' in body
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures:
+            failureStep === 'connection' && isFinalValidation
+              ? [
+                  {
+                    name: 'Access revoked',
+                    reason: 'Restore destination access.',
+                    failure_type: 'critical',
+                  },
+                ]
+              : [],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/validate',
+      response: () =>
+        HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+          validation_failures:
+            failureStep === 'data'
+              ? [
+                  {
+                    name: 'Invalid publication',
+                    reason: 'Choose a different publication.',
+                    failure_type: 'critical',
+                  },
+                ]
+              : [],
+        }),
+    })
+    customRender(
+      <PipelineRequestStatusProvider>
+        <CreatePipelineWizard />
+      </PipelineRequestStatusProvider>,
+      { nuqs: { searchParams: '?destinationType=ClickHouse&step=connection', hasMemory: true } }
+    )
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Pipeline name' }), {
+      target: { value: 'Analytics' },
+    })
+    fireEvent.change(screen.getByRole('textbox', { name: 'HTTPS endpoint' }), {
+      target: { value: 'https://example.clickhouse.cloud:8443' },
+    })
+    fireEvent.change(screen.getByRole('textbox', { name: 'User' }), {
+      target: { value: 'default' },
+    })
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'password' } })
+    fireEvent.change(screen.getByRole('textbox', { name: 'Database' }), {
+      target: { value: 'analytics' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+    await screen.findByText('Ready to continue')
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await screen.findByRole('heading', { name: 'Choose what to replicate' })
+    fireEvent.click(screen.getAllByRole('combobox')[0])
+    fireEvent.click(await screen.findByRole('option', { name: 'analytics' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled())
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await screen.findByRole('heading', { name: 'Review and create' })
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await screen.findByText(failureStep === 'data' ? 'Invalid publication' : 'Access revoked')
+    expect(screen.getByRole('heading', { name: 'Review and create' })).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: `Edit ${failureStep}` })).toBeEnabled()
+    )
+    fireEvent.click(screen.getByRole('button', { name: `Edit ${failureStep}` }))
+    await screen.findByRole('heading', {
+      name: failureStep === 'data' ? 'Choose what to replicate' : 'Authorize the destination',
+    })
+    if (failureStep === 'data') {
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled())
+      fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+      expect(await screen.findByText('Ready to continue')).toBeInTheDocument()
+    }
+  }
+)

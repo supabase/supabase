@@ -5,6 +5,13 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationLogo } from '../DestinationLogo'
+import {
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
   BIGQUERY_DATASET_ID_FIELD_COPY,
@@ -33,6 +40,7 @@ import {
 } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { PipelineCreateStepId, PipelineDestinationType } from './CreatePipelineWizard.utils'
 import { PipelineCostEstimate } from './PipelineCostEstimate'
+import { describeBigQueryTableLayout } from './PipelineReviewSummary.utils'
 import {
   CONNECTION_VALIDATION_HINT,
   DATA_VALIDATION_HINT,
@@ -128,6 +136,63 @@ export const PipelineReviewSummary = ({
     })
   }
 
+  dataRows.push(
+    {
+      label: 'Table sync workers',
+      value: String(values.maxTableSyncWorkers ?? DEFAULT_MAX_TABLE_SYNC_WORKERS),
+    },
+    {
+      label: 'Initial sync connections per table',
+      value: String(values.maxCopyConnectionsPerTable ?? DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE),
+    },
+    {
+      label: 'Invalidated slot behavior',
+      value: values.invalidatedSlotBehavior === 'recreate' ? 'Recreate slot' : 'Block startup',
+      description:
+        values.invalidatedSlotBehavior === 'recreate'
+          ? 'Replaces destination tables and runs a new, billable initial sync.'
+          : 'Blocks startup for manual recovery.',
+    }
+  )
+
+  if (type === 'BigQuery') {
+    for (const option of values.tableOptions ?? []) {
+      const table = publicationTables.find(({ id }) => id === option.tableId)
+      dataRows.push({
+        label: `Table layout: ${table ? tableLabel(table) : `Table ${option.tableId}`}`,
+        value: describeBigQueryTableLayout(option),
+      })
+    }
+  }
+
+  const connectionRows: ReviewRow[] = [
+    { label: 'Batch wait time', value: `${values.maxFillMs ?? DEFAULT_MAX_FILL_MS} milliseconds` },
+  ]
+  if (type === 'BigQuery') {
+    connectionRows.push(
+      {
+        label: 'Connection pool size',
+        value: String(values.connectionPoolSize ?? DEFAULT_CONNECTION_POOL_SIZE),
+      },
+      {
+        label: 'Maximum staleness',
+        value:
+          typeof values.maxStalenessMins === 'number'
+            ? `${values.maxStalenessMins} minutes`
+            : 'Freshest results',
+      }
+    )
+  }
+  if (type === 'DuckLake') {
+    connectionRows.push({
+      label: 'Pool size',
+      value: String(values.ducklakePoolSize ?? DEFAULT_DUCKLAKE_POOL_SIZE),
+    })
+  }
+  if (type === 'Snowflake') {
+    connectionRows.push({ label: 'Role', value: values.snowflakeRole || 'Service user default' })
+  }
+
   const sections: ReviewSection[] = [
     {
       title: 'Destination',
@@ -155,6 +220,7 @@ export const PipelineReviewSummary = ({
           description: PIPELINE_NAME_FIELD_COPY.description,
         },
         ...getDestinationRows(type, values),
+        ...connectionRows,
         {
           label: 'Pipeline region',
           description: getPipelineRegionDescription(type),
@@ -280,7 +346,7 @@ const getDestinationRows = (
       return [
         {
           label: DUCKLAKE_CATALOG_URL_FIELD_COPY.label,
-          value: values.ducklakeCatalogUrl || '—',
+          value: values.ducklakeCatalogUrl ? 'Configured (credentials hidden)' : 'Not configured',
           description: DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription,
         },
         {
