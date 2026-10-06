@@ -12,7 +12,12 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
-const options = vi.hoisted(() => ({ legacy: false, hasAccess: true }))
+const options = vi.hoisted(() => ({
+  legacy: false,
+  hasAccess: true,
+  isLoading: false,
+  failEnable: false,
+}))
 vi.mock('./useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => !options.legacy,
   useIsETLIcebergPrivateAlpha: () => options.legacy,
@@ -21,7 +26,7 @@ vi.mock('./useIsETLPrivateAlpha', () => ({
   useIsETLClickHousePrivateAlpha: () => false,
 }))
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
-  useCheckEntitlements: () => ({ hasAccess: options.hasAccess }),
+  useCheckEntitlements: () => ({ hasAccess: options.hasAccess, isLoading: options.isLoading }),
 }))
 vi.mock('./DestinationPanel/DestinationPanel', () => ({
   DestinationPanel: () => {
@@ -34,6 +39,8 @@ beforeEach(() => {
   isEnabled = false
   options.legacy = false
   options.hasAccess = true
+  options.isLoading = false
+  options.failEnable = false
   mswServer.use(
     http.get('http://localhost:3000/api/enabled-features-overrides', () =>
       HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
@@ -77,6 +84,10 @@ beforeEach(() => {
     method: 'post',
     path: '/platform/replication/:ref/tenants-sources',
     response: () => {
+      if (options.failEnable) {
+        options.failEnable = false
+        return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
+      }
       isEnabled = true
       return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
         source_id: 42,
@@ -96,53 +107,37 @@ const renderList = async (waitForSources = true) => {
 }
 const addPipeline = () =>
   fireEvent.click(screen.getAllByRole('button', { name: 'Add pipeline' })[0])
-test.each([true, false])(
+test.each([true, false, 'retry'])(
   'opens creation after enabling when needed (enabled: %s)',
   async (enabled) => {
-    isEnabled = enabled
+    isEnabled = enabled === true
+    options.failEnable = enabled === 'retry'
     await renderList()
+    options.isLoading = enabled !== true
+    options.hasAccess = !options.isLoading
     addPipeline()
-    if (!enabled) {
+    if (enabled !== true) {
+      expect(screen.getByText('Checking Pipelines access…')).toBeInTheDocument()
+      expect(screen.queryByText('Pipelines requires the Pro plan.')).not.toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Enable Pipelines' })).toBeDisabled()
+      options.isLoading = false
+      options.hasAccess = true
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+      addPipeline()
       expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')
-      expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
       fireEvent.click(screen.getByRole('button', { name: 'Enable Pipelines' }))
+      if (enabled === 'retry') {
+        await waitFor(() => expect(options.failEnable).toBe(false))
+        await waitFor(() =>
+          expect(screen.getByRole('button', { name: 'Enable Pipelines' })).toBeEnabled()
+        )
+        expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+        fireEvent.click(screen.getByRole('button', { name: 'Enable Pipelines' }))
+      }
     }
-    expect(
-      await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
-    ).toBeInTheDocument()
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
   }
 )
-test('failed enablement keeps the modal open and can be retried', async () => {
-  let hasFailed = false
-  addAPIMock({
-    method: 'post',
-    path: '/platform/replication/:ref/tenants-sources',
-    response: () => {
-      if (!hasFailed) {
-        hasFailed = true
-        return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
-      }
-      isEnabled = true
-      return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
-        source_id: 42,
-        tenant_id: 'tenant',
-      })
-    },
-  })
-  await renderList()
-  addPipeline()
-  fireEvent.click(await screen.findByRole('button', { name: 'Enable Pipelines' }))
-  await waitFor(() => expect(hasFailed).toBe(true))
-  await waitFor(() =>
-    expect(screen.getByRole('button', { name: 'Enable Pipelines' })).toBeEnabled()
-  )
-  expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button', { name: 'Enable Pipelines' }))
-  expect(
-    await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
-  ).toBeInTheDocument()
-})
 test('dismissal during enablement prevents a late response opening creation', async () => {
   let finish: (() => void) | undefined
   addAPIMock({
@@ -178,9 +173,7 @@ test('Analytics Bucket keeps its existing creation path without ETL enablement',
   options.legacy = true
   await renderList()
   addPipeline()
-  expect(
-    await screen.findByRole('heading', { name: 'Creation sheet: Analytics Bucket' })
-  ).toBeInTheDocument()
+  await screen.findByRole('heading', { name: 'Creation sheet: Analytics Bucket' })
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })
 test.each(['loading', 'error'])('blocks creation when source status is %s', async (state) => {

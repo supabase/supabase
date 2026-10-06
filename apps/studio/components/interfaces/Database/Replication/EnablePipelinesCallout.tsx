@@ -37,7 +37,7 @@ export const EnablePipelinesModal = ({
   const setOpen = onOpenChange ?? _setOpen
   const hideTrigger = extOpen !== undefined && onOpenChange !== undefined
 
-  const { hasAccess } = useCheckEntitlements('replication.etl')
+  const { hasAccess, isLoading } = useCheckEntitlements('replication.etl')
 
   const { mutate: createTenantSource, isPending: creatingTenantSource } =
     useCreateTenantSourceMutation({
@@ -52,6 +52,7 @@ export const EnablePipelinesModal = ({
     })
 
   const onEnablePipelines = async () => {
+    if (isLoading || !hasAccess) return
     if (!projectRef) return console.error('Project ref is required')
     createTenantSource({ projectRef })
   }
@@ -84,15 +85,22 @@ export const EnablePipelinesModal = ({
               </p>
             </>
           ) : (
-            <p className="text-sm text-foreground-light">Pipelines requires the Pro plan.</p>
+            <p role="status" className="text-sm text-foreground-light">
+              {isLoading ? 'Checking Pipelines access…' : 'Pipelines requires the Pro plan.'}
+            </p>
           )}
         </DialogSection>
         <DialogFooter>
           <Button disabled={creatingTenantSource} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          {hasAccess ? (
-            <Button variant="primary" loading={creatingTenantSource} onClick={onEnablePipelines}>
+          {isLoading || hasAccess ? (
+            <Button
+              variant="primary"
+              loading={isLoading || creatingTenantSource}
+              disabled={isLoading}
+              onClick={onEnablePipelines}
+            >
               Enable Pipelines
             </Button>
           ) : (
