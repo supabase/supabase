@@ -238,7 +238,7 @@ export const RegionSelector = ({
               >
                 <FormControl>
                   <Select
-                    value={dbRegion}
+                    value={dbRegion ?? ''}
                     onValueChange={(value) => {
                       if (value === '') return
                       field.onChange(value)
