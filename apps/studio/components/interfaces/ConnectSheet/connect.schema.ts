@@ -85,6 +85,15 @@ const dotnetUnityInstallStep: StepDefinition = {
   content: 'dotnet/unity/install',
 }
 
+// ASP.NET Core also needs the dependency injection extension package, so it
+// gets its own install step instead of the shared single-package one.
+const dotnetAspnetInstallStep: StepDefinition = {
+  id: 'install',
+  title: 'Install packages',
+  description: 'Run these commands to install the required dependencies.',
+  content: 'dotnet/aspnetcore/install',
+}
+
 const frameworkNextJsFilesStep: StepDefinition = {
   id: 'configure-nextjs',
   title: 'Add files',
@@ -470,6 +479,7 @@ export const connectSchema: ConnectSchema = {
           remix: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
           dotnet: {
             frameworkVariant: {
+              aspnetcore: [dotnetAspnetInstallStep, frameworkConfigureStep, skillsInstallStep],
               unity: [dotnetUnityInstallStep, frameworkConfigureStep, skillsInstallStep],
               DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
             },

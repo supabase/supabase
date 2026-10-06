@@ -11,6 +11,7 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       name: 'SupabaseManager.cs',
       language: 'csharp',
       code: `
+using System.Threading.Tasks;
 using Supabase;
 using UnityEngine;
 
@@ -21,10 +22,14 @@ public class SupabaseManager : MonoBehaviour
     public static SupabaseManager Instance { get; private set; }
     public Client Supabase { get; private set; }
 
+    // Await this before using the client. Awake returns at the first await, so
+    // other scripts could run before InitializeAsync() finishes without it.
+    public Task InitializationTask { get; private set; }
+
     private const string Url = "${supabaseUrl}";
     private const string Key = "${supabaseKey}";
 
-    private async void Awake()
+    private void Awake()
     {
         if (Instance != null)
         {
@@ -34,13 +39,15 @@ public class SupabaseManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+        InitializationTask = InitializeAsync();
+    }
 
-        var options = new SupabaseOptions
+    private async Task InitializeAsync()
+    {
+        Supabase = new Client(Url, Key, new SupabaseOptions
         {
             AutoConnectRealtime = true
-        };
-
-        Supabase = new Client(Url, Key, options);
+        });
         await Supabase.InitializeAsync();
     }
 }
@@ -50,15 +57,24 @@ public class SupabaseManager : MonoBehaviour
       name: 'TodoList.cs',
       language: 'csharp',
       code: `
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class TodoList : MonoBehaviour
 {
-    private async void Start()
+    // Lifecycle hooks can't be awaited, so start the async work from a Task
+    // method rather than an "async void" Start, which would swallow exceptions.
+    private void Start()
     {
-        var supabase = SupabaseManager.Instance.Supabase;
+        _ = LoadTodosAsync();
+    }
 
-        var response = await supabase.From<Todo>().Get();
+    private async Task LoadTodosAsync()
+    {
+        var manager = SupabaseManager.Instance;
+        await manager.InitializationTask;
+
+        var response = await manager.Supabase.From<Todo>().Get();
         foreach (var todo in response.Models)
         {
             Debug.Log(todo.Name);

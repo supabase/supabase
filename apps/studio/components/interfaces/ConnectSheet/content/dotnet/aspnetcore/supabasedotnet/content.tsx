@@ -1,9 +1,6 @@
-import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
-
-const diPackageCommand = 'dotnet add package Supabase.Extensions.DependencyInjection'
 
 const ContentFile = ({ projectKeys }: StepContentProps) => {
   const supabaseUrl = projectKeys.apiUrl ?? 'your-project-url'
@@ -75,24 +72,7 @@ public class Todo : BaseModel
     },
   ]
 
-  return (
-    <div className="flex flex-col gap-y-4">
-      <div className="flex flex-col gap-y-2">
-        <p className="text-sm text-foreground-light">
-          Add the dependency injection extension on top of the Supabase client.
-        </p>
-        <CodeBlock
-          className="[&_code]:text-foreground"
-          value={diPackageCommand}
-          hideLineNumbers
-          language="bash"
-        >
-          {diPackageCommand}
-        </CodeBlock>
-      </div>
-      <MultipleCodeBlock files={files} />
-    </div>
-  )
+  return <MultipleCodeBlock files={files} />
 }
 
 // Used as a dynamic import

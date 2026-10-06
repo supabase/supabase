@@ -12,8 +12,6 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       language: 'csharp',
       code: `
 using Supabase;
-using Supabase.Postgrest.Attributes;
-using Supabase.Postgrest.Models;
 
 var url = "${supabaseUrl}";
 var key = "${supabaseKey}";
@@ -29,6 +27,14 @@ foreach (var todo in response.Models)
 {
     Console.WriteLine(todo.Name);
 }
+`,
+    },
+    {
+      name: 'Todo.cs',
+      language: 'csharp',
+      code: `
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
 
 [Table("todos")]
 public class Todo : BaseModel
