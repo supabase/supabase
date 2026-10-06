@@ -4,12 +4,13 @@ import { usePathname } from 'next/navigation'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import { OrganizationResourceBanner } from '../Organization/HeaderBanner'
-import { isLogsOrObservabilityPath } from './AppBannerWrapper.utils'
+import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBannerWrapper.utils'
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusBanner } from '@/components/layouts/AppLayout/StatusBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
+import { BannerTermsOfServiceUpdate } from '@/components/ui/BannerStack/Banners/BannerTermsOfServiceUpdate'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
@@ -29,6 +30,26 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const { addBanner, dismissBanner } = useBannerStack()
   const pathname = usePathname()
   const track = useTrack()
+
+  const [isTermsUpdateAcknowledged, , { isSuccess: isTermsDismissalLoaded }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE,
+    false
+  )
+
+  useEffect(() => {
+    if (!isTermsDismissalLoaded || pathname == null) return
+
+    if (IS_PLATFORM && isOrganizationLandingPath(pathname) && !isTermsUpdateAcknowledged) {
+      addBanner({
+        id: BANNER_ID.TERMS_OF_SERVICE_UPDATE,
+        isDismissed: false,
+        content: <BannerTermsOfServiceUpdate />,
+        priority: 0,
+      })
+    } else {
+      dismissBanner(BANNER_ID.TERMS_OF_SERVICE_UPDATE)
+    }
+  }, [pathname, isTermsDismissalLoaded, isTermsUpdateAcknowledged, addBanner, dismissBanner])
 
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)
