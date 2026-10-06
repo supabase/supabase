@@ -17,11 +17,6 @@ import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
 } from './DestinationForm.schema'
-import {
-  DUCKLAKE_MODE_CUSTOM,
-  DUCKLAKE_MODE_SUPABASE,
-  type DucklakeMode,
-} from './DuckLake/DuckLake.constants'
 import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
 import { type ReplicationDestinationByIdData } from '@/data/replication/destination-by-id-query'
@@ -35,8 +30,6 @@ import type {
   ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
-  DucklakeManualDestinationConfig,
-  DucklakeSupabaseDestinationConfig,
   IcebergDestinationConfig,
   SnowflakeDestinationConfig,
   TableSyncCopyConfig,
@@ -66,14 +59,12 @@ export const generateDefaultValues = ({
   pipelineData,
   catalogToken,
   region,
-  projectRef,
   editMode,
 }: {
   destinationData?: ReplicationDestinationByIdData
   pipelineData?: ReplicationPipelineByIdData
   catalogToken: string
   region?: string
-  projectRef?: string
   editMode: boolean
 }): DestinationPanelSchemaType => {
   const config = destinationData?.config
@@ -130,14 +121,8 @@ export const generateDefaultValues = ({
     s3AccessKeyId: '',
     s3SecretAccessKey: '',
     s3Region: region ?? icebergConfig?.s3_region ?? '',
-    // DuckLake fields
-    // New destinations default to the managed "Use Supabase" mode with the current project
-    // pre-selected as both catalog and storage. Existing destinations always read back as the
-    // resolved/custom shape, so edit mode is locked to "Custom parameters".
-    ducklakeMode: (editMode ? DUCKLAKE_MODE_CUSTOM : DUCKLAKE_MODE_SUPABASE) as DucklakeMode,
-    ducklakeCatalogProjectRef: editMode ? '' : (projectRef ?? ''),
-    ducklakeStorageProjectRef: editMode ? '' : (projectRef ?? ''),
-    ducklakeStorageBucket: '',
+    // DuckLake fields. Destination responses omit stored secrets; leave those blank on edit
+    // so submissions preserve existing values unless the user replaces them.
     ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
     ducklakeDataPath: ducklakeConfig?.data_path ?? '',
     ducklakePoolSize: ducklakeConfig?.pool_size ?? DEFAULT_DUCKLAKE_POOL_SIZE,
@@ -322,36 +307,22 @@ const buildClickHouseConfig = (
   engine: data.clickhouseEngine,
 })
 
-// Builds the studio-side DuckLake config from form data, picking the right shape for the
-// selected mode. The create / update / validate mutations convert this to the API payload.
+// Builds the studio-side DuckLake config from form data. The create / update / validate
+// mutations convert this to the API payload.
 const buildDucklakeConfig = (
   data: z.infer<typeof DestinationPanelFormSchema>
-): DucklakeDestinationConfig => {
-  if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
-    const supabaseConfig: DucklakeSupabaseDestinationConfig = {
-      catalogProjectRef: normalizeRequiredString(data.ducklakeCatalogProjectRef),
-      storageProjectRef: normalizeRequiredString(data.ducklakeStorageProjectRef),
-      bucket: normalizeRequiredString(data.ducklakeStorageBucket),
-      poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
-      metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-    }
-    return supabaseConfig
-  }
-
-  const manualConfig: DucklakeManualDestinationConfig = {
-    catalogUrl: data.ducklakeCatalogUrl ?? '',
-    dataPath: data.ducklakeDataPath ?? '',
-    poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
-    s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
-    s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
-    s3Region: normalizeRequiredString(data.ducklakeS3Region),
-    s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
-    s3UrlStyle: data.ducklakeS3UrlStyle,
-    s3UseSsl: data.ducklakeS3UseSsl,
-    metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
-  }
-  return manualConfig
-}
+): DucklakeDestinationConfig => ({
+  catalogUrl: data.ducklakeCatalogUrl ?? '',
+  dataPath: data.ducklakeDataPath ?? '',
+  poolSize: data.ducklakePoolSize === '' ? undefined : data.ducklakePoolSize,
+  s3AccessKeyId: normalizeRequiredString(data.ducklakeS3AccessKeyId),
+  s3SecretAccessKey: normalizeRequiredString(data.ducklakeS3SecretAccessKey),
+  s3Region: normalizeRequiredString(data.ducklakeS3Region),
+  s3Endpoint: normalizeRequiredString(data.ducklakeS3Endpoint),
+  s3UrlStyle: data.ducklakeS3UrlStyle,
+  s3UseSsl: data.ducklakeS3UseSsl,
+  metadataSchema: normalizeOptionalString(data.ducklakeMetadataSchema),
+})
 
 // Helper function to build destination config for validation
 export const buildDestinationConfigForValidation = ({

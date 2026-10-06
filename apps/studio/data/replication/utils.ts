@@ -3,8 +3,6 @@ import type {
   BigQueryTableOption,
   CompleteBigQueryPartitionBy,
   CreatePipelineApiConfig,
-  DucklakeDestinationConfig,
-  DucklakeSupabaseDestinationConfig,
   PipelineConfig,
 } from './types'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
@@ -44,12 +42,6 @@ export const checkReplicationFeatureFlagRetry = (
   }
 
   return false
-}
-
-export function isDucklakeSupabaseConfig(
-  config: DucklakeDestinationConfig
-): config is DucklakeSupabaseDestinationConfig {
-  return 'catalogProjectRef' in config
 }
 
 export const buildPipelineApiConfig = ({

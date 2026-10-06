@@ -1,5 +1,4 @@
 import { type DestinationPanelSchemaType } from '../DestinationForm.schema'
-import { DUCKLAKE_MODE_SUPABASE } from './DuckLake.constants'
 
 export type DucklakeApiConfig = {
   catalog_url?: string
@@ -14,7 +13,6 @@ export type DucklakeApiConfig = {
   metadata_schema?: string
 }
 
-// Fields entered when configuring DuckLake manually (always present in the validation data).
 const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeCatalogUrl',
   'ducklakeDataPath',
@@ -25,16 +23,7 @@ const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeMetadataSchema',
 ] as const
 
-// Fields entered only in "Use Supabase" mode (optional in the validation data).
-const DUCKLAKE_SUPABASE_FIELD_PATHS = [
-  'ducklakeCatalogProjectRef',
-  'ducklakeStorageProjectRef',
-  'ducklakeStorageBucket',
-] as const
-
-type DucklakeFieldPath =
-  | (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
-  | (typeof DUCKLAKE_SUPABASE_FIELD_PATHS)[number]
+type DucklakeFieldPath = (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
 
 export type DucklakeValidationIssue = {
   path: DucklakeFieldPath
@@ -44,23 +33,9 @@ export type DucklakeValidationIssue = {
 type DucklakeValidationData = Pick<
   DestinationPanelSchemaType,
   (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
-> &
-  Partial<
-    Pick<
-      DestinationPanelSchemaType,
-      'ducklakeMode' | (typeof DUCKLAKE_SUPABASE_FIELD_PATHS)[number]
-    >
-  >
+>
 
-// Required fields per mode. "Use Supabase" only needs project refs + a bucket; the catalog URL and
-// S3 credentials are resolved by the platform API.
-const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
-  { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-  { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
-  { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
-]
-
-const DUCKLAKE_CUSTOM_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
+const DUCKLAKE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
   { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required.' },
   { path: 'ducklakeDataPath', message: 'Data path is required.' },
   { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required.' },
@@ -69,7 +44,7 @@ const DUCKLAKE_CUSTOM_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
   { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required.' },
 ]
 
-const DUCKLAKE_CUSTOM_SECRET_FIELDS = new Set<DucklakeFieldPath>([
+const DUCKLAKE_SECRET_FIELDS = new Set<DucklakeFieldPath>([
   'ducklakeCatalogUrl',
   'ducklakeS3AccessKeyId',
   'ducklakeS3SecretAccessKey',
@@ -91,19 +66,9 @@ export const getDucklakeValidationIssues = (
   data: DucklakeValidationData,
   options: { secretsOptional?: boolean } = {}
 ): DucklakeValidationIssue[] => {
-  if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
-    const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_SUPABASE_REQUIRED_FIELDS)
-
-    if (data.ducklakeMetadataSchema && !METADATA_SCHEMA_PATTERN.test(data.ducklakeMetadataSchema)) {
-      issues.push(METADATA_SCHEMA_ISSUE)
-    }
-
-    return issues
-  }
-
   const requiredFields = options.secretsOptional
-    ? DUCKLAKE_CUSTOM_REQUIRED_FIELDS.filter(({ path }) => !DUCKLAKE_CUSTOM_SECRET_FIELDS.has(path))
-    : DUCKLAKE_CUSTOM_REQUIRED_FIELDS
+    ? DUCKLAKE_REQUIRED_FIELDS.filter(({ path }) => !DUCKLAKE_SECRET_FIELDS.has(path))
+    : DUCKLAKE_REQUIRED_FIELDS
   const issues = getMissingRequiredFieldIssues(data, requiredFields)
 
   if (

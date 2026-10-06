@@ -178,53 +178,7 @@ describe('buildBigQueryApiConfig', () => {
 })
 
 describe('buildDucklakeApiConfig', () => {
-  it('maps a "Use Supabase" config with catalog-level pool size + metadata schema', () => {
-    expect(
-      buildDucklakeApiConfig({
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
-        bucket: 'ducklake-data',
-        poolSize: 4,
-        metadataSchema: 'ducklake',
-      })
-    ).toEqual({
-      ducklake: {
-        catalog: {
-          type: 'supabase_project',
-          project_ref: 'catalog-ref',
-          pool_size: 4,
-          metadata_schema: 'ducklake',
-        },
-        storage: {
-          type: 'supabase_storage',
-          project_ref: 'storage-ref',
-          bucket: 'ducklake-data',
-        },
-      },
-    })
-  })
-
-  it('includes the optional path prefix when provided', () => {
-    const config = buildDucklakeApiConfig({
-      catalogProjectRef: 'catalog-ref',
-      storageProjectRef: 'storage-ref',
-      bucket: 'ducklake-data',
-      path: 'replication',
-    })
-
-    expect(config).toMatchObject({
-      ducklake: {
-        storage: {
-          type: 'supabase_storage',
-          project_ref: 'storage-ref',
-          bucket: 'ducklake-data',
-          path: 'replication',
-        },
-      },
-    })
-  })
-
-  it('maps a "Custom parameters" config to the flat snake_case payload', () => {
+  it('maps DuckLake config to the flat snake_case payload', () => {
     expect(
       buildDucklakeApiConfig({
         catalogUrl: 'postgres://user:pass@host:5432/catalog',
@@ -254,7 +208,7 @@ describe('buildDucklakeApiConfig', () => {
     })
   })
 
-  it('omits blank custom secret fields when requested', () => {
+  it('omits blank secret fields when requested', () => {
     expect(
       buildDucklakeUpdateApiConfig({
         catalogUrl: '  ',

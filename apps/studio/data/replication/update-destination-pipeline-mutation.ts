@@ -16,7 +16,6 @@ import {
   buildBigQueryTableOptionApiConfig,
   buildPipelineApiConfig,
   getConfiguredBigQueryTableOptions,
-  isDucklakeSupabaseConfig,
 } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -55,25 +54,6 @@ export function buildBigQueryUpdateApiConfig(
 export function buildDucklakeUpdateApiConfig(
   config: DucklakeDestinationConfig
 ): UpdateDucklakeApiConfig {
-  if (isDucklakeSupabaseConfig(config)) {
-    return {
-      ducklake: {
-        catalog: {
-          type: 'supabase_project',
-          project_ref: config.catalogProjectRef,
-          pool_size: config.poolSize,
-          metadata_schema: config.metadataSchema,
-        },
-        storage: {
-          type: 'supabase_storage',
-          project_ref: config.storageProjectRef,
-          bucket: config.bucket,
-          ...(config.path ? { path: config.path } : {}),
-        },
-      },
-    }
-  }
-
   return {
     ducklake: {
       catalog_url: optionalSecret(config.catalogUrl),

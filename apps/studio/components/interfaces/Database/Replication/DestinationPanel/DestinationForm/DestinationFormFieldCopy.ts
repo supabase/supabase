@@ -23,21 +23,6 @@ export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
   description: 'The namespace within the bucket where tables will be organized.',
 } as const
 
-export const DUCKLAKE_CATALOG_PROJECT_FIELD_COPY = {
-  label: 'Catalog project',
-  description: 'Postgres project that stores this DuckLake’s metadata.',
-} as const
-
-export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
-  label: 'Storage project',
-  description: 'Supabase project that stores the DuckLake data files.',
-} as const
-
-export const DUCKLAKE_BUCKET_FIELD_COPY = {
-  label: 'Bucket',
-  description: 'Files bucket for DuckLake data.',
-} as const
-
 export const DUCKLAKE_CATALOG_URL_FIELD_COPY = {
   label: 'Catalog URL',
   createDescription:

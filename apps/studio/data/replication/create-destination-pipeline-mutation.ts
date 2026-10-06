@@ -15,7 +15,6 @@ import {
   buildBigQueryTableOptionApiConfig,
   buildPipelineApiConfig,
   getConfiguredBigQueryTableOptions,
-  isDucklakeSupabaseConfig,
 } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -52,27 +51,6 @@ export function buildBigQueryApiConfig(config: BigQueryDestinationConfig): Creat
 // Maps the studio-side DuckLake config to the snake_case `{ ducklake: ... }` payload accepted
 // by the platform API. Shared by the create / update / validate mutations.
 export function buildDucklakeApiConfig(config: DucklakeDestinationConfig): CreateDucklakeApiConfig {
-  if (isDucklakeSupabaseConfig(config)) {
-    return {
-      ducklake: {
-        // pool_size / metadata_schema live on the catalog so they apply to the selected
-        // Supabase Postgres catalog (the API resolves catalog-level values over top-level).
-        catalog: {
-          type: 'supabase_project',
-          project_ref: config.catalogProjectRef,
-          pool_size: config.poolSize,
-          metadata_schema: config.metadataSchema,
-        },
-        storage: {
-          type: 'supabase_storage',
-          project_ref: config.storageProjectRef,
-          bucket: config.bucket,
-          ...(config.path ? { path: config.path } : {}),
-        },
-      },
-    }
-  }
-
   return {
     ducklake: {
       catalog_url: config.catalogUrl,
