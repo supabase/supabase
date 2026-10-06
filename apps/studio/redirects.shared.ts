@@ -318,11 +318,6 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
-    source: '/project/:ref/database/hooks',
-    destination: '/project/:ref/integrations/webhooks/overview',
-    permanent: true,
-  },
-  {
     source: '/project/:ref/database/wrappers',
     destination: '/project/:ref/integrations?category=wrapper',
     permanent: true,
