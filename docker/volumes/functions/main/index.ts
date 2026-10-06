@@ -2,6 +2,11 @@ import * as jose from 'jsr:@panva/jose@6'
 
 console.log('main function started')
 
+addEventListener('unhandledrejection', (ev) => {
+  ev.preventDefault()
+  console.error('unhandled promise rejection in main worker', ev.reason)
+})
+
 const MAX_WORKER_RETRIES = 3
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET')
@@ -46,6 +51,16 @@ function getFunctionErrorResponse({ code, message, status }: FunctionFailure): R
       },
     }
   )
+}
+
+function onError(e: unknown): Response {
+  const ref = crypto.randomUUID()
+  console.error(`unhandled error in request handler (ref: ${ref})`, e)
+  return getFunctionErrorResponse({
+    code: RequestErrors.BootError,
+    message: `Internal Server Error (ref: ${ref})`,
+    status: 503,
+  })
 }
 
 function handleWorkerResponse(response: Response): Response {
@@ -281,7 +296,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
   }
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve({ onError }, async (req: Request) => {
   if (req.method !== 'OPTIONS' && VERIFY_JWT) {
     try {
       const token = getAuthToken(req)
