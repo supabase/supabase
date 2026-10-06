@@ -21,6 +21,7 @@ import { useOAuthAppsAuthorizeDenyMutation } from '@/data/oauth-apps/oauth-apps-
 import { useOAuthAppsAuthorizeOrganizationProjectsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organization-projects-query'
 import { useOAuthAppsAuthorizeOrganizationsQuery } from '@/data/oauth-apps/oauth-apps-authorize-organizations-query'
 import { useOAuthOrgAppDetailsQuery } from '@/data/oauth-apps/oauth-apps-org-app-details-query'
+import { useOAuthAppsPreflightValidationQuery } from '@/data/oauth-apps/oauth-apps-preflight-validation-query'
 import type {
   OAuthAppsAuthorizeRedirect,
   OAuthAppsAuthorizeRequest,
@@ -116,6 +117,16 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const signOut = useSignOut()
 
+  const preflightQuery = useOAuthAppsPreflightValidationQuery(
+    {
+      appId: request.app_id,
+      slug: memberOrgQuery.data!,
+    },
+    {
+      enabled: !memberOrgQuery.isPending && !!memberOrgQuery.data,
+    }
+  )
+
   const approveMutation = useOAuthAppsAuthorizeApproveMutation({
     onSuccess: (data) => {
       if (isRoleValidationFailure(data)) {
@@ -154,7 +165,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  if (identityQuery.isPending || memberOrgQuery.isPending) {
+  if (identityQuery.isPending || memberOrgQuery.isPending || preflightQuery.isPending) {
     return null
   }
 
@@ -248,9 +259,16 @@ export const OAuthAppsAuthorizeScreen = ({
       description="This application wants to access your Supabase Account"
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
+        {preflightQuery.data?.status === 'error' && (
+          <Admonition
+            type="warning"
+            title={CONSENT_COPY.roleFailureAllProjects.title(request.name)}
+            description={CONSENT_COPY.roleFailureAllProjects.description(memberOrgQuery.data)}
+          />
+        )}
         {hasRoleFailure && (
           <Admonition
-            type="destructive"
+            type="warning"
             title={CONSENT_COPY.roleFailure.title(flaggedRefs.length)}
             description={CONSENT_COPY.roleFailure.description(request.name)}
           />

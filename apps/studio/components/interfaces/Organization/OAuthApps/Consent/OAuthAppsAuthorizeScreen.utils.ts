@@ -28,6 +28,11 @@ export const CONSENT_COPY = {
     description: (appName: string) =>
       `${appName} needs write access but your role is read-only on the projects highlighted. Deselect them to continue.`,
   },
+  roleFailureAllProjects: {
+    title: (appName: string) => `Couldn't authorize ${appName}`,
+    description: (orgName: string) =>
+      `Your Read-only role in ${orgName} can't grant write access. Ask an admin to change your role, or switch organization.`,
+  },
 } as const
 
 export function groupScopesByLevel(scopes: OAuthScope[]) {

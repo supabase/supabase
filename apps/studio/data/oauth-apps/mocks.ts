@@ -549,8 +549,9 @@ function evaluateGrantEligibility(
   organization: OAuthOrganizationRole
 ): OAuthAppsAuthorizePreflightResult {
   if (request.grant_kind === 'organization_bound') {
-    if (isOwnerOrAdmin(organization.default_role)) return { ok: true }
+    if (isOwnerOrAdmin(organization.default_role)) return { status: 'success' }
     return {
+      status: 'error',
       error_code: 'role_validation_failed',
       message: `Your ${organization.default_role.name} role cannot install this app for the organization.`,
       validation: { scope_target: 'organization', role: organization.default_role },
@@ -558,9 +559,11 @@ function evaluateGrantEligibility(
   }
 
   const failedScopes = request.scopes.filter(isWriteScope)
-  if (failedScopes.length === 0 || !isReadOnlyRole(organization.default_role)) return { ok: true }
+  if (failedScopes.length === 0 || !isReadOnlyRole(organization.default_role))
+    return { status: 'success' }
 
   return {
+    status: 'error',
     error_code: 'role_validation_failed',
     message: `Your ${organization.default_role.name} role cannot satisfy this app's scopes for all projects.`,
     validation: {
@@ -577,7 +580,7 @@ export function getMockOAuthAppsPreflightValidation(
 ): OAuthAppsAuthorizePreflightResult {
   const request = MOCK_APPS_BY_ID[appId]
   const organization = MOCK_ORGANIZATIONS_BY_SLUG[slug]
-  if (!request || !organization) return { ok: true }
+  if (!request || !organization) return { status: 'success' }
 
   return evaluateGrantEligibility(request, organization)
 }
@@ -607,6 +610,7 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   if (blocked.length === 0) return approved
 
   return {
+    status: 'error',
     error_code: 'role_validation_failed',
     message: `Your role is read-only on ${blocked.length} of the selected projects.`,
     validation: {
