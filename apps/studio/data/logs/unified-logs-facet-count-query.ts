@@ -100,13 +100,19 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
         }
       : search
   const facetScope = {
-    date: scopedSearch.date,
-    filter: scopedSearch.filter,
-    user: scopedSearch.user,
-    show_connection_logs: scopedSearch.show_connection_logs,
-    edge_auth: scopedSearch.edge_auth,
-    edge_storage: scopedSearch.edge_storage,
-    edge_postgrest: scopedSearch.edge_postgrest,
+    ...scopedSearch,
+    latency: null,
+    'timing.dns': null,
+    'timing.connection': null,
+    'timing.tls': null,
+    'timing.ttfb': null,
+    'timing.transfer': null,
+    sort: null,
+    size: 40,
+    start: 0,
+    direction: 'next' as const,
+    cursor: new Date(0),
+    id: null,
   }
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [
@@ -115,7 +121,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ],
     queryFn: ({ signal }) =>
       getUnifiedLogsFacetCount(
-        { projectRef, search: scopedSearch, facet, facetSearch, useOtel },
+        { projectRef, search: facetScope, facet, facetSearch, useOtel },
         signal
       ),
     enabled: enabled && typeof projectRef !== 'undefined',
