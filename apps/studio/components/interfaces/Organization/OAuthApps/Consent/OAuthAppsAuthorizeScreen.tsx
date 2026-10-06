@@ -15,6 +15,7 @@ import {
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { oauthAppsKeys } from '@/data/oauth-apps/keys'
 import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { useOAuthAppsAuthorizeApproveMutation } from '@/data/oauth-apps/oauth-apps-authorize-approve-mutation'
@@ -46,6 +47,146 @@ export interface OAuthAppsAuthorizeScreenProps {
   navigate: (destination: string) => void
 }
 
+const useMemberOrganization = ({
+  authId,
+  organizationSlug,
+  projectRef = null,
+  request,
+}: Omit<OAuthAppsAuthorizeScreenProps, 'navigate'>):
+  | { isPending: false; isError: true; error: Error; data: null }
+  | { isPending: true; isError: false; error: null; data: null }
+  | { isPending: false; isError: false; error: null; data: string } => {
+  const isProjectScopingModeEnabled = request.project_scoping_mode
+  const needsOrgResolution = isProjectScopingModeEnabled && !organizationSlug && projectRef !== null
+  const identityQuery = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
+
+  const resolveOrgFromProjectQuery = useQueries({
+    queries: (identityQuery.data?.organizations ?? []).map((organization) => ({
+      queryKey: oauthAppsKeys.authorizeOrganizationProjects(authId, organization.slug),
+      queryFn: () =>
+        getOAuthAppsAuthorizeOrganizationProjects({ id: authId, slug: organization.slug }),
+      enabled: USE_MOCKS && needsOrgResolution && identityQuery.isSuccess,
+    })),
+    combine: (queries) => {
+      // When combine is called, this cannot be null/undefined as it's a condition for the query to be enabled
+      // TS doesn't know though
+      if (!identityQuery.data) {
+        return {
+          isPending: true,
+          isError: false,
+        }
+      }
+
+      const owners = identityQuery.data.organizations.filter((_, index) =>
+        (queries[index].data ?? []).some((project) => project.ref === projectRef)
+      )
+      return {
+        isPending: queries.some((query) => query.isPending),
+        isError: queries.some((query) => query.isError),
+        error: queries.find((query) => !!query.error)?.error,
+        data: owners.length === 1 ? owners[0].slug : undefined,
+      }
+    },
+  })
+
+  if (identityQuery.isPending) {
+    return {
+      isPending: true,
+      isError: false,
+      data: null,
+      error: null,
+    }
+  }
+
+  if (identityQuery.isError) {
+    return {
+      isPending: false,
+      isError: true,
+      data: null,
+      error: identityQuery.error,
+    }
+  }
+
+  // An organization slug was provided
+  if (organizationSlug != null) {
+    const organization = identityQuery.data?.organizations.find(
+      (org) => org.slug === organizationSlug
+    )
+
+    if (organization) {
+      return {
+        isPending: false,
+        isError: false,
+        data: organization.slug,
+        error: null,
+      }
+    }
+
+    return {
+      isPending: false,
+      isError: true,
+      data: null,
+      error: new Error(`You are not part of organization ${organizationSlug}`),
+    }
+  }
+
+  // No organization slug was provided, nor a project ref, fallback to the first user org if available
+  if (!needsOrgResolution) {
+    if (identityQuery.data.organizations.length > 0) {
+      return {
+        isPending: false,
+        isError: false,
+        data: identityQuery.data?.organizations[0].slug,
+        error: null,
+      }
+    }
+
+    return {
+      isPending: false,
+      isError: true,
+      data: null,
+      error: new Error('No organizations found'),
+    }
+  }
+
+  // A project ref was provided and the authorization request is scoped to projects
+  if (resolveOrgFromProjectQuery.isPending) {
+    return {
+      isPending: true,
+      isError: false,
+      data: null,
+      error: null,
+    }
+  }
+
+  if (resolveOrgFromProjectQuery.isError) {
+    return {
+      isPending: false,
+      isError: true,
+      data: null,
+      error: resolveOrgFromProjectQuery.error!,
+    }
+  }
+
+  const orgSlug = resolveOrgFromProjectQuery.data ?? identityQuery.data?.organizations[0]?.slug
+  const memberOrg = identityQuery.data?.organizations.find((org) => org.slug === orgSlug)
+  if (!memberOrg) {
+    return {
+      isPending: false,
+      isError: true,
+      data: null,
+      error: new Error('No organizations found'),
+    }
+  }
+
+  return {
+    isPending: false,
+    isError: false,
+    data: memberOrg.slug,
+    error: null,
+  }
+}
+
 export const OAuthAppsAuthorizeScreen = ({
   authId,
   request,
@@ -56,7 +197,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const grantKind = request.grant_kind
   const isProjectScopingModeEnabled = request.project_scoping_mode
 
-  const { data: identity } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
+  const identityQuery = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
 
   const [selectedProjectRefs, setSelectedProjectRefs] = useState<string[]>([])
   const [allProjectsSelected, setAllProjectsSelected] = useState(false)
@@ -65,50 +206,40 @@ export const OAuthAppsAuthorizeScreen = ({
     null
   )
 
-  const needsOrgResolution =
-    isProjectScopingModeEnabled &&
-    !organizationSlug &&
-    projectRef !== null &&
-    (identity?.organizations.length ?? 0) > 1
-
-  const orgProjectsQueries = useQueries({
-    queries: (identity?.organizations ?? []).map((organization) => ({
-      queryKey: oauthAppsKeys.authorizeOrganizationProjects(authId, organization.slug),
-      queryFn: () =>
-        getOAuthAppsAuthorizeOrganizationProjects({ id: authId, slug: organization.slug }),
-      enabled: USE_MOCKS && needsOrgResolution,
-    })),
+  const memberOrgQuery = useMemberOrganization({
+    authId,
+    organizationSlug,
+    projectRef,
+    request,
   })
-  const orgResolutionSettled =
-    !needsOrgResolution || orgProjectsQueries.every((query) => query.isSuccess)
 
-  const resolvedOrgSlug = (() => {
-    if (!needsOrgResolution || !orgResolutionSettled || !identity) return undefined
+  const projectsQuery = useOAuthAppsAuthorizeOrganizationProjectsQuery(
+    {
+      id: authId,
+      slug: memberOrgQuery.data || '',
+    },
+    {
+      enabled: !memberOrgQuery.isPending && !!memberOrgQuery.data,
+    }
+  )
+  const appDetailsQuery = useOAuthOrgAppDetailsQuery(
+    {
+      slug: memberOrgQuery.data || '',
+      appId: request.app_id,
+    },
+    {
+      enabled: !memberOrgQuery.isPending && !!memberOrgQuery.data,
+    }
+  )
 
-    const owners = identity.organizations.filter((_, index) =>
-      (orgProjectsQueries[index].data ?? []).some((project) => project.ref === projectRef)
-    )
-    return owners.length === 1 ? owners[0].slug : undefined
-  })()
-
-  const orgSlug = organizationSlug ?? resolvedOrgSlug ?? identity?.organizations[0]?.slug
-  const memberOrg = identity?.organizations.find((org) => org.slug === orgSlug)
-
-  const { data: projects } = useOAuthAppsAuthorizeOrganizationProjectsQuery({
-    id: authId,
-    slug: orgSlug,
-  })
-  const { data: orgAppDetails } = useOAuthOrgAppDetailsQuery({
-    slug: orgSlug,
-    appId: request.app_id,
-  })
   const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !projects || !orgAppDetails || !orgResolutionSettled) return
+    if (seeded.current || !projectsQuery.data || !appDetailsQuery.data || !memberOrgQuery.data)
+      return
     seeded.current = true
     if (!isProjectScopingModeEnabled) return
 
-    const grant = orgAppDetails.existing_grant
+    const grant = appDetailsQuery.data.existing_grant
     const hasAllProjectsGrant = grant !== null && grant.project_refs.length === 0
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -118,10 +249,16 @@ export const OAuthAppsAuthorizeScreen = ({
     const refs = getPreselectedProjectRefs({
       existingGrant: grant,
       projectRef,
-      liveProjects: projects,
+      liveProjects: projectsQuery.data,
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [orgAppDetails, projects, orgResolutionSettled, isProjectScopingModeEnabled, projectRef])
+  }, [
+    appDetailsQuery.data,
+    projectsQuery.data,
+    memberOrgQuery.data,
+    isProjectScopingModeEnabled,
+    projectRef,
+  ])
 
   const signOut = useSignOut()
 
@@ -142,14 +279,12 @@ export const OAuthAppsAuthorizeScreen = ({
   })
 
   const isSubmitting = approveMutation.isPending
-  const hasProjects = (projects?.length ?? 0) > 0
-
-  if (!identity || !orgSlug || !memberOrg || !orgResolutionSettled || !orgAppDetails) return null
+  const hasProjects = (projectsQuery.data?.length ?? 0) > 0
 
   const isBlockedOnProjects = isProjectScopingModeEnabled && !hasProjects
   const canProceed = !isBlockedOnProjects
 
-  const grantedProjects = (projects ?? []).filter((project) =>
+  const grantedProjects = (projectsQuery.data ?? []).filter((project) =>
     selectedProjectRefs.includes(project.ref)
   )
 
@@ -169,6 +304,42 @@ export const OAuthAppsAuthorizeScreen = ({
     ? { project_refs: selectedProjectRefs }
     : {}
 
+  if (identityQuery.isPending || memberOrgQuery.isPending) {
+    return null
+  }
+
+  if (identityQuery.isError) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`${request.name} is connected`}
+        titleClassName="text-2xl"
+        description={`You can return to ${request.name} to continue`}
+      >
+        <AlertError
+          subject="An error occurred while loading your data"
+          error={identityQuery.error}
+        />
+      </InterstitialLayout>
+    )
+  }
+
+  if (memberOrgQuery.isError) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`${request.name} is connected`}
+        titleClassName="text-2xl"
+        description={`You can return to ${request.name} to continue`}
+      >
+        <AlertError
+          subject="We couldn't find the organization for this application authorization"
+          error={memberOrgQuery.error}
+        />
+      </InterstitialLayout>
+    )
+  }
+
   if (approveRedirect) {
     return (
       <InterstitialLayout
@@ -180,8 +351,8 @@ export const OAuthAppsAuthorizeScreen = ({
         <AuthorizeSuccessScreen
           appName={request.name}
           grant={{
-            email: identity.email,
-            organization_slug: memberOrg.slug,
+            email: identityQuery.data.email,
+            organization_slug: memberOrgQuery.data,
             project_refs: usesSelectedProjects ? selectedProjectRefs : null,
             projects: grantedProjects,
             scopes: request.scopes,
@@ -206,11 +377,11 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const handleApprove = () => {
     if (hasNoSelection) return
-    approveMutation.mutate({ auth_id: authId, slug: orgSlug, body: approveBody })
+    approveMutation.mutate({ auth_id: authId, slug: memberOrgQuery.data, body: approveBody })
   }
 
   const handleDeny = () => {
-    denyMutation.mutate({ auth_id: authId, slug: orgSlug })
+    denyMutation.mutate({ auth_id: authId, slug: memberOrgQuery.data })
   }
 
   const footerMessage = isSubmitting
@@ -236,8 +407,8 @@ export const OAuthAppsAuthorizeScreen = ({
 
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
-            email={identity.email}
-            organizationSlug={memberOrg.slug}
+            email={identityQuery.data.email}
+            organizationSlug={memberOrgQuery.data}
             onSignOut={handleSignOut}
             grantKind={grantKind}
           />
@@ -245,7 +416,7 @@ export const OAuthAppsAuthorizeScreen = ({
           {isBlockedOnProjects && (
             <NoProjectsNotice
               appName={request.name}
-              organizationSlug={orgSlug}
+              organizationSlug={memberOrgQuery.data}
               onSwitchOrg={handleSwitchOrg}
             />
           )}
@@ -253,7 +424,7 @@ export const OAuthAppsAuthorizeScreen = ({
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
-                projects={projects ?? []}
+                projects={projectsQuery.data ?? []}
                 selectedRefs={selectedProjectRefs}
                 onChange={setSelectedProjectRefs}
                 maxSelected={MAX_SELECTED_PROJECTS}
@@ -284,7 +455,10 @@ export const OAuthAppsAuthorizeScreen = ({
                 <Admonition
                   type="default"
                   title={CONSENT_COPY.coversEveryProject.title}
-                  description={CONSENT_COPY.coversEveryProject.description(request.name, orgSlug)}
+                  description={CONSENT_COPY.coversEveryProject.description(
+                    request.name,
+                    memberOrgQuery.data
+                  )}
                 />
               )}
 
