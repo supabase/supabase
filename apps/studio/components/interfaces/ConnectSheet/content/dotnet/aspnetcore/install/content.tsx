@@ -9,12 +9,7 @@ const command = [
 
 const InstallContent = () => {
   return (
-    <CodeBlock
-      className="[&_code]:text-foreground"
-      value={command}
-      hideLineNumbers
-      language="bash"
-    >
+    <CodeBlock className="[&_code]:text-foreground" value={command} hideLineNumbers language="bash">
       {command}
     </CodeBlock>
   )
