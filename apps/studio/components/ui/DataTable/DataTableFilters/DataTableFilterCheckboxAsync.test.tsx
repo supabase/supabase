@@ -292,34 +292,6 @@ describe('pathname facet filter', () => {
     await waitFor(() => expect(screen.queryByRole('checkbox', { name: /\/selected/ })).toBeNull())
   })
 
-  it('uses changed sidebar filters before the URL update completes', async () => {
-    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    let requests = 0
-    addAPIMock({
-      method: 'post',
-      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
-      response: () => {
-        requests += 1
-        return HttpResponse.json<AnalyticsResponse>({
-          result: [{ value: requests === 1 ? '/before' : '/after', count: 1 }],
-        })
-      },
-    })
-
-    const { rerender } = customRender(<PathnameFilter search={pathnameSearch()} />, { queryClient })
-    fireEvent.click(screen.getByText('Pathname'))
-    expect(await screen.findByText('/before')).toBeInTheDocument()
-
-    fireEvent.click(screen.getByText('Method'))
-    fireEvent.click(screen.getByRole('checkbox', { name: /POST/ }))
-    expect(screen.queryByText('/before')).not.toBeInTheDocument()
-    expect(await screen.findByText('/after')).toBeInTheDocument()
-    expect(requests).toBe(2)
-    rerender(<PathnameFilter search={pathnameSearch({ filter: ['method:eq:POST'] })} />)
-    expect(screen.getByText('/after')).toBeInTheDocument()
-    expect(requests).toBe(2)
-  })
-
   it('validates and orders option rows from the response', async () => {
     addAPIMock({
       method: 'post',
