@@ -1,4 +1,4 @@
-name: kb_troubleshooting_sync
+name: 'KB Troubleshooting Sync'
 
 on:
   push:
