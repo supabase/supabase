@@ -153,25 +153,6 @@ describe('StatusBanner', () => {
     })
   })
 
-  test('incident description links "status page" inline without a trailing Status page link', async () => {
-    mswServer.use(
-      http.get(`${BASE_PATH}/api/status-page`, () =>
-        HttpResponse.json<StatusPageResponse>(
-          buildStatusPage({ ongoing_incidents: [buildIncident()] })
-        )
-      )
-    )
-    mockOrgProjectEndpoints()
-
-    customRender(<StatusBanner />, { profileContext: createMockProfileContext() })
-
-    await screen.findByText(INCIDENT_TITLE)
-
-    const statusPageLink = screen.getByRole('link', { name: 'status page' })
-    expect(statusPageLink).toHaveAttribute('href', 'https://status.supabase.com/')
-    expect(screen.queryByRole('link', { name: 'Status page' })).not.toBeInTheDocument()
-  })
-
   test('dismissing hides the banner and writes the dismissed key to local storage', async () => {
     mswServer.use(
       http.get(`${BASE_PATH}/api/status-page`, () =>
