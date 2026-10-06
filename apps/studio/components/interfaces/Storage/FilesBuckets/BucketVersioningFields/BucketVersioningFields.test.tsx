@@ -6,12 +6,12 @@ import { Form } from 'ui'
 import { describe, expect, test } from 'vitest'
 import { z } from 'zod'
 
-import { BucketVersioningFields } from './BucketVersioningFields'
 import {
   bucketVersioningFormFields,
   superRefineBucketVersioning,
   type BucketVersioningFormValues,
-} from './BucketVersioningFields.schema'
+} from '../FilesBucket.schema'
+import { BucketVersioningFields } from './BucketVersioningFields'
 import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'

@@ -14,7 +14,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
+import type { BucketVersioningFormValues } from '../FilesBucket.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { AlertError } from '@/components/ui/AlertError'

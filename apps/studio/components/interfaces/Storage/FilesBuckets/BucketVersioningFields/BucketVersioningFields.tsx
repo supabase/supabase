@@ -4,7 +4,7 @@ import { Badge, DialogSection, DialogSectionSeparator, FormControl, FormField, S
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { type BucketVersioningFormValues } from './BucketVersioningFields.schema'
+import { type BucketVersioningFormValues } from '../FilesBucket.schema'
 import {
   getRetentionTightening,
   RETENTION_TIGHTENING_DESCRIPTION,

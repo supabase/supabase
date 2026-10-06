@@ -1,4 +1,4 @@
-import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
+import type { BucketVersioningFormValues } from '../FilesBucket.schema'
 import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import type { BucketLifecycle } from '@/data/storage/bucket-lifecycle-query'
 import type { BucketLifecycleRuleInput } from '@/data/storage/bucket-lifecycle-update-mutation'

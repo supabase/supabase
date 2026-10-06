@@ -1,4 +1,4 @@
-import type { BucketVersioningFormValues } from './BucketVersioningFields/BucketVersioningFields.schema'
+import type { BucketVersioningFormValues } from './FilesBucket.schema'
 import {
   PROJECT_VERSIONING_DEFAULTS,
   type BucketVersioningState,
