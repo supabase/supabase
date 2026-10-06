@@ -7,8 +7,8 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'
-import { MEMBERS_GRID_CLASS } from './MembersList.constants'
-import { getMemberRowHeight } from './TeamSettings.utils'
+import { MEMBERS_GRID_CLASS, type MfaFilter } from './MembersList.constants'
+import { getMemberRowHeight, matchesMfaFilter } from './TeamSettings.utils'
 import { TeamSettingsDataProvider } from './TeamSettingsDataContext'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 import { AlertError } from '@/components/ui/AlertError'
@@ -36,9 +36,10 @@ const getMemberKey = (member: OrganizationMember) =>
 
 export interface MembersViewProps {
   searchString: string
+  mfaFilter: MfaFilter
 }
 
-export const MembersView = ({ searchString }: MembersViewProps) => {
+export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
 
@@ -73,7 +74,7 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
   )
 
   const filteredMembers = useMemo(() => {
-    return !searchString
+    const searchedMembers = !searchString
       ? members
       : members.filter((member) => {
           if (member.invited_at) {
@@ -86,7 +87,9 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
           }
           return false
         })
-  }, [members, searchString])
+
+    return searchedMembers.filter((member) => matchesMfaFilter(member, mfaFilter))
+  }, [members, searchString, mfaFilter])
 
   const handleManageAccess = useCallback((member: OrganizationMember) => {
     setMemberForRoleUpdate(member)
@@ -128,7 +131,7 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
     [listedMembers]
   )
 
-  const isFiltering = searchString.length > 0
+  const isFiltering = searchString.length > 0 || mfaFilter !== 'all'
   const hasLimitedVisibility = isSuccessRoles && isSuccessMembers && !isOrgScopedRole
 
   return (
@@ -201,7 +204,9 @@ export const MembersView = ({ searchString }: MembersViewProps) => {
               <div className="flex items-center gap-x-3 p-4">
                 <AlertCircle size={16} strokeWidth={2} className="text-foreground-lighter" />
                 <p className="text-foreground-lighter text-sm">
-                  No members matched the search query "{searchString}"
+                  {searchString.length > 0
+                    ? `No members matched the search query "${searchString}"`
+                    : 'No members match the selected MFA filter'}
                 </p>
               </div>
             )}

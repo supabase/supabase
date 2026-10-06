@@ -1,7 +1,9 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Search } from 'lucide-react'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useState } from 'react'
+import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -15,15 +17,13 @@ import {
 import { PageSection } from 'ui-patterns/PageSection'
 
 import { InviteMemberButton } from './InviteMemberButton'
+import { MFA_FILTER_OPTIONS, type MfaFilter } from './MembersList.constants'
 import { MembersView } from './MembersView'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
-  ScaffoldContainer,
   ScaffoldFilterAndContent,
-  ScaffoldSection,
   ScaffoldSectionContent,
-  ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
@@ -33,6 +33,17 @@ import { DOCS_URL } from '@/lib/constants'
 export const TeamSettings = () => {
   const { slug } = useParams()
   const [searchString, setSearchString] = useState('')
+  const [mfaFilter, setMfaFilter] = useQueryState(
+    'mfa',
+    parseAsStringEnum<MfaFilter>(MFA_FILTER_OPTIONS.map((option) => option.value)).withDefault(
+      'all'
+    )
+  )
+
+  const mfaFilterLabel =
+    mfaFilter === 'all'
+      ? 'MFA status'
+      : MFA_FILTER_OPTIONS.find((option) => option.value === mfaFilter)?.label
 
   const debouncedSearch = useDebounce(searchString, 500)
 
@@ -58,16 +69,39 @@ export const TeamSettings = () => {
         <PageSection className="pt-4 last:pb-0">
           <ScaffoldFilterAndContent>
             <ScaffoldActionsContainer className="w-full flex-col md:flex-row gap-2 justify-between">
-              <Input
-                size="tiny"
-                autoComplete="off"
-                icon={<Search />}
-                value={searchString}
-                onChange={(e) => setSearchString(e.target.value)}
-                name="email"
-                id="email"
-                placeholder="Filter members"
-              />
+              <div className="flex items-center gap-x-2">
+                <Input
+                  size="tiny"
+                  autoComplete="off"
+                  icon={<Search />}
+                  value={searchString}
+                  onChange={(e) => setSearchString(e.target.value)}
+                  name="email"
+                  id="email"
+                  placeholder="Filter members"
+                />
+                <Select
+                  value={mfaFilter}
+                  onValueChange={(value) => setMfaFilter(value as MfaFilter)}
+                >
+                  <SelectTrigger
+                    size="tiny"
+                    aria-label="Filter by MFA status"
+                    className={cn('w-32 bg-transparent!', mfaFilter === 'all' && 'border-dashed')}
+                  >
+                    <SelectValue>{mfaFilterLabel}</SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {MFA_FILTER_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value} className="text-xs">
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
               <ScaffoldActionsGroup className="w-full md:w-auto">
                 <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
                 <InviteMemberButton />
@@ -85,6 +119,7 @@ export const TeamSettings = () => {
             <ScaffoldSectionContent className="w-full">
               <MembersView
                 searchString={searchString.length === 0 ? searchString : debouncedSearch}
+                mfaFilter={mfaFilter}
               />
             </ScaffoldSectionContent>
           </ScaffoldFilterAndContent>
