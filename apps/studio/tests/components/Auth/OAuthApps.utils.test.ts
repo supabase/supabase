@@ -26,6 +26,20 @@ const apps = [
     client_type: 'public',
   }),
   makeApp({ client_id: 'nameless-1', client_name: undefined, registration_type: 'dynamic' }),
+  // Share the "zeta" name with xyz-789 but differ on one criterion each, so the
+  // combined filter test fails if any single criterion is dropped.
+  makeApp({
+    client_id: 'zeta-manual-1',
+    client_name: 'Zeta Manual',
+    registration_type: 'manual',
+    client_type: 'public',
+  }),
+  makeApp({
+    client_id: 'zeta-confidential-1',
+    client_name: 'Zeta Confidential',
+    registration_type: 'dynamic',
+    client_type: 'confidential',
+  }),
 ]
 
 describe('filterOAuthApps', () => {
@@ -56,23 +70,23 @@ describe('filterOAuthApps', () => {
   it('filters by registration type', () => {
     expect(
       filterOAuthApps({ apps, registrationTypes: ['dynamic'] }).map((a) => a.client_id)
-    ).toEqual(['xyz-789', 'nameless-1'])
+    ).toEqual(['xyz-789', 'nameless-1', 'zeta-confidential-1'])
   })
 
   it('filters by client type', () => {
     expect(
       filterOAuthApps({ apps, clientTypes: ['confidential'] }).map((a) => a.client_id)
-    ).toEqual(['acme-123'])
+    ).toEqual(['acme-123', 'zeta-confidential-1'])
   })
 
-  it('applies search and type filters together', () => {
+  it('applies search, registration and client type filters together', () => {
     expect(
       filterOAuthApps({
         apps,
         searchString: 'zeta',
         registrationTypes: ['dynamic'],
-        clientTypes: ['confidential'],
-      })
-    ).toEqual([])
+        clientTypes: ['public'],
+      }).map((a) => a.client_id)
+    ).toEqual(['xyz-789'])
   })
 })
