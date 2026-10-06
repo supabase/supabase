@@ -6738,6 +6738,9 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -6803,6 +6806,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -7698,6 +7702,9 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -7763,6 +7770,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -10524,6 +10532,8 @@ export interface components {
       billing_email: string | null
       /** @enum {string|null} */
       billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      /** Format: date-time */
+      created_at: string
       has_oriole_project: boolean
       id: number
       integration_source: string | null
@@ -14313,6 +14323,9 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -14378,6 +14391,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
