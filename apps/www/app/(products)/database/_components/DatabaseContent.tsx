@@ -25,13 +25,6 @@ export function DatabaseContent({ apiSlot }: { apiSlot: React.ReactNode }) {
       <section id="highlights" className="border-t border-border" aria-label="Database highlights">
         <HighlightsSection />
       </section>
-      <section
-        id="multigres"
-        className="border-t border-border"
-        aria-label="Multigres private alpha"
-      >
-        <MultigresAlphaSection />
-      </section>
       <section id="table-editor" className="border-t border-border" aria-label="Table editor">
         <TableEditorSection />
       </section>
@@ -47,6 +40,13 @@ export function DatabaseContent({ apiSlot }: { apiSlot: React.ReactNode }) {
         aria-label="Built with Supabase"
       >
         <BuiltWithSupabaseSection />
+      </section>
+      <section
+        id="multigres"
+        className="border-t border-border"
+        aria-label="Multigres private alpha"
+      >
+        <MultigresAlphaSection />
       </section>
       <section id="get-started" className="border-t border-border" aria-label="Get started">
         <CTASection />
