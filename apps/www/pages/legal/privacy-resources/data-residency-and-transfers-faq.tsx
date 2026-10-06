@@ -4,20 +4,22 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import LegalDocVersions, { type LegalDocVersion } from '~/components/Legal/LegalDocVersions'
 import PageBreadcrumb from '~/components/Sections/PageBreadcrumb'
 import PageHeader from '~/components/Sections/PageHeader'
-import V1 from '~/data/legal/customer-resources/data-processing-addendum/v1.mdx'
+import V1 from '~/data/legal/privacy-resources/data-residency-and-transfers-faq/v1.mdx'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { NextSeo } from 'next-seo'
 
 const meta = {
-  title: 'Data Processing Addendum',
-  description: 'Supabase Data Processing Addendum',
+  title: 'Data Residency and Transfers FAQ | Supabase',
+  description:
+    'Answers to common questions about where Supabase hosts and processes your data, international data transfers, retention, and data subject rights.',
+  canonical: 'https://supabase.com/legal/privacy-resources/data-residency-and-transfers-faq',
 }
 
 const versions: LegalDocVersion[] = [
-  { id: 'v1', label: 'Version 1', effectiveDate: 'August 1, 2026', Component: V1 },
+  { id: 'v1', label: 'Version 1', effectiveDate: 'October 2026', Component: V1 },
 ]
 
-export default function DataProcessingAddendumPage() {
+export default function DataResidencyAndTransfersFaqPage() {
   return (
     <DefaultLayout>
       <NextSeo {...meta} />
@@ -30,7 +32,7 @@ export default function DataProcessingAddendumPage() {
             ]}
           />
         }
-        h1="Data Processing Addendum"
+        h1="Data Residency and Transfers FAQ"
       />
       <MDXProvider components={mdxComponents()}>
         <SectionContainer className="prose">
