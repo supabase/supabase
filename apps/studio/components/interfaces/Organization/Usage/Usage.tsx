@@ -49,8 +49,9 @@ export const Usage = () => {
   const isHighAvailability = resolveHighAvailability(selectedProject)
   const canLoadUsage = !selectedProjectRef || (!isLoadingSelectedProject && !isHighAvailability)
 
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
 
   const {
     data: subscription,

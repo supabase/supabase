@@ -35,7 +35,9 @@ export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
     ...options
   }: UseCustomQueryOptions<OrganizationTaxIdData, OrganizationTaxIdError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
 
   return useQuery<OrganizationTaxIdData, OrganizationTaxIdError, TData>({
     queryKey: organizationKeys.taxId(slug),

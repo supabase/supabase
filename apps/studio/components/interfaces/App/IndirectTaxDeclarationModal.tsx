@@ -39,8 +39,9 @@ export const IndirectTaxDeclarationModal = () => {
     setResponse('')
   }, [organization?.slug])
 
-  const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canUpdateBillingInfo, isSuccess: permissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
 
   const { mutate: updateCustomerProfile, isPending } = useOrganizationCustomerProfileUpdateMutation(
     {

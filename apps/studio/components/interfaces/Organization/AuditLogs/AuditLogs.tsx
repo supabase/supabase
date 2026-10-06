@@ -67,8 +67,9 @@ export const AuditLogs = () => {
     projects: [], // project_ref[]
   })
 
-  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.AUDIT_LOGS_READ)
+  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.AUDIT_LOGS_READ
+  )
 
   const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('security.audit_logs_days')

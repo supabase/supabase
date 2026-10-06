@@ -42,7 +42,9 @@ export const BillingCustomerData = () => {
 
   const { can: canReadBillingCustomerData, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
-  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canUpdateBillingCustomerData } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
 
   const { ref, inView } = useInView({ triggerOnce: true })
 

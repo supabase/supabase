@@ -23,8 +23,9 @@ export const SOC2 = () => {
   const slug = organization?.slug
 
   const track = useTrack()
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
   const { hasAccess: hasAccessToSoc2Report, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('security.soc2_report')
 

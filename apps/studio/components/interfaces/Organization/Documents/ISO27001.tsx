@@ -23,8 +23,9 @@ export const ISO27001 = () => {
   const slug = organization?.slug
 
   const track = useTrack()
-  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadSubscriptions, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
   const { hasAccess: hasAccessToISO27001, isLoading: isLoadingEntitlement } = useCheckEntitlements(
     'security.iso27001_certificate'
   )

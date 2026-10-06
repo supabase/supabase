@@ -34,8 +34,9 @@ export const CostControl = () => {
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
 
   const {
     data: subscription,
@@ -119,8 +120,9 @@ export const CostControl = () => {
                       <Admonition
                         type="default"
                         layout="horizontal"
-                        title={`You will be charged for any additional usage on the ${currentPlan?.name || ''
-                          } plan`}
+                        title={`You will be charged for any additional usage on the ${
+                          currentPlan?.name || ''
+                        } plan`}
                         description={
                           <>
                             {currentPlan?.name || ''} plan requires you to have spend cap off at all
@@ -152,10 +154,12 @@ export const CostControl = () => {
                           height={96}
                           src={
                             isUsageBillingEnabled
-                              ? `${BASE_PATH}/img/spend-cap-off${resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
-                              : `${BASE_PATH}/img/spend-cap-on${resolvedTheme?.includes('dark') ? '' : '--light'
-                              }.png`
+                              ? `${BASE_PATH}/img/spend-cap-off${
+                                  resolvedTheme?.includes('dark') ? '' : '--light'
+                                }.png`
+                              : `${BASE_PATH}/img/spend-cap-on${
+                                  resolvedTheme?.includes('dark') ? '' : '--light'
+                                }.png`
                           }
                         />
                       </div>

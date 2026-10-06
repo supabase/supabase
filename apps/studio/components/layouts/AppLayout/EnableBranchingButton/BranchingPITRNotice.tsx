@@ -11,7 +11,9 @@ export const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
 
   return (
     <div className="flex flex-row gap-4">

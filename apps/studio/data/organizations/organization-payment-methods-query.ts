@@ -47,7 +47,9 @@ export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMe
     TData
   > = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
   return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>({
     queryKey: organizationKeys.paymentMethods(slug),
     queryFn: ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),

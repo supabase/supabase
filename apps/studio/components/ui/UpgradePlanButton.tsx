@@ -53,9 +53,12 @@ export const UpgradePlanButton = ({
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE, {
-    organizationSlug: slug,
-  })
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
+    {
+      organizationSlug: slug,
+    }
+  )
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`
   const message = `Name: ${organization?.name}\nSlug: ${slug}\nRequested plan: ${plan ?? PLAN_REQUEST_EMPTY_PLACEHOLDER}`

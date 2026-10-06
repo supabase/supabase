@@ -35,7 +35,9 @@ export const useOrgBalanceQuery = <TData = OrgBalanceData>(
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const { can: canReadBalance } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadBalance } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
 
   return useQuery<OrgBalanceData, OrgBalanceError, TData>({
     queryKey: subscriptionKeys.orgBalance(orgSlug),

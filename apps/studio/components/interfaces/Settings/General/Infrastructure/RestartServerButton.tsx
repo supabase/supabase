@@ -44,7 +44,9 @@ export const RestartServerButton = () => {
   const projectRegion = project?.region ?? ''
 
   const projectRestartDisabled = useFlag('disableProjectRestarts')
-  const { can: canRestartProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE)
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE
+  )
 
   const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
     onSuccess: () => {

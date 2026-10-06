@@ -122,7 +122,9 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isAwsManaged = selectedOrganization?.managed_by === MANAGED_BY.AWS_MARKETPLACE
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: slug,

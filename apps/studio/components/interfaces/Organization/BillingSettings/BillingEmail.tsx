@@ -37,9 +37,12 @@ const formSchema = z.object({
 const BillingEmail = () => {
   const { slug } = useParams()
 
-  const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
-  const { can: canUpdateBillingData } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canReadBillingEmail, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
+  const { can: canUpdateBillingData } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
 
   const { ref, inView } = useInView({ triggerOnce: true })
 

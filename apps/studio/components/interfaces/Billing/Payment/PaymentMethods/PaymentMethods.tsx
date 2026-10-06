@@ -48,9 +48,12 @@ const PaymentMethods = () => {
     isSuccess,
   } = useOrganizationPaymentMethodsQuery({ slug }, { enabled: inView })
 
-  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
-  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
   )

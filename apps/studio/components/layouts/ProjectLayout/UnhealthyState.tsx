@@ -19,7 +19,9 @@ export const UnhealthyState = () => {
   const { setProjectStatus } = useSetProjectStatus()
   const [showConfirm, setShowConfirm] = useState(false)
 
-  const { can: canRestartProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE)
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE
+  )
 
   useProjectDetailQuery(
     { ref },

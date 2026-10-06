@@ -27,7 +27,9 @@ export const useOrgPlansQuery = <TData = OrgPlansData>(
   { orgSlug }: OrgPlansVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
 ) => {
-  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ)
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
+  )
 
   return useQuery<OrgPlansData, OrgPlansError, TData>({
     queryKey: subscriptionKeys.orgPlans(orgSlug),

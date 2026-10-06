@@ -135,7 +135,9 @@ export const PlanUpdateSidePanel = () => {
     []
   )
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE)
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
+  )
 
   const snap = useOrgSettingsPageStateSnapshot()
   const isOpenedViaUrl = router.query.panel === 'subscriptionPlan'

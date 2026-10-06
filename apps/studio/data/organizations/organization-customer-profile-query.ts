@@ -47,9 +47,12 @@ export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomer
 ) => {
   // [Joshen] Thinking it makes sense to add this check at the RQ level - prevent
   // unnecessary requests, although this behaviour still needs handling on the UI
-  const { can: canReadCustomerProfile } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.BILLING_READ, {
-    organizationSlug: slug,
-  })
+  const { can: canReadCustomerProfile } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ,
+    {
+      organizationSlug: slug,
+    }
+  )
 
   return useQuery<OrganizationCustomerProfileData, OrganizationCustomerProfileError, TData>({
     queryKey: organizationKeys.customerProfile(slug),

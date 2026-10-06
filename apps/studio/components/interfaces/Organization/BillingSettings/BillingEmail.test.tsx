@@ -8,9 +8,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import BillingEmail from './BillingEmail'
 import { organizationKeys } from '@/data/organizations/keys'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
-import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 
 type CustomerResponse = components['schemas']['CustomerResponse_Output']
 
