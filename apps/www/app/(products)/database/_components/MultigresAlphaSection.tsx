@@ -1,5 +1,5 @@
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { FormSection } from 'marketing'
+import { MarketingForm } from 'marketing/forms'
 
 import { getGoPageBySlug } from '@/lib/go'
 
@@ -13,24 +13,32 @@ function getMultigresAlphaPage() {
     throw new Error(`Go page form "${GO_PAGE_SLUG}#${FORM_ID}" not found`)
   }
 
-  const { crm: _crm, ...clientForm } = form
-  return { hero: page.hero, form: clientForm }
+  return { hero: page.hero, form }
 }
 
 export function MultigresAlphaSection() {
   const { hero, form } = getMultigresAlphaPage()
 
   return (
-    <SectionContainerWithCn spacing="sections">
-      <div className="flex flex-col gap-4 max-w-xl">
-        <h3 className="text-2xl md:text-4xl text-foreground-lighter">
-          {hero.subtitle}
-          <br />
-          <span className="text-foreground">{hero.title}</span>
-        </h3>
-        <p className="text-foreground-lighter">{hero.description}</p>
+    <SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+        <div className="flex flex-col gap-4">
+          <h3 className="text-2xl md:text-4xl text-foreground-lighter">
+            {hero.subtitle}
+            <br />
+            <span className="text-foreground">{hero.title}</span>
+          </h3>
+          <p className="text-foreground-light">{hero.description}</p>
+          <p className="text-foreground-lighter text-sm">{form.description}</p>
+        </div>
+        <MarketingForm
+          fields={form.fields}
+          submitLabel={form.submitLabel}
+          disclaimer={form.disclaimer}
+          successRedirect={form.successRedirect}
+          formRef={{ slug: GO_PAGE_SLUG, formId: FORM_ID }}
+        />
       </div>
-      <FormSection section={form} slug={GO_PAGE_SLUG} />
     </SectionContainerWithCn>
   )
 }
