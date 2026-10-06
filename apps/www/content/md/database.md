@@ -24,6 +24,7 @@ You do not need any other Supabase product to use the database. Auth, Storage, R
 - **40+ extensions**: enable Postgres extensions with a single click (pgvector, PostGIS, pg_cron, pg_stat_statements, and more)
 - **Database Branching**: create isolated database branches synced with git branches, with Vercel Preview support
 - **Read Replicas**: distribute read traffic across replicas in multiple regions for lower latency and higher throughput
+- **Multigres (private alpha)**: multi-node high availability for Postgres, built by the team behind Vitess. Request access: https://supabase.com/go/multigres-early-access
 - **Realtime**: subscribe to INSERT, UPDATE, DELETE, and other changes via WebSockets
 - **Database Webhooks**: trigger Edge Functions or external HTTP endpoints on table events
 - **Supabase Pipelines**: move published Postgres data to supported analytical destinations in near real time
