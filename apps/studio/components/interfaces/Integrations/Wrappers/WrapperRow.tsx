@@ -13,10 +13,9 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 
 interface WrapperRowProps {
   wrapper: FDW
-  isShared: boolean
 }
 
-export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
+export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const { ref, id } = useParams()
   const { can: canManageWrappers } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
@@ -38,47 +37,15 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
   )
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
-  const canEdit = canManageWrappers && !isShared
 
-  let editTooltip = 'Edit wrapper'
-  if (!canManageWrappers) editTooltip = 'You need additional permissions to edit wrappers'
-  else if (isShared) editTooltip = 'Shared wrappers cannot be edited in the dashboard'
+  const editTooltip = canManageWrappers
+    ? 'Edit wrapper'
+    : 'You need additional permissions to edit wrappers'
 
   return (
     <TableRow>
       <TableCell className="gap-2 align-top py-3! min-w-80">
-        {wrapper.name}
-        <p className="text-sm text-foreground-light">
-          Connection: <code className="text-code-inline">{wrapper.server_name}</code>
-        </p>
-        {isShared && (
-          <p className="text-sm text-foreground-light">
-            This wrapper is shared. To edit this connection, use <code>ALTER SERVER</code> on{' '}
-            <code className="text-code-inline">{wrapper.server_name}</code> or{' '}
-            <code>ALTER FOREIGN TABLE</code> in the{' '}
-            <Link
-              href={`/project/${ref}/sql/new?skip=true`}
-              className="underline underline-offset-2"
-            >
-              SQL Editor
-            </Link>
-            .
-            {encryptedMetadata.length > 0 && (
-              <>
-                {' '}
-                Edit this server&apos;s credentials in{' '}
-                <Link
-                  href={`/project/${ref}/integrations/vault/secrets`}
-                  className="underline underline-offset-2"
-                >
-                  Vault
-                </Link>
-                . Changes to a secret used by other connections affect them too.
-              </>
-            )}
-          </p>
-        )}
-
+        <p className="text-sm">{wrapper.server_name}</p>
         {visibleMetadata.map((metadata) => (
           <div
             key={metadata.name}
@@ -94,11 +61,16 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
 
       <TableCell className="space-y-2 p-4!">
         {_tables?.map((table) => {
-          const target = table.table ?? table.object ?? table.src_key
+          const target =
+            (table.table as string | undefined) ??
+            (table.object as string | undefined) ??
+            (table.src_key as string | undefined) ??
+            table.table_name
+          const tableId = table.id as string
 
           return (
-            <div key={table.id} className="flex items-center">
-              <Badge className="bg-surface-300 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
+            <div key={tableId} className="flex items-center">
+              <Badge className="bg-surface-300 gap-2 font-mono text-xs tracking-tight h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
                 </div>
@@ -114,8 +86,8 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
                 <ChevronRight size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
               </Badge>
 
-              <Link href={`/project/${ref}/editor/${table.id}`}>
-                <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-[0.75rem] border-l-0">
+              <Link href={`/project/${ref}/editor/${tableId}`}>
+                <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-xs tracking-tight border-l-0">
                   <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                   <Tooltip>
                     <TooltipTrigger className="truncate max-w-28">
@@ -138,17 +110,13 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
         {encryptedMetadata.map((metadata) => (
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
-              href={`/project/${ref}/integrations/vault/secrets?search=${encodeURIComponent(
-                `${wrapper.name}_${metadata.name}`
+              href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
+                serverOptions[metadata.name] ?? ''
               )}`}
-              className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
+              className="transition text-foreground-light hover:text-foreground flex items-center gap-x-2"
             >
-              <span className="truncate" title={metadata.label}>
-                {metadata.label}
-              </span>
-              <div>
-                <ExternalLink size={12} strokeWidth={1.5} className="text-foreground-lighter" />
-              </div>
+              <span title={`View ${metadata.label} in Vault`}>{metadata.label}</span>
+              <ExternalLink size={14} strokeWidth={1.5} />
             </Link>
           </div>
         ))}
@@ -156,7 +124,7 @@ export const WrapperRow = ({ wrapper, isShared }: WrapperRowProps) => {
       <TableCell className="flex-nowrap">
         <div className="flex items-center gap-x-2">
           <ButtonTooltip
-            disabled={!canEdit}
+            disabled={!canManageWrappers}
             icon={<Edit strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToEdit(wrapper.id.toString())}

@@ -11,9 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
 import {
   BranchManagementSection,
   BranchRow,
@@ -248,14 +251,22 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                 // whether the branch is linked to a GitHub PR.
                                 branch.review_requested_at && (
                                   <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button
-                                        variant="text"
-                                        icon={<MoreVertical />}
-                                        className="px-1"
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                    </DropdownMenuTrigger>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            aria-label="Manage merge request"
+                                            variant="text"
+                                            className="px-1"
+                                            icon={<MoreVertical />}
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </DropdownMenuTrigger>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="bottom">
+                                        Manage merge request
+                                      </TooltipContent>
+                                    </Tooltip>
                                     <DropdownMenuContent className="w-56" side="bottom" align="end">
                                       <Tooltip>
                                         <DropdownMenuItem
@@ -367,11 +378,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
             variant="text"
             icon={<MessageCircle className="text-muted" strokeWidth={1} />}
           >
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://github.com/orgs/supabase/discussions/18937"
-            >
+            <a target="_blank" rel="noreferrer" href={BRANCHING_GITHUB_DISCUSSION_LINK}>
               Branching feedback
             </a>
           </Button>

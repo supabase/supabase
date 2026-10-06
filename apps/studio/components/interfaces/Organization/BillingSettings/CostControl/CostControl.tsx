@@ -8,7 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
-import SpendCapSidePanel from './SpendCapSidePanel'
+import { SpendCapSidePanel } from './SpendCapSidePanel'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -26,18 +26,17 @@ import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
-export interface CostControlProps {}
-
-const CostControl = ({}: CostControlProps) => {
+export const CostControl = () => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
+  const snap = useOrgSettingsPageStateSnapshot()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } =
     useAsyncCheckPermissionsV2('billing_read')
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const {
     data: subscription,
     error,
@@ -120,9 +119,8 @@ const CostControl = ({}: CostControlProps) => {
                       <Admonition
                         type="default"
                         layout="horizontal"
-                        title={`You will be charged for any additional usage on the ${
-                          currentPlan?.name || ''
-                        } plan`}
+                        title={`You will be charged for any additional usage on the ${currentPlan?.name || ''
+                          } plan`}
                         description={
                           <>
                             {currentPlan?.name || ''} plan requires you to have spend cap off at all
@@ -154,12 +152,10 @@ const CostControl = ({}: CostControlProps) => {
                           height={96}
                           src={
                             isUsageBillingEnabled
-                              ? `${BASE_PATH}/img/spend-cap-off${
-                                  resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png`
-                              : `${BASE_PATH}/img/spend-cap-on${
-                                  resolvedTheme?.includes('dark') ? '' : '--light'
-                                }.png`
+                              ? `${BASE_PATH}/img/spend-cap-off${resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.png`
+                              : `${BASE_PATH}/img/spend-cap-on${resolvedTheme?.includes('dark') ? '' : '--light'
+                              }.png`
                           }
                         />
                       </div>
@@ -200,5 +196,3 @@ const CostControl = ({}: CostControlProps) => {
     </>
   )
 }
-
-export default CostControl

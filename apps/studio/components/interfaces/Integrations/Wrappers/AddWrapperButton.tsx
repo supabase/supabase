@@ -1,3 +1,5 @@
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useMemo } from 'react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -9,10 +11,10 @@ const WRAPPER_REQUIRED_EXTENSION_NAMES = ['wrappers', 'supabase_vault']
 
 interface AddWrapperButtonProps {
   variant?: 'default' | 'primary' | 'outline'
-  onClick: () => void
 }
 
-export const AddWrapperButton = ({ variant = 'default', onClick }: AddWrapperButtonProps) => {
+export const AddWrapperButton = ({ variant = 'default' }: AddWrapperButtonProps) => {
+  const { ref, id } = useParams()
   const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
@@ -31,20 +33,27 @@ export const AddWrapperButton = ({ variant = 'default', onClick }: AddWrapperBut
     [extensions]
   )
 
+  const label = needsExtensions ? 'Install wrapper' : 'Add new wrapper'
+
   return (
     <ButtonTooltip
+      asChild={canCreateWrapper}
       variant={variant}
-      onClick={onClick}
       disabled={!canCreateWrapper}
       tooltip={{
         content: {
+          side: 'bottom',
           text: !canCreateWrapper
             ? 'You need additional permissions to create a foreign data wrapper'
             : undefined,
         },
       }}
     >
-      {needsExtensions ? 'Install wrapper' : 'Add new wrapper'}
+      {canCreateWrapper ? (
+        <Link href={`/project/${ref}/integrations/${id}/wrappers?new=true`}>{label}</Link>
+      ) : (
+        label
+      )}
     </ButtonTooltip>
   )
 }

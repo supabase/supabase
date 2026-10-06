@@ -66,7 +66,8 @@ export const SecretsManagement = () => {
         ? allSecrets.filter(
             (secret) =>
               (secret?.name ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
-              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
+              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
+              (secret?.key_id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
           )
         : allSecrets
 
