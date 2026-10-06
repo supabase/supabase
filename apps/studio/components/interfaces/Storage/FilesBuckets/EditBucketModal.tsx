@@ -524,6 +524,7 @@ export const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalPro
 
               {isStorageVersioningEnabled && (
                 <BucketVersioningFields
+                  form={form}
                   initialVersioningState={versioningSettings.versioning}
                   initialRetentionDays={versioningSettings.versionExpiryDays}
                   initialMaxVersions={versioningSettings.maxNoncurrentVersions}

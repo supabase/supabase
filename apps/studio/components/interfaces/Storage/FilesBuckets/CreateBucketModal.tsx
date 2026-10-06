@@ -379,7 +379,7 @@ export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps
             </DialogSection>
 
             {isStorageVersioningEnabled && (
-              <BucketVersioningFields isPublicBucket={isPublicBucket} />
+              <BucketVersioningFields form={form} isPublicBucket={isPublicBucket} />
             )}
           </form>
         </Form>

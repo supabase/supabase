@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AnimatePresence } from 'framer-motion'
 import { useEffect, useRef } from 'react'
-import { useFormContext, type Control } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -14,7 +14,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { BucketVersioningFormValues } from '../FilesBucket.schema'
+import type { BucketFormValues } from '../FilesBucket.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { AlertError } from '@/components/ui/AlertError'
@@ -33,7 +33,7 @@ const SectionHeading = () => (
 )
 
 interface LifecyclePolicySectionProps {
-  control: Control<BucketVersioningFormValues>
+  form: UseFormReturn<BucketFormValues>
   hasDays: boolean
   hasVersions: boolean
   mode: ExpirationMode
@@ -47,7 +47,7 @@ interface LifecyclePolicySectionProps {
 }
 
 export const LifecyclePolicySection = ({
-  control,
+  form,
   hasDays,
   hasVersions,
   mode,
@@ -57,7 +57,7 @@ export const LifecyclePolicySection = ({
   error,
 }: LifecyclePolicySectionProps) => {
   const { ref } = useParams()
-  const { setValue } = useFormContext<BucketVersioningFormValues>()
+  const { control, setValue } = form
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
 

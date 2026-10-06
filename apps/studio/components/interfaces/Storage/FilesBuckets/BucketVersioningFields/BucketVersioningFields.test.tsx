@@ -4,21 +4,18 @@ import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
 import { describe, expect, test } from 'vitest'
-import { z } from 'zod'
 
-import {
-  bucketVersioningFormFields,
-  superRefineBucketVersioning,
-  type BucketVersioningFormValues,
-} from '../FilesBucket.schema'
+import { BucketFormSchema, type BucketFormValues } from '../FilesBucket.schema'
 import { BucketVersioningFields } from './BucketVersioningFields'
 import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-const FormSchema = z.object(bucketVersioningFormFields).superRefine(superRefineBucketVersioning)
-
-const DEFAULT_VALUES: BucketVersioningFormValues = {
+const DEFAULT_VALUES: BucketFormValues = {
+  name: 'bucket',
+  public: false,
+  has_file_size_limit: false,
+  allowed_mime_types: '',
   enable_versioning: false,
   version_expiry_days: 30,
   max_noncurrent_versions: 10,
@@ -29,7 +26,7 @@ const Harness = ({
   defaultValues,
   ...props
 }: {
-  defaultValues?: Partial<BucketVersioningFormValues>
+  defaultValues?: Partial<BucketFormValues>
   initialVersioningState?: BucketVersioningState
   initialRetentionDays?: number | null
   initialMaxVersions?: number | null
@@ -38,8 +35,8 @@ const Harness = ({
   isUnsupportedPolicy?: boolean
   policyError?: { message: string } | null
 }) => {
-  const form = useForm<BucketVersioningFormValues>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<BucketFormValues>({
+    resolver: zodResolver(BucketFormSchema),
     defaultValues: { ...DEFAULT_VALUES, ...defaultValues },
     mode: 'onChange',
   })
@@ -47,7 +44,7 @@ const Harness = ({
   return (
     <Form {...form}>
       <form>
-        <BucketVersioningFields {...props} />
+        <BucketVersioningFields form={form} {...props} />
       </form>
     </Form>
   )

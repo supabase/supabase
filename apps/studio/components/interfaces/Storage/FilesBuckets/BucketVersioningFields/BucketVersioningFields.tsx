@@ -1,10 +1,10 @@
 import { AnimatePresence } from 'framer-motion'
-import { useFormContext, useWatch } from 'react-hook-form'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { Badge, DialogSection, DialogSectionSeparator, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { type BucketVersioningFormValues } from '../FilesBucket.schema'
+import { type BucketFormValues } from '../FilesBucket.schema'
 import {
   getRetentionTightening,
   RETENTION_TIGHTENING_DESCRIPTION,
@@ -18,6 +18,7 @@ import type {
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 interface BucketVersioningFieldsProps {
+  form: UseFormReturn<BucketFormValues>
   initialVersioningState?: BucketVersioningState
   initialRetentionDays?: number | null
   initialMaxVersions?: number | null
@@ -31,6 +32,7 @@ interface BucketVersioningFieldsProps {
 }
 
 export const BucketVersioningFields = ({
+  form,
   initialVersioningState = 'disabled',
   initialRetentionDays,
   initialMaxVersions,
@@ -39,7 +41,7 @@ export const BucketVersioningFields = ({
   isUnsupportedPolicy = false,
   policyError,
 }: BucketVersioningFieldsProps) => {
-  const { control, setValue } = useFormContext<BucketVersioningFormValues>()
+  const { control, setValue } = form
 
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
   const retentionDays = useWatch({ control, name: 'version_expiry_days' })
@@ -147,7 +149,7 @@ export const BucketVersioningFields = ({
           {isVersioningEnabled && (
             <FormSectionCollapse key="lifecycle-policy">
               <LifecyclePolicySection
-                control={control}
+                form={form}
                 hasDays={hasDays}
                 hasVersions={hasVersions}
                 mode={expirationMode}
