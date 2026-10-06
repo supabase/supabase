@@ -13,6 +13,7 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
   SelectValue,
   Tooltip,
@@ -81,6 +82,7 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
+  const isSpecificRegionsLinkEnabled = useFlag('projectCreationSpecificRegionsLink') === true
 
   const { getRegionRestriction } = useRegionRestriction()
 
@@ -171,22 +173,22 @@ export const RegionSelector = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbRegion, form])
 
-  // The specific regions sit behind a link rather than in the same list as the general regions, so
-  // the picker shows one group at a time.
+  // Behind projectCreationSpecificRegionsLink the dropdown opens on the general regions alone, with
+  // a link that reveals the full list — the same list that ships today, general selection intact.
   const hasGeneralRegions = smartRegionEnabled && !highAvailability
   const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
-  const [isChoosingSpecificRegion, setIsChoosingSpecificRegion] = useState(false)
-  const isSpecificSelectVisible =
-    isChoosingSpecificRegion || isSpecificRegionSelected || !hasGeneralRegions
-  const isShowingPlaceholder = isSpecificSelectVisible && !isSpecificRegionSelected
+  const [isOpen, setIsOpen] = useState(false)
+  const [hasRevealedSpecificRegions, setHasRevealedSpecificRegions] = useState(false)
+  const areSpecificRegionsVisible =
+    !isSpecificRegionsLinkEnabled ||
+    hasRevealedSpecificRegions ||
+    isSpecificRegionSelected ||
+    !hasGeneralRegions
 
-  // Going back to the general regions restores whatever was selected before the switch. `dbRegion`
-  // can't be cleared, so with nothing to restore we fall back to the recommended general region
-  // rather than leaving the field showing a region the form no longer holds.
-  const lastGeneralRegionRef = useRef<string | undefined>(undefined)
-  useEffect(() => {
-    if (dbRegion !== undefined && !isSpecificRegionSelected) lastGeneralRegionRef.current = dbRegion
-  }, [dbRegion, isSpecificRegionSelected])
+  const handleRevealSpecificRegions = () => {
+    setHasRevealedSpecificRegions(true)
+    setIsOpen(true)
+  }
 
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
@@ -213,15 +215,6 @@ export const RegionSelector = ({
               ? getRegionRestrictionCopy(selectedRestriction)
               : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
-
-          const handleUseGeneralRegion = () => {
-            setIsChoosingSpecificRegion(false)
-            const regionToRestore =
-              lastGeneralRegionRef.current ??
-              smartRegions.find((region) => recommendedSmartRegions.has(region.code))?.name ??
-              smartRegions[0]?.name
-            if (regionToRestore !== undefined) field.onChange(regionToRestore)
-          }
 
           const affectingIncidents = incidents.filter((incident) => {
             const affectedRegions = incident.cache?.affected_regions ?? []
@@ -264,7 +257,9 @@ export const RegionSelector = ({
                 <div className="flex flex-col items-start gap-y-1">
                   <FormControl>
                     <Select
-                      value={isShowingPlaceholder ? '' : dbRegion}
+                      open={isSpecificRegionsLinkEnabled ? isOpen : undefined}
+                      onOpenChange={isSpecificRegionsLinkEnabled ? setIsOpen : undefined}
+                      value={dbRegion}
                       onValueChange={(value) => {
                         if (value === '') return
                         field.onChange(value)
@@ -280,12 +275,10 @@ export const RegionSelector = ({
                           placeholder={
                             isLoading
                               ? 'Loading available regions...'
-                              : isSpecificSelectVisible
-                                ? 'Select a specific region...'
-                                : 'Select a region for your project..'
+                              : 'Select a region for your project..'
                           }
                         >
-                          {!isShowingPlaceholder && dbRegion !== undefined && (
+                          {dbRegion !== undefined && (
                             <div className="flex items-center gap-x-3">
                               {isLoading && <Loader2 size={14} className="animate-spin" />}
                               {selectedRegion?.code && (
@@ -297,39 +290,42 @@ export const RegionSelector = ({
                         </SelectValue>
                       </SelectTrigger>
                       <SelectContent>
-                        {!isSpecificSelectVisible && (
-                          <SelectGroup>
-                            <SelectLabel>General regions</SelectLabel>
-                            {smartRegions.map((value) => {
-                              return (
-                                <SelectItem
-                                  key={value.code}
-                                  value={value.name}
-                                  className="w-full [&>:nth-child(2)]:w-full"
-                                >
-                                  <div className="flex flex-row items-center justify-between w-full">
-                                    <div className="flex items-center gap-x-3">
-                                      <RegionFlag className="w-5" region={value.code} />
-                                      <span className="text-foreground">
-                                        {getDisplayNameForSmartRegion(value.name)}
-                                      </span>
-                                    </div>
+                        {hasGeneralRegions && (
+                          <>
+                            <SelectGroup>
+                              <SelectLabel>General regions</SelectLabel>
+                              {smartRegions.map((value) => {
+                                return (
+                                  <SelectItem
+                                    key={value.code}
+                                    value={value.name}
+                                    className="w-full [&>:nth-child(2)]:w-full"
+                                  >
+                                    <div className="flex flex-row items-center justify-between w-full">
+                                      <div className="flex items-center gap-x-3">
+                                        <RegionFlag className="w-5" region={value.code} />
+                                        <span className="text-foreground">
+                                          {getDisplayNameForSmartRegion(value.name)}
+                                        </span>
+                                      </div>
 
-                                    <div>
-                                      {recommendedSmartRegions.has(value.code) && (
-                                        <Badge variant="success" className="mr-1">
-                                          Recommended
-                                        </Badge>
-                                      )}
+                                      <div>
+                                        {recommendedSmartRegions.has(value.code) && (
+                                          <Badge variant="success" className="mr-1">
+                                            Recommended
+                                          </Badge>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                </SelectItem>
-                              )
-                            })}
-                          </SelectGroup>
+                                  </SelectItem>
+                                )
+                              })}
+                            </SelectGroup>
+                            {areSpecificRegionsVisible && <SelectSeparator />}
+                          </>
                         )}
 
-                        {isSpecificSelectVisible && (
+                        {areSpecificRegionsVisible && (
                           <SelectGroup>
                             <SelectLabel>
                               {highAvailability ? 'High Availability Regions' : 'Specific regions'}
@@ -385,21 +381,15 @@ export const RegionSelector = ({
                     </Select>
                   </FormControl>
 
-                  {hasGeneralRegions && (
+                  {!areSpecificRegionsVisible && (
                     <p className="text-sm text-foreground-lighter">
                       <button
                         type="button"
                         tabIndex={0}
                         className={InlineLinkClassName}
-                        onClick={
-                          isSpecificSelectVisible
-                            ? handleUseGeneralRegion
-                            : () => setIsChoosingSpecificRegion(true)
-                        }
+                        onClick={handleRevealSpecificRegions}
                       >
-                        {isSpecificSelectVisible
-                          ? 'Use a general region instead'
-                          : 'Need a specific region?'}
+                        Need a specific region?
                       </button>
                     </p>
                   )}
