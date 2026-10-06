@@ -35,6 +35,7 @@ export function MultigresAlphaSection() {
           fields={form.fields}
           submitLabel={form.submitLabel}
           disclaimer={form.disclaimer}
+          successMessage={form.successMessage}
           successRedirect={form.successRedirect}
           formRef={{ slug: GO_PAGE_SLUG, formId: FORM_ID }}
         />
