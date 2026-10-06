@@ -32,7 +32,9 @@ type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
 const facetRowsSchema = z.array(
   z.object({
     value: z.union([z.string(), z.number()]).transform(String),
-    count: z.coerce.number(),
+    count: z
+      .union([z.number(), z.string().regex(/^\d+$/).transform(Number)])
+      .refine((count) => Number.isSafeInteger(count) && count >= 0),
   })
 )
 
@@ -64,8 +66,11 @@ SELECT dimension, value, count from ${cteName};
     iso_timestamp_end: isoTimestampEnd,
     signal,
   })
+  if (data.error !== undefined) {
+    throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
+  }
   return facetRowsSchema
-    .parse(data.result ?? [])
+    .parse(data.result)
     .sort((a, b) => b.count - a.count)
     .map((row) => ({
       label: row.value,
@@ -94,9 +99,18 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
           ),
         }
       : search
+  const facetScope = {
+    date: scopedSearch.date,
+    filter: scopedSearch.filter,
+    user: scopedSearch.user,
+    show_connection_logs: scopedSearch.show_connection_logs,
+    edge_auth: scopedSearch.edge_auth,
+    edge_storage: scopedSearch.edge_storage,
+    edge_postgrest: scopedSearch.edge_postgrest,
+  }
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [
-      ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, scopedSearch),
+      ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, facetScope),
       { otel: useOtel },
     ],
     queryFn: ({ signal }) =>

@@ -40,7 +40,7 @@ export const logsKeys = {
     projectRef: string | undefined,
     facet: string,
     facetSearch: string | undefined,
-    searchParams: QuerySearchParamsType | undefined
+    searchParams: Partial<QuerySearchParamsType> | undefined
   ) =>
     [
       'projects',

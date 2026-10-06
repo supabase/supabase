@@ -13,7 +13,7 @@ import { buildDefaultColumnFilters } from '@/components/interfaces/UnifiedLogs/U
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { DataTableCheckboxFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
-import { logsKeys } from '@/data/logs/keys'
+import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -40,13 +40,40 @@ const columns = [
   { accessorKey: 'method', header: 'Method' },
 ]
 const initialDate = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
+const defaultPathnameSearch: QuerySearchParamsType = {
+  filter: null,
+  latency: null,
+  'timing.dns': null,
+  'timing.connection': null,
+  'timing.tls': null,
+  'timing.ttfb': null,
+  'timing.transfer': null,
+  date: initialDate,
+  sort: null,
+  size: 40,
+  start: 0,
+  direction: 'next',
+  cursor: new Date('2026-05-08T10:00:00Z'),
+  id: null,
+  show_connection_logs: true,
+  edge_auth: true,
+  edge_storage: true,
+  edge_postgrest: true,
+  user: null,
+}
+const pathnameSearch = (overrides: Partial<QuerySearchParamsType> = {}): QuerySearchParamsType => ({
+  ...defaultPathnameSearch,
+  ...overrides,
+})
 
 function PathnameFilter({
   search,
   flagsLoaded = true,
+  useOtel = false,
 }: {
   search: QuerySearchParamsType
   flagsLoaded?: boolean
+  useOtel?: boolean
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
     buildDefaultColumnFilters(search)
@@ -67,7 +94,7 @@ function PathnameFilter({
 
   return (
     <FeatureFlagContext.Provider
-      value={{ configcat: { otelUnifiedLogs: false }, posthog: {}, hasLoaded: flagsLoaded }}
+      value={{ configcat: { otelUnifiedLogs: useOtel }, posthog: {}, hasLoaded: flagsLoaded }}
     >
       <DataTableProvider
         table={table}
@@ -88,7 +115,48 @@ function PathnameFilter({
   )
 }
 
+function ProjectFacetOptions({ projectRef }: { projectRef: string }) {
+  const { data } = useUnifiedLogsFacetCountQuery({
+    projectRef,
+    search: pathnameSearch(),
+    facet: 'pathname',
+  })
+  return (
+    <div>
+      {data?.map((option) => (
+        <span key={option.value}>{option.label}</span>
+      ))}
+    </div>
+  )
+}
+
 mockAnimationsApi()
+
+const addProjectMock = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: {
+      id: 1,
+      ref: 'default',
+      organization_id: 1,
+      name: 'Test Project',
+      status: 'ACTIVE_HEALTHY',
+      cloud_provider: 'AWS',
+      region: 'us-east-1',
+      db_host: 'db.default.supabase.co',
+      restUrl: 'https://default.supabase.co/rest/v1/',
+      inserted_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      subscription_id: 'sub_123',
+      is_branch_enabled: false,
+      is_physical_backups_enabled: false,
+      high_availability: false,
+      integration_source: null,
+      connectionString: 'postgresql://postgres@localhost:5432/postgres',
+      is_hibernating: false,
+    },
+  })
 
 describe('pathname facet filter', () => {
   it('waits for feature flags before requesting options', async () => {
@@ -102,7 +170,7 @@ describe('pathname facet filter', () => {
       },
     })
 
-    const search = { date: initialDate } as QuerySearchParamsType
+    const search = pathnameSearch()
     const { rerender } = customRender(<PathnameFilter search={search} flagsLoaded={false} />)
 
     fireEvent.click(screen.getByText('Pathname'))
@@ -125,7 +193,7 @@ describe('pathname facet filter', () => {
       },
     })
 
-    customRender(<PathnameFilter search={{ date: initialDate } as QuerySearchParamsType} />, {
+    const { rerender } = customRender(<PathnameFilter search={pathnameSearch()} />, {
       queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }),
     })
 
@@ -143,6 +211,12 @@ describe('pathname facet filter', () => {
     fireEvent.click(screen.getByText('Pathname'))
     expect(await screen.findByText('/base')).toBeInTheDocument()
     expect(requests).toBe(2)
+
+    rerender(
+      <PathnameFilter search={pathnameSearch({ cursor: new Date('2026-05-08T09:30:00Z') })} />
+    )
+    expect(screen.getByText('/base')).toBeInTheDocument()
+    expect(requests).toBe(2)
   })
 
   it('replaces options on URL time-range and filter changes without syncing local filters', async () => {
@@ -158,9 +232,7 @@ describe('pathname facet filter', () => {
     })
 
     const { rerender } = customRender(
-      <PathnameFilter
-        search={{ date: initialDate, filter: ['pathname:eq:/selected'] } as QuerySearchParamsType}
-      />
+      <PathnameFilter search={pathnameSearch({ filter: ['pathname:eq:/selected'] })} />
     )
 
     fireEvent.click(screen.getByText('Pathname'))
@@ -172,12 +244,10 @@ describe('pathname facet filter', () => {
 
     rerender(
       <PathnameFilter
-        search={
-          {
-            date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
-            filter: ['pathname:eq:/selected'],
-          } as QuerySearchParamsType
-        }
+        search={pathnameSearch({
+          date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
+          filter: ['pathname:eq:/selected'],
+        })}
       />
     )
     expect(screen.queryByText('/initial')).not.toBeInTheDocument()
@@ -185,12 +255,10 @@ describe('pathname facet filter', () => {
 
     rerender(
       <PathnameFilter
-        search={
-          {
-            date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
-            filter: ['pathname:eq:/selected', 'method:eq:POST'],
-          } as QuerySearchParamsType
-        }
+        search={pathnameSearch({
+          date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
+          filter: ['pathname:eq:/selected', 'method:eq:POST'],
+        })}
       />
     )
     expect(screen.queryByText('/later')).not.toBeInTheDocument()
@@ -199,12 +267,10 @@ describe('pathname facet filter', () => {
 
     rerender(
       <PathnameFilter
-        search={
-          {
-            date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
-            filter: ['method:eq:POST'],
-          } as QuerySearchParamsType
-        }
+        search={pathnameSearch({
+          date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
+          filter: ['method:eq:POST'],
+        })}
       />
     )
     expect(screen.getByText('/post')).toBeInTheDocument()
@@ -218,11 +284,7 @@ describe('pathname facet filter', () => {
       response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
     })
 
-    customRender(
-      <PathnameFilter
-        search={{ date: initialDate, filter: ['pathname:eq:/selected'] } as QuerySearchParamsType}
-      />
-    )
+    customRender(<PathnameFilter search={pathnameSearch({ filter: ['pathname:eq:/selected'] })} />)
     fireEvent.click(screen.getByText('Pathname'))
     const selectedCheckbox = screen.getByRole('checkbox', { name: /\/selected/ })
     expect(selectedCheckbox).toHaveAttribute('data-state', 'checked')
@@ -244,10 +306,7 @@ describe('pathname facet filter', () => {
       },
     })
 
-    const { rerender } = customRender(
-      <PathnameFilter search={{ date: initialDate } as QuerySearchParamsType} />,
-      { queryClient }
-    )
+    const { rerender } = customRender(<PathnameFilter search={pathnameSearch()} />, { queryClient })
     fireEvent.click(screen.getByText('Pathname'))
     expect(await screen.findByText('/before')).toBeInTheDocument()
 
@@ -256,22 +315,7 @@ describe('pathname facet filter', () => {
     expect(screen.queryByText('/before')).not.toBeInTheDocument()
     expect(await screen.findByText('/after')).toBeInTheDocument()
     expect(requests).toBe(2)
-    expect(
-      queryClient
-        .getQueryCache()
-        .getAll()
-        .some(
-          (query) =>
-            query.queryKey[4] === 'pathname' &&
-            (query.queryKey[6] as QuerySearchParamsType).filter?.includes('method:eq:POST')
-        )
-    ).toBe(true)
-
-    rerender(
-      <PathnameFilter
-        search={{ date: initialDate, filter: ['method:eq:POST'] } as QuerySearchParamsType}
-      />
-    )
+    rerender(<PathnameFilter search={pathnameSearch({ filter: ['method:eq:POST'] })} />)
     expect(screen.getByText('/after')).toBeInTheDocument()
     expect(requests).toBe(2)
   })
@@ -289,41 +333,18 @@ describe('pathname facet filter', () => {
         }),
     })
 
-    customRender(<PathnameFilter search={{ date: initialDate } as QuerySearchParamsType} />)
+    customRender(<PathnameFilter search={pathnameSearch()} />)
     fireEvent.click(screen.getByText('Pathname'))
     expect(await screen.findByText('/high')).toBeInTheDocument()
-    expect(screen.getAllByRole('checkbox').map((checkbox) => checkbox.id)).toEqual([
-      'pathname-/high',
-      'pathname-/low',
+    expect(screen.getAllByText(/^\/(high|low)$/).map((option) => option.textContent)).toEqual([
+      '/high',
+      '/low',
     ])
     expect(screen.getByText('12')).toBeInTheDocument()
   })
 
   it('shows a validation error while keeping selected paths removable', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: {
-        id: 1,
-        ref: 'default',
-        organization_id: 1,
-        name: 'Test Project',
-        status: 'ACTIVE_HEALTHY',
-        cloud_provider: 'AWS',
-        region: 'us-east-1',
-        db_host: 'db.default.supabase.co',
-        restUrl: 'https://default.supabase.co/rest/v1/',
-        inserted_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        subscription_id: 'sub_123',
-        is_branch_enabled: false,
-        is_physical_backups_enabled: false,
-        high_availability: false,
-        integration_source: null,
-        connectionString: 'postgresql://postgres@localhost:5432/postgres',
-        is_hibernating: false,
-      },
-    })
+    addProjectMock()
     addAPIMock({
       method: 'post',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all',
@@ -331,11 +352,7 @@ describe('pathname facet filter', () => {
         HttpResponse.json<AnalyticsResponse>({ result: [{ value: '/invalid', count: 'wrong' }] }),
     })
 
-    customRender(
-      <PathnameFilter
-        search={{ date: initialDate, filter: ['pathname:eq:/selected'] } as QuerySearchParamsType}
-      />
-    )
+    customRender(<PathnameFilter search={pathnameSearch({ filter: ['pathname:eq:/selected'] })} />)
     fireEvent.click(screen.getByText('Pathname'))
     expect(await screen.findByText('Failed to retrieve pathnames')).toBeInTheDocument()
     expect(screen.queryByText('/invalid')).not.toBeInTheDocument()
@@ -344,22 +361,107 @@ describe('pathname facet filter', () => {
     expect(screen.queryByRole('checkbox', { name: /\/selected/ })).not.toBeInTheDocument()
   })
 
-  it('keys cached options by project, time range, and filters', () => {
-    const search = { date: initialDate, filter: ['method:eq:GET'] } as QuerySearchParamsType
-    const key = logsKeys.unifiedLogsFacetCount('project-a', 'pathname', '', search)
+  it('shows a validation error when the analytics response omits results', async () => {
+    addProjectMock()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: () => HttpResponse.json<AnalyticsResponse>({}),
+    })
 
-    expect(logsKeys.unifiedLogsFacetCount('project-b', 'pathname', '', search)).not.toEqual(key)
-    expect(
-      logsKeys.unifiedLogsFacetCount('project-a', 'pathname', '', {
-        ...search,
-        date: [new Date('2026-05-09T09:00:00Z'), new Date('2026-05-09T10:00:00Z')],
+    customRender(<PathnameFilter search={pathnameSearch()} />)
+    fireEvent.click(screen.getByText('Pathname'))
+    expect(await screen.findByText('Failed to retrieve pathnames')).toBeInTheDocument()
+    expect(screen.queryByText('No results found')).not.toBeInTheDocument()
+  })
+
+  it.each([null, '', true, false, -1, 1.5, '-1', '1.5'])(
+    'rejects malformed option count %s without hiding selected paths',
+    async (count) => {
+      addProjectMock()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+        response: () =>
+          HttpResponse.json<AnalyticsResponse>({ result: [{ value: '/invalid', count }] }),
       })
-    ).not.toEqual(key)
-    expect(
-      logsKeys.unifiedLogsFacetCount('project-a', 'pathname', '', {
-        ...search,
-        filter: ['method:eq:POST'],
+
+      customRender(
+        <PathnameFilter search={pathnameSearch({ filter: ['pathname:eq:/selected'] })} />
+      )
+      fireEvent.click(screen.getByText('Pathname'))
+      expect(await screen.findByText('Failed to retrieve pathnames')).toBeInTheDocument()
+      expect(screen.queryByText('/invalid')).not.toBeInTheDocument()
+      fireEvent.click(screen.getByRole('checkbox', { name: /\/selected/ }))
+      expect(screen.queryByRole('checkbox', { name: /\/selected/ })).not.toBeInTheDocument()
+    }
+  )
+
+  it.each([
+    { error: 'Analytics unavailable', message: 'Analytics unavailable' },
+    {
+      error: {
+        code: 503,
+        errors: [],
+        message: 'Analytics service unavailable',
+        status: 'UNAVAILABLE',
+      },
+      message: 'Analytics service unavailable',
+    },
+  ])(
+    'shows analytics error $message without treating missing results as empty options',
+    async ({ error, message }) => {
+      addProjectMock()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+        response: () => HttpResponse.json<AnalyticsResponse>({ error }),
       })
-    ).not.toEqual(key)
+
+      customRender(<PathnameFilter search={pathnameSearch()} />)
+      fireEvent.click(screen.getByText('Pathname'))
+      expect(await screen.findByText('Failed to retrieve pathnames')).toBeInTheDocument()
+      expect(screen.getByRole('alert')).toHaveTextContent(message)
+      expect(screen.queryByText('No results found')).not.toBeInTheDocument()
+    }
+  )
+
+  it('loads and displays options from the OTEL endpoint when that backend is enabled', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () =>
+        HttpResponse.json<AnalyticsResponse>({ result: [{ value: '/otel', count: '3' }] }),
+    })
+
+    customRender(<PathnameFilter search={pathnameSearch()} useOtel />)
+    fireEvent.click(screen.getByText('Pathname'))
+    expect(await screen.findByRole('checkbox', { name: /\/otel/ })).toBeInTheDocument()
+    expect(screen.getByText('3')).toBeInTheDocument()
+  })
+
+  it('replaces project options without showing cached paths from another project', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+      response: ({ params }) =>
+        HttpResponse.json<AnalyticsResponse>({
+          result: [{ value: params.ref === 'project-a' ? '/project-a' : '/project-b', count: 1 }],
+        }),
+    })
+
+    const renderProject = (projectRef: string) => (
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: false }, posthog: {}, hasLoaded: true }}
+      >
+        <ProjectFacetOptions projectRef={projectRef} />
+      </FeatureFlagContext.Provider>
+    )
+    const { rerender } = customRender(renderProject('project-a'))
+    expect(await screen.findByText('/project-a')).toBeInTheDocument()
+
+    rerender(renderProject('project-b'))
+    expect(screen.queryByText('/project-a')).not.toBeInTheDocument()
+    expect(await screen.findByText('/project-b')).toBeInTheDocument()
   })
 })
