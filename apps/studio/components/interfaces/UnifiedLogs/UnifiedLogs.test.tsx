@@ -82,6 +82,8 @@ describe('UnifiedLogs', () => {
 
     expect(onUrlUpdate).not.toHaveBeenCalled()
     expect(screen.queryByText('/before')).not.toBeInTheDocument()
-    expect(await screen.findByText('/after', {}, { timeout: 5_000 })).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText('/after')).toBeInTheDocument(), {
+      timeout: 5_000,
+    })
   }, 15_000)
 })
