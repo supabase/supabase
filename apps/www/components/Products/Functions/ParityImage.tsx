@@ -107,7 +107,7 @@ const ParityImage = ({ isHovered = false }: { isHovered?: boolean }) => (
                 boxShadow: '0 0 12px 0 #3ecf8e40',
               }
             : {
-                border: '1px solid hsl(var(--border-default))',
+                border: '1px solid var(--border-default)',
                 boxShadow: 'none',
               }
         }
@@ -127,7 +127,7 @@ const ParityImage = ({ isHovered = false }: { isHovered?: boolean }) => (
                 boxShadow: '0 0 12px 0 #bda4ff40',
               }
             : {
-                border: '1px solid hsl(var(--border-default))',
+                border: '1px solid var(--border-default)',
                 boxShadow: 'none',
               }
         }

@@ -1,5 +1,4 @@
 import ProductIcon from 'components/ProductIcon'
-import Link from 'next/link'
 import { Fragment, ReactNode } from 'react'
 import { FeatureKey } from 'shared-data/pricing'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -104,9 +103,9 @@ export const pricingTooltips: PricingTooltips = {
       <span className="prose text-xs">
         AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
         traffic within the AWS network. Read more in our{' '}
-        <Link href="/docs/guides/platform/privatelink" target="_blank">
+        <a href="/docs/guides/platform/privatelink" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -117,9 +116,9 @@ export const pricingTooltips: PricingTooltips = {
       <span className="prose text-xs">
         Supabase provides granular access controls to manage permissions across your organizations
         and projects. Read more in our{' '}
-        <Link href="/docs/guides/platform/access-control" target="_blank">
+        <a href="/docs/guides/platform/access-control" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -136,9 +135,9 @@ export const pricingTooltips: PricingTooltips = {
         automatically captured for all authentication events and help you monitor user
         authentication activities, detect suspicious behavior, and maintain compliance with security
         requirements. Read more in our{' '}
-        <Link href="/docs/guides/auth/audit-logs" target="_blank">
+        <a href="/docs/guides/auth/audit-logs" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -150,9 +149,9 @@ export const pricingTooltips: PricingTooltips = {
         Any Platform API/Dashboard actions performed by organization members are logged
         automatically for auditing and security purposes. Includes actions such as creating a new
         project, inviting members or changing project settings. Read more in our{' '}
-        <Link href="/docs/guides/security/platform-audit-logs" target="_blank">
+        <a href="/docs/guides/security/platform-audit-logs" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -164,9 +163,9 @@ export const pricingTooltips: PricingTooltips = {
         You are charged for the total volume of log data that Supabase ingests across all your
         project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and
         others) during the billing cycle. Read more in our{' '}
-        <Link href="/docs/guides/platform/manage-your-usage/logs-ingest" target="_blank">
+        <a href="/docs/guides/platform/manage-your-usage/logs-ingest" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),
@@ -179,9 +178,9 @@ export const pricingTooltips: PricingTooltips = {
         allowance that scales with how much log data you ingest. The allowance covers the volume of
         log data scanned when you read logs through the Studio UI, the Management API, the CLI, or
         any other interface. Read more in our{' '}
-        <Link href="/docs/guides/platform/manage-your-usage/logs-query" target="_blank">
+        <a href="/docs/guides/platform/manage-your-usage/logs-query" target="_blank">
           docs
-        </Link>
+        </a>
         .
       </span>
     ),

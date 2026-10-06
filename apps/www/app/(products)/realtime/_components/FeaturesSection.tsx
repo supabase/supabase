@@ -610,7 +610,7 @@ function BroadcastSkeleton() {
           <g key={i}>
             <path
               d={line.d}
-              stroke="hsl(var(--foreground-muted))"
+              stroke="var(--foreground-muted)"
               strokeWidth="2"
               strokeLinecap="round"
               opacity="0.15"

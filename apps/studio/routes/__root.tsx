@@ -341,7 +341,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       maintenanceMode: IS_MAINTENANCE_MODE,
       hash: location.hash,
     })
-    if (!match) return
+    if (!match) return undefined
     // `to`/`search`/`hash`, never `href`: the router treats `href` as an
     // opaque (external) target, and preloading a Link whose beforeLoad
     // throws `redirect({ href })` recurses forever — the preload retry
@@ -420,6 +420,8 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
   return (
     // suppressHydrationWarning is for next-themes: it writes data-theme and
     // color-scheme onto <html> from localStorage pre-hydration, which the
@@ -430,19 +432,21 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[
-            {
-              name: 'TanStack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            {
-              name: 'TanStack Query',
-              render: <ReactQueryDevtoolsPanel />,
-            },
-          ]}
-        />
+        {!isTestEnv && (
+          <TanStackDevtools
+            config={{ position: 'bottom-right' }}
+            plugins={[
+              {
+                name: 'TanStack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              {
+                name: 'TanStack Query',
+                render: <ReactQueryDevtoolsPanel />,
+              },
+            ]}
+          />
+        )}
         <Scripts />
       </body>
     </html>

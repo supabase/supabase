@@ -39,6 +39,7 @@
 }
 [data-theme='light'],
 .light {
+  --shadow-codeblock: 0 0 #0000;
   --code-token-keyword: #5f2fc4;
   --code-foreground: oklch(from var(--foreground-light) l c h / 1);
   --code-token-constant: #15593b;

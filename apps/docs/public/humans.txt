@@ -38,6 +38,7 @@ Artyom Borissov
 Aziz Quadri
 Barco Fourie
 Barry Roodt
+Ben Fritsch
 Beng Eu
 Benjamin Coenen
 Beth Long

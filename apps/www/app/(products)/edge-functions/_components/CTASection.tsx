@@ -2,7 +2,6 @@
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
-import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
@@ -88,7 +87,7 @@ export function CTASection() {
         <div className="flex items-center gap-2">
           <StartYourProjectButton />
           <Button asChild size="medium">
-            <Link href="/docs/guides/functions/quickstart">Quickstart guide</Link>
+            <a href="/docs/guides/functions/quickstart">Quickstart guide</a>
           </Button>
         </div>
       </div>

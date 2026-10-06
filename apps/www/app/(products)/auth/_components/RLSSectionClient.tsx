@@ -2,7 +2,6 @@
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -178,7 +177,7 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
               />
             </motion.div>
           </AnimatePresence>
-          <Link
+          <a
             href="/docs/guides/database/postgres/row-level-security"
             className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
           >
@@ -200,7 +199,7 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
                 strokeLinejoin="round"
               />
             </svg>
-          </Link>
+          </a>
         </motion.div>
       </div>
     </SectionContainerWithCn>

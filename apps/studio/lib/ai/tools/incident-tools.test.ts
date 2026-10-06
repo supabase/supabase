@@ -170,22 +170,19 @@ describe('ai/tools/incident-tools', () => {
         expect((result as any).message).toContain('2 active incidents')
       })
 
-      it('should handle fetch errors', async () => {
+      it('throws on fetch errors', async () => {
         const common = await import('common')
         vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(true)
 
         mockFetch.mockRejectedValue(new Error('Network error'))
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
-
-        expect(result).toEqual({
-          incidents: [],
-          error: 'Unable to check incident status at this time.',
-        })
+        await expect(
+          (tools.get_active_incidents.execute as any)({}, executeOptions)
+        ).rejects.toThrow('Network error')
       })
 
-      it('should handle non-ok responses', async () => {
+      it('throws on non-ok responses with the status code', async () => {
         const common = await import('common')
         vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(true)
 
@@ -195,12 +192,9 @@ describe('ai/tools/incident-tools', () => {
         })
 
         const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
-        const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
-
-        expect(result).toEqual({
-          incidents: [],
-          error: 'Unable to check incident status at this time.',
-        })
+        await expect(
+          (tools.get_active_incidents.execute as any)({}, executeOptions)
+        ).rejects.toThrow('Failed to fetch incident status: 500')
       })
 
       it('should use timeout signal', async () => {
@@ -424,7 +418,7 @@ describe('ai/tools/incident-tools', () => {
       })
     })
 
-    it('returns an error when the response fails to parse', async () => {
+    it('throws when the response fails to parse', async () => {
       mockFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ this_is: 'not a valid status page response' }),
@@ -434,15 +428,12 @@ describe('ai/tools/incident-tools', () => {
         baseUrl: 'https://supabase.com/dashboard',
         useStatusPageWidget: true,
       })
-      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
-
-      expect(result).toEqual({
-        incidents: [],
-        error: 'Unable to check incident status at this time.',
-      })
+      await expect((tools.get_active_incidents.execute as any)({}, executeOptions)).rejects.toThrow(
+        'Failed to parse status page response'
+      )
     })
 
-    it('returns an error on a non-ok response', async () => {
+    it('throws on a non-ok response with the status code', async () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
@@ -452,12 +443,9 @@ describe('ai/tools/incident-tools', () => {
         baseUrl: 'https://supabase.com/dashboard',
         useStatusPageWidget: true,
       })
-      const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
-
-      expect(result).toEqual({
-        incidents: [],
-        error: 'Unable to check incident status at this time.',
-      })
+      await expect((tools.get_active_incidents.execute as any)({}, executeOptions)).rejects.toThrow(
+        'Failed to fetch status page: 500'
+      )
     })
   })
 })

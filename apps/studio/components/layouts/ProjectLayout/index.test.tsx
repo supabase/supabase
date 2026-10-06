@@ -178,7 +178,6 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
   BANNER_ID: {
     FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
-    SELECT_26: 'select-2026-banner',
   },
   useBannerStack: () => ({
     addBanner: mockAddBanner,

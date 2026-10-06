@@ -1,3 +1,5 @@
+import { ident } from '@supabase/pg-meta'
+
 import { SupaTable } from '@/components/grid/types'
 import { Lint } from '@/data/lint/lint-query'
 
@@ -37,7 +39,7 @@ export const getTablePoliciesUrl = (
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 
-  const columns = table.columns.map((col) => `"${col.name}"`).join(', ')
+  const columns = table.columns.map((col) => ident(col.name)).join(', ')
 
   const valuesSets = rows
     .map((row) => {
@@ -78,7 +80,7 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
     })
     .join(', ')
 
-  return `INSERT INTO "${table.schema}"."${table.name}" (${columns}) VALUES ${valuesSets};`
+  return `INSERT INTO ${ident(table.schema)}.${ident(table.name)} (${columns}) VALUES ${valuesSets};`
 }
 
 /**
