@@ -312,9 +312,8 @@ export const OAuthAppsAuthorizeScreen = ({
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
-        title={`${request.name} is connected`}
-        titleClassName="text-2xl"
-        description={`You can return to ${request.name} to continue`}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
       >
         <AlertError
           subject="An error occurred while loading your data"
@@ -328,9 +327,8 @@ export const OAuthAppsAuthorizeScreen = ({
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
-        title={`${request.name} is connected`}
-        titleClassName="text-2xl"
-        description={`You can return to ${request.name} to continue`}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
       >
         <AlertError
           subject="We couldn't find the organization for this application authorization"
