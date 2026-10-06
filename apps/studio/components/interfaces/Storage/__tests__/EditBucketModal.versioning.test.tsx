@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { EditBucketModal } from '../EditBucketModal'
+import { EditBucketModal } from '../FilesBuckets/EditBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { render } from '@/tests/helpers'

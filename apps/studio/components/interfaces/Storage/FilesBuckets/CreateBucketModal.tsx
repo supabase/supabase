@@ -31,12 +31,12 @@ import { BucketVersioningFields } from './BucketVersioningFields/BucketVersionin
 import { toLifecycleRules } from './BucketVersioningFields/BucketVersioningFields.lifecycle'
 import { BucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { PROJECT_VERSIONING_DEFAULTS } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
   convertToBytes,
 } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { PROJECT_VERSIONING_DEFAULTS } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'

@@ -46,12 +46,12 @@ import {
 } from './EditBucketModal.utils'
 import { EditBucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { getBucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
 import {
   convertFromBytes,
   convertToBytes,
 } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { getBucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { bucketLifecycleQueryOptions } from '@/data/storage/bucket-lifecycle-query'
