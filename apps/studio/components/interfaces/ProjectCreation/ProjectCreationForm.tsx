@@ -234,10 +234,8 @@ export const ProjectCreationForm = ({
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
-  const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
-    { slug },
-    { enabled: isFreePlan }
-  )
+  const { data: membersExceededLimit = [], isLoading: isLoadingFreeProjectLimit } =
+    useFreeProjectLimitCheckQuery({ slug }, { enabled: isFreePlan })
   const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
   const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
 
@@ -621,17 +619,25 @@ export const ProjectCreationForm = ({
     track('project_creation_form_exposed', { surface })
   }, [isOrganizationsSuccess, canCreateProject, currentOrg, track, surface])
 
-  const hasTrackedFreeTierGeneralRegionExposed = useRef(false)
-
+  const freeTierGeneralRegionExposedSlug = useRef<string | undefined>(undefined)
   useEffect(() => {
-    if (hasTrackedFreeTierGeneralRegionExposed.current) return
+    if (!slug || freeTierGeneralRegionExposedSlug.current === slug) return
     if (isResolvingFreeTierGeneralRegionExperiment) return
     if (freeTierGeneralRegionExperimentVariant === undefined) return
-    hasTrackedFreeTierGeneralRegionExposed.current = true
+    if (!canCreateProject || projectCreationDisabled || isLoadingFreeProjectLimit) return
+    freeTierGeneralRegionExposedSlug.current = slug
     track('free_tier_general_region_experiment_exposed', {
       variant: freeTierGeneralRegionExperimentVariant,
     })
-  }, [isResolvingFreeTierGeneralRegionExperiment, freeTierGeneralRegionExperimentVariant, track])
+  }, [
+    slug,
+    isResolvingFreeTierGeneralRegionExperiment,
+    freeTierGeneralRegionExperimentVariant,
+    canCreateProject,
+    projectCreationDisabled,
+    isLoadingFreeProjectLimit,
+    track,
+  ])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
