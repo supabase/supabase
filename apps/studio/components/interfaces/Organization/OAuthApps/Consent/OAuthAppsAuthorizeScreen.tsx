@@ -154,10 +154,6 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
-    ? { project_refs: selectedProjectRefs }
-    : {}
-
   if (identityQuery.isPending || memberOrgQuery.isPending) {
     return null
   }
@@ -229,6 +225,9 @@ export const OAuthAppsAuthorizeScreen = ({
 
   const handleApprove = () => {
     if (hasNoSelection) return
+    const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
+      ? { project_refs: selectedProjectRefs }
+      : {}
     approveMutation.mutate({ auth_id: authId, slug: memberOrgQuery.data, body: approveBody })
   }
 
@@ -262,7 +261,7 @@ export const OAuthAppsAuthorizeScreen = ({
             email={identityQuery.data.email}
             organizationSlug={memberOrgQuery.data}
             onSignOut={handleSignOut}
-            grantKind={grantKind}
+            request={request}
           />
 
           {isBlockedOnProjects && (
@@ -302,17 +301,6 @@ export const OAuthAppsAuthorizeScreen = ({
                   above.
                 </p>
               </section>
-
-              {!isProjectScopingModeEnabled && (
-                <Admonition
-                  type="default"
-                  title={CONSENT_COPY.coversEveryProject.title}
-                  description={CONSENT_COPY.coversEveryProject.description(
-                    request.name,
-                    memberOrgQuery.data
-                  )}
-                />
-              )}
 
               {grantKind === 'organization_bound' && (
                 <Admonition

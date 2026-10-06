@@ -1,18 +1,18 @@
 import { LogOut } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { OAuthGrantKind } from '@/data/oauth-apps/types'
+import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 
 export interface AuthorizingAsCardProps {
   email: string
-  grantKind: OAuthGrantKind
+  request: OAuthAppsAuthorizeRequest
   organizationSlug: string
   onSignOut: () => void
 }
 
 export const AuthorizingAsCard = ({
   email,
-  grantKind,
+  request,
   organizationSlug,
   onSignOut,
 }: AuthorizingAsCardProps) => {
@@ -44,8 +44,16 @@ export const AuthorizingAsCard = ({
           <span className="shrink-0 text-foreground-light">Organization</span>
           <span className="min-w-0 truncate text-right text-foreground">{organizationSlug}</span>
         </div>
+        {!request.project_scoping_mode && (
+          <div className="flex items-center justify-between gap-4 py-2.5 text-xs">
+            <span className="shrink-0 text-foreground-light">Projects</span>
+            <span className="min-w-0 truncate text-right text-foreground">
+              All projects, including future ones
+            </span>
+          </div>
+        )}
       </div>
-      {grantKind === 'member_bound' && (
+      {request.grant_kind === 'member_bound' && (
         <p className="text-xs text-foreground-lighter">
           This grant acts as you, it can never do more than your role in this organization allows.
         </p>

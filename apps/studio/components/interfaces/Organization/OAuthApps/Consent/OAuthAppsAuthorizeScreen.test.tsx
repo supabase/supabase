@@ -187,12 +187,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('says the grant covers future projects when there is no picker', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects })
 
-    expect(await screen.findByText('This grant covers every project')).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        'Vercel can reach every project in northwind-traders, including ones created later.'
-      )
-    ).toBeInTheDocument()
+    expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
   })
 
   test('does not claim future projects when the member picks them', async () => {
