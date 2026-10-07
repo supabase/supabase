@@ -1,10 +1,12 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { expect, test, vi } from 'vitest'
 
 import { AlertError } from './AlertError'
 import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
 import { customRender } from '@/tests/lib/custom-render'
+
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
 test('support is an inline link with the error context, not an action button', () => {
   customRender(
@@ -30,3 +32,17 @@ test('custom support prose links unless support is hidden', () => {
   expect(screen.queryByRole('link', { name: 'contact support' })).not.toBeInTheDocument()
   expect(screen.getByText('Please contact support for assistance.')).toBeInTheDocument()
 })
+
+test.each([false, true])(
+  'keeps support available with custom instructions (hidden: %s)',
+  (hidden) => {
+    const { rerender } = customRender(
+      <AlertError description="Refresh the page." showInstructions={!hidden} />
+    )
+    expect(screen.getByRole('link', { name: 'Contact support' })).toBeInTheDocument()
+    rerender(
+      <AlertError description="Refresh the page." showInstructions={!hidden} hideContactSupport />
+    )
+    expect(screen.queryByRole('link', { name: /contact support/i })).not.toBeInTheDocument()
+  }
+)

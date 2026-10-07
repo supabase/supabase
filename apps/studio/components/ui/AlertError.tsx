@@ -87,6 +87,22 @@ export const AlertError = ({
     }
   }, [track])
 
+  const renderSupportLink = (text: string, key?: number) => (
+    <InlineLink
+      key={key}
+      href={createSupportFormUrl({
+        category: SupportCategories.DASHBOARD_BUG,
+        projectRef,
+        orgSlug,
+        subject,
+        error: error?.message,
+      })}
+      onClick={() => takeBreadcrumbSnapshot()}
+    >
+      {text}
+    </InlineLink>
+  )
+
   return (
     <Admonition
       type="warning"
@@ -103,26 +119,17 @@ export const AlertError = ({
           )}
           {showInstructions && (
             <p>
-              {description.split(/(contact support)/i).map((part, index) =>
-                !hideContactSupport && part.toLowerCase() === 'contact support' ? (
-                  <InlineLink
-                    key={index}
-                    href={createSupportFormUrl({
-                      category: SupportCategories.DASHBOARD_BUG,
-                      projectRef,
-                      orgSlug,
-                      subject,
-                      error: error?.message,
-                    })}
-                    onClick={() => takeBreadcrumbSnapshot()}
-                  >
-                    {part}
-                  </InlineLink>
-                ) : (
-                  part
-                )
-              )}
+              {description
+                .split(/(contact support)/i)
+                .map((part, index) =>
+                  !hideContactSupport && part.toLowerCase() === 'contact support'
+                    ? renderSupportLink(part, index)
+                    : part
+                )}
             </p>
+          )}
+          {!hideContactSupport && (!showInstructions || !/contact support/i.test(description)) && (
+            <p>{renderSupportLink('Contact support')}</p>
           )}
           {children}
         </>
