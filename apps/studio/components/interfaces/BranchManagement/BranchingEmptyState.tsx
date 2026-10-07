@@ -8,7 +8,11 @@ import { CreateBranchButton } from './CreateBranchButton'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 
-export const BranchingEmptyState = () => {
+export const BranchingEmptyState = ({
+  isGithubConnected = false,
+}: {
+  isGithubConnected?: boolean
+}) => {
   const { ref } = useParams()
   return (
     <Card>
@@ -30,8 +34,8 @@ export const BranchingEmptyState = () => {
             <div className="text-sm">
               <p className="space-x-2">Create a preview branch</p>
               <p className="text-foreground-light text-balance mt-1 mb-4">
-                Make schema or Edge Function changes on a clone of your project, then merge them back
-                when ready.
+                Make schema or Edge Function changes on a clone of your project, then merge them
+                back when ready.
               </p>
               <div className="flex items-center gap-x-2">
                 <CreateBranchButton />
@@ -50,18 +54,26 @@ export const BranchingEmptyState = () => {
             <div className="text-sm">
               <p className="space-x-2">
                 <span>Connect with GitHub</span>
-                <Badge variant="default" className="-translate-y-px">
-                  Optional
-                </Badge>
+                {isGithubConnected ? (
+                  <Badge variant="success" className="-translate-y-px">
+                    Connected
+                  </Badge>
+                ) : (
+                  <Badge variant="default" className="-translate-y-px">
+                    Optional
+                  </Badge>
+                )}
               </p>
               <p className="text-foreground-light text-balance mt-1 mb-4">
                 Automatically create a preview branch for each pull request and apply your
                 migrations on every commit.
               </p>
               <div className="flex items-center gap-x-2">
-                <Button asChild>
-                  <Link href={`/project/${ref}/settings/integrations`}>Connect GitHub</Link>
-                </Button>
+                {!isGithubConnected && (
+                  <Button asChild>
+                    <Link href={`/project/${ref}/settings/integrations`}>Connect GitHub</Link>
+                  </Button>
+                )}
                 <DocsButton
                   label="Learn more"
                   href={`${DOCS_URL}/deployment/branching/github-integration`}

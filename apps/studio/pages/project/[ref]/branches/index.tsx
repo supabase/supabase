@@ -112,7 +112,7 @@ const BranchesPage: NextPageWithLayout = () => {
                   )}
 
                   {!isError && showEmptyState ? (
-                    <BranchingEmptyState />
+                    <BranchingEmptyState isGithubConnected={isGithubConnected} />
                   ) : (
                     <Overview
                       isGithubConnected={isGithubConnected}
