@@ -55,6 +55,11 @@ export const ExplorerNavChats = () => {
           })
         )}
       </div>
+      <section className="flex shrink-0 flex-col gap-3 border-t border-default p-3">
+        <p className="text-xs text-foreground-lighter">
+          Chat history is saved to this browser and isn't synced across devices.
+        </p>
+      </section>
     </ExplorerNavResourceWrapper>
   )
 }
