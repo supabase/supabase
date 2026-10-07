@@ -1,4 +1,5 @@
 import { useFlag } from 'common'
+import type { ReactNode } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
@@ -23,9 +24,21 @@ import { DOCS_URL } from '@/lib/constants'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
+  /** Hidden when no OrioleDB image is available for the current selection. */
+  hasPostgresTypeOption?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /** Extra fields rendered above the Postgres type field, e.g. the region picker in option B. */
+  children?: ReactNode
 }
 
-export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
+export const AdvancedConfiguration = ({
+  form,
+  hasPostgresTypeOption = true,
+  open,
+  onOpenChange,
+  children,
+}: AdvancedConfigurationProps) => {
   const disableOrioleProjectCreation = useFlag('disableOrioleProjectCreation')
 
   return (
@@ -33,86 +46,97 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
       <CollapsibleCardSection
         title="Advanced Configuration"
         description="These settings cannot be changed after the project is created"
+        open={open}
+        onOpenChange={onOpenChange}
       >
-        <FormField
-          name="useOrioleDb"
-          control={form.control}
-          render={({ field }) => (
-            <>
-              <FormItemLayout
-                layout="horizontal"
-                label="Postgres Type"
-                className="[&>div>label]:break-normal!"
-              >
-                <FormControl>
-                  <RadioGroupStacked
-                    // Due to radio group not supporting boolean values
-                    // value is converted to boolean
-                    onValueChange={(value) => field.onChange(value === 'true')}
-                    defaultValue={field.value.toString()}
+        <div className="flex flex-col gap-y-6">
+          {children}
+
+          {hasPostgresTypeOption && (
+            <FormField
+              name="useOrioleDb"
+              control={form.control}
+              render={({ field }) => (
+                <>
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Postgres Type"
+                    className="[&>div>label]:break-normal!"
                   >
-                    <FormItem asChild>
-                      <FormControl>
-                        <RadioGroupStackedItem
-                          value="false"
-                          // @ts-ignore
-                          label={
-                            <>
-                              Postgres
-                              <Badge>Default</Badge>
-                            </>
-                          }
-                          description="Recommended for production workloads"
-                          className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2"
-                        />
-                      </FormControl>
-                    </FormItem>
-                    <FormItem asChild>
-                      <FormControl>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
+                    <FormControl>
+                      <RadioGroupStacked
+                        // Due to radio group not supporting boolean values
+                        // value is converted to boolean
+                        onValueChange={(value) => field.onChange(value === 'true')}
+                        defaultValue={field.value.toString()}
+                      >
+                        <FormItem asChild>
+                          <FormControl>
                             <RadioGroupStackedItem
-                              value="true"
+                              value="false"
                               // @ts-ignore
                               label={
                                 <>
-                                  Postgres with OrioleDB
-                                  <Badge variant="warning">Beta</Badge>
+                                  Postgres
+                                  <Badge>Default</Badge>
                                 </>
                               }
-                              description="Not recommended for production workloads"
-                              className={cn(
-                                '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2',
-                                form.getValues('useOrioleDb') ? 'rounded-b-none!' : ''
-                              )}
-                              disabled={disableOrioleProjectCreation}
+                              description="Recommended for production workloads"
+                              className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2"
                             />
-                          </TooltipTrigger>
-                          {disableOrioleProjectCreation && (
-                            <TooltipContent side="right" className="w-60 text-center">
-                              OrioleDB is temporarily disabled for new projects. Please try again
-                              later.
-                            </TooltipContent>
-                          )}
-                        </Tooltip>
-                      </FormControl>
-                    </FormItem>
-                  </RadioGroupStacked>
-                </FormControl>
-                {form.getValues('useOrioleDb') && (
-                  <Admonition
-                    type="warning"
-                    className="rounded-t-none [&>div]:text-xs"
-                    title="OrioleDB is not production ready"
-                    description="Postgres with OrioleDB extension is currently in Public Beta and not recommended for production usage yet."
-                  >
-                    <DocsButton className="mt-2" href={`${DOCS_URL}/guides/database/orioledb`} />
-                  </Admonition>
-                )}
-              </FormItemLayout>
-            </>
+                          </FormControl>
+                        </FormItem>
+                        <FormItem asChild>
+                          <FormControl>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <RadioGroupStackedItem
+                                  value="true"
+                                  // @ts-ignore
+                                  label={
+                                    <>
+                                      Postgres with OrioleDB
+                                      <Badge variant="warning">Beta</Badge>
+                                    </>
+                                  }
+                                  description="Not recommended for production workloads"
+                                  className={cn(
+                                    '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2',
+                                    form.getValues('useOrioleDb') ? 'rounded-b-none!' : ''
+                                  )}
+                                  disabled={disableOrioleProjectCreation}
+                                />
+                              </TooltipTrigger>
+                              {disableOrioleProjectCreation && (
+                                <TooltipContent side="right" className="w-60 text-center">
+                                  OrioleDB is temporarily disabled for new projects. Please try
+                                  again later.
+                                </TooltipContent>
+                              )}
+                            </Tooltip>
+                          </FormControl>
+                        </FormItem>
+                      </RadioGroupStacked>
+                    </FormControl>
+                    {form.getValues('useOrioleDb') && (
+                      <Admonition
+                        type="warning"
+                        className="rounded-t-none [&>div]:text-xs"
+                        title="OrioleDB is not production ready"
+                        description="Postgres with OrioleDB extension is currently in Public Beta and not recommended for production usage yet."
+                      >
+                        <DocsButton
+                          className="mt-2"
+                          href={`${DOCS_URL}/guides/database/orioledb`}
+                        />
+                      </Admonition>
+                    )}
+                  </FormItemLayout>
+                </>
+              )}
+            />
           )}
-        />
+        </div>
       </CollapsibleCardSection>
     </Panel.Content>
   )

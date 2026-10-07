@@ -6,15 +6,19 @@ type CollapsibleCardSectionProps = PropsWithChildren<{
   title: string
   description?: ReactNode
   defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }>
 
 export const CollapsibleCardSection = ({
   title,
   description,
   defaultOpen = false,
+  open,
+  onOpenChange,
   children,
 }: CollapsibleCardSectionProps) => (
-  <Collapsible defaultOpen={defaultOpen}>
+  <Collapsible defaultOpen={defaultOpen} open={open} onOpenChange={onOpenChange}>
     <CollapsibleTrigger className="group/trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-open:text-foreground-light">
       {title}
       <ChevronRight

@@ -277,7 +277,9 @@ const DEFAULT_FLAGS = {
   projectCreationRestrictedRegions: false,
 }
 
-async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
+async function renderWizard(
+  options: { flags?: Record<string, boolean | string>; searchParams?: string } = {}
+) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
@@ -285,7 +287,10 @@ async function renderWizard(options: { flags?: Record<string, boolean | string> 
     >
       <Wizard dehydratedState={undefined} />
     </FeatureFlagContext.Provider>,
-    { profileContext: createMockProfileContext() }
+    {
+      profileContext: createMockProfileContext(),
+      ...(options.searchParams ? { nuqs: { searchParams: options.searchParams } } : {}),
+    }
   )
 }
 
@@ -1235,5 +1240,130 @@ describe('project creation wizard', () => {
         expect.stringContaining('Organization is over quota')
       )
     )
+  })
+  // P-PROD-4259 — the variants only move the picker around; every arm must still submit the
+  // same region_selection payload for both a general and a specific region.
+  describe('advanced region config experiment', () => {
+    // Option B renders two "Region" labels (the summary row and the picker in advanced
+    // configuration), so the shared helper can't disambiguate them.
+    const getLastSelectTriggerByLabel = (labelText: string) => {
+      const labels = screen.getAllByText(labelText)
+      const row = labels[labels.length - 1].closest(
+        '[data-formlayout-id="labelContainer"]'
+      )?.parentElement
+      const trigger = row?.querySelector('[role="combobox"]')
+      if (!trigger) throw new Error(`No combobox trigger found near label "${labelText}"`)
+      return trigger as HTMLElement
+    }
+
+    const getTriggerByPlaceholder = (placeholder: string) => {
+      const trigger = screen.getByText(placeholder).closest('[role="combobox"]')
+      if (!trigger) throw new Error(`No combobox trigger found for "${placeholder}"`)
+      return trigger as HTMLElement
+    }
+
+    const renderVariant = async (variant: string) => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard({ searchParams: `?regionVariant=${variant}` })
+
+      await fillProjectName(`${variant} project`)
+      await generateAndWaitForStrongPassword()
+
+      return onRequest
+    }
+
+    const submitAndReadRegion = async (onRequest: ReturnType<typeof vi.fn>) => {
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      return onRequest.mock.calls[0][0].region_selection
+    }
+
+    test('option A submits a general region, and a specific region behind the inline disclosure', async () => {
+      const onRequest = await renderVariant('option_a')
+
+      await selectRegion(/Americas/)
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+
+      await user.click(getSelectTriggerByLabel('Region'))
+      await user.click(
+        await screen.findByRole('button', { name: /Advanced: choose a specific region/ })
+      )
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'us-east-1' })
+    })
+
+    test('option B keeps the picker in advanced configuration and mirrors it in the summary row', async () => {
+      const onRequest = await renderVariant('option_b')
+
+      await waitFor(() => expect(screen.getByText('Americas')).toBeInTheDocument())
+      expect(screen.queryByRole('combobox', { name: 'Region' })).not.toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: 'Change in advanced configuration' }))
+
+      await user.click(await waitFor(() => getLastSelectTriggerByLabel('Region')))
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      await waitFor(() =>
+        expect(screen.getAllByText('East US (North Virginia)').length).toBeGreaterThan(1)
+      )
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'us-east-1' })
+    })
+
+    test('option C reveals a second selector for specific regions', async () => {
+      const onRequest = await renderVariant('option_c')
+
+      await selectRegion(/Americas/)
+
+      await user.click(getSelectTriggerByLabel('Region'))
+      await user.click(await screen.findByRole('option', { name: 'Choose a specific region' }))
+
+      await user.click(getTriggerByPlaceholder('Select a specific region...'))
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'us-east-1' })
+    })
+
+    test('option C keeps the previous general region until a specific one is picked', async () => {
+      const onRequest = await renderVariant('option_c')
+
+      await selectRegion(/Americas/)
+
+      await user.click(getSelectTriggerByLabel('Region'))
+      await user.click(await screen.findByRole('option', { name: 'Choose a specific region' }))
+
+      expect(getTriggerByPlaceholder('Select a specific region...')).toBeInTheDocument()
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'americas' })
+    })
+
+    test('option C (link) swaps the dropdown for the specific regions', async () => {
+      const onRequest = await renderVariant('option_c_link')
+
+      await selectRegion(/Americas/)
+
+      await user.click(screen.getByRole('button', { name: 'Need a specific region?' }))
+      await user.click(getTriggerByPlaceholder('Select a specific region...'))
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'us-east-1' })
+    })
+
+    test('option C (link) restores the previous general region in one click', async () => {
+      const onRequest = await renderVariant('option_c_link')
+
+      await selectRegion(/Americas/)
+
+      await user.click(screen.getByRole('button', { name: 'Need a specific region?' }))
+      await user.click(getTriggerByPlaceholder('Select a specific region...'))
+      await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+      await user.click(screen.getByRole('button', { name: 'Use a general region instead' }))
+
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+      expect(await submitAndReadRegion(onRequest)).toMatchObject({ code: 'americas' })
+    })
   })
 })
