@@ -1,7 +1,8 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
+import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
+import type { SupportFormParams } from 'ui-patterns/ErrorDisplay'
 
 import { getMappingForError } from './ErrorMatcher.utils'
 import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
@@ -31,8 +32,9 @@ export function ErrorMatcher({
 
   return (
     <ErrorDisplay
+      type="destructive"
       title={title}
-      errorMessage={message}
+      error={{ message }}
       supportFormParams={supportFormParams}
       className={className}
       onRender={() => {
@@ -47,7 +49,7 @@ export function ErrorMatcher({
           track('inline_error_troubleshooter_exposed', { errorType: mapping.id })
         }
       }}
-      onSupportClick={
+      onContactSupport={
         mapping
           ? () =>
               track('inline_error_troubleshooter_action_clicked', {

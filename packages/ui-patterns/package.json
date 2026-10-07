@@ -310,6 +310,10 @@
       "import": "./src/EmptyStatePresentational/index.tsx",
       "types": "./src/EmptyStatePresentational/index.tsx"
     },
+    "./ErrorDisplay/ErrorDisplay.constants": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.constants.ts",
+      "types": "./src/ErrorDisplay/ErrorDisplay.constants.ts"
+    },
     "./ErrorDisplay/ErrorDisplay": {
       "import": "./src/ErrorDisplay/ErrorDisplay.tsx",
       "types": "./src/ErrorDisplay/ErrorDisplay.tsx"
@@ -317,6 +321,14 @@
     "./ErrorDisplay/ErrorDisplay.types": {
       "import": "./src/ErrorDisplay/ErrorDisplay.types.ts",
       "types": "./src/ErrorDisplay/ErrorDisplay.types.ts"
+    },
+    "./ErrorDisplay/ErrorDisplay.utils": {
+      "import": "./src/ErrorDisplay/ErrorDisplay.utils.ts",
+      "types": "./src/ErrorDisplay/ErrorDisplay.utils.ts"
+    },
+    "./ErrorDisplay": {
+      "import": "./src/ErrorDisplay/index.tsx",
+      "types": "./src/ErrorDisplay/index.tsx"
     },
     "./ExpandableVideo": {
       "import": "./src/ExpandableVideo/index.tsx",

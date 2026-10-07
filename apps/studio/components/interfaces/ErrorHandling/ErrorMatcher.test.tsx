@@ -101,7 +101,7 @@ describe('ErrorMatcher', () => {
     expect(screen.getByText('UNKNOWN ERROR')).toBeInTheDocument()
   })
 
-  it('builds support link with projectRef param', () => {
+  it('prefills the support link with projectRef and the error details', () => {
     render(
       <ErrorMatcher
         title="Failed to load tables"
@@ -109,17 +109,19 @@ describe('ErrorMatcher', () => {
         supportFormParams={{ projectRef: 'my-project' }}
       />
     )
-    expect(screen.getByRole('link', { name: /contact support/i })).toHaveAttribute(
-      'href',
-      '/support/new?projectRef=my-project'
-    )
+    const href = screen.getByRole('link', { name: /contact support/i }).getAttribute('href') ?? ''
+    const params = new URL(href, 'https://supabase.com').searchParams
+    expect(params.get('projectRef')).toBe('my-project')
+    expect(params.get('subject')).toBe('Failed to load tables')
+    expect(params.get('error')).toContain('UNKNOWN ERROR')
   })
 
-  it('builds support link with no params when supportFormParams is omitted', () => {
+  it('prefills the support link from the error alone when supportFormParams is omitted', () => {
     render(<ErrorMatcher title="Failed to load tables" error="UNKNOWN ERROR" />)
-    expect(screen.getByRole('link', { name: /contact support/i })).toHaveAttribute(
-      'href',
-      '/support/new'
-    )
+    const href = screen.getByRole('link', { name: /contact support/i }).getAttribute('href') ?? ''
+    const params = new URL(href, 'https://supabase.com').searchParams
+    expect(params.get('projectRef')).toBeNull()
+    expect(params.get('subject')).toBe('Failed to load tables')
+    expect(params.get('error')).toContain('UNKNOWN ERROR')
   })
 })
