@@ -238,7 +238,8 @@ function getLatestParams() {
   const queryParams = new URLSearchParams(window.location.search)
   const sort = queryParams.getAll('sort')
   const filter = queryParams.getAll('filter')
-  return { sort, filter }
+  const tableId = window.location.pathname.match(/\/editor\/(\d+)\/?$/)?.[1]
+  return { tableId, sort, filter }
 }
 
 export function useSyncTableEditorStateFromLocalStorageWithUrl({
@@ -273,6 +274,9 @@ export function useSyncTableEditorStateFromLocalStorageWithUrl({
 
     // `urlParams` from `useQueryStates` can be stale so always get the latest from the URL
     const latestUrlParams = getLatestParams()
+    // Under TanStack the URL moves to the next table before `table` does; saving then would
+    // store one table's filters and sorts under another's id.
+    if (latestUrlParams.tableId !== String(table.id)) return
 
     saveTableEditorStateToLocalStorage({
       projectRef,
