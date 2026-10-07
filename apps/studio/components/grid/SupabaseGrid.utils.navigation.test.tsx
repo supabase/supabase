@@ -16,7 +16,8 @@ import {
   loadTableEditorStateFromLocalStorage,
   useSyncTableEditorStateFromLocalStorageWithUrl,
 } from './SupabaseGrid.utils'
-import type { Entity } from '@/data/table-editor/table-editor-types'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { ForeignTable } from '@/data/table-editor/table-editor-types'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 vi.mock('next/navigation', () => import('@/compat/next/navigation'))
@@ -28,11 +29,24 @@ vi.mock('nuqs', async (importOriginal) => ({
 const tableA = '/project/default/editor/1?schema=public&filter=id%3Aeq%3A2'
 const tableB = '/project/default/editor/2?schema=public'
 
+// The hook only reads `id`; a foreign table is the smallest complete `Entity`.
+const getTable = (id: number): ForeignTable => ({
+  entity_type: ENTITY_TYPE.FOREIGN_TABLE,
+  id,
+  schema: 'public',
+  name: `table_${id}`,
+  comment: null,
+  foreign_server_name: '',
+  foreign_data_wrapper_name: '',
+  foreign_data_wrapper_handler: '',
+  columns: [],
+})
+
 function TablePage() {
   const { id } = useParams<AnyRouter, undefined, false>({ strict: false })
   useSyncTableEditorStateFromLocalStorageWithUrl({
     projectRef: 'default',
-    table: { id: Number(id) } as Entity,
+    table: getTable(Number(id)),
   })
   return <output data-testid="table">{id}</output>
 }
