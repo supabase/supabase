@@ -23,8 +23,7 @@ export const FGA_PERMISSIONS = Object.fromEntries(
 
 type DeepValue<T> = T extends object ? DeepValue<T[keyof T]> : T
 export type ExistingFgaPermissions = DeepValue<typeof FGA_PERMISSIONS>
-// TODO(Hieu): migrate to shared type when every permissions are available there
-export type FgaPermissions = ExistingFgaPermissions | (string & {})
+export type FgaPermissions = ExistingFgaPermissions
 
 /**
  * Checks an FGA permission against the v2 permissions response.
