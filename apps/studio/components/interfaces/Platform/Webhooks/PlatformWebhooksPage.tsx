@@ -125,7 +125,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const fallbackHref =
     scope === 'organization' ? `/org/${slug}/general` : `/project/${ref}/settings/general`
 
-  const eventTypeOptions = [...PLATFORM_WEBHOOK_EVENT_TYPES]
+  // A project-scoped endpoint only ever receives project events — subscribing it to an
+  // organization event would be a dead option, since the backend never delivers one there.
+  const eventTypeOptions =
+    scope === 'project'
+      ? PLATFORM_WEBHOOK_EVENT_TYPES.filter((eventType) => eventType.startsWith('v1.project.'))
+      : [...PLATFORM_WEBHOOK_EVENT_TYPES]
   const webhooksHref =
     scope === 'organization' ? `/org/${slug}/webhooks` : `/project/${ref}/settings/webhooks`
 
