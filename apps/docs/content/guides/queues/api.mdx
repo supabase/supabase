@@ -55,8 +55,12 @@ Permanently deletes a Message from the specified Queue.
 
 ## `pgmq_public.read(queue_name, sleep_seconds, n)`
 
-Reads up to "n" Messages from the specified Queue with an optional "sleep_seconds" (visibility timeout).
+Reads up to `n` Messages from the specified Queue and hides them from other consumers for `sleep_seconds` seconds. All three parameters are required.
 
 - `queue_name` (`text`): Queue name
 - `sleep_seconds` (`integer`): Visibility timeout in seconds
 - `n` (`integer`): Maximum number of Messages to read
+
+Reading a Message doesn't remove it from the Queue. Until the visibility timeout expires, no other `read` returns it. Delete or archive the Message once you've processed it. If you don't, it becomes visible again when the timeout expires, and the next `read` returns it. This lets a failed consumer's Messages be retried.
+
+Set `sleep_seconds` longer than you need to process and delete the Messages. With `0`, the Messages are visible again immediately, so another consumer can read and process them at the same time.
