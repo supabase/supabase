@@ -880,6 +880,41 @@ withTestDatabase('dropping column checks', async ({ executeQuery }) => {
   expect(updatedColumn!.check).toMatchInlineSnapshot(`null`)
 })
 
+withTestDatabase(
+  'updating a column check when another schema has a same-named check constraint',
+  async ({ executeQuery }) => {
+    // `public.t` already has a `t_c_check` constraint, but on a different column position
+    await executeQuery(`
+      create table public.t(x int8, c int8 check (c > 0));
+      create schema s;
+      create table s.t(c int8, d int8);
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = await pgMeta.columns.retrieve({
+      schema: 's',
+      table: 't',
+      name: 'c',
+    })
+    const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    const { sql: updateSql } = await pgMeta.columns.update(column!, {
+      check: rawSql('c > 1'),
+    })
+    await executeQuery(updateSql)
+
+    const updatedColumn = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updatedColumn!.check).toBe('c > 1')
+
+    // A check that refers to another column must still be rejected
+    const { sql: invalidUpdateSql } = await pgMeta.columns.update(updatedColumn!, {
+      check: rawSql('c > d'),
+    })
+    await expect(executeQuery(invalidUpdateSql)).rejects.toThrow(
+      'check condition cannot refer to multiple columns'
+    )
+  }
+)
+
 withTestDatabase('column with fully-qualified type', async ({ executeQuery }) => {
   // Setup: Create table and type in separate schema
   await executeQuery(`
