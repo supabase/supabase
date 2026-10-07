@@ -11,7 +11,10 @@ import {
   toNullableNumber,
 } from './BucketVersioningFields.utils'
 import { LifecyclePolicySection } from './LifecyclePolicySection'
-import type { BucketVersioningState, ExpirationMode } from './StorageVersioning.constants'
+import type {
+  BucketVersioningState,
+  ExpirationMode,
+} from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 interface BucketVersioningFieldsProps {

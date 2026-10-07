@@ -100,6 +100,7 @@ export type OAuthScopeValidationProjectFailure = Extract<
 >['failures'][number]
 
 export type OAuthAppsAuthorizeRoleValidationFailure = {
+  status: 'error'
   error_code: 'role_validation_failed'
   message: string
   validation: OAuthScopeValidationResult
@@ -122,7 +123,7 @@ export function getFailedProjects(
   return failure.validation.scope_target === 'projects' ? failure.validation.failures : []
 }
 
-export type OAuthAppsAuthorizePreflightSuccess = { ok: true }
+export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
 
 export type OAuthAppsAuthorizePreflightResult =
   | OAuthAppsAuthorizePreflightSuccess
