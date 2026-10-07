@@ -41,7 +41,7 @@ export function MultiSelectActionBar({
   const aiSnap = useAiAssistantStateSnapshot()
 
   function handleOpenAiAssistant() {
-    const prompt = buildLogsPrompt(selectedRowsData, queryType, sqlQuery)
+    const prompt = buildLogsPrompt(selectedRowsData, { queryType, sqlQuery })
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialMessage: prompt })
   }
@@ -91,7 +91,7 @@ export function MultiSelectActionBar({
 
         <AiAssistantDropdown
           label="Explain with AI"
-          buildPrompt={() => buildLogsPrompt(selectedRowsData, queryType, sqlQuery)}
+          buildPrompt={() => buildLogsPrompt(selectedRowsData, { queryType, sqlQuery })}
           onOpenAssistant={handleOpenAiAssistant}
           telemetrySource="log_explorer"
         />

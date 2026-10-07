@@ -10,7 +10,6 @@ import {
   SortingState,
   Table,
   useReactTable,
-  VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
@@ -31,6 +30,7 @@ import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Colum
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
+import { LogsTable } from './components/LogsTable'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -40,22 +40,27 @@ import {
   buildFilterSearchUpdate,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
-import { useFilterSearchSync, useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
+import {
+  useFilterSearchSync,
+  useLiveMode,
+  useLogsTableColumns,
+  useResetFocus,
+} from './UnifiedLogs.hooks'
 import { isUserFilterUnreachable } from './UnifiedLogs.queries'
 import { ColumnSchema } from './UnifiedLogs.schema'
-import { QuerySearchParamsType } from './UnifiedLogs.types'
 import {
   gateLogTypeFilters,
   gateLogTypeOptions,
   getComputeLogsAvailability,
   getFacetedUniqueValues,
-  getLevelRowClassName,
+  getLogRowClassName,
+  getUniqueLogRows,
+  toQuerySearchParams,
 } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
 import { DataTableFilterControlsDrawer } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterControlsDrawer'
-import { DataTableInfinite } from '@/components/ui/DataTable/DataTableInfinite'
 import { DataTableSideBarLayout } from '@/components/ui/DataTable/DataTableSideBarLayout'
 import { DataTableViewOptions } from '@/components/ui/DataTable/DataTableViewOptions'
 import { FilterSideBar } from '@/components/ui/DataTable/FilterSideBar'
@@ -109,7 +114,6 @@ export const UnifiedLogs = () => {
   })
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
-  const defaultColumnVisibility = { uuid: false }
   const defaultColumnFilters = buildDefaultColumnFilters({
     ...search,
     filter: visibleSearchFilters,
@@ -138,28 +142,13 @@ export const UnifiedLogs = () => {
     'bottom'
   )
 
-  const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
-    'data-table-visibility',
-    defaultColumnVisibility
-  )
-  const [columnOrder, setColumnOrder] = useLocalStorageQuery<string[]>(
-    'data-table-column-order',
-    []
-  )
+  const { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder } =
+    useLogsTableColumns()
 
   // Create a stable query key object by removing nulls/undefined, id, and live
   // Mainly to prevent the react queries from unnecessarily re-fetching
   const searchParameters = useMemo(() => {
-    const parameters = Object.entries(search).reduce(
-      (acc, [key, value]) => {
-        if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
-          acc[key] = value
-        }
-        return acc
-      },
-      {} as Record<string, unknown>
-    ) as QuerySearchParamsType
-
+    const parameters = toQuerySearchParams(search)
     if (parameters.filter) {
       parameters.filter =
         gateLogTypeFilters(parameters.filter, {
@@ -223,15 +212,10 @@ export const UnifiedLogs = () => {
   // Only fade when filtering (not when loading more data or live mode)
   const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
-  const rawFlatData = useMemo(() => {
-    return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
-  }, [unifiedLogsData?.pages])
-  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
-  const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
-    })
-  }, [rawFlatData])
+  const flatData: ColumnSchema[] = useMemo(
+    () => getUniqueLogRows(unifiedLogsData?.pages),
+    [unifiedLogsData?.pages]
+  )
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -252,16 +236,8 @@ export const UnifiedLogs = () => {
     ) as ChartConfig
   }, [search.filter])
 
-  const getRowClassName = <
-    TData extends { date: Date; level: (typeof LEVELS)[number] | null; timestamp: number },
-  >(
-    row: Row<TData>
-  ) => {
-    const rowTimestamp = row.original.timestamp
-    const isPast = rowTimestamp <= (liveMode.timestamp || -1)
-    const levelClassName = getLevelRowClassName(row.original.level)
-    return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
-  }
+  const getRowClassName = (row: Row<ColumnSchema>) =>
+    getLogRowClassName(row.original, liveMode.timestamp)
 
   // Generate dynamic columns based on current data
   const { columns: dynamicColumns, columnVisibility: dynamicColumnVisibility } = useMemo(() => {
@@ -514,37 +490,26 @@ export const UnifiedLogs = () => {
                   isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
                 )}
               >
-                <div
-                  className={cn(
-                    'h-full [&>div]:h-full',
-                    '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
-                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
-                    '[&_thead_th]:text-foreground-lighter! [&_thead_tr]:bg-background! [&_thead_tr:hover]:bg-background!',
-                    '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
-                  )}
-                >
-                  <DataTableInfinite
-                    columns={UNIFIED_LOGS_COLUMNS}
-                    totalRows={totalDBRowCount}
-                    filterRows={filterDBRowCount}
-                    totalRowsFetched={totalFetched}
-                    fetchNextPage={fetchNextPage}
-                    hasNextPage={hasNextPage}
-                    setColumnOrder={setColumnOrder}
-                    setColumnVisibility={setColumnVisibility}
-                    errorSubject="Failed to retrieve logs"
-                    emptyStateMessage={
-                      isUserFilterUnreachable(searchParameters) ? (
-                        <div className="text-sm flex flex-col gap-y-1">
-                          <p className="text-foreground-light">No results found</p>
-                          <p className="text-foreground-lighter">
-                            Filtering by user is only supported for Auth and API Gateway log types
-                          </p>
-                        </div>
-                      ) : undefined
-                    }
-                  />
-                </div>
+                <LogsTable
+                  columns={UNIFIED_LOGS_COLUMNS}
+                  totalRows={totalDBRowCount}
+                  filterRows={filterDBRowCount}
+                  totalRowsFetched={totalFetched}
+                  fetchNextPage={fetchNextPage}
+                  hasNextPage={hasNextPage}
+                  setColumnOrder={setColumnOrder}
+                  setColumnVisibility={setColumnVisibility}
+                  emptyStateMessage={
+                    isUserFilterUnreachable(searchParameters) ? (
+                      <div className="text-sm flex flex-col gap-y-1">
+                        <p className="text-foreground-light">No results found</p>
+                        <p className="text-foreground-lighter">
+                          Filtering by user is only supported for Auth and API Gateway log types
+                        </p>
+                      </div>
+                    ) : undefined
+                  }
+                />
               </ResizablePanel>
 
               {!!openRowId && !!selectedRow && (
