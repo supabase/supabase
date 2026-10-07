@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { fromLifecycleRules } from '../BucketVersioningFields.lifecycle'
+import { fromLifecycleRules } from '../FilesBuckets/BucketVersioningFields/BucketVersioningFields.lifecycle'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import { getBucketVersioningState } from '../StorageVersioning.constants'
