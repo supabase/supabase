@@ -235,7 +235,7 @@ export const ResumeProjectButton = ({
         open={showFreeProjectLimitWarning}
         onOpenChange={() => setShowFreeProjectLimitWarning(false)}
       >
-        <DialogContent size="medium" className="gap-0 pb-0">
+        <DialogContent size="medium" className="gap-0 pb-0" aria-describedby={undefined}>
           <DialogHeader className="border-b">
             <DialogTitle className="leading-normal">
               Your organization has members who have exceeded their free project limits
@@ -268,7 +268,7 @@ export const ResumeProjectButton = ({
       </Dialog>
 
       <Dialog open={!!billingBlockReason} onOpenChange={() => setBillingBlockReason(undefined)}>
-        <DialogContent size="small" className="gap-0 pb-0">
+        <DialogContent size="small" aria-describedby={undefined} className="gap-0 pb-0">
           <DialogHeader className="border-b">
             <DialogTitle>Unable to resume project</DialogTitle>
           </DialogHeader>
