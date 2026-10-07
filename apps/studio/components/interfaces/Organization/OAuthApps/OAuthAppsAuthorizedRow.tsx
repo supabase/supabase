@@ -4,11 +4,12 @@ import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/t
 
 export interface OAuthAppsAuthorizedRowProps {
   approval: OAuthApprovalItem
+  className?: string
 }
 
-export const OAuthAppsAuthorizedRow = ({ approval }: OAuthAppsAuthorizedRowProps) => {
+export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthorizedRowProps) => {
   return (
-    <TableRow>
+    <TableRow className={className}>
       <TableCell>
         <div className="flex items-center gap-x-3">
           <div

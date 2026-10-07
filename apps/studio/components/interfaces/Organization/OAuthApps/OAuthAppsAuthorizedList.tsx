@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Fragment, useEffect } from 'react'
-import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { Card, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -97,14 +97,26 @@ export const OAuthAppsAuthorizedList = () => {
                   <>
                     {data.pages.map((page, pageIndex) => (
                       <Fragment key={pageIndex}>
-                        {page.data.map((approval) => (
-                          <OAuthAppsAuthorizedRow key={approval.app.id} approval={approval} />
+                        {page.data.map((approval, index) => (
+                          <OAuthAppsAuthorizedRow
+                            key={approval.app.id}
+                            approval={approval}
+                            className={cn(
+                              pageIndex === data.pages.length - 1 &&
+                                index === page.data.length - 1 &&
+                                !isFetchingNextPage &&
+                                'border-none'
+                            )}
+                          />
                         ))}
                       </Fragment>
                     ))}
-                    <TableRow ref={sentinelRef} className="[&>td]:hover:bg-inherit">
-                      <TableCell colSpan={2} className={isFetchingNextPage ? '' : 'p-0 hidden'}>
-                        <p aria-live="polite" className="text-sm text-foreground-lighter">
+                    <TableRow
+                      ref={sentinelRef}
+                      className={cn('[&>td]:hover:bg-inherit', !isFetchingNextPage && 'hidden')}
+                    >
+                      <TableCell colSpan={2}>
+                        <p className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>
                       </TableCell>
@@ -113,6 +125,9 @@ export const OAuthAppsAuthorizedList = () => {
                 )}
               </TableBody>
             </Table>
+            <p aria-live="polite" className="sr-only">
+              {isFetchingNextPage ? 'Loading next page' : ''}
+            </p>
           </Card>
         )}
       </PageSectionContent>
