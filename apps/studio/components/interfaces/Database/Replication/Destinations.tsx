@@ -381,6 +381,7 @@ export const Destinations = () => {
 
         {isSourcesError && (
           <AlertError
+            layout="responsive"
             projectRef={projectRef}
             error={sourcesError}
             subject={sourceErrorTitle}
