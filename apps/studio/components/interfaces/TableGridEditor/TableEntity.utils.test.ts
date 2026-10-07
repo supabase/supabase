@@ -26,9 +26,7 @@ describe('TableEntity.utils: formatTableRowsToJSON', () => {
 
   it('should follow column order, including integer-like column names', () => {
     const rows = [{ idx: 0, '2023': 42, '2024': 99, id: 7, meta: { a: 1 } }]
-    expect(formatTableRowsToJSON(table, rows)).toBe(
-      `[{"id":7,"2024":99,"2023":42,"meta":{"a":1}}]`
-    )
+    expect(formatTableRowsToJSON(table, rows)).toBe(`[{"id":7,"2024":99,"2023":42,"meta":{"a":1}}]`)
   })
 
   it('should omit the grid idx key unless the table has an idx column', () => {
