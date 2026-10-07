@@ -36,13 +36,6 @@
         // vite.config.ts (`next/link` -> compat/next/link.tsx), which knip
         // cannot resolve, so they need to be entries in their own right.
         "compat/**/*.{ts,tsx}",
-        // Vercel serverless function. Vercel deploys every file under `api/`
-        // as a Function by convention; knip's vercel plugin only contributes
-        // `vercel.ts`, so this one is manual. Listing it also traces its
-        // runtime `import('../instrument.server.mjs')`, which is why
-        // instrument.server.mjs needs no entry of its own even though
-        // scripts/serve.js (its other importer) is ignored below.
-        "api/server.js",
       ],
       "ignore": [
         "public/**",
@@ -72,6 +65,17 @@
         // read are documentation of the valid values, not dead code. Scoped to
         // this file so `enumMembers` keeps working everywhere else.
         "data/database/constraints-query.ts": ["enumMembers"],
+        // Org settings authorized-apps data layer, landed in #49476 ahead of the
+        // tables that consume it. Scoped to the remaining files rather than the whole
+        // folder so everything else here stays gated.
+        // TODO(FE-4330): remove — used from #50529, drop this entry in that PR.
+        "data/oauth-apps/oauth-apps-approvals-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-authorized-apps-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-grants-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-member-grants-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-preflight-validation-query.ts": ["files"],
+        "data/oauth-apps/oauth-apps-revoke-grant-mutation.ts": ["files"],
+        "data/oauth-apps/oauth-apps-revoke-mutation.ts": ["files"],
         "hooks/misc/useTrackExperimentExposure.ts": ["files"],
         // Staging-only pinned Postgres image + FDW request payload for creating
         // Warehouse test projects by hand. Nothing imports it yet — it's kept

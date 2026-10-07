@@ -10,10 +10,10 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 export type ProjectSettingsVariables = { projectRef?: string }
 
 // Manually add the protocol property to the response - specifically just for the local/CLI environment
-type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
+type ProjectAppConfig = components['schemas']['ProjectSettingsResponse_Output']['app_config'] & {
   protocol?: string
 }
-export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
+export type ProjectSettings = components['schemas']['ProjectSettingsResponse_Output'] & {
   app_config?: ProjectAppConfig
 }
 

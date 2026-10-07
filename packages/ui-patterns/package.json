@@ -66,18 +66,6 @@
       "import": "./src/Banners/LW15Banner.tsx",
       "types": "./src/Banners/LW15Banner.tsx"
     },
-    "./Banners/Select26Banner": {
-      "import": "./src/Banners/Select26Banner.tsx",
-      "types": "./src/Banners/Select26Banner.tsx"
-    },
-    "./Banners/Select26Promotion.module.css": {
-      "import": "./src/Banners/Select26Promotion.module.css",
-      "types": "./src/Banners/Select26Promotion.module.css"
-    },
-    "./Banners/Select26Promotion": {
-      "import": "./src/Banners/Select26Promotion.tsx",
-      "types": "./src/Banners/Select26Promotion.tsx"
-    },
     "./Banners": {
       "import": "./src/Banners/index.ts",
       "types": "./src/Banners/index.ts"
@@ -819,8 +807,8 @@
   },
   "devDependencies": {
     "@testing-library/dom": "^10.0.0",
-    "@testing-library/jest-dom": "^6.6.0",
-    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.0.0",
     "@types/common-tags": "^1.8.4",
     "@types/js-yaml": "^4.0.9",

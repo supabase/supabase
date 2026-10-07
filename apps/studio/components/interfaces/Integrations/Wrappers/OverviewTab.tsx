@@ -1,93 +1,35 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
-import { Button, Sheet, SheetContent } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
-import { CreateIcebergWrapperSheet } from './CreateIcebergWrapperSheet'
-import { CreateWrapperSheet } from './CreateWrapperSheet'
+import { AddWrapperButton } from './AddWrapperButton'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 const WrapperOverviewContent = () => {
-  const { id } = useParams()
-  const wrapperMeta = WRAPPERS.find((w) => w.name === id)
-
-  const [isDirty, setIsDirty] = useState(false)
-  const [createWrapperShown, setCreateWrapperShown] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setCreateWrapperShown(false)
-      setIsDirty(false)
-    },
-  })
-
-  // [Joshen] Opting to declare custom wrapper sheets here instead of within Wrappers.constants.ts
-  // as we'll easily run into circular dependencies doing so unfortunately
-  const CreateWrapperSheetComponent = !wrapperMeta
-    ? null
-    : wrapperMeta.customComponent
-      ? wrapperMeta.name === 'iceberg_wrapper'
-        ? CreateIcebergWrapperSheet
-        : null
-      : CreateWrapperSheet
-
   return (
-    <>
-      <div className="flex flex-col gap-y-5">
+    <div className="flex flex-col gap-y-5 max-w-5xl">
+      <div className="flex items-center justify-between">
         <p>Recent wrappers</p>
-        <WrapperTable />
+        <AddWrapperButton variant="primary" />
       </div>
-
-      {!!CreateWrapperSheetComponent && !!wrapperMeta && (
-        <Sheet open={!!createWrapperShown} onOpenChange={handleOpenChange}>
-          <SheetContent size="lg">
-            <CreateWrapperSheetComponent
-              wrapperMeta={wrapperMeta}
-              onDirty={setIsDirty}
-              onClose={() => setCreateWrapperShown(false)}
-              onCloseWithConfirmation={confirmOnClose}
-            />
-          </SheetContent>
-        </Sheet>
-      )}
-
-      <DiscardChangesConfirmationDialog {...modalProps} />
-    </>
+      <WrapperTable />
+    </div>
   )
 }
 
 const AddNewWrapperCTA = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [, setCreateWrapperShown] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-
-  const { can: canCreateWrapper } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
-  )
 
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -121,7 +63,7 @@ const AddNewWrapperCTA = () => {
             wrappers. Afterward, you can recreate the wrappers.
           </p>
         </div>
-        <Button asChild variant="default" className="w-min mt-3">
+        <Button asChild className="w-min mt-3">
           <Link
             href={
               databaseNeedsUpgrading
@@ -136,24 +78,7 @@ const AddNewWrapperCTA = () => {
     )
   }
 
-  return (
-    <div className="py-3 px-5 border rounded-md">
-      <ButtonTooltip
-        variant="default"
-        onClick={() => setCreateWrapperShown(true)}
-        disabled={!canCreateWrapper}
-        tooltip={{
-          content: {
-            text: !canCreateWrapper
-              ? 'You need additional permissions to create a foreign data wrapper'
-              : undefined,
-          },
-        }}
-      >
-        Add new wrapper
-      </ButtonTooltip>
-    </div>
-  )
+  return null
 }
 
 export const WrapperContent = () => {

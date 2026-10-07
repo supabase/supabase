@@ -5,7 +5,7 @@ import { warehouseKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse']
+export type WarehouseCatalogResponse = components['schemas']['WarehouseCatalogResponse_Output']
 
 type WarehouseCatalogVariables = { projectRef?: string }
 

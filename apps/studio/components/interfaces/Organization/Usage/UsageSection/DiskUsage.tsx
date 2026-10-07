@@ -62,11 +62,14 @@ export const DiskUsage = ({
       : []
   }, [isSuccess, projects, projectRef])
 
+  const hasReplicas = useMemo(
+    () => relevantProjects.some((it) => it.databases.some((db) => db.type === 'READ_REPLICA')),
+    [relevantProjects]
+  )
+
   const hasProjectsExceedingDiskSize = useMemo(() => {
     return relevantProjects.some((it) =>
-      it.databases.some(
-        (db) => db.type === 'READ_REPLICA' || (db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
-      )
+      it.databases.some((db) => db.disk_volume_size_gb && db.disk_volume_size_gb > 8)
     )
   }, [relevantProjects])
 
@@ -100,6 +103,21 @@ export const DiskUsage = ({
                     You have projects that are exceeding 8 GB of provisioned disk size, but do not
                     allow any overages with the Spend Cap on. Reduce the disk size or disable the
                     spend cap.
+                  </AlertDescription>
+                </Alert>
+              )}
+            {currentBillingCycleSelected &&
+              subscription?.usage_billing_enabled === false &&
+              !hasProjectsExceedingDiskSize &&
+              hasReplicas && (
+                <Alert variant="warning">
+                  <CriticalIcon />
+                  <AlertTitle>
+                    Read replicas add disk usage beyond your plan's included quota
+                  </AlertTitle>
+                  <AlertDescription>
+                    You have read replicas in your projects, but do not allow any overages with the
+                    Spend Cap on. Remove the read replicas or disable the spend cap.
                   </AlertDescription>
                 </Alert>
               )}
@@ -199,7 +217,7 @@ export const DiskUsage = ({
                           </div>
                         </div>
 
-                        <Button asChild variant="default" size="tiny">
+                        <Button asChild size="tiny">
                           <Link href={getInfrastructurePath(project.ref)}>Manage Disk</Link>
                         </Button>
                       </div>

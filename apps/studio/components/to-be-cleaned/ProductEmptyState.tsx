@@ -64,7 +64,7 @@ const ProductEmptyState = ({
                   </ButtonTooltip>
                 ) : null}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                  <Button icon={<ExternalLink strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

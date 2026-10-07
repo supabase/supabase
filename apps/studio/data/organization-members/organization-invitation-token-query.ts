@@ -7,7 +7,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OrganizationInviteTokenVariables = { slug?: string; token?: string }
 
-export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse']
+export type OrganizationInviteByToken = components['schemas']['InvitationByTokenResponse_Output']
 
 export async function getOrganizationInviteByToken(
   { slug, token }: OrganizationInviteTokenVariables,

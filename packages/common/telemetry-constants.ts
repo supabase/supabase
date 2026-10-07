@@ -427,7 +427,7 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
     useApiSchema?: boolean
     /**
      * Postgres engine type selection.
-     * true = "Postgres with OrioleDB" (alpha)
+     * true = "Postgres with OrioleDB" (beta)
      * false = "Postgres" (default)
      */
     useOrioleDb?: boolean
@@ -449,6 +449,18 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * omitted = PostHog flags had not loaded at the time of project creation
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
+    /**
+     * freeTierGeneralRegionExperiment variant at submission time. Omitted when the org isn't
+     * in the experiment (paid plan, smart regions disabled for the selected cloud provider,
+     * or not enrolled via the freeTierGeneralRegionEnrollment ConfigCat flag).
+     */
+    freeTierGeneralRegionExperiment?: 'control' | 'test'
+    /**
+     * Whether the submitted region is a smart region group ('general', e.g. Americas) or an
+     * exact region ('specific', e.g. us-east-1). Only set when smart regions are enabled for
+     * the selected cloud provider.
+     */
+    regionSelectionType?: 'general' | 'specific'
   }
   groups: TelemetryGroups
 }
@@ -503,6 +515,36 @@ export interface ProjectCreationFormExposedEvent {
      */
     surface?: 'main' | 'vercel'
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Org was targeted for the freeTierGeneralRegionExperiment: a free-plan org with smart
+ * regions enabled for the selected cloud provider, enrolled (control or test arm) via the
+ * freeTierGeneralRegionEnrollment ConfigCat flag.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionExperimentExposedEvent {
+  action: 'free_tier_general_region_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionUpgradeClickedEvent {
+  action: 'free_tier_general_region_upgrade_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -995,6 +1037,41 @@ export interface AskAiClickedEvent {
 }
 
 /**
+ * Surface that rendered the prompt panel a user copied from.
+ */
+export type DocsAiPromptSource = 'homepage' | 'guide' | 'agent_setup'
+
+/**
+ * User copied the contents of a docs prompt panel - the homepage setup card or an
+ * `AiPrompt` block - and the clipboard write succeeded. Fires on success only;
+ * failed clipboard writes are not counted.
+ *
+ * Distinct from `ai_prompt_copied`, which belongs to Studio's AI assistant.
+ *
+ * @group Events
+ * @source docs
+ * @page /docs, /docs/guides
+ */
+export interface DocsAiPromptCopiedEvent {
+  action: 'docs_ai_prompt_copied'
+  properties: {
+    /**
+     * Surface the panel was rendered on.
+     */
+    source: DocsAiPromptSource
+    /**
+     * `value` of the pane that was active when the copy happened. Known panes
+     * are `prompt` and `cli`; other strings remain allowed for future panes.
+     */
+    tab: 'prompt' | 'cli' | (string & {})
+    /**
+     * Prompt identifier, set when the panel comes from an `AiPrompt` block.
+     */
+    promptId?: string
+  }
+}
+
+/**
  * User clicked a curated orientation link from a content listings MDX component.
  *
  * @group Events
@@ -1008,6 +1085,68 @@ export interface DocsContentListingClickedEvent {
     groupTitle?: string
     listingId?: string
   }
+}
+
+/**
+ * User opened the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2OpenedEvent {
+  action: 'docs_search_v2_opened'
+  properties: {
+    /**
+     * The trigger that opened the Search V2 dialog.
+     */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User's search term was sent to the Search V2 endpoint.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2SearchSubmittedEvent {
+  action: 'docs_search_v2_search_submitted'
+  properties: {
+    /**
+     * The search term sent to the Search V2 endpoint.
+     */
+    query: string
+  }
+}
+
+/**
+ * User activated a Search V2 result, either by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ResultClickedEvent {
+  action: 'docs_search_v2_result_clicked'
+  properties: {
+    /**
+     * The path of the result that was activated.
+     */
+    resultPath: string
+    /**
+     * The search term whose results were showing when the result was activated.
+     */
+    query: string
+  }
+}
+
+/**
+ * User closed the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ClosedEvent {
+  action: 'docs_search_v2_closed'
 }
 
 /**
@@ -1561,8 +1700,8 @@ export interface ExplorerBannerCtaButtonClickedEvent {
 }
 
 /**
- * User clicked the button in the Explorer sidebar title bar to temporarily switch to the SQL
- * Editor for snippet access.
+ * User clicked the SQL Editor button in the Explorer sidebar footer to temporarily switch
+ * to the SQL Editor for snippet access.
  *
  * @group Events
  * @source studio
@@ -1574,8 +1713,8 @@ export interface ExplorerTempAccessSqlEditorClickedEvent {
 }
 
 /**
- * User clicked the "Back to Explorer" button in the SQL Editor title bar, shown only when the
- * visit originated from the Explorer's temporary switch button.
+ * User clicked the Explorer sidebar nav item while on the SQL Editor page, navigating back
+ * to Explorer.
  *
  * @group Events
  * @source studio
@@ -2010,6 +2149,24 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /** Whether object versioning was turned on at creation time. */
+    hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a bucket that has never had it.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /** Whether a lifecycle policy was configured at the same time. */
+    hasLifecyclePolicy?: boolean
   }
   groups: TelemetryGroups
 }
@@ -2956,7 +3113,7 @@ export interface AuditLogDrainRemovedEvent {
 }
 
 type AdvisorCategory =
-  components['schemas']['GetProjectLintsResponse'][number]['categories'][number]
+  components['schemas']['GetProjectLintsResponse_Output'][number]['categories'][number]
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
@@ -3394,6 +3551,85 @@ export interface LogExplorerQueryRunButtonClickedEvent {
   groups: TelemetryGroups
 }
 
+export type ExplorerQueryLocation =
+  | { surface: 'query_tab'; queryId: string; notebookId?: never; cellId?: never }
+  | { surface: 'notebook_cell'; notebookId: string; cellId: string; queryId?: never }
+
+export type ExplorerQueryRunProperties = ExplorerQueryLocation & {
+  runId: string
+  source: 'database' | 'logs'
+}
+
+type ExplorerGroups = Pick<TelemetryGroups, 'project'> &
+  Partial<Pick<TelemetryGroups, 'organization'>>
+
+/**
+ * User started an Explorer query run.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQuerySubmittedEvent {
+  action: 'explorer_query_submitted'
+  properties: ExplorerQueryRunProperties
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer query run completed successfully.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQueryCompletedEvent {
+  action: 'explorer_query_completed'
+  properties: ExplorerQueryRunProperties
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer query run failed.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerQueryFailedEvent {
+  action: 'explorer_query_failed'
+  properties: ExplorerQueryRunProperties & {
+    failureReason: 'logs_unavailable' | 'connection_unavailable' | 'execution_error'
+  }
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer notebook was saved for the first time.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerNotebookCreatedEvent {
+  action: 'explorer_notebook_created'
+  properties: { notebookId: string }
+  groups: ExplorerGroups
+}
+
+/**
+ * An Explorer notebook was saved after creation.
+ *
+ * @group Events
+ * @source studio
+ * @page /project/{ref}/explorer
+ */
+export interface ExplorerNotebookUpdatedEvent {
+  action: 'explorer_notebook_updated'
+  properties: { notebookId: string }
+  groups: ExplorerGroups
+}
+
 /**
  * User clicked an upgrade CTA inside the compute badge hover card.
  *
@@ -3622,7 +3858,7 @@ export interface PricingPanelPlanPresentationExperimentExposedEvent {
   action: 'pricing_panel_plan_presentation_experiment_exposed'
   properties: {
     /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps'
+    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3657,6 +3893,23 @@ export interface ResourceExhaustionBannerAiAssistantClickedEvent {
 }
 
 /**
+ * User clicked a metrics or documentation link on a resource exhaustion warning banner (Troubleshoot menu item or single-action button).
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ResourceExhaustionBannerTroubleshootClickedEvent {
+  action: 'resource_exhaustion_banner_troubleshoot_clicked'
+  groups: TelemetryGroups
+  properties: {
+    troubleshootAction: 'metrics' | 'docs'
+    warningType: string
+    warningTypes: string[]
+    destination: string
+  }
+}
+
+/**
  * User clicked a row in the Unified Logs interface.
  *
  * @group Events
@@ -3681,7 +3934,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
-      | 'workers'
+      | 'compute'
   }
   groups: TelemetryGroups
 }
@@ -3858,9 +4111,52 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
+ * User enabled Warehouse by submitting a schema and table selection.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseEnabledEvent {
+  action: 'warehouse_enabled'
+  properties: {
+    /** Where the user initiated Warehouse setup. */
+    source: 'integrations_overview'
+    /** Number of schemas replicated in full. */
+    schemaTargetCount: number
+    /** Number of tables replicated individually. */
+    tableTargetCount: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * User disabled Warehouse for a project.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/warehouse/overview
+ */
+export interface WarehouseDisabledEvent {
+  action: 'warehouse_disabled'
+  properties: {
+    /** Number of schemas that were replicated in full. Omitted when the replicated tables have not resolved. */
+    schemaTargetCount?: number
+    /** Number of tables that were replicated individually. Omitted when the replicated tables have not resolved. */
+    tableTargetCount?: number
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | ExplorerQuerySubmittedEvent
+  | ExplorerQueryCompletedEvent
+  | ExplorerQueryFailedEvent
+  | ExplorerNotebookCreatedEvent
+  | ExplorerNotebookUpdatedEvent
   | SignUpEvent
   | SignInEvent
   | SignInSubmittedEvent
@@ -3885,6 +4181,8 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationFormExposedEvent
+  | FreeTierGeneralRegionExperimentExposedEvent
+  | FreeTierGeneralRegionUpgradeClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -3914,7 +4212,12 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | AskAiClickedEvent
+  | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
+  | DocsSearchV2OpenedEvent
+  | DocsSearchV2SearchSubmittedEvent
+  | DocsSearchV2ResultClickedEvent
+  | DocsSearchV2ClosedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
@@ -3983,6 +4286,7 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
@@ -4059,6 +4363,7 @@ export type TelemetryEvent =
   | AccessTokenDoneButtonClickedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
   | ResourceExhaustionBannerAiAssistantClickedEvent
+  | ResourceExhaustionBannerTroubleshootClickedEvent
   | UnifiedLogsRowClickedEvent
   | HeaderHomeLogoClickedEvent
   | HeaderBackToDashboardClickedEvent
@@ -4075,3 +4380,5 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
+  | WarehouseEnabledEvent
+  | WarehouseDisabledEvent

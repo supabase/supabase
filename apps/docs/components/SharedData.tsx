@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import { config, logConstants } from 'shared-data'
 
-import { resolveSharedDataPath } from './SharedData.utils'
+import { getLogFieldReference, resolveSharedDataPath } from './SharedData.utils'
 
 const sharedData = {
   config,
-  logConstants,
+  logConstants: { schemas: getLogFieldReference(logConstants.schemas) },
 }
 
 /**

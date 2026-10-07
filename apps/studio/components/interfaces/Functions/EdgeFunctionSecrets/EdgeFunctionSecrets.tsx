@@ -20,6 +20,7 @@ import { EditSecretSheet } from './EditSecretSheet'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
 import { useSecretsQuery } from '@/data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -27,7 +28,7 @@ import { DOCS_URL } from '@/lib/constants'
 
 export const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
-  const workersEnabled = useFlag('workers')
+  const computeEnabled = useFlag('compute')
   const [searchString, setSearchString] = useState('')
 
   const { can: canReadSecrets, isLoading: isLoadingSecretsPermissions } = useAsyncCheckPermissions(
@@ -181,14 +182,11 @@ export const EdgeFunctionSecrets = () => {
                           </TableCell>
                         </TableRow>
                       ) : (
-                        <TableRow className="[&>td]:hover:bg-inherit">
-                          <TableCell colSpan={headers.length}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{searchString}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults
+                          className="[&>td]:hover:bg-inherit"
+                          colSpan={headers.length}
+                          search={searchString}
+                        />
                       )}
                     </TableBody>
                   </Table>
@@ -232,11 +230,11 @@ export const EdgeFunctionSecrets = () => {
           }
         }}
       >
-        {workersEnabled ? (
+        {computeEnabled ? (
           <p className="text-sm">
             Ensure none of your <span className="font-medium">edge functions</span> or{' '}
-            <span className="font-medium">workers</span> are actively using this secret before
-            deleting it. This action cannot be undone.
+            <span className="font-medium">compute instances</span> are actively using this secret
+            before deleting it. This action cannot be undone.
           </p>
         ) : (
           <p className="text-sm">

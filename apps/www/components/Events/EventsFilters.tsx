@@ -237,12 +237,7 @@ function EventFilters({ allEvents, setEvents, categories, onDemandEvents }: Prop
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
         >
-          <Button
-            className="px-2 w-9 h-9"
-            size="large"
-            variant="default"
-            onClick={() => setShowSearchInput(true)}
-          >
+          <Button className="px-2 w-9 h-9" size="large" onClick={() => setShowSearchInput(true)}>
             <Search size="14" />
           </Button>
         </motion.div>

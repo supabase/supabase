@@ -55,8 +55,23 @@ export async function collectDocsOwnedLinks(
   return [...links].sort()
 }
 
-// Vercel bot protection blocks the HeadlessChrome UA on some routes; strip it.
-export async function browserLikeUserAgent(page: Page): Promise<string> {
-  const userAgent = await page.evaluate(() => navigator.userAgent)
-  return userAgent.replace('HeadlessChrome', 'Chrome')
+export type LinkCheckResult = {
+  ok: boolean
+  status: number
+  error?: string
+}
+
+// The docs middleware rewrites /reference/* requests whose user agent looks like a bot
+// (isbot, which matches HeadlessChrome) to /api/crawlers. Fetching from inside the page
+// keeps the browser's own user agent and network stack, so a link resolves the same way
+// page.goto resolves it in this suite.
+export async function checkLinkFromBrowser(page: Page, url: string): Promise<LinkCheckResult> {
+  return page.evaluate(async (linkUrl) => {
+    try {
+      const response = await fetch(linkUrl)
+      return { ok: response.ok, status: response.status }
+    } catch (error) {
+      return { ok: false, status: 0, error: error instanceof Error ? error.message : String(error) }
+    }
+  }, url)
 }

@@ -30,7 +30,6 @@ const createWrapper = () => {
 describe('useAdvisorSignals', () => {
   beforeEach(() => {
     window.localStorage.clear()
-    vi.clearAllMocks()
   })
 
   it('resurfaces a dismissed banned-IP signal after the IP disappears and is banned again', async () => {

@@ -1,30 +1,6 @@
 import { createLogCellSkeleton, createMarkdownCellSkeleton, createQueryCellSkeleton } from './utils'
 import type { Notebooks } from '@/types'
 
-export type ChatTemplate = {
-  title: string
-  description: string
-  initialMessage: string
-}
-
-export const CHAT_TEMPLATES: ChatTemplate[] = [
-  {
-    title: 'Generate sample data',
-    description: 'Chat template',
-    initialMessage: 'Generate sample data for a blog with users, posts, and comments tables.',
-  },
-  {
-    title: 'Set up RLS policies',
-    description: 'Chat template',
-    initialMessage: 'Create RLS policies to ensure users can only access their own data.',
-  },
-  {
-    title: 'Build a notebook',
-    description: 'Chat template',
-    initialMessage: 'Build me a notebook that tracks weekly signups and active users.',
-  },
-]
-
 export type NotebookTemplate = {
   title: string
   description: string

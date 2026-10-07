@@ -2,7 +2,15 @@
 
 import { components } from 'api-types'
 import { FlagValues } from 'flags/react'
-import { createContext, PropsWithChildren, useContext, useEffect, useRef, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import { useAuth, useUser } from './auth'
 import { getFlags as getDefaultConfigCatFlags } from './configcat'
@@ -12,7 +20,8 @@ import { ensurePlatformSuffix } from './helpers'
 import { useParams } from './hooks'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody']
-export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponse']
+export type CallFeatureFlagsResponse =
+  components['schemas']['TelemetryCallFeatureFlagsResponse_Output']
 
 export async function getFeatureFlags(
   API_URL: string,
@@ -51,6 +60,21 @@ export type FeatureFlagContextType = {
   configcat: { [key: string]: boolean | number | string | null }
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
+  /**
+   * True while ConfigCat flags are being re-evaluated after `getConfigCatFlags` changed,
+   * e.g. because its custom attributes changed. Until then, `configcat` holds values
+   * evaluated with the previous attributes.
+   */
+  isConfigCatStale?: boolean
+}
+
+type ConfigCatFlagsFetcher = (
+  userEmail?: string
+) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+
+type FeatureFlagStore = FeatureFlagContextType & {
+  /** The `getConfigCatFlags` that produced the current ConfigCat values */
+  configCatFetcher?: ConfigCatFlagsFetcher
 }
 
 export const FeatureFlagContext = createContext<FeatureFlagContextType>({
@@ -86,9 +110,7 @@ export const FeatureFlagProvider = ({
   organizationSlug?: string
   projectRef?: string
   /** Custom fetcher for ConfigCat flags if passing in custom attributes */
-  getConfigCatFlags?: (
-    userEmail?: string
-  ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
+  getConfigCatFlags?: ConfigCatFlagsFetcher
 }>) => {
   const { isLoading } = useAuth()
   const user = useUser()
@@ -98,7 +120,7 @@ export const FeatureFlagProvider = ({
   const resolvedProjectRef = projectRef ?? params.ref
   const lastSentGroupContextRef = useRef<string | null>(null)
 
-  const [store, setStore] = useState<FeatureFlagContextType>({
+  const [store, setStore] = useState<FeatureFlagStore>({
     API_URL,
     configcat: {},
     posthog: {},
@@ -144,7 +166,11 @@ export const FeatureFlagProvider = ({
         (enabled === true || (typeof enabled === 'object' && enabled.ph)) && !!API_URL
       const loadCCFlags = enabled === true || (typeof enabled === 'object' && enabled.cc)
 
-      let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
+      let flagStore: FeatureFlagStore = {
+        configcat: {},
+        posthog: {},
+        configCatFetcher: getConfigCatFlags,
+      }
 
       // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
       const [phResult, ccResult] = await Promise.allSettled([
@@ -252,8 +278,14 @@ export const FeatureFlagProvider = ({
     getConfigCatFlags,
   ])
 
+  // Memoized so consumers only re-render when the flags or their staleness change
+  const contextValue = useMemo<FeatureFlagContextType>(() => {
+    const { configCatFetcher, ...flags } = store
+    return { ...flags, isConfigCatStale: configCatFetcher !== getConfigCatFlags }
+  }, [store, getConfigCatFlags])
+
   return (
-    <FeatureFlagContext.Provider value={store}>
+    <FeatureFlagContext.Provider value={contextValue}>
       {/*
         [Joshen] Just support configcat flags in Vercel flags for now for simplicity
         although I think it should be fairly simply to support PH too

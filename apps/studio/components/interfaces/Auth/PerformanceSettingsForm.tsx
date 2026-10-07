@@ -267,9 +267,7 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {requestDurationForm.formState.isDirty && (
-                  <Button variant="default" onClick={() => requestDurationForm.reset()}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => requestDurationForm.reset()}>Cancel</Button>
                 )}
                 <Button
                   variant={promptUpgrade ? 'default' : 'primary'}
@@ -411,9 +409,7 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {databaseForm.formState.isDirty && (
-                  <Button variant="default" onClick={() => databaseForm.reset()}>
-                    Cancel
-                  </Button>
+                  <Button onClick={() => databaseForm.reset()}>Cancel</Button>
                 )}
                 <Button
                   variant={promptUpgrade ? 'default' : 'primary'}

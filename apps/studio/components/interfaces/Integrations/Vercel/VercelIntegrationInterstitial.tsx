@@ -89,7 +89,7 @@ export function VercelIntegrationInterstitialErrorState({
           </>
         }
       />
-      <Button variant="default" block asChild>
+      <Button block asChild>
         <Link href="/">Back to dashboard</Link>
       </Button>
     </div>

@@ -182,7 +182,7 @@ export const ProjectUpgradeAlert = () => {
                           </p>
 
                           <div>
-                            <Button size="tiny" variant="default" asChild>
+                            <Button size="tiny" asChild>
                               <Link
                                 href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                                 target="_blank"
@@ -216,15 +216,15 @@ export const ProjectUpgradeAlert = () => {
                               <code className="text-xs">
                                 {legacyAuthCustomRoles.map((role) => (
                                   <div key={role} className="pb-1">
-                                    ALTER ROLE <span className="text-brand">{role}</span> WITH
-                                    PASSWORD '<span className="text-brand">newpassword</span>';
+                                    ALTER ROLE <span className="text-primary">{role}</span> WITH
+                                    PASSWORD '<span className="text-primary">newpassword</span>';
                                   </div>
                                 ))}
                               </code>
                             </div>
                           </div>
                           <div>
-                            <Button size="tiny" variant="default" asChild>
+                            <Button size="tiny" asChild>
                               <Link
                                 href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                                 target="_blank"
@@ -276,14 +276,15 @@ export const ProjectUpgradeAlert = () => {
                   </div>
                 </DialogSection>
                 <DialogFooter>
-                  <Button
-                    variant="default"
-                    onClick={() => setShowUpgradeModal(false)}
-                    disabled={isUpgrading}
-                  >
+                  <Button onClick={() => setShowUpgradeModal(false)} disabled={isUpgrading}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isUpgrading} loading={isUpgrading}>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={isUpgrading}
+                    loading={isUpgrading}
+                  >
                     Confirm upgrade
                   </Button>
                 </DialogFooter>

@@ -55,7 +55,6 @@ vi.mock('sonner', () => ({
 
 describe('AddNewURLModal', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     useAuthConfigUpdateMutationMock.mockReturnValue({
       mutate: mutateMock,
       isPending: false,

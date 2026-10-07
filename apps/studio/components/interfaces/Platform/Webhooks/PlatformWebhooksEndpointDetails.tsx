@@ -123,7 +123,6 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
         <div className="flex h-full items-center justify-end">
           {row.original.status !== 'success' ? (
             <ButtonTooltip
-              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2"
               icon={<RotateCcw />}
@@ -137,7 +136,6 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             />
           ) : (
             <Button
-              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2 invisible pointer-events-none"
               icon={<RotateCcw />}
@@ -366,7 +364,6 @@ export const PlatformWebhooksEndpointDetails = ({
                   icon={<ChevronLeft />}
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
-                  variant="default"
                   size="tiny"
                   disabled={!table.getCanPreviousPage()}
                   onClick={() => table.previousPage()}
@@ -375,7 +372,6 @@ export const PlatformWebhooksEndpointDetails = ({
                   icon={<ChevronRight />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
-                  variant="default"
                   size="tiny"
                   disabled={!table.getCanNextPage()}
                   onClick={() => table.nextPage()}

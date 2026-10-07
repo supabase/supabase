@@ -2,8 +2,6 @@ export const MCP_SECRETS_ROUTE = '/mcp/secrets'
 
 export const MCP_SECRETS_FLAG = 'McpElicitURLMode'
 
-export const UNKNOWN_CLIENT_LABEL = 'your AI client'
-
 export const SECRETS_TOOL_NAME = 'create_edge_function_secret'
 
 export const MAX_SECRET_NAME_LENGTH = 256

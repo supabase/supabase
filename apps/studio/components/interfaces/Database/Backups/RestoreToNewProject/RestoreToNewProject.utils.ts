@@ -42,7 +42,7 @@ export function projectSpecToMonthlyPrice({
 
   const computePrice = calculateComputeSizePrice({
     availableOptions: [
-      { identifier: targetComputeSize, price: getComputeHourlyPrice(targetComputeSize) },
+      { identifier: targetComputeSize, price: getComputeHourlyPrice(targetComputeSize, planId) },
     ],
     oldComputeSize: 'nano', // not used for r2np
     newComputeSize: targetComputeSize,
@@ -55,9 +55,9 @@ export function projectSpecToMonthlyPrice({
   }
 }
 
-function getComputeHourlyPrice(computeSize: InfraInstanceSize): number {
+function getComputeHourlyPrice(computeSize: InfraInstanceSize, planId: PlanId): number {
   if (computeSize === 'pico' || computeSize === 'nano') {
-    return 0
+    return planId === 'free' ? 0 : instanceSizeSpecs.micro.priceHourly
   }
 
   return instanceSizeSpecs[computeSize]?.priceHourly

@@ -348,7 +348,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" className="w-7" icon={<MoreVertical />} />
+                  <Button className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
@@ -357,7 +357,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                       {!!inferredPostgresTable && (
                         <DropdownMenuItem asChild className="flex items-center gap-x-2">
                           <Link
-                            href={`/project/${projectRef}/database/replication/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
+                            href={`/project/${projectRef}/database/pipelines/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
                           >
                             <Eye size={12} className="text-foreground-lighter" />
                             <p>View pipeline</p>
@@ -410,7 +410,6 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
               <DropdownMenuTrigger asChild>
                 <Button
                   loading={isDeletingNamespaceTable}
-                  variant="default"
                   className="w-7"
                   icon={<MoreVertical />}
                 />
@@ -452,7 +451,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <InsertDataDialog table={table.name} fdwTable={x} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" className="w-7" icon={<MoreVertical />} />
+                <Button className="w-7" icon={<MoreVertical />} />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-fit min-w-[180px]" align="end">
                 <DropdownMenuItem asChild className="flex items-center gap-x-2">

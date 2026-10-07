@@ -7,7 +7,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 const NOTEBOOK_ID = 'd3aadd77-7c3c-4de7-aa5c-5aa8ac270b44'
 
-const NOTEBOOK_ROW: components['schemas']['GetUserContentByIdResponse'] = {
+const NOTEBOOK_ROW: components['schemas']['GetUserContentByIdResponse_Output'] = {
   id: NOTEBOOK_ID,
   type: 'notebook',
   name: 'Signup funnel',
@@ -31,7 +31,7 @@ describe('getNotebook', () => {
       method: 'get',
       path: '/platform/projects/:ref/content/item/:id',
       response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>(NOTEBOOK_ROW),
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>(NOTEBOOK_ROW),
     })
 
     const result = await getNotebook({ projectRef: 'default', id: NOTEBOOK_ID })
@@ -45,7 +45,7 @@ describe('getNotebook', () => {
       method: 'get',
       path: '/platform/projects/:ref/content/item/:id',
       response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>({
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
           id: NOTEBOOK_ID,
           type: 'report',
           name: 'A report',

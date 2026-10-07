@@ -159,12 +159,7 @@ export function SupportAssistantSuccessCardContent({
           </div>
         </CardHeader>
         <CardContent>
-          <Button
-            asChild
-            variant="default"
-            size="tiny"
-            iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}
-          >
+          <Button asChild size="tiny" iconRight={<ArrowUpRight size={14} strokeWidth={1.5} />}>
             <Link
               href={`/project/${request.projectRef}?sidebar=ai-assistant&${ASSISTANT_HANDOFF_QUERY_PARAM}=${handoffToken}`}
               onClick={() =>

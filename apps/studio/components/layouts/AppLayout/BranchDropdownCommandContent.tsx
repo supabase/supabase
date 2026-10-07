@@ -14,11 +14,10 @@ import {
 } from 'ui'
 
 import { BranchLink } from './BranchLink'
+import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Branch } from '@/data/branches/branches-query'
 import { useTrack } from '@/lib/telemetry/track'
-
-const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
 export interface BranchDropdownCommandContentProps {
   embedded: boolean
@@ -82,7 +81,6 @@ export function BranchDropdownCommandContent({
             </a>
           </Button>
           <Button
-            variant="default"
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"

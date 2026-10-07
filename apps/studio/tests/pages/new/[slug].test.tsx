@@ -16,14 +16,14 @@ import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 import type { Permission } from '@/types'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
-type CreateProjectResponse = components['schemas']['CreateProjectResponse']
-type RegionsInfo = components['schemas']['RegionsInfo']
-type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit']
-type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
-type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][number]
+type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
+type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
+type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type Entitlement = components['schemas']['ListEntitlementsResponse_Output']['entitlements'][number]
 type AvailableVersion = {
   postgres_engine: '15' | '17' | '17-oriole'
   release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
@@ -103,6 +103,18 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 }
 
 const FRANKFURT = 'Central EU (Frankfurt)'
+const SAO_PAULO = 'South America (São Paulo)'
+
+const availableRegionsWithSaoPaulo = (status?: 'capacity' | 'other'): RegionsInfo => ({
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    specific: [
+      ...DEFAULT_AVAILABLE_REGIONS.all.specific,
+      { code: 'sa-east-1', name: SAO_PAULO, provider: 'AWS', type: 'specific', status },
+    ],
+  },
+})
 
 const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -120,7 +132,7 @@ const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
     {
       postgres_engine: '17-oriole',
-      release_channel: 'alpha',
+      release_channel: 'beta',
       version: 'supabase-postgres-17.9.9.999-orioledb',
     },
   ],
@@ -174,6 +186,15 @@ function mockWizardEndpoints(
     path: '/platform/organizations',
     response: () =>
       HttpResponse.json<OrganizationResponse[]>(overrides.organizations ?? [mockOrg()]),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug',
+    response: {
+      ...(overrides.organizations?.[0] ?? mockOrg()),
+      created_at: '2026-01-01T00:00:00Z',
+      has_oriole_project: false,
+    },
   })
   addAPIMock({
     method: 'get',
@@ -262,13 +283,23 @@ const DEFAULT_FLAGS = {
   newProjectInternalOnlyConfiguration: false,
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
+  projectCreationRestrictedRegions: false,
+  freeTierGeneralRegionEnrollment: false,
+  freeTierGeneralRegionSelection: false,
 }
 
-async function renderWizard(options: { flags?: Partial<typeof DEFAULT_FLAGS> } = {}) {
+async function renderWizard(
+  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
-      value={{ configcat: { ...DEFAULT_FLAGS, ...options.flags }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: { ...DEFAULT_FLAGS, ...options.flags },
+        posthog: {},
+        hasLoaded: true,
+        isConfigCatStale: options.isConfigCatStale,
+      }}
     >
       <Wizard dehydratedState={undefined} />
     </FeatureFlagContext.Provider>,
@@ -341,7 +372,6 @@ const generateAndWaitForStrongPassword = async () => {
 
 describe('project creation wizard', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     user = userEvent.setup({ delay: null })
     routerMock.setCurrentUrl(`/new/${ORG_SLUG}`)
   })
@@ -480,6 +510,163 @@ describe('project creation wizard', () => {
 
       await screen.findByText('Error loading available regions')
     })
+
+    describe('free tier general region experiment', () => {
+      test('keeps the region selector loading while flags are being re-evaluated', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+          isConfigCatStale: true,
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        expect(await screen.findByText('Loading available regions...')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toBeDisabled()
+      })
+
+      test('restricts the picker to general regions with an upgrade footer for a free-plan org in the test arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.queryByRole('option', { name: /North Virginia/ })).not.toBeInTheDocument()
+
+        const upgradeLink = screen.getByRole('link', { name: 'Upgrade to Pro' })
+        expect(upgradeLink).toHaveAttribute(
+          'href',
+          `/org/${ORG_SLUG}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`
+        )
+      })
+
+      test('shows the full region picker with no upgrade footer for a free-plan org in the control arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: false,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: /North Virginia/ })).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
+
+      test('shows the full region picker with no upgrade footer for a paid-plan org even when enrolled', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
+    })
+
+    describe('restricted regions', () => {
+      const CAPACITY_COPY = {
+        title: 'Selected region is at capacity',
+        notice:
+          'This region currently has capacity for Micro compute and above. Free plan projects run on Nano compute.',
+      }
+      const GENERIC_COPY = {
+        title: 'Selected region is unavailable',
+        notice: 'This region is temporarily unavailable for new projects.',
+      }
+
+      const expectSelectableRestrictedRegion = async (
+        onRequest: ReturnType<typeof vi.fn>,
+        copy: { title: string; notice: string }
+      ) => {
+        await fillProjectName('Restricted Region Project')
+        await generateAndWaitForStrongPassword()
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        const saoPaulo = await screen.findByRole('option', { name: /São Paulo/ })
+        expect(saoPaulo).not.toHaveAttribute('aria-disabled', 'true')
+        expect(within(saoPaulo).getByText('Unavailable')).toBeInTheDocument()
+        expect(
+          within(screen.getByRole('option', { name: /North Virginia/ })).queryByText('Unavailable')
+        ).not.toBeInTheDocument()
+        await user.click(saoPaulo)
+
+        expect(await screen.findByText(copy.title)).toBeInTheDocument()
+        expect(screen.getByText(copy.notice, { exact: false })).toBeInTheDocument()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+        const message = `${copy.title}. Select a different region to continue.`
+        expect(await screen.findByText(message)).toBeInTheDocument()
+        expect(onRequest).not.toHaveBeenCalled()
+
+        await selectRegion(/Americas/)
+        await waitFor(() => expect(screen.queryByText(message)).not.toBeInTheDocument())
+        expect(screen.queryByText(copy.title)).not.toBeInTheDocument()
+      }
+
+      test('keeps a capacity-restricted region selectable, explains it, and blocks submission', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('capacity') })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await expectSelectableRestrictedRegion(onRequest, CAPACITY_COPY)
+      })
+
+      test('labels an "other" platform status with generic copy instead of greying it out silently', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo('other') })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard()
+
+        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
+      })
+
+      test('applies a flag-only restriction the same way when the platform reports no status', async () => {
+        mockWizardEndpoints({ availableRegions: availableRegionsWithSaoPaulo() })
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard({
+          flags: { projectCreationRestrictedRegions: '{"sa-east-1":"unavailable"}' },
+        })
+
+        await expectSelectableRestrictedRegion(onRequest, GENERIC_COPY)
+      })
+    })
   })
 
   describe('compute size and spend confirmation', () => {
@@ -494,7 +681,7 @@ describe('project creation wizard', () => {
       await generateAndWaitForStrongPassword()
 
       await user.click(getSelectTriggerByLabel('Compute size'))
-      await user.click(await screen.findByText('4 GB RAM / 2-core CPU'))
+      await user.click(await screen.findByText('4 GB RAM / Shared compute'))
 
       fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
 
@@ -531,7 +718,7 @@ describe('project creation wizard', () => {
       ).not.toBeInTheDocument()
     })
 
-    test('selecting orioledb shows the alpha warning and submits the oriole engine/channel', async () => {
+    test('selecting orioledb shows the beta warning and submits the oriole engine/channel', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
@@ -552,7 +739,7 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       const body = onRequest.mock.calls[0][0]
       expect(body.postgres_engine).toBe('17-oriole')
-      expect(body.release_channel).toBe('alpha')
+      expect(body.release_channel).toBe('beta')
     })
 
     test('hides advanced configuration only while high availability is enabled', async () => {

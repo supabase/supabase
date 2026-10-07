@@ -1,15 +1,12 @@
-import { keepPreviousData } from '@tanstack/react-query'
-import { useDebounce } from '@uidotdev/usehooks'
-import { useParams } from 'common'
 import { Loader2, Search } from 'lucide-react'
-import { useState } from 'react'
-import { Checkbox, cn, Label, Skeleton } from 'ui'
+import { Checkbox, cn, Label } from 'ui'
 
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
-import { useDataTable } from '../providers/DataTableProvider'
-import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
+import { useUnifiedLogsPathnameOptions } from '@/components/interfaces/UnifiedLogs/useUnifiedLogsPathnameOptions'
+import { AlertError } from '@/components/ui/AlertError'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 export function DataTableFilterCheckboxAsync<TData>({
   value: _value,
@@ -17,43 +14,18 @@ export function DataTableFilterCheckboxAsync<TData>({
   component: Component,
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
-  const [inputValue, setInputValue] = useState('')
-
-  const { table, searchParameters, columnFilters, isLoadingCounts, getFacetedUniqueValues } =
-    useDataTable()
-
-  // [Joshen] JFYI for simplicity currently, i'm adding UnifiedLogs logic into this file
-  // despite this supposedly being a reusable component - tbh really, this doesn't need to
-  // be reusable perhaps unless we plan for this to be used in another area of the dashboard
-  // but its too early to say for sure atm.
-  const { ref: projectRef } = useParams()
-  const debouncedSearch = useDebounce(inputValue, 700)
-  const { data: filterOptions = [], isFetching: isFetchingFacetCount } =
-    useUnifiedLogsFacetCountQuery(
-      {
-        projectRef,
-        search: searchParameters,
-        facet: value,
-        facetSearch: debouncedSearch,
-      },
-      {
-        placeholderData: keepPreviousData,
-        enabled: debouncedSearch.length > 0,
-        initialData: debouncedSearch.length === 0 ? options : undefined,
-      }
-    )
-
-  const column = table.getColumn(value)
-  const filterValue = columnFilters.find((i) => i.id === value)?.value
-  const facetedValue = getFacetedUniqueValues?.(table, value) || column?.getFacetedUniqueValues()
-  const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
-
-  if (!options?.length)
-    return (
-      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded-sm">
-        <p className="text-xs text-foreground-light">No options available</p>
-      </div>
-    )
+  const {
+    column,
+    error,
+    filterOptions,
+    inputValue,
+    isError,
+    isFetching,
+    isLoading,
+    projectRef,
+    selectedValues,
+    setInputValue,
+  } = useUnifiedLogsPathnameOptions(value, options)
 
   return (
     <div className="grid gap-2">
@@ -62,12 +34,21 @@ export function DataTableFilterCheckboxAsync<TData>({
         leading={<Search size={14} className="text-foreground-lighter" />}
         containerClassName="h-8 rounded-sm"
         value={inputValue}
-        trailing={isFetchingFacetCount ? <Loader2 size={12} className="animate-spin" /> : undefined}
+        trailing={isFetching ? <Loader2 size={12} className="animate-spin" /> : undefined}
         onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={onSearchInputEscape(inputValue, setInputValue)}
       />
 
+      {isError && (
+        <AlertError error={error} subject="Failed to retrieve pathnames" projectRef={projectRef} />
+      )}
+
       <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
-        {filterOptions.length === 0 ? (
+        {filterOptions.length === 0 && isLoading ? (
+          <div className="flex items-center justify-center px-2 py-3 text-center">
+            <Loader2 size={14} className="animate-spin" />
+          </div>
+        ) : filterOptions.length === 0 && !isError ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
             <div className="space-y-0.5">
               <p className="text-xs text-foreground">No results found</p>
@@ -76,7 +57,7 @@ export function DataTableFilterCheckboxAsync<TData>({
           </div>
         ) : (
           filterOptions.map((option, index) => {
-            const checked = filters.includes(option.value)
+            const checked = selectedValues.includes(option.value)
 
             return (
               <div
@@ -90,10 +71,12 @@ export function DataTableFilterCheckboxAsync<TData>({
                   id={`${value}-${option.value}`}
                   checked={checked}
                   onCheckedChange={(checked) => {
-                    const newValue = checked
-                      ? [...(filters || []), option.value]
-                      : filters?.filter((value) => option.value !== value)
-                    column?.setFilterValue(newValue?.length ? newValue : undefined)
+                    const newValues = checked
+                      ? [...selectedValues, option.value]
+                      : selectedValues.filter((value) => option.value !== value)
+                    column?.setFilterValue(
+                      newValues.length ? { operator: '=', values: newValues } : undefined
+                    )
                   }}
                 />
                 <Label
@@ -108,18 +91,14 @@ export function DataTableFilterCheckboxAsync<TData>({
                     )}
                   </div>
                   <span className="shrink-0 flex items-center justify-center font-mono text-xs group-hover:opacity-0">
-                    {isLoadingCounts ? (
-                      <Skeleton className="h-4 w-4" />
-                    ) : facetedValue?.has(option.value) ? (
-                      formatCompactNumber(facetedValue.get(option.value) || 0)
-                    ) : ['log_type', 'method', 'level'].includes(value) ? (
-                      '0'
-                    ) : null}
+                    {'count' in option ? formatCompactNumber(option.count) : null}
                   </span>
                   <button
                     type="button"
                     tabIndex={0}
-                    onClick={() => column?.setFilterValue([option.value])}
+                    onClick={() =>
+                      column?.setFilterValue({ operator: '=', values: [option.value] })
+                    }
                     className={cn(
                       'text-xs text-muted-foreground hover:text-foreground',
                       'absolute inset-y-0 right-0 hidden bg-surface-100 group-hover:flex group-focus-within:flex items-center cursor-pointer',

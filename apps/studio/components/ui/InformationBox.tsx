@@ -75,7 +75,7 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
 
               {url && (
                 <div>
-                  <Button asChild variant="default" icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLink />}>
                     <Link href={url} target="_blank" rel="noreferrer">
                       {urlLabel}
                     </Link>

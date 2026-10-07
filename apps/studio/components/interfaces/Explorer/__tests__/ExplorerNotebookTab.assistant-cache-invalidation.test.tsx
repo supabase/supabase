@@ -5,6 +5,7 @@ import { HttpResponse } from 'msw'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
+import { ExplorerProvider } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import type { components } from '@/data/api'
 import { contentKeys } from '@/data/content/keys'
 import {
@@ -66,7 +67,9 @@ const seedNotebook = () => {
 const renderNotebookTab = (queryClient: QueryClient, tabsState = createTabsState(PROJECT_REF)) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
-      <ExplorerNotebookTab />
+      <ExplorerProvider>
+        <ExplorerNotebookTab />
+      </ExplorerProvider>
     </TabsStateContext.Provider>,
     { queryClient }
   )
@@ -87,7 +90,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
       method: 'get',
       path: '/platform/projects/:ref/content/item/:id',
       response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>({
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
           id: NOTEBOOK_ID,
           type: 'notebook',
           name: 'Test notebook',
@@ -147,7 +150,7 @@ describe('ExplorerNotebookTab — assistant cache invalidation', () => {
       method: 'get',
       path: '/platform/projects/:ref/content/item/:id',
       response: () =>
-        HttpResponse.json<components['schemas']['GetUserContentByIdResponse']>({
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
           id: NOTEBOOK_ID,
           type: 'notebook',
           name: 'Test notebook',

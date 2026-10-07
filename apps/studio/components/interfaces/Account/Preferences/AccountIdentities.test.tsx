@@ -107,7 +107,6 @@ const openAddPasswordDialog = async () => {
 
 describe('AccountIdentities', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     refreshSessionMock.mockResolvedValue({ data: {}, error: null })
     signOutMock.mockResolvedValue({ error: null })
     useFlagMock.mockImplementation((name: string) => name === 'enableAccountPassword')

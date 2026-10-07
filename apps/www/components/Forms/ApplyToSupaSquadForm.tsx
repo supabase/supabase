@@ -551,7 +551,13 @@ const FormContent = memo(function FormContent({
               >
                 Cancel
               </Button>
-              <Button size="small" type="submit" disabled={isSubmitting} className="flex-1">
+              <Button
+                variant="primary"
+                size="small"
+                type="submit"
+                disabled={isSubmitting}
+                className="flex-1"
+              >
                 {isSubmitting ? <>Submitting...</> : <>Submit Application</>}
               </Button>
             </div>

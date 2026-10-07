@@ -1,4 +1,5 @@
 import { toast } from 'sonner'
+import { copyToClipboard } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -7,9 +8,15 @@ import {
 } from '@/components/interfaces/Storage/Storage.constants'
 import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
+  copyStorageExplorerUrl,
+  copyStoragePath,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getStorageExplorerUrlForItem,
+  getStoragePathForItem,
+  parseStoragePath,
   sanitizeNameForDuplicateInColumn,
+  serializeStoragePath,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 
@@ -157,7 +164,8 @@ describe('getPathAlongFoldersToIndex', () => {
   })
 })
 
-vi.mock('sonner', () => ({ toast: { error: vi.fn() } }))
+vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
+vi.mock('ui', () => ({ copyToClipboard: vi.fn() }))
 
 describe('sanitizeNameForDuplicateInColumn', () => {
   // Reset mock call counts between tests
@@ -274,5 +282,173 @@ describe('sanitizeNameForDuplicateInColumn', () => {
         ' (1).myfile'
       )
     })
+  })
+})
+
+describe('parseStoragePath', () => {
+  it('returns an empty array for an absent or empty param', () => {
+    expect(parseStoragePath(null)).toEqual([])
+    expect(parseStoragePath(undefined)).toEqual([])
+    expect(parseStoragePath('')).toEqual([])
+  })
+
+  it('splits a slash-joined path into segments', () => {
+    expect(parseStoragePath('a/b/c')).toEqual(['a', 'b', 'c'])
+  })
+
+  it('tolerates leading, trailing and repeated slashes', () => {
+    expect(parseStoragePath('/a//b/')).toEqual(['a', 'b'])
+    expect(parseStoragePath('///')).toEqual([])
+  })
+
+  it('preserves spaces and unicode within a segment', () => {
+    expect(parseStoragePath('my folder/ünïcode 📁/x')).toEqual(['my folder', 'ünïcode 📁', 'x'])
+  })
+})
+
+describe('serializeStoragePath', () => {
+  it('returns an empty string for the bucket root so clearOnDefault strips the param', () => {
+    expect(serializeStoragePath([])).toBe('')
+  })
+
+  it('joins segments with a slash', () => {
+    expect(serializeStoragePath(['a', 'b', 'c'])).toBe('a/b/c')
+  })
+
+  it('drops empty segments', () => {
+    expect(serializeStoragePath(['a', '', 'b'])).toBe('a/b')
+  })
+
+  it('round-trips with parseStoragePath', () => {
+    const segments = ['images', 'my folder', '2024']
+    expect(parseStoragePath(serializeStoragePath(segments))).toEqual(segments)
+  })
+})
+
+function makeFile(name: string): StorageItem {
+  return { ...makeFolder(name), id: name, type: STORAGE_ROW_TYPES.FILE }
+}
+
+describe('getStoragePathForItem', () => {
+  it('returns just the name at the bucket root', () => {
+    expect(getStoragePathForItem([], { ...makeFile('photo.png'), columnIndex: 0 })).toBe(
+      'photo.png'
+    )
+  })
+
+  it('joins the opened folder chain above the item', () => {
+    const openedFolders = [makeFolder('avatars'), makeFolder('2024')]
+    expect(getStoragePathForItem(openedFolders, { ...makeFile('photo.png'), columnIndex: 2 })).toBe(
+      'avatars/2024/photo.png'
+    )
+  })
+
+  it('uses the same shape for folders', () => {
+    const openedFolders = [makeFolder('avatars')]
+    expect(getStoragePathForItem(openedFolders, { ...makeFolder('2024'), columnIndex: 1 })).toBe(
+      'avatars/2024'
+    )
+  })
+
+  it('omits the bucket name so the value works with storage.from(bucket)', () => {
+    const openedFolders = [makeFolder('avatars')]
+    const path = getStoragePathForItem(openedFolders, { ...makeFile('a.png'), columnIndex: 1 })
+    expect(path.startsWith('my-bucket')).toBe(false)
+  })
+})
+
+describe('getStorageExplorerUrlForItem', () => {
+  const projectRef = 'abcdef'
+  const bucketId = 'my-bucket'
+
+  it('points a folder link at the folder itself', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [makeFolder('avatars')],
+        item: { ...makeFolder('2024'), columnIndex: 1 },
+        projectRef,
+        bucketId,
+      })
+    )
+
+    expect(url.pathname).toContain(`/project/${projectRef}/storage/files/buckets/${bucketId}`)
+    expect(url.searchParams.get('path')).toBe('avatars/2024')
+    expect(url.searchParams.get('preview')).toBeNull()
+  })
+
+  it('points a file link at its parent folder plus the file', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [makeFolder('avatars'), makeFolder('2024')],
+        item: { ...makeFile('photo.png'), columnIndex: 2 },
+        projectRef,
+        bucketId,
+      })
+    )
+
+    expect(url.searchParams.get('path')).toBe('avatars/2024')
+    expect(url.searchParams.get('preview')).toBe('photo.png')
+  })
+
+  it('omits path at the bucket root', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [],
+        item: { ...makeFile('photo.png'), columnIndex: 0 },
+        projectRef,
+        bucketId,
+      })
+    )
+
+    expect(url.searchParams.get('path')).toBeNull()
+    expect(url.searchParams.get('preview')).toBe('photo.png')
+  })
+
+  it('escapes a bucket id that needs encoding', () => {
+    const url = new URL(
+      getStorageExplorerUrlForItem({
+        openedFolders: [],
+        item: { ...makeFolder('a'), columnIndex: 0 },
+        projectRef,
+        bucketId: 'a b/c',
+      })
+    )
+
+    expect(url.pathname).toContain('a%20b%2Fc')
+  })
+})
+
+describe('clipboard helpers', () => {
+  beforeEach(() => {
+    vi.mocked(copyToClipboard).mockClear()
+    vi.mocked(toast.success).mockClear()
+  })
+
+  it('announces a copied relative path only once the write has landed', () => {
+    copyStoragePath([makeFolder('images')], { ...makeFile('photo.png'), columnIndex: 1 })
+
+    const [text, onCopied] = vi.mocked(copyToClipboard).mock.calls[0]
+    expect(text).toBe('images/photo.png')
+    // The write is async and reports its own failure, so nothing is claimed up front
+    expect(toast.success).not.toHaveBeenCalled()
+
+    onCopied?.()
+    expect(toast.success).toHaveBeenCalledWith('Copied relative path for "photo.png"')
+  })
+
+  it('announces a copied URL only once the write has landed', () => {
+    copyStorageExplorerUrl({
+      openedFolders: [],
+      item: { ...makeFile('photo.png'), columnIndex: 0 },
+      projectRef: 'abcdefghijklmnopqrst',
+      bucketId: 'my-bucket',
+    })
+
+    const [text, onCopied] = vi.mocked(copyToClipboard).mock.calls[0]
+    expect(text).toContain('preview=photo.png')
+    expect(toast.success).not.toHaveBeenCalled()
+
+    onCopied?.()
+    expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
   })
 })

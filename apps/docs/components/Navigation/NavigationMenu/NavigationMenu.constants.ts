@@ -367,36 +367,48 @@ export const gettingstarted: NavMenuConstant = {
       enabled: frameworkQuickstartsEnabled,
       items: [
         {
+          name: 'React',
+          url: '/guides/getting-started/quickstarts/reactjs',
+        },
+        {
           name: 'Next.js',
           url: '/guides/getting-started/quickstarts/nextjs',
         },
         {
-          name: 'React',
-          url: '/guides/getting-started/quickstarts/reactjs',
+          name: 'TanStack Start',
+          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
         },
         {
           name: 'Astro',
           url: '/guides/getting-started/quickstarts/astrojs',
         },
         {
-          name: 'Nuxt',
-          url: '/guides/getting-started/quickstarts/nuxtjs',
-        },
-        {
           name: 'Vue',
           url: '/guides/getting-started/quickstarts/vue',
         },
         {
+          name: 'Nuxt',
+          url: '/guides/getting-started/quickstarts/nuxtjs',
+        },
+        {
+          name: 'SvelteKit',
+          url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
+        },
+        {
+          name: 'SolidJS',
+          url: '/guides/getting-started/quickstarts/solidjs',
+        },
+        {
+          name: 'RedwoodJS',
+          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
+        },
+        {
+          name: 'Refine',
+          url: '/guides/getting-started/quickstarts/refine',
+        },
+        {
           name: 'Hono',
           url: '/guides/getting-started/quickstarts/hono',
-        },
-        {
-          name: 'Expo React Native',
-          url: '/guides/getting-started/quickstarts/expo-react-native',
-        },
-        {
-          name: 'Flutter',
-          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'iOS SwiftUI',
@@ -407,8 +419,12 @@ export const gettingstarted: NavMenuConstant = {
           url: '/guides/getting-started/quickstarts/kotlin' as `/${string}`,
         },
         {
-          name: 'SvelteKit',
-          url: '/guides/getting-started/quickstarts/sveltekit' as `/${string}`,
+          name: 'Expo React Native',
+          url: '/guides/getting-started/quickstarts/expo-react-native',
+        },
+        {
+          name: 'Flutter',
+          url: '/guides/getting-started/quickstarts/flutter',
         },
         {
           name: 'Flask (Python)',
@@ -416,8 +432,9 @@ export const gettingstarted: NavMenuConstant = {
           enabled: !jsOnly,
         },
         {
-          name: 'TanStack Start',
-          url: '/guides/getting-started/quickstarts/tanstack' as `/${string}`,
+          name: 'Reflex (Python)',
+          url: '/guides/getting-started/quickstarts/reflex' as `/${string}`,
+          enabled: !jsOnly,
         },
         {
           name: 'Laravel PHP',
@@ -433,18 +450,6 @@ export const gettingstarted: NavMenuConstant = {
           name: 'Spring Boot',
           url: '/guides/getting-started/quickstarts/spring-boot' as `/${string}`,
           enabled: !jsOnly,
-        },
-        {
-          name: 'SolidJS',
-          url: '/guides/getting-started/quickstarts/solidjs',
-        },
-        {
-          name: 'RedwoodJS',
-          url: '/guides/getting-started/quickstarts/redwoodjs' as `/${string}`,
-        },
-        {
-          name: 'Refine',
-          url: '/guides/getting-started/quickstarts/refine',
         },
       ],
     },
@@ -1034,6 +1039,20 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres' as `/${string}`,
+          items: [
+            {
+              name: 'Connecting to your database',
+              url: '/guides/database/connecting-to-postgres' as `/${string}`,
+            },
+            {
+              name: 'Connection pooling and limits',
+              url: '/guides/database/connecting-to-postgres/pooling-and-limits' as `/${string}`,
+            },
+            {
+              name: 'Serverless drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers' as `/${string}`,
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -1044,8 +1063,12 @@ export const database: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Managing tables, views, and data',
+          name: 'Managing tables and data',
           url: '/guides/database/tables' as `/${string}`,
+        },
+        {
+          name: 'Views',
+          url: '/guides/database/views' as `/${string}`,
         },
         {
           name: 'Working with arrays',
@@ -1075,6 +1098,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Managing database functions',
           url: '/guides/database/functions' as `/${string}`,
+        },
+        {
+          name: 'Debugging database functions',
+          url: '/guides/database/debugging-functions' as `/${string}`,
         },
         {
           name: 'Managing database triggers',
@@ -1113,6 +1140,20 @@ export const database: NavMenuConstant = {
         {
           name: 'Overview',
           url: '/guides/database/orioledb' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Multigres',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/multigres' as `/${string}`,
+        },
+        {
+          name: 'Compatibility',
+          url: '/guides/database/multigres/compatibility' as `/${string}`,
         },
       ],
     },
@@ -1169,6 +1210,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/custom-postgres-config' as `/${string}`,
         },
         {
+          name: 'Postgres log configuration',
+          url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
+        },
+        {
           name: 'Autovacuum management',
           url: '/guides/database/postgres/autovacuum-management' as `/${string}`,
         },
@@ -1217,19 +1262,19 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'BigQuery',
-              url: '/guides/database/replication/bigquery' as `/${string}`,
+              url: '/guides/database/replication/pipelines/bigquery' as `/${string}`,
             },
             {
               name: 'ClickHouse',
-              url: '/guides/database/replication/clickhouse' as `/${string}`,
+              url: '/guides/database/replication/pipelines/clickhouse' as `/${string}`,
             },
             {
               name: 'DuckLake',
-              url: '/guides/database/replication/ducklake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/ducklake' as `/${string}`,
             },
             {
               name: 'Snowflake',
-              url: '/guides/database/replication/snowflake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/snowflake' as `/${string}`,
             },
             {
               name: 'Monitoring',
@@ -1631,8 +1676,12 @@ export const api: NavMenuConstant = {
       url: '/guides/api/data-apis',
       items: [
         {
-          name: 'Managing tables, views, and data',
+          name: 'Managing tables and data',
           url: '/guides/database/tables' as `/${string}`,
+        },
+        {
+          name: 'Views',
+          url: '/guides/database/views' as `/${string}`,
         },
         {
           name: 'Querying joins and nested tables',
@@ -1742,7 +1791,7 @@ export const functions: NavMenuConstant = {
       name: 'Configuration',
       url: undefined,
       items: [
-        { name: 'Environment Variables', url: '/guides/functions/secrets' },
+        { name: 'Environment variables', url: '/guides/functions/secrets' },
         { name: 'Managing Dependencies', url: '/guides/functions/dependencies' },
         { name: 'Function Configuration', url: '/guides/functions/function-configuration' },
       ],
@@ -2493,8 +2542,20 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
         {
+          name: 'Running multiple local projects',
+          url: '/guides/local-development/running-multiple-local-projects' as `/${string}`,
+        },
+        {
+          name: 'Docker and native runtimes',
+          url: '/guides/local-development/docker-and-native-runtimes' as `/${string}`,
+        },
+        {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
+        },
+        {
+          name: 'Diff engines',
+          url: '/guides/local-development/diff-engines' as `/${string}`,
         },
         {
           name: 'Seeding your database',
@@ -2810,6 +2871,15 @@ export const platform: NavMenuConstant = {
             },
           ],
         },
+        {
+          name: 'Platform Webhooks',
+          url: '/guides/platform/webhooks',
+          enabled: fullPlatformEnabled,
+          items: [
+            { name: 'Overview', url: '/guides/platform/webhooks' as `/${string}` },
+            { name: 'Events', url: '/guides/platform/webhooks/events' as `/${string}` },
+          ],
+        },
       ],
     },
     {
@@ -3030,143 +3100,57 @@ export const telemetry: NavMenuConstant = {
   items: [
     { name: 'Overview', url: '/guides/observability' },
     {
-      name: 'Observe the data',
-      url: '/guides/observability/access-data' as `/${string}`,
+      name: 'Read project data',
       items: [
-        {
-          name: 'Logs',
-          url: '/guides/observability/advanced-log-filtering' as `/${string}`,
-          items: [
-            {
-              name: 'Query and filter logs',
-              url: '/guides/observability/advanced-log-filtering' as `/${string}`,
-            },
-            {
-              name: 'Sources',
-              url: '/guides/observability/advanced-log-filtering#logs-explorer' as `/${string}`,
-            },
-            {
-              name: 'Logs field reference',
-              url: '/guides/observability/log-field-reference' as `/${string}`,
-            },
-            {
-              name: 'Logs in Studio',
-              url: '/guides/observability/logs' as `/${string}`,
-            },
-          ],
-        },
+        { name: 'Query logs with SQL', url: '/guides/observability/advanced-log-filtering' },
+        { name: 'Logs in Studio', url: '/guides/observability/logs' },
+        { name: 'Log sources and fields', url: '/guides/observability/log-field-reference' },
+        { name: 'Inspect the database', url: '/guides/observability/inspect' },
+        { name: 'Advisors', url: '/guides/observability/advisors' },
+        { name: 'Reports', url: '/guides/observability/reports' },
         {
           name: 'Metrics API',
-          url: '/guides/observability/metrics' as `/${string}`,
+          url: '/guides/observability/metrics',
           items: [
-            {
-              name: 'Grafana Cloud',
-              url: '/guides/observability/metrics/grafana-cloud' as `/${string}`,
-            },
+            { name: 'Grafana Cloud', url: '/guides/observability/metrics/grafana-cloud' },
             {
               name: 'Grafana self-hosted',
-              url: '/guides/observability/metrics/grafana-self-hosted' as `/${string}`,
+              url: '/guides/observability/metrics/grafana-self-hosted',
             },
-            {
-              name: 'Datadog',
-              url: 'https://docs.datadoghq.com/integrations/supabase/',
-            },
-            {
-              name: 'Elastic',
-              url: 'https://www.elastic.co/docs/reference/integrations/supabase',
-            },
-            {
-              name: 'Vendor-agnostic setup',
-              url: '/guides/observability/metrics/vendor-agnostic' as `/${string}`,
-            },
+            { name: 'Datadog', url: 'https://docs.datadoghq.com/integrations/supabase/' },
+            { name: 'Elastic', url: 'https://www.elastic.co/docs/reference/integrations/supabase' },
+            { name: 'Vendor-agnostic setup', url: '/guides/observability/metrics/vendor-agnostic' },
           ],
         },
-        {
-          name: 'Database',
-          url: '/guides/observability/inspect' as `/${string}`,
-          items: [
-            {
-              name: 'CLI commands',
-              url: '/guides/observability/inspect#using-the-cli' as `/${string}`,
-            },
-            {
-              name: 'SQL',
-              url: '/guides/observability/inspect#using-sql' as `/${string}`,
-            },
-          ],
-        },
-        {
-          name: 'Advisors',
-          url: '/guides/observability/advisors' as `/${string}`,
-        },
-        {
-          name: 'Reports',
-          url: '/guides/observability/reports' as `/${string}`,
-        },
       ],
     },
     {
-      name: 'Detect issues',
-      url: '/guides/observability/detecting' as `/${string}`,
+      name: 'Detect and diagnose',
       items: [
-        {
-          name: 'Detection checks',
-          url: '/guides/observability/detecting' as `/${string}`,
-        },
+        { name: 'Detection checks', url: '/guides/observability/detecting' },
+        { name: 'Troubleshooting', url: '/guides/troubleshooting' },
       ],
     },
     {
-      name: 'Diagnose and resolve',
-      url: '/guides/troubleshooting' as `/${string}`,
+      name: 'Agent prompts',
       items: [
+        { name: 'Overview', url: '/guides/observability/automate-with-agents' },
+        { name: 'Health', url: '/guides/observability/automate-with-agents/health' },
+        { name: 'Security', url: '/guides/observability/automate-with-agents/security' },
         {
-          name: 'Troubleshooting',
-          url: '/guides/troubleshooting' as `/${string}`,
+          name: 'Performance',
+          url: '/guides/observability/automate-with-agents/performance',
         },
+        { name: 'Resources', url: '/guides/observability/automate-with-agents/usage' },
       ],
     },
     {
-      name: 'Hire an agent',
-      url: '/guides/observability/automate-with-agents' as `/${string}`,
+      name: 'Configure and export',
       items: [
-        {
-          name: 'Generalist',
-          url: '/guides/observability/automate-with-agents/all' as `/${string}`,
-        },
-        {
-          name: 'Health monitor',
-          url: '/guides/observability/automate-with-agents/health' as `/${string}`,
-        },
-        {
-          name: 'Security monitor',
-          url: '/guides/observability/automate-with-agents/security' as `/${string}`,
-        },
-        {
-          name: 'Performance monitor',
-          url: '/guides/observability/automate-with-agents/performance' as `/${string}`,
-        },
-        {
-          name: 'Capacity monitor',
-          url: '/guides/observability/automate-with-agents/usage' as `/${string}`,
-        },
-      ],
-    },
-    {
-      name: 'Export',
-      url: undefined,
-      items: [
-        {
-          name: 'Log drains',
-          url: '/guides/observability/log-drains' as `/${string}`,
-        },
-        {
-          name: 'Client-side tracing',
-          url: '/guides/observability/client-side-tracing' as `/${string}`,
-        },
-        {
-          name: 'Sentry integration',
-          url: '/guides/observability/sentry-monitoring' as `/${string}`,
-        },
+        { name: 'Configure logging', url: '/guides/observability/configure-logging' },
+        { name: 'Log drains', url: '/guides/observability/log-drains' },
+        { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
+        { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },
       ],
     },
   ],
@@ -3203,6 +3187,10 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
         { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
+        {
+          name: 'Configure Custom OAuth/OIDC',
+          url: '/guides/self-hosting/self-hosted-custom-oauth-providers',
+        },
         { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
         { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
@@ -3557,6 +3545,17 @@ export const reference_csharp_v0 = {
 }
 
 export const reference_csharp_v1 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+  pkg: {
+    name: 'supabase',
+    repo: 'https://github.com/supabase-community/supabase-csharp',
+  },
+}
+
+export const reference_csharp_v8 = {
   icon: 'reference-csharp',
   title: 'C#',
   url: 'guides/reference/csharp',

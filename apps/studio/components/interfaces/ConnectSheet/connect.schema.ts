@@ -34,8 +34,7 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
   supabasepy: 'pip install supabase',
   supabaseflutter: 'flutter pub add supabase_flutter',
-  supabaseswift:
-    'swift package add-dependency https://github.com/supabase-community/supabase-swift',
+  supabaseswift: 'swift package add-dependency https://github.com/supabase/supabase-swift',
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
 }
 
@@ -292,7 +291,7 @@ export const connectSchema: ConnectSchema = {
     {
       id: 'warehouse',
       label: 'Warehouse',
-      description: 'Connect to Warehouse',
+      description: 'Analytical endpoint',
       fields: [],
     },
   ],
@@ -304,8 +303,13 @@ export const connectSchema: ConnectSchema = {
     // Framework fields
     framework: {
       id: 'framework',
-      type: 'select',
+      type: 'combobox',
       label: 'Framework',
+      combobox: {
+        placeholder: 'Select framework',
+        searchPlaceholder: 'Search frameworks...',
+        emptyMessage: 'No frameworks found',
+      },
       options: { source: 'frameworks' },
       defaultValue: 'nextjs',
     },
@@ -377,9 +381,14 @@ export const connectSchema: ConnectSchema = {
     // MCP fields
     mcpClient: {
       id: 'mcpClient',
-      type: 'select',
+      type: 'combobox',
       label: 'Client',
       description: 'The MCP client you are using.',
+      combobox: {
+        placeholder: 'Select client',
+        searchPlaceholder: 'Search clients...',
+        emptyMessage: 'No clients found',
+      },
       options: { source: 'mcpClients' },
       defaultValue: 'claude-code',
     },

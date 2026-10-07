@@ -112,7 +112,9 @@ export default function CheckboxReactHookFormMultiple() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   )

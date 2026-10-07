@@ -168,7 +168,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               </p>
             }
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -204,7 +204,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
               </>
             }
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -219,7 +219,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
       <AwsMarketplaceInterstitial description={getContractIneligibilityDescription(reason)}>
         <div className="flex flex-col gap-3">
           <ContractIneligibilityNotice reason={reason} />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>

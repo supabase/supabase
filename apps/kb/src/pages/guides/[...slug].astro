@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import GuideLayout from '../../layouts/GuideLayout.astro'
 
@@ -17,5 +18,5 @@ const { Content } = await render(guide)
 ---
 
 <GuideLayout title={title} description={description} topics={topics} github_url={github_url}>
-	<Content />
+	<Content components={{ Admonition }} />
 </GuideLayout>
