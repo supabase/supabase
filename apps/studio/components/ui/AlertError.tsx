@@ -59,7 +59,7 @@ export const AlertError = ({
   error,
   className,
   showIcon = true,
-  layout = 'responsive',
+  layout,
   showInstructions = true,
   showErrorPrefix = true,
   children,
@@ -87,7 +87,7 @@ export const AlertError = ({
   return (
     <Admonition
       type="warning"
-      layout={additionalActions ? 'vertical' : layout}
+      layout={layout ?? (additionalActions ? 'vertical' : 'responsive')}
       showIcon={showIcon}
       title={subject}
       description={
