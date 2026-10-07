@@ -62,8 +62,9 @@ export const UserPanel = () => {
       <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
         <Button
           variant="text"
-          className="absolute top-3 right-3 px-1"
+          className="absolute top-3 right-3 z-10 px-1"
           icon={<X />}
+          aria-label="Close panel"
           onClick={() => setSelectedId(null)}
         />
         <Tabs
