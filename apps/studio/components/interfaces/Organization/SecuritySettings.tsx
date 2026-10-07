@@ -40,7 +40,9 @@ export const SecuritySettings = () => {
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ
   )
-  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE)
+  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
   const track = useTrack()
 
   const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =

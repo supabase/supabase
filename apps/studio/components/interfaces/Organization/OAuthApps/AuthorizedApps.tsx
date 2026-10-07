@@ -38,8 +38,9 @@ export const AuthorizedApps = () => {
   const [selectedAppToRevoke, setSelectedAppToRevoke] = useState<AuthorizedApp>()
   const [authorizedAppsSort, setAuthorizedAppsSort] = useState<AuthorizedAppsSort>('authorized:asc')
 
-  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
+  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ
+  )
 
   const {
     data: authorizedApps,

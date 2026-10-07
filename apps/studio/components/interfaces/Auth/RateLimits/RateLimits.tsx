@@ -45,7 +45,7 @@ import { DOCS_URL } from '@/lib/constants'
 export const RateLimits = () => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
   const { can: canReadConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ

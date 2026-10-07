@@ -49,9 +49,12 @@ export const PublishableApps = () => {
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
 
-  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
-  const { can: canCreateOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE)
+  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ
+  )
+  const { can: canCreateOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
 
   const {
     data: publishedApps,

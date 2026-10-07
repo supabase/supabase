@@ -35,7 +35,7 @@ export const ResetTemplateDialog = ({
   const [open, setOpen] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { id } = template
@@ -46,7 +46,7 @@ export const ResetTemplateDialog = ({
       toast.success('Email template reset to default')
       onResetSuccess(config)
     },
-    onError: () => { },
+    onError: () => {},
   })
 
   const resetTemplateToDefault = async () => {

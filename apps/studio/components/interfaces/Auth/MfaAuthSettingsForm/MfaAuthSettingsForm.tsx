@@ -127,7 +127,7 @@ export const MfaAuthSettingsForm = () => {
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { hasAccess: hasAccessToMFAEntitlement, isLoading: isLoadingEntitlement } =

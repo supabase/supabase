@@ -20,10 +20,13 @@ export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ, {
-    organizationSlug: org?.slug,
-    projectRef: null,
-  })
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ,
+    {
+      organizationSlug: org?.slug,
+      projectRef: null,
+    }
+  )
 
   const {
     data: allIntegrations = EMPTY_ARR,

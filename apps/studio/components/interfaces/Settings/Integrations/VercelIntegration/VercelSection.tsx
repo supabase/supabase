@@ -127,8 +127,8 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   let connections =
     (isProjectScoped
       ? vercelIntegration?.connections.filter(
-        (connection) => connection.supabase_project_ref === project?.ref
-      )
+          (connection) => connection.supabase_project_ref === project?.ref
+        )
       : vercelIntegration?.connections) || []
 
   const ConnectionHeaderTitle = `${connections.length} project ${pluralize(

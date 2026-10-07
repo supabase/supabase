@@ -94,7 +94,7 @@ export const GitHubIntegrationConnectionForm = ({
   )
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
-    useCheckGithubBranchValidity({ onError: () => { } })
+    useCheckGithubBranchValidity({ onError: () => {} })
 
   const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
@@ -572,7 +572,7 @@ export const GitHubIntegrationConnectionForm = ({
                         className={cn(
                           'space-y-4 pl-6 border-l',
                           (!hasAccessToBranching || !newBranchPerPr) &&
-                          'opacity-25 pointer-events-none'
+                            'opacity-25 pointer-events-none'
                         )}
                       >
                         <FormField

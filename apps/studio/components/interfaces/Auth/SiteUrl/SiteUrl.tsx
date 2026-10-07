@@ -36,7 +36,7 @@ const SiteUrl = () => {
   const [isUpdatingSiteUrl, setIsUpdatingSiteUrl] = useState(false)
 
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const siteUrlForm = useForm({

@@ -74,10 +74,13 @@ export const useProjectOAuthIntegrationData = (
   // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
   // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
   // are unaffected by this.
-  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ, {
-    organizationSlug: org?.slug,
-    projectRef: null,
-  })
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ,
+    {
+      organizationSlug: org?.slug,
+      projectRef: null,
+    }
+  )
 
   const sharedOptions = { enabled, retryOnMount: false }
   const queries = {

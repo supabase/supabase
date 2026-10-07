@@ -63,7 +63,7 @@ export const ThirdPartyAuthForm = () => {
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
   const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   if (isError) {
@@ -142,31 +142,31 @@ export const ThirdPartyAuthForm = () => {
 
         <CreateFirebaseAuthIntegrationDialog
           visible={selectedIntegration === 'firebase'}
-          onDelete={() => { }}
+          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateAwsCognitoAuthIntegrationDialog
           visible={selectedIntegration === 'awsCognito'}
-          onDelete={() => { }}
+          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateAuth0IntegrationDialog
           visible={selectedIntegration === 'auth0'}
-          onDelete={() => { }}
+          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateClerkAuthIntegrationDialog
           visible={selectedIntegration === 'clerk'}
-          onDelete={() => { }}
+          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
         <CreateWorkOSIntegrationDialog
           visible={selectedIntegration === 'workos'}
-          onDelete={() => { }}
+          onDelete={() => {}}
           onClose={() => setSelectedIntegration(undefined)}
         />
 
