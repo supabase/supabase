@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { generateDeterministicUuid } from './snippets.browser'
 import {
@@ -28,6 +28,9 @@ vi.mock('fs/promises', () => ({
     unlink: vi.fn(),
     rm: vi.fn(),
     stat: vi.fn(),
+    realpath: vi.fn(),
+    rename: vi.fn(),
+    link: vi.fn(),
   },
 }))
 const mockedFS = vi.mocked(fs)
@@ -1145,6 +1148,10 @@ describe('snippets.utils', () => {
   })
 
   describe('updateSnippet', () => {
+    beforeEach(() => {
+      mockedFS.realpath.mockImplementation(async (filePath) => String(filePath))
+    })
+
     it('should update an existing snippet', async () => {
       const id = generateDeterministicUuid(['existing-snippet.sql'])
 
@@ -1166,8 +1173,12 @@ describe('snippets.utils', () => {
       expect(mockedFS.unlink).toHaveBeenCalledWith(
         path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
       )
+      expect(mockedFS.link).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'updated-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'updated-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM new;',
         'utf-8'
       )
@@ -1243,8 +1254,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates)
 
       // Should write to the folder path
+      expect(mockedFS.link).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'existing-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'existing-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM old;',
         'utf-8'
       )
@@ -1288,8 +1303,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates)
 
       // Should write to the root path
+      expect(mockedFS.link).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM folder;',
         'utf-8'
       )
@@ -1355,8 +1374,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates as any)
 
       // Should write to the folder path with new name
+      expect(mockedFS.link).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'renamed-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'target-folder', 'renamed-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         'SELECT * FROM new;',
         'utf-8'
       )
@@ -1386,8 +1409,12 @@ describe('snippets.utils', () => {
       const result = await updateSnippet(id, updates as any)
 
       expect(result.content.sql).toBe('')
+      expect(mockedFS.rename).toHaveBeenCalledWith(
+        expect.any(String),
+        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')
+      )
       expect(mockedFS.writeFile).toHaveBeenCalledWith(
-        path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql'),
+        expect.stringContaining('.snippet-'),
         '',
         'utf-8'
       )
@@ -1405,14 +1432,16 @@ describe('snippets.utils', () => {
 
       const error = new Error('Permission denied') as NodeJS.ErrnoException
       error.code = 'EACCES'
-      mockedFS.unlink.mockRejectedValue(error)
+      mockedFS.unlink.mockImplementation(async (filePath) => {
+        if (filePath === path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')) throw error
+      })
 
       const updates = { name: 'new-name' }
 
       await expect(updateSnippet(id, updates)).rejects.toThrow('Permission denied')
     })
 
-    it('should continue when old file deletion fails with ENOENT', async () => {
+    it('should roll back the destination when the source disappears', async () => {
       const id = generateDeterministicUuid(['existing-snippet.sql'])
 
       mockedFS.access.mockResolvedValue(undefined)
@@ -1425,14 +1454,14 @@ describe('snippets.utils', () => {
 
       const error = new Error('File not found') as NodeJS.ErrnoException
       error.code = 'ENOENT'
-      mockedFS.unlink.mockRejectedValue(error)
+      mockedFS.unlink.mockImplementation(async (filePath) => {
+        if (filePath === path.join(MOCK_SNIPPETS_DIR, 'existing-snippet.sql')) throw error
+      })
 
       const updates = { name: 'new-name' }
 
-      const result = await updateSnippet(id, updates)
-
-      expect(result.name).toBe('new-name')
-      expect(result.content.sql).toBe('SELECT * FROM old;')
+      await expect(updateSnippet(id, updates)).rejects.toThrow('File not found')
+      expect(mockedFS.unlink).toHaveBeenCalledWith(path.join(MOCK_SNIPPETS_DIR, 'new-name.sql'))
     })
 
     it('should throw error when moving snippet to folder that already contains snippet with same name', async () => {
