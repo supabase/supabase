@@ -7,8 +7,8 @@ import type { ClassifiedError, KnownErrorType } from '@/types/api-errors'
 import type { ResponseError } from '@/types/base'
 
 export interface TroubleshootingContent {
-  /** ID reported on every troubleshooter telemetry event. */
-  errorType: string
+  /** ID reported on every troubleshooter telemetry event. Omitted when there is no mapping. */
+  errorType?: string
   steps: ErrorDisplayStep[]
   /** Dialogs the steps open. Rendered alongside the steps, and invisible until opened. */
   overlays?: ReactNode

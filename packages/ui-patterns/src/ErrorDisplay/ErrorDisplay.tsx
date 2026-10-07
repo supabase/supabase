@@ -21,15 +21,7 @@ import {
 } from 'ui'
 
 import { AdmonitionTypeIcon } from '../Admonition/AdmonitionIcons'
-import {
-  TYPE_TO_ADMONITION_TYPE,
-  TYPE_TO_BORDER_CLASS,
-  TYPE_TO_DIVIDER_CLASS,
-  TYPE_TO_MONO_TEXT_CLASS,
-  TYPE_TO_ROLE,
-  TYPE_TO_SURFACE_CLASS,
-  TYPE_TO_VARIANT,
-} from './ErrorDisplay.constants'
+import { TYPE_STYLES } from './ErrorDisplay.constants'
 import type {
   ErrorDisplayDetails,
   ErrorDisplayProps,
@@ -46,26 +38,7 @@ import {
   useRetry,
 } from './ErrorDisplay.utils'
 
-export { COMPACT_LAYOUT_BREAKPOINT } from './ErrorDisplay.constants'
-export type {
-  ErrorDisplayDetails,
-  ErrorDisplayProps,
-  ErrorDisplaySize,
-  ErrorDisplayStep,
-  ErrorDisplayStepAction,
-  ErrorDisplayType,
-  SupportFormParams,
-} from './ErrorDisplay.types'
-
-function CopyErrorDetailsButton({
-  error,
-  title,
-  className,
-}: {
-  error: ErrorDisplayDetails
-  title: string
-  className?: string
-}) {
+function CopyErrorDetailsButton({ error, title }: { error: ErrorDisplayDetails; title: string }) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -78,61 +51,11 @@ function CopyErrorDetailsButton({
     <Button
       size="tiny"
       variant="text"
-      className={cn('px-1', className)}
+      className="-mr-1 -mt-1 shrink-0 px-1"
       aria-label={copied ? 'Error details copied' : 'Copy error details'}
       icon={copied ? <Check /> : <Copy />}
       onClick={() => copyToClipboard(formatErrorDetails(error, title), () => setCopied(true))}
     />
-  )
-}
-
-function ErrorMeta({ error }: { error: ErrorDisplayDetails }) {
-  const items = [
-    error.code ? { label: 'Code', value: error.code } : undefined,
-    error.requestId ? { label: 'Request ID', value: error.requestId } : undefined,
-    error.timestamp ? { label: 'Time', value: formatTimestamp(error.timestamp) } : undefined,
-  ].filter(Boolean) as { label: string; value: string }[]
-
-  if (items.length === 0) return null
-
-  return (
-    <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-      {items.map((item) => (
-        <div key={item.label} className="flex items-baseline gap-1.5 min-w-0">
-          <dt className="text-xs text-foreground-lighter shrink-0">{item.label}</dt>
-          <dd className="text-xs font-mono text-foreground-light truncate">{item.value}</dd>
-        </div>
-      ))}
-    </dl>
-  )
-}
-
-function ErrorBlock({
-  error,
-  title,
-  type,
-  className,
-}: {
-  error: ErrorDisplayDetails
-  title: string
-  type: ErrorDisplayType
-  className?: string
-}) {
-  return (
-    <div className={cn('flex items-start gap-2', className)}>
-      <div className="min-w-0 flex-1">
-        <pre
-          className={cn(
-            'text-xs font-mono normal-case whitespace-pre-wrap wrap-break-word overflow-auto max-h-32',
-            TYPE_TO_MONO_TEXT_CLASS[type]
-          )}
-        >
-          {error.message}
-        </pre>
-        <ErrorMeta error={error} />
-      </div>
-      <CopyErrorDetailsButton error={error} title={title} className="shrink-0 -mt-1 -mr-1" />
-    </div>
   )
 }
 
@@ -147,18 +70,44 @@ function ErrorDetailsPanel({
   type: ErrorDisplayType
   className?: string
 }) {
+  const style = TYPE_STYLES[type]
+  const meta = [
+    error.code && (['Code', error.code] as const),
+    error.requestId && (['Request ID', error.requestId] as const),
+    error.timestamp && (['Time', formatTimestamp(error.timestamp)] as const),
+  ].filter(Boolean) as (readonly [string, string])[]
+
   return (
-    <ErrorBlock
-      error={error}
-      title={title}
-      type={type}
+    <div
       className={cn(
-        'rounded-md border px-2.5 py-2',
-        TYPE_TO_BORDER_CLASS[type],
-        TYPE_TO_SURFACE_CLASS[type],
+        'flex items-start gap-2 rounded-md border px-2.5 py-2',
+        style.border,
+        style.surface,
         className
       )}
-    />
+    >
+      <div className="min-w-0 flex-1">
+        <pre
+          className={cn(
+            'max-h-32 overflow-auto whitespace-pre-wrap wrap-break-word font-mono text-xs normal-case',
+            style.mono
+          )}
+        >
+          {error.message}
+        </pre>
+        {meta.length > 0 && (
+          <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            {meta.map(([label, value]) => (
+              <div key={label} className="flex min-w-0 items-baseline gap-1.5">
+                <dt className="shrink-0 text-xs text-foreground-lighter">{label}</dt>
+                <dd className="truncate font-mono text-xs text-foreground-light">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
+      <CopyErrorDetailsButton error={error} title={title} />
+    </div>
   )
 }
 
@@ -194,29 +143,18 @@ function RetryButton({
   iconOnly?: boolean
 }) {
   const { isRetrying, retry } = useRetry(onRetry)
-
-  if (iconOnly) {
-    return (
-      <Button
-        size="tiny"
-        className="shrink-0 px-1"
-        aria-label={isRetrying ? 'Retrying...' : label}
-        loading={isRetrying}
-        icon={<RefreshCw />}
-        onClick={retry}
-      />
-    )
-  }
+  const retryingLabel = 'Retrying...'
 
   return (
     <Button
       size="tiny"
-      className="shrink-0"
+      className={cn('shrink-0', iconOnly && 'px-1')}
+      aria-label={iconOnly ? (isRetrying ? retryingLabel : label) : undefined}
       loading={isRetrying}
-      icon={isRetrying ? undefined : <RefreshCw />}
+      icon={iconOnly || !isRetrying ? <RefreshCw /> : undefined}
       onClick={retry}
     >
-      {isRetrying ? 'Retrying...' : label}
+      {iconOnly ? undefined : isRetrying ? retryingLabel : label}
     </Button>
   )
 }
@@ -294,7 +232,7 @@ function StepsTimeline({
           {index < steps.length - 1 && (
             <span
               aria-hidden
-              className={cn('absolute bottom-0 left-3 top-9 w-px', TYPE_TO_DIVIDER_CLASS[type])}
+              className={cn('absolute bottom-0 left-3 top-9 w-px', TYPE_STYLES[type].divider)}
             />
           )}
           <AccordionTrigger className="gap-3 py-2.5 hover:no-underline">
@@ -397,7 +335,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
 
     const visibleSteps = steps ?? []
     const isNumbered = visibleSteps.length > 1
-    const admonitionType = TYPE_TO_ADMONITION_TYPE[type]
+    const admonitionType = TYPE_STYLES[type].admonition
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
@@ -413,11 +351,11 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
     return (
       <div
         ref={setRefs}
-        role={TYPE_TO_ROLE[type]}
+        role={TYPE_STYLES[type].role}
         aria-labelledby={titleId}
         data-size={resolvedSize}
         className={cn(
-          alertVariants({ variant: TYPE_TO_VARIANT[type] }),
+          alertVariants({ variant: TYPE_STYLES[type].variant }),
           'w-auto min-w-0 overflow-hidden p-0',
           className
         )}

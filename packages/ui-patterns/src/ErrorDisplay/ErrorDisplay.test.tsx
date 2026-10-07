@@ -234,50 +234,29 @@ describe('ErrorDisplay steps', () => {
   })
 })
 
+const renderStep: ErrorDisplayStep = {
+  id: 'ai',
+  title: 'Debug with AI',
+  action: {
+    label: 'Debug with AI',
+    render: ({ block }) => <div data-block={String(!!block)}>custom control</div>,
+  },
+}
+
 describe('ErrorDisplay step actions', () => {
-  it('renders a custom control through the action render escape hatch', () => {
-    mockContainerWidth(640)
-    render(
-      <ErrorDisplay
-        title="Failed to retrieve tables"
-        steps={[
-          {
-            id: 'ai',
-            title: 'Debug with AI',
-            action: {
-              label: 'Debug with AI',
-              render: ({ block }) => <div data-block={String(!!block)}>custom control</div>,
-            },
-          },
-        ]}
-      />
-    )
+  it.each([
+    ['full', 640, 'false'],
+    ['compact', 260, 'true'],
+  ] as const)(
+    'renders a custom control through the render escape hatch in the %s layout',
+    async (_layout, width, block) => {
+      mockContainerWidth(width)
+      render(<ErrorDisplay title="Failed to retrieve tables" steps={[renderStep]} />)
 
-    expect(screen.getByText('custom control')).toBeInTheDocument()
-    expect(screen.getByText('custom control')).toHaveAttribute('data-block', 'false')
-  })
-
-  it('passes block to render in the compact layout', async () => {
-    mockContainerWidth(260)
-    render(
-      <ErrorDisplay
-        title="Failed to retrieve tables"
-        steps={[
-          {
-            id: 'ai',
-            title: 'Debug with AI',
-            action: {
-              label: 'Debug with AI',
-              render: ({ block }) => <div data-block={String(!!block)}>custom control</div>,
-            },
-          },
-        ]}
-      />
-    )
-
-    const control = await screen.findByText('custom control')
-    expect(control).toHaveAttribute('data-block', 'true')
-  })
+      const control = await screen.findByText('custom control')
+      expect(control).toHaveAttribute('data-block', block)
+    }
+  )
 
   it('fires onStepOpenChange as steps expand and collapse', async () => {
     const user = userEvent.setup()

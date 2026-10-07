@@ -17,65 +17,55 @@ interface ErrorMatcherProps {
   useFallbackTroubleshooting?: UseTroubleshooting
 }
 
-interface ErrorDisplayShellProps extends Omit<ErrorMatcherProps, 'useFallbackTroubleshooting'> {
-  message: string
-  errorType?: string
-  hasTroubleshooting: boolean
-}
+const useNoTroubleshooting: UseTroubleshooting = () => ({ errorType: undefined, steps: [] })
 
-function useErrorDisplayProps({
+function TroubleshootingErrorDisplay({
   title,
   message,
   supportFormParams,
   className,
-  errorType,
-  hasTroubleshooting,
-}: Omit<ErrorDisplayShellProps, 'error'>) {
-  const track = useTrack()
-
-  return {
-    type: 'warning' as const,
-    title,
-    error: { message },
-    supportFormParams,
-    className,
-    onRender: () => {
-      if (isDashboardErrorSampled()) {
-        track('dashboard_error_created', {
-          source: 'error_display',
-          errorType,
-          hasTroubleshooting,
-        })
-      }
-      if (errorType) {
-        track('inline_error_troubleshooter_exposed', { errorType })
-      }
-    },
-    onContactSupport: errorType
-      ? () =>
-          track('inline_error_troubleshooter_action_clicked', {
-            errorType,
-            ctaType: 'contact_support' as const,
-          })
-      : undefined,
-  }
-}
-
-function TroubleshootingErrorDisplay({
+  hasMapping,
   useTroubleshooting,
-  ...props
-}: Omit<ErrorDisplayShellProps, 'error' | 'errorType'> & {
+}: {
+  title: string
+  message: string
+  supportFormParams?: SupportFormParams
+  className?: string
+  hasMapping: boolean
   useTroubleshooting: UseTroubleshooting
 }) {
   const track = useTrack()
   const { errorType, steps, overlays } = useTroubleshooting()
-  const displayProps = useErrorDisplayProps({ ...props, errorType })
 
   return (
     <ErrorDisplay
-      {...displayProps}
+      type="warning"
+      title={title}
+      error={{ message }}
+      className={className}
       steps={steps}
+      supportFormParams={supportFormParams}
+      onRender={() => {
+        if (isDashboardErrorSampled()) {
+          track('dashboard_error_created', {
+            source: 'error_display',
+            errorType,
+            hasTroubleshooting: hasMapping,
+          })
+        }
+        if (errorType) track('inline_error_troubleshooter_exposed', { errorType })
+      }}
+      onContactSupport={
+        errorType
+          ? () =>
+              track('inline_error_troubleshooter_action_clicked', {
+                errorType,
+                ctaType: 'contact_support',
+              })
+          : undefined
+      }
       onStepOpenChange={(stepId) => {
+        if (!errorType) return
         const index = steps.findIndex((step) => step.id === stepId)
         track('inline_error_troubleshooter_step_clicked', {
           errorType,
@@ -90,11 +80,6 @@ function TroubleshootingErrorDisplay({
   )
 }
 
-function PlainErrorDisplay(props: Omit<ErrorDisplayShellProps, 'error' | 'errorType'>) {
-  const displayProps = useErrorDisplayProps(props)
-  return <ErrorDisplay {...displayProps} />
-}
-
 export function ErrorMatcher({
   title,
   error,
@@ -102,24 +87,18 @@ export function ErrorMatcher({
   className,
   useFallbackTroubleshooting,
 }: ErrorMatcherProps) {
-  const message = typeof error === 'string' ? error : error.message
   const mapping = getMappingForError(error)
-  const useTroubleshooting = mapping?.useTroubleshooting ?? useFallbackTroubleshooting
-
-  const shared = {
-    title,
-    message,
-    supportFormParams,
-    className,
-    hasTroubleshooting: !!mapping,
-  }
-
-  if (!useTroubleshooting) return <PlainErrorDisplay {...shared} />
+  const useTroubleshooting =
+    mapping?.useTroubleshooting ?? useFallbackTroubleshooting ?? useNoTroubleshooting
 
   return (
     <TroubleshootingErrorDisplay
       key={mapping?.id ?? 'fallback'}
-      {...shared}
+      title={title}
+      message={typeof error === 'string' ? error : error.message}
+      supportFormParams={supportFormParams}
+      className={className}
+      hasMapping={!!mapping}
       useTroubleshooting={useTroubleshooting}
     />
   )

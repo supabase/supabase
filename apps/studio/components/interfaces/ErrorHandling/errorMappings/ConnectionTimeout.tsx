@@ -1,10 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-
 import type { TroubleshootingContent } from '../error-mappings'
-import { RestartProjectDialog } from '../RestartProjectDialog'
-import { DebugWithAIAction } from '../TroubleshootingActions'
+import { DebugWithAIAction, useRestartStep } from '../TroubleshootingActions'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -17,7 +14,7 @@ const BUILD_PROMPT = () =>
 
 export function useConnectionTimeoutTroubleshooting(): TroubleshootingContent {
   const track = useTrack()
-  const [showRestartDialog, setShowRestartDialog] = useState(false)
+  const { step: restartStep, overlay } = useRestartStep(ERROR_TYPE)
 
   return {
     errorType: ERROR_TYPE,
@@ -47,28 +44,8 @@ export function useConnectionTimeoutTroubleshooting(): TroubleshootingContent {
           ),
         },
       },
-      {
-        id: 'restart',
-        title: 'Try restarting your project',
-        description: 'Restarting can clear timeout errors and stale connections.',
-        action: {
-          label: 'Restart project',
-          onClick: () => {
-            track('inline_error_troubleshooter_action_clicked', {
-              errorType: ERROR_TYPE,
-              ctaType: 'restart_db',
-            })
-            setShowRestartDialog(true)
-          },
-        },
-      },
+      restartStep,
     ],
-    overlays: (
-      <RestartProjectDialog
-        visible={showRestartDialog}
-        onClose={() => setShowRestartDialog(false)}
-        restartType="database"
-      />
-    ),
+    overlays: overlay,
   }
 }
