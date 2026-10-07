@@ -37,7 +37,6 @@ interface LifecyclePolicySectionProps {
   hasDays: boolean
   hasVersions: boolean
   mode: ExpirationMode
-  onModeChange: (mode: ExpirationMode) => void
   /** The stored policy is still in flight, so there is nothing truthful to show yet. */
   isLoading?: boolean
   /** The stored policy holds rules these fields cannot represent, let alone round-trip. */
@@ -51,7 +50,6 @@ export const LifecyclePolicySection = ({
   hasDays,
   hasVersions,
   mode,
-  onModeChange,
   isLoading = false,
   isUnsupported = false,
   error,
@@ -171,7 +169,10 @@ export const LifecyclePolicySection = ({
       <AnimatePresence initial={false}>
         {hasBothConditions && (
           <FormSectionCollapse key="mode">
-            <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />
+            <ExpirationModeToggle
+              mode={mode}
+              onModeChange={(value) => setValue('expiration_mode', value, { shouldDirty: true })}
+            />
           </FormSectionCollapse>
         )}
 

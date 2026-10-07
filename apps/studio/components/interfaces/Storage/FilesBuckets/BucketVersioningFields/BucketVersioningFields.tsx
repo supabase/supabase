@@ -11,10 +11,7 @@ import {
   toNullableNumber,
 } from './BucketVersioningFields.utils'
 import { LifecyclePolicySection } from './LifecyclePolicySection'
-import type {
-  BucketVersioningState,
-  ExpirationMode,
-} from '@/components/interfaces/Storage/StorageVersioning.constants'
+import type { BucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 interface BucketVersioningFieldsProps {
@@ -41,7 +38,7 @@ export const BucketVersioningFields = ({
   isUnsupportedPolicy = false,
   policyError,
 }: BucketVersioningFieldsProps) => {
-  const { control, setValue } = form
+  const { control } = form
 
   const isVersioningEnabled = useWatch({ control, name: 'enable_versioning' })
   const retentionDays = useWatch({ control, name: 'version_expiry_days' })
@@ -65,10 +62,6 @@ export const BucketVersioningFields = ({
 
   const hasDays = typeof retentionDays === 'number' && retentionDays > 0
   const hasVersions = typeof maxVersions === 'number' && maxVersions > 0
-
-  const handleModeChange = (mode: ExpirationMode) => {
-    setValue('expiration_mode', mode, { shouldDirty: true })
-  }
 
   return (
     <>
@@ -153,7 +146,6 @@ export const BucketVersioningFields = ({
                 hasDays={hasDays}
                 hasVersions={hasVersions}
                 mode={expirationMode}
-                onModeChange={handleModeChange}
                 isLoading={isLoadingPolicy}
                 isUnsupported={isUnsupportedPolicy}
                 error={policyError}
