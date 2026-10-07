@@ -34,6 +34,12 @@ vi.mock('@/components/interfaces/Storage/StorageExplorer/StorageExplorerNavigati
     clearPreviewedFile: vi.fn(),
   }),
 }))
+vi.mock('@/components/interfaces/Storage/StorageExplorer/FileExplorerKeyboardNavigation', () => ({
+  useFileExplorerKeyboardNavigation: () => ({
+    onItemInteraction: vi.fn(),
+    enterFolder: vi.fn(),
+  }),
+}))
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => ({ can: true }),
 }))

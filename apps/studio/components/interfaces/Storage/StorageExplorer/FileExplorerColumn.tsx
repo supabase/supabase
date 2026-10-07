@@ -26,6 +26,8 @@ import {
   STORAGE_VIEWS,
 } from '../Storage.constants'
 import type { StorageColumn, StorageItemWithColumn } from '../Storage.types'
+import { useFileExplorerKeyboardNavigation } from './FileExplorerKeyboardNavigation'
+import { getExplorerRowId } from './FileExplorerKeyboardNavigation.utils'
 import { FileExplorerRow } from './FileExplorerRow'
 import { FileExplorerRowContextMenuProvider } from './FileExplorerRowContextMenu'
 import { useStoragePreference } from './useStoragePreference'
@@ -99,6 +101,11 @@ export const FileExplorerColumn = ({
   const snap = useStorageExplorerStateSnapshot()
   const { view, setSortByOrder, setSortBy, setView } = useStoragePreference(snap.projectRef)
   const { can: canUpdateStorage } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { cursor, isListFocused, registerColumn, onColumnFocus, onColumnBlur, onColumnKeyDown } =
+    useFileExplorerKeyboardNavigation()
+
+  const isCursorColumn = cursor.columnIndex === index
+  const activeItemIndex = isCursorColumn ? cursor.itemIndex : undefined
 
   useEffect(() => {
     if (fileExplorerColumnRef) {
@@ -156,8 +163,9 @@ export const FileExplorerColumn = ({
       view: view,
       columnIndex: index,
       selectedItems,
+      activeItemIndex: isListFocused ? activeItemIndex : undefined,
     }),
-    [view, index, selectedItems]
+    [view, index, selectedItems, isListFocused, activeItemIndex]
   )
 
   const onSelectCreateFolder = () => {
@@ -184,14 +192,36 @@ export const FileExplorerColumn = ({
     <ContextMenu modal={false}>
       <ContextMenuTrigger asChild>
         <div
-          ref={fileExplorerColumnRef}
+          ref={(element) => {
+            fileExplorerColumnRef.current = element
+            registerColumn(index, element)
+          }}
+          // A listbox rather than a list of buttons: the rows are virtualized, so the
+          // cursor is tracked here via `aria-activedescendant` instead of DOM focus
+          role="listbox"
+          aria-label={column.name ? `Contents of ${column.name}` : 'Bucket contents'}
+          aria-multiselectable
+          aria-activedescendant={
+            activeItemIndex !== undefined && columnItems.length > 0
+              ? getExplorerRowId(index, activeItemIndex)
+              : undefined
+          }
+          tabIndex={0}
           className={cn(
             fullWidth ? 'w-full' : 'w-64 border-r border-overlay',
             view === STORAGE_VIEWS.LIST && 'h-full',
-            'hide-scrollbar relative flex shrink-0 flex-col overflow-auto'
+            'hide-scrollbar relative flex shrink-0 flex-col overflow-auto',
+            // Focus sits on the column, so the browser rings the whole thing. The row
+            // under the cursor is the indicator instead.
+            'focus:outline-none'
           )}
           onDragOver={onDragOver}
           onDrop={onDrop}
+          onFocus={(event) => {
+            if (event.target === event.currentTarget) onColumnFocus(index)
+          }}
+          onBlur={onColumnBlur}
+          onKeyDown={(event) => onColumnKeyDown(index, event)}
           onClick={() => {
             onSelectColumnEmptySpace(index)
           }}
@@ -285,6 +315,7 @@ export const FileExplorerColumn = ({
                 className="h-full"
                 items={columnItems}
                 itemProps={itemProps}
+                activeIndex={activeItemIndex}
                 getItemKey={getItemKey}
                 getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}
                 ItemComponent={FileExplorerRow}
