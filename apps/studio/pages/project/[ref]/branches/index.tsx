@@ -6,7 +6,9 @@ import { useRouter } from 'next/router'
 import { useState, type PropsWithChildren } from 'react'
 import { Button } from 'ui'
 
+import { BranchingEmptyState } from '@/components/interfaces/BranchManagement/BranchingEmptyState'
 import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
+import { CreateBranchButton } from '@/components/interfaces/BranchManagement/CreateBranchButton'
 import { DeleteBranchModal } from '@/components/interfaces/BranchManagement/DeleteBranchModal'
 import { Overview } from '@/components/interfaces/BranchManagement/Overview'
 import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
@@ -14,7 +16,6 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
@@ -70,13 +71,13 @@ const BranchesPage: NextPageWithLayout = () => {
   )
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
+  const showEmptyState = isSuccessBranches && branches?.length === 0 && !isGithubConnected
 
   const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
-
-  const isGithubConnected = githubConnection !== undefined
 
   const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
@@ -110,7 +111,9 @@ const BranchesPage: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isError && (
+                  {!isError && showEmptyState ? (
+                    <BranchingEmptyState />
+                  ) : (
                     <Overview
                       isGithubConnected={isGithubConnected}
                       isLoading={isLoading}
@@ -156,33 +159,6 @@ const BranchesPage: NextPageWithLayout = () => {
 // directly. Same shape and identical body as before — accepts the page
 // content as `children` instead of capturing it from a closure.
 export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
-  const snap = useAppStateSnapshot()
-  const { can: canCreateBranches } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'preview_branches',
-    {
-      resource: { is_default: false },
-    }
-  )
-
-  const primaryActions = (
-    <ButtonTooltip
-      variant="primary"
-      disabled={!canCreateBranches}
-      onClick={() => snap.setShowCreateBranchModal(true)}
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: !canCreateBranches
-            ? 'You need additional permissions to create branches'
-            : undefined,
-        },
-      }}
-    >
-      Create branch
-    </ButtonTooltip>
-  )
-
   const secondaryActions = (
     <div className="flex items-center gap-x-2">
       <Button
@@ -202,7 +178,7 @@ export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
     <PageLayout
       title="Branches"
       subtitle="Manage your database preview branches and deployments"
-      primaryActions={primaryActions}
+      primaryActions={<CreateBranchButton />}
       secondaryActions={secondaryActions}
     >
       {children}
