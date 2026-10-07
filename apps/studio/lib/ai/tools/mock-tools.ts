@@ -2,7 +2,7 @@ import assert from 'node:assert'
 import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
-import { getStudioTools } from '../tools/studio-tools'
+import { getOptInTools, getStudioTools } from '../tools/studio-tools'
 import { getNotebookTools } from './notebook-tools'
 import {
   applyNotebookOperations,
@@ -15,6 +15,7 @@ import type {
   CellWire,
   NotebookWire,
 } from '@/data/content/notebooks/notebook-schema'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 
 const listTablesInputSchema = z.object({
@@ -604,7 +605,10 @@ export type MockToolOverrides = {
  *
  * Note: search_docs uses the real implementation.
  */
-export async function getMockTools(overrides: MockToolOverrides | undefined) {
+export async function getMockTools(
+  overrides: MockToolOverrides | undefined,
+  aiOptInLevel: AiOptInLevel = 'schema_and_log_and_data'
+) {
   const mockedStudioTools = createMockedStudioTools()
   const notebookStore = createMockNotebookStore()
 
@@ -612,6 +616,7 @@ export async function getMockTools(overrides: MockToolOverrides | undefined) {
 
   const tools = {
     ...mockedStudioTools,
+    ...getOptInTools({ aiOptInLevel }),
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),

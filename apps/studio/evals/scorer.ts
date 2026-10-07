@@ -6,13 +6,21 @@ import { z } from 'zod'
 
 import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
 import type { Transcript } from './transcript'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
 
+/** How the simulated user answers an `update_opt_in_level` card. Needs `aiOptInLevel`. */
+export type OptInDecision = 'accept' | 'skip' | { chooses: AiOptInLevel }
+
 export type AssistantEvalInput = {
   prompt: string
+  /** Opt-in level the mock tools are filtered by. Omitted means no filtering, same as the highest level. */
+  aiOptInLevel?: AiOptInLevel
+  /** Resumes the chat after the Assistant asks for a level. Omit to stop at the request. */
+  optInDecision?: OptInDecision
   mockTables?: Record<
     string,
     Array<{

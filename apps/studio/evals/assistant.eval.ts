@@ -1,7 +1,9 @@
 import assert from 'node:assert'
+import { readUIMessageStream, toUIMessageStream, type UIMessage } from 'ai'
 import { Eval } from 'braintrust'
 
 import { dataset } from './dataset'
+import { applyOptInDecision, joinTranscripts } from './opt-in-replay'
 import {
   completenessScorer,
   concisenessScorer,
@@ -15,9 +17,11 @@ import {
 } from './scorer'
 import { sqlIdentifierQuotingScorer, sqlSyntaxScorer } from './scorer-wasm'
 import { buildTranscript } from './transcript'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_ASSISTANT_BASE_MODEL_ID, getAssistantModelEntry } from '@/lib/ai/model.utils'
+import { filterToolsByOptInLevel } from '@/lib/ai/tool-filter'
 import { getMockTools } from '@/lib/ai/tools/mock-tools'
 
 assert(process.env.BRAINTRUST_PROJECT_ID, 'BRAINTRUST_PROJECT_ID is not set')
@@ -37,22 +41,52 @@ Eval('Assistant', {
     const modelResponse = await getModel({ provider: 'openai', modelEntry })
     if (modelResponse.error) throw modelResponse.error
 
-    const result = await generateAssistantResponse({
-      ...modelResponse.modelParams,
-      isExplorerEnabled: true,
-      messages: [
-        {
-          id: '1',
-          role: 'user',
-          parts: [{ type: 'text', text: input.prompt }],
-        },
-      ],
-      tools: await getMockTools(input.mockTables ? { list_tables: input.mockTables } : undefined),
-    })
+    const { aiOptInLevel, optInDecision } = input
+    assert(!optInDecision || aiOptInLevel, 'optInDecision needs aiOptInLevel')
 
-    const finishReason = await result.finishReason
-    const steps = await result.steps
-    return { finishReason, transcript: buildTranscript(input.prompt, steps) }
+    const userMessage: UIMessage = {
+      id: '1',
+      role: 'user',
+      parts: [{ type: 'text', text: input.prompt }],
+    }
+
+    const run = async (messages: UIMessage[], level: AiOptInLevel | undefined) => {
+      const mockTools = await getMockTools(
+        input.mockTables ? { list_tables: input.mockTables } : undefined,
+        level
+      )
+      return generateAssistantResponse({
+        ...modelResponse.modelParams,
+        isExplorerEnabled: true,
+        ...(level && { aiOptInLevel: level }),
+        messages,
+        tools: level ? filterToolsByOptInLevel(mockTools, level) : mockTools,
+      })
+    }
+
+    const results = [await run([userMessage], aiOptInLevel)]
+
+    if (optInDecision && aiOptInLevel) {
+      // Same two requests as production: the approval pauses the turn, then the answered
+      // approval resumes it at the level the user saved.
+      let assistantMessage: UIMessage | undefined
+      for await (const message of readUIMessageStream({
+        stream: toUIMessageStream({ stream: results[0].stream }),
+      })) {
+        assistantMessage = message
+      }
+      const resumed =
+        assistantMessage && applyOptInDecision(assistantMessage, optInDecision, aiOptInLevel)
+      if (resumed) results.push(await run([userMessage, resumed.message], resumed.level))
+    }
+
+    const finishReason = await results[results.length - 1].finishReason
+    const [first, second] = await Promise.all(
+      results.map(async (result) => buildTranscript(input.prompt, await result.steps))
+    )
+    const transcript =
+      second && optInDecision ? joinTranscripts(first, second, optInDecision) : first
+    return { finishReason, transcript }
   },
   scores: [
     toolUsageScorer,
