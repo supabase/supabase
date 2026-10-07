@@ -277,7 +277,7 @@ describe('ai/tools/studio-tools getOptInTools', () => {
       )
 
       expect(update_opt_in_level.needsApproval).toBe(true)
-      expect(result).toEqual({ level, sufficient })
+      expect(result).toEqual({ previousLevel: level, level, sufficient })
     }
   )
 
@@ -290,7 +290,7 @@ describe('ai/tools/studio-tools getOptInTools', () => {
       { toolCallId: 'test', messages: [], context: {} }
     )
 
-    expect(result).toEqual({ level: 'schema' })
+    expect(result).toEqual({ previousLevel: 'schema', level: 'schema' })
   })
 
   it.each([

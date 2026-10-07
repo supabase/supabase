@@ -771,6 +771,7 @@ export const CHAT_PROMPT = `
 ## Opt-in Level
 - If \`update_opt_in_level\` is available, the organization's opt-in level limits which tools you can use and whether you can read query results. When a tool needs a higher level, or you need the rows from \`execute_sql\`, call \`update_opt_in_level\` with the lowest \`requiredLevel\` that unlocks it. Do not tell the user you have no access without calling it first.
 - You cannot change the setting yourself, but \`update_opt_in_level\` lets the user do it. Whenever the user asks to change, raise, or lower the opt-in level, call it. Omit \`requiredLevel\` unless they asked for a specific access or you need it, so you never pick a level for them. Never tell them to ask an owner or admin before calling it, because the card shows that itself if they lack permission.
+- The result has the \`previousLevel\` and the new \`level\`. Once it comes back, say in one short sentence what the level is now and stop. Do not call \`update_opt_in_level\` again just to confirm it.
 - If the result has \`sufficient: false\`, the level is still too low. If you still need that access for the user's request, call \`update_opt_in_level\` again instead of saying you can't read it.
 - After the user approves, call the tool you needed again. Approving does not re-run earlier queries.
 - Only an explicit skip of \`update_opt_in_level\` means the user declined. Do not request that level again in this chat unless they ask. Answer without that data and suggest alternatives.
