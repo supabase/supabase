@@ -95,6 +95,19 @@ describe('ErrorDisplay layout switching', () => {
   })
 })
 
+describe('ErrorDisplay sizing', () => {
+  it('sizes to the container rather than forcing w-full, so margins do not overflow', () => {
+    mockContainerWidth(260)
+    render(<ErrorDisplay title="Failed to load tables" className="mx-4 mt-3" />)
+
+    const root = screen.getByRole('status')
+    expect(root).not.toHaveClass('w-full')
+    expect(root).toHaveClass('w-auto')
+    expect(root).toHaveClass('min-w-0')
+    expect(root).toHaveClass('mx-4')
+  })
+})
+
 describe('ErrorDisplay error details', () => {
   it('shows the raw error inline in the full layout', () => {
     mockContainerWidth(640)
@@ -222,6 +235,70 @@ describe('ErrorDisplay steps', () => {
 })
 
 describe('ErrorDisplay step actions', () => {
+  it('renders a custom control through the action render escape hatch', () => {
+    mockContainerWidth(640)
+    render(
+      <ErrorDisplay
+        title="Failed to retrieve tables"
+        steps={[
+          {
+            id: 'ai',
+            title: 'Debug with AI',
+            action: {
+              label: 'Debug with AI',
+              render: ({ block }) => <div data-block={String(!!block)}>custom control</div>,
+            },
+          },
+        ]}
+      />
+    )
+
+    expect(screen.getByText('custom control')).toBeInTheDocument()
+    expect(screen.getByText('custom control')).toHaveAttribute('data-block', 'false')
+  })
+
+  it('passes block to render in the compact layout', async () => {
+    mockContainerWidth(260)
+    render(
+      <ErrorDisplay
+        title="Failed to retrieve tables"
+        steps={[
+          {
+            id: 'ai',
+            title: 'Debug with AI',
+            action: {
+              label: 'Debug with AI',
+              render: ({ block }) => <div data-block={String(!!block)}>custom control</div>,
+            },
+          },
+        ]}
+      />
+    )
+
+    const control = await screen.findByText('custom control')
+    expect(control).toHaveAttribute('data-block', 'true')
+  })
+
+  it('fires onStepOpenChange as steps expand and collapse', async () => {
+    const user = userEvent.setup()
+    const onStepOpenChange = vi.fn()
+    mockContainerWidth(640)
+
+    render(
+      <ErrorDisplay
+        title="Failed to retrieve tables"
+        steps={steps}
+        onStepOpenChange={onStepOpenChange}
+      />
+    )
+
+    await user.click(screen.getByRole('button', { name: /Restart your project/ }))
+    expect(onStepOpenChange).toHaveBeenLastCalledWith('restart')
+
+    await user.click(screen.getByRole('button', { name: /Restart your project/ }))
+    expect(onStepOpenChange).toHaveBeenLastCalledWith(null)
+  })
+
   it('calls the action handler directly, with no inline confirmation', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()

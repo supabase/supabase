@@ -60,7 +60,25 @@ import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
 
 In Studio, wire [`ErrorMatcher`](https://github.com/supabase/supabase/tree/master/apps/studio/components/interfaces/ErrorHandling) on top so classified errors get their steps automatically.
 
-For troubleshooting that `steps` can't express — a split dropdown, or an action backed by a dialog — pass it as `children`. It renders after the steps in both layouts but doesn't get the compact treatment, so keep it short.
+`children` renders after the steps in both layouts. Use it for the dialogs your step actions open — they take no space until opened — or for anything else that has to sit inside the card. It doesn't get the compact treatment, so keep visible content short.
+
+### Actions a button can't express
+
+A step action is normally a `label` plus `onClick` or `href`. For a control a button can't express — a split dropdown, say — use `render`, which receives `{ block }` (`true` in the compact layout):
+
+```tsx
+{
+  id: 'ai',
+  title: 'Debug with AI',
+  description: 'Ask the assistant to diagnose this error.',
+  action: {
+    label: 'Debug with AI',
+    render: ({ block }) => <AiAssistantDropdown block={block} />,
+  },
+}
+```
+
+`label` is still required — it's what the compact layout announces. Don't reach for `render` for an ordinary button: it opts the step out of the built-in loading and external-link handling. For an action that opens a dialog, keep `onClick` and render the dialog through `children`.
 
 ## When to use each type
 
@@ -91,6 +109,7 @@ For troubleshooting that `steps` can't express — a split dropdown, or an actio
 | `retryLabel`        | `string?`                              | `"Try again"`       | Retry button label, and its `aria-label` when icon-only.                |
 | `steps`             | `ErrorDisplayStep[]?`                  | —                   | Troubleshooting steps, least to most disruptive.                        |
 | `defaultOpenStep`   | `string?`                              | first step          | `id` of the step expanded on mount.                                     |
+| `onStepOpenChange`  | `(stepId: string \| null) => void`     | —                   | Fired when a step expands or collapses. `null` when all are collapsed.  |
 | `onContactSupport`  | `(details?) => void`                   | —                   | Fired with the error details when support is clicked.                   |
 | `supportHref`       | `string?`                              | —                   | Overrides the generated support URL.                                    |
 | `supportFormParams` | `SupportFormParams?`                   | —                   | Params for the support URL. Error message and request ID are merged in. |
@@ -111,12 +130,13 @@ For troubleshooting that `steps` can't express — a split dropdown, or an actio
 
 ### ErrorDisplayStepAction
 
-| Field     | Type                          | Description                                               |
-| --------- | ----------------------------- | --------------------------------------------------------- |
-| `label`   | `string`                      | Button label. Starts with a verb.                         |
-| `onClick` | `() => void \| Promise<void>` | Pending promises show a spinner.                          |
-| `href`    | `string?`                     | Renders a link. External links get an external-link icon. |
-| `icon`    | `ReactNode?`                  | Leading icon.                                             |
+| Field     | Type                          | Description                                                                                     |
+| --------- | ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| `label`   | `string`                      | Button label. Starts with a verb.                                                               |
+| `onClick` | `() => void \| Promise<void>` | Pending promises show a spinner.                                                                |
+| `href`    | `string?`                     | Renders a link. External links get an external-link icon. `onClick` still fires, for telemetry. |
+| `icon`    | `ReactNode?`                  | Leading icon.                                                                                   |
+| `render`  | `({ block }) => ReactNode`    | Custom control in place of the button. Escape hatch — see below.                                |
 
 ### ErrorDisplayDetails
 

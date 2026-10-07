@@ -225,6 +225,8 @@ function StepAction({ step, block }: { step: ErrorDisplayStep; block?: boolean }
   const { action } = step
   const [isRunning, setIsRunning] = useState(false)
 
+  if (action.render) return <>{action.render({ block })}</>
+
   const run = async () => {
     setIsRunning(true)
     try {
@@ -248,6 +250,7 @@ function StepAction({ step, block }: { step: ErrorDisplayStep; block?: boolean }
           href={action.href}
           target={external ? '_blank' : undefined}
           rel={external ? 'noopener noreferrer' : undefined}
+          onClick={action.onClick}
         >
           {action.label}
         </a>
@@ -265,10 +268,12 @@ function StepAction({ step, block }: { step: ErrorDisplayStep; block?: boolean }
 function StepsTimeline({
   steps,
   defaultOpenStep,
+  onStepOpenChange,
   type,
 }: {
   steps: ErrorDisplayStep[]
   defaultOpenStep?: string
+  onStepOpenChange?: (stepId: string | null) => void
   type: ErrorDisplayType
 }) {
   const [openStep, setOpenStep] = useState<string>(defaultOpenStep ?? steps[0]?.id ?? '')
@@ -278,7 +283,10 @@ function StepsTimeline({
       type="single"
       collapsible
       value={openStep}
-      onValueChange={setOpenStep}
+      onValueChange={(value) => {
+        setOpenStep(value)
+        onStepOpenChange?.(value || null)
+      }}
       className="w-full"
     >
       {steps.map((step, index) => (
@@ -358,6 +366,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
       retryLabel = 'Try again',
       steps,
       defaultOpenStep,
+      onStepOpenChange,
       onContactSupport,
       supportHref,
       supportFormParams,
@@ -409,7 +418,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
         data-size={resolvedSize}
         className={cn(
           alertVariants({ variant: TYPE_TO_VARIANT[type] }),
-          'overflow-hidden p-0',
+          'w-auto min-w-0 overflow-hidden p-0',
           className
         )}
         {...props}
@@ -480,6 +489,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
                   <StepsTimeline
                     steps={visibleSteps}
                     defaultOpenStep={defaultOpenStep}
+                    onStepOpenChange={onStepOpenChange}
                     type={type}
                   />
                 ) : (

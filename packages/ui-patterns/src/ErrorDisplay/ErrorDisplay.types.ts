@@ -45,6 +45,13 @@ export interface ErrorDisplayStepAction {
   href?: string
 
   icon?: ReactNode
+
+  /**
+   * Renders a custom control in place of the default button. Use only for controls
+   * a button can't express — a split dropdown, say. `label` is still required, and
+   * is what the compact layout announces.
+   */
+  render?: (props: { block?: boolean }) => ReactNode
 }
 
 export interface ErrorDisplayStep {
@@ -105,6 +112,9 @@ export interface ErrorDisplayProps extends Omit<ComponentPropsWithoutRef<'div'>,
 
   /** `id` of the step expanded on mount. Defaults to the first step. */
   defaultOpenStep?: string
+
+  /** Fired when a numbered step expands or collapses. `null` when every step is collapsed. */
+  onStepOpenChange?: (stepId: string | null) => void
 
   /** Fired with the error details when the support link is clicked. */
   onContactSupport?: (details?: ErrorDisplayDetails) => void

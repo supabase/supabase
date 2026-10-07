@@ -19,6 +19,17 @@ vi.mock('./RestartProjectDialog', () => ({
   RestartProjectDialog: () => null,
 }))
 
+const useNoopFallback = () => ({
+  errorType: 'unknown',
+  steps: [
+    {
+      id: 'restart',
+      title: 'Try restarting your project',
+      action: { label: 'Restart project', onClick: vi.fn() },
+    },
+  ],
+})
+
 describe('ErrorMatcher', () => {
   it('renders the provided title and error message', () => {
     render(
@@ -64,30 +75,30 @@ describe('ErrorMatcher', () => {
     expect(screen.getByText('UNKNOWN ERROR')).toBeInTheDocument()
   })
 
-  it('renders the caller-provided fallback when the error is unclassified', () => {
+  it('renders the caller-provided fallback troubleshooting when the error is unclassified', () => {
     render(
       <ErrorMatcher
         title="Failed to load tables"
         error="UNKNOWN ERROR"
         supportFormParams={{}}
-        fallback={<div>Custom fallback</div>}
+        useFallbackTroubleshooting={useNoopFallback}
       />
     )
-    expect(screen.getByText('Custom fallback')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Restart project' })).toBeInTheDocument()
   })
 
-  it('ignores the caller-provided fallback when the error is classified', () => {
+  it('prefers the mapped troubleshooting over the fallback when the error is classified', () => {
     const error = new ConnectionTimeoutError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')
     render(
       <ErrorMatcher
         title="Failed to load tables"
         error={error}
         supportFormParams={{}}
-        fallback={<div>Custom fallback</div>}
+        useFallbackTroubleshooting={useNoopFallback}
       />
     )
-    expect(screen.queryByText('Custom fallback')).not.toBeInTheDocument()
-    expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
+    expect(screen.getByText('Debug with AI')).toBeInTheDocument()
+    expect(screen.getByText('Try our troubleshooting guide')).toBeInTheDocument()
   })
 
   it('accepts error as object with message property', () => {
