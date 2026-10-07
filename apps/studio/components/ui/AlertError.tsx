@@ -58,7 +58,10 @@ export const AlertError = ({
   projectRef,
   orgSlug,
   subject,
-  description = 'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.',
+  hideContactSupport = false,
+  description = hideContactSupport
+    ? 'Try refreshing your browser.'
+    : 'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.',
   error,
   className,
   showIcon = true,
@@ -67,7 +70,6 @@ export const AlertError = ({
   showErrorPrefix = true,
   children,
   additionalActions,
-  hideContactSupport = false,
 }: PropsWithChildren<AlertErrorProps>) => {
   const track = useTrack()
   const hasTrackedRef = useRef(false)

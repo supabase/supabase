@@ -8,6 +8,18 @@ import { customRender } from '@/tests/lib/custom-render'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
+test('explicit responsive layout survives additional actions', () => {
+  customRender(<AlertError layout="responsive" additionalActions={<button>Retry</button>} />)
+  expect(screen.getByRole('alert')).toHaveClass('@container')
+  expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+})
+
+test('hiding support removes its wording from the default instructions', () => {
+  customRender(<AlertError hideContactSupport />)
+  expect(screen.getByText('Try refreshing your browser.')).toBeInTheDocument()
+  expect(screen.queryByText(/contact support/i)).not.toBeInTheDocument()
+})
+
 test('support is an inline link with the error context, not an action button', () => {
   customRender(
     <AlertError projectRef="default" subject="Failed to load" error={{ message: 'Test error' }} />
