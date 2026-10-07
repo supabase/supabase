@@ -2,6 +2,7 @@ import type { CloudProvider, Region } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
+import type { OrganizationAvailableRegionsData } from '@/data/organizations/organization-available-regions-query'
 import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
@@ -102,4 +103,51 @@ export const filterHighAvailabilityRegions = <T extends { code: string }>(
   return highAvailability && !isLocal && regionCode !== undefined
     ? regions.filter((region) => region.code === regionCode)
     : regions
+}
+
+export type FreeTierGeneralRegionExperimentVariant = 'test' | 'control'
+
+type GetFreeTierGeneralRegionExperimentVariantArgs = {
+  isFreePlan: boolean
+  smartRegionEnabled: boolean
+  enrollmentFlag: boolean
+  selectionFlag: boolean
+}
+
+/**
+ * Org's arm in the freeTierGeneralRegionExperiment. The test arm only sees general regions.
+ * Returns undefined when the org isn't enrolled.
+ */
+export function getFreeTierGeneralRegionExperimentVariant({
+  isFreePlan,
+  smartRegionEnabled,
+  enrollmentFlag,
+  selectionFlag,
+}: GetFreeTierGeneralRegionExperimentVariantArgs):
+  | FreeTierGeneralRegionExperimentVariant
+  | undefined {
+  const isInExperiment = isFreePlan && smartRegionEnabled && enrollmentFlag === true
+  if (!isInExperiment) return undefined
+  return selectionFlag === true ? 'test' : 'control'
+}
+
+export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['all']
+
+type GetRegionSelectionTypeArgs = {
+  dbRegion: string | undefined
+  availableRegions: AvailableRegions | undefined
+}
+
+/**
+ * Whether the selected region is a general region (e.g. Americas) or a specific one
+ * (e.g. us-east-1). Returns undefined if it matches neither list.
+ */
+export function getRegionSelectionType({
+  dbRegion,
+  availableRegions,
+}: GetRegionSelectionTypeArgs): 'general' | 'specific' | undefined {
+  if (!dbRegion || !availableRegions) return undefined
+  if (availableRegions.smartGroup.some((region) => region.name === dbRegion)) return 'general'
+  if (availableRegions.specific.some((region) => region.name === dbRegion)) return 'specific'
+  return undefined
 }

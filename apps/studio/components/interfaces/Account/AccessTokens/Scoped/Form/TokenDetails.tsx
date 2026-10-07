@@ -14,6 +14,7 @@ import {
   SelectValue,
   useWatch,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   DatePicker,
   DatePickerButton,
@@ -35,6 +36,7 @@ interface TokenDetailsProps {
 }
 
 export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
+  const expiresAt = useWatch({ control, name: 'expiresAt' })
   const customExpiryDate = useWatch({ control, name: 'customExpiryDate' })
   const maxExpiryDate = getMaxCustomExpiryDate().toDate()
 
@@ -136,6 +138,15 @@ export const TokenDetails = ({ control, setValue }: TokenDetailsProps) => {
           </FormItemLayout>
         )}
       />
+
+      {expiresAt === 'never' && (
+        <Admonition
+          type="warning"
+          className="mb-0"
+          title="This token never expires"
+          description="Anyone with the token keeps access until you delete it."
+        />
+      )}
     </section>
   )
 }

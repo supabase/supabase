@@ -71,13 +71,13 @@ const page: GoPageInput = {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             <Button asChild variant="primary" size="medium">
-              <Link
+              <a
                 href="https://supabase.com/docs/guides/getting-started/ai-skills"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 Learn about Supabase AI Tools
-              </Link>
+              </a>
             </Button>
             <Button asChild size="medium">
               <Link
@@ -104,7 +104,7 @@ const page: GoPageInput = {
             <li>Complete these steps by Monday, May 4, 2026 at 12:00 PM PST</li>
           </ol>
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Create your account</Link>
+            <a href="https://supabase.com/dashboard">Create your account</a>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">
             No purchase necessary. Void where prohibited.{' '}
