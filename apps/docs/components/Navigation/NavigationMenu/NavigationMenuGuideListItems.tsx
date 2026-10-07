@@ -32,10 +32,13 @@ function isRenderable(item: NavAccordionItem): boolean {
   return item.items?.some(isRenderable) ?? false
 }
 
-function groupLinks(item: NavAccordionItem): NavAccordionItem[] {
+function groupLinks(item: NavAccordionItem): Array<{ name: string; url: string }> {
   return (item.items ?? [])
-    .filter(isRenderable)
-    .flatMap((child) => [...(child.url ? [child] : []), ...groupLinks(child)])
+    .filter((child) => isRenderable(child))
+    .flatMap((child) => [
+      ...(child.url && child.name ? [{ name: child.name, url: child.url }] : []),
+      ...groupLinks(child),
+    ])
 }
 
 const HeaderLink = React.memo(function HeaderLink(props: {
@@ -174,7 +177,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
             <ul hidden>
               {groupLinks(props.subItem).map((child) => (
                 <li key={`${child.name}-${child.url}`}>
-                  <Link href={child.url!}>{child.name}</Link>
+                  <Link href={child.url}>{child.name}</Link>
                 </li>
               ))}
             </ul>
