@@ -24,29 +24,35 @@ function getTableGrantsCTEs({
         c.relname as name,
         c.relkind as kind,
 
+        -- A grantee of 0 is PUBLIC, which reaches every role including these three. Tables are
+        -- owner-only by default, so this only matters once something has explicitly granted to
+        -- PUBLIC -- but when it has, Postgres does allow the access and we should say so.
+
         -- Anon Privileges
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'SELECT') as anon_select,
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'INSERT') as anon_insert,
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'UPDATE') as anon_update,
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'DELETE') as anon_delete,
+        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'SELECT') as anon_select,
+        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'INSERT') as anon_insert,
+        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'UPDATE') as anon_update,
+        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'DELETE') as anon_delete,
 
         -- Authenticated Privileges
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'SELECT') as auth_select,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'INSERT') as auth_insert,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'UPDATE') as auth_update,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'DELETE') as auth_delete,
+        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'SELECT') as auth_select,
+        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'INSERT') as auth_insert,
+        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'UPDATE') as auth_update,
+        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'DELETE') as auth_delete,
 
         -- Service Role Privileges
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'SELECT') as srv_select,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'INSERT') as srv_insert,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'UPDATE') as srv_update,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'DELETE') as srv_delete
+        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'SELECT') as srv_select,
+        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'INSERT') as srv_insert,
+        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'UPDATE') as srv_update,
+        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'DELETE') as srv_delete
 
       from pg_class c
       join pg_namespace n
         on n.oid = c.relnamespace
       left join lateral aclexplode(coalesce(c.relacl, acldefault('r', c.relowner))) as acl
         on true
+      -- No row exists in pg_roles for PUBLIC (grantee 0), so pr is null for those entries and
+      -- the predicates above test acl.grantee directly instead.
       left join pg_roles pr
         on pr.oid = acl.grantee
       where c.relkind in ('r', 'p', 'v', 'm', 'f')
@@ -167,16 +173,22 @@ function getFunctionGrantsCTEs({
         n.nspname as schema_name,
         p.proname as name,
 
+        -- A grantee of 0 is PUBLIC, which reaches every role including these three. Functions hit
+        -- this by default: with no explicit ACL, acldefault() supplies an EXECUTE entry held by
+        -- PUBLIC, so anon really can call them and reporting revoked would be wrong.
+
         -- Aggregate EXECUTE across all overloads + all 3 roles
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'EXECUTE') as anon_execute,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'EXECUTE') as auth_execute,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'EXECUTE') as srv_execute
+        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'EXECUTE') as anon_execute,
+        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'EXECUTE') as auth_execute,
+        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'EXECUTE') as srv_execute
 
       from pg_proc p
       join pg_namespace n
         on n.oid = p.pronamespace
       left join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) as acl
         on true
+      -- No row exists in pg_roles for PUBLIC (grantee 0), so pr is null for those entries and
+      -- the predicates above test acl.grantee directly instead.
       left join pg_roles pr
         on pr.oid = acl.grantee
       where p.prokind in ('f', 'w')
