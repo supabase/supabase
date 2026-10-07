@@ -40,9 +40,9 @@ const CodeSnippet = ({ prompt }: { prompt: AIPrompt }) => {
   }
 
   return (
-    <div className="relative group bg-surface-75 border border-default rounded-lg">
+    <div className="relative group bg-surface-75 border border-default rounded-lg min-w-0">
       <div className="flex items-center justify-between px-4 py-3 border-b border-default bg-surface-100">
-        <h3 className="text-sm text-foreground truncate">{prompt.title}</h3>
+        <h3 className="text-sm text-foreground truncate min-w-0">{prompt.title}</h3>
         {prompt.docsUrl && (
           <Link href={prompt.docsUrl} className="relative">
             <ArrowUpRight className="w-4 h-4 not-sr-only stroke-1 opacity-80 transition-opacity group-hover:opacity-100" />
