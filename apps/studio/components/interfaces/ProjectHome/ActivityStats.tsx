@@ -160,7 +160,7 @@ export const ActivityStats = () => {
         <SingleStat
           href={getInfrastructurePath(ref)}
           icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
-          label={<span>Machine size</span>}
+          label={<span>Compute size</span>}
           value={
             <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
               {project?.infra_compute_size ? (
