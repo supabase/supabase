@@ -256,7 +256,7 @@ export const OAuthAppsAuthorizeScreen = ({
       ? null
       : `Cancelling will redirect you to ${request.redirect_uri} with access denied.`
 
-  const cannotApprove = preflightQuery.data?.status === 'error' || hasRoleFailure || hasNoSelection
+  const cannotApprove = preflightQuery.data?.status === 'error' || hasNoSelection
 
   return (
     <InterstitialLayout
