@@ -64,9 +64,9 @@ select
 from pg_stat_activity
 where
     (backend_xmin is not null or backend_xid is not null)
-    or
-    (now() - xact_start >= interval '30 minutes' and state <> 'idle')
-order by greatest(age(backend_xmin), age(backend_xid)) desc
+      and
+    (now() - xact_start >= interval '5 minutes' and state <> 'idle')
+order by now() - xact_start desc
 limit 10;
 
 -- if a transaction is unusually old or referenced in the xmin warning logs, kill it
@@ -127,14 +127,20 @@ select
   indexrelid::regclass as idx_name,
   indisvalid as is_valid
 from pg_index
-where indisvalid = false;
+where 
+indisvalid = false;
+  and
+(idx_name like '%ccnew%'  or idx_name like '%ccnew%'
+
 ```
 
-If you find an invalid index, reindex it again or drop it:
+If you find an invalid index with the term `ccnew`, that index is unusable and should be removed:
 
 ```sql
 drop index concurrently my_invalid_index;
 ```
+
+Afterward, you can try to reindex again. If the index contains the term `_ccold`, then the index successfully was changed, but an invalid one was left behind as part of the process. The invalid one should just be dropped, but another reindex is not not required.
 
 ### Manage vacuum settings
 

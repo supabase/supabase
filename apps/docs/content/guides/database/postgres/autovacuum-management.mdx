@@ -636,7 +636,7 @@ alter table public.mytable set (
 
 <Admonition type="note">
 
-Normal autovacuums do not immediately remove all bloat. If a table has already accummulated a problematic amount of bloat, check the troubleshooting guide [Remove table bloat immediately](/docs/guides/troubleshooting/postgres-clearing-bloat).
+Normal autovacuums do not immediately remove all bloat. If a table has already accumulated a problematic amount of bloat, check the troubleshooting guide [Remove table bloat immediately](/docs/guides/troubleshooting/postgres-clearing-bloat).
 
 </Admonition>
 
@@ -714,7 +714,6 @@ These settings control how much memory each autovacuum worker can use:
 
 | Parameter                   | Default                | Description                                                                                                    |
 | --------------------------- | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `maintenance_work_mem`      | Varies by compute size | Maximum memory for maintenance operations such as `vacuum`, `create index`, and `alter table add foreign key`. |
 | `autovacuum_work_mem`       | -1                     | Maximum memory per autovacuum worker. `-1` falls back to `maintenance_work_mem`.                               |
 | `vacuum_buffer_usage_limit` | 2MB                    | Size of the buffer ring that `vacuum` and `analyze` use in shared buffers. `0` removes the limit.              |
 
@@ -722,7 +721,7 @@ A memory-starved vacuum has to make multiple passes over a table's indexes. You 
 
 If your vacuums take too long, consider raising the memory limit. 
 
-You can change two of the settings at the database level:
+You can change one of the settings at the database level:
 
 ```sql
 alter database postgres set vacuum_buffer_usage_limit = '4MB';
