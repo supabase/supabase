@@ -84,7 +84,7 @@ A few things here are intentional, not bugs to fix:
 - `topics` are passed through verbatim from the source, unvalidated against `TOPIC_NAMES` — unlike `guides`.
   `description` is optional too, since the source doesn't provide one.
 
-Auth reuses the docs GitHub App env vars (`DOCS_GITHUB_APP_ID`/`_INSTALLATION_ID`/`_PRIVATE_KEY`), falling back
+Auth reuses the docs GitHub App env vars (`KB_GITHUB_APP_ID`/`_INSTALLATION_ID`/`_PRIVATE_KEY`), falling back
 to `GH_TOKEN`/`GITHUB_TOKEN` for local dev — see `.env.example`.
 
 Syncing guides to GitHub Discussions (`scripts/federated-content/sync-troubleshooting-entries.ts` and

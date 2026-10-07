@@ -7,9 +7,9 @@ import { createAppAuth } from '@octokit/auth-app'
  * fall-back, to avoid silently authenticating as the wrong identity.
  */
 export function githubAuthOptions() {
-  const appId = process.env.DOCS_GITHUB_APP_ID
-  const installationId = process.env.DOCS_GITHUB_APP_INSTALLATION_ID
-  const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
+  const appId = process.env.KB_GITHUB_APP_ID
+  const installationId = process.env.KB_GITHUB_APP_INSTALLATION_ID
+  const privateKey = process.env.KB_GITHUB_APP_PRIVATE_KEY
 
   if (appId && installationId && privateKey) {
     return {
@@ -26,9 +26,9 @@ export function githubAuthOptions() {
   }
 
   const appVars: Array<[string, string | undefined]> = [
-    ['DOCS_GITHUB_APP_ID', appId],
-    ['DOCS_GITHUB_APP_INSTALLATION_ID', installationId],
-    ['DOCS_GITHUB_APP_PRIVATE_KEY', privateKey],
+    ['KB_GITHUB_APP_ID', appId],
+    ['KB_GITHUB_APP_INSTALLATION_ID', installationId],
+    ['KB_GITHUB_APP_PRIVATE_KEY', privateKey],
   ]
   const missing = appVars.filter(([, value]) => !value).map(([name]) => name)
   if (missing.length < appVars.length) {
@@ -39,6 +39,6 @@ export function githubAuthOptions() {
   if (token) return { auth: token }
 
   throw new Error(
-    'Missing GitHub credentials. Set DOCS_GITHUB_APP_ID/_INSTALLATION_ID/_PRIVATE_KEY, or GH_TOKEN / GITHUB_TOKEN.'
+    'Missing GitHub credentials. Set KB_GITHUB_APP_ID/_INSTALLATION_ID/_PRIVATE_KEY, or GH_TOKEN / GITHUB_TOKEN.'
   )
 }
