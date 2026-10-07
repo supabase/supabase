@@ -1023,6 +1023,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'Beekeeper Studio',
       url: '/guides/database/beekeeper-studio',
     },
+    {
+      name: 'LibreDB Studio',
+      url: '/guides/database/libredb-studio',
+    },
   ],
 }
 
