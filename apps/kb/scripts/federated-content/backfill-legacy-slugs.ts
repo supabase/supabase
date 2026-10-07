@@ -5,9 +5,11 @@
 // apps/docs/content/troubleshooting/*.mdx (that content isn't checked out by
 // this workflow and doesn't need to be — these ids never change).
 //
-// Prefixed with "docs-legacy:" so these rows are structurally distinguishable
-// from kb's own entries (not reconciled against by sync-troubleshooting-entries.ts
-// or sync-troubleshooting-updates.ts).
+// Stored as the bare slug, not prefixed: as these files get migrated into the
+// federated supabase/troubleshooting repo under the same slug, sync-troubleshooting-entries.ts
+// needs to match them by slug against these rows' existing github_url — otherwise
+// it treats the guide as new and creates a duplicate discussion, orphaning the
+// original (with its comments and links).
 //
 // Delete this file, legacy-troubleshooting-slugs.json, its package.json script,
 // and its workflow step once all legacy rows are backfilled — safe to remove
@@ -21,7 +23,7 @@ const DRY_RUN = process.argv.includes('--dry-run')
 async function backfillLegacySlugs() {
   if (DRY_RUN) {
     for (const [databaseId, slug] of Object.entries(legacySlugs)) {
-      console.log(`  - ${databaseId} -> docs-legacy:${slug}`)
+      console.log(`  - ${databaseId} -> ${slug}`)
     }
     return
   }
@@ -39,7 +41,7 @@ async function backfillLegacySlugs() {
     // run updates 0 rows instead of racing.
     const { data, error } = await db
       .from('troubleshooting_entries')
-      .update({ slug: `docs-legacy:${slug}` })
+      .update({ slug })
       .eq('id', databaseId)
       .is('slug', null)
       .select('id')
