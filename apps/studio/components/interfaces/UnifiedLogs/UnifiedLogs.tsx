@@ -15,7 +15,7 @@ import {
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -208,6 +208,12 @@ export const UnifiedLogs = () => {
     projectRef,
     search: searchParameters,
   })
+
+  const fetchLiveLogs = useCallback(async () => {
+    const response = await fetchPreviousPage()
+    if (!response.isError) await refetchCounts()
+    return response
+  }, [fetchPreviousPage, refetchCounts])
 
   const refetchAllData = () => {
     refetchLogs()
@@ -464,7 +470,7 @@ export const UnifiedLogs = () => {
                   <DownloadLogsButton searchParameters={searchParameters} />
                   {fetchPreviousPage ? (
                     <LiveButton
-                      fetchPreviousPage={fetchPreviousPage}
+                      fetchPreviousPage={fetchLiveLogs}
                       searchParamsParser={SEARCH_PARAMS_PARSER}
                     />
                   ) : null}

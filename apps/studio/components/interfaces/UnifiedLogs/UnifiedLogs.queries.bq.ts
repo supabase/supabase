@@ -497,7 +497,7 @@ ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })}
 ${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })},
 ${getFacetCountCTE({ search, facet: 'pathname', cteName: safeSql`pathname_count` })}
 
-SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
+SELECT 'total' AS facet, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
