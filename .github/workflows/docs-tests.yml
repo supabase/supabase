@@ -16,6 +16,7 @@ on:
       - 'e2e/docs/local-smoke/**'
       - 'e2e/docs/playwright.local-smoke.config.ts'
       - 'e2e/docs/package.json'
+      - '.github/workflows/docs-tests.yml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
