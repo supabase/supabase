@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "supabase-client-nuxtjs",
-  "type": "registry:lib",
   "title": "Supabase Client for Nuxt.js",
   "description": "",
   "dependencies": [
@@ -11,7 +10,7 @@
   "registryDependencies": [],
   "files": [
     {
-      "path": "registry/default/clients/nuxtjs/lib/supabase/client.ts",
+      "path": "lib/supabase/client.ts",
       "content": "import { createBrowserClient } from '@supabase/ssr'\n\nexport function createClient() {\n  return createBrowserClient(\n    process.env.NUXT_PUBLIC_SUPABASE_URL!,\n    process.env.NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!\n  )\n}\n",
       "type": "registry:lib"
     },
@@ -38,5 +37,6 @@
     "NUXT_PUBLIC_SUPABASE_URL": "",
     "NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:lib"
 }

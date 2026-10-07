@@ -1,0 +1,447 @@
+---
+id: 'platform-webhook-events'
+title: 'Platform Webhook Events'
+description: 'Event types and payload schemas for Platform Webhooks.'
+---
+
+Webhook events are categorized into two scopes:
+
+- **project events** related to a specific project
+- **organization events** related to the organization itself
+
+For an overview of Platform Webhooks including delivery behavior and signing, see [Platform Webhooks](/docs/guides/platform/webhooks).
+
+<Admonition type="note" title="Platform Webhooks is an early access feature">
+
+Platform Webhooks is available to organizations on an early access allowlist. The API rejects a request from an organization outside the allowlist with `403` and the error code `access_disabled`.
+
+</Admonition>
+
+## Event envelope
+
+Every event arrives in the same envelope regardless of type:
+
+```json
+{
+  "id": "<event UUID>",
+  "type": "<event-type>",
+  "timestamp": "<ISO 8601 UTC>",
+  "payload": {
+    "organization_slug": "<org-slug>",
+    "project_ref": "<project-ref>"
+    // event-specific fields
+  }
+}
+```
+
+For example:
+
+```json
+{
+  "id": "019f3c9c-c758-766d-acb2-94eb089b3f69",
+  "type": "v1.project.paused",
+  "timestamp": "2026-07-07T12:45:35.449Z",
+  "payload": {
+    "project_ref": "your-project-ref",
+    "organization_slug": "your-org-slug",
+    "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+  }
+}
+```
+
+Organization scoped events always have `project_ref` set to `null` because they do not relate to a specific project.
+
+The version prefix in the `type` field, such as `v1`, identifies the payload schema. For how versions change over time and how to handle an unrecognized version, see [Versioning](/docs/guides/platform/webhooks#versioning).
+
+New fields can be added to an existing version without a version bump. Design your handler to ignore fields it does not recognize.
+
+## Common payload fields
+
+### `actor`
+
+Represents a user who performed or triggered an action.
+
+Present on all events. `null` when the event was triggered by an automated system process rather than a user.
+
+```json
+"actor": {
+  "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e"
+}
+```
+
+### `is_test`
+
+Present only on test events sent through the [Send a test event](/docs/guides/platform/webhooks#send-a-test-event) endpoint. Always `true`. Check this field before triggering any side effect.
+
+## Project events
+
+Project events fire when a change occurs or an action is taken in a specific project. The payload always includes both non-nullable `organization_slug` and `project_ref`.
+
+| Event                                                  | Fires when                                       |
+| ------------------------------------------------------ | ------------------------------------------------ |
+| [`v1.project.created`](#v1projectcreated)              | A project is created                             |
+| [`v1.project.paused`](#v1projectpaused)                | A project is paused                              |
+| [`v1.project.restored`](#v1projectrestored)            | A paused project is restored                     |
+| [`v1.project.restarted`](#v1projectrestarted)          | A project is restarted                           |
+| [`v1.project.removed`](#v1projectremoved)              | A project is deleted                             |
+| [`v1.project.transferred`](#v1projecttransferred)      | A project is transferred to another organization |
+| [`v1.project.status.changed`](#v1projectstatuschanged) | A project's status transitions                   |
+| [`v1.project.backup.started`](#v1projectbackupstarted) | A project backup begins                          |
+| [`v1.project.branch.created`](#v1projectbranchcreated) | A preview branch is created                      |
+| [`v1.project.branch.updated`](#v1projectbranchupdated) | A preview branch is updated                      |
+| [`v1.project.branch.removed`](#v1projectbranchremoved) | A preview branch is deleted                      |
+
+### v1.project.created
+
+Fires when a project is created and begins initial setup. When receiving this event, a project might not be healthy yet.
+
+```json
+{
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" },
+  "source": null
+}
+```
+
+`source` is `null` for projects created from scratch. When a project is cloned, `source` carries the origin:
+
+```json
+"source": {
+  "type": "clone",
+  "project_ref": "abcdefghijklmnoprstu"
+}
+```
+
+### v1.project.paused
+
+Fires when a project is paused.
+
+```json
+{
+  "reason": "inactivity",
+  "actor": null
+}
+```
+
+`reason` is one of the following:
+
+| Value         | Description                                                             |
+| ------------- | ----------------------------------------------------------------------- |
+| `api_request` | Paused by a user via the API or dashboard. `actor` carries the user ID. |
+| `inactivity`  | Paused automatically due to inactivity. `actor` is `null`.              |
+| `other`       | Paused for another system reason. `actor` is `null`.                    |
+
+### v1.project.restored
+
+Fires when a paused project is restored. When receiving this event, a project might not be healthy yet.
+
+```json
+{
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+### v1.project.restarted
+
+Fires when a project is restarted.
+
+```json
+{
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+### v1.project.removed
+
+Fires when a project is deleted.
+
+```json
+{
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+### v1.project.transferred
+
+Fires when a project is transferred to another organization. A corresponding event is emitted for both the source and the target organizations.
+
+Use `source` and `target` to determine whether the transfer is outgoing or incoming from the perspective of the receiving organization.
+
+```json
+{
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" },
+  "source": { "organization_slug": "from-org" },
+  "target": { "organization_slug": "to-org" }
+}
+```
+
+### v1.project.status.changed
+
+Fires when a project's status transitions.
+
+```json
+{
+  "previous_status": "RESTARTING",
+  "current_status": "ACTIVE_HEALTHY",
+  "actor": null
+}
+```
+
+`previous_status` and `current_status` are one of:
+
+| Value              | Description                          |
+| ------------------ | ------------------------------------ |
+| `ACTIVE_HEALTHY`   | Project is running normally          |
+| `ACTIVE_UNHEALTHY` | Project is running but has issues    |
+| `COMING_UP`        | Project is starting                  |
+| `RESTARTING`       | Project is restarting                |
+| `RESTORING`        | Project is being restored from pause |
+| `RESTORE_FAILED`   | Restore operation failed             |
+| `PAUSING`          | Project is in the process of pausing |
+| `PAUSE_FAILED`     | Pause operation failed               |
+| `UPGRADING`        | Project is being upgraded            |
+| `RESIZING`         | Project is being resized             |
+| `GOING_DOWN`       | Project is shutting down             |
+| `INIT_FAILED`      | Initialization failed                |
+| `INACTIVE`         | Project is inactive                  |
+| `REMOVED`          | Project has been removed             |
+| `UNKNOWN`          | Status cannot be determined          |
+
+`actor` is `null` for system-initiated transitions. This event fires during normal project operations such as restarts, upgrades, and scaling.
+
+### v1.project.backup.started
+
+Fires when a project backup begins.
+
+```json
+{
+  "actor": null
+}
+```
+
+`actor` is `null` for scheduled backups and carries a `user_id` when the backup is triggered manually.
+
+### v1.project.branch.created
+
+Fires when a preview branch is created.
+
+```json
+{
+  "branch": {
+    "ref": "abcdefghijklmnoprstu",
+    "name": "feature/login",
+    "git_branch": "feature/login",
+    "is_default": false
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`git_branch` is `null` when the branch is not connected to a Git branch.
+
+### v1.project.branch.updated
+
+Fires when a preview branch is updated.
+
+```json
+{
+  "branch": {
+    "ref": "abcdefghijklmnoprstu",
+    "name": "feature/login",
+    "git_branch": "feature/login",
+    "is_default": false
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`git_branch` is `null` when the branch is not connected to a Git branch.
+
+### v1.project.branch.removed
+
+Fires when a preview branch is deleted.
+
+```json
+{
+  "branch": {
+    "ref": "abcdefghijklmnoprstu",
+    "name": "feature/login",
+    "git_branch": "feature/login",
+    "is_default": false
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`git_branch` is `null` when the branch is not connected to a Git branch.
+
+## Organization events
+
+Organization events fire when something changes at the organization level. The payload always includes `organization_slug` and `project_ref` is always `null`.
+
+| Event                                                                                   | Fires after                               |
+| --------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [`v1.organization.member.invitation.created`](#v1organizationmemberinvitationcreated)   | A member is invited to the organization   |
+| [`v1.organization.member.invitation.canceled`](#v1organizationmemberinvitationcanceled) | A pending invitation is canceled          |
+| [`v1.organization.member.added`](#v1organizationmemberadded)                            | A member joins the organization           |
+| [`v1.organization.member.removed`](#v1organizationmemberremoved)                        | A member is removed from the organization |
+| [`v1.organization.member.role.assigned`](#v1organizationmemberroleassigned)             | A role is assigned to a member            |
+| [`v1.organization.member.role.updated`](#v1organizationmemberroleupdated)               | An existing role assignment is updated    |
+| [`v1.organization.member.role.removed`](#v1organizationmemberroleremoved)               | A role is removed from a member           |
+| [`v1.organization.billing.plan.upgraded`](#v1organizationbillingplanupgraded)           | The billing plan is upgraded              |
+| [`v1.organization.billing.plan.downgraded`](#v1organizationbillingplandowngraded)       | The billing plan is downgraded            |
+
+### v1.organization.member.invitation.created
+
+Fires when a member is invited to the organization.
+
+```json
+{
+  "member": {
+    "invitation": {
+      "email": "user@example.com",
+      "role": {
+        "name": "Developer",
+        "projects": [{ "ref": "abcdefghijklmnoprstu" }]
+      }
+    }
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`role.projects` is `null` for organization-wide roles that apply to all projects.
+
+### v1.organization.member.invitation.canceled
+
+Fires when a pending invitation is canceled.
+
+```json
+{
+  "member": {
+    "invitation": {
+      "email": "user@example.com"
+    }
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+### v1.organization.member.added
+
+Fires when a member joins the organization by accepting an invitation.
+
+```json
+{
+  "member": {
+    "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e",
+    "primary_email": "user@example.com",
+    "role": {
+      "name": "Developer",
+      "projects": [{ "ref": "abcdefghijklmnoprstu" }]
+    }
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`role.projects` is `null` for organization-wide roles that apply to all projects.
+
+### v1.organization.member.removed
+
+Fires when a member is removed from the organization.
+
+```json
+{
+  "member": {
+    "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e",
+    "primary_email": "user@example.com"
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+### v1.organization.member.role.assigned
+
+Fires when a role is assigned to a member.
+
+```json
+{
+  "member": {
+    "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e",
+    "primary_email": "user@example.com",
+    "role": {
+      "name": "Developer",
+      "projects": [{ "ref": "abcdefghijklmnoprstu" }]
+    }
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`role.projects` is `null` for organization-wide roles that apply to all projects.
+
+### v1.organization.member.role.updated
+
+Fires when an existing role assignment is updated.
+
+```json
+{
+  "member": {
+    "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e",
+    "primary_email": "user@example.com",
+    "role": {
+      "name": "Admin",
+      "projects": null
+    }
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`role.projects` is `null` for organization-wide roles that apply to all projects.
+
+### v1.organization.member.role.removed
+
+Fires when a role is removed from a member.
+
+```json
+{
+  "member": {
+    "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e",
+    "primary_email": "user@example.com",
+    "role": {
+      "name": "Developer",
+      "projects": [{ "ref": "abcdefghijklmnoprstu" }]
+    }
+  },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`role.projects` is `null` for organization-wide roles that apply to all projects.
+
+### v1.organization.billing.plan.upgraded
+
+Fires when the organization's billing plan is upgraded.
+
+```json
+{
+  "billing": { "plan": "pro" },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`plan` is one of `free`, `pro`, `team`, or `enterprise`.
+
+### v1.organization.billing.plan.downgraded
+
+Fires when the organization's billing plan is downgraded.
+
+```json
+{
+  "billing": { "plan": "free" },
+  "actor": { "user_id": "6cf38595-f5ff-43ca-ba0f-84617bbe192e" }
+}
+```
+
+`plan` is one of `free`, `pro`, `team`, or `enterprise`.

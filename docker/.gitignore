@@ -2,9 +2,13 @@ volumes/db/data
 volumes/storage
 volumes/snippets
 volumes/functions/**
+!volumes/functions/deno.json*
 !volumes/functions/main/
 volumes/functions/main/**
 !volumes/functions/main/index.ts
+!volumes/functions/hello/
+volumes/functions/hello/**
+!volumes/functions/hello/index.ts
 .env
 test.http
 docker-compose.override.yml

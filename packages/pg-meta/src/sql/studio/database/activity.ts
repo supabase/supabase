@@ -10,6 +10,7 @@ select
   a.query,
   a.wait_event_type,
   a.wait_event,
+  a.backend_start,
   a.xact_start as transaction_start,
   a.query_start,
   a.state_change,

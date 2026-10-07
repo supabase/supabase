@@ -4,8 +4,10 @@ import { FormField, RadioGroup, RadioGroupItem } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { AIOptInFormValues } from '@/hooks/forms/useAIOptInForm'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
 
 interface AIOptInLevelSelectorProps {
   control: Control<AIOptInFormValues>
@@ -89,7 +91,12 @@ export const AIOptInLevelSelector = ({
           <p>
             For organizations with HIPAA compliance enabled in their Supabase configuration, any
             consented information will only be shared with third-party AI providers with whom
-            Supabase has established a Business Associate Agreement (BAA).
+            Supabase has established a Business Associate Agreement (BAA). Don't input personal data
+            unless you've{' '}
+            <InlineLink href={`${DOCS_URL}/guides/deployment/shared-responsibility-model`}>
+              obtained consent
+            </InlineLink>{' '}
+            from the individuals it relates to.
           </p>
           <OptInToOpenAIToggle />
         </div>

@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Form,
+  FormControl,
   FormField,
   Tooltip,
   TooltipContent,
@@ -51,7 +52,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
 
   const FormSchema = z.object({
     description: z.string().min(3, {
-      message: 'Description must be at least 3 characters long',
+      message: 'Name must be at least 3 characters long',
     }),
   })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -88,7 +89,6 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              variant="default"
               icon={<Plus size={14} />}
               disabled={disableCreation}
               className="pointer-events-auto"
@@ -111,6 +111,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
       </Tooltip>
 
       <DialogContent
+        size="small"
         onInteractOutside={(e) => {
           if (showSuccess) e.preventDefault()
         }}
@@ -118,10 +119,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         {showSuccess ? (
           <>
             <DialogHeader>
-              <DialogTitle>Save your new S3 access keys</DialogTitle>
+              <DialogTitle>Save your new access key</DialogTitle>
               <DialogDescription>
-                You won't be able to see them again. If you lose these access keys, you'll need to
-                create a new ones.
+                Copy the access key ID and secret now. The secret won't be shown again. If you lose
+                it, create a new access key.
               </DialogDescription>
             </DialogHeader>
             <DialogSectionSeparator />
@@ -129,7 +130,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
               <FormItemLayout label="Access key ID" isReactForm={false}>
                 <Input className="input-mono" readOnly copy value={createS3KeyData?.access_key} />
               </FormItemLayout>
-              <FormItemLayout label={'Secret access key'} isReactForm={false}>
+              <FormItemLayout label="Secret access key" isReactForm={false}>
                 <Input className="input-mono" readOnly copy value={createS3KeyData?.secret_key} />
               </FormItemLayout>
             </DialogSection>
@@ -147,10 +148,9 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Create new S3 access keys</DialogTitle>
+              <DialogTitle>Create new access key</DialogTitle>
               <DialogDescription>
-                S3 access keys provide full access to all S3 operations across all buckets and
-                bypass any existing RLS policies.
+                This access key grants full access to every bucket and bypasses RLS policies.
               </DialogDescription>
             </DialogHeader>
             <DialogSectionSeparator />
@@ -160,20 +160,22 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                   <FormField
                     name="description"
                     render={({ field }) => (
-                      <FormItemLayout label="Description">
-                        <Input
-                          autoComplete="off"
-                          placeholder="My test key"
-                          type="text"
-                          {...field}
-                        />
+                      <FormItemLayout label="Name">
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            placeholder="My test key"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </DialogSection>
                 <DialogFooter>
-                  <Button type="submit" loading={isCreating}>
-                    Create access key
+                  <Button variant="primary" type="submit" loading={isCreating}>
+                    Create
                   </Button>
                 </DialogFooter>
               </form>

@@ -146,7 +146,12 @@ app.listen(8000);`,
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "jsr:@supabase/server@^1";
 import { createOpenAI } from "npm:@ai-sdk/openai";
-import { convertToModelMessages, streamText } from "npm:ai";
+import {
+  convertToModelMessages,
+  createUIMessageStreamResponse,
+  streamText,
+  toUIMessageStream,
+} from "npm:ai";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -186,13 +191,16 @@ export default {
       const result = streamText({
         model,
         messages: normalizedMessages,
-        system: SYSTEM_PROMPT,
+        instructions: SYSTEM_PROMPT,
       });
 
-      return result.toUIMessageStreamResponse({
+      const stream = toUIMessageStream({
+        stream: result.stream,
         sendReasoning: true,
         sendSources: true,
       });
+
+      return createUIMessageStreamResponse({ stream });
     } catch (err) {
       if (err instanceof ClientError) {
         return Response.json({ error: err.message }, { status: 400 });
@@ -268,7 +276,7 @@ export default {
 
       const result = await generateText({
         model,
-        system: SYSTEM_PROMPT,
+        instructions: SYSTEM_PROMPT,
         prompt,
         output: Output.object({
           schema: RecipeSchema,

@@ -12,7 +12,7 @@ export type OAuthAppUpdateVariables = {
   name: string
   website: string
   icon?: string
-  scopes?: OAuthScope[]
+  scopes: OAuthScope[]
   redirect_uris: string[]
 }
 

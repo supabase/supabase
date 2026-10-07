@@ -137,13 +137,13 @@ export const NamespaceWithTables = ({
 
   const missingTables = useMemo(() => {
     return (tablesData || []).filter(
-      (t) => !tables.find((table) => table.table.split('.')[1] === t)
+      (t) => !tables.find((table) => (table.table as string).split('.')[1] === t)
     )
   }, [tablesData, tables])
 
   // Get all tables (connected + missing) for display
   const allTables = useMemo(() => {
-    const connectedTableNames = tables.map((table) => table.table.split('.')[1])
+    const connectedTableNames = tables.map((table) => (table.table as string).split('.')[1])
     const allTableNames = [...new Set([...connectedTableNames, ...missingTables])]
 
     return allTableNames.map((tableName) => ({
@@ -301,7 +301,7 @@ export const NamespaceWithTables = ({
                 ) : null}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="default" className="w-7" icon={<MoreVertical />} />
+                    <Button className="w-7" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
                     <DropdownMenuItem

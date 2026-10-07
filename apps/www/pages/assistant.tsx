@@ -683,12 +683,12 @@ function Assistant() {
                 <div className="min-h-12 flex items-center gap-x-2">
                   {!isUserLoading && (
                     <Button variant="primary" size="medium" asChild>
-                      <Link href="/dashboard/project/_?sidebar=ai-assistant">
+                      <a href="/dashboard/project/_?sidebar=ai-assistant">
                         {isLoggedIn ? 'Dashboard' : 'Start your project'}
-                      </Link>
+                      </a>
                     </Button>
                   )}
-                  <Button variant="default" size="medium" asChild>
+                  <Button size="medium" asChild>
                     <Link
                       target="_blank"
                       rel="noreferrer noopener"
@@ -726,7 +726,6 @@ function Assistant() {
                       >
                         <Button
                           className="rounded-full"
-                          variant="default"
                           onClick={() => handleNewMessage(query.messages)}
                         >
                           {query.label}

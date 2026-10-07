@@ -9,6 +9,7 @@ export type ConnectSheetQueryParams = {
   method: string | null
   type: string | null
   mcpClient: string | null
+  warehouseQueryEngine: string | null
 }
 
 export type ConnectSheetUrlUpdates = Partial<Record<keyof ConnectSheetQueryParams, string | null>>
@@ -19,6 +20,16 @@ export type ConnectSheetHydration = {
   mode: ConnectMode | null
   fieldUpdates: ConnectSheetFieldUpdate[]
   urlUpdates: ConnectSheetUrlUpdates
+}
+
+export const CLEARED_CONNECT_SHEET_QUERY_PARAMS = {
+  connectTab: null,
+  framework: null,
+  using: null,
+  method: null,
+  type: null,
+  mcpClient: null,
+  warehouseQueryEngine: null,
 }
 
 function isConnectMode(value: string): value is ConnectMode {
@@ -58,6 +69,8 @@ export function resolveConnectSheetHydration(
   const effectiveMethod = query.method ?? storedPrefs.method ?? null
   const effectiveType = query.type ?? storedPrefs.type ?? null
   const effectiveMcpClient = query.mcpClient ?? storedPrefs.mcpClient ?? null
+  const effectiveWarehouseQueryEngine =
+    query.warehouseQueryEngine ?? storedPrefs.warehouseQueryEngine ?? null
 
   const mappedMode = mapConnectTabToMode(effectiveTab)
   const mode = mappedMode && availableModeIds.includes(mappedMode) ? mappedMode : null
@@ -94,6 +107,13 @@ export function resolveConnectSheetHydration(
     if (effectiveMcpClient) {
       fieldUpdates.push({ fieldId: 'mcpClient', value: effectiveMcpClient })
       if (query.mcpClient === null) urlUpdates.mcpClient = effectiveMcpClient
+    }
+  } else if (
+    mappedMode === 'warehouse' &&
+    (effectiveWarehouseQueryEngine === 'flightsql' || effectiveWarehouseQueryEngine === 'duckdb')
+  ) {
+    if (query.warehouseQueryEngine === null) {
+      urlUpdates.warehouseQueryEngine = effectiveWarehouseQueryEngine
     }
   }
 

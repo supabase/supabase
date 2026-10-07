@@ -27,7 +27,7 @@ const LW14Summary = () => {
         <ul className="flex flex-col gap-2">
           {days.map((day, i: number) =>
             day.shipped ? (
-              <ol key={`main-shipped-${day.id}`}>
+              <li key={`main-shipped-${day.id}`}>
                 <Link
                   href={day.blog}
                   className="group flex items-center py-1 gap-2 hover:text-foreground"
@@ -36,9 +36,9 @@ const LW14Summary = () => {
                   <span>-</span>
                   <span className="leading-6">{day.title}</span>
                 </Link>
-              </ol>
+              </li>
             ) : (
-              <ol key={`main-not-shipped-${day.id}`}>
+              <li key={`main-not-shipped-${day.id}`}>
                 <Link
                   href={day.blog}
                   className="group flex items-center gap-2 py-1 text-foreground-muted pointer-events-none"
@@ -47,7 +47,7 @@ const LW14Summary = () => {
                   <span>-</span>
                   <Lock className="w-3 h-3" />
                 </Link>
-              </ol>
+              </li>
             )
           )}
         </ul>
@@ -58,7 +58,7 @@ const LW14Summary = () => {
           <ul className="flex flex-col gap-2 mt-4">
             {buildDays.map((day, i: number) =>
               day.is_shipped ? (
-                <ol key={`build-shipped-${day.id}`}>
+                <li key={`build-shipped-${day.id}`}>
                   <Link
                     href={day.links[0].url}
                     className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
@@ -72,9 +72,9 @@ const LW14Summary = () => {
                       {day.title}
                     </span>
                   </Link>
-                </ol>
+                </li>
               ) : (
-                <ol key={`build-not-shipped-${day.id}`}>
+                <li key={`build-not-shipped-${day.id}`}>
                   <Link
                     href={day.links[0].url}
                     className="relative flex items-center justify-between group w-full py-1 text-foreground-muted pointer-events-none"
@@ -88,17 +88,17 @@ const LW14Summary = () => {
                       <Lock className="w-3 h-3" />
                     </span>
                   </Link>
-                </ol>
+                </li>
               )
             )}
-            <ol className="border-t pt-4 mt-2">
+            <li className="border-t pt-4 mt-2">
               <Link
                 href="/events?category=meetup"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Community Meetups
               </Link>
-            </ol>
+            </li>
           </ul>
         </div>
       </div>

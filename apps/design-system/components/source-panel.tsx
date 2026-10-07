@@ -4,12 +4,16 @@ import Link from 'next/link'
 import { forwardRef } from 'react'
 import { Button, cn } from 'ui'
 
-import { Doc } from '@/.contentlayer/generated'
+import { Doc } from '@/.velite'
 
 const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> & { doc: Doc }>(
   ({ doc, children, ...props }, ref) => {
     const ShadcnPanel = () => {
       if (doc.source?.shadcn) {
+        const shadcnDocsUrl = doc.slugAsParams?.startsWith('components/')
+          ? `https://ui.shadcn.com/docs/${doc.slugAsParams}`
+          : 'https://ui.shadcn.com/'
+
         return (
           <div
             className={cn(
@@ -46,9 +50,19 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
               </svg>
               <span className="hidden font-bold sm:inline-block">shadcn/ui</span>
             </div>
-            <span className="text-foreground-light text-sm">
-              This component is based on ui.shadcn
-            </span>
+            <div className="flex flex-row items-center justify-between text-sm w-full">
+              <span className="text-foreground-light text-xs">This component uses shadcn/ui</span>
+              <Button
+                asChild
+                variant="outline"
+                className="rounded-full"
+                icon={<ExternalLink className="text-foreground-muted" strokeWidth={1} />}
+              >
+                <Link href={shadcnDocsUrl} target="_blank" rel="noreferrer">
+                  Docs
+                </Link>
+              </Button>
+            </div>
           </div>
         )
       }
@@ -299,11 +313,11 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
     return (
       <div className="flex flex-col -space-y-px">
         <RadixPanel />
+        <ShadcnPanel />
         <VaulPanel />
         <InputOtp />
         <ReactAccesibleTreeViewPanel />
         <RechartsPanel />
-        {/* <ShadcnPanel /> */}
       </div>
     )
   }

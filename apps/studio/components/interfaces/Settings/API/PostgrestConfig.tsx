@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
@@ -24,6 +25,7 @@ import {
   useWatch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -40,20 +42,25 @@ import { ExposedSchemaSelector, internalSchemasCannotExpose } from './ExposedSch
 import { HardenAPIModal } from './HardenAPIModal'
 import { ExposedFunctionSelector } from '@/components/interfaces/Settings/API/ExposedFunctionSelector'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
+import CopyButton from '@/components/ui/CopyButton'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
 import { useUpdateExposedEntitiesMutation } from '@/data/privileges/update-exposed-entities-mutation'
+import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { noop } from '@/lib/void'
 import type { ResponseError } from '@/types'
+
+const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
 const formSchema = z.object({
   // Fields for updatePostgrestConfig
@@ -89,6 +96,7 @@ export const PostgrestConfig = () => {
   const queryClient = useQueryClient()
 
   const [showModal, setShowModal] = useState(false)
+  const [showResetOverrideConfirm, setShowResetOverrideConfirm] = useState(false)
 
   const {
     data: config,
@@ -116,6 +124,14 @@ export const PostgrestConfig = () => {
     })
   )
 
+  const { data: authenticatorDbSchemasOverride, refetch: refetchAuthenticatorRoleConfig } =
+    useQuery(
+      authenticatorRoleConfigQueryOptions({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+      })
+    )
+
   const configDbSchemas = useMemo(
     () => (config?.db_schema ? config.db_schema.split(',').map((x) => x.trim()) : []),
     [config?.db_schema]
@@ -130,6 +146,18 @@ export const PostgrestConfig = () => {
   const { mutateAsync: updateDefaultPrivileges } = useUpdateDefaultPrivilegesMutation({
     onError: noop,
   })
+
+  const { mutate: resetAuthenticatorOverride, isPending: isResettingAuthenticatorOverride } =
+    useExecuteSqlMutation({
+      onSuccess: async () => {
+        toast.success('Reset the authenticator role override')
+        setShowResetOverrideConfirm(false)
+        await refetchAuthenticatorRoleConfig()
+      },
+      onError: (error) => {
+        toast.error(`Failed to reset the authenticator role override: ${error.message}`)
+      },
+    })
 
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -285,6 +313,16 @@ export const PostgrestConfig = () => {
     [watchedDbSchema]
   )
 
+  const isAuthenticatorRoleOverridingSchemas = useMemo(() => {
+    if (!authenticatorDbSchemasOverride) return false
+    // Compared against the persisted config, not the live form selection, so the warning stays
+    // visible until the save actually succeeds rather than disappearing the moment the selector
+    // is edited to match.
+    const saved = new Set(configDbSchemas)
+    const overridden = new Set(authenticatorDbSchemasOverride)
+    return saved.size !== overridden.size || [...saved].some((schema) => !overridden.has(schema))
+  }, [authenticatorDbSchemasOverride, configDbSchemas])
+
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
       <PageSectionContent>
@@ -340,6 +378,45 @@ export const PostgrestConfig = () => {
                         </p>
                       ) : null}
                     </FormItemLayout>
+
+                    {isAuthenticatorRoleOverridingSchemas && (
+                      <Admonition
+                        type="warning"
+                        title="Exposed schemas are being overridden"
+                        description={
+                          <>
+                            The <code>authenticator</code> role has <code>pgrst.db_schemas</code>{' '}
+                            set to{' '}
+                            {authenticatorDbSchemasOverride?.map((schema, i) => (
+                              <span key={schema}>
+                                {i > 0 && ', '}
+                                <code>{schema}</code>
+                              </span>
+                            ))}
+                            , which overrides this setting. See the{' '}
+                            <a
+                              href="https://supabase.com/docs/guides/troubleshooting/pgrst106-the-schema-must-be-one-of-the-following-error-when-querying-an-exposed-schema"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline"
+                            >
+                              PGRST106 troubleshooting guide
+                            </a>{' '}
+                            to check or reset it.
+                          </>
+                        }
+                        actions={
+                          <Button
+                            type="button"
+                            variant="default"
+                            disabled={!canUpdateExposedEntities}
+                            onClick={() => setShowResetOverrideConfirm(true)}
+                          >
+                            Reset override
+                          </Button>
+                        }
+                      />
+                    )}
 
                     <FormItemLayout
                       isReactForm={false}
@@ -603,7 +680,7 @@ export const PostgrestConfig = () => {
                 description="Expose a custom schema instead of the public schema"
               >
                 <div className="flex gap-2 items-center justify-end">
-                  <Button variant="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                  <Button icon={<Lock />} onClick={() => setShowModal(true)}>
                     Harden Data API
                   </Button>
                 </div>
@@ -614,6 +691,41 @@ export const PostgrestConfig = () => {
       </PageSectionContent>
 
       {IS_PLATFORM && <HardenAPIModal visible={showModal} onClose={() => setShowModal(false)} />}
+
+      <ConfirmationModal
+        visible={showResetOverrideConfirm}
+        title="Reset authenticator role override?"
+        confirmLabel="Reset override"
+        confirmLabelLoading="Resetting..."
+        loading={isResettingAuthenticatorOverride}
+        onCancel={() => setShowResetOverrideConfirm(false)}
+        onConfirm={() => {
+          if (!projectRef) return
+          resetAuthenticatorOverride({
+            projectRef,
+            connectionString: project?.connectionString,
+            sql: resetAuthenticatorDbSchemasSql,
+          })
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          This clears the <code>pgrst.db_schemas</code> setting on the <code>authenticator</code>{' '}
+          role, so the Data API falls back to the schemas selected in the Dashboard above.
+        </p>
+        <p className="text-sm text-foreground-light mt-4">The following statement will be run:</p>
+        <div className="relative mt-2">
+          <pre className="px-3 py-2 pr-10 rounded bg-surface-200 text-xs font-mono whitespace-pre-wrap break-words">
+            {resetAuthenticatorDbSchemasSql}
+          </pre>
+          <CopyButton
+            iconOnly
+            type="button"
+            variant="text"
+            className="absolute top-1 right-1"
+            text={resetAuthenticatorDbSchemasSql}
+          />
+        </div>
+      </ConfirmationModal>
     </PageSection>
   )
 }

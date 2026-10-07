@@ -30,15 +30,19 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  getAvailableRegions,
   getHighAvailabilityRegionCode,
   instanceLabel,
   monthlyInstancePrice,
+  resolveDefaultDbRegion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
+import { getRegionRestrictionMessage } from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import {
   GitHubRepositoryField,
@@ -117,6 +121,7 @@ export const ProjectCreationForm = ({
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const hasSelectedOrganization = currentOrg !== undefined
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -135,6 +140,7 @@ export const ProjectCreationForm = ({
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
+  const { getRegionRestriction } = useRegionRestriction()
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -161,6 +167,8 @@ export const ProjectCreationForm = ({
       highAvailability: false,
       postgresVersion: '',
       instanceType: '',
+      kubernetesClusterId: '',
+      kubernetesClusterForce: false,
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
@@ -178,7 +186,7 @@ export const ProjectCreationForm = ({
       shouldRunMigrations: true,
     },
   })
-  const { getFieldState, resetField, setValue } = form
+  const { getFieldState, resetField, setError, setValue } = form
   const {
     instanceSize: watchedInstanceSize,
     cloudProvider,
@@ -187,6 +195,8 @@ export const ProjectCreationForm = ({
     organization,
     projectName: watchedProjectName,
     highAvailability,
+    kubernetesClusterId: watchedKubernetesClusterId,
+    kubernetesClusterForce: watchedKubernetesClusterForce,
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
@@ -256,21 +266,25 @@ export const ProjectCreationForm = ({
     }
   )
 
-  const { data: availableRegionsData, error: availableRegionsError } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug: slug,
-        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
-        desiredInstanceSize: instanceSize as DesiredInstanceSize,
-      },
-      {
-        enabled: flagsLoaded && smartRegionEnabled,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchInterval: false,
-        refetchOnReconnect: false,
-      }
-    )
+  const {
+    data: availableRegionsData,
+    error: availableRegionsError,
+    isFetching: isFetchingAvailableRegions,
+  } = useOrganizationAvailableRegionsQuery(
+    {
+      slug: slug,
+      cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+      desiredInstanceSize: instanceSize as DesiredInstanceSize,
+      highAvailability,
+    },
+    {
+      enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+    }
+  )
 
   const highAvailabilityRegion =
     highAvailability && highAvailabilityRegionCode !== undefined
@@ -284,12 +298,16 @@ export const ProjectCreationForm = ({
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
-  const defaultRegion =
-    highAvailability && highAvailabilityRegionCode !== undefined
-      ? highAvailabilityRegion?.name
-      : smartRegionEnabled
-        ? recommendedSmartRegion
-        : (autoDefaultRegion ?? fixedDefaultRegion)
+  const defaultRegion = resolveDefaultDbRegion({
+    cloudProvider: selectedCloudProvider,
+    isHighAvailabilityRestricted:
+      highAvailability === true && highAvailabilityRegionCode !== undefined,
+    highAvailabilityRegionName: highAvailabilityRegion?.name,
+    isSmartRegionEnabled: smartRegionEnabled,
+    recommendedSmartRegion,
+    autoDefaultRegion,
+    fixedDefaultRegion,
+  })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -302,6 +320,7 @@ export const ProjectCreationForm = ({
       cloudProvider: cloudProvider as CloudProvider,
       dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
+      highAvailability,
     },
     { enabled: currentOrg !== null }
   )
@@ -371,7 +390,14 @@ export const ProjectCreationForm = ({
       values.instanceSize &&
       !sizesWithNoCostConfirmationRequired.includes(values.instanceSize as DesiredInstanceSize)
 
-    if (additionalMonthlySpend > 0 && (hasOAuthApps || launchingLargerInstance)) {
+    // High availability projects are free during Alpha, so the forced large compute
+    // doesn't incur the usual compute costs.
+    const requiresCostConfirmation =
+      !values.highAvailability &&
+      additionalMonthlySpend > 0 &&
+      (hasOAuthApps || launchingLargerInstance)
+
+    if (requiresCostConfirmation) {
       track('project_creation_simple_version_confirm_modal_opened', {
         instanceSize: values.instanceSize,
       })
@@ -393,6 +419,8 @@ export const ProjectCreationForm = ({
       dbRegion,
       postgresVersion,
       instanceType,
+      kubernetesClusterId,
+      kubernetesClusterForce,
       instanceSize,
       dataApi,
       dataApiDefaultPrivileges,
@@ -443,18 +471,37 @@ export const ProjectCreationForm = ({
       extractPostgresVersionDetails(postgresVersionSelection)
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion =
-      highAvailability && highAvailabilityRegionCode !== undefined
-        ? specific.find((region) => region.code === highAvailabilityRegionCode)
-        : smartRegionEnabled
-          ? (smartGroup.find((x) => x.name === dbRegion) ??
-            specific.find((x) => x.name === dbRegion))
-          : undefined
+    const selectedRegion = smartRegionEnabled
+      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
+      : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(
         `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
       )
+    }
+
+    const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
+    const selectedStaticRegion = smartRegionEnabled
+      ? undefined
+      : Object.values(getAvailableRegions(cloudProvider as CloudProvider)).find(
+          (region) => region.displayName === dbRegion
+        )
+    const selectedRegionRestriction = getRegionRestriction(
+      selectedSpecificRegion ?? selectedStaticRegion
+    )
+    if (selectedRegionRestriction !== undefined) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: getRegionRestrictionMessage(selectedRegionRestriction) },
+        { shouldFocus: true }
+      )
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'region_unavailable' },
+        'form'
+      )
+      return
     }
     const parsedGitHubRepositoryId =
       githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
@@ -519,14 +566,19 @@ export const ProjectCreationForm = ({
         : {}),
     }
 
-    if (customPostgresVersion || instanceType) {
+    if (customPostgresVersion || instanceType || kubernetesClusterId) {
       data['customSupabaseRequest'] = {
-        ami: {
-          ...(customPostgresVersion && {
-            search_tags: { 'tag:postgresVersion': customPostgresVersion },
-          }),
-          ...(instanceType && { instance_type: instanceType }),
-        },
+        ...((customPostgresVersion || instanceType) && {
+          ami: {
+            ...(customPostgresVersion && {
+              search_tags: { 'tag:postgresVersion': customPostgresVersion },
+            }),
+            ...(instanceType && { instance_type: instanceType }),
+          },
+        }),
+        ...(kubernetesClusterId && { kubernetes_cluster_id: kubernetesClusterId }),
+        ...(kubernetesClusterId &&
+          kubernetesClusterForce && { kubernetes_cluster_force: kubernetesClusterForce }),
       }
     }
 
@@ -584,6 +636,16 @@ export const ProjectCreationForm = ({
       })
     }
   }, [instanceSize, watchedInstanceSize, setValue])
+
+  useEffect(() => {
+    const isK8sProvider = cloudProvider === 'AWS_K8S' || cloudProvider === 'AWS_NIMBUS'
+    if (!isK8sProvider && watchedKubernetesClusterId) {
+      setValue('kubernetesClusterId', '', { shouldDirty: false, shouldValidate: false })
+    }
+    if ((!isK8sProvider || !watchedKubernetesClusterId) && watchedKubernetesClusterForce) {
+      setValue('kubernetesClusterForce', false, { shouldDirty: false, shouldValidate: false })
+    }
+  }, [cloudProvider, watchedKubernetesClusterId, watchedKubernetesClusterForce, setValue])
 
   useEffect(() => {
     if (!githubRepositoryName) return
@@ -651,9 +713,11 @@ export const ProjectCreationForm = ({
               form={form}
               canCreateProject={canCreateProject}
               instanceSize={instanceSize}
+              highAvailability={highAvailability}
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
+              isLoadingAvailableRegions={isFetchingAvailableRegions}
               cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
@@ -680,8 +744,8 @@ export const ProjectCreationForm = ({
                           label="GitHub (optional)"
                           description={
                             <>
-                              Ideal for agent-first workflows: update your schema in code, push it
-                              to GitHub, and Supabase deploys the changes automatically.{' '}
+                              Ideal for agent-first workflows. Update your schema in code and push
+                              it to GitHub. Supabase deploys the changes.{' '}
                               <a
                                 href="https://supabase.com/docs/guides/deployment/branching/github-integration"
                                 target="_blank"
@@ -715,6 +779,7 @@ export const ProjectCreationForm = ({
 
                     <RegionSelector
                       form={form}
+                      hasSelectedOrganization={hasSelectedOrganization}
                       instanceSize={instanceSize as DesiredInstanceSize}
                     />
 
@@ -765,7 +830,7 @@ export const ProjectCreationForm = ({
                           </p>
 
                           <div>
-                            <Button asChild variant="default">
+                            <Button asChild>
                               <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                             </Button>
                           </div>

@@ -600,7 +600,8 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#serverside-poolers',
+    docsUrl:
+      'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -648,18 +649,18 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 
 ## Key benefits
 1. Initial sync: Copy existing rows from published tables.
-2. Ongoing replication: Apply subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
+2. Ongoing replication: Capture and deliver subsequent INSERT, UPDATE, DELETE, and TRUNCATE operations selected by the publication.
 3. Managed operation: Monitor pipeline status, lag, table state, and errors in the Dashboard.
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. [Request early access](/go/supabase-pipelines-new-destinations) to ClickHouse, Snowflake, and DuckLake while destination support expands.
+BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
 
 ## Setup
-Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
-Requirements depend on the destination. BigQuery requires source tables to have primary keys and requires the publication to include those columns.
+Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
 
 ## Pipelines is valuable for:
 - Near real-time analytics data movement
@@ -667,9 +668,9 @@ Requirements depend on the destination. BigQuery requires source tables to have 
 - Managed replication to supported destination systems
 
 ## Limitations
-Schema change support is currently in beta and limited to supported BigQuery changes. Destination-specific constraints apply.
+Schema change support is destination-specific and limited. Destination-specific constraints apply.
 
-Pipelines keeps the current destination table state synchronized. It does not automatically create a queryable history of every row version.`,
+BigQuery and DuckLake keep current-state tables synchronized. ClickHouse supports current-state ReplacingMergeTree tables or append-only MergeTree CDC history. Snowflake stores append-only CDC history. Source \`TRUNCATE\` operations and table resets erase accumulated destination data. Schema changes can alter retained history in append-only ClickHouse and Snowflake tables.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: 'https://www.youtube-nocookie.com/embed/8o3duiYqppA',
@@ -2131,6 +2132,7 @@ Supabase's Command Line Interface (CLI) tool provides developers with a powerful
 5. Environment management: Handle multiple environments (development, staging, production) efficiently.
 6. Seed data management: Populate your database with test data for consistent development and testing.
 7. CI/CD integration: Incorporate Supabase operations into your continuous integration and deployment pipelines.
+8. Parallel local projects: Run a separate local project for each app, git worktree, or named environment with the experimental \`supabase stack\` commands.
 
 ## The CLI is particularly valuable for:
 - Development teams working on Supabase projects collaboratively
@@ -2150,6 +2152,68 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Parallel local projects',
+    subtitle: 'Run a local Supabase project for every app or git worktree.',
+    description: `
+The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to its project directory and git branch. Every app or git worktree gets its own Postgres database, Auth, Storage, and other services, with separate ports and data.
+
+With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. The experimental \`supabase stack\` commands assign ports automatically and keep them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`, so a destructive test run never touches your development data.
+
+## Key benefits
+1. One local project per worktree: Run coding agents in separate git worktrees, each against its own database.
+2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or create the project with the stack commands turned on.
+3. Named environments: Start \`--stack dev\` and \`--stack test\` side by side in one app.
+4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
+5. Services start on demand: Postgres starts right away. Other services start on their first request. Most of them stop when idle, which keeps idle local projects light.
+
+## Parallel local projects are valuable for:
+- Developers running coding agents in git worktrees
+- Teams that keep separate development and test databases on one machine
+- Freelancers and consultants switching between several client apps
+- CI jobs and agent sandboxes that run without a Docker daemon
+
+The \`supabase stack\` commands are experimental. Their interface can change between releases. See the documentation for the full workflow and limitations.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'parallel-local-projects',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Native runtime for local development',
+    subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
+    description: `
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. To run there, [turn on the \`[experimental] stack\` setting](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands). Then \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
+
+It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
+
+## Key benefits
+1. Works without Docker: Bring up a real local Supabase project in environments that can't run a container engine.
+2. Verified binaries: The CLI downloads service archives from Supabase's GitHub releases and checks them before extracting.
+3. Same project, same services: Postgres with the full extension set, Auth, PostgREST, Realtime, Storage, Edge Functions, Studio, and more.
+
+## The native runtime is valuable for:
+- Coding agents running in sandboxes with no container engine
+- CI jobs on runners without a Docker daemon
+
+The native runtime supports Linux on amd64 and arm64 and macOS on Apple silicon. Windows and Intel Macs use Docker. For several local projects on one machine, Docker remains the recommended runtime. The \`supabase stack\` commands are experimental.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
+    slug: 'native-local-runtime',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -2343,6 +2407,8 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 
 OpenTelemetry integration allows you to export logs, metrics, and traces to any OTel-compatible tool—Datadog, Honeycomb, Grafana, or your preferred monitoring platform. The Metrics API exposes ~200 Prometheus-compatible Postgres metrics, including CPU, IO, WAL, connections, and query statistics.
 
+Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python can propagate W3C Trace Context to Supabase, so a client-side trace and the corresponding Supabase logs share the same trace_id. It is opt-in and works with any W3C-compliant tracer, including OTLP, Sentry, Datadog, Honeycomb, and Grafana. See the [client-side tracing guide](https://supabase.com/docs/guides/observability/client-side-tracing) for the latest on supported SDKs and target platforms.
+
 ## Key benefits
 1. Real-Time Monitoring: Access live data on application performance and user interactions to make informed decisions.
 2. Comprehensive Log Management: Ingest and store logs from multiple sources, allowing for centralized management of application events.
@@ -2351,6 +2417,7 @@ OpenTelemetry integration allows you to export logs, metrics, and traces to any 
 5. Scalability: Handle large volumes of log data with a robust infrastructure designed for high availability and performance.
 6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
 7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
+8. Client-Side Trace Propagation: correlate a trace from your client app — web, mobile, or server-side — with the matching API Gateway and Edge Function log under one shared 'trace_id'.
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
@@ -2671,7 +2738,7 @@ $60 per drain per project, plus $0.20 per million events and $0.09 per GB egress
     icon: Activity,
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
-    docsUrl: 'https://supabase.com/docs/guides/telemetry/log-drains',
+    docsUrl: 'https://supabase.com/docs/guides/observability/log-drains',
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2696,7 +2763,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2721,7 +2788,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2830,7 +2897,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
     slug: 'orioledb',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },

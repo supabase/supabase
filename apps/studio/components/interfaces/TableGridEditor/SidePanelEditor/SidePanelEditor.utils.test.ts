@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
-  IMPORT_SQL_SIZE_LIMIT,
   buildImportInsertBatches,
   executeImportInsertBatch,
   formatRowsForInsert,
   getRowFromSidePanel,
+  IMPORT_SQL_SIZE_LIMIT,
 } from './SidePanelEditor.utils'
 import type { SupaRow } from '@/components/grid/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { SidePanel } from '@/state/table-editor'
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
@@ -202,6 +202,47 @@ describe('import insert batching', () => {
         table: mockTable,
         rows: [{ id: '1', name: 'too large', geom: 'POINT(0 0)'.repeat(100) }],
         maxSqlBytes: 100,
+      })
+    ).toThrow(/too large/i)
+  })
+
+  test('buildImportInsertBatches includes role impersonation SQL in each batch size', () => {
+    const rows = [
+      { id: '1', name: 'é'.repeat(500) },
+      { id: '2', name: 'é'.repeat(500) },
+    ]
+    const maxSqlBytes = getByteSize(buildImportInsertBatches({ table: mockTable, rows })[0].sql)
+    const batches = buildImportInsertBatches({
+      table: mockTable,
+      rows,
+      roleImpersonationState: {
+        role: { type: 'custom', role: 'import_role' },
+        claims: undefined,
+      },
+      maxSqlBytes,
+    })
+
+    expect(batches).toHaveLength(2)
+    expect(batches.flatMap((batch) => batch.rows)).toEqual(rows)
+    for (const batch of batches) {
+      expect(batch.sql).toContain("set local role 'import_role'")
+      expect(getByteSize(batch.sql)).toBeLessThanOrEqual(maxSqlBytes)
+    }
+  })
+
+  test('buildImportInsertBatches rejects a row when its role wrapper exceeds the limit', () => {
+    const rows = [{ id: '1', name: 'large row' }]
+    const maxSqlBytes = getByteSize(buildImportInsertBatches({ table: mockTable, rows })[0].sql)
+
+    expect(() =>
+      buildImportInsertBatches({
+        table: mockTable,
+        rows,
+        roleImpersonationState: {
+          role: { type: 'custom', role: 'import_role' },
+          claims: undefined,
+        },
+        maxSqlBytes,
       })
     ).toThrow(/too large/i)
   })

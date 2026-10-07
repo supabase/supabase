@@ -14,7 +14,7 @@ import pgMeta, {
 } from '@supabase/pg-meta'
 import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
-import { chunk, find, isEmpty, isEqual } from 'lodash'
+import { find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
@@ -32,17 +32,13 @@ import { deleteDatabaseColumn } from '@/data/database-columns/database-column-de
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
-import { databaseKeys } from '@/data/database/keys'
-import { entityTypeKeys } from '@/data/entity-types/keys'
-import { lintKeys } from '@/data/lint/keys'
 import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { tableEditorKeys } from '@/data/table-editor/keys'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
-import { tableRowKeys } from '@/data/table-rows/keys'
 import { executeWithRetry } from '@/data/table-rows/table-rows-query'
 import { tableKeys } from '@/data/tables/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { getTable, getTableQuery, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import {
   UpdateTableBody,
@@ -51,8 +47,10 @@ import {
 import { getTables } from '@/data/tables/tables-query'
 import { isObject, isObjectContainingKeys, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import type { SidePanel } from '@/state/table-editor'
 
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -595,7 +593,7 @@ export const createTable = async ({
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-brand"
+                    barClass="bg-primary-bright"
                     labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
                     labelBottomClass=""
                     labelTop={`${progress.toFixed(2)}%`}
@@ -632,7 +630,7 @@ export const createTable = async ({
                     value={progress}
                     max={100}
                     type="horizontal"
-                    barClass="bg-brand"
+                    barClass="bg-primary-bright"
                     labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
                     labelTop={`${progress.toFixed(2)}%`}
                     labelTopClass="tabular-nums"
@@ -860,36 +858,15 @@ export const updateTable = async ({
     existingForeignKeyRelations,
   })
 
-  await Promise.all([
-    queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, table.id) }),
-    queryClient.invalidateQueries({
-      queryKey: databaseKeys.foreignKeyConstraints(projectRef, table.schema),
-    }),
-    queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
-    queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-    queryClient.invalidateQueries({
-      queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
-    }),
-    queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
-    // useTableQuery (FK selectors/formatters) has a 5min staleTime, and the columns/FKs
-    // above were only just applied after `updatedTable` was fetched -- refresh its identity,
-    // plus the pre-rename one too, so nothing serves stale/deleted columns until then.
-    queryClient.invalidateQueries({
-      queryKey: tableKeys.retrieve(projectRef, updatedTable.name, updatedTable.schema),
-    }),
-    ...(updatedTable.name !== table.name || updatedTable.schema !== table.schema
-      ? [
-          queryClient.invalidateQueries({
-            queryKey: tableKeys.retrieve(projectRef, table.name, table.schema),
-          }),
-        ]
-      : []),
-  ])
-
-  // We need to invalidate tableRowsAndCount after tableEditor
-  // to ensure the query sent is correct
-  await queryClient.invalidateQueries({
-    queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),
+  await invalidateTableMetadata(queryClient, {
+    projectRef,
+    schema: table.schema,
+    tableId: table.id,
+    tableName: table.name,
+    newSchema: updatedTable.schema,
+    newTableName: updatedTable.name,
+    includeRows: true,
+    includeLint: true,
   })
 
   return {
@@ -957,8 +934,15 @@ export type ImportInsertBatch = {
   sql: SafeSqlFragment
 }
 
-function getImportInsertSql(table: RetrieveTableResult, rows: Record<string, unknown>[]) {
-  return new Query().from(table.name, table.schema).insert(rows).toSql()
+function getImportInsertSql(
+  table: RetrieveTableResult,
+  rows: Record<string, unknown>[],
+  roleImpersonationState?: RoleImpersonationState
+) {
+  return wrapWithRoleImpersonation(
+    new Query().from(table.name, table.schema).insert(rows).toSql(),
+    roleImpersonationState
+  )
 }
 
 function getSqlByteSize(sql: SafeSqlFragment) {
@@ -976,10 +960,12 @@ function getRowTooLargeError(maxSqlBytes: number) {
 export function buildImportInsertBatches({
   table,
   rows,
+  roleImpersonationState,
   maxSqlBytes = IMPORT_SQL_SIZE_LIMIT,
 }: {
   table: RetrieveTableResult
   rows: Record<string, unknown>[]
+  roleImpersonationState?: RoleImpersonationState
   maxSqlBytes?: number
 }): ImportInsertBatch[] {
   const batches: ImportInsertBatch[] = []
@@ -988,7 +974,7 @@ export function buildImportInsertBatches({
 
   for (const row of rows) {
     const candidateRows = [...batchRows, row]
-    const candidateSql = getImportInsertSql(table, candidateRows)
+    const candidateSql = getImportInsertSql(table, candidateRows, roleImpersonationState)
 
     if (getSqlByteSize(candidateSql) <= maxSqlBytes) {
       batchRows = candidateRows
@@ -1002,7 +988,7 @@ export function buildImportInsertBatches({
 
     batches.push({ rows: batchRows, sql: batchSql! })
 
-    const singleRowSql = getImportInsertSql(table, [row])
+    const singleRowSql = getImportInsertSql(table, [row], roleImpersonationState)
     if (getSqlByteSize(singleRowSql) > maxSqlBytes) {
       throw getRowTooLargeError(maxSqlBytes)
     }
@@ -1022,15 +1008,25 @@ export async function executeImportInsertBatch({
   projectRef,
   connectionString,
   sql,
+  roleImpersonationState,
   timeoutMs = IMPORT_CHUNK_TIMEOUT_MS,
 }: {
   projectRef: string
   connectionString: string | undefined | null
   sql: SafeSqlFragment
+  roleImpersonationState?: RoleImpersonationState
   timeoutMs?: number
 }) {
   await executeWithRetry(() =>
-    executeSql({ projectRef, connectionString, sql }, AbortSignal.timeout(timeoutMs))
+    executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql,
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      },
+      AbortSignal.timeout(timeoutMs)
+    )
   )
 }
 
@@ -1079,6 +1075,7 @@ export async function insertRowsViaSpreadsheet({
   table,
   selectedHeaders,
   emptyStringAsNullHeaders = selectedHeaders,
+  roleImpersonationState,
   onProgressUpdate,
 }: {
   projectRef: string
@@ -1087,6 +1084,7 @@ export async function insertRowsViaSpreadsheet({
   table: RetrieveTableResult
   selectedHeaders: string[]
   emptyStringAsNullHeaders?: string[]
+  roleImpersonationState?: RoleImpersonationState
   onProgressUpdate: (progress: number) => void
 }): Promise<{ error: unknown }> {
   let chunkNumber = 0
@@ -1120,13 +1118,18 @@ export async function insertRowsViaSpreadsheet({
         }) as Record<string, unknown>[]
 
         try {
-          const batches = buildImportInsertBatches({ table, rows: formattedData })
+          const batches = buildImportInsertBatches({
+            table,
+            rows: formattedData,
+            roleImpersonationState,
+          })
 
           for (const batch of batches) {
             await executeImportInsertBatch({
               projectRef,
               connectionString,
               sql: batch.sql,
+              roleImpersonationState,
             })
           }
         } catch (error) {
@@ -1176,6 +1179,7 @@ export async function insertTableRows({
   rows,
   selectedHeaders,
   emptyStringAsNullHeaders = selectedHeaders,
+  roleImpersonationState,
   onProgressUpdate,
 }: {
   projectRef: string
@@ -1184,6 +1188,7 @@ export async function insertTableRows({
   rows: unknown[]
   selectedHeaders: string[]
   emptyStringAsNullHeaders?: string[]
+  roleImpersonationState?: RoleImpersonationState
   onProgressUpdate: (progress: number) => void
 }): Promise<{ error: unknown }> {
   let insertError: unknown = undefined
@@ -1197,13 +1202,18 @@ export async function insertTableRows({
   }) as Record<string, unknown>[]
 
   try {
-    const batches = buildImportInsertBatches({ table, rows: formattedRows })
+    const batches = buildImportInsertBatches({
+      table,
+      rows: formattedRows,
+      roleImpersonationState,
+    })
 
     for (const batch of batches) {
       await executeImportInsertBatch({
         projectRef,
         connectionString,
         sql: batch.sql,
+        roleImpersonationState,
       })
 
       insertProgress = insertProgress + batch.rows.length / rows.length

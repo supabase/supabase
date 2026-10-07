@@ -1,11 +1,10 @@
 import 'server-only'
 
-import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
 import { retry } from '@octokit/plugin-retry'
-import crypto from 'node:crypto'
 
 import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { githubAuthOptions } from './octokit.auth'
 import { OCTOKIT_RETRY_OPTIONS } from './octokit.constants'
 
 export { OCTOKIT_RETRY_OPTIONS }
@@ -16,25 +15,7 @@ let octokitInstance: InstanceType<typeof RetryOctokit>
 
 export function octokit() {
   if (!octokitInstance) {
-    const privateKey = process.env.DOCS_GITHUB_APP_PRIVATE_KEY
-    if (!privateKey) {
-      throw new Error('DOCS_GITHUB_APP_PRIVATE_KEY environment variable is required')
-    }
-
-    // https://github.com/gr2m/universal-github-app-jwt?tab=readme-ov-file#converting-pkcs1-to-pkcs8
-    const privateKeyPkcs8 = crypto.createPrivateKey(privateKey).export({
-      type: 'pkcs8',
-      format: 'pem',
-    })
-
-    octokitInstance = new RetryOctokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId: process.env.DOCS_GITHUB_APP_ID,
-        installationId: process.env.DOCS_GITHUB_APP_INSTALLATION_ID,
-        privateKey: privateKeyPkcs8,
-      },
-    })
+    octokitInstance = new RetryOctokit(githubAuthOptions())
   }
 
   return octokitInstance

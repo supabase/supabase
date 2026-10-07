@@ -10,23 +10,15 @@ breadcrumb: 'Framework Quickstarts'
 
 ## 3. Create a SvelteKit app
 
-Create a SvelteKit app using the `npm create` command.
+Create a SvelteKit app using the `sv` CLI.
 
 ```bash
 npx sv create my-app
 ```
 
-## 4. Install Supabase's Agent Skills (optional)
+## 4. Set up AI tooling (optional)
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-Install them so your AI coding agent can produce more accurate, reliable code using current Supabase patterns, such as authentication, server-side rendering, and database migrations, rather than relying solely on training data.
-
-To install, run the following command in the root of your project:
-
-```bash
-npx skills add supabase/agent-skills
-```
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -89,9 +81,16 @@ Create `+page.server.js` file in the `src/routes` directory with the following c
 import { supabase } from '$lib/supabaseClient'
 
 export async function load() {
-  const { data } = await supabase.from('instruments').select()
+  const { data, error } = await supabase.from('instruments').select()
+
+  if (error) {
+    console.error('Error loading instruments:', error.message)
+    return { instruments: [], error: error.message }
+  }
+
   return {
     instruments: data ?? [],
+    error: null,
   }
 }
 ```
@@ -107,15 +106,16 @@ type Instrument = {
 }
 
 export const load: PageServerLoad = async () => {
-  const { data, error } = await supabase.from('instruments').select<'instruments', Instrument>()
+  const { data, error } = await supabase.from('instruments').select<'*', Instrument>()
 
   if (error) {
     console.error('Error loading instruments:', error.message)
-    return { instruments: [] }
+    return { instruments: [], error: error.message }
   }
 
   return {
     instruments: data ?? [],
+    error: null,
   }
 }
 ```
@@ -129,11 +129,15 @@ Replace the existing content in your `+page.svelte` file in the `src/routes` dir
   let { data } = $props();
 </script>
 
-<ul>
-  {#each data.instruments as instrument}
-    <li>{instrument.name}</li>
-  {/each}
-</ul>
+{#if data.error}
+  <p>Error loading instruments: {data.error}</p>
+{:else}
+  <ul>
+    {#each data.instruments as instrument}
+      <li>{instrument.name}</li>
+    {/each}
+  </ul>
+{/if}
 ```
 
 ## 9. Start the app
@@ -143,6 +147,8 @@ Start the app and go to http://localhost:5173 in a browser and you should see th
 ```bash
 npm run dev
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

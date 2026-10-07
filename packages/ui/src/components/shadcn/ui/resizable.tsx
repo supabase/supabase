@@ -16,7 +16,12 @@ const serverCompatibleLocalStorage = {
   getItem: (k: string) => {
     if (typeof window === 'undefined') return null
     try {
-      return localStorage.getItem(transformLayoutKey(k))
+      const value = localStorage.getItem(transformLayoutKey(k))
+      if (value === null) return null
+      // react-resizable-panels JSON.parses this value itself with no guard;
+      // validate here so a corrupted value falls back to null instead of crashing.
+      JSON.parse(value)
+      return value
     } catch {
       return null
     }

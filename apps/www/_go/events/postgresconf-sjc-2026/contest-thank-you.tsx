@@ -22,8 +22,8 @@ const page: GoPageInput = {
       description: "If you haven't already, create your account and start building.",
       children: (
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button asChild variant="default" size="small">
-            <Link href="https://supabase.com/dashboard">Go to dashboard</Link>
+          <Button asChild size="small">
+            <a href="https://supabase.com/dashboard">Go to dashboard</a>
           </Button>
           <Button asChild variant="outline" size="small">
             <Link href="https://supabase.com">Visit supabase.com</Link>

@@ -15,12 +15,14 @@ export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) 
       <div className="absolute -inset-16 z-0 opacity-100 pointer-events-none">
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-          alt="Background pattern"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover object-right hidden dark:block"
         />
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-          alt="Background pattern"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover object-right dark:hidden"
         />
         <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />

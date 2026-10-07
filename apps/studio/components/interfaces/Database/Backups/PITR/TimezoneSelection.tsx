@@ -1,8 +1,8 @@
-import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
+import { CheckIcon, Globe } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
-  Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -36,20 +36,22 @@ export const TimezoneSelection = ({
     <div className="w-full">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            role="combobox"
+          <ComboboxTrigger
             aria-expanded={open}
             aria-controls={listboxId}
-            className="w-[350px] justify-start"
+            data-state={open ? 'open' : 'closed'}
+            className="w-[350px]"
             size="small"
-            variant="default"
-            icon={<Globe />}
-            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} className="ml-auto" />}
           >
-            {selectedTimezone
-              ? timezoneOptions.find((option) => option === selectedTimezone.text)
-              : 'Select timezone...'}
-          </Button>
+            <span className="flex min-w-0 items-center gap-2">
+              <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
+              <span className="truncate">
+                {selectedTimezone
+                  ? timezoneOptions.find((option) => option === selectedTimezone.text)
+                  : 'Select timezone...'}
+              </span>
+            </span>
+          </ComboboxTrigger>
         </PopoverTrigger>
         <PopoverContent id={listboxId} className="w-[350px] p-0">
           <Command>

@@ -69,7 +69,6 @@ export default function ComboboxPopover() {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="default"
             size="small"
             className="w-[150px] justify-start rounded-full"
             icon={

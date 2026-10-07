@@ -8,14 +8,15 @@ export type AiSupportStatus = 'bot_active' | 'escalated' | 'user_resolved' | 'bo
 export type SyncConversationMessagesVariables =
   components['schemas']['SyncConversationMessagesBody']
 
-type SyncConversationMessagesResponse = components['schemas']['SyncConversationMessagesResponse']
+type SyncConversationMessagesResponse =
+  components['schemas']['SyncConversationMessagesResponse_Output']
 
 type EscalateConversationVariables = components['schemas']['EscalateConversationBody']
 
 type ResolveConversationVariables = components['schemas']['ResolveConversationBody']
 
 type UpdateConversationLifecycleResponse =
-  components['schemas']['UpdateConversationLifecycleResponse']
+  components['schemas']['UpdateConversationLifecycleResponse_Output']
 
 /**
  * Sync AI support chat messages to Front via the Platform API.

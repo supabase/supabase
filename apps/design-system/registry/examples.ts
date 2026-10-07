@@ -200,6 +200,12 @@ export const examples: Registry = [
     files: ['example/button-default.tsx'],
   },
   {
+    name: 'button-floating-plate',
+    type: 'components:example',
+    registryDependencies: ['button'],
+    files: ['example/button-floating-plate.tsx'],
+  },
+  {
     name: 'button-warning',
     type: 'components:example',
     registryDependencies: ['button'],
@@ -380,6 +386,12 @@ export const examples: Registry = [
     files: ['example/combobox-demo.tsx'],
   },
   {
+    name: 'combobox-create-option',
+    type: 'components:example',
+    registryDependencies: ['command'],
+    files: ['example/combobox-create-option.tsx'],
+  },
+  {
     name: 'combobox-dropdown-menu',
     type: 'components:example',
     registryDependencies: ['command', 'dropdown-menu', 'button'],
@@ -552,6 +564,18 @@ export const examples: Registry = [
     files: ['example/dialog-centered-off.tsx'],
   },
   {
+    name: 'disabled-focusable',
+    type: 'components:example',
+    registryDependencies: ['button', 'tooltip'],
+    files: ['example/disabled-focusable.tsx'],
+  },
+  {
+    name: 'disabled-unavailable-with-notice',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'card', 'tooltip'],
+    files: ['example/disabled-unavailable-with-notice.tsx'],
+  },
+  {
     name: 'drawer-demo',
     type: 'components:example',
     registryDependencies: ['drawer'],
@@ -586,6 +610,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['filter-bar'],
     files: ['example/filter-bar-demo.tsx'],
+  },
+  {
+    name: 'filter-bar-pill-demo',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/filter-bar-pill-demo.tsx'],
+  },
+  {
+    name: 'filter-bar-segmented-demo',
+    type: 'components:example',
+    registryDependencies: ['filter-bar'],
+    files: ['example/filter-bar-segmented-demo.tsx'],
   },
   {
     name: 'hover-card-demo',
@@ -845,6 +881,12 @@ export const examples: Registry = [
     files: ['example/separator-demo.tsx'],
   },
   {
+    name: 'sidebar-demo',
+    type: 'components:example',
+    registryDependencies: ['sidebar'],
+    files: ['example/sidebar-demo.tsx'],
+  },
+  {
     name: 'sheet-confirm-on-close-demo',
     type: 'components:example',
     registryDependencies: ['alert-dialog', 'button', 'input', 'label', 'separator', 'sheet'],
@@ -1004,6 +1046,12 @@ export const examples: Registry = [
     files: ['example/textarea-form.tsx'],
   },
   {
+    name: 'textarea-with-addon',
+    type: 'components:example',
+    registryDependencies: ['textarea', 'input-group'],
+    files: ['example/textarea-with-addon.tsx'],
+  },
+  {
     name: 'textarea-with-button',
     type: 'components:example',
     registryDependencies: ['textarea', 'button'],
@@ -1044,6 +1092,18 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['toggle-group'],
     files: ['example/toggle-group-outline.tsx'],
+  },
+  {
+    name: 'toggle-group-segmented',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented.tsx'],
+  },
+  {
+    name: 'toggle-group-segmented-filter',
+    type: 'components:example',
+    registryDependencies: ['toggle-group'],
+    files: ['example/toggle-group-segmented-filter.tsx'],
   },
   {
     name: 'toggle-group-sm',
@@ -1512,6 +1572,11 @@ export const examples: Registry = [
     name: 'multi-select-disabled',
     type: 'components:example',
     files: ['example/multi-select-disabled.tsx'],
+  },
+  {
+    name: 'multi-select-without-icon',
+    type: 'components:example',
+    files: ['example/multi-select-without-icon.tsx'],
   },
   {
     name: 'multi-select-badge-limit-wrap',

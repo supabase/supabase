@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Compute',
+        url: '/compute',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },
@@ -105,6 +109,10 @@ const footerData = [
         url: '/security',
       },
       {
+        text: 'Regions',
+        url: '/regions',
+      },
+      {
         text: 'SOC2',
         url: '/security',
       },
@@ -122,8 +130,8 @@ const footerData = [
         url: '/docs',
       },
       {
-        text: 'Supabase UI',
-        url: 'https://supabase.com/ui',
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
       },
       {
         text: 'Changelog',

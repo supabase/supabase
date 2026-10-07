@@ -93,7 +93,7 @@ export const HTTPRequestConfig = ({ form }: HTTPRequestConfigProps) => {
             <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
             <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
-              <Button asChild>
+              <Button variant="primary" asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
               </Button>
             </div>

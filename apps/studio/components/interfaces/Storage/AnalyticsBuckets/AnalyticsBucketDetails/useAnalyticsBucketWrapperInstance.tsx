@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { getAnalyticsBucketFDWName } from './AnalyticsBucketDetails.utils'
+import { getAnalyticsBucketFDWServerName } from './AnalyticsBucketDetails.utils'
 import { WRAPPER_HANDLERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
   getWrapperMetaForWrapper,
@@ -32,7 +32,7 @@ export const useAnalyticsBucketWrapperInstance = (
           wrapper
         )
       )
-      .find((w) => w.name === getAnalyticsBucketFDWName(bucketId ?? ''))
+      .find((w) => w.server_name === getAnalyticsBucketFDWServerName(bucketId ?? ''))
   }, [data, bucketId])
 
   const icebergWrapperMeta = getWrapperMetaForWrapper(icebergWrapper)

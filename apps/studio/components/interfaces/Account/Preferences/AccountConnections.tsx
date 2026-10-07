@@ -111,7 +111,7 @@ export const AccountConnections = () => {
                 {isConnected ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button iconRight={<ChevronDown size={14} />} variant="default">
+                      <Button iconRight={<ChevronDown size={14} />}>
                         <span>Manage</span>
                       </Button>
                     </DropdownMenuTrigger>

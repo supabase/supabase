@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef } from 'react'
 
 import { Entity } from '@/data/entity-types/entity-types-infinite-query'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
+import { getSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
 
 export function useTableEditorTabsCleanUp() {
@@ -91,9 +93,20 @@ export function useSqlEditorTabsCleanup() {
         ...IGNORED_TAB_IDS,
       ]
 
+      // A snippet created during this session (by typing in a new tab) exists only
+      // in the local store until its first save lands, so the server-fetched list
+      // legitimately doesn't contain it yet. Without this, invalidating the snippet
+      // lists on that first keystroke prunes the tab that was just opened — the URL
+      // and editor stay on the new snippet while the tab bar falls back to whichever
+      // tab was open before, making it look like the previous tab is being edited.
+      const localSnippets = getSqlEditorV2StateSnapshot().snippets
+      const isUnpersistedLocalSnippet = (sqlId: string | undefined) =>
+        sqlId !== undefined && wasNeverPersisted(localSnippets[sqlId]?.snippet.status)
+
       const isPrunable = (id: string) =>
         id.startsWith('sql') &&
         !currentContentIds.includes(id) &&
+        !isUnpersistedLocalSnippet(tabMapRef.current[id]?.metadata?.sqlId) &&
         (canPruneLogsTabs || tabMapRef.current[id]?.metadata?.sqlSource !== 'logs')
 
       // Remove any snippet tabs that might no longer be existing (removed outside of the dashboard session)
@@ -108,6 +121,7 @@ export function useSqlEditorTabsCleanup() {
               .filter(
                 (item) =>
                   !currentContentIds.includes(item.id) &&
+                  !isUnpersistedLocalSnippet(item.metadata?.sqlId) &&
                   (canPruneLogsTabs || item.metadata?.sqlSource !== 'logs')
               )
               .map((item) => item.id)

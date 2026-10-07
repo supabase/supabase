@@ -30,9 +30,9 @@ import {
   getAddons,
   subscriptionHasHipaaAddon,
 } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { ProjectUpdateDisabledTooltip } from '@/components/interfaces/Organization/BillingSettings/ProjectUpdateDisabledTooltip'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
+import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ResourceItem } from '@/components/ui/Resource/ResourceItem'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
@@ -44,6 +44,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
+  useIsHighAvailability,
   useIsOrioleDbInAws,
   useIsProjectActive,
   useSelectedProjectQuery,
@@ -59,6 +60,7 @@ export const Addons = () => {
   const isAws = useIsAwsCloudProvider()
   const isProjectActive = useIsProjectActive()
   const isOrioleDbInAws = useIsOrioleDbInAws() === true
+  const isHighAvailability = useIsHighAvailability()
 
   const { projectSettingsCustomDomains, projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
     'project_settings:custom_domains',
@@ -100,14 +102,22 @@ export const Addons = () => {
   const customDomainEnabled = customDomain !== undefined
 
   const canOpenIPv4 =
-    isAws && isProjectActive && !projectUpdateDisabled && (canUpdateIPv4 || ipv4Enabled)
+    isAws &&
+    isProjectActive &&
+    !projectUpdateDisabled &&
+    (canUpdateIPv4 || ipv4Enabled) &&
+    !isHighAvailability
+  // HIPAA projects must have 28-day PITR. Once enabled it is locked; until then it can be enabled.
+  const hasHipaaCompliantPitr = pitr?.variant.identifier === 'pitr_28'
+  const isPitrLockedByHipaa = hasHipaaAddon && hasHipaaCompliantPitr
   const canOpenPITR =
     isProjectActive &&
     !projectUpdateDisabled &&
     sufficientPgVersion &&
-    !hasHipaaAddon &&
-    !isOrioleDbInAws
-  const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled
+    !isPitrLockedByHipaa &&
+    !isOrioleDbInAws &&
+    !isHighAvailability
+  const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled && !isHighAvailability
 
   const ipv4DisabledReason = getIPv4DisabledReason({
     isAws,
@@ -115,22 +125,26 @@ export const Addons = () => {
     projectUpdateDisabled,
     canUpdateIPv4,
     ipv4Enabled,
+    isHighAvailability,
   })
 
   const pitrDisabledReason = getPitrDisabledReason({
     isProjectActive,
     projectUpdateDisabled,
-    hasHipaaAddon,
+    hasHipaaAddon: isPitrLockedByHipaa,
     sufficientPgVersion,
     isOrioleDbInAws,
+    isHighAvailability,
   })
 
   const customDomainDisabledReason = getCustomDomainDisabledReason({
     isProjectActive,
     projectUpdateDisabled,
+    isHighAvailability,
   })
   const pitrAlertState = getPitrAlertState({
     hasHipaaAddon,
+    hasHipaaCompliantPitr,
     sufficientPgVersion,
     isOrioleDbInAws,
   })
@@ -147,11 +161,20 @@ export const Addons = () => {
         <AlertTitle>PITR cannot be changed with HIPAA</AlertTitle>
         <AlertDescription>
           All projects should have PITR enabled by default and cannot be changed with HIPAA enabled.
-          Contact support for further assistance.
+        </AlertDescription>
+      </Alert>
+    )
+  } else if (pitrAlertState === 'hipaa-non-compliant') {
+    pitrAlert = (
+      <Alert variant="warning" className="rounded-none border-0 border-b px-6">
+        <AlertTitle>Project is not HIPAA compliant</AlertTitle>
+        <AlertDescription>
+          Projects with HIPAA enabled must have 28 days of PITR. Enable the 28-day PITR add-on to
+          make this project compliant.
         </AlertDescription>
         <div className="mt-4">
-          <Button variant="default" asChild>
-            <SupportLink>Contact support</SupportLink>
+          <Button onClick={() => setPanel('pitr')} disabled={!canOpenPITR}>
+            Enable 28-day PITR
           </Button>
         </div>
       </Alert>
@@ -164,7 +187,7 @@ export const Addons = () => {
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
-          <Button asChild variant="default">
+          <Button asChild>
             <SupportLink
               queryParams={{
                 projectRef,
@@ -190,6 +213,11 @@ export const Addons = () => {
   return (
     <PageContainer size="default">
       <PageSection className="last:pb-0 gap-0">
+        <HighAvailabilityDisabledSectionNotice
+          className="mb-4"
+          title="Add-ons unavailable on High Availability projects"
+          description="We're working to bring add-ons to High Availability projects. Contact support if this is blocking your work."
+        />
         {isBranch && (
           <Admonition
             type="default"
@@ -246,17 +274,19 @@ export const Addons = () => {
                 }
                 meta={
                   <div className="flex items-center gap-4">
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                      tooltip={ipv4DisabledReason}
-                    >
-                      {ipv4Enabled ? (
-                        <Badge variant="success">Enabled</Badge>
-                      ) : (
-                        <Badge variant="default">Disabled</Badge>
-                      )}
-                    </ProjectUpdateDisabledTooltip>
+                    {ipv4Enabled ? (
+                      <Badge variant="success">Enabled</Badge>
+                    ) : (
+                      <Badge variant="default">Disabled</Badge>
+                    )}
+                    {!canOpenIPv4 && ipv4DisabledReason && (
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                        </TooltipTrigger>
+                        <TooltipContent>{ipv4DisabledReason}</TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 }
               >
@@ -384,9 +414,13 @@ export const Addons = () => {
           </ResourceList>
         )}
 
-        <PITRSidePanel />
-        <CustomDomainSidePanel />
-        <IPv4SidePanel />
+        {!isHighAvailability && (
+          <>
+            <PITRSidePanel />
+            <CustomDomainSidePanel />
+            <IPv4SidePanel />
+          </>
+        )}
       </PageSection>
     </PageContainer>
   )

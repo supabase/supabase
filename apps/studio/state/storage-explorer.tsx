@@ -1,6 +1,17 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM } from 'common'
-import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
+import {
+  capitalize,
+  chunk,
+  compact,
+  debounce,
+  find,
+  findIndex,
+  has,
+  isObject,
+  uniq,
+  uniqBy,
+} from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
@@ -70,7 +81,7 @@ if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
 
-function createStorageExplorerState({
+export function createStorageExplorerState({
   projectRef,
   connectionString,
   bucket,
@@ -91,6 +102,15 @@ function createStorageExplorerState({
   const state = proxy({
     projectRef,
     connectionString,
+    itemSearchString: '',
+    debouncedSearchString: '',
+    setItemSearchString: (value: string) => {
+      state.itemSearchString = value
+      state.setDebouncedSearchString(value)
+    },
+    setDebouncedSearchString: debounce((value: string) => {
+      state.debouncedSearchString = value
+    }, 500),
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
     selectedBucket: bucket as Bucket,
@@ -328,7 +348,10 @@ function createStorageExplorerState({
             path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
-            hasMoreItems: formattedItems.length === LIMIT,
+            // Compare the raw page, not the formatted one: formatFolderItems drops the
+            // .emptyFolderPlaceholder, so a full page can format to LIMIT - 1 and stop
+            // pagination a page early.
+            hasMoreItems: (data ?? []).length === LIMIT,
             isLoadingMoreItems: false,
           },
           index
@@ -397,7 +420,22 @@ function createStorageExplorerState({
 
     refetchAllOpenedFolders: async () => {
       const paths = state.openedFolders.map((folder) => folder.name)
-      await state.fetchFoldersByPath({ paths })
+
+      if (state.itemSearchString && paths.length === 0) {
+        await state.fetchFoldersByPath({ paths, searchString: state.itemSearchString })
+      } else if (state.itemSearchString) {
+        await state.fetchFoldersByPath({ paths })
+        // Reapply the filter to the current column only.
+        await state.fetchFolderContents({
+          bucketId: state.selectedBucket.id,
+          folderId: state.openedFolders[paths.length - 1].id,
+          folderName: paths[paths.length - 1],
+          index: paths.length - 1,
+          searchString: state.itemSearchString,
+        })
+      } else {
+        await state.fetchFoldersByPath({ paths })
+      }
     },
 
     refreshAll: async () => {
@@ -409,6 +447,10 @@ function createStorageExplorerState({
       }
     },
 
+    /**
+     * Rebuilds the column stack (and `openedFolders`) from an absolute folder path,
+     * returning the segments it could not find so a URL restore can recover.
+     */
     fetchFoldersByPath: async ({
       paths,
       searchString = '',
@@ -417,8 +459,14 @@ function createStorageExplorerState({
       paths: string[]
       searchString?: string
       showLoading?: boolean
-    }) => {
-      if (state.selectedBucket.id === undefined) return
+    }): Promise<{ missingPaths: string[] }> => {
+      if (state.selectedBucket.id === undefined) return { missingPaths: [] }
+
+      // The listings below are issued against this bucket. The provider is keyed per
+      // project rather than per bucket, so a bucket switch mid-flight would otherwise
+      // commit these items under the *new* bucket's name — and because columns[0].name
+      // would then match, nothing downstream would notice and refetch.
+      const bucketIdAtStart = state.selectedBucket.id
 
       const pathsWithEmptyPrefix = [''].concat(paths)
 
@@ -445,36 +493,48 @@ function createStorageExplorerState({
               path: prefix,
               options,
             })
-            return data
+            return { items: data, isComplete: true }
           } catch (error: any) {
             toast.error(`Failed to fetch folders: ${error.message}`)
-            return []
+            // Flagged so an empty listing isn't read as "the folder has nothing in it"
+            return { items: [], isComplete: false }
           }
         })
       )
 
-      const formattedFolders = foldersItems.map((folderItems, idx) => {
+      const formattedFolders = foldersItems.map(({ items }, idx) => {
         const prefix = paths.slice(0, idx).join('/')
-        const formattedItems = formatFolderItems(folderItems, prefix)
+        const formattedItems = formatFolderItems(items, prefix)
         return {
           id: null,
           status: STORAGE_ROW_STATUS.READY,
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
           path: prefix,
           items: formattedItems,
-          hasMoreItems: formattedItems.length === LIMIT,
+          // Raw page length — see fetchFolderContents. Getting this wrong here also
+          // makes isParentListingExhaustive below claim a folder is missing.
+          hasMoreItems: items.length === LIMIT,
           isLoadingMoreItems: false,
         }
       })
+
+      if (state.selectedBucket.id !== bucketIdAtStart) return { missingPaths: [] }
 
       // Package into columns and update this.columns
       state.columns = formattedFolders
 
       // Update openedFolders as well
+      const missingPaths: string[] = []
       const updatedOpenedFolders: StorageItem[] = paths.map((path, idx) => {
-        const folderInfo = find(formattedFolders[idx].items, { name: path })
+        const parentColumn = formattedFolders[idx]
+        const folderInfo = find(parentColumn.items, { name: path })
         // Folder doesnt exist, FE just scaffolds a "fake" folder
         if (!folderInfo) {
+          // Only report a missing segment when the parent listing proves it: a failed
+          // request, a search filter, or a LIMIT cap can all drop a folder that exists.
+          const isParentListingExhaustive =
+            foldersItems[idx].isComplete && !searchString && !parentColumn.hasMoreItems
+          if (isParentListingExhaustive) missingPaths.push(path)
           return {
             id: null,
             name: path,
@@ -490,6 +550,8 @@ function createStorageExplorerState({
         return folderInfo
       })
       state.openedFolders = updatedOpenedFolders
+
+      return { missingPaths }
     },
 
     /**
@@ -750,6 +812,7 @@ function createStorageExplorerState({
         folderId: folder.id,
         folderName: folder.name,
         index: columnIndex,
+        searchString: state.itemSearchString,
       })
     },
 
@@ -1788,12 +1851,7 @@ function createStorageExplorerState({
           progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${formatTime(remainingTime)} remaining – ` : ''}`}
           action={
             toastId && (
-              <Button
-                size="tiny"
-                variant="default"
-                className="ml-6"
-                onClick={() => state.abortUploads(toastId)}
-              >
+              <Button size="tiny" className="ml-6" onClick={() => state.abortUploads(toastId)}>
                 Cancel
               </Button>
             )
@@ -1898,6 +1956,16 @@ export const StorageExplorerStateContextProvider = ({ children }: PropsWithChild
     isSuccessSettings,
     bucket,
   ])
+
+  // [Monica] The effect above only refreshes `selectedBucket` when the project changes, so
+  // editing the current bucket (e.g. toggling public/private) doesn't update it there. This
+  // keeps `selectedBucket` synced to the bucket query on every change, so Get URL always
+  // uses the current public/private state instead of a stale one from initial load.
+  useEffect(() => {
+    if (bucket && state.projectRef === project?.ref) {
+      state.selectedBucket = bucket
+    }
+  }, [bucket, project?.ref, state.projectRef])
 
   return (
     <StorageExplorerStateContext.Provider value={state}>

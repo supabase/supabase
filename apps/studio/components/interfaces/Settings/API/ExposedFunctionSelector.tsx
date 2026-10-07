@@ -101,7 +101,6 @@ export const ExposedFunctionSelector = ({
         <Button
           size="small"
           disabled={disabled}
-          variant="default"
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
@@ -211,7 +210,7 @@ export const ExposedFunctionSelector = ({
                         >
                           <div className="w-full flex items-center gap-x-2">
                             <div className="w-4 shrink-0 flex items-center justify-center">
-                              {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                              {isExposed && <Check size={16} className="text-primary shrink-0" />}
                               {!isSchemaExposed && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>

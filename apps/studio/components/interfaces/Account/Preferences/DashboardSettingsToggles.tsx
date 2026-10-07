@@ -1,11 +1,23 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Card, Form } from 'ui'
+import {
+  Card,
+  CardContent,
+  Form,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { DashboardToggle } from './DashboardToggle'
 import { useIsInlineEditorSetting, useIsQueueOperationsSetting } from './useDashboardSettings'
+import { explorerHomeSchema, useExplorerPreferences } from './useExplorerPreferences'
+import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useTrack } from '@/lib/telemetry/track'
 
 const DashboardSettingsSchema = z.object({
@@ -14,6 +26,8 @@ const DashboardSettingsSchema = z.object({
 })
 
 export const DashboardSettingsToggles = () => {
+  const isExplorerEnabled = useIsExplorerEnabled()
+  const { home, setHome, isReady } = useExplorerPreferences()
   const { inlineEditorEnabled, setInlineEditorEnabled } = useIsInlineEditorSetting()
   const { isQueueOperationsEnabled, setIsQueueOperationsEnabled } = useIsQueueOperationsSetting()
 
@@ -52,6 +66,33 @@ export const DashboardSettingsToggles = () => {
   return (
     <Form {...form}>
       <Card>
+        {isExplorerEnabled && (
+          <CardContent>
+            <FormItemLayout
+              isReactForm={false}
+              label="Explorer startup"
+              description="Choose how Explorer opens."
+              layout="flex-row-reverse"
+            >
+              <Select
+                value={home}
+                onValueChange={(value) => {
+                  const result = explorerHomeSchema.safeParse(value)
+                  if (result.success) setHome(result.data)
+                }}
+                disabled={!isReady}
+              >
+                <SelectTrigger aria-label="Explorer startup">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="home">Start page</SelectItem>
+                  <SelectItem value="query">SQL query</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormItemLayout>
+          </CardContent>
+        )}
         <DashboardToggle
           form={form}
           name="inlineEditorEnabled"

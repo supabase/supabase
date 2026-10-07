@@ -13,7 +13,7 @@ export enum ReplicaInitializationStatus {
   'Failed' = 'failed',
 }
 
-export type DatabaseStatus = components['schemas']['DatabaseStatusResponse']
+export type DatabaseStatus = components['schemas']['DatabaseStatusResponse_Output']
 export type DatabaseInitEstimations = {
   baseBackupDownloadEstimateSeconds: number
   walArchiveReplayEstimateSeconds: number

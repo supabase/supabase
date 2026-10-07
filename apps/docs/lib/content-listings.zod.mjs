@@ -22,8 +22,10 @@ export const contentListingIconSchema = z.union([z.string().min(1), contentListi
 
 export const contentListingItemSchema = z.object({
   title: z.string().min(1),
-  href: z.string().min(1),
+  href: z.string().min(1).optional(),
   description: z.string().min(1),
+  /** Shown under the title on grid cards, before the description. */
+  subtitle: z.string().min(1).optional(),
   icon: contentListingIconSchema.optional(),
   hasLightIcon: z.boolean().optional(),
   badge: z.string().min(1).optional(),

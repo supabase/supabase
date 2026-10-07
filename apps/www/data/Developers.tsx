@@ -25,8 +25,8 @@ export const data = {
           icon: () => <Pencil className="w-4 h-4" />,
         },
         {
-          text: 'Supabase UI',
-          url: 'https://supabase.com/ui',
+          text: 'Supabase Library',
+          url: 'https://supabase.com/library',
           icon: (props: any) => (
             <svg
               width="17"

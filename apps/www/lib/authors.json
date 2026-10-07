@@ -38,6 +38,13 @@
     "author_image_url": "https://github.com/darora.png"
   },
   {
+    "author_id": "elsa_heffernan",
+    "author": "Elsa Heffernan",
+    "position": "Partnerships",
+    "author_url": "https://www.linkedin.com/in/elsaheffernan/",
+    "author_image_url": "/images/blog/avatars/elsa-heffernan.png"
+  },
+  {
     "author_id": "fracek",
     "author": "Francesco Ceccon",
     "username": "fracek",
@@ -97,6 +104,14 @@
     "position": "Head of Growth",
     "author_url": "https://github.com/roryw10",
     "author_image_url": "https://github.com/roryw10.png"
+  },
+  {
+    "author_id": "shaziya_bandukia",
+    "author": "Shaziya Bandukia",
+    "username": "shaziyabandukia",
+    "position": "Product + Partnerships",
+    "author_url": "https://github.com/shaziyabandukia",
+    "author_image_url": "https://github.com/shaziyabandukia.png"
   },
   {
     "author_id": "steve_chavez",
@@ -872,7 +887,7 @@
     "username": "deepthi",
     "position": "Head of Databases",
     "author_url": "https://github.com/deepthi",
-    "author_image_url": "https://github.com/deepthi.png"
+    "author_image_url": "/images/avatars/deepthi-sigireddi.jpg"
   },
   {
     "author_id": "joe_sciarrino",
@@ -1016,5 +1031,53 @@
     "position": "Growth",
     "author_url": "https://github.com/ekhar",
     "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
+  },
+  {
+    "author_id": "miranda_limonczenko",
+    "author": "Miranda Limonczenko",
+    "username": "czenko",
+    "position": "Docs Engineer",
+    "author_url": "https://github.com/czenko",
+    "author_image_url": "https://github.com/czenko.png"
+  },
+  {
+    "author_id": "nik_richers",
+    "author": "Nik Richers",
+    "username": "nrichers",
+    "position": "Product Manager",
+    "author_url": "https://github.com/nrichers",
+    "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "aditya_maruvada",
+    "author": "Aditya Maruvada",
+    "username": "supa-aditya",
+    "position": "Engineering",
+    "author_url": "https://github.com/supa-aditya",
+    "author_image_url": "https://github.com/supa-aditya.png"
+  },
+  {
+    "author_id": "daniel_mitterdorfer",
+    "author": "Daniel Mitterdorfer",
+    "username": "danielmitterdorfer",
+    "position": "Engineering",
+    "author_url": "https://github.com/danielmitterdorfer",
+    "author_image_url": "https://github.com/danielmitterdorfer.png"
+  },
+  {
+    "author_id": "alexander_korotkov",
+    "author": "Alexander Korotkov",
+    "username": "akorotkov",
+    "position": "Engineering",
+    "author_url": "https://github.com/akorotkov",
+    "author_image_url": "https://github.com/akorotkov.png"
+  },
+  {
+    "author_id": "rand_arete",
+    "author": "Rand Arete",
+    "username": "rand",
+    "position": "Engineering",
+    "author_url": "https://github.com/rand",
+    "author_image_url": "https://github.com/rand.png"
   }
 ]

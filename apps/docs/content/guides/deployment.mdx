@@ -49,7 +49,7 @@ No. The GitHub integration and CLI-based deployments work on all plans. Branchin
 
 ### What gets deployed?
 
-Database migrations in your `supabase/` directory, plus Edge Functions and storage buckets that are declared in `supabase/config.toml`. Other local configuration files (such as API or Auth settings) are ignored by default. See the [local development guide](/docs/guides/local-development) for details on the directory structure.
+Database migrations in your `supabase/` directory, plus Edge Functions and Storage buckets that are declared in `supabase/config.toml`. If you use [declarative schemas](/docs/guides/local-development/declarative-database-schemas), only the generated migrations are deployed and not the `supabase/schemas/` files themselves. On preview branches, `config.toml` settings such as `[api]` and `[auth]` are also applied to the branch project by default. On persistent branches, including your production branch, those settings are skipped unless you opt in with a `[remotes]` block for that project. See the [local development guide](/docs/guides/local-development) for details on the directory structure.
 
 ### Can you use your own CI/CD pipeline?
 

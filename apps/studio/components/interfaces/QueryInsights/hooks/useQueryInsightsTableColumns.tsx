@@ -163,7 +163,6 @@ export function useQueryInsightsTableColumns({
                   tooltip={{ content: { text: 'Query details' } }}
                   icon={<ArrowRight size={14} />}
                   size="tiny"
-                  variant="default"
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -371,7 +370,6 @@ export function useQueryInsightsTableColumns({
                 tooltip={{ content: { text: 'Query details' } }}
                 icon={<ArrowRight size={14} />}
                 size="tiny"
-                variant="default"
                 onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   setSelectedTriageRow(props.rowIdx)
@@ -496,7 +494,6 @@ export function useQueryInsightsTableColumns({
             <div className="flex items-center gap-2 justify-end w-full h-full">
               {!row.issueType && (
                 <Button
-                  variant="default"
                   size="tiny"
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
@@ -511,7 +508,7 @@ export function useQueryInsightsTableColumns({
                   <Button
                     variant="primary"
                     size="tiny"
-                    className="rounded-r-none border-r-0"
+                    className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                     onClick={() => {
                       setSelectedTriageRow(props.rowIdx)
                       setSheetView('indexes')
@@ -524,7 +521,8 @@ export function useQueryInsightsTableColumns({
                       <Button
                         variant="primary"
                         size="tiny"
-                        className="rounded-l-none px-1"
+                        aria-label="More index actions"
+                        className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                         icon={<ChevronDown size={12} />}
                       />
                     </DropdownMenuTrigger>

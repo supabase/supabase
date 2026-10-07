@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import type { ProfileContextType } from '@/lib/profile'
 import { CliLoginScreen } from '@/pages/cli/login'
@@ -53,10 +53,6 @@ function renderScreen(props: Partial<Parameters<typeof CliLoginScreen>[0]> = {})
 }
 
 describe('CliLoginScreen', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   test('creates a session and routes to the device code', async () => {
     createCliLoginSessionMock.mockResolvedValue({ nonce: 'ABCDEFGH12345678' })
     const { navigate } = renderScreen()

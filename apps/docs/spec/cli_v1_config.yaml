@@ -63,6 +63,8 @@ parameters:
     description: |
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
+      Local projects started with the experimental `supabase stack` commands are identified by their project directory, git branch, and `--stack` name instead. See [Running multiple local projects](https://supabase.com/docs/guides/local-development/running-multiple-local-projects).
+
   - id: 'api.enabled'
     title: 'api.enabled'
     tags: ['api']
@@ -151,6 +153,16 @@ parameters:
     links:
       - name: 'PostgreSQL configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.orioledb_version'
+    title: 'db.orioledb_version'
+    tags: ['database']
+    required: false
+    description: |
+      OrioleDB version of the Postgres image to use for the local database. Leave empty to use the default storage engine. Requires `db.major_version` 15 or 17. `supabase init --use-orioledb` sets this value.
+    links:
+      - name: 'OrioleDB'
+        link: 'https://supabase.com/docs/guides/database/orioledb'
 
   - id: 'db.pooler.enabled'
     title: 'db.pooler.enabled'
@@ -448,6 +460,18 @@ parameters:
     links:
       - name: 'PgBouncer Configuration'
         link: https://www.pgbouncer.org/config.html#max_client_conn
+
+  - id: 'db.migrations.schema_paths'
+    title: 'db.migrations.schema_paths'
+    tags: ['database']
+    required: false
+    default: '[]'
+    description: |
+      An ordered list of schema files, directories, or glob patterns describing your database, relative to the `supabase` directory. For example: `["./schemas/*.sql"]`.
+      Only the legacy `migra` diff engine uses this setting, where it controls the order in which declarative schema files are applied. The `pg-delta` diff engine (see `experimental.pgdelta.enabled`) ignores it and orders declarative files automatically based on the dependencies between statements.
+    links:
+      - name: 'Declarative database schemas'
+        link: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas'
 
   - id: 'db.seed.enabled'
     title: 'db.seed.enabled'
@@ -1489,7 +1513,7 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out after the specified duration. Sample values include: '50m', '20h'.
+      Force sign out after the specified duration. Sample values include: '50m', '20h'.
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'
@@ -1500,7 +1524,7 @@ parameters:
     required: false
     default: ''
     description: |
-      Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
+      Force sign out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
     links:
       - name: 'Auth Sessions'
         link: 'https://supabase.com/docs/guides/auth/sessions'
@@ -1736,6 +1760,19 @@ parameters:
       - name: Self-hosted Logflare Configuration
         link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started
 
+  - id: 'experimental.stack'
+    title: 'experimental.stack'
+    tags: ['experimental']
+    required: false
+    default: 'false'
+    description: |
+      Turns on the experimental `supabase stack` commands, and makes the top-level `supabase start`, `supabase status`, and `supabase stop` commands run `supabase stack start`, `supabase stack status`, and `supabase stack stop`. The local targets of the `db`, `migration`, `test`, `gen`, `inspect`, `pull`, `storage`, `seed`, and `services` commands, and `functions serve`, also use the stack. With this setting, several local projects can run at the same time on one machine. On supported platforms a local project can also run without Docker.
+      Local projects started this way keep their own data, separate from local projects started with the default `supabase start`. The environment variable `SUPABASE_EXPERIMENTAL_STACK=1` or `0` overrides this value.
+      Note: This is an experimental feature and may change in future releases.
+    links:
+      - name: 'Running multiple local projects'
+        link: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects'
+
   - id: 'experimental.webhooks.enabled'
     title: 'experimental.webhooks.enabled'
     tags: ['experimental']
@@ -1751,8 +1788,7 @@ parameters:
     tags: ['experimental']
     required: false
     description: |
-      Configures Postgres storage engine to use OrioleDB with S3 support.
-      Note: This is an experimental feature and may change in future releases.
+      Deprecated. Use `db.orioledb_version` instead. The CLI still reads this setting and prints a deprecation warning when it is set.
     links: []
 
   - id: 'experimental.s3_host'
@@ -1796,6 +1832,42 @@ parameters:
     description: |
       Configures AWS_SECRET_ACCESS_KEY for S3 bucket access.
       DO NOT commit your AWS secret key to git. Use environment variable substitution instead.
+      Note: This is an experimental feature and may change in future releases.
+    links: []
+
+  - id: 'experimental.pgdelta.enabled'
+    title: 'experimental.pgdelta.enabled'
+    tags: ['experimental']
+    required: false
+    default: 'false'
+    description: |
+      Enables the `pg-delta` diff engine for `db diff`, `db pull`, and the `db schema declarative` commands.
+      Projects created with a recent `supabase init` have this set to `true` in the generated `config.toml`. Existing projects keep the legacy `migra` engine until they opt in by adding this setting. Set to `false` to fall back to `migra`.
+      Note: This is an experimental feature and may change in future releases.
+    links:
+      - name: 'Declarative database schemas'
+        link: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas'
+
+  - id: 'experimental.pgdelta.declarative_schema_path'
+    title: 'experimental.pgdelta.declarative_schema_path'
+    tags: ['experimental']
+    required: false
+    default: './schemas'
+    description: |
+      The directory where the `pg-delta` engine reads and writes declarative schema files. Relative paths resolve from the `supabase` directory.
+      Note: This is an experimental feature and may change in future releases.
+    links:
+      - name: 'Declarative database schemas'
+        link: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas'
+
+  - id: 'experimental.pgdelta.format_options'
+    title: 'experimental.pgdelta.format_options'
+    tags: ['experimental']
+    required: false
+    description: |
+      A JSON string of formatting options applied to SQL generated by the `pg-delta` engine. When unset, generated SQL uses uppercase keywords wrapped at a maximum line width of 180 characters.
+      Supported keys: `keywordCase` (`"upper"`, `"lower"`, or `"preserve"`), `commaStyle` (`"trailing"` or `"leading"`), `indent` (number), `maxWidth` (number), and the booleans `alignColumns`, `alignKeyValues`, `preserveRoutineBodies`, `preserveViewBodies`, and `preserveRuleBodies`. Omitted keys keep their defaults.
+      For example: `format_options = "{\"keywordCase\":\"lower\",\"maxWidth\":80}"`. Set `format_options = "null"` to emit raw statements with no formatting applied.
       Note: This is an experimental feature and may change in future releases.
     links: []
 
