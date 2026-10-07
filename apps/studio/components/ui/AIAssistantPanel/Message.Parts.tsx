@@ -32,8 +32,10 @@ import { MessageMarkdown } from './MessageMarkdown'
 import { MessagePartQueryLogs } from './MessagePartQueryLogs'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
 import { NotebookRunRenderer } from './NotebookRunRenderer'
+import { OptInRequest } from './OptInRequest'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
+import { storedUpdateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -272,6 +274,31 @@ function MessagePartNotebookRun({ toolPart }: { toolPart: ToolUIPart }) {
   )
 }
 
+function MessagePartUpdateOptInLevel({ toolPart }: { toolPart: ToolUIPart }) {
+  const { state, input, output } = toolPart
+  const { addToolApprovalResponse } = useMessageActionsContext()
+
+  const parsedInput = storedUpdateOptInLevelInputSchema.safeParse(input)
+  if (state === 'input-streaming' || !parsedInput.success) return null
+
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
+
+  return (
+    <OptInRequest
+      requiredLevel={parsedInput.data.requiredLevel}
+      levelAtRequest={parsedInput.data.currentLevel}
+      output={output}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
+  )
+}
+
 const MessagePart = {
   Text: MessagePartText,
   Compact: MessagePartCompact,
@@ -280,6 +307,7 @@ const MessagePart = {
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
   NotebookProposal: MessagePartNotebookProposal,
   NotebookRun: MessagePartNotebookRun,
+  UpdateOptInLevel: MessagePartUpdateOptInLevel,
 } as const
 
 // Wide parts share the default width for now; the split stays so a part can diverge again.
@@ -379,6 +407,9 @@ export const MessagePartSwitcher = memo(
         }
         case 'tool-run_notebook': {
           return <MessagePart.NotebookRun toolPart={part} />
+        }
+        case 'tool-update_opt_in_level': {
+          return <MessagePart.UpdateOptInLevel toolPart={part} />
         }
 
         case 'source-url':

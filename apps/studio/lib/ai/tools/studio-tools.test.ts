@@ -1,7 +1,7 @@
 import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getStudioTools } from './studio-tools'
+import { createUpdateOptInLevelInputSchema, getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 
@@ -194,7 +194,7 @@ describe('ai/tools/studio-tools', () => {
         undefined,
         undefined
       )
-      expect(result).toEqual(rows)
+      expect(result).toEqual({ rows, optInLevel: 'schema' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'text',
         value: NO_DATA_PERMISSIONS,
@@ -231,7 +231,7 @@ describe('ai/tools/studio-tools', () => {
         undefined,
         undefined
       )
-      expect(result).toEqual(rows)
+      expect(result).toEqual({ rows, optInLevel: 'schema_and_log_and_data' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'json',
         value: rows,
@@ -257,5 +257,48 @@ describe('ai/tools/studio-tools', () => {
         expect(schema).toBeDefined()
       }
     })
+  })
+})
+
+describe('ai/tools/studio-tools getOptInTools', () => {
+  it.each([
+    ['schema', 'schema_and_log_and_data', false],
+    ['schema_and_log_and_data', 'schema', true],
+    ['schema', 'schema', true],
+  ] as const)(
+    'level %s after approval, required %s → sufficient %s',
+    async (level, requiredLevel, sufficient) => {
+      const { update_opt_in_level } = getOptInTools({ aiOptInLevel: level })
+      if (!update_opt_in_level.execute) throw new Error('execute is undefined')
+
+      const result = await update_opt_in_level.execute(
+        { currentLevel: level, requiredLevel },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(update_opt_in_level.needsApproval).toBe(true)
+      expect(result).toEqual({ level, sufficient })
+    }
+  )
+
+  it('returns only the level when no level is requested', async () => {
+    const { update_opt_in_level } = getOptInTools({ aiOptInLevel: 'schema' })
+    if (!update_opt_in_level.execute) throw new Error('execute is undefined')
+
+    const result = await update_opt_in_level.execute(
+      { currentLevel: 'schema' },
+      { toolCallId: 'test', messages: [], context: {} }
+    )
+
+    expect(result).toEqual({ level: 'schema' })
+  })
+
+  it.each([
+    ['schema_and_log_and_data', 'schema', undefined],
+    ['schema', 'schema', undefined],
+    ['schema', 'schema_and_log', 'schema_and_log'],
+  ] as const)('at level %s, requested %s is stored as %s', (level, requested, stored) => {
+    const parsed = createUpdateOptInLevelInputSchema(level).parse({ requiredLevel: requested })
+    expect(parsed).toEqual({ currentLevel: level, requiredLevel: stored })
   })
 })

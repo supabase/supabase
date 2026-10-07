@@ -238,7 +238,17 @@ function createMockedStudioTools() {
     Object.entries(studioTools).map(([name, baseTool]) => {
       // Always mock execute_sql and deploy_edge_function with needsApproval disabled
       if (name === 'execute_sql') {
-        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+        return [
+          name,
+          {
+            ...baseTool,
+            needsApproval: false,
+            execute: async () => ({
+              rows: [] as unknown[],
+              optInLevel: 'schema_and_log_and_data' as const,
+            }),
+          },
+        ]
       }
       if (name === 'deploy_edge_function') {
         return [
@@ -502,6 +512,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
           id,
           name: notebook.name,
           updated_at: notebook.updated_at,
+          optInLevel: 'schema_and_log_and_data' as const,
           cells: notebook.content.cells.flatMap((cell) =>
             cell._tag === 'markdown_cell'
               ? []
