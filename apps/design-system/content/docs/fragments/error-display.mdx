@@ -48,12 +48,6 @@ import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
       description: 'Diagnose connection timeouts step by step.',
       action: { label: 'View guide', href: `${DOCS_URL}/guides/troubleshooting` },
     },
-    {
-      id: 'restart',
-      title: 'Restart your project',
-      description: 'Clears stale connections held by the pooler.',
-      action: { label: 'Restart project', onClick: openRestartDialog },
-    },
   ]}
 />
 ```
@@ -62,23 +56,11 @@ In Studio, wire [`ErrorMatcher`](https://github.com/supabase/supabase/tree/maste
 
 `children` renders after the steps in both layouts. Use it for the dialogs your step actions open — they take no space until opened — or for anything else that has to sit inside the card. It doesn't get the compact treatment, so keep visible content short.
 
-### Actions a button can't express
-
-A step action is normally a `label` plus `onClick` or `href`. For a control a button can't express — a split dropdown, say — use `render`, which receives `{ block }` (`true` in the compact layout):
+For a control a button can't express — a split dropdown, say — give the action a `render`, which receives `{ block }` (`true` in the compact layout). `label` is still required: it's what the compact layout announces. Don't use it for an ordinary button, as it opts the step out of the built-in loading and link handling.
 
 ```tsx
-{
-  id: 'ai',
-  title: 'Debug with AI',
-  description: 'Ask the assistant to diagnose this error.',
-  action: {
-    label: 'Debug with AI',
-    render: ({ block }) => <AiAssistantDropdown block={block} />,
-  },
-}
+action: { label: 'Debug with AI', render: ({ block }) => <AiAssistantDropdown block={block} /> }
 ```
-
-`label` is still required — it's what the compact layout announces. Don't reach for `render` for an ordinary button: it opts the step out of the built-in loading and external-link handling. For an action that opens a dialog, keep `onClick` and render the dialog through `children`.
 
 ## When to use each type
 
@@ -119,45 +101,33 @@ A step action is normally a `label` plus `onClick` or `href`. For a control a bu
 | `onRender`          | `() => void?`                          | —                   | Fired once on mount — use for telemetry.                                |
 | `className`         | `string?`                              | —                   | Extra classes on the root element.                                      |
 
-### ErrorDisplayStep
+### Step and error shapes
 
-| Field         | Type                     | Description                                                   |
-| ------------- | ------------------------ | ------------------------------------------------------------- |
-| `id`          | `string`                 | Accordion value and React key.                                |
-| `title`       | `string`                 | Step heading. Hidden in the compact layout.                   |
-| `description` | `string?`                | One line. Shown on expand in full, button tooltip in compact. |
-| `action`      | `ErrorDisplayStepAction` | The step's single action.                                     |
+```ts
+type ErrorDisplayStep = {
+  id: string
+  title: string // hidden in the compact layout
+  description?: string // shown on expand in full, button tooltip in compact
+  action: {
+    label: string // starts with a verb
+    onClick?: () => void | Promise<void> // pending promises show a spinner
+    href?: string // external links get an icon; onClick still fires, for telemetry
+    icon?: ReactNode
+    render?: (props: { block?: boolean }) => ReactNode // escape hatch, see above
+  }
+}
 
-### ErrorDisplayStepAction
-
-| Field     | Type                          | Description                                                                                     |
-| --------- | ----------------------------- | ----------------------------------------------------------------------------------------------- |
-| `label`   | `string`                      | Button label. Starts with a verb.                                                               |
-| `onClick` | `() => void \| Promise<void>` | Pending promises show a spinner.                                                                |
-| `href`    | `string?`                     | Renders a link. External links get an external-link icon. `onClick` still fires, for telemetry. |
-| `icon`    | `ReactNode?`                  | Leading icon.                                                                                   |
-| `render`  | `({ block }) => ReactNode`    | Custom control in place of the button. Escape hatch — see below.                                |
-
-### ErrorDisplayDetails
-
-| Field       | Type              | Description                                        |
-| ----------- | ----------------- | -------------------------------------------------- |
-| `message`   | `string`          | Raw error, rendered in monospace exactly as given. |
-| `code`      | `string?`         | Machine-readable error code.                       |
-| `requestId` | `string?`         | Sent to support as `sid`.                          |
-| `timestamp` | `string \| Date?` | Dates are formatted as an ISO string.              |
+type ErrorDisplayDetails = {
+  message: string // rendered in monospace exactly as given
+  code?: string
+  requestId?: string // sent to support as `sid`
+  timestamp?: string | Date // Dates are formatted as an ISO string
+}
+```
 
 ### SupportFormParams
 
-| Field        | Type      | Description                   |
-| ------------ | --------- | ----------------------------- |
-| `projectRef` | `string?` | Project reference slug        |
-| `orgSlug`    | `string?` | Organization slug             |
-| `category`   | `string?` | Pre-selected support category |
-| `subject`    | `string?` | Pre-filled subject line       |
-| `message`    | `string?` | Pre-filled message body       |
-| `error`      | `string?` | Raw error string for context  |
-| `sid`        | `string?` | Sentry event or request ID    |
+All optional: `projectRef`, `orgSlug`, `category`, `subject`, `message`, `error`, `sid`. `subject` defaults to the `title`, and `error`/`sid` are filled from `error` when you don't set them.
 
 ## Accessibility
 
