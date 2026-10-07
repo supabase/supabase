@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
+import { EllipsisVertical, Pencil, RotateCw, Send, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -58,6 +58,7 @@ import { useWebhookDeliveryRetryMutation } from '@/data/platform-webhooks/platfo
 import { useWebhookEndpointCreateMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-create-mutation'
 import { useWebhookEndpointDeleteMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-delete-mutation'
 import { useWebhookEndpointRegenerateSecretMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-regenerate-secret-mutation'
+import { useWebhookEndpointTestMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-test-mutation'
 import { useWebhookEndpointUpdateMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-update-mutation'
 import { useWebhookEndpointsQuery } from '@/data/platform-webhooks/platform-webhook-endpoints-query'
 import type { WebhookScopeParams } from '@/data/platform-webhooks/platform-webhooks-fetchers'
@@ -95,6 +96,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const updateEndpointMutation = useWebhookEndpointUpdateMutation()
   const deleteEndpointMutation = useWebhookEndpointDeleteMutation()
   const regenerateSecretMutation = useWebhookEndpointRegenerateSecretMutation()
+  const testEndpointMutation = useWebhookEndpointTestMutation()
   const retryDeliveryMutation = useWebhookDeliveryRetryMutation()
 
   const [deliveryId, setDeliveryId] = useQueryState('deliveryId', parseAsString)
@@ -326,6 +328,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     toast.success('Signing secret regenerated')
   }
 
+  const handleSendTestEvent = async () => {
+    if (!selectedEndpoint) return
+    await testEndpointMutation.mutateAsync({ scope: apiScope, id: selectedEndpoint.id })
+    toast.success('Test event sent — check deliveries shortly')
+  }
+
   const handleRetryDelivery = async (deliveryId: string) => {
     if (!selectedEndpoint) return
     const delivery = deliveries.find((item) => item.id === deliveryId)
@@ -412,6 +420,10 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   <Button icon={<EllipsisVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="bottom" className="w-48">
+                  <DropdownMenuItem className="gap-x-2" onClick={handleSendTestEvent}>
+                    <Send size={14} className="text-foreground-lighter" />
+                    <span>Send test event</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setShowRegenerateSecretConfirm(true)}

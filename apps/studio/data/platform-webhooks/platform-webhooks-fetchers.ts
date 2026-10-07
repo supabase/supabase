@@ -201,6 +201,24 @@ export async function getWebhookDelivery(
   return data
 }
 
+export async function sendTestWebhookEvent(scope: WebhookScopeParams, id: string) {
+  // No event type specified — the backend picks one the endpoint is already
+  // subscribed to. See PlatformWebhooksPage.tsx for the simpler v1 scope decision.
+  const { data, error } =
+    scope.scope === 'organization'
+      ? await post('/v2/organizations/{slug}/webhooks/endpoints/{id}/test', {
+          params: { path: { slug: scope.orgSlug, id } },
+          body: {},
+        })
+      : await post('/v2/projects/{ref}/webhooks/endpoints/{id}/test', {
+          params: { path: { ref: scope.projectRef, id } },
+          body: {},
+        })
+
+  if (error) handleError(error)
+  return data
+}
+
 export async function retryWebhookDelivery(scope: WebhookScopeParams, id: string) {
   const { data, error } =
     scope.scope === 'organization'
