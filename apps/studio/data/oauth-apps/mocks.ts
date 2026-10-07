@@ -234,7 +234,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS, FABRIKAM_OWNER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: {
     email: 'admin@example.com',

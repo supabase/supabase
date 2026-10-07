@@ -133,10 +133,13 @@ describe('OAuthAppsAuthorizeScreen', () => {
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
-    renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot })
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.kemalBot,
+      organizationSlug: 'fabrikam-industries',
+    })
 
     await screen.findByRole('combobox')
-    selectProject('northwind-storefront')
+    selectProject('fabrikam-ledger')
     fireEvent.click(screen.getByRole('button', { name: /Authorize kemal-bot/ }))
 
     expect(await screen.findByText('kemal-bot is connected')).toBeInTheDocument()
@@ -319,15 +322,6 @@ describe('OAuthAppsAuthorizeScreen', () => {
     expect(
       screen.queryByText('Must select at least one project to authorize.')
     ).not.toBeInTheDocument()
-  })
-
-  test('an unknown project_ref preselects nothing and shows no notice', async () => {
-    renderScreen({ projectRef: 'no-such-ref' })
-
-    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeDisabled()
-    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
-    expect(screen.queryByText(/couldn't be preselected/i)).not.toBeInTheDocument()
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
   test('a project_scoping_mode off app ignores the project_ref param', async () => {

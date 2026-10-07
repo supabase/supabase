@@ -165,7 +165,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  if (identityQuery.isPending || memberOrgQuery.isPending || preflightQuery.isPending) {
+  if (identityQuery.isPending || memberOrgQuery.isPending) {
     return null
   }
 
@@ -176,10 +176,12 @@ export const OAuthAppsAuthorizeScreen = ({
         title={`Authorize ${request.name}`}
         description="This application wants to access your Supabase Account"
       >
-        <AlertError
-          subject="An error occurred while loading your data"
-          error={identityQuery.error}
-        />
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError
+            subject="An error occurred while loading your data"
+            error={identityQuery.error}
+          />
+        </div>
       </InterstitialLayout>
     )
   }
@@ -191,10 +193,12 @@ export const OAuthAppsAuthorizeScreen = ({
         title={`Authorize ${request.name}`}
         description="This application wants to access your Supabase Account"
       >
-        <AlertError
-          subject="We couldn't find the organization for this application authorization"
-          error={memberOrgQuery.error}
-        />
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError
+            subject="We couldn't find the organization for this application authorization"
+            error={memberOrgQuery.error}
+          />
+        </div>
       </InterstitialLayout>
     )
   }
