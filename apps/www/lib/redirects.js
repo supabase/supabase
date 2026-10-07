@@ -415,28 +415,28 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/postgres/postgres-intro',
-    destination: '/docs/postgres/server/about',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: false,
     source: '/docs/realtime/about',
-    destination: '/docs/realtime/server/about',
+    destination: '/docs/guides/self-hosting',
   },
-  { permanent: false, source: '/docs/realtime/aws', destination: '/docs/postgres/server/aws' },
+  { permanent: false, source: '/docs/realtime/aws', destination: '/docs/guides/self-hosting' },
   {
     permanent: false,
     source: '/docs/realtime/digitalocean',
-    destination: '/docs/postgres/server/digitalocean',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: false,
     source: '/docs/realtime/docker',
-    destination: '/docs/postgres/server/docker',
+    destination: '/docs/guides/self-hosting/docker',
   },
   {
     permanent: false,
     source: '/docs/realtime/source',
-    destination: '/docs/postgres/server/about',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: false,
@@ -818,7 +818,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/connecting/direct-connections',
-    destination: '/docs/guides/database/connection-pooling',
+    destination: '/docs/guides/database/connecting-to-postgres/pooling-and-limits',
   },
   {
     permanent: true,
@@ -1008,7 +1008,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/03/22/In-The-Loop',
-    destination: '/blog/in-the-loop',
+    destination: '/blog/In-The-Loop',
   },
   {
     permanent: true,
@@ -1420,52 +1420,52 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-branches-list',
+    destination: '/docs/reference/cli/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-branches-create',
+    destination: '/docs/reference/cli/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-branches-delete',
+    destination: '/docs/reference/cli/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-branches-create',
+    destination: '/docs/reference/cli/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db-diff',
+    destination: '/docs/reference/cli/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db-pull',
+    destination: '/docs/reference/cli/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-link',
+    destination: '/docs/reference/cli/supabase-link',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-changes',
-    destination: '/docs/reference/supabase-db-diff',
+    destination: '/docs/reference/cli/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-commit',
-    destination: '/docs/reference/supabase-db-pull',
+    destination: '/docs/reference/cli/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-gen-types-typescript',
-    destination: '/docs/reference/supabase-gen-types',
+    destination: '/docs/reference/cli/supabase-gen-types',
   },
 
   {
@@ -1486,7 +1486,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
-    destination: '/docs/reference/javascript/release-notes',
+    destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
   {
     permanent: true,
@@ -1544,70 +1544,70 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-getuser',
-    destination: '/docs/reference/javascript/v1/auth-api-getuser',
+    destination: '/docs/reference/javascript/auth-getuser',
   },
   // v1: /auth-api-resetpasswordforemail
   // v2: /auth-resetpasswordforemail
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
-    destination: '/docs/reference/javascript/v1/auth-api-resetpasswordforemail',
+    destination: '/docs/reference/javascript/auth-resetpasswordforemail',
   },
   // v1: /auth-api-verifyotp
   // v2: /auth-verifyotp
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-verifyotp',
-    destination: '/docs/reference/javascript/v1/auth-api-verifyotp',
+    destination: '/docs/reference/javascript/auth-verifyotp',
   },
   // v1: /auth-api-listusers
   // v2: /auth-admin-listusers
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-listusers',
-    destination: '/docs/reference/javascript/v1/auth-api-listusers',
+    destination: '/docs/reference/javascript/auth-admin-listusers',
   },
   // v1: /auth-api-createuser
   // v2: /auth-admin-createuser
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-createuser',
-    destination: '/docs/reference/javascript/v1/auth-api-createuser',
+    destination: '/docs/reference/javascript/auth-admin-createuser',
   },
   // v1: /auth-api-deleteuser
   // v2: /auth-admin-deleteuser
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-deleteuser',
-    destination: '/docs/reference/javascript/v1/auth-api-deleteuser',
+    destination: '/docs/reference/javascript/auth-admin-deleteuser',
   },
   // v1: /auth-api-generatelink
   // v2: /auth-admin-generatelink
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-generatelink',
-    destination: '/docs/reference/javascript/v1/auth-api-generatelink',
+    destination: '/docs/reference/javascript/auth-admin-generatelink',
   },
   // v1: /auth-api-inviteuserbyemail
   // v2: /auth-admin-inviteuserbyemail
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
-    destination: '/docs/reference/javascript/v1/auth-api-inviteuserbyemail',
+    destination: '/docs/reference/javascript/auth-admin-inviteuserbyemail',
   },
   // v1: /auth-api-getuserbyid
   // v2: /auth-admin-getuserbyid
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-getuserbyid',
-    destination: '/docs/reference/javascript/v1/auth-api-getuserbyid',
+    destination: '/docs/reference/javascript/auth-admin-getuserbyid',
   },
   // v1: /auth-api-updateuserbyid
   // v2: /auth-admin-updateuserbyid
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-updateuserbyid',
-    destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
+    destination: '/docs/reference/javascript/auth-admin-updateuserbyid',
   },
   // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v1 docs instead
@@ -1628,7 +1628,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-sendmobileotp',
-    destination: '/docs/reference/javascript/v1/auth-api-sendmobileotp',
+    destination: '/docs/reference/javascript/auth-signinwithotp',
   },
 
   // realtime methods been replaced with new names
@@ -1673,7 +1673,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/auth-signin',
-    destination: '/docs/reference/dart/v0/auth-signin',
+    destination: '/docs/reference/dart/auth-signinwithpassword',
   },
   // v0: /auth-session
   // v1: /auth-currentsession
@@ -1700,12 +1700,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/removesubscription',
-    destination: '/docs/reference/dart/v0/removesubscription',
+    destination: '/docs/reference/dart/removechannel',
   },
   {
     permanent: true,
     source: '/docs/reference/dart/getsubscriptions',
-    destination: '/docs/reference/dart/v0/getsubscriptions',
+    destination: '/docs/reference/dart/getchannels',
   },
   {
     permanent: true,
@@ -2342,7 +2342,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',
-    destination: '/docs/guides/ai/examples/docs-search',
+    destination: '/docs/guides/ai/examples/nextjs-vector-search',
   },
   {
     permanent: true,
@@ -2489,7 +2489,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/bracket',
-    destination: '/partners/catalog/bracket',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2534,7 +2534,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/forestadmin',
-    destination: '/partners/catalog/forestadmin',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2569,7 +2569,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/passage',
-    destination: '/partners/catalog/passage',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2579,7 +2579,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/picket',
-    destination: '/partners/catalog/picket',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2589,7 +2589,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/polyscale',
-    destination: '/partners/catalog/polyscale',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2639,7 +2639,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/snaplet',
-    destination: '/partners/catalog/snaplet',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2749,7 +2749,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/sign-in-with-apple',
-    destination: '/docs/reference/dart/sign-in-with-id-token',
+    destination: '/docs/reference/dart/auth-signinwithidtoken',
   },
   {
     permanent: true,
@@ -2994,17 +2994,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/functions/debugging',
-    destination: '/docs/functions/logging',
+    destination: '/docs/guides/functions/logging',
   },
   {
     permanent: true,
     source: '/docs/guides/functions/log-drains',
-    destination: '/docs/platform/log-drains',
+    destination: '/docs/guides/observability/log-drains',
   },
   {
     permanent: true,
     source: '/docs/guides/functions/functions-headers',
-    destination: '/docs/functions/logging',
+    destination: '/docs/guides/functions/logging',
   },
   {
     permanent: true,
