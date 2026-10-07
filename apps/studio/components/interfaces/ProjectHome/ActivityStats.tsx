@@ -151,6 +151,8 @@ export const ActivityStats = () => {
   const integrationsPath = parentProjectRef
     ? `/project/${parentProjectRef}/settings/integrations`
     : undefined
+  // Only link once the project is known, so the card never points at a placeholder ref
+  const infrastructurePath = project?.ref ? getInfrastructurePath(project.ref) : undefined
 
   return (
     <div className="@container">
@@ -158,7 +160,7 @@ export const ActivityStats = () => {
         <ServiceStatus />
 
         <SingleStat
-          href={getInfrastructurePath(ref)}
+          href={infrastructurePath}
           icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Compute size</span>}
           value={
