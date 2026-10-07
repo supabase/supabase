@@ -31,7 +31,7 @@ Your requests are identified and tracked using one of the following identifiers,
 2. **User ID**: If your request is authenticated with a personal access token
 3. **IP Address**: If your request is unauthenticated (extracted from request headers)
 
-Each identifier is combined with the scope (project, organization, or endpoint) to create a unique tracking key. This ensures that rate limits are isolated per user and per scope, preventing one project or organization from affecting another.
+Each identifier is combined with the scope (project or organization) and the endpoint to create a unique tracking key. This ensures that rate limits are isolated per user and per scope, preventing one project or organization from affecting another.
 
 ### Who the limit applies to
 
