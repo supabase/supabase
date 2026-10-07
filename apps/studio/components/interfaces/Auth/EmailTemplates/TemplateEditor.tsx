@@ -88,10 +88,9 @@ const getPreviewSrcDoc = (html: string) => {
 
 export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-  ])
+  )
   const canEdit = canUpdateConfig && !isReadOnly
 
   const { id, properties } = template

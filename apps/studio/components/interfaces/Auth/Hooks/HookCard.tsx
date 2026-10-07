@@ -23,7 +23,7 @@ interface HookCardProps {
 
 export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) => {
   const { can: canUpdateAuthHook } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_HOOKS_WRITE
   )
 
   return (

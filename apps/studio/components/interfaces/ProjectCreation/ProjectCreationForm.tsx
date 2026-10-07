@@ -126,9 +126,8 @@ export const ProjectCreationForm = ({
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { can: isAdmin } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE)
-  // TODO(Hieu) create new perm
   const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
   const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(

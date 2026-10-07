@@ -35,7 +35,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type PublishedAppsSort = 'created:asc' | 'created:desc'
@@ -50,8 +50,8 @@ export const PublishableApps = () => {
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('oauth_apps_read')
-  const { can: canCreateOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_write')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
+  const { can: canCreateOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE)
 
   const {
     data: publishedApps,

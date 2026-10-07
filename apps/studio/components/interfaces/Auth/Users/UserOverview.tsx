@@ -65,20 +65,20 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 
   const { can: canUpdateUser } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
   const { can: canSendMagicLink } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
   const { can: canSendRecovery } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canSendOtp } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE)
+  const { can: canSendOtp } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE)
   const { can: canRemoveUser } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
   const { can: canRemoveMFAFactors } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const [successAction, setSuccessAction] = useState<

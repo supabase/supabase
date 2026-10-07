@@ -25,7 +25,6 @@ vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
     PROJECT: {
       AUTH_CONFIG_READ: 'auth_config_read',
       AUTH_CONFIG_WRITE: 'auth_config_write',
-      ADMIN_WRITE: 'project_admin_write',
     },
   },
 }))

@@ -38,7 +38,7 @@ const CreateUserFormSchema = z.object({
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
   const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const { mutate: createUser, isPending: isCreatingUser } = useUserCreateMutation({

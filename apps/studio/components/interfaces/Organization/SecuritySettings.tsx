@@ -18,7 +18,7 @@ import { useOrganizationMembersQuery } from '@/data/organizations/organization-m
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
 import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -37,12 +37,10 @@ export const SecuritySettings = () => {
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })
 
-  // TODO(Hieu): org member (aka project scoped user) can already access organization_admin_read, so we should gate org config
-  // reads behind a new dedicated permission with readonly as the minimum required role.
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
-    'organization_config_read'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ
   )
-  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2('organization_config_write')
+  const { can: canUpdateMfaConfig } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE)
   const track = useTrack()
 
   const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =

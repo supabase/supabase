@@ -29,7 +29,7 @@ import {
   type GitHubConnection,
 } from '@/data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
@@ -63,12 +63,12 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   const { data: org } = useSelectedOrganizationQuery()
 
   const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('organization_integrations_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
   const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery({

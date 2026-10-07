@@ -19,7 +19,7 @@ import {
   usePartnerIntegrationsQuery,
 } from '@/data/partners/integration-status-query'
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
 
@@ -74,7 +74,7 @@ export const useProjectOAuthIntegrationData = (
   // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
   // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
   // are unaffected by this.
-  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_read', {
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ, {
     organizationSlug: org?.slug,
     projectRef: null,
   })

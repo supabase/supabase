@@ -11,7 +11,7 @@ import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
@@ -20,7 +20,7 @@ export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_read', {
+  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ, {
     organizationSlug: org?.slug,
     projectRef: null,
   })

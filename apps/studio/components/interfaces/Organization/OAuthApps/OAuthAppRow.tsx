@@ -16,7 +16,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import CopyButton from '@/components/ui/CopyButton'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface OAuthAppRowProps {
   app: OAuthApp
@@ -25,8 +25,8 @@ export interface OAuthAppRowProps {
 }
 
 export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_write')
-  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2('oauth_apps_write')
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE)
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE)
 
   return (
     <TableRow>

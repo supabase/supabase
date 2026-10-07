@@ -19,10 +19,7 @@ vi.mock('sonner', () => ({
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
   useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
   FGA_PERMISSIONS: {
-    PROJECT: {
-      AUTH_CONFIG_WRITE: 'auth_config_write',
-      ADMIN_WRITE: 'project_admin_write',
-    },
+    PROJECT: { AUTH_CONFIG_WRITE: 'auth_config_write' },
   },
 }))
 

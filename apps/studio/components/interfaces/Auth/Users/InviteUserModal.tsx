@@ -49,7 +49,7 @@ const InviteUserModal = ({ visible, setVisible }: InviteUserModalProps) => {
     },
   })
   const { can: canInviteUsers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const onInviteUser: SubmitHandler<z.infer<typeof formSchema>> = async (values) => {

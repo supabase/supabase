@@ -56,10 +56,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-  ])
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+  )
 
   const shouldDisableField = (field: string): boolean => {
     const shouldDisableSmsFields =

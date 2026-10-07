@@ -30,7 +30,7 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
@@ -45,12 +45,12 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   const isBranch = project?.parent_project_ref !== undefined
 
   const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('organization_integrations_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
   const { can: canCreateVercelConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const { can: canUpdateVercelConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
@@ -127,8 +127,8 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   let connections =
     (isProjectScoped
       ? vercelIntegration?.connections.filter(
-          (connection) => connection.supabase_project_ref === project?.ref
-        )
+        (connection) => connection.supabase_project_ref === project?.ref
+      )
       : vercelIntegration?.connections) || []
 
   const ConnectionHeaderTitle = `${connections.length} project ${pluralize(

@@ -36,7 +36,7 @@ import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-co
 import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -60,10 +60,10 @@ export const GitHubIntegrationConnectionForm = ({
   const { hasAccess: hasAccessToBranching } = useCheckEntitlements('branching_limit')
 
   const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
-    'organization_integrations_write'
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const {
@@ -94,7 +94,7 @@ export const GitHubIntegrationConnectionForm = ({
   )
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
-    useCheckGithubBranchValidity({ onError: () => {} })
+    useCheckGithubBranchValidity({ onError: () => { } })
 
   const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
@@ -572,7 +572,7 @@ export const GitHubIntegrationConnectionForm = ({
                         className={cn(
                           'space-y-4 pl-6 border-l',
                           (!hasAccessToBranching || !newBranchPerPr) &&
-                            'opacity-25 pointer-events-none'
+                          'opacity-25 pointer-events-none'
                         )}
                       >
                         <FormField

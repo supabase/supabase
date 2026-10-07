@@ -64,10 +64,9 @@ export const BasicAuthSettingsForm = () => {
   const { can: canReadConfig, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-  ])
+  )
 
   const form = useForm({
     resolver: zodResolver(schema),

@@ -77,10 +77,9 @@ const RedirectToTemplates = () => {
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-  ])
+  )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
   const { data: selectedOrganization } = useSelectedOrganizationQuery()

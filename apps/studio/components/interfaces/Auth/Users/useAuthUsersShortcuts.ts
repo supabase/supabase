@@ -75,10 +75,10 @@ export function useAuthUsersShortcuts({
   )
 
   const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_READ
   )
   const { can: canInviteUsers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
   const showSendInvitation = useIsFeatureEnabled('authentication:show_send_invitation')
 

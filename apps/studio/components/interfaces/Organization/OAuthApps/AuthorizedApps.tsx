@@ -27,7 +27,7 @@ import { RevokeAppModal } from './RevokeAppModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { AuthorizedApp, useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
-import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 type AuthorizedAppsSort = 'authorized:asc' | 'authorized:desc'
 type AuthorizedAppsSortColumn = 'authorized'
@@ -39,7 +39,7 @@ export const AuthorizedApps = () => {
   const [authorizedAppsSort, setAuthorizedAppsSort] = useState<AuthorizedAppsSort>('authorized:asc')
 
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissionsV2('oauth_apps_read')
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
 
   const {
     data: authorizedApps,

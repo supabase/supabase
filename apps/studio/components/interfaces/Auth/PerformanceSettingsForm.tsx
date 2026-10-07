@@ -70,10 +70,9 @@ export const PerformanceSettingsForm = () => {
   const { can: canReadConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
-  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2([
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE,
-    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-  ])
+  )
 
   const [isUpdatingRequestDurationForm, setIsUpdatingRequestDurationForm] = useState(false)
   const [isUpdatingDatabaseForm, setIsUpdatingDatabaseForm] = useState(false)
@@ -392,8 +391,8 @@ export const PerformanceSettingsForm = () => {
                             <span className="text-foreground-light">
                               {chosenUnit === 'percent'
                                 ? Math.floor(
-                                    maxConnectionLimit * (Math.min(100, field.value!) / 100)
-                                  ).toString()
+                                  maxConnectionLimit * (Math.min(100, field.value!) / 100)
+                                ).toString()
                                 : Math.min(maxConnectionLimit, field.value!)}
                             </span>{' '}
                             / {maxConnectionLimit}

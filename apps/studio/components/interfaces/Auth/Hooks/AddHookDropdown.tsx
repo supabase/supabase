@@ -42,7 +42,7 @@ export const AddHookDropdown = ({
 
   const { data: authConfig } = useAuthConfigQuery({ projectRef })
   const { can: canUpdateAuthHook } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+    FGA_PERMISSIONS.PROJECT.AUTH_HOOKS_WRITE
   )
   const { getEntitlementSetValues: getEntitledHookSet } = useCheckEntitlements('auth.hooks')
   const entitledHookSet = getEntitledHookSet()
