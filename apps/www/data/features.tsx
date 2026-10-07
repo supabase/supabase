@@ -2168,7 +2168,7 @@ With the default ports, a second \`supabase start\` on the same machine fails wi
 2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or create the project with the stack commands turned on.
 3. Named environments: Start \`--stack dev\` and \`--stack test\` side by side in one app.
 4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
-5. Services start on demand: Postgres starts right away. Other services start on their first request and stop when idle, which keeps idle local projects light.
+5. Services start on demand: Postgres starts right away. Other services start on their first request. Most of them stop when idle, which keeps idle local projects light.
 
 ## Parallel local projects are valuable for:
 - Developers running coding agents in git worktrees
@@ -2192,7 +2192,7 @@ The \`supabase stack\` commands are experimental. Their interface can change bet
     title: 'Native runtime for local development',
     subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
     description: `
-The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. There, \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. To run there, [turn on the \`[experimental] stack\` setting](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands). Then \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
 
 It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
 

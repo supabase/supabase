@@ -4,7 +4,7 @@ import { platformComponents } from 'api-types'
 import * as common from 'common'
 import { HttpResponse } from 'msw'
 import { createLoader } from 'nuqs/server'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
 import { getUnifiedLogs, useUnifiedLogsInfiniteQuery } from './unified-logs-infinite-query'
@@ -15,6 +15,14 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 const now = new Date('2026-09-30T12:00:00.000Z')
 const search = createLoader(SEARCH_PARAMS_PARSER)(new URLSearchParams())
+
+beforeEach(() => {
+  vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
+    configcat: { otelUnifiedLogs: false },
+    posthog: {},
+    hasLoaded: true,
+  })
+})
 
 const createRow = (id: string, timestamp: number | string = now.getTime() * 1000) => ({
   id,
@@ -315,7 +323,11 @@ describe('getUnifiedLogs live polling', () => {
   ])(
     'retains Live bursts across refreshes with otel=$useOtel and overlap=$hasOverlap',
     async ({ useOtel, hasOverlap }) => {
-      vi.spyOn(common, 'useFlag').mockReturnValue(useOtel)
+      vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
+        configcat: { otelUnifiedLogs: useOtel },
+        posthog: {},
+        hasLoaded: true,
+      })
       const timestamp = Date.now() - (hasOverlap ? 30 * 1000 : 10 * 60 * 1000)
       const rows = Array.from({ length: 110 }, (_, index) =>
         createRow(`old-${String(index).padStart(3, '0')}`, (timestamp - index * 1000) * 1000 + 123)

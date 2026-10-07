@@ -16,9 +16,6 @@ async function getStatusPage(signal?: AbortSignal): Promise<StatusPageResponse> 
   })
 
   if (!response.ok) {
-    const errorText = await response.text()
-    console.error('[getStatusPage] Failed:', response.status, errorText)
-
     let retryAfter: number | undefined
     const retryAfterHeader = response.headers.get('Retry-After')
     if (retryAfterHeader !== null) {

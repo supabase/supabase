@@ -51,7 +51,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     ...options
   }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
 ) => {
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useQuery<TableEditorData, TableEditorError, TData>({
     ...tableEditorQueryOptions({ projectRef, connectionString, id, scoped }),

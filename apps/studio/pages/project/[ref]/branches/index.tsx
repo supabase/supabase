@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useState, type PropsWithChildren } from 'react'
 import { Button } from 'ui'
 
+import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
 import { DeleteBranchModal } from '@/components/interfaces/BranchManagement/DeleteBranchModal'
 import { Overview } from '@/components/interfaces/BranchManagement/Overview'
 import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
@@ -189,11 +190,7 @@ export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
         variant="text"
         icon={<MessageCircle className="text-muted" strokeWidth={1} />}
       >
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://github.com/orgs/supabase/discussions/18937"
-        >
+        <a target="_blank" rel="noreferrer" href={BRANCHING_GITHUB_DISCUSSION_LINK}>
           Branching feedback
         </a>
       </Button>

@@ -21,6 +21,7 @@ import {
 } from 'ui'
 
 import UpgradePlan from './UpgradePlan'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 const MobileHeader = ({
   description,
@@ -46,6 +47,17 @@ const MobileHeader = ({
 
   const selectedPlan = plans.find((p) => p.name === plan)!
   const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
+  const trackPlanCtaClick = () =>
+    sendTelemetryEvent({
+      action: 'www_pricing_plan_cta_clicked',
+      properties: {
+        plan,
+        showUpgradeText: false,
+        section: 'comparison_table',
+        tableMode: 'mobile',
+      },
+      ...(orgSlug && { groups: { organization: orgSlug } }),
+    })
 
   return (
     <div className="mt-8 px-4 mobile-header">
@@ -84,23 +96,15 @@ const MobileHeader = ({
         />
       ) : (
         <Button asChild size="medium" variant={plan === 'Enterprise' ? 'default' : 'primary'} block>
-          <Link
-            href={selectedPlan.href}
-            onClick={() =>
-              sendTelemetryEvent({
-                action: 'www_pricing_plan_cta_clicked',
-                properties: {
-                  plan,
-                  showUpgradeText: false,
-                  section: 'comparison_table',
-                  tableMode: 'mobile',
-                },
-                ...(orgSlug && { groups: { organization: orgSlug } }),
-              })
-            }
-          >
-            {selectedPlan.cta}
-          </Link>
+          {isCrossZoneHref(selectedPlan.href) ? (
+            <a href={selectedPlan.href} onClick={trackPlanCtaClick}>
+              {selectedPlan.cta}
+            </a>
+          ) : (
+            <Link href={selectedPlan.href} onClick={trackPlanCtaClick}>
+              {selectedPlan.cta}
+            </Link>
+          )}
         </Button>
       )}
     </div>
@@ -407,6 +411,17 @@ const PricingComparisonTable = ({
 
               {plans.map((plan) => {
                 const isUpgradablePlan = plan.name === 'Pro' || plan.name === 'Team'
+                const trackPlanCtaClick = () =>
+                  sendTelemetryEvent({
+                    action: 'www_pricing_plan_cta_clicked',
+                    properties: {
+                      plan: plan.name,
+                      showUpgradeText: false,
+                      section: 'comparison_table',
+                      tableMode: 'desktop',
+                    },
+                    ...(orgSlug && { groups: { organization: orgSlug } }),
+                  })
 
                 return (
                   <th
@@ -463,23 +478,15 @@ const PricingComparisonTable = ({
                             variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                             block
                           >
-                            <Link
-                              href={plan.href}
-                              onClick={() =>
-                                sendTelemetryEvent({
-                                  action: 'www_pricing_plan_cta_clicked',
-                                  properties: {
-                                    plan: plan.name,
-                                    showUpgradeText: false,
-                                    section: 'comparison_table',
-                                    tableMode: 'desktop',
-                                  },
-                                  ...(orgSlug && { groups: { organization: orgSlug } }),
-                                })
-                              }
-                            >
-                              {plan.cta}
-                            </Link>
+                            {isCrossZoneHref(plan.href) ? (
+                              <a href={plan.href} onClick={trackPlanCtaClick}>
+                                {plan.cta}
+                              </a>
+                            ) : (
+                              <Link href={plan.href} onClick={trackPlanCtaClick}>
+                                {plan.cta}
+                              </Link>
+                            )}
                           </Button>
                         )}
                       </span>
