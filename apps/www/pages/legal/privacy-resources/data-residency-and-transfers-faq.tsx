@@ -11,7 +11,7 @@ import { NextSeo } from 'next-seo'
 const meta = {
   title: 'Data Residency and Transfers FAQ | Supabase',
   description:
-    'Answers to common questions about where Supabase hosts and processes your data, international data transfers, retention, and data subject rights.',
+    'Answers to common questions about where Supabase processes your data, subprocessors, international data transfers, retention, and data subject rights.',
   canonical: 'https://supabase.com/legal/privacy-resources/data-residency-and-transfers-faq',
 }
 
