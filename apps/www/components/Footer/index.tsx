@@ -119,6 +119,8 @@ const Footer = (props: Props) => {
             </Link>
             <div className="flex space-x-5">
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://twitter.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -127,6 +129,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://github.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -135,6 +139,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://discord.supabase.com/"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -143,6 +149,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://youtube.com/c/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -151,6 +159,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.tiktok.com/@supabase.com"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -159,6 +169,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.instagram.com/supabasecom"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
