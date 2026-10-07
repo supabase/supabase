@@ -182,11 +182,12 @@ test('dismissal during enablement prevents a late response opening creation', as
   expect(await screen.findByRole('menuitem', { name: 'Disable Pipelines' })).toBeInTheDocument()
   expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
 })
-test('Analytics Bucket keeps its existing creation path without ETL enablement', async () => {
+test('creation defaults to BigQuery regardless of legacy destination flags', async () => {
   options.legacy = true
+  isEnabled = true
   await renderList()
   addPipeline()
-  await screen.findByRole('heading', { name: 'Creation sheet: Analytics Bucket' })
+  await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
 })
 test.each(['loading', 'error'])('blocks creation when source status is %s', async (state) => {
   let finish: (() => void) | undefined

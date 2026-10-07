@@ -31,13 +31,6 @@ import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -100,24 +93,6 @@ export const Destinations = () => {
   const { data: organization } = useSelectedOrganizationQuery()
 
   useRedirectLegacyReadReplicaDestination()
-
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-
-  const newDestinationDefaultType: DestinationType | null = etlEnableBigQuery
-    ? 'BigQuery'
-    : etlEnableIceberg
-      ? 'Analytics Bucket'
-      : etlEnableDucklake
-        ? 'DuckLake'
-        : etlEnableSnowflake
-          ? 'Snowflake'
-          : etlEnableClickHouse
-            ? 'ClickHouse'
-            : null
 
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -238,27 +213,20 @@ export const Destinations = () => {
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
-  const canCreate =
-    !!newDestinationDefaultType &&
-    (newDestinationDefaultType === 'Analytics Bucket' || isSourcesSuccess)
-
-  const isCheckingPipelineStatus =
-    !!newDestinationDefaultType &&
-    newDestinationDefaultType !== 'Analytics Bucket' &&
-    !isSourcesSuccess &&
-    !isSourcesError
+  const canCreate = isSourcesSuccess
+  const isCheckingPipelineStatus = !isSourcesSuccess && !isSourcesError
   const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
 
   const openDestinationPanel = () => {
     if (!canCreate) return
-    if (replicationNotEnabled && newDestinationDefaultType !== 'Analytics Bucket') {
-      pendingCreationTypeRef.current = newDestinationDefaultType
+    if (replicationNotEnabled) {
+      pendingCreationTypeRef.current = 'BigQuery'
       setShowEnablePipelinesDialog(true)
       return
     }
-    setDestinationType(newDestinationDefaultType)
+    setDestinationType('BigQuery')
   }
 
   const handleEnableDialogOpenChange = (open: boolean) => {
@@ -411,7 +379,7 @@ export const Destinations = () => {
           {isDestinationsLoading ? 'Loading pipelines' : ''}
         </p>
 
-        {isSourcesError && newDestinationDefaultType !== 'Analytics Bucket' && (
+        {isSourcesError && (
           <AlertError
             projectRef={projectRef}
             error={sourcesError}
