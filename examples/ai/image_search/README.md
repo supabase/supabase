@@ -2,7 +2,7 @@
 
 In this example we're implementing image search using the [OpenAI CLIP Model](https://github.com/openai/CLIP), which was trained on a variety of (image, text)-pairs.
 
-We're implementing two methods in the [`/image_search/main.py` file](/image_search/main.py):
+We're implementing two methods in the [`/image_search/main.py` file](./image_search/main.py):
 
 1. The `seed` method generates embeddings for the images in the `images` folder and upserts them into a collection in Supabase Vector.
 2. The `search` method generates an embedding from the search query and performs a vector similarity search query.
