@@ -32,6 +32,14 @@ describe('parseNumericValue', () => {
   it('returns 0 for undefined', () => {
     expect(parseNumericValue(undefined)).toBe(0)
   })
+
+  it('returns 0 for non-finite numeric values (NaN, Infinity, -Infinity)', () => {
+    // NaN has typeof === 'number', so the naive `if (typeof val === 'number') return val`
+    // would silently propagate NaN into metric gauges (showing "NaN%" on the dashboard).
+    expect(parseNumericValue(NaN)).toBe(0)
+    expect(parseNumericValue(Infinity)).toBe(0)
+    expect(parseNumericValue(-Infinity)).toBe(0)
+  })
 })
 
 describe('parseInfrastructureMetrics', () => {
