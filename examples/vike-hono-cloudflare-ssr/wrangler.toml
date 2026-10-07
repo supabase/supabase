@@ -1,0 +1,11 @@
+name = "vike-hono-supabase-ssr"
+main = "server.ts"
+compatibility_date = "2024-08-21"
+
+[vars]
+SUPABASE_URL = "your-supabase-url"
+SUPABASE_ANON_KEY = "your-supabase-anon-key"
+
+# For production, use wrangler secrets:
+# wrangler secret put SUPABASE_URL
+# wrangler secret put SUPABASE_ANON_KEY
