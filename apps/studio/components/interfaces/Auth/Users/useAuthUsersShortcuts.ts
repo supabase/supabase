@@ -75,7 +75,7 @@ export function useAuthUsersShortcuts({
   )
 
   const { can: canCreateUsers } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_USERS_READ
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
   const { can: canInviteUsers } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
