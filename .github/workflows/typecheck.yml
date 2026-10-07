@@ -46,8 +46,8 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      # Independent turbo pipelines, so run them side by side. Both always
-      # finish, so a typecheck failure no longer hides lint errors.
+      # Independent turbo pipelines, run side by side so a typecheck failure
+      # doesn't hide lint errors.
       - parallel:
           - name: Run TypeScript type check
             run: pnpm run typecheck
