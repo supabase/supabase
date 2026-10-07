@@ -887,4 +887,34 @@ describe('generateUpdateRowPayload', () => {
     const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
     expect(payload).toEqual({ price: '90' })
   })
+
+  it('should not re-send untouched json columns', () => {
+    // A jsonb value as the grid returns it (text). Re-sending it would round the big integer.
+    const payload_json = '{"tweet_id": 1836486125467611137, "big": 1e400}'
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'name', format: 'text', value: 'b' }),
+      createField({ name: 'payload', format: 'jsonb', value: payload_json }),
+    ]
+    const payload = generateUpdateRowPayload({ id: '1', name: 'a', payload: payload_json }, fields)
+    expect(payload).toEqual({ name: 'b' })
+  })
+
+  it('should not re-send a null json column saved as the string "null"', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'payload', format: 'jsonb', value: 'null' }),
+    ]
+    const payload = generateUpdateRowPayload({ id: '1', payload: null }, fields)
+    expect(payload).toEqual({})
+  })
+
+  it('should send json columns whose text was edited', () => {
+    const fields: RowField[] = [
+      createField({ name: 'id', format: 'int8', value: '1', isPrimaryKey: true }),
+      createField({ name: 'payload', format: 'jsonb', value: '{"a": 2}' }),
+    ]
+    const payload = generateUpdateRowPayload({ id: '1', payload: '{"a": 1}' }, fields)
+    expect(payload).toEqual({ payload: { a: 2 } })
+  })
 })
