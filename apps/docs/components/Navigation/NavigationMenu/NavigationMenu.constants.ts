@@ -1169,8 +1169,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/custom-postgres-config' as `/${string}`,
         },
         {
-          name: 'Vacuum management',
-          url: '/guides/database/postgres/vacuum-management' as `/${string}`,
+          name: 'Autovacuum management',
+          url: '/guides/database/postgres/autovacuum-management' as `/${string}`,
         },
       ],
     },

@@ -1,5 +1,5 @@
 ---
-title: 'Vacuum management'
+title: 'Autovacuum management'
 description: 'Monitor and tune autovacuum to control bloat and prevent transaction ID wraparound'
 subtitle: 'Prevent table bloat and transaction ID wraparound'
 footerHelpType: 'postgres'
@@ -14,7 +14,6 @@ Use this guide in the order that matches your situation:
 - [How autovacuum works](#how-autovacuum-works): background on row versioning and why vacuuming is necessary.
 - [Monitoring autovacuum](#monitoring-autovacuum): check bloat levels, wraparound risk, and vacuum activity.
 - [Tuning autovacuum](#tuning-autovacuum): control how often and how aggressively autovacuum runs.
-- [Recovering from immediate vacuum problems](#recovering-from-immediate-vacuum-problems): remove vacuum blockers, manage emergency vacuums, and immediately reclaim disk space.
 
 ## How autovacuum works
 
@@ -75,7 +74,7 @@ This section helps you measure the main symptoms of a poorly tuned vacuum: bloat
 
 ### Checking table bloat
 
-There's no universal healthy range for bloat, but levels above 20% are often a sign of a poorly tuned vacuum. For tables with tens of millions of rows, consider stricter thresholds, such as 5% to 15%. If you identify a problem table, review [Vacuum frequency configurations](#vacuum-frequency-configurations) to make it vacuum more often.
+There's no universal healthy range for bloat, but levels above 20% are often a sign of a poorly tuned vacuum. For tables with tens of millions of rows, consider stricter thresholds, such as 5% to 15%. If you identify a problem table, review [Vacuum frequency configurations](#vacuum-frequency-configurations) to make it vacuum more often. 
 
 Measuring bloat precisely requires scanning an entire table, which becomes expensive as it grows. Start with an estimate across all tables, then confirm any outliers with a precise check.
 
@@ -431,7 +430,7 @@ You can change the setting with the [Supabase CLI](/docs/guides/local-developmen
 
 ```sh
 supabase --experimental \
-postgres-config update --config log_autovacuum_min_duration=5s \
+postgres-config update --config log_autovacuum_min_duration=15s \
 --project-ref <project-ref>
 ```
 
@@ -443,7 +442,7 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
   --header 'Content-Type: application/json' \
   --header 'Authorization: Bearer ACCESS_TOKEN' \
   --data '{
-  "log_autovacuum_min_duration": "5s"
+  "log_autovacuum_min_duration": "15s"
 }'
 ```
 
@@ -457,7 +456,7 @@ automatic vacuum of table "postgres.public.vac_test": index scans: 5
 automatic analyze of table "postgres.public.vac_test"
 ```
 
-Besides recording that a vacuum ran, the entry reports how many index scan passes it needed. An `index scans` value greater than 1 means the vacuum ran out of memory and had to re-scan indexes, which can impose significant performance costs. See [Vacuum memory](#vacuum-memory) to fix this, and [Vacuum frequency configurations](#vacuum-frequency-configurations) to spread vacuum work out over time instead of in large, intense runs.
+Besides recording that a vacuum ran, the entry reports how many index scan passes it needed. An `index scans` value greater than 1 means the vacuum ran out of memory and had to re-scan indexes, which can impose significant performance costs. See [Vacuum memory](#vacuum-memory) to fix this, and [Vacuum frequency configurations](#vacuum-frequency-configurations) to spread vacuum work out over more smaller runs instead of in large, intense ones.
 
 ### Uncovering wraparound risks
 
@@ -486,7 +485,7 @@ automatic aggressive vacuum to prevent wraparound of table "TABLE_NAME"...
 
 These aggressive vacuums are more intensive than normal vacuum activity and can introduce greater disk and CPU strain. If `transaction_ids_used` regularly climbs toward 200 million, consider [tuning autovacuum](#tuning-autovacuum) to run more often rather than paying the cost of repeated aggressive vacuums.
 
-#### Signs of imminent wraparound
+#### Signs of inevitable wraparound
 
 If an aggressive vacuum can't complete, your database begins logging wraparound warnings:
 
@@ -494,7 +493,8 @@ If an aggressive vacuum can't complete, your database begins logging wraparound 
 oldest xmin is far in the past
 ```
 
-If you see these warnings, or a table's `transaction_ids_used` keeps climbing past 200 million, go to [Recovering from wraparound risk](#recovering-from-wraparound-risk).
+If you see these warnings, or a table's `transaction_ids_used` keeps climbing past 200 million, go to [Recovering from wraparound risk](/docs/guides/troubleshooting/postgres-recovering-from-wraparound-risk).
+
 
 ## Tuning autovacuum
 
@@ -510,7 +510,6 @@ The autovacuum launcher checks every minute for tables that need attention. A ta
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
-  defaultValue={['update-and-delete-threshold']}
 >
   <AccordionItem
 
@@ -634,6 +633,13 @@ alter table public.mytable set (
 );
 ```
 
+
+<Admonition type="note">
+
+Normal autovacuums do not immediately remove all bloat. If a table has already accummulated a problematic amount of bloat, check the troubleshooting guide [Remove table bloat immediately](/docs/guides/troubleshooting/postgres-clearing-bloat).
+
+</Admonition>
+
 ### Throttle vacuum resource usage
 
 Vacuuming a large table can cause CPU and disk spikes. The first lever is [vacuum frequency configurations](#vacuum-frequency-configurations): lowering the scale factors trades infrequent, aggressive runs for frequent, low-intensity ones.
@@ -653,7 +659,7 @@ As an example, a vacuum that makes 9 previously clean pages dirty, costing 180, 
 You can change the setting at the database level:
 
 ```sql
-alter database postgres set vacuum_cost_page_hit = 400;
+alter database postgres set vacuum_cost_limit = 400;
 ```
 
 However, the `autovacuum_vacuum_cost_delay` can only be set with the CLI or management API:
@@ -716,6 +722,56 @@ A memory-starved vacuum has to make multiple passes over a table's indexes. You 
 
 If your vacuums take too long, consider raising the memory limit. 
 
+You can change two of the settings at the database level:
+
+```sql
+alter database postgres set vacuum_buffer_usage_limit = '4MB';
+```
+
+However, the autovacuum_vacuum_cost_delay can only be set with the CLI or management API:
+
+<Accordion
+  type="default"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <AccordionItem
+    header="Configure autovacuum_work_mem"
+    id="configure-autovacuum-work-mem"
+  >
+
+You can change `autovacuum_work_mem` with the [Supabase CLI](/docs/guides/local-development/cli/getting-started):
+
+```sh
+supabase --experimental \
+postgres-config update --config autovacuum_work_mem=1GB \
+--project-ref <project-ref>
+```
+
+Or with the [Management API](/docs/reference/api/introduction), using an [access token](/dashboard/account/tokens):
+
+```sh
+curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
+  --request PUT \
+  --header 'Content-Type: application/json' \
+  --header 'Authorization: Bearer ACCESS_TOKEN' \
+  --data '{
+  "autovacuum_work_mem": "1GB"
+}'
+```
+
+  </AccordionItem>
+</Accordion>
+
+
+For compute sizes above XL, `1GB` is an appropriate `autovacuum_work_mem` value. Memory claimed by vacuums competes with normal app activity, so check your [memory usage](/dashboard/project/_/observability/database) first to make sure a higher limit won't cause memory strain during vacuum runs.
+
+### Vacuum workers
+
+By default, up to `3` autovacuum workers run simultaneously, each vacuuming a single table per wake-up cycle. If many tables stay bloated despite [lowering the thresholds](#lowering-the-thresholds-for-a-busy-table), consider raising `autovacuum_max_workers` to ensure there are enough for your instance.
+
 <Accordion
   type="default"
   chevronAlign="right"
@@ -757,16 +813,20 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
   </AccordionItem>
 </Accordion>
 
-For compute sizes above XL, `1GB` is an appropriate value. Memory claimed by vacuums competes with normal app activity, so check your [memory usage](/dashboard/project/_/observability/database) first to make sure a higher limit won't cause memory strain during vacuum runs.
-
-### Vacuum workers
-
-By default, up to 3 autovacuum workers run simultaneously, each vacuuming a single table per wake-up cycle. If many tables stay bloated despite [lowering the thresholds](#lowering-the-thresholds-for-a-busy-table), consider raising `autovacuum_max_workers` to ensure there are enough for your instance.
 
 Two settings interact with the worker count:
 
 - Each worker can claim up to `autovacuum_work_mem`, so more workers means more total memory use. Review [system memory usage](/dashboard/project/_/observability/database) before incrementing the setting.
 - All workers share one [`autovacuum_vacuum_cost_limit`](#throttle-vacuum-resource-usage) budget. When you add workers, raise the cost limit too, or each worker gets throttled harder.
+
+### Wraparound thresholds
+
+When a table's oldest unfrozen transaction ID grows older than `autovacuum_freeze_max_age` (default: 200 million transactions), Postgres launches an [aggressive anti-wraparound vacuum](#uncovering-wraparound-risks), which can be expensive on large tables.
+
+The most effective way to avoid these runs is to make routine vacuums happen more often by [lowering the scale factors](#lowering-the-thresholds-for-a-busy-table), so transaction IDs are recycled before the table ever approaches the limit.
+
+You can set the `autovacuum_freeze_max_age` globally with the Supabase API or CLI:
+
 
 <Accordion
   type="default"
@@ -776,15 +836,21 @@ Two settings interact with the worker count:
   className="text-foreground-light mt-8 mb-6"
 >
   <AccordionItem
-    header="Configure autovacuum_work_mem"
-    id="configure-autovacuum-work-mem"
+    header="Configure autovacuum_freeze_max_age"
+    id="configure-freeze_max_age"
   >
 
-You can change `autovacuum_work_mem` with the [Supabase CLI](/docs/guides/local-development/cli/getting-started):
+<Admonition type="caution">
+
+Changing `autovacuum_freeze_max_age` requires a server restart, which causes a few seconds of downtime. By default, the API and CLI automatically trigger the restart when updating this setting. To defer the change until a later restart, pass the `--no-restart` flag to the CLI or `"restart_database": false` to the API data.
+
+</Admonition>
+
+Modifying configurations with the [Supabase CLI](/docs/guides/local-development/cli/getting-started):
 
 ```sh
 supabase --experimental \
-postgres-config update --config autovacuum_work_mem=1GB \
+postgres-config update --config autovacuum_freeze_max_age=300000000 \
 --project-ref <project-ref>
 ```
 
@@ -796,18 +862,12 @@ curl https://api.supabase.com/v1/projects/PROJECT_REF/config/database/postgres \
   --header 'Content-Type: application/json' \
   --header 'Authorization: Bearer ACCESS_TOKEN' \
   --data '{
-  "autovacuum_work_mem": "1GB"
+  "autovacuum_freeze_max_age": 300000000
 }'
 ```
 
   </AccordionItem>
 </Accordion>
-
-### Wraparound thresholds
-
-When a table's oldest unfrozen transaction ID grows older than `autovacuum_freeze_max_age` (default: 200 million transactions), Postgres launches an [aggressive anti-wraparound vacuum](#uncovering-wraparound-risks), which can be expensive on large tables.
-
-The most effective way to avoid these runs is to make routine vacuums happen more often by [lowering the scale factors](#lowering-the-thresholds-for-a-busy-table), so transaction IDs are recycled before the table ever approaches the limit.
 
 You can also set `autovacuum_freeze_max_age` per table, but only to a _lower_ value: Postgres ignores per-table values that are larger than the system-wide setting. Lowering it makes anti-wraparound vacuums more frequent but smaller:
 
@@ -815,143 +875,3 @@ You can also set `autovacuum_freeze_max_age` per table, but only to a _lower_ va
 alter table your_table_name set (autovacuum_freeze_max_age = 150000000);
 ```
 
-## Recovering from immediate vacuum problems
-
-This section covers correcting problems that monitoring surfaced: a table at risk of wraparound, an emergency vacuum disrupting your app, and disk space held by bloat.
-
-### Recovering from wraparound risk
-
-First, confirm the risk with the [wraparound check query](#uncovering-wraparound-risks). If a table's `transaction_ids_used` is past 200 million and still climbing, something is likely preventing the vacuum from freezing rows. Remove potential blockers by reviewing the following checklist:
-
-1. Remove dead replication slots. These are the most common blocker:
-
-   ```sql
-   -- find dead slots
-   select * from pg_replication_slots where wal_status = 'lost';
-
-   -- drop the dead slots
-   select pg_drop_replication_slot(slot_name)
-   from pg_replication_slots
-   where wal_status = 'lost';
-   ```
-
-2. Roll back orphaned prepared transactions:
-
-   ```sql
-   -- check for old prepared transactions
-   select age(transaction), * from pg_prepared_xacts;
-
-   -- once an orphaned transaction is identified, roll it back
-   rollback prepared 'your_transaction_id';
-   ```
-
-3. Terminate long-running transactions:
-
-   ```sql
-   -- find old transactions
-   select
-     pid,
-     query,
-     datname,
-     usename,
-     state,
-     backend_xmin,
-     backend_xid,
-     now() - xact_start as time_running
-   from pg_stat_activity
-   where
-     (backend_xmin is not null or backend_xid is not null)
-     or
-     (now() - xact_start <= interval '30 minutes' and state <> 'idle')
-   order by greatest(age(backend_xmin), age(backend_xid)) desc
-   limit 10;
-
-   -- if a transaction is unusually old or referenced in the xmin warning logs, kill it
-   select pg_terminate_backend(pid)
-   from pg_stat_activity
-   where pid = <connection_id>;
-   ```
-
-If the wraparound checks show a clear problem but you can't find any blockers, [contact support](/dashboard/support/new). This can be a sign of orphaned rows caused by operating system or Postgres bugs.
-
-### Control a disruptive emergency vacuum
-
-When a table's vacuum has been blocked for long enough, the eventual anti-wraparound vacuum can be very intensive. If it's too disruptive, you can terminate it manually:
-
-```sql
--- get vacuum process ids
-select
-  pid,
-  application_name,
-  backend_start,
-  xact_start,
-  state,
-  backend_type,
-  now() - coalesce(xact_start, backend_start) as time_running,
-  query
-from pg_stat_activity
-where backend_type like '%autovacuum worker%';
-
--- kill the vacuum
-select pg_terminate_backend(pid)
-from pg_stat_activity
-where pid = <pid>;
-```
-
-The table still needs vacuuming, so follow up with a manual vacuum that skips index cleanup. This leaves the indexes bloated but reduces the intensity of the run:
-
-```sql
-vacuum (index_cleanup false) table_name;
-```
-
-Afterwards, you can remove the index bloat by reindexing:
-
-```sql
--- raise the timeout so long reindexes aren't cancelled
-set statement_timeout = '10min';
-
--- remove bloat for an individual index
-reindex index concurrently my_index;
-
--- remove bloat for all indexes on a table (more intensive)
-reindex table concurrently my_table;
-```
-
-A failed `reindex concurrently` leaves behind invalid indexes. Check for them with:
-
-```sql
-select
-  indexrelid::regclass as idx_name,
-  indisvalid as is_valid
-from pg_index
-where indisvalid = false;
-```
-
-If you find an invalid index, reindex it again or drop it:
-
-```sql
-drop index concurrently my_invalid_index;
-```
-
-### Immediately reclaim disk space
-
-A plain vacuum marks dead space as reusable for future writes, but it does not compact the table.
-
-```sql
--- dead rows will be cleared, but they will leave behind a lot of free space
-vacuum my_table;
-```
-
-To immediately return free space to the system, the table must be rewritten. `vacuum full` does this, but takes the table offline until it completes or fails:
-
-```sql
-vacuum full my_table;
-```
-
-Instead of `vacuum full`, consider the [`pg_repack` extension](/docs/guides/database/extensions/pg_repack). It achieves the same result without taking the table offline.
-
-<Admonition type="caution">
-
-Both `vacuum full` and `pg_repack` create a full copy of the table, potentially doubling the disk space the table claims for the duration of the operation. Check your [I/O and storage charts](/dashboard/project/_/observability/database) beforehand. If your system is constrained, consider modifying your [disk settings](/dashboard/project/_/settings/infrastructure) before cleanup.
-
-</Admonition>
