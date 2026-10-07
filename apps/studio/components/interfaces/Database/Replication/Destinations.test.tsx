@@ -36,8 +36,10 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
   },
 }))
 let isEnabled = false
+let enableGate: Promise<void> | undefined
 beforeEach(() => {
   isEnabled = false
+  enableGate = undefined
   options.legacy = false
   options.hasAccess = true
   options.isLoading = false
@@ -95,7 +97,8 @@ beforeEach(() => {
   addAPIMock({
     method: 'post',
     path: '/platform/replication/:ref/tenants-sources',
-    response: () => {
+    response: async () => {
+      await enableGate
       if (options.failEnable) {
         options.failEnable = false
         return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 })
@@ -163,24 +166,12 @@ test.each([true, false, 'retry', 'refresh error'])(
 )
 test('dismissal during enablement prevents a late response opening creation', async () => {
   let finish: (() => void) | undefined
-  addAPIMock({
-    method: 'post',
-    path: '/platform/replication/:ref/tenants-sources',
-    response: async () => {
-      await new Promise<void>((resolve) => {
-        finish = resolve
-      })
-      isEnabled = true
-      return HttpResponse.json<components['schemas']['CreateTenantSourceResponse_Output']>({
-        source_id: 42,
-        tenant_id: 'tenant',
-      })
-    },
+  enableGate = new Promise<void>((resolve) => {
+    finish = resolve
   })
   await renderList()
   addPipeline()
   fireEvent.click(await screen.findByRole('button', { name: 'Enable' }))
-  await waitFor(() => expect(finish).toBeDefined())
   fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   finish?.()

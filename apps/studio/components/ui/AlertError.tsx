@@ -3,10 +3,7 @@ import { PropsWithChildren, useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'
 import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -58,7 +55,7 @@ export const AlertError = ({
   projectRef,
   orgSlug,
   subject,
-  description = 'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.',
+  description = 'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.',
   error,
   className,
   showIcon = true,
@@ -101,33 +98,25 @@ export const AlertError = ({
               {formattedErrorMessage}
             </p>
           )}
-          {showInstructions && (
-            <p>
-              {description.split(/(contact support)/i).map((part, index) =>
-                !hideContactSupport && part.toLowerCase() === 'contact support' ? (
-                  <InlineLink
-                    key={index}
-                    href={createSupportFormUrl({
-                      category: SupportCategories.DASHBOARD_BUG,
-                      projectRef,
-                      orgSlug,
-                      subject,
-                      error: error?.message,
-                    })}
-                    onClick={() => takeBreadcrumbSnapshot()}
-                  >
-                    {part}
-                  </InlineLink>
-                ) : (
-                  part
-                )
-              )}
-            </p>
-          )}
+          {showInstructions && <p>{description}</p>}
           {children}
         </>
       }
-      actions={additionalActions}
+      actions={
+        additionalActions || !hideContactSupport ? (
+          <>
+            {additionalActions}
+            {!hideContactSupport && (
+              <ContactSupportButton
+                projectRef={projectRef}
+                orgSlug={orgSlug}
+                subject={subject}
+                error={error}
+              />
+            )}
+          </>
+        ) : null
+      }
       className={className}
     />
   )
