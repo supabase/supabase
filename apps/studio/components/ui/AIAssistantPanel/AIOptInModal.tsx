@@ -70,13 +70,13 @@ export const AIOptInModal = ({ visible, onCancel, requiredLevel, onSaved }: AIOp
             <DialogSectionSeparator />
 
             <DialogSection className="space-y-4 pb-0" padding="small">
-              {proposedLevel && (
-                <Admonition
-                  type="default"
-                  title="The Assistant needs more access to answer your question"
-                  description={`This applies to every project in ${organization?.name ?? 'this organization'}.`}
-                />
-              )}
+              <Admonition
+                type="warning"
+                title={`This changes the opt-in level for every project in ${organization?.name ?? 'this organization'}`}
+                description={
+                  proposedLevel && 'The Assistant needs more access to answer your question.'
+                }
+              />
               <AIOptInLevelSelector
                 control={form.control}
                 disabled={!canUpdateOrganization || isUpdating}
