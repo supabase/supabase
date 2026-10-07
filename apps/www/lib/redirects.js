@@ -813,12 +813,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/connecting/direct-connections',
-    destination: '/docs/guides/database/connecting-to-postgres',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting/direct-connections',
-    destination: '/docs/guides/database/connecting-to-postgres/pooling-and-limits',
+    destination: '/docs/guides/database/connecting-to-postgres/#direct-connection',
   },
   {
     permanent: true,
