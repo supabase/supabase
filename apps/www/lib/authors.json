@@ -1047,5 +1047,13 @@
     "position": "Product Manager",
     "author_url": "https://github.com/nrichers",
     "author_image_url": "https://github.com/nrichers.png"
+  },
+  {
+    "author_id": "mrinali_umashankar",
+    "author": "Mrinali Umashankar",
+    "position": "Solutions Architect II",
+    "company": "AWS",
+    "author_url": "https://www.linkedin.com/in/mrinali-umashankar-79064a194/",
+    "author_image_url": "/images/blog/avatars/mrinali-umashankar.webp"
   }
 ]
