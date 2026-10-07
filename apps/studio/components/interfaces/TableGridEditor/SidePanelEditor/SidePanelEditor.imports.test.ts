@@ -35,6 +35,35 @@ const roleImpersonationState: RoleImpersonationState = {
 }
 
 describe('CSV imports with role impersonation', () => {
+  test('import timeout reaches and aborts the real SQL request', async () => {
+    let requestSignal: AbortSignal | undefined
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        requestSignal = request.signal
+        await new Promise<void>((resolve) => {
+          if (request.signal.aborted) {
+            resolve()
+          } else {
+            request.signal.addEventListener('abort', () => resolve(), { once: true })
+          }
+        })
+        return HttpResponse.json<unknown[]>([])
+      },
+    })
+
+    await expect(
+      executeImportInsertBatch({
+        projectRef: 'default',
+        connectionString: undefined,
+        sql: safeSql`select 1`,
+        timeoutMs: 100,
+      })
+    ).rejects.toMatchObject({ name: 'TimeoutError' })
+    expect(requestSignal?.aborted).toBe(true)
+  })
+
   test.each(['uploaded', 'pasted'])(
     '%s CSV wraps every large-row batch in the selected role',
     async (source) => {

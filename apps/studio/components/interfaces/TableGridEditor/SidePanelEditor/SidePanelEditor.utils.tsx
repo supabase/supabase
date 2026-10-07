@@ -12,7 +12,12 @@ import pgMeta, {
   getUpdateIdentitySequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
-import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+import {
+  joinSqlFragments,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
 import { find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
@@ -934,6 +939,7 @@ export type ImportInsertBatch = {
   sql: SafeSqlFragment
 }
 
+/** Builds an import statement with the selected role applied to its execution. */
 function getImportInsertSql(
   table: RetrieveTableResult,
   rows: Record<string, unknown>[],
@@ -945,10 +951,12 @@ function getImportInsertSql(
   )
 }
 
+/** Measures the UTF-8 SQL payload, including escaped values and role setup. */
 function getSqlByteSize(sql: SafeSqlFragment) {
   return new Blob([sql]).size
 }
 
+/** Explains why a single row cannot fit in a dashboard import request. */
 function getRowTooLargeError(maxSqlBytes: number) {
   return new Error(
     `A row in this import is too large to be imported through the dashboard. The generated SQL for a single row exceeds ${Math.floor(
@@ -957,6 +965,10 @@ function getRowTooLargeError(maxSqlBytes: number) {
   )
 }
 
+/**
+ * Groups rows in order by escaped SQL bytes without rebuilding a growing statement.
+ * Measures each JSON row once and checks the complete SQL before emitting a batch.
+ */
 export function buildImportInsertBatches({
   table,
   rows,
@@ -970,40 +982,54 @@ export function buildImportInsertBatches({
 }): ImportInsertBatch[] {
   const batches: ImportInsertBatch[] = []
   let batchRows: Record<string, unknown>[] = []
-  let batchSql: SafeSqlFragment | undefined
+  let batchBytes = 0
+  let hasBatchBackslash = false
+
+  /** Emits the completed batch only after verifying its complete SQL payload. */
+  const finishBatch = () => {
+    const sql = getImportInsertSql(table, batchRows, roleImpersonationState)
+    if (getSqlByteSize(sql) > maxSqlBytes) {
+      throw getRowTooLargeError(maxSqlBytes)
+    }
+    batches.push({ rows: batchRows, sql })
+    batchRows = []
+  }
 
   for (const row of rows) {
-    const candidateRows = [...batchRows, row]
-    const candidateSql = getImportInsertSql(table, candidateRows, roleImpersonationState)
+    // Query.insert stores the rows as one SQL-escaped JSON array. Its E prefix is
+    // shared by the entire literal, while commas add one byte per additional row.
+    const rowLiteral = literal(JSON.stringify(row))
+    const hasRowBackslash = rowLiteral.startsWith("E'")
+    const rowBytes = getSqlByteSize(rowLiteral) - 2 - Number(hasRowBackslash)
+    const additionalBytes = rowBytes + 1 + Number(hasRowBackslash && !hasBatchBackslash)
 
-    if (getSqlByteSize(candidateSql) <= maxSqlBytes) {
-      batchRows = candidateRows
-      batchSql = candidateSql
-      continue
+    if (batchRows.length > 0 && batchBytes + additionalBytes > maxSqlBytes) {
+      finishBatch()
     }
 
     if (batchRows.length === 0) {
-      throw getRowTooLargeError(maxSqlBytes)
+      // A one-row statement captures this batch's columns and role-wrapper overhead.
+      batchBytes = getSqlByteSize(getImportInsertSql(table, [row], roleImpersonationState))
+      if (batchBytes > maxSqlBytes) {
+        throw getRowTooLargeError(maxSqlBytes)
+      }
+      hasBatchBackslash = hasRowBackslash
+    } else {
+      batchBytes += additionalBytes
+      hasBatchBackslash ||= hasRowBackslash
     }
 
-    batches.push({ rows: batchRows, sql: batchSql! })
-
-    const singleRowSql = getImportInsertSql(table, [row], roleImpersonationState)
-    if (getSqlByteSize(singleRowSql) > maxSqlBytes) {
-      throw getRowTooLargeError(maxSqlBytes)
-    }
-
-    batchRows = [row]
-    batchSql = singleRowSql
+    batchRows.push(row)
   }
 
-  if (batchRows.length > 0 && batchSql !== undefined) {
-    batches.push({ rows: batchRows, sql: batchSql })
+  if (batchRows.length > 0) {
+    finishBatch()
   }
 
   return batches
 }
 
+/** Runs a size-bounded import statement with rate-limit retries and an abortable timeout. */
 export async function executeImportInsertBatch({
   projectRef,
   connectionString,
@@ -1030,6 +1056,7 @@ export async function executeImportInsertBatch({
   )
 }
 
+/** Advances identity/serial sequences after all rows have been imported successfully. */
 async function updateImportedRowsSequences({
   projectRef,
   connectionString,
@@ -1068,6 +1095,7 @@ async function updateImportedRowsSequences({
   })
 }
 
+/** Parses and imports uploaded CSV chunks, stopping parsing when an insert fails. */
 export async function insertRowsViaSpreadsheet({
   projectRef,
   connectionString,
@@ -1172,6 +1200,7 @@ export async function insertRowsViaSpreadsheet({
   })
 }
 
+/** Imports pasted rows sequentially with byte-bounded statements and progress updates. */
 export async function insertTableRows({
   projectRef,
   connectionString,

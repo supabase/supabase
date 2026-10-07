@@ -1,21 +1,15 @@
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { Query } from '@supabase/pg-meta/src/query'
+import { describe, expect, test } from 'vitest'
 
 import {
   buildImportInsertBatches,
-  executeImportInsertBatch,
   formatRowsForInsert,
   getRowFromSidePanel,
   IMPORT_SQL_SIZE_LIMIT,
 } from './SidePanelEditor.utils'
 import type { SupaRow } from '@/components/grid/types'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { wrapWithRoleImpersonation, type RoleImpersonationState } from '@/lib/role-impersonation'
 import type { SidePanel } from '@/state/table-editor'
-
-vi.mock('@/data/sql/execute-sql-mutation', () => ({
-  executeSql: vi.fn(),
-}))
-
-const mockExecuteSql = vi.mocked(executeSql)
 
 const mockTable = {
   id: 1,
@@ -35,10 +29,6 @@ function getByteSize(value: string) {
 function makeLargeWktCoordinate(index: number) {
   return `-111.${String(index).padStart(12, '0')} 34.${String(index).padStart(12, '0')}`
 }
-
-beforeEach(() => {
-  mockExecuteSql.mockReset()
-})
 
 describe('SidePanelEditor.utils.test.ts', () => {
   test('formatRowsForInsert should for format rows with basic data types correctly', () => {
@@ -247,34 +237,74 @@ describe('import insert batching', () => {
     ).toThrow(/too large/i)
   })
 
-  test('executeImportInsertBatch rejects when the SQL request is aborted by timeout', async () => {
-    mockExecuteSql.mockImplementation((_args, signal) => {
-      return new Promise((_resolve, reject) => {
-        if (signal?.aborted) {
-          reject(signal.reason ?? new Error('Import request timed out'))
-          return
-        }
+  test.each([false, true])(
+    'accounts for SQL literal escaping when backslashes appear first: %s',
+    (backslashFirst) => {
+      const escaped = { name: "O'Reilly\\path\n\té😀", json: { nested: ["quote'", '\\'] } }
+      const plain = { name: 'plain', json: { nested: [] } }
+      const rows = backslashFirst ? [escaped, plain] : [plain, escaped]
+      const expectedSql = new Query().from(mockTable.name, mockTable.schema).insert(rows).toSql()
+      const maxSqlBytes = getByteSize(expectedSql)
 
-        signal?.addEventListener(
-          'abort',
-          () => {
-            reject(signal.reason ?? new Error('Import request timed out'))
-          },
-          { once: true }
-        )
-      }) as any
-    })
+      const exactBatches = buildImportInsertBatches({ table: mockTable, rows, maxSqlBytes })
+      expect(exactBatches).toHaveLength(1)
+      expect(exactBatches[0].sql).toBe(expectedSql)
 
-    await expect(
-      executeImportInsertBatch({
-        projectRef: 'project-ref',
-        connectionString: undefined,
-        sql: 'select 1;' as any,
-        timeoutMs: 1,
+      const splitBatches = buildImportInsertBatches({
+        table: mockTable,
+        rows,
+        maxSqlBytes: maxSqlBytes - 1,
       })
-    ).rejects.toThrow()
+      expect(splitBatches).toHaveLength(2)
+      expect(splitBatches.flatMap((batch) => batch.rows)).toEqual(rows)
+      expect(splitBatches.every((batch) => getByteSize(batch.sql) < maxSqlBytes)).toBe(true)
+    }
+  )
 
-    expect(mockExecuteSql).toHaveBeenCalledTimes(1)
+  test('serializes many small rows a bounded number of times', () => {
+    let reads = 0
+    const rows = Array.from({ length: 20_000 }, (_, id) => ({
+      id,
+      get name() {
+        reads += 1
+        return 'small row'
+      },
+    }))
+
+    const batches = buildImportInsertBatches({ table: mockTable, rows })
+
+    expect(batches).toHaveLength(1)
+    expect(batches[0].rows).toEqual(rows)
+    expect(getByteSize(batches[0].sql)).toBeLessThanOrEqual(IMPORT_SQL_SIZE_LIMIT)
+    expect(reads).toBeLessThanOrEqual(rows.length * 3)
+  })
+
+  test('counts escaped role claims separately from the JSON payload prefix', () => {
+    const roleImpersonationState: RoleImpersonationState = {
+      role: { type: 'postgrest', role: 'anon' },
+      claims: { role: 'anon', exp: 0, iat: 0, iss: "O'Reilly\\é😀", ref: 'default' },
+    }
+    const rows = [{ name: 'plain' }, { name: "quote'\\é😀" }]
+    const insertSql = new Query().from(mockTable.name, mockTable.schema).insert(rows).toSql()
+    const maxSqlBytes = getByteSize(wrapWithRoleImpersonation(insertSql, roleImpersonationState))
+
+    const exactBatches = buildImportInsertBatches({
+      table: mockTable,
+      rows,
+      roleImpersonationState,
+      maxSqlBytes,
+    })
+    expect(exactBatches).toHaveLength(1)
+    expect(getByteSize(exactBatches[0].sql)).toBe(maxSqlBytes)
+
+    const splitBatches = buildImportInsertBatches({
+      table: mockTable,
+      rows,
+      roleImpersonationState,
+      maxSqlBytes: maxSqlBytes - 1,
+    })
+    expect(splitBatches).toHaveLength(2)
+    expect(splitBatches.every((batch) => getByteSize(batch.sql) < maxSqlBytes)).toBe(true)
   })
 })
 
