@@ -8,14 +8,14 @@ type BucketLimitErrorBucket = { name: string; limit: number }
 
 export const convertFromBytes = (bytes: number, unit?: StorageSizeUnits) => {
   // Up to GB since that's our storage upload limit
-  if (bytes <= 0) return { value: 0, unit: StorageSizeUnits.BYTES }
+  if (!Number.isFinite(bytes) || bytes <= 0) return { value: 0, unit: StorageSizeUnits.BYTES }
 
   const i =
     unit !== undefined
       ? Object.values(StorageSizeUnits).indexOf(unit)
       : Math.floor(Math.log(bytes) / Math.log(k))
 
-  const formattedIdx = unit !== undefined ? (i < 0 ? 0 : i) : i > 3 ? 3 : i
+  const formattedIdx = unit !== undefined ? (i < 0 ? 0 : i) : Math.min(3, Math.max(0, i))
 
   const formattedUnit = Object.values(StorageSizeUnits)[formattedIdx]
   const value = bytes / Math.pow(k, formattedIdx)
