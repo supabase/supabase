@@ -667,8 +667,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       dotenv:
-        specifier: ^16.0.3
-        version: 16.3.1
+        specifier: ^18.0.3
+        version: 18.0.3
       ejs:
         specifier: ^3.1.10
         version: 3.1.10
@@ -2221,8 +2221,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0(encoding@0.1.13)
       dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
+        specifier: ^18.0.3
+        version: 18.0.3
       otpauth:
         specifier: ^9.4.1
         version: 9.4.1
@@ -2308,8 +2308,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       dotenv:
-        specifier: ^16.3.1
-        version: 16.3.1
+        specifier: ^18.0.3
+        version: 18.0.3
       libpg-query:
         specifier: 15.2.0
         version: 15.2.0(encoding@0.1.13)(supports-color@8.1.1)
@@ -11620,10 +11620,6 @@ packages:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
     engines: {node: '>=12'}
 
-  dotenv@16.3.1:
-    resolution: {integrity: sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==}
-    engines: {node: '>=12'}
-
   dotenv@16.5.0:
     resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
@@ -11631,6 +11627,11 @@ packages:
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
+
+  dotenv@18.0.3:
+    resolution: {integrity: sha512-/8CJTyL817qPnfbQrJgOEcrU3fDrJkRIoXBE566wHuvIXKOCHUZhPqGPbCPi9SogjdGnreF0TlvnTgK6J/8zpA==}
+    engines: {node: '>=12'}
+    hasBin: true
 
   drange@1.1.1:
     resolution: {integrity: sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==}
@@ -29304,11 +29305,11 @@ snapshots:
 
   dotenv@16.0.3: {}
 
-  dotenv@16.3.1: {}
-
   dotenv@16.5.0: {}
 
   dotenv@17.4.2: {}
+
+  dotenv@18.0.3: {}
 
   drange@1.1.1: {}
 
