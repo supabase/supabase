@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -70,7 +71,13 @@ export const EnablePipelinesModal = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-3">
-          {hasAccess ? (
+          {isLoading && (
+            <div role="status" aria-label="Checking Pipelines access">
+              <GenericSkeletonLoader />
+              <span className="sr-only">Checking Pipelines access…</span>
+            </div>
+          )}
+          {!isLoading && hasAccess && (
             <>
               <p className="text-sm text-foreground-light">
                 Pipelines bills for configured pipeline hours and Postgres row data processed during
@@ -84,10 +91,9 @@ export const EnablePipelinesModal = ({
                 Pipelines is in public alpha and may change.
               </p>
             </>
-          ) : (
-            <p role="status" className="text-sm text-foreground-light">
-              {isLoading ? 'Checking Pipelines access…' : 'Pipelines requires the Pro plan.'}
-            </p>
+          )}
+          {!isLoading && !hasAccess && (
+            <p className="text-sm text-foreground-light">Pipelines requires the Pro plan.</p>
           )}
         </DialogSection>
         <DialogFooter>

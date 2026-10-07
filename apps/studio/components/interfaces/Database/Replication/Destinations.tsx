@@ -40,6 +40,7 @@ import {
 } from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -241,6 +242,10 @@ export const Destinations = () => {
     !!newDestinationDefaultType &&
     (newDestinationDefaultType === 'Analytics Bucket' || isSourcesSuccess)
 
+  const creationDisabledReason = isSourcesError
+    ? 'Pipeline enablement status is unavailable. Retry the lookup below.'
+    : 'Checking whether Pipelines is enabled…'
+
   const openDestinationPanel = () => {
     if (!canCreate) return
     if (replicationNotEnabled && newDestinationDefaultType !== 'Analytics Bucket') {
@@ -372,15 +377,17 @@ export const Destinations = () => {
             onTrigger={openDestinationPanel}
             options={{ enabled: canCreate }}
             side="bottom"
+            tooltipOpen={canCreate ? undefined : false}
           >
-            <Button
+            <ButtonTooltip
+              tooltip={{ content: { text: canCreate ? undefined : creationDisabledReason } }}
               variant="primary"
               icon={<Plus />}
               disabled={!canCreate}
               onClick={openDestinationPanel}
             >
               Add pipeline
-            </Button>
+            </ButtonTooltip>
           </Shortcut>
         </div>
       </div>
@@ -470,14 +477,15 @@ export const Destinations = () => {
             title="Add a pipeline"
             description="Send tables to an external destination for analytics workloads."
           >
-            <Button
+            <ButtonTooltip
+              tooltip={{ content: { text: canCreate ? undefined : creationDisabledReason } }}
               variant="default"
               icon={<Plus />}
               disabled={!canCreate}
               onClick={openDestinationPanel}
             >
               Add pipeline
-            </Button>
+            </ButtonTooltip>
           </EmptyStatePresentational>
         )}
       </div>
