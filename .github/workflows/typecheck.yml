@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   typecheck:
-    runs-on: blacksmith-2vcpu-ubuntu-2404
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     env:
       NODE_OPTIONS: --max-old-space-size=4096
 
@@ -46,10 +46,13 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Run TypeScript type check
-        run: pnpm run typecheck
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Independent turbo pipelines, so run them side by side. Both always
+      # finish, so a typecheck failure no longer hides lint errors.
+      - parallel:
+          - name: Run TypeScript type check
+            run: pnpm run typecheck
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Lint
-        run: pnpm run lint
+          - name: Run Lint
+            run: pnpm run lint

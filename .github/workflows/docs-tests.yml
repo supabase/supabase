@@ -57,27 +57,29 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Check access-control partials
-        run: |
-          make -C apps/docs/spec generate.partials.access-control
-          git diff --exit-code -- \
-            apps/docs/content/_partials/access-control/scoped_pat_permissions.mdx \
-            apps/docs/content/_partials/access-control/scoped_pat_mcp_tools.mdx
+      # Independent prep: a codegen diff check, a download, and a local codegen.
+      - parallel:
+          - name: Check access-control partials
+            run: |
+              make -C apps/docs/spec generate.partials.access-control
+              git diff --exit-code -- \
+                apps/docs/content/_partials/access-control/scoped_pat_permissions.mdx \
+                apps/docs/content/_partials/access-control/scoped_pat_mcp_tools.mdx
 
-      - name: Download JS reference TypeDoc dumps
-        # The source dumps under apps/docs/spec/reference/<lib>/<ver>/*.json are
-        # gitignored — `make download.tsdoc.v2` re-fetches them from
-        # supabase.github.io so the reference-content snapshot test has
-        # something to walk.
-        working-directory: apps/docs/spec
-        run: make download.tsdoc.v2
+          - name: Download JS reference TypeDoc dumps
+            # The source dumps under apps/docs/spec/reference/<lib>/<ver>/*.json are
+            # gitignored — `make download.tsdoc.v2` re-fetches them from
+            # supabase.github.io so the reference-content snapshot test has
+            # something to walk.
+            working-directory: apps/docs/spec
+            run: make download.tsdoc.v2
 
-      - name: Generate Dart reference dump
-        # Dart has no upstream TypeDoc dump; its gitignored dump is generated
-        # from the committed `supabase_dart_v2.yml` so the reference-content
-        # snapshot test has something to walk.
-        working-directory: apps/docs
-        run: pnpm run codegen:references:dart
+          - name: Generate Dart reference dump
+            # Dart has no upstream TypeDoc dump; its gitignored dump is generated
+            # from the committed `supabase_dart_v2.yml` so the reference-content
+            # snapshot test has something to walk.
+            working-directory: apps/docs
+            run: pnpm run codegen:references:dart
 
       - name: Run tests
         run: |

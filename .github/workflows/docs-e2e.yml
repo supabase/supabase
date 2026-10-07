@@ -146,6 +146,8 @@ jobs:
         if: steps.scope.outputs.skip == 'false' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && steps.changes.outputs.docs_app == 'true'
         id: deployment
         continue-on-error: true
+        # Polls for minutes; install deps and Chromium while it does.
+        background: true
         run: node scripts/waitForVercelPreview.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -154,6 +156,17 @@ jobs:
           VERCEL_STATUS_CONTEXT: 'Vercel – docs'
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+
+      - name: Install dependencies
+        if: steps.scope.outputs.skip == 'false'
+        run: pnpm install --frozen-lockfile --filter=e2e-docs...
+
+      - name: Install Playwright Chromium
+        if: steps.scope.outputs.skip == 'false'
+        run: pnpm -C e2e/docs exec playwright install chromium --with-deps --only-shell
+
+      - name: Wait for Vercel docs preview to finish
+        wait: [deployment]
 
       - name: Resolve base URL
         if: steps.scope.outputs.skip == 'false'
@@ -206,14 +219,6 @@ jobs:
             echo "  -f page_paths=$PAGE_PATHS"
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-
-      - name: Install dependencies
-        if: steps.base-url.outputs.should_test == 'true'
-        run: pnpm install --frozen-lockfile --filter=e2e-docs...
-
-      - name: Install Playwright Chromium
-        if: steps.base-url.outputs.should_test == 'true'
-        run: pnpm -C e2e/docs exec playwright install chromium --with-deps --only-shell
 
       - name: Run docs E2E
         if: steps.base-url.outputs.should_test == 'true'
