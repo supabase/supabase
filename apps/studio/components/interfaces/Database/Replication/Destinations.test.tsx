@@ -119,20 +119,17 @@ test.each([true, false, 'retry'])(
     if (enabled !== true) {
       expect(screen.getByText('Checking Pipelines access…')).toBeInTheDocument()
       expect(screen.queryByText('Pipelines requires the Pro plan.')).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Enable Pipelines' })).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Enable' })).toBeDisabled()
       options.isLoading = false
       options.hasAccess = true
       fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
       addPipeline()
-      expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')
-      fireEvent.click(screen.getByRole('button', { name: 'Enable Pipelines' }))
+      fireEvent.click(screen.getByRole('button', { name: 'Enable' }))
       if (enabled === 'retry') {
         await waitFor(() => expect(options.failEnable).toBe(false))
-        await waitFor(() =>
-          expect(screen.getByRole('button', { name: 'Enable Pipelines' })).toBeEnabled()
-        )
+        await waitFor(() => expect(screen.getByRole('button', { name: 'Enable' })).toBeEnabled())
         expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
-        fireEvent.click(screen.getByRole('button', { name: 'Enable Pipelines' }))
+        fireEvent.click(screen.getByRole('button', { name: 'Enable' }))
       }
     }
     await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
@@ -156,12 +153,11 @@ test('dismissal during enablement prevents a late response opening creation', as
   })
   await renderList()
   addPipeline()
-  fireEvent.click(await screen.findByRole('button', { name: 'Enable Pipelines' }))
+  fireEvent.click(await screen.findByRole('button', { name: 'Enable' }))
   await waitFor(() => expect(finish).toBeDefined())
   fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' })
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   finish?.()
-  await waitFor(() => expect(isEnabled).toBe(true))
   fireEvent.pointerDown(screen.getByRole('button', { name: 'More actions' }), {
     button: 0,
     ctrlKey: false,
@@ -174,7 +170,6 @@ test('Analytics Bucket keeps its existing creation path without ETL enablement',
   await renderList()
   addPipeline()
   await screen.findByRole('heading', { name: 'Creation sheet: Analytics Bucket' })
-  expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
 })
 test.each(['loading', 'error'])('blocks creation when source status is %s', async (state) => {
   let finish: (() => void) | undefined

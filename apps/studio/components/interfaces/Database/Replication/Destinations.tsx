@@ -393,6 +393,7 @@ export const Destinations = () => {
 
         {isSourcesError && newDestinationDefaultType !== 'Analytics Bucket' && (
           <AlertError
+            layout="responsive"
             projectRef={projectRef}
             error={sourcesError}
             subject={

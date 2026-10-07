@@ -101,7 +101,7 @@ export const EnablePipelinesModal = ({
               disabled={isLoading}
               onClick={onEnablePipelines}
             >
-              Enable Pipelines
+              Enable
             </Button>
           ) : (
             <UpgradePlanButton source="replication" featureProposition="use replication" />
