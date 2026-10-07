@@ -193,17 +193,16 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
     },
   })
   await renderList(false)
-  await waitFor(() =>
-    expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).toHaveAttribute(
-      'aria-disabled',
-      'true'
-    )
-  )
-  if (state === 'error') await screen.findByRole('button', { name: 'Retry' })
-  fireEvent.focus(screen.getAllByRole('button', { name: 'Add pipeline' })[0])
-  expect(await screen.findByRole('tooltip')).toHaveTextContent(
-    state === 'error' ? 'Retry the lookup below.' : 'Checking whether Pipelines is enabled'
-  )
+  if (state === 'error') {
+    await screen.findByRole('button', { name: 'Retry' })
+    const button = screen.getAllByRole('button', { name: 'Add pipeline' })[0]
+    expect(button).toHaveAttribute('aria-disabled', 'true')
+    fireEvent.focus(button)
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Replication unavailable locally')
+  } else {
+    expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).toBeDisabled()
+    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument()
+  }
   addPipeline()
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -214,10 +213,7 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
     finish?.()
   }
   await waitFor(() =>
-    expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).not.toHaveAttribute(
-      'aria-disabled',
-      'true'
-    )
+    expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).toBeEnabled()
   )
   addPipeline()
   expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')

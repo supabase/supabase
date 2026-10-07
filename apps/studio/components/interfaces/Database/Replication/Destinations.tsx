@@ -242,9 +242,14 @@ export const Destinations = () => {
     !!newDestinationDefaultType &&
     (newDestinationDefaultType === 'Analytics Bucket' || isSourcesSuccess)
 
-  const creationDisabledReason = isSourcesError
-    ? 'Pipeline enablement status is unavailable. Retry the lookup below.'
-    : 'Checking whether Pipelines is enabled…'
+  const isCheckingPipelineStatus =
+    !!newDestinationDefaultType &&
+    newDestinationDefaultType !== 'Analytics Bucket' &&
+    !isSourcesSuccess &&
+    !isSourcesError
+  const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
+    ? 'Replication unavailable locally'
+    : 'Failed to retrieve pipeline enablement status'
 
   const openDestinationPanel = () => {
     if (!canCreate) return
@@ -380,9 +385,12 @@ export const Destinations = () => {
             tooltipOpen={canCreate ? undefined : false}
           >
             <ButtonTooltip
-              tooltip={{ content: { text: canCreate ? undefined : creationDisabledReason } }}
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
               variant="primary"
               icon={<Plus />}
+              loading={isCheckingPipelineStatus}
               disabled={!canCreate}
               onClick={openDestinationPanel}
             >
@@ -403,11 +411,7 @@ export const Destinations = () => {
             layout="responsive"
             projectRef={projectRef}
             error={sourcesError}
-            subject={
-              checkLocalETLNotSetUp(sourcesError)
-                ? 'Replication unavailable locally'
-                : 'Failed to retrieve pipeline enablement status'
-            }
+            subject={sourceErrorTitle}
             description={
               checkLocalETLNotSetUp(sourcesError)
                 ? 'Configure the replication API to manage pipelines in local development.'
@@ -478,9 +482,12 @@ export const Destinations = () => {
             description="Send tables to an external destination for analytics workloads."
           >
             <ButtonTooltip
-              tooltip={{ content: { text: canCreate ? undefined : creationDisabledReason } }}
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
               variant="default"
               icon={<Plus />}
+              loading={isCheckingPipelineStatus}
               disabled={!canCreate}
               onClick={openDestinationPanel}
             >
