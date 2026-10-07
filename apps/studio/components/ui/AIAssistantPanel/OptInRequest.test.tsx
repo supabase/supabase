@@ -12,7 +12,11 @@ vi.mock('@/hooks/misc/useOrgOptedIntoAi', () => ({
 }))
 vi.mock('./AIOptInModal', () => ({
   AIOptInModal: ({ visible, onSaved }: { visible: boolean; onSaved: () => void }) =>
-    visible ? <button onClick={onSaved}>Save level</button> : null,
+    visible ? (
+      <button tabIndex={0} onClick={onSaved}>
+        Save level
+      </button>
+    ) : null,
 }))
 
 const setCanUpdate = (can: boolean) =>
