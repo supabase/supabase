@@ -53,9 +53,13 @@ export const useBucketDeleteMutation = ({
 
       await onSuccess?.(data, variables, context)
 
-      // Fire-and-forget: only the bucket list needs refreshing, and it shouldn't block
-      // onSuccess (modal close/navigation) above.
-      void queryClient.invalidateQueries({ queryKey: storageKeys.bucketsList(projectRef) })
+      // Keyed on `buckets`, not `bucketsList`: the latter spells out every param as
+      // `undefined`, which partial matching never matches against a registered list key.
+      // `refetchType: 'all'` because the list query is inactive on the bucket page.
+      void queryClient.invalidateQueries({
+        queryKey: storageKeys.buckets(projectRef),
+        refetchType: 'all',
+      })
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
