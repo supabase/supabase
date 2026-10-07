@@ -1,4 +1,4 @@
-import { MIN_NONCURRENT_DAYS } from '../BucketVersioningFields.lifecycle'
+import { MIN_NONCURRENT_DAYS } from '../FilesBuckets/BucketVersioningFields/BucketVersioningFields.lifecycle'
 import type { ExpirationMode } from '../StorageVersioning.constants'
 
 export type VersionFate =
