@@ -71,10 +71,12 @@ export const EnablePipelinesModal = ({
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-3">
+          <p role="status" aria-live="polite" className="sr-only">
+            {isLoading ? 'Checking Pipelines access…' : ''}
+          </p>
           {isLoading && (
-            <div role="status" aria-label="Checking Pipelines access">
+            <div aria-hidden="true">
               <GenericSkeletonLoader />
-              <span className="sr-only">Checking Pipelines access…</span>
             </div>
           )}
           {!isLoading && hasAccess && (

@@ -269,7 +269,12 @@ export const Destinations = () => {
   const handlePipelinesEnabled = () => {
     const type = pendingCreationTypeRef.current
     pendingCreationTypeRef.current = null
-    if (type) setDestinationType(type)
+    if (
+      type &&
+      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
+    ) {
+      setDestinationType(type)
+    }
   }
 
   useShortcut(

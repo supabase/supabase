@@ -17,6 +17,7 @@ const options = vi.hoisted(() => ({
   hasAccess: true,
   isLoading: false,
   failEnable: false,
+  failRefresh: false,
 }))
 vi.mock('./useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => !options.legacy,
@@ -40,6 +41,7 @@ beforeEach(() => {
   options.legacy = false
   options.hasAccess = true
   options.isLoading = false
+  options.failRefresh = false
   options.failEnable = false
   mswServer.use(
     http.get('http://localhost:3000/api/enabled-features-overrides', () =>
@@ -67,18 +69,28 @@ beforeEach(() => {
     method: 'get',
     path: '/platform/replication/:ref/sources',
     response: () =>
-      HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
-        sources: isEnabled
-          ? [
-              {
-                id: 42,
-                name: 'default',
-                tenant_id: 'tenant',
-                config: { host: 'localhost', port: 5432, name: 'postgres', username: 'postgres' },
-              },
-            ]
-          : [],
-      }),
+      options.failRefresh && isEnabled
+        ? HttpResponse.json<APIErrorBody>(
+            { message: 'replication API URL is not configured' },
+            { status: 503 }
+          )
+        : HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
+            sources: isEnabled
+              ? [
+                  {
+                    id: 42,
+                    name: 'default',
+                    tenant_id: 'tenant',
+                    config: {
+                      host: 'localhost',
+                      port: 5432,
+                      name: 'postgres',
+                      username: 'postgres',
+                    },
+                  },
+                ]
+              : [],
+          }),
   })
   addAPIMock({
     method: 'post',
@@ -98,21 +110,23 @@ beforeEach(() => {
 })
 const renderList = async (waitForSources = true) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  customRender(<Destinations />, { queryClient, nuqs: { hasMemory: true } })
+  const view = customRender(<Destinations />, { queryClient, nuqs: { hasMemory: true } })
   await screen.findByRole('heading', { name: 'Add a pipeline' })
   if (waitForSources)
     await waitFor(() =>
       expect(queryClient.getQueryState(replicationKeys.sources('default'))?.status).toBe('success')
     )
+  return view
 }
 const addPipeline = () =>
   fireEvent.click(screen.getAllByRole('button', { name: 'Add pipeline' })[0])
-test.each([true, false, 'retry'])(
+test.each([true, false, 'retry', 'refresh error'])(
   'opens creation after enabling when needed (enabled: %s)',
   async (enabled) => {
     isEnabled = enabled === true
     options.failEnable = enabled === 'retry'
-    await renderList()
+    const view = await renderList()
+    options.failRefresh = enabled === 'refresh error'
     options.isLoading = enabled !== true
     options.hasAccess = !options.isLoading
     addPipeline()
@@ -122,8 +136,7 @@ test.each([true, false, 'retry'])(
       expect(screen.getByRole('button', { name: 'Enable' })).toBeDisabled()
       options.isLoading = false
       options.hasAccess = true
-      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-      addPipeline()
+      view.rerender(<Destinations />)
       fireEvent.click(screen.getByRole('button', { name: 'Enable' }))
       if (enabled === 'retry') {
         await waitFor(() => expect(options.failEnable).toBe(false))
@@ -131,6 +144,19 @@ test.each([true, false, 'retry'])(
         expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
         fireEvent.click(screen.getByRole('button', { name: 'Enable' }))
       }
+    }
+    if (enabled === 'refresh error') {
+      await screen.findByRole('button', { name: 'Retry' })
+      expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+      options.failRefresh = false
+      fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+      await waitFor(() =>
+        expect(screen.getAllByRole('button', { name: 'Add pipeline' })[0]).not.toHaveAttribute(
+          'aria-disabled',
+          'true'
+        )
+      )
+      addPipeline()
     }
     await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
   }
