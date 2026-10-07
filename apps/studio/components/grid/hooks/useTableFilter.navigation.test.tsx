@@ -64,7 +64,9 @@ describe('useUrlTableFilters', () => {
       // Table 2 was rendered with table 1's URL filters while Back was pending.
       expect(table2Renders.some((state) => state.urlFilters.length > 0)).toBe(true)
       for (const state of table2Renders) {
-        expect(state.tableFilters ?? []).toEqual([])
+        // Mismatched renders must be `undefined`, not `[]`, so the sidebar count query stays off.
+        if (state.urlFilters.length > 0) expect(state.tableFilters).toBeUndefined()
+        else expect(state.tableFilters).toEqual([])
       }
       expect(renders.at(-1)?.tableFilters).toHaveLength(1)
     } finally {

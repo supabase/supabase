@@ -1,5 +1,3 @@
-import { useRouter } from 'next/router'
-
 import { formatFilterURLParams, getTableIdFromPath } from '@/components/grid/SupabaseGrid.utils'
 import { Filter } from '@/components/grid/types'
 import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
@@ -15,13 +13,16 @@ import { useOptionalTableEditorTableStateSnapshot } from '@/state/table-editor-t
  */
 export function useTableFilter() {
   const snap = useOptionalTableEditorTableStateSnapshot()
-  const { filters: urlFilters } = useTableEditorFiltersSort()
+  const { path, filters: urlFilters } = useTableEditorFiltersSort()
   const urlParsedFilters = formatFilterURLParams(urlFilters)
+  const urlTableId = getTableIdFromPath(path)
 
   const filters = snap ? snap.filters : urlParsedFilters
 
   return {
     filters,
+    /** Table id in the current URL path, which can lead the rendered table during navigation. */
+    urlTableId,
     setFilters: (filters: Filter[]) => {
       if (!snap) {
         throw new Error('useTableFilter: setFilters requires TableEditorTableStateContextProvider')
@@ -45,7 +46,6 @@ export function useTableFilter() {
  * table before route params do.
  */
 export function useUrlTableFilters(tableId: number): Filter[] | undefined {
-  const { asPath } = useRouter()
-  const { filters } = useTableFilter()
-  return getTableIdFromPath(asPath) === String(tableId) ? filters : undefined
+  const { filters, urlTableId } = useTableFilter()
+  return urlTableId === String(tableId) ? filters : undefined
 }

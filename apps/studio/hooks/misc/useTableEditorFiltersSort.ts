@@ -4,6 +4,8 @@ import { useCallback, useMemo } from 'react'
 export const useTableEditorFiltersSort = () => {
   const router = useRouter()
 
+  const path = router.asPath.split(/[?#]/)[0]
+
   const urlParams = useMemo(() => {
     return new URLSearchParams(router.asPath.split('?')[1])
   }, [router.asPath])
@@ -46,6 +48,7 @@ export const useTableEditorFiltersSort = () => {
   )
 
   return {
+    path,
     filters,
     sorts,
     setParams,
