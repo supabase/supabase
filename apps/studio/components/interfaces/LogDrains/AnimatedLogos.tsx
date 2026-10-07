@@ -121,7 +121,7 @@ export const AnimatedLogos = ({ iconSize = 36, className }: AnimatedLogosProps) 
           )
         })}
       </AnimatePresence>
-      <div className="absolute -inset-4 bg-linear-to-r from-background-surface-75 via-transparent to-background-surface-75 z-40" />
+      <div className="absolute -inset-4 bg-linear-to-r from-background via-background/0 to-background z-40" />
     </div>
   )
 }
