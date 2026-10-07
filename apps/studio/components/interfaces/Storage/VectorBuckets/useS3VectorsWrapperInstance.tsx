@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 
-import { getVectorBucketFDWName } from './VectorBuckets.utils'
+import { getVectorBucketFDWServerName } from './VectorBuckets.utils'
 import {
   WRAPPER_HANDLERS,
   WRAPPERS,
@@ -30,7 +30,7 @@ export const useS3VectorsWrapperInstance = ({ bucketId }: { bucketId?: string })
           wrapper
         )
       )
-      .find((w) => w.name === getVectorBucketFDWName(bucketId ?? ''))
+      .find((w) => w.server_name === getVectorBucketFDWServerName(bucketId ?? ''))
   }, [data, bucketId])
 
   const s3VectorsWrapperMeta = WRAPPERS.find((w) => w.handlerName === WRAPPER_HANDLERS.S3_VECTORS)

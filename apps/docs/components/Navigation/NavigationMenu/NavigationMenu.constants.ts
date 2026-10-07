@@ -1100,6 +1100,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/functions' as `/${string}`,
         },
         {
+          name: 'Debugging database functions',
+          url: '/guides/database/debugging-functions' as `/${string}`,
+        },
+        {
           name: 'Managing database triggers',
           url: '/guides/database/postgres/triggers' as `/${string}`,
         },
@@ -2861,6 +2865,15 @@ export const platform: NavMenuConstant = {
               name: 'Enterprise-Managed Authentication for MCP',
               url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
             },
+          ],
+        },
+        {
+          name: 'Platform Webhooks',
+          url: '/guides/platform/webhooks',
+          enabled: fullPlatformEnabled,
+          items: [
+            { name: 'Overview', url: '/guides/platform/webhooks' as `/${string}` },
+            { name: 'Events', url: '/guides/platform/webhooks/events' as `/${string}` },
           ],
         },
       ],

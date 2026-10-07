@@ -9,17 +9,17 @@
 
 :root {
   /*
-   * Hue inputs. A single --hue used to drive both the neutral surface/text ramp
-   * and the brand, so the two could never drift apart. They are now split so a
-   * theme can run, say, a cool-gray surface against the green brand:
-   *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
-   *   --primary-hue  is the spot hue that functional primary colors use
-   * Both default to --hue (Supabase green ≈157.5° in OKLCH), so a theme that only
-   * sets --hue keeps surfaces and brand locked together as before; override
-   * either one to let them diverge. */
+   * Hue inputs. --primary-hue is the spot colour; --surface-hue tints the
+   * neutral ramp (backgrounds, text, borders). Surface is derived from primary
+   * plus a theme offset so canvases stay coupled when spot changes:
+   *   dark  offset 0   → same hue as spot (subtle brand tint)
+   *   light offset 180 → complementary canvas tint (brand green → rose)
+   * Themes can still set --surface-hue directly to break the link.
+   */
   --hue: 157.5;
-  --surface-hue: var(--hue);
   --primary-hue: var(--hue);
+  --surface-hue-offset: 0;
+  --surface-hue: calc(var(--primary-hue) + var(--surface-hue-offset));
   /* Root defaults mirror the dark theme (the app's default appearance). */
   --chroma: 0.016;
   --surface: 0.17;
