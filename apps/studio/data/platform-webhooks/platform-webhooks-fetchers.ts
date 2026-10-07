@@ -51,26 +51,6 @@ export async function listWebhookEndpoints(
   return data
 }
 
-export async function getWebhookEndpoint(
-  scope: WebhookScopeParams,
-  id: string,
-  signal?: AbortSignal
-) {
-  const { data, error } =
-    scope.scope === 'organization'
-      ? await get('/v2/organizations/{slug}/webhooks/endpoints/{id}', {
-          params: { path: { slug: scope.orgSlug, id } },
-          signal,
-        })
-      : await get('/v2/projects/{ref}/webhooks/endpoints/{id}', {
-          params: { path: { ref: scope.projectRef, id } },
-          signal,
-        })
-
-  if (error) handleError(error)
-  return data
-}
-
 export async function createWebhookEndpoint(
   scope: WebhookScopeParams,
   attributes: WebhookEndpointAttributesInput & { signing_secret: string }
