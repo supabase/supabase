@@ -137,6 +137,46 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     expect(result).toBe(expected)
   })
 
+  it('should keep values aligned with columns when column names are integer-like', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+        { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      ],
+      name: 'yearly_totals',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    // JS hoists integer-like keys to the front of Object.entries, regardless of insertion order
+    const rows = [{ idx: 0, id: 7, '2024': 99, '2023': 42 }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO public.yearly_totals (id, "2024", "2023") VALUES (7, 99, 42);`
+    expect(result).toBe(expected)
+  })
+
+  it('should emit null for columns missing from a row', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'name', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'people',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+
+    const result = formatTableRowsToSQL(table, [{ id: 1 }])
+    expect(result).toBe(`INSERT INTO public.people (id, name) VALUES (1, null);`)
+  })
+
   it('should return an empty string for empty rows', () => {
     const table: SupaTable = {
       id: 1,

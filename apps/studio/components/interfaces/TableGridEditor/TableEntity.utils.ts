@@ -43,18 +43,15 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
 
   const valuesSets = rows
     .map((row) => {
-      const filteredRow = { ...row }
-      if ('idx' in filteredRow) delete filteredRow.idx
-
-      const values = Object.entries(filteredRow).map(([key, val]) => {
-        const { dataType, format } = table.columns.find((col) => col.name === key) ?? {}
+      const values = table.columns.map(({ name, dataType, format }) => {
+        const val = row[name]
 
         // We only check for NULL, array and JSON types, everything else we stringify
         // given that Postgres can implicitly cast the right type based on the column type
         // For string types, we need to deal with escaping single quotes
         const stringFormats = ['text', 'varchar']
 
-        if (val === null) {
+        if (val === null || val === undefined) {
           return 'null'
         } else if (dataType === 'ARRAY') {
           const array = Array.isArray(val) ? val : JSON.parse(val as string)
