@@ -1,6 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { screen } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
+import { Button } from 'ui'
 
 import { AlertError } from './AlertError'
 import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
@@ -9,7 +10,7 @@ import { customRender } from '@/tests/lib/custom-render'
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
 test('explicit responsive layout survives additional actions', () => {
-  customRender(<AlertError layout="responsive" additionalActions={<button>Retry</button>} />)
+  customRender(<AlertError layout="responsive" additionalActions={<Button>Retry</Button>} />)
   expect(screen.getByRole('alert')).toHaveClass('@container')
   expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
 })
