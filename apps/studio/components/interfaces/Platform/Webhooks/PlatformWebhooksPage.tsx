@@ -87,7 +87,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       : { scope: 'project', projectRef: ref ?? '' }
   const queryEnabled = platformWebhooksEnabled && isScopeReady
 
-  const { data: endpoints = [] } = useWebhookEndpointsQuery(
+  const { data: endpoints = [], isSuccess: isEndpointsLoaded } = useWebhookEndpointsQuery(
     { scope: apiScope },
     { enabled: queryEnabled }
   )
@@ -137,7 +137,11 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     { scope: apiScope, endpointId: selectedEndpoint?.id ?? '' },
     { enabled: queryEnabled && !!selectedEndpoint }
   )
-  const { data: selectedDelivery = null } = useWebhookDeliveryQuery(
+  const {
+    data: selectedDelivery = null,
+    isSuccess: isSelectedDeliveryLoaded,
+    isError: isSelectedDeliveryError,
+  } = useWebhookDeliveryQuery(
     { scope: apiScope, endpointId: selectedEndpoint?.id ?? '', id: deliveryId ?? '' },
     { enabled: queryEnabled && !!selectedEndpoint && !!deliveryId }
   )
@@ -178,6 +182,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   }, [fallbackHref, platformWebhooksEnabled, router])
 
   useEffect(() => {
+    if (!isEndpointsLoaded) return
+
     if (
       shouldHandleEndpointNotFound({
         endpointId,
@@ -188,7 +194,14 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       toast('Endpoint not found')
       router.replace(webhooksHref)
     }
-  }, [endpointId, pendingCreatedEndpointId, selectedEndpoint, router, webhooksHref])
+  }, [
+    endpointId,
+    isEndpointsLoaded,
+    pendingCreatedEndpointId,
+    selectedEndpoint,
+    router,
+    webhooksHref,
+  ])
 
   useEffect(() => {
     if (!pendingCreatedEndpointId) return
@@ -341,10 +354,18 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   }, [deliveryId, selectedEndpoint, setDeliveryId])
 
   useEffect(() => {
-    if (!!deliveryId && !selectedDelivery) {
+    const deliveryUnavailable =
+      (isSelectedDeliveryLoaded && !selectedDelivery) || isSelectedDeliveryError
+    if (!!deliveryId && deliveryUnavailable) {
       setDeliveryId(null)
     }
-  }, [deliveryId, selectedDelivery, setDeliveryId])
+  }, [
+    deliveryId,
+    isSelectedDeliveryError,
+    isSelectedDeliveryLoaded,
+    selectedDelivery,
+    setDeliveryId,
+  ])
 
   if (!platformWebhooksEnabled) {
     return null

@@ -13,8 +13,14 @@ import type {
 // so it's not part of the selectable catalog, but it's still a value the API accepts.
 const webhookEventTypeSchema = z.enum([...PLATFORM_WEBHOOK_EVENT_TYPES, '*'])
 
+// Drop (rather than throw on) event types our client catalog doesn't recognize —
+// e.g. the backend added one after this build shipped. Throwing here would make
+// editing any endpoint using it impossible until the client catalog catches up.
 const toWebhookEventTypes = (eventTypes: string[]): { type: WebhookEventType }[] =>
-  eventTypes.map((eventType) => ({ type: webhookEventTypeSchema.parse(eventType) }))
+  eventTypes
+    .map((eventType) => webhookEventTypeSchema.safeParse(eventType))
+    .filter((result) => result.success)
+    .map((result) => ({ type: result.data }))
 
 // Send `{}` rather than `null` for "no headers" — the OpenAPI spec allows `null` here,
 // but the backend's `custom_headers` column is NOT NULL and rejects it (observed as a
