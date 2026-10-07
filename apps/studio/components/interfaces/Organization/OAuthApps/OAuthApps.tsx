@@ -4,6 +4,7 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { AuthorizedApps } from './AuthorizedApps'
 import { OAuthAppsAuthorizedList } from './OAuthAppsAuthorizedList'
 import { PublishableApps } from './PublishableApps'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -12,12 +13,12 @@ import { PublishableApps } from './PublishableApps'
 
 export const OAuthApps = () => {
   const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
-
+  const showNewOAuthApps = oauthAppScopedGrants && USE_MOCKS
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
-        {oauthAppScopedGrants ? <OAuthAppsAuthorizedList /> : <AuthorizedApps />}
+        {showNewOAuthApps ? <OAuthAppsAuthorizedList /> : <AuthorizedApps />}
       </PageContainer>
     </>
   )
