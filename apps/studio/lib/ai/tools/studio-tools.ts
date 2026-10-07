@@ -2,6 +2,7 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getEdgeFunction, type EdgeFunctionData } from '@/data/edge-functions/edge-function-query'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -15,6 +16,7 @@ import {
 } from '@/lib/ai/prompts'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
+import { ResponseError } from '@/types'
 
 const KNOWLEDGE = {
   pg_best_practices: PG_BEST_PRACTICES,
@@ -98,13 +100,27 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
       }),
       needsApproval: true,
       execute: async ({ name, code }) => {
+        // Redeploying an existing function must not reset its JWT verification
+        // setting or display name, so look it up before deploying.
+        let existingFunction: EdgeFunctionData | undefined
+        try {
+          existingFunction = await getEdgeFunction(
+            { projectRef, slug: name },
+            undefined,
+            authHeaders
+          )
+        } catch (error) {
+          const isNotDeployedYet = error instanceof ResponseError && error.code === 404
+          if (!isNotDeployedYet) throw error
+        }
+
         await deployEdgeFunction({
           projectRef: projectRef ?? '',
           slug: name,
           metadata: {
             entrypoint_path: 'index.ts',
-            name,
-            verify_jwt: true,
+            name: existingFunction?.name ?? name,
+            verify_jwt: existingFunction?.verify_jwt ?? true,
           },
           files: [{ name: 'index.ts', content: code }],
           authorization,
