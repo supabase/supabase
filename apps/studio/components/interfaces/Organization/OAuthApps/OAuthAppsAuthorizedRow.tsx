@@ -18,9 +18,12 @@ export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthori
           >
             {!!approval.app.icon ? '' : approval.app.name[0]}
           </div>
-          <p className="min-w-0 truncate" title={approval.app.name}>
-            {approval.app.name}
-          </p>
+          <div>
+            <p className="min-w-0 truncate" title={approval.app.name}>
+              {approval.app.name}
+            </p>
+            <p className="min-w-0 text-foreground-lighter font-mono">{approval.app.id}</p>
+          </div>
         </div>
       </TableCell>
       <TableCell>{getGrantTargetLabel(approval.grant_target)}</TableCell>
