@@ -535,6 +535,12 @@ export default defineConfig(({ command, mode }) => {
   return {
     server: {
       port: 3000,
+      watch: {
+        // Next's build output, left behind when switching from
+        // STUDIO_FRAMEWORK=next, includes a full node_modules copy under
+        // `.next/standalone`.
+        ignored: ['**/.next/**'],
+      },
     },
     preview: {
       // The prerender step (@tanstack/start-plugin-core) boots `vite preview`

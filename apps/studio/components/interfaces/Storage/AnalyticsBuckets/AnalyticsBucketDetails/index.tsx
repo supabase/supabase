@@ -121,11 +121,11 @@ export const AnalyticBucketDetails = () => {
   const isPollingForData = pollIntervalNamespaces > 0 || pollIntervalNamespaceTables > 0
 
   const namespaces = useMemo(() => {
-    const fdwNamespaces = wrapperTables.map((t) => t.table.split('.')[0]) as string[]
+    const fdwNamespaces = wrapperTables.map((t) => (t.table as string).split('.')[0])
     const namespaces = uniq([...fdwNamespaces, ...(namespacesData ?? [])])
 
     return namespaces.map((namespace) => {
-      const tables = wrapperTables.filter((t) => t.table.split('.')[0] === namespace)
+      const tables = wrapperTables.filter((t) => (t.table as string).split('.')[0] === namespace)
       const schema = tables[0]?.schema
 
       return {

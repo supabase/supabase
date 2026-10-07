@@ -1,9 +1,9 @@
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
-import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../CreateBucketModal.utils'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
+import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../Storage.utils'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'

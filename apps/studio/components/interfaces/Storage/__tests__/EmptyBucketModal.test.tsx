@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { EmptyBucketModal } from '../EmptyBucketModal'
+import { EmptyBucketModal } from '../FilesBuckets/EmptyBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from '@/data/storage/buckets-query'
 import { render } from '@/tests/helpers'
