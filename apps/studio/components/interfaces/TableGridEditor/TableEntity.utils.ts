@@ -36,6 +36,16 @@ export const getTablePoliciesUrl = (
   )}&schema=${encodeURIComponent(schema ?? '')}`
 }
 
+export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unknown>[]) => {
+  const objects = rows.map((row) => {
+    const entries = table.columns.map(
+      ({ name }) => `${JSON.stringify(name)}:${JSON.stringify(row[name] ?? null)}`
+    )
+    return `{${entries.join(',')}}`
+  })
+  return `[${objects.join(',')}]`
+}
+
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 

@@ -1,8 +1,53 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatTableRowsToSQL, getTablePoliciesUrl } from './TableEntity.utils'
+import {
+  formatTableRowsToJSON,
+  formatTableRowsToSQL,
+  getTablePoliciesUrl,
+} from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+
+describe('TableEntity.utils: formatTableRowsToJSON', () => {
+  const table: SupaTable = {
+    id: 1,
+    type: ENTITY_TYPE.TABLE,
+    columns: [
+      { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+      { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+      { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      { name: 'meta', dataType: 'jsonb', format: 'jsonb', position: 3 },
+    ],
+    name: 'yearly_totals',
+    schema: 'public',
+    comment: undefined,
+    estimateRowCount: 1,
+  }
+
+  it('should follow column order, including integer-like column names', () => {
+    const rows = [{ idx: 0, '2023': 42, '2024': 99, id: 7, meta: { a: 1 } }]
+    expect(formatTableRowsToJSON(table, rows)).toBe(
+      `[{"id":7,"2024":99,"2023":42,"meta":{"a":1}}]`
+    )
+  })
+
+  it('should omit the grid idx key unless the table has an idx column', () => {
+    expect(formatTableRowsToJSON(table, [{ idx: 3, id: 1 }])).not.toContain('idx')
+
+    const withIdx: SupaTable = {
+      ...table,
+      columns: [{ name: 'idx', dataType: 'bigint', format: 'int8', position: 0 }],
+    }
+    expect(formatTableRowsToJSON(withIdx, [{ idx: 3 }])).toBe(`[{"idx":3}]`)
+  })
+
+  it('should emit null for missing columns and [] for no rows', () => {
+    expect(formatTableRowsToJSON(table, [{ id: 1 }])).toBe(
+      `[{"id":1,"2024":null,"2023":null,"meta":null}]`
+    )
+    expect(formatTableRowsToJSON(table, [])).toBe('[]')
+  })
+})
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
   it('should format rows into a single SQL INSERT statement', () => {
