@@ -15,10 +15,10 @@
   - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
+  - [x] Edge Functions. [Docs](https://supabase.com/docs/guides/functions)
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
-- [x] Dashboard
+- [x] Dashboard.
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
