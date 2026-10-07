@@ -1,0 +1,68 @@
+---
+title = "TLS handshake failures after removal of CBC-mode ciphers"
+topics = [ "platform" ]
+keywords = [ "tls", "ssl", "cipher", "cbc", "handshake", "https", "custom domain", "deprecation" ]
+
+[[errors]]
+message = "sslv3 alert handshake failure"
+
+[[errors]]
+message = "ERR_SSL_VERSION_OR_CIPHER_MISMATCH"
+
+[[errors]]
+message = "The request was aborted: Could not create SSL/TLS secure channel."
+
+[[errors]]
+message = "javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure"
+
+[[errors]]
+message = "An SSL error has occurred and a secure connection to the server cannot be made."
+---
+
+On **November 10, 2026 at the earliest**, Supabase will stop offering four CBC-mode TLS 1.2 cipher suites on project APIs (`<project_ref>.supabase.co` and custom domains). After the removal, clients that support only these ciphers can no longer connect to Auth, the Data API, Storage, Realtime, or Edge Functions.
+
+Direct Postgres connections, connections through the pooler, and the Management API are not affected.
+
+## Symptoms
+
+The client fails while establishing the TLS connection, before any HTTP request is sent. No request appears in your project's API logs. The exact error depends on the client, for example:
+
+- OpenSSL-based clients, such as curl, Node.js, Python, or PHP: `sslv3 alert handshake failure`
+- Browsers: `ERR_SSL_VERSION_OR_CIPHER_MISMATCH`
+- Windows PowerShell and .NET Framework: `The request was aborted: Could not create SSL/TLS secure channel.`
+- Java: `javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure`
+- Apple platforms: `An SSL error has occurred and a secure connection to the server cannot be made.`
+
+Other clients and connections from up-to-date devices keep working normally.
+
+## Why this happens
+
+The client supports neither TLS 1.3 nor any of the TLS 1.2 cipher suites still offered by Supabase. This usually means it's running end-of-life software, such as:
+
+- Old, unsupported versions of macOS, iOS, or Windows
+- Embedded devices, such as smart TVs or set-top boxes, that no longer receive updates
+- Outdated HTTP clients or runtimes built against old TLS libraries
+
+For the full list of removed and remaining cipher suites, see [TLS for project APIs](/docs/guides/security/tls).
+
+If you see these errors before the removal date, the cause is something else. For example, Supabase doesn't support TLS 1.0 or TLS 1.1, so clients limited to those versions can't connect regardless of this change.
+
+## How to diagnose
+
+From a machine using the same TLS library as the failing client, try a TLS 1.2 handshake restricted to the remaining cipher suites:
+
+```bash
+openssl s_client -connect <project_ref>.supabase.co:443 -servername <project_ref>.supabase.co \
+  -tls1_2 -cipher 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305' \
+  < /dev/null
+```
+
+If this command fails with a handshake error, that TLS library doesn't support any of the remaining ciphers. If you use a custom domain, replace both occurrences of `<project_ref>.supabase.co` with your domain.
+
+## How to fix it
+
+Update the affected client's operating system, runtime, or TLS library to a version that supports TLS 1.3 or the remaining TLS 1.2 cipher suites. Any client released in the last several years does.
+
+If you can't update the client, for example because it's an embedded device that no longer receives firmware updates, route its traffic through a proxy or server you control that supports the older ciphers and forwards requests to Supabase over a modern TLS connection.
+
+If the removal affects you and none of these options work for you, [open a support ticket](/dashboard/support/new).

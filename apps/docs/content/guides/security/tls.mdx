@@ -1,0 +1,98 @@
+---
+id: 'tls'
+title: 'TLS for project APIs'
+description: 'TLS versions and cipher suites supported by Supabase project APIs, and the upcoming removal of CBC-mode ciphers.'
+---
+
+All HTTP APIs of your Supabase project are served over HTTPS. This applies to your project's default domain (`<project_ref>.supabase.co`) as well as [custom domains](/docs/guides/platform/custom-domains), and covers every service routed through it:
+
+- [Auth](/docs/guides/auth)
+- [Data API](/docs/guides/api)
+- [Storage](/docs/guides/storage)
+- [Realtime](/docs/guides/realtime)
+- [Edge Functions](/docs/guides/functions)
+
+Direct Postgres connections and connections through the pooler use their own TLS configuration. See [Postgres SSL Enforcement](/docs/guides/platform/ssl-enforcement) for those.
+
+<Admonition type="caution" title="Removal of CBC-mode ciphers on November 10, 2026">
+
+Supabase will stop offering four CBC-mode TLS 1.2 cipher suites on project APIs **on November 10, 2026 at the earliest**. The ciphers will not be removed before this date, but the date may be moved later based on customer feedback.
+
+Modern clients already negotiate stronger ciphers and won't notice a change. See [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers) for details.
+
+</Admonition>
+
+## Supported TLS versions
+
+Project APIs accept connections using TLS 1.2 and TLS 1.3. Older protocol versions (SSL 3.0, TLS 1.0, and TLS 1.1) are not supported.
+
+## Supported cipher suites
+
+### TLS 1.3
+
+All standard TLS 1.3 cipher suites are supported. TLS 1.3 is not affected by the removal of CBC-mode ciphers.
+
+### TLS 1.2
+
+The following cipher suites are offered on TLS 1.2 connections:
+
+| IANA name                                       | OpenSSL name                    |
+| ----------------------------------------------- | ------------------------------- |
+| `TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256`       | `ECDHE-ECDSA-AES128-GCM-SHA256` |
+| `TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256` | `ECDHE-ECDSA-CHACHA20-POLY1305` |
+| `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256`         | `ECDHE-RSA-AES128-GCM-SHA256`   |
+| `TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256`   | `ECDHE-RSA-CHACHA20-POLY1305`   |
+| `TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384`       | `ECDHE-ECDSA-AES256-GCM-SHA384` |
+| `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384`         | `ECDHE-RSA-AES256-GCM-SHA384`   |
+
+Until the [removal date](#removal-of-cbc-mode-ciphers), the deprecated CBC-mode ciphers listed below are also offered.
+
+## Removal of CBC-mode ciphers
+
+CBC-mode cipher suites are vulnerable to several known attacks and are commonly flagged by security scanners and penetration tests. To address this, Supabase will stop offering the following cipher suites on TLS 1.2 **on November 10, 2026 at the earliest**:
+
+| IANA name                                 | OpenSSL name                |
+| ----------------------------------------- | --------------------------- |
+| `TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256` | `ECDHE-ECDSA-AES128-SHA256` |
+| `TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256`   | `ECDHE-RSA-AES128-SHA256`   |
+| `TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384` | `ECDHE-ECDSA-AES256-SHA384` |
+| `TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384`   | `ECDHE-RSA-AES256-SHA384`   |
+
+### Who is affected
+
+Only clients that support none of the [remaining cipher suites](#tls-12) and don't support TLS 1.3 are affected. These clients will fail to establish a connection to your project's APIs after the removal.
+
+In the past 30 days, only 0.00001% of connections to Supabase projects negotiated one of these ciphers. Clients that depend on them typically run end-of-life software, for example:
+
+- Old, unsupported versions of macOS, iOS, or Windows
+- Embedded devices, such as smart TVs or set-top boxes, that no longer receive updates
+- Outdated HTTP clients or runtimes built against old TLS libraries
+
+Owners of projects that received connections using one of these ciphers in the past 30 days have been contacted directly.
+
+### What isn't affected
+
+- TLS 1.3 connections
+- TLS 1.2 connections using any of the [remaining cipher suites](#tls-12)
+- Direct Postgres connections and connections through the pooler
+- The [Management API](/docs/reference/api/introduction) (`api.supabase.com`)
+
+### Check whether your client is affected
+
+Update the client's operating system, runtime, or TLS library to a supported version. Any client released in the last several years supports TLS 1.3 or the remaining TLS 1.2 ciphers.
+
+To confirm that a client can connect after the removal, check that it can negotiate a TLS 1.2 connection using one of the remaining cipher suites. For example, on a machine using the same TLS library as your client:
+
+```bash
+openssl s_client -connect <project_ref>.supabase.co:443 -servername <project_ref>.supabase.co \
+  -tls1_2 -cipher 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305' \
+  < /dev/null
+```
+
+If the handshake succeeds, the output includes the negotiated cipher. If it fails with a handshake error, that client relies on a cipher being removed. If you use a custom domain, replace both occurrences of `<project_ref>.supabase.co` with your domain.
+
+For common error messages and workarounds, see [TLS handshake failures after removal of CBC-mode ciphers](/docs/guides/troubleshooting/tls-handshake-failures-after-cbc-cipher-removal).
+
+### Concerns about the removal
+
+If the removal affects you and you can't update your clients before the removal date, [open a support ticket](/dashboard/support/new).
