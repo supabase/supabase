@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps/OAuthApps.constants'
@@ -34,7 +34,7 @@ export const ProjectClaimConfirm = ({
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   const { mutateAsync: approveRequest, isPending: isApproving } =
-    useApiAuthorizationApproveMutation({ onError: () => {} })
+    useApiAuthorizationApproveMutation()
 
   const { mutateAsync: claimProject, isPending: isClaiming } = useOrganizationProjectClaimMutation()
 
@@ -68,8 +68,8 @@ export const ProjectClaimConfirm = ({
     <ProjectClaimLayout
       title={
         <>
-          Claim a project <span className="text-brand">{projectClaim?.project?.name}</span> from{' '}
-          <span className="text-brand">{requester?.name}</span>
+          Claim a project <span className="text-primary">{projectClaim?.project?.name}</span> from{' '}
+          <span className="text-primary">{requester?.name}</span>
         </>
       }
     >
@@ -85,7 +85,7 @@ export const ProjectClaimConfirm = ({
               }}
             >
               {!requester.icon && (
-                <p className="text-foreground-light text-lg">{requester.name[0]}</p>
+                <p className="text-foreground-light text-lg">{requester.name?.[0] ?? '?'}</p>
               )}
             </div>
 
@@ -117,7 +117,7 @@ export const ProjectClaimConfirm = ({
           <ul className="space-y-3">
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-brand h-5 w-5" />
+                <CheckCircle2 className="text-primary h-5 w-5" />
               </span>
               <span>
                 The project will be transferred to your Supabase organization{' '}
@@ -133,7 +133,7 @@ export const ProjectClaimConfirm = ({
             </li>
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-brand h-5 w-5" />
+                <CheckCircle2 className="text-primary h-5 w-5" />
               </span>
               <span>
                 <span className="text-foreground">{requester?.name}</span> will receive API access
@@ -143,7 +143,7 @@ export const ProjectClaimConfirm = ({
             </li>
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-brand h-5 w-5" />
+                <CheckCircle2 className="text-primary h-5 w-5" />
               </span>
               <span>
                 You'll be responsible for maintaining the project, which may include additional
@@ -255,7 +255,13 @@ export const ProjectClaimConfirm = ({
         </div>
       </div>
       <div className="flex justify-center sticky bottom-0">
-        <Button size="medium" loading={isLoading} disabled={isLoading} onClick={onClaimProject}>
+        <Button
+          variant="primary"
+          size="medium"
+          loading={isLoading}
+          disabled={isLoading}
+          onClick={onClaimProject}
+        >
           Claim project {projectClaim?.project?.name}
         </Button>
       </div>

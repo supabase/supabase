@@ -39,7 +39,6 @@ export function SecretEnvRow({ secret }: SecretEnvRowProps) {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="default"
             size="tiny"
             className={cn('px-1.5', isDisabled && 'opacity-50')}
             aria-label={secret.isRevealed ? 'Hide secret key' : 'Reveal secret key'}

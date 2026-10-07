@@ -30,6 +30,8 @@ import {
   Outlet,
   redirect,
   Scripts,
+  type AnyRouter,
+  type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import {
@@ -59,10 +61,12 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
@@ -72,10 +76,13 @@ import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalEr
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
@@ -103,6 +110,7 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const { data: organizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
@@ -110,9 +118,17 @@ const FeatureFlagProviderWithOrgContext = ({
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      if (selectedOrganization?.slug) customAttributes.organization_slug = selectedOrganization.slug
+      const createdAtUnixSeconds = toUnixSecondsString(organizationCreatedAt)
+      if (createdAtUnixSeconds) customAttributes.organization_created_at = createdAtUnixSeconds
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider, selectedOrganization?.plan?.id]
+    [
+      cloudProvider,
+      selectedOrganization?.plan?.id,
+      selectedOrganization?.slug,
+      organizationCreatedAt,
+    ]
   )
 
   return (
@@ -136,6 +152,12 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: ReactNode }) => {
 const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+// Mirrors the `MAINTENANCE_MODE` reads in `next.config.ts` and `vercel.ts`.
+// The var is unprefixed, so vite.config.ts inlines it explicitly (see the
+// define there) rather than it arriving via the NEXT_PUBLIC_ sweep — that
+// keeps the toggle a single build-time env var across all three runtimes.
+const IS_MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true'
 
 // Keep dev-only components out of the production bundle.
 const IS_DEV_TOOLBAR_ENABLED = IS_NON_PROD_ENV
@@ -298,7 +320,7 @@ function NotFound() {
   return <Error404 />
 }
 
-function ErrorBoundaryRoute({ error }: { error: Error }) {
+function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // Mirrors `errorBoundaryHandler` above (used by the in-tree
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
@@ -311,7 +333,7 @@ function ErrorBoundaryRoute({ error }: { error: Error }) {
         ;(error as Error & { sentryId?: string }).sentryId = eventId
       }
     })
-    console.error(error.stack)
+    console.error(error instanceof Error ? error.stack : error)
   }, [error])
 
   return <Error500 />
@@ -327,11 +349,25 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
+      maintenanceMode: IS_MAINTENANCE_MODE,
       hash: location.hash,
     })
-    if (!match) return
-    const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination
-    throw redirect({ href, statusCode: match.permanent ? 308 : 307 })
+    if (!match) return undefined
+    // `to`/`search`/`hash`, never `href`: the router treats `href` as an
+    // opaque (external) target, and preloading a Link whose beforeLoad
+    // throws `redirect({ href })` recurses forever — the preload retry
+    // rebuilds the origin location and re-runs this beforeLoad
+    // (https://github.com/TanStack/router/issues/7141). `to` is also
+    // basepath-relative, so no manual BASE_PATH prefix. The explicit
+    // `search`/`hash` fallbacks clear the incoming values rather than
+    // inherit them — `preserveQueryAndHash` already merged what carries over.
+    const { to, search, hash } = splitInternalUrl(match.destination)
+    throw redirect<AnyRouter, string>({
+      to,
+      search: search ?? {},
+      hash: hash ?? '',
+      statusCode: match.permanent ? 308 : 307,
+    })
   },
   component: RootComponent,
   shellComponent: RootDocument,
@@ -353,12 +389,7 @@ function RootComponent() {
                   <DynamicTitle />
                   <TooltipProvider>
                     <RouteValidationWrapper>
-                      <ThemeProvider
-                        defaultTheme="system"
-                        themes={['dark', 'light', 'classic-dark']}
-                        enableSystem
-                        disableTransitionOnChange
-                      >
+                      <ThemeProvider>
                         <DevToolbarProvider apiUrl={API_URL}>
                           <AiAssistantStateContextProvider>
                             <CommandProvider>
@@ -372,11 +403,13 @@ function RootComponent() {
                                   <GlobalShortcuts />
                                   <StudioCommandMenu />
                                   <FeaturePreviewModal />
+                                  <IndirectTaxDeclarationModal />
                                 </FeaturePreviewContextProvider>
                               </BannerStackProvider>
                               <Toaster />
                               <ToastErrorTracker />
                               <MonacoThemeProvider />
+                              <AppearanceSettingsProvider />
                             </CommandProvider>
                           </AiAssistantStateContextProvider>
                           <DevToolbar extraTabs={devToolbarExtraTabs} />
@@ -398,6 +431,8 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
   return (
     // suppressHydrationWarning is for next-themes: it writes data-theme and
     // color-scheme onto <html> from localStorage pre-hydration, which the
@@ -408,19 +443,21 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body>
         {children}
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[
-            {
-              name: 'TanStack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-            {
-              name: 'TanStack Query',
-              render: <ReactQueryDevtoolsPanel />,
-            },
-          ]}
-        />
+        {!isTestEnv && (
+          <TanStackDevtools
+            config={{ position: 'bottom-right' }}
+            plugins={[
+              {
+                name: 'TanStack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+              {
+                name: 'TanStack Query',
+                render: <ReactQueryDevtoolsPanel />,
+              },
+            ]}
+          />
+        )}
         <Scripts />
       </body>
     </html>

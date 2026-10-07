@@ -10,7 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -170,12 +170,6 @@ export const DowngradeModal = ({
               </div>
             </li>
           </ul>
-
-          {subscription?.billing_via_partner === true && subscription.billing_partner === 'fly' && (
-            <p className="mt-4 text-sm">
-              Your organization will be downgraded at the end of your current billing cycle.
-            </p>
-          )}
         </div>
         <DialogFooter>
           <Button variant={'default'} onClick={onClose}>

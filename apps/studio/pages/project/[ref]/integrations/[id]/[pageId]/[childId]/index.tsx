@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,

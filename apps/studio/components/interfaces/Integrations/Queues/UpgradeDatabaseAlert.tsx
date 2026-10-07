@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface UpgradeDatabaseAlertProps {
@@ -23,8 +24,8 @@ export const UpgradeDatabaseAlert = ({ minimumVersion = '15.6' }: UpgradeDatabas
           version of Postgres. The extension is available on version {minimumVersion} and higher.
         </p>
       </div>
-      <Button color="primary" className="w-fit">
-        <Link href={`/project/${project?.ref}/settings/infrastructure`}>Upgrade database</Link>
+      <Button variant="primary" color="primary" className="w-fit">
+        <Link href={getServiceVersionsPath(project?.ref)}>Upgrade database</Link>
       </Button>
     </Admonition>
   )

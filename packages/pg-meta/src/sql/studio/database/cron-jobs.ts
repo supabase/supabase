@@ -107,7 +107,7 @@ WITH deleted AS (
 SELECT count(*) as deleted_count FROM deleted;`
 }
 
-const CRON_CLEANUP_SCHEDULE_NAME = 'delete-job-run-details'
+export const CRON_CLEANUP_JOB_NAME = 'delete-job-run-details'
 const CRON_CLEANUP_SCHEDULE_EXPRESSION = '0 12 * * *'
 
 export const getScheduleDeleteCronJobRunDetailsSql = (interval: string): SafeSqlFragment => {
@@ -115,7 +115,7 @@ export const getScheduleDeleteCronJobRunDetailsSql = (interval: string): SafeSql
 
   return safeSql`
 SELECT cron.schedule(
-  ${literal(CRON_CLEANUP_SCHEDULE_NAME)},
+  ${literal(CRON_CLEANUP_JOB_NAME)},
   ${literal(CRON_CLEANUP_SCHEDULE_EXPRESSION)},
   ${literal(command)}
 );`

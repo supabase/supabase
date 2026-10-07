@@ -24,9 +24,13 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
+  shortcutsEnabled?: boolean
 }
 
-export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({
+  disabled = false,
+  shortcutsEnabled = true,
+}: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
@@ -35,7 +39,13 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
 
   const chats = Object.entries(snap.chats)
 
-  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY, () => setChatSelectorOpen((prev) => !prev))
+  useShortcut(
+    SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY,
+    () => setChatSelectorOpen((prev) => !prev),
+    {
+      enabled: shortcutsEnabled,
+    }
+  )
 
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)
@@ -211,6 +221,12 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                 <Plus size={14} strokeWidth={1.5} />
                 <span>Start a new chat</span>
               </CommandItem>
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup className="px-2 py-1.5">
+              <p className="text-xs text-foreground-lighter">
+                Chat history is saved to this browser and isn't synced across devices.
+              </p>
             </CommandGroup>
           </CommandList>
         </Command>

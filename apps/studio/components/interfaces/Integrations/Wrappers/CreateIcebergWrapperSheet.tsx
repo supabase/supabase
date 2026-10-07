@@ -10,6 +10,7 @@ import {
   Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  Separator,
   SheetFooter,
   SheetHeader,
   SheetSection,
@@ -19,7 +20,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
-import InputField from './InputField'
+import { InputField } from './InputField'
 import {
   FormSection,
   FormSectionContent,
@@ -36,7 +37,7 @@ const FORM_ID = 'create-wrapper-form'
 const S3TableSchema = z.object({
   target: z.literal('S3Tables'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
-  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  server_name: z.string().min(1, 'Please provide a name for your server'),
   target_schema: z.string().min(1, 'Please provide an unique target schema'),
   vault_aws_access_key_id: z.string().min(1, 'Required'),
   vault_aws_secret_access_key: z.string().min(1, 'Required'),
@@ -46,7 +47,7 @@ const S3TableSchema = z.object({
 const R2CatalogSchema = z.object({
   target: z.literal('R2Catalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
-  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  server_name: z.string().min(1, 'Please provide a name for your server'),
   target_schema: z.string().min(1, 'Please provide an unique target schema'),
   vault_aws_access_key_id: z.string().min(1, 'Required'),
   vault_aws_secret_access_key: z.string().min(1, 'Required'),
@@ -58,7 +59,7 @@ const R2CatalogSchema = z.object({
 const IcebergRestCatalogSchema = z.object({
   target: z.literal('IcebergRestCatalog'),
   source_schema: z.string().min(1, 'Please provide a namespace name'),
-  wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+  server_name: z.string().min(1, 'Please provide a name for your server'),
   target_schema: z.string().min(1, 'Please provide an unique target schema'),
   vault_aws_access_key_id: z.string().optional(),
   vault_aws_secret_access_key: z.string().optional(),
@@ -107,7 +108,7 @@ const targetFields: Record<Target, { name: string; required: boolean }[]> = {
 type Target = 'S3Tables' | 'R2Catalog' | 'IcebergRestCatalog'
 
 const INITIAL_VALUES = {
-  wrapper_name: '',
+  server_name: '',
   source_schema: '',
   target_schema: '',
   target: 'S3Tables',
@@ -144,7 +145,7 @@ export const CreateIcebergWrapperSheet = ({
     resolver: zodResolver(formSchema),
     defaultValues: INITIAL_VALUES,
   })
-  const { resetField, formState, setError, watch } = form
+  const { resetField, formState, setError } = form
   const { isDirty, isSubmitting } = formState
 
   useEffect(() => {
@@ -153,21 +154,23 @@ export const CreateIcebergWrapperSheet = ({
 
   const currentTarget = useRef<FormSchema['target']>(INITIAL_VALUES.target)
   useEffect(() => {
-    const subscription = watch((values) => {
-      if (!values.target || values.target === currentTarget.current) return
-      currentTarget.current = values.target
+    return form.subscribe({
+      name: 'target',
+      formState: { values: true },
+      callback: ({ values }) => {
+        if (!values.target || values.target === currentTarget.current) return
+        currentTarget.current = values.target
 
-      const fields = targetFields[values.target]
-      if (!fields) return
+        const fields = targetFields[values.target]
+        if (!fields) return
 
-      wrapperMeta.server.options.forEach((option) => {
-        // @ts-expect-error Can't reconcile with form schema
-        resetField(option.name, { defaultValue: option.defaultValue ?? '' })
-      })
+        wrapperMeta.server.options.forEach((option) => {
+          // @ts-expect-error Can't reconcile with form schema
+          resetField(option.name, { defaultValue: option.defaultValue ?? '' })
+        })
+      },
     })
-
-    return () => subscription.unsubscribe()
-  }, [resetField, watch, wrapperMeta])
+  }, [form, resetField, wrapperMeta])
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
     const foundSchema = schemas?.find((s) => s.name === values.target_schema)
@@ -201,7 +204,6 @@ export const CreateIcebergWrapperSheet = ({
         wrapperMeta,
         formState: {
           ...formValues,
-          server_name: `${values.wrapper_name}_server`,
           supabase_target_schema: values.target_schema,
         },
         mode: 'schema',
@@ -218,7 +220,6 @@ export const CreateIcebergWrapperSheet = ({
   }
 
   const isLoading = isCreatingWrapper || isSubmitting
-  const wrapperName = useWatch({ name: 'wrapper_name', control: form.control })
   const target = useWatch({ name: 'target', control: form.control })
 
   const targetOptions = wrapperMeta.server.options
@@ -241,27 +242,18 @@ export const CreateIcebergWrapperSheet = ({
             <SheetHeader>
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
-            <SheetSection className="grow overflow-y-auto">
-              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+
+            <SheetSection className="grow overflow-y-auto p-0">
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Server Configuration</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
-                    name="wrapper_name"
+                    name="server_name"
                     render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        label="Wrapper Name"
-                        description={
-                          wrapperName.length > 0 ? (
-                            <>
-                              Your wrapper's server name will be{' '}
-                              <code className="text-code-inline">{wrapperName}_server</code>
-                            </>
-                          ) : (
-                            ''
-                          )
-                        }
-                      >
+                      <FormItemLayout layout="horizontal" label="Server Name">
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
@@ -270,13 +262,19 @@ export const CreateIcebergWrapperSheet = ({
                   />
                 </FormSectionContent>
               </FormSection>
-              <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
+
+              <Separator />
+
+              <FormSection
+                className="p-5!"
+                header={<FormSectionLabel>Data target</FormSectionLabel>}
+              >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   <FormField
                     control={form.control}
                     name="target"
                     render={({ field }) => (
-                      <FormItemLayout layout="vertical">
+                      <FormItemLayout layout="horizontal" label="Import as">
                         <div>
                           <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
                             <RadioGroupStackedItem
@@ -329,7 +327,10 @@ export const CreateIcebergWrapperSheet = ({
                 </FormSectionContent>
               </FormSection>
 
+              <Separator />
+
               <FormSection
+                className="p-5!"
                 header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
               >
                 <FormSectionContent className="flex flex-col space-y-2" loading={false}>
@@ -351,11 +352,15 @@ export const CreateIcebergWrapperSheet = ({
                   )}
                 </FormSectionContent>
               </FormSection>
+
+              <Separator />
+
               <FormSection
+                className="p-5!"
                 header={
-                  <FormSectionLabel>
-                    <p>Foreign Schema</p>
-                    <p className="text-foreground-light mt-2 w-[90%]">
+                  <FormSectionLabel className="lg:col-span-12 flex flex-col gap-y-1">
+                    <p>Foreign schema</p>
+                    <p className="text-foreground-light">
                       You can query your data from the foreign tables in the specified schema after
                       the wrapper is created.
                     </p>
@@ -385,7 +390,6 @@ export const CreateIcebergWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                variant="default"
                 type="button"
                 onClick={onCloseWithConfirmation}
                 disabled={isLoading}

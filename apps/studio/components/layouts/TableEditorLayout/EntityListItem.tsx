@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
@@ -38,6 +38,7 @@ import type {
   TableApiAccessData,
   TableApiAccessMap,
 } from '@/data/privileges/table-api-access-query'
+import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -78,6 +79,7 @@ export const EntityListItem = ({
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const tabId = createTabId(entity.type, { id: entity.id })
   const tabs = useTabsStateSnapshot()
@@ -234,17 +236,23 @@ export const EntityListItem = ({
 
         {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger
-              asChild
-              className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
-            >
-              <Button
-                variant="text"
-                className="w-6 h-6"
-                icon={<MoreVertical size={14} strokeWidth={2} />}
-                onClick={(e) => e.preventDefault()}
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger
+                  asChild
+                  className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
+                >
+                  <Button
+                    variant="text"
+                    className="w-6 h-6"
+                    icon={<MoreVertical size={14} strokeWidth={2} />}
+                    onClick={(e) => e.preventDefault()}
+                    aria-label={`More options for ${entity.name}`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent side="bottom" align="start" className="w-52">
               <DropdownMenuItem
                 key="copy-name"
@@ -270,6 +278,7 @@ export const EntityListItem = ({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
+                      scoped,
                     }).then((tableDefinition) => {
                       if (!tableDefinition) {
                         throw new Error('Failed to get table schema')
@@ -585,7 +594,7 @@ const EntityTooltipTrigger = ({
       if (materializedViewHasLints) {
         tooltipContent = (
           <>
-            {accessWarning} as this is a Security definer view {learnMoreCTA}.
+            {accessWarning} as materialized view is accessible via API. {learnMoreCTA}.
           </>
         )
       }

@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -81,9 +81,7 @@ export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: stri
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="mt-1">
-          Update catalog token
-        </Button>
+        <Button className="mt-1">Update catalog token</Button>
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
@@ -130,7 +128,7 @@ export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: stri
           </FormItemLayout>
         </DialogSection>
         <DialogFooter>
-          <Button variant="default" disabled={isUpdating} onClick={() => setOpen(false)}>
+          <Button disabled={isUpdating} onClick={() => setOpen(false)}>
             Cancel
           </Button>
           <Button

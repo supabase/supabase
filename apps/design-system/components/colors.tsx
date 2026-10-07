@@ -1,15 +1,20 @@
 import { useState } from 'react'
-import { cn } from 'ui'
-import color from 'ui/src/lib/tailwind-demo-classes'
+import { cn, colors } from 'ui'
 
 import { Grid, GridItem } from './grid'
 
+const color = colors['default']
+
 const Colors = ({
   definition,
+  classes,
 }: {
   definition: 'background' | 'border' | 'text' | 'colors' | 'palletes'
+  /** Optional subset of utility classes. Defaults to the full set for `definition`. */
+  classes?: string[]
 }) => {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null)
+  const items = classes ?? color[definition]
 
   const handleCopy = async (value: string, index: number) => {
     try {
@@ -62,7 +67,7 @@ const Colors = ({
   return (
     <>
       <Grid>
-        {color[definition].map((x: string, i) => {
+        {items.map((x: string, i) => {
           return (
             <GridItem
               key={i}

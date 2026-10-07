@@ -134,6 +134,8 @@ export const showWhenSchema = z
 const formFieldBase = z.object({
   name: z.string().min(1),
   label: z.string().min(1),
+  /** Small italicized note rendered directly beneath the label, above the input. */
+  hint: z.string().optional(),
   /** Helper text rendered beneath the input. */
   description: z.string().optional(),
   placeholder: z.string().optional(),
@@ -193,6 +195,7 @@ export const formFieldSchema = z.discriminatedUnion('type', [
   textareaFieldSchema,
   selectFieldSchema,
   checkboxFieldSchema,
+  checkboxGroupFieldSchema,
 ])
 
 // ----- Form CRM config schemas -----
@@ -229,6 +232,12 @@ export const hubspotFormConfigSchema = z.object({
   excludeFields: z.array(z.string()).optional(),
   /** Legal consent text for GDPR. */
   consent: z.string().optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const customerioFormConfigSchema = z.object({
@@ -249,6 +258,12 @@ export const customerioFormConfigSchema = z.object({
    * Example: { event_name: 'Stripe Sessions 2026 Exec Dinner' }
    */
   staticProperties: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const notionFormConfigSchema = z.object({
@@ -270,6 +285,15 @@ export const notionFormConfigSchema = z.object({
    * Example: { source: 'Website Go Page' }
    */
   staticProperties: z.record(z.string(), z.unknown()).optional(),
+  /**
+   * Conditional fan-out — only send to this provider when the rule passes.
+   * Evaluated against the submitted form values using the same semantics as
+   * field-level `showWhen`. Omit to always send.
+   *
+   * Example: only sync Technology partner submissions to a specialised Notion
+   * database — `{ field: 'partner_type', equals: 'technology' }`.
+   */
+  sendWhen: showWhenSchema.optional(),
 })
 
 export const formCrmConfigSchema = z

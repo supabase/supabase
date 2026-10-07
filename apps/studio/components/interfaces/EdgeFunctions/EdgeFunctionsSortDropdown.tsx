@@ -43,7 +43,6 @@ export const EdgeFunctionsSortDropdown = ({ value, onChange }: EdgeFunctionsSort
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="default"
           icon={
             value.includes('desc') ? (
               <ArrowDownWideNarrow size={14} />

@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 import { v4 as _uuidV4 } from 'uuid'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,6 +9,8 @@ import {
   extractUrls,
   formatBytes,
   formatCurrency,
+  formatRestoreWindow,
+  getBasePathURL,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
   getSemanticVersion,
@@ -29,6 +32,10 @@ import {
   tryParseJson,
   uuidv4,
 } from './helpers'
+
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn(), success: vi.fn() },
+}))
 
 vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid'),
@@ -98,6 +105,33 @@ describe('getURL', () => {
     const result = getURL()
 
     expect(result).toEqual('https://supabase.com/dashboard')
+  })
+})
+
+describe('getBasePathURL', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('appends the base path to the site URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('does not double the base path on the fallback URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', '')
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_BRANCH_URL', '')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('strips a trailing slash before appending the base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com/')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('returns the site URL when there is no base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:8082')
+    expect(getBasePathURL('')).toEqual('http://localhost:8082')
   })
 })
 
@@ -217,18 +251,61 @@ describe('copyToClipboard', () => {
     await copyToClipboard('hello')
     expect(writeTextMock).toHaveBeenCalledWith('hello')
   })
+
+  it('falls back to writeText when clipboard.write is denied', async () => {
+    writeMock.mockRejectedValue(
+      new DOMException("Failed to execute 'write' on 'Clipboard': Write permission denied.")
+    )
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeTextMock).toHaveBeenCalledWith('hello')
+    expect(callback).toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
+  })
+
+  it('does not retry after a successful rich write when the callback throws', async () => {
+    const callback = vi.fn(() => {
+      throw new Error('Callback failed')
+    })
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeMock).toHaveBeenCalledOnce()
+    expect(writeTextMock).not.toHaveBeenCalled()
+    expect(callback).toHaveBeenCalledOnce()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
+  it('reports when both clipboard methods are denied', async () => {
+    writeMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(callback).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
+  it('resolves and reports when writeText is denied', async () => {
+    writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    vi.stubGlobal('navigator', { clipboard: { writeText: writeTextMock } })
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(callback).not.toHaveBeenCalled()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
 })
 
 describe('detectBrowser', () => {
-  const originalNavigator = global.navigator
-
   const setUserAgent = (ua: string) => {
     vi.stubGlobal('navigator', { userAgent: ua })
   }
 
   afterEach(() => {
+    // `global.navigator` can't be assigned directly (jsdom defines it as a getter),
+    // so restore it by unstubbing.
     vi.unstubAllGlobals()
-    global.navigator = originalNavigator
   })
 
   it('detects Chrome', () => {
@@ -700,5 +777,17 @@ describe('tablesToSQL', () => {
 
     expect(result).toContain('-- WARNING: This schema is for context only')
     expect(result).not.toContain('CREATE TABLE')
+  })
+})
+
+describe('formatRestoreWindow', () => {
+  it('renders windows under a year in days', () => {
+    expect(formatRestoreWindow(90)).toBe('90 days')
+    expect(formatRestoreWindow(364)).toBe('364 days')
+  })
+
+  it('renders windows of a year or more as 1 year', () => {
+    expect(formatRestoreWindow(365)).toBe('1 year')
+    expect(formatRestoreWindow(400)).toBe('1 year')
   })
 })

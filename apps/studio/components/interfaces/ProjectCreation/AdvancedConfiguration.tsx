@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -63,7 +63,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                             </>
                           }
                           description="Recommended for production workloads"
-                          className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2"
+                          className="[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2"
                         />
                       </FormControl>
                     </FormItem>
@@ -77,12 +77,12 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                               label={
                                 <>
                                   Postgres with OrioleDB
-                                  <Badge variant="warning">Alpha</Badge>
+                                  <Badge variant="warning">Beta</Badge>
                                 </>
                               }
                               description="Not recommended for production workloads"
                               className={cn(
-                                '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>label]:flex [&>div>div>label]:items-center [&>div>div>label]:gap-x-2',
+                                '[&>div>div>p]:text-left [&>div>div>p]:text-xs [&>div>div>div]:flex [&>div>div>div]:items-center [&>div>div>div]:gap-x-2',
                                 form.getValues('useOrioleDb') ? 'rounded-b-none!' : ''
                               )}
                               disabled={disableOrioleProjectCreation}
@@ -104,7 +104,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                     type="warning"
                     className="rounded-t-none [&>div]:text-xs"
                     title="OrioleDB is not production ready"
-                    description="Postgres with OrioleDB extension is currently in Public Alpha and not recommended for production usage yet."
+                    description="Postgres with OrioleDB extension is currently in Public Beta and not recommended for production usage yet."
                   >
                     <DocsButton className="mt-2" href={`${DOCS_URL}/guides/database/orioledb`} />
                   </Admonition>

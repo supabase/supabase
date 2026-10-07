@@ -74,32 +74,10 @@ function buildPlanTiersSection(): string {
 function buildComputeSection(): string {
   const rows = addOnTable.database.rows
 
-  const headers = [
-    'Size',
-    '$/month',
-    'CPU',
-    'Dedicated',
-    'RAM',
-    'Direct Connections',
-    'Pooler Connections',
-  ]
-  const keys = [
-    'plan',
-    'pricing',
-    'cpu',
-    'dedicated',
-    'memory',
-    'directConnections',
-    'poolerConnections',
-  ]
+  const headers = ['Size', '$/month', 'Compute', 'RAM', 'Direct Connections', 'Pooler Connections']
+  const keys = ['plan', 'pricing', 'cpu', 'memory', 'directConnections', 'poolerConnections']
 
-  const dataRows = rows.map((row) =>
-    keys.map((key) => {
-      const val = getColumnValue(row, key)
-      if (key === 'dedicated') return val ? 'Yes' : 'No'
-      return String(val)
-    })
-  )
+  const dataRows = rows.map((row) => keys.map((key) => String(getColumnValue(row, key))))
 
   const widths = headers.map((h, i) => Math.max(h.length, ...dataRows.map((r) => r[i].length)))
 
@@ -130,7 +108,7 @@ function buildComputeSection(): string {
 const DISK_TYPES = [
   {
     name: 'General Purpose',
-    maxSize: '16 TB',
+    maxSize: '64 TB',
     size: '8 GB included, then $0.125 per GB',
     iops: '3,000 IOPS included, then $0.024 per IOPS',
     throughput: '125 MB/s included, then $0.095 per MB/s',
@@ -260,6 +238,44 @@ function buildFAQSection(): string {
 }
 
 // ---------------------------------------------------------------------------
+// Database-only projects
+// ---------------------------------------------------------------------------
+
+function findPlan(planId: PlanId) {
+  const plan = plans.find((p) => p.planId === planId)
+  if (!plan) throw new Error(`Missing plan "${planId}"`)
+  return plan
+}
+
+function findFeatureLabel(planId: PlanId, pattern: RegExp): string {
+  for (const feature of findPlan(planId).features) {
+    const label = Array.isArray(feature) ? feature[0] : feature
+    if (pattern.test(label)) return label
+  }
+  throw new Error(`Missing feature matching ${pattern} on plan "${planId}"`)
+}
+
+function buildDatabaseOnlySection(): string {
+  const free = findPlan('free')
+  const pro = findPlan('pro')
+  const freeDatabase = findFeatureLabel('free', /database size/i)
+  const proDisk = findFeatureLabel('pro', /disk size/i)
+
+  return [
+    '## Database-only projects',
+    '',
+    "A Supabase project can be used as a standalone Postgres database. Connect with psql, Prisma, Drizzle, or any Postgres client or ORM using the project's connection string. Auth, Storage, Realtime, and Edge Functions are included in every project but optional. Unused products cost nothing.",
+    '',
+    `- Free: $${free.priceMonthly}/month, including ${freeDatabase}.${free.footer ? ` ${free.footer}` : ''}`,
+    `- Pro: from $${pro.priceMonthly}/month, including ${proDisk} and $10/month in compute credits that cover one project on Micro compute. A single database-only project on Micro compute costs $${pro.priceMonthly}/month before usage beyond the included quotas.`,
+    '- Projects on paid plans are not paused for inactivity.',
+    '',
+    'Connection guide: https://supabase.com/docs/guides/database/connecting-to-postgres.md',
+    '',
+  ].join('\n')
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -269,7 +285,7 @@ export function generatePricingContent(): string {
     '',
     '> Start for free, scale as you grow. Pay only for what you use.',
     '',
-    'Supabase offers four plans: Free, Pro, Team, and Enterprise. All plans include unlimited API requests.',
+    "Supabase offers four plans: Free, Pro, Team, and Enterprise. All plans include unlimited API requests. Projects on paid plans aren't paused for inactivity.",
     '',
     '## How billing works',
     '',
@@ -279,6 +295,7 @@ export function generatePricingContent(): string {
     '',
     'For current pricing, visit https://supabase.com/pricing.',
     '',
+    buildDatabaseOnlySection(),
     buildPlanTiersSection(),
     buildComputeSection(),
     buildDiskSection(),

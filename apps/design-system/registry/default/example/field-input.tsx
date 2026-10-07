@@ -1,11 +1,4 @@
-import { Input } from 'ui'
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldSet,
-} from 'ui/src/components/shadcn/ui/field'
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet, Input } from 'ui'
 
 export default function FieldInput() {
   return (

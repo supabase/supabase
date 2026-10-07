@@ -1,10 +1,13 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
+import { logsKeys } from './keys'
 import { logsAllEndpointUrl } from './logs-endpoint'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
 
 const LOOKBACK_HOURS = 24 * 7
+
+const KEYS_STALE_TIME = 5 * 60 * 1000
 
 export async function fetchOtelLogKeys({
   projectRef,
@@ -31,15 +34,31 @@ export async function fetchOtelLogKeys({
   return rows.map((r) => r.key).filter(Boolean)
 }
 
+/**
+ * Shared by the reactive hook and imperative `queryClient.fetchQuery` callers, so
+ * a lookup triggered on submit reuses whatever a subscribed component already
+ * cached for the same source (and vice versa).
+ */
+export function otelLogKeysQueryOptions({
+  projectRef,
+  source,
+}: {
+  projectRef: string
+  source: string
+}) {
+  return queryOptions({
+    queryKey: logsKeys.otelLogKeys(projectRef, source),
+    queryFn: ({ signal }) => fetchOtelLogKeys({ projectRef, source, signal }),
+    staleTime: KEYS_STALE_TIME,
+  })
+}
+
 export function useOtelLogKeysQuery(
   { projectRef, source }: { projectRef?: string; source?: string },
   { enabled = true }: { enabled?: boolean } = {}
 ) {
   return useQuery({
-    queryKey: ['projects', projectRef, 'otel-log-keys', source],
-    queryFn: ({ signal }) =>
-      fetchOtelLogKeys({ projectRef: projectRef ?? '', source: source ?? '', signal }),
+    ...otelLogKeysQueryOptions({ projectRef: projectRef ?? '', source: source ?? '' }),
     enabled: enabled && Boolean(projectRef) && Boolean(source),
-    staleTime: 5 * 60 * 1000,
   })
 }

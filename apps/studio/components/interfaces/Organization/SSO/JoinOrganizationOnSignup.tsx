@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -19,7 +19,7 @@ export const JoinOrganizationOnSignup = ({
 }: {
   form: ReturnType<typeof useForm<SSOConfigFormSchema>>
 }) => {
-  const joinOrgOnSignup = form.watch('joinOrgOnSignup')
+  const joinOrgOnSignup = useWatch({ control: form.control, name: 'joinOrgOnSignup' })
 
   return (
     <div className="space-y-4">

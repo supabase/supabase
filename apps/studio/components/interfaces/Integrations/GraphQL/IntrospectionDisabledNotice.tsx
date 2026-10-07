@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { PG_GRAPHQL_CONFIG_DOCS_URL } from './constants'
 import { IntrospectionConfirmModal } from './IntrospectionConfirmModal'
@@ -45,7 +45,7 @@ export const IntrospectionDisabledNotice = ({
             GraphQL introspection is disabled — docs explorer and autocomplete are unavailable.
           </span>
           <div className="flex items-center gap-1">
-            <Button variant="default" size="tiny" onClick={() => setShowConfirm(true)}>
+            <Button size="tiny" onClick={() => setShowConfirm(true)}>
               Enable introspection
             </Button>
             <Button
@@ -75,9 +75,7 @@ export const IntrospectionDisabledNotice = ({
               .
             </p>
             <div className="mt-3">
-              <Button variant="default" onClick={() => setShowConfirm(true)}>
-                Enable introspection
-              </Button>
+              <Button onClick={() => setShowConfirm(true)}>Enable introspection</Button>
             </div>
           </Admonition>
           <Button

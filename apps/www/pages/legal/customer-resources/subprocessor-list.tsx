@@ -26,14 +26,10 @@ const meta = {
   description: 'The list of third-party sub-processors Supabase uses to provide its services.',
 }
 
-// NOTE: This page is intentionally HIDDEN for now — it is not linked from the Legal Hub
-// index (`pages/legal/index.tsx`) or any navigation. It is also marked noindex/nofollow
-// so search engines do not index it while it is in draft. Remove `noindex`/`nofollow` and
-// add a link from the Legal Hub index when Legal is ready to publish it.
 export default function SubprocessorListPage() {
   return (
     <DefaultLayout>
-      <NextSeo {...meta} noindex nofollow />
+      <NextSeo {...meta} />
       <PageHeader
         breadcrumb={
           <PageBreadcrumb
@@ -49,7 +45,7 @@ export default function SubprocessorListPage() {
       <SectionContainer className="prose">
         <div className="flex flex-col gap-4">
           <div className="not-prose">
-            <Button asChild variant="default" icon={<Download />}>
+            <Button asChild icon={<Download />}>
               <a href={PDF_PATH} download target="_blank" rel="noopener noreferrer">
                 Subprocessor List - Updated {CURRENT_PDF.displayDate}
               </a>

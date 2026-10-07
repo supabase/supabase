@@ -139,6 +139,22 @@ val data = supabase.auth.signUpWith(Email) {
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var session = await supabase.Auth.SignUp("valid.email@supabase.io", "example-password", new SignUpOptions
+{
+    Data = new Dictionary<string, object>
+    {
+        { "first_name", "John" },
+        { "age", 27 }
+    }
+});
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 User metadata is stored on the `raw_user_meta_data` column of the `auth.users` table. To view the metadata:
@@ -196,6 +212,16 @@ val metadata = user?.userMetadata
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var user = supabase.Auth.CurrentUser;
+var metadata = user?.UserMetadata;
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Deleting users
@@ -209,6 +235,22 @@ You cannot delete a user if they are the owner of any objects in Supabase Storag
 You will encounter an error when you try to delete an Auth user that owns any Storage objects. If this happens, try deleting all the objects for that user, or reassign ownership to another user.
 
 </Admonition>
+
+### Removing account access
+
+When the goal is to remove an account so it can no longer access your app, delete the auth user with [`auth.admin.deleteUser()`](/docs/reference/javascript/auth-admin-deleteuser). With the default `shouldSoftDelete: false`, this removes the row from `auth.users`, which cascades to `auth.sessions` and invalidates the user's refresh tokens — so the account can no longer mint new access tokens.
+
+A few things are _not_ a substitute for deleting the user:
+
+- A temporary [ban](/docs/reference/javascript/auth-admin-updateuserbyid) only blocks sign-in for its duration and does not revoke existing sessions.
+- Marking the account as deleted only in your own application tables leaves the `auth.users` row intact, so it can still authenticate and refresh.
+
+Deleting the user still cannot retroactively invalidate an access token that was already issued. Supabase access tokens are stateless JWTs, so a token already in the user's hands stays valid until its `exp` claim passes, and during that window the account can still call the API. You have two ways to handle this window:
+
+- **Bound it:** keep the [access token (JWT) expiry](/docs/guides/auth/sessions) short, so any outstanding token expires soon after you delete the user.
+- **Close it for sensitive operations:** validate the `session_id` claim against the `auth.sessions` table on those operations. Because deleting the user removes the session row, an outstanding token fails this check — but only on the requests where you perform it; other API calls still accept the token until `exp`.
+
+See [User sessions](/docs/guides/auth/sessions) for details.
 
 ## Exporting users
 

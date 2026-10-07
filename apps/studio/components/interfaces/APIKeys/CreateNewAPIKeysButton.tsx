@@ -13,7 +13,7 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
 
@@ -59,7 +59,9 @@ export const CreateNewAPIKeysButton = () => {
 
   return (
     <AlertDialog open={createKeysDialogOpen} onOpenChange={setCreateKeysDialogOpen}>
-      <Button onClick={() => setCreateKeysDialogOpen(true)}>Create new API keys</Button>
+      <Button variant="primary" onClick={() => setCreateKeysDialogOpen(true)}>
+        Create new API keys
+      </Button>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Create new API keys</AlertDialogTitle>

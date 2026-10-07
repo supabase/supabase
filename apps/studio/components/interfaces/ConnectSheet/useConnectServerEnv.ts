@@ -69,7 +69,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     { enabled: canReadAPIKeys }
   )
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
-  const secretKey = keys?.secretKey
+  const secretKey = keys?.secretKey ?? keys?.serviceKey
   const maskedValue = secretKey?.api_key
     ? `${secretKey.api_key.slice(0, 15)}${SECRET_MASK}`
     : 'your-secret-key'
@@ -79,7 +79,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     isLoading: isRevealing,
     reveal,
     clear,
-  } = useRevealedSecret({ projectRef, id: secretKey?.id })
+  } = useRevealedSecret({ projectRef, id: secretKey?.id ?? undefined })
 
   // toggle() and getSecretValue() can both decide to reveal before either
   // resolves (e.g. clicking "Reveal" and "Copy" in quick succession); share

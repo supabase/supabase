@@ -7,8 +7,11 @@ vi.mock('common', () => ({
   useParams: () => ({ ref: 'test-ref' }),
 }))
 
+const readReplicasMock: {
+  data: Array<{ identifier: string; region: string; inserted_at: string }>
+} = { data: [] }
 vi.mock('@/data/read-replicas/replicas-query', () => ({
-  useReadReplicasQuery: () => ({ data: [] }),
+  useReadReplicasQuery: () => readReplicasMock,
 }))
 
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
@@ -498,6 +501,69 @@ describe('useConnectState', () => {
   // ============================================================================
 
   describe('high availability projects', () => {
+    const PRIMARY_DATABASE = {
+      identifier: 'test-ref',
+      region: 'ap-southeast-1',
+      inserted_at: '2024-01-01T00:00:00Z',
+    }
+    const REPLICA_DATABASE = {
+      identifier: 'test-ref-rr-abcdefgh',
+      region: 'ap-southeast-1',
+      inserted_at: '2024-01-02T00:00:00Z',
+    }
+
+    afterEach(async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(false)
+      readReplicasMock.data = []
+    })
+
+    test('should offer only the primary and the load balancer as sources for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+      readReplicasMock.data = [PRIMARY_DATABASE, REPLICA_DATABASE]
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const options = result.current.getFieldOptions('connectionSource')
+      expect(options).toEqual([
+        { value: 'test-ref', label: 'Primary database' },
+        { value: 'load-balancer', label: 'Replica (read-only)' },
+      ])
+    })
+
+    test('should keep replicas as sources and omit the load balancer for non-HA projects', () => {
+      readReplicasMock.data = [PRIMARY_DATABASE, REPLICA_DATABASE]
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      const options = result.current.getFieldOptions('connectionSource')
+      expect(options.map((o) => o.value)).toEqual(['test-ref', 'test-ref-rr-abcdefgh'])
+      expect(options.some((o) => o.value === 'load-balancer')).toBe(false)
+    })
+
+    test('should coerce a replica connection source to the primary for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionSource: 'test-ref-rr-abcdefgh' })
+      )
+
+      expect(result.current.state.connectionSource).toBe('test-ref')
+    })
+
+    test('should preserve the load balancer as a valid connection source for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionSource: 'load-balancer' })
+      )
+
+      expect(result.current.state.connectionSource).toBe('load-balancer')
+    })
+
     test('should hide connectionMethod field for HA projects', async () => {
       const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
       vi.mocked(useIsHighAvailability).mockReturnValue(true)
@@ -528,6 +594,34 @@ describe('useConnectState', () => {
 
       const connectionTypeField = result.current.activeFields.find((f) => f.id === 'connectionType')
       expect(connectionTypeField?.label).toBe('Connection Type')
+    })
+
+    test('should coerce pooler-flavored initial state to the direct method for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      // Simulates pooler selections restored from the URL or localStorage
+      const { result } = renderHook(() =>
+        useConnectState({ mode: 'direct', connectionMethod: 'transaction', useSharedPooler: true })
+      )
+
+      expect(result.current.state.connectionMethod).toBe('direct')
+      expect(result.current.state.useSharedPooler).toBe(false)
+    })
+
+    test('should coerce connectionMethod updates to the direct method for HA projects', async () => {
+      const { useIsHighAvailability } = await import('@/hooks/misc/useSelectedProject')
+      vi.mocked(useIsHighAvailability).mockReturnValue(true)
+
+      const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+
+      act(() => {
+        result.current.updateField('connectionMethod', 'session')
+        result.current.updateField('useSharedPooler', true)
+      })
+
+      expect(result.current.state.connectionMethod).toBe('direct')
+      expect(result.current.state.useSharedPooler).toBe(false)
     })
 
     test('should not affect non-HA projects', async () => {
@@ -692,6 +786,47 @@ describe('useConnectState', () => {
           result.current.setMode('direct')
         })
         expect(result.current.state.connectionMethod).toBe('session')
+      })
+    })
+
+    describe('mcp features for deployment mode', () => {
+      test('self-hosted defaults and options stay within the non-platform subset', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
+        act(() => {
+          result.current.setMode('mcp')
+        })
+
+        const features = result.current.state.mcpFeatures
+        expect(Array.isArray(features)).toBe(true)
+        expect(features).toEqual(
+          expect.arrayContaining(['docs', 'database', 'development', 'debugging'])
+        )
+        expect(features).not.toContain('storage')
+        expect(features).not.toContain('account')
+        expect(features).not.toContain('auth')
+
+        const options = result.current.getFieldOptions('mcpFeatures').map((o) => o.value)
+        expect(options).toEqual(['docs', 'database', 'debugging', 'development'])
+      })
+
+      test('self-hosted strips unsupported features when re-entering mcp mode', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() =>
+          useConnectState({ mode: 'mcp', mcpFeatures: ['docs', 'account', 'database'] })
+        )
+        act(() => {
+          result.current.setMode('mcp')
+        })
+        expect(result.current.state.mcpFeatures).toEqual(['docs', 'database'])
       })
     })
   })

@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 
 import {
   findTrustedPartnerByRedirectUri,
+  getOAuthImpersonationWarning,
   getRedirectHostname,
   getRequesterLogo,
   hostMatchesAllowlist,
@@ -60,9 +61,10 @@ describe('findTrustedPartnerByRedirectUri', () => {
 })
 
 describe('getRequesterLogo', () => {
-  test('uses curated assets only when redirect host is allowlisted', () => {
+  test('uses curated assets when redirect host is allowlisted', () => {
     const trusted = getRequesterLogo({
       icon: null,
+      name: 'Claude',
       redirectUri: 'https://claude.ai/api/mcp/auth_callback',
       useDarkVariant: false,
     })
@@ -70,22 +72,97 @@ describe('getRequesterLogo', () => {
       src: getMcpClientIconSrc({ icon: 'claude', useDarkVariant: false }),
       isKnownClient: true,
     })
+  })
 
-    const namedOnly = getRequesterLogo({
-      icon: null,
-      redirectUri: 'https://evil.com/callback',
-      useDarkVariant: false,
+  test('uses curated assets for localhost when the name matches a trusted partner', () => {
+    expect(
+      getRequesterLogo({
+        icon: null,
+        name: 'Claude',
+        redirectUri: 'http://127.0.0.1:42813/callback',
+        useDarkVariant: false,
+      })
+    ).toEqual({
+      src: getMcpClientIconSrc({ icon: 'claude', useDarkVariant: false }),
+      isKnownClient: true,
     })
-    expect(namedOnly).toEqual({ src: '', isKnownClient: false })
+  })
+
+  test('does not use curated assets from name alone on a remote host', () => {
+    expect(
+      getRequesterLogo({
+        icon: null,
+        name: 'Claude',
+        redirectUri: 'https://evil.com/callback',
+        useDarkVariant: false,
+      })
+    ).toEqual({ src: '', isKnownClient: false })
   })
 
   test('falls back to the supplied icon URL when redirect is not trusted', () => {
     expect(
       getRequesterLogo({
         icon: 'https://example.com/icon.png',
+        name: 'Acme',
         redirectUri: 'https://evil.com/callback',
         useDarkVariant: false,
       })
     ).toEqual({ src: 'https://example.com/icon.png', isKnownClient: false })
+  })
+})
+
+describe('getOAuthImpersonationWarning', () => {
+  test('warns when a trusted name redirects to a remote non-allowlisted host', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude Desktop',
+        redirectUri: 'https://evil.com/callback',
+      })
+    ).toEqual({
+      brandDisplayName: 'Claude',
+      redirectHost: 'evil.com',
+    })
+  })
+
+  test('skips localhost MCP redirects', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: 'http://127.0.0.1:42813/callback',
+      })
+    ).toBe(null)
+  })
+
+  test('skips when redirect host matches the named partner', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: 'https://claude.ai/api/mcp/auth_callback',
+      })
+    ).toBe(null)
+  })
+
+  test('skips when the name does not match a trusted partner', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Acme Tools',
+        redirectUri: 'https://evil.com/callback',
+      })
+    ).toBe(null)
+  })
+
+  test('skips missing or unparsable redirect URIs', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: null,
+      })
+    ).toBe(null)
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: 'not-a-url',
+      })
+    ).toBe(null)
   })
 })

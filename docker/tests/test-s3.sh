@@ -3,7 +3,7 @@
 # Test S3 protocol endpoint for self-hosted Supabase Storage.
 #
 # Verifies that the S3-compatible endpoint at /storage/v1/s3 works with
-# standard S3 clients — the same way end users interact with it via
+# standard S3 clients - the same way end users interact with it via
 # aws cli, rclone, or other S3-compatible tools.
 #
 # Usage:
@@ -65,11 +65,24 @@ check() {
     fi
 }
 
-# Wrapper for aws s3/s3api commands with correct endpoint and credentials
+# Wrapper for aws s3/s3api commands with correct endpoint and credentials.
+#
+# Always exits 0: under `set -e` a failing aws call would kill the suite on the
+# spot, so the check never records a FAIL and no summary is printed. The aws
+# error is echoed to stderr so a FAIL stays explainable even where the caller
+# discards stdout.
 s3() {
-    AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY" \
-    AWS_SECRET_ACCESS_KEY="$S3_SECRET_KEY" \
-    aws "$@" --endpoint-url "$S3_ENDPOINT" --region "$REGION" 2>&1
+    s3_out=$(AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY" \
+        AWS_SECRET_ACCESS_KEY="$S3_SECRET_KEY" \
+        aws "$@" --endpoint-url "$S3_ENDPOINT" --region "$REGION" 2>&1) ||
+        echo "  aws $1 $2 failed: $(printf '%s' "$s3_out" | tail -n 1)" >&2
+    printf '%s\n' "$s3_out"
+}
+
+# Wrapper for jq that yields empty output instead of aborting the suite when
+# the payload is not JSON (e.g. an S3 error document) and jq exits non-zero.
+jq_r() {
+    jq -r "$@" 2>/dev/null || true
 }
 
 bucket_name="s3-test-$$"
@@ -84,7 +97,7 @@ echo ""
 
 echo "--- S3 ListBuckets ---"
 list_output=$(s3 s3api list-buckets --output json)
-list_ok=$(echo "$list_output" | jq -r 'if .Buckets then "true" else "false" end' 2>/dev/null)
+list_ok=$(echo "$list_output" | jq_r 'if .Buckets then "true" else "false" end')
 check "ListBuckets returns valid response" "true" "$list_ok"
 
 # ---------------------------------------------
@@ -93,11 +106,11 @@ check "ListBuckets returns valid response" "true" "$list_ok"
 
 echo ""
 echo "--- S3 CreateBucket ---"
-s3 s3api create-bucket --bucket "$bucket_name" --output json >/dev/null 2>&1
+s3 s3api create-bucket --bucket "$bucket_name" --output json >/dev/null
 
 # Verify create succeeded
 create_found=$(s3 s3api list-buckets --output json | \
-    jq -r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end' 2>/dev/null)
+    jq_r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end')
 check "CreateBucket" "true" "$create_found"
 
 if [ "$create_found" != "true" ]; then
@@ -109,7 +122,7 @@ fi
 
 # Verify bucket appears in ListBuckets (separate call)
 s3_bucket_found=$(s3 s3api list-buckets --output json | \
-    jq -r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end' 2>/dev/null)
+    jq_r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "true" else "false" end')
 check "Bucket visible in ListBuckets" "true" "$s3_bucket_found"
 
 # ---------------------------------------------
@@ -132,7 +145,7 @@ echo ""
 echo "--- S3 ListObjectsV2 ---"
 list_objects=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --output json)
 object_found=$(echo "$list_objects" | \
-    jq -r '[.Contents[]? | .Key] | if any(. == "s3-uploaded.txt") then "true" else "false" end' 2>/dev/null)
+    jq_r '[.Contents[]? | .Key] | if any(. == "s3-uploaded.txt") then "true" else "false" end')
 check "Object found in ListObjectsV2" "true" "$object_found"
 
 # ---------------------------------------------
@@ -142,7 +155,7 @@ check "Object found in ListObjectsV2" "true" "$object_found"
 echo ""
 echo "--- S3 HeadObject ---"
 head_output=$(s3 s3api head-object --bucket "$bucket_name" --key "s3-uploaded.txt" --output json)
-head_size=$(echo "$head_output" | jq -r '.ContentLength // 0' 2>/dev/null)
+head_size=$(echo "$head_output" | jq_r '.ContentLength // 0')
 original_size=$(wc -c < "$tmpfile" | tr -d ' ')
 check "HeadObject returns correct size" "$original_size" "$head_size"
 rm -f "$tmpfile"
@@ -185,7 +198,7 @@ s3 s3 rm "s3://$bucket_name/s3-copied.txt" >/dev/null
 # Verify object is gone
 list_after_delete=$(s3 s3api list-objects-v2 --bucket "$bucket_name" --output json)
 copied_gone=$(echo "$list_after_delete" | \
-    jq -r '[.Contents[]? | .Key] | if any(. == "s3-copied.txt") then "false" else "true" end' 2>/dev/null)
+    jq_r '[.Contents[]? | .Key] | if any(. == "s3-copied.txt") then "false" else "true" end')
 check "Deleted object no longer listed" "true" "$copied_gone"
 
 # ---------------------------------------------
@@ -203,7 +216,7 @@ check "Multipart upload (7MB)" "true" "$large_ok"
 
 # Verify size via HeadObject
 large_head=$(s3 s3api head-object --bucket "$bucket_name" --key "large-file.bin" --output json)
-remote_size=$(echo "$large_head" | jq -r '.ContentLength // 0' 2>/dev/null)
+remote_size=$(echo "$large_head" | jq_r '.ContentLength // 0')
 check "Multipart upload size matches ($large_size bytes)" "$large_size" "$remote_size"
 
 # Download and verify size
@@ -234,11 +247,7 @@ rm -f "$range_download"
 # ---------------------------------------------
 # 11. Presigned URLs
 # ---------------------------------------------
-# Storage supports S3 presigned URLs (query-parameter auth), but Kong's
-# request-transformer adds an empty Authorization header when the Lua
-# expression evaluates to nil. Storage sees typeof "" === "string" and
-# enters parseAuthorizationHeader instead of parseQuerySignature.
-# This test will pass once the Kong config is fixed.
+# Storage supports S3 presigned URLs (query-parameter auth).
 
 echo ""
 echo "--- Presigned URLs ---"
@@ -248,7 +257,7 @@ s3 s3 cp "$presign_file" "s3://$bucket_name/presign-test.txt" >/dev/null
 rm -f "$presign_file"
 
 presigned_url=$(s3 s3 presign "s3://$bucket_name/presign-test.txt")
-presign_body=$(curl -s "$presigned_url")
+presign_body=$(curl -s "$presigned_url" || true)
 check "Presigned URL returns correct content" "presigned content test" "$presign_body"
 
 # ---------------------------------------------
@@ -276,7 +285,7 @@ s3 s3 rm "s3://$bucket_name/" --recursive >/dev/null
 s3 s3api delete-bucket --bucket "$bucket_name" >/dev/null
 # Verify bucket is gone
 bucket_gone=$(s3 s3api list-buckets --output json | \
-    jq -r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "false" else "true" end' 2>/dev/null)
+    jq_r --arg name "$bucket_name" '[.Buckets[] | .Name] | if any(. == $name) then "false" else "true" end')
 check "Bucket deleted via S3" "true" "$bucket_gone"
 
 # ---------------------------------------------

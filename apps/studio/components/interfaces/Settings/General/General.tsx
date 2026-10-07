@@ -4,7 +4,7 @@ import { IS_PLATFORM, useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -50,7 +50,11 @@ export const General = () => {
   const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
 
   const formSchema = z.object({
-    name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
+    name: z
+      .string()
+      .trim()
+      .min(3, 'Project name must be at least 3 characters long')
+      .max(256, 'Project name must be no longer than 256 characters'),
   })
 
   const defaultValues = { name: projectName ?? '' }
@@ -240,7 +244,6 @@ export const General = () => {
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button
-                        variant="default"
                         type="button"
                         disabled={isUpdating}
                         onClick={() => form.reset({ name: project?.name ?? '' })}

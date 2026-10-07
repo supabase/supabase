@@ -43,19 +43,19 @@ ALTER ROLE postgres SET auto_explain.log_min_duration = '.5s';
 
 After running your test, you should be able to find the plan in the [Postgres logs](/dashboard/project/_/logs/postgres-logs?s=duration:). The auto_explain module always starts logs with the term "duration:", which can be used as a filter keyword.
 
-You can also filter for the specific function in the [log explorer](/dashboard/project/_/logs/explorer?q=select%0A++cast%28postgres_logs.timestamp+as+datetime%29+as+timestamp%2C%0A++event_message+AS+query_and_plan%2C%0A++parsed.user_name%2C%0A++parsed.context%0Afrom%0A++postgres_logs%0A++cross+join+unnest%28metadata%29+as+metadata%0A++cross+join+unnest%28metadata.parsed%29+as+parsed%0Awhere%0A++regexp_contains%28event_message%2C+%27duration%3A%27%29%0A++AND%0A++regexp_contains%28context%2C+%27example_func%27%29+--%3C----ADD+FUNCTION+NAME+HERE.+IS+CASE+SENSITIVE%0Aorder+by+timestamp+desc%0Alimit+100%3B) with the below query:
+You can also filter for the specific function in the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs&content=select%0A%20%20timestamp%2C%0A%20%20event_message%20as%20query_and_plan%2C%0A%20%20log_attributes%5B%27parsed.user_name%27%5D%20as%20user_name%2C%0A%20%20log_attributes%5B%27parsed.context%27%5D%20as%20context%0Afrom%20logs%0Awhere%0A%20%20source%20%3D%20%27postgres_logs%27%0A%20%20and%20match%28event_message%2C%20%27duration%3A%27%29%0A%20%20and%20match%28log_attributes%5B%27parsed.context%27%5D%2C%20%27%28%3Fi%29FUNCTION_NAME%27%29%0Aorder%20by%20timestamp%20desc%0Alimit%20100%3B) with the below query:
 
 ```sql
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
+  timestamp,
   event_message as query_and_plan,
-  parsed.user_name,
-  parsed.context
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where regexp_contains(event_message, 'duration:') and regexp_contains(context, '(?i)FUNCTION_NAME')
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.context'] as context
+from logs
+where
+  source = 'postgres_logs'
+  and match(event_message, 'duration:')
+  and match(log_attributes['parsed.context'], '(?i)FUNCTION_NAME')
 order by timestamp desc
 limit 100;
 ```

@@ -3,6 +3,8 @@ import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
 import matter from 'gray-matter'
 
+import { AGENT_RESOURCES } from '@/lib/agent-resources'
+
 export const dynamic = 'force-dynamic'
 
 interface Source {
@@ -73,23 +75,6 @@ async function getSources(): Promise<Source[]> {
   ]
 }
 
-// Editorial ordering for the product overview list (mirrors the homepage
-// products section); not derived from MD_PAGES because the order is
-// intentional. When dropping a new content/md/<slug>.md file, add a matching
-// entry here too — otherwise the page ships but won't be linked from /llms.txt.
-const PRODUCT_OVERVIEW_LINKS = [
-  '- [Supabase Overview](https://supabase.com/homepage.md)',
-  '- [Supabase Database](https://supabase.com/database.md)',
-  '- [Supabase Auth](https://supabase.com/auth.md)',
-  '- [Supabase Storage](https://supabase.com/storage.md)',
-  '- [Supabase Edge Functions](https://supabase.com/edge-functions.md)',
-  '- [Supabase Realtime](https://supabase.com/realtime.md)',
-  '- [Supabase Vector](https://supabase.com/vector.md)',
-  '- [Supabase Cron](https://supabase.com/modules/cron.md)',
-  '- [Supabase Queues](https://supabase.com/modules/queues.md)',
-  '- [Supabase Pricing](https://supabase.com/pricing.md)',
-].join('\n')
-
 export async function GET() {
   const sources = await getSources()
 
@@ -97,6 +82,10 @@ export async function GET() {
     .filter((source) => source.enabled)
     .map((source) => `- [${source.title}](https://supabase.com/${source.relPath})`)
     .join('\n')
+
+  const agentResourceLinks = AGENT_RESOURCES.map(
+    (resource) => `- [${resource.title}](${resource.url}): ${resource.description}`
+  ).join('\n')
 
   const content = [
     '# Supabase Docs',
@@ -107,9 +96,25 @@ export async function GET() {
     '',
     sourceLinks,
     '',
-    '## Product Overview',
+    '## Pricing',
     '',
-    PRODUCT_OVERVIEW_LINKS,
+    '- [Supabase Pricing](https://supabase.com/pricing.md)',
+    '',
+    '## Product overviews',
+    '',
+    '- [Supabase overview](https://supabase.com/index.md)',
+    '- [Database](https://supabase.com/database.md): dedicated Postgres, usable on its own with any Postgres client or ORM',
+    '- [Auth](https://supabase.com/auth.md)',
+    '- [Storage](https://supabase.com/storage.md)',
+    '- [Realtime](https://supabase.com/realtime.md)',
+    '- [Edge Functions](https://supabase.com/edge-functions.md)',
+    '- [Cron](https://supabase.com/modules/cron.md)',
+    '- [Queues](https://supabase.com/modules/queues.md)',
+    '- [Vector](https://supabase.com/modules/vector.md)',
+    '',
+    '## API and agent resources',
+    '',
+    agentResourceLinks,
   ].join('\n')
 
   return new Response(content, {

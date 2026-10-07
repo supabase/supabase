@@ -5,6 +5,8 @@
 // - Shorter threshold as it indicates a lock
 export const WARN_DURATION_ACTIVE_QUERY = 30 // seconds
 export const WARN_DURATION_IDLE_TXN = 10 // seconds
+export const WARN_DURATION_BLOCKED = 10 // seconds
+export const WARN_TOP_BLOCKER = 3 // If the query is blocking more than 3 queries
 
 export const QUERY_STATE_TOOLTIP = {
   ['active']: 'Currently executing a query.',

@@ -1,16 +1,19 @@
-import { generateText, Output, stepCountIs } from 'ai'
+import type { JwtPayload } from '@supabase/supabase-js'
+import { generateText, isStepCount, Output } from 'ai'
 import { IS_PLATFORM } from 'common'
 import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { getOrgAIDetails } from '@/lib/ai/ai-details'
+import { getAIDetails } from '@/lib/ai/ai-details'
+import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
 import { getTools } from '@/lib/ai/tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { trustedUserEmail } from '@/lib/server/configcat'
 
 const policySchema = z.object({
   sql: z.string().describe('The generated Postgres CREATE POLICY statement.'),
@@ -40,19 +43,19 @@ const requestBodySchema = z.object({
   message: z.string().optional(),
 })
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const { method } = req
 
   switch (method) {
     case 'POST':
-      return handlePost(req, res)
+      return handlePost(req, res, claims)
     default:
       res.setHeader('Allow', ['POST'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
-export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+export async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -75,20 +78,19 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     aiOptInLevel = 'schema'
   }
 
-  if (IS_PLATFORM && orgSlug && authorization) {
+  if (IS_PLATFORM && orgSlug && authorization && projectRef) {
     try {
-      const { aiOptInLevel: orgAIOptInLevel } = await getOrgAIDetails({
-        orgSlug,
-        authorization,
-      })
+      const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
-      aiOptInLevel = orgAIOptInLevel
+      aiOptInLevel = aiDetails.aiOptInLevel
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
       })
     }
   }
+
+  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
 
   try {
     const { modelParams, error: modelError } = await getModel({
@@ -116,12 +118,13 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
         authorization,
         aiOptInLevel,
         accessToken,
+        isExplorerEnabled: explorerEnabled,
         signal: toolsAbortController.signal,
       })
 
-      const { experimental_output } = await generateText({
+      const { output } = await generateText({
         ...modelParams,
-        stopWhen: stepCountIs(5),
+        stopWhen: isStepCount(5),
         prompt: source`
           You are a Postgres RLS (Row Level Security) expert.
           Determine the most appropriate policies for the "${schema}"."${tableName}" table within a Supabase project.
@@ -143,7 +146,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
           - Prefer PERMISSIVE policies unless a RESTRICTIVE policy is explicitly required
         `,
         tools,
-        experimental_output: Output.object({
+        output: Output.object({
           schema: z.object({
             policies: z.array(policySchema),
           }),
@@ -151,7 +154,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
 
       // Add table and schema to each policy from the request
-      const policies = (experimental_output?.policies ?? []).map((policy) => ({
+      const policies = (output?.policies ?? []).map((policy) => ({
         ...policy,
         table: tableName,
         schema,

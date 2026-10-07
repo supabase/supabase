@@ -42,8 +42,8 @@ const page: GoPageInput = {
             <li>Fill out the entry form below</li>
             <li>Complete these steps by the contest deadline</li>
           </ol>
-          <Button asChild variant="default" size="medium">
-            <Link href="https://supabase.com/dashboard">Create your account</Link>
+          <Button asChild size="medium">
+            <a href="https://supabase.com/dashboard">Create your account</a>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">
             No purchase necessary. Void where prohibited.{' '}

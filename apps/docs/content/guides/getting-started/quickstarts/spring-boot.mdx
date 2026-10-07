@@ -1,0 +1,212 @@
+---
+title: 'Use Supabase with Spring Boot'
+subtitle: 'Learn how to create a Spring Boot project and connect it to your Supabase project.'
+breadcrumb: 'Framework Quickstarts'
+---
+
+<AiPrompt id="spring-boot" />
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- Java 17 or later, which you can check with `java -version`
+- `curl` and `unzip`, to download and extract the generated project
+
+<$Partial path="quickstart_create_project.mdx" />
+
+Save your database password securely. You need it for the connection string.
+
+<Admonition type="note">
+
+This guide uses Spring Boot's own JPA entities and generated schema, not the shared `instruments` sample table used by other quickstarts.
+
+</Admonition>
+
+## 2. Create a Spring Boot project
+
+Use [Spring Initializr](https://start.spring.io) to scaffold a new project with the Web, Spring Data JPA, and Postgres Driver dependencies. Run the following from the directory where you keep your projects.
+
+```bash
+curl https://start.spring.io/starter.zip \
+  -d dependencies=web,data-jpa,postgresql \
+  -d type=maven-project \
+  -d language=java \
+  -d groupId=com.example \
+  -d artifactId=instruments \
+  -d name=instruments \
+  -o instruments.zip
+unzip instruments.zip -d instruments && cd instruments
+```
+
+## 3. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
+
+## 4. Set up the Postgres connection details
+
+<$Partial path="quickstart_connection_string.mdx" />
+
+Select the **JDBC** tab to copy the connection string in the right format for Spring Boot.
+
+The connection string contains your database password, and `application.properties` is committed with your project. Set the string as an environment variable instead, and set it the same way on whatever platform you deploy to.
+
+```bash
+export SUPABASE_DB_URL='jdbc:postgresql://[POOLER-HOST]:5432/postgres?user=postgres.[PROJECT-REF]&password=[YOUR-PASSWORD]&sslmode=require'
+```
+
+Then reference the variable, along with the driver, in `src/main/resources/application.properties`.
+
+```text name=src/main/resources/application.properties
+spring.datasource.url=${SUPABASE_DB_URL}
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+```
+
+If the app fails to start with `Unable to determine Dialect without JDBC metadata`, Hibernate couldn't open a connection at all. Look above that line in the logs for the real cause, most commonly `password authentication failed`.
+
+## 5. Change the default schema
+
+By default Hibernate creates tables in the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
+
+Create the `app` schema before you start the app. Hibernate creates tables in that schema on startup, but it does not create the schema itself. Run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql SQL_EDITOR
+create schema if not exists app;
+```
+
+Then point Hibernate at the schema in `application.properties`.
+
+```text name=src/main/resources/application.properties
+spring.jpa.properties.hibernate.default_schema=app
+```
+
+## 6. Create an entity and repository
+
+Spring Data JPA maps Java classes to database tables. Create an `Instrument` entity in `src/main/java/com/example/instruments/Instrument.java`. With `spring.jpa.hibernate.ddl-auto=update` set, Hibernate creates the `instruments` table for you when the app starts.
+
+```java name=src/main/java/com/example/instruments/Instrument.java
+package com.example.instruments;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "instruments")
+public class Instrument {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    public Instrument() {}
+
+    public Instrument(String name) {
+        this.name = name;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+Create an `InstrumentRepository` interface in the same package. Extending `JpaRepository` gives you `findAll`, `save`, and other query methods without writing any implementation.
+
+```java name=src/main/java/com/example/instruments/InstrumentRepository.java
+package com.example.instruments;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface InstrumentRepository extends JpaRepository<Instrument, Long> {}
+```
+
+## 7. Seed sample data
+
+Add a `CommandLineRunner` bean to `InstrumentsApplication.java` that saves some sample instruments the first time the app starts.
+
+```java name=src/main/java/com/example/instruments/InstrumentsApplication.java
+package com.example.instruments;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+@SpringBootApplication
+public class InstrumentsApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(InstrumentsApplication.class, args);
+    }
+
+    @Bean
+    CommandLineRunner seedInstruments(InstrumentRepository instrumentRepository) {
+        return args -> {
+            if (instrumentRepository.count() == 0) {
+                instrumentRepository.save(new Instrument("violin"));
+                instrumentRepository.save(new Instrument("viola"));
+                instrumentRepository.save(new Instrument("cello"));
+            }
+        };
+    }
+}
+```
+
+## 8. Query data from the app
+
+Create an `InstrumentController` that fetches every row from the `instruments` table through the repository and returns it as JSON.
+
+```java name=src/main/java/com/example/instruments/InstrumentController.java
+package com.example.instruments;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class InstrumentController {
+
+    private final InstrumentRepository instrumentRepository;
+
+    public InstrumentController(InstrumentRepository instrumentRepository) {
+        this.instrumentRepository = instrumentRepository;
+    }
+
+    @GetMapping("/instruments")
+    public List<Instrument> getInstruments() {
+        return instrumentRepository.findAll();
+    }
+}
+```
+
+## 9. Start the app
+
+Run the Spring Boot app, and go to http://localhost:8080/instruments in your browser. You should see the list of instruments.
+
+```bash
+./mvnw spring-boot:run
+```
+
+<$Partial path="quickstart_going_to_production.mdx" />
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
+- Replace `ddl-auto` with [database migrations](/docs/guides/deployment/database-migrations) before going to production

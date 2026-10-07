@@ -4,56 +4,11 @@ import {
   convertResultsToCSV,
   convertResultsToJSON,
   convertResultsToMarkdown,
-  formatCellValue,
-  formatClipboardValue,
   formatResults,
   getResultsHeaders,
-  isLargeValue,
 } from './Results.utils'
 
 describe('Results.utils', () => {
-  describe('formatClipboardValue', () => {
-    it('returns empty string for null', () => {
-      expect(formatClipboardValue(null)).toBe('')
-    })
-
-    it('stringifies objects', () => {
-      expect(formatClipboardValue({ a: 1 })).toBe('{"a":1}')
-    })
-
-    it('stringifies arrays', () => {
-      expect(formatClipboardValue([1, 2])).toBe('[1,2]')
-    })
-
-    it('converts primitives to string', () => {
-      expect(formatClipboardValue('hello')).toBe('hello')
-      expect(formatClipboardValue(42)).toBe('42')
-      expect(formatClipboardValue(false)).toBe('false')
-    })
-  })
-
-  describe('formatCellValue', () => {
-    it('returns NULL for null', () => {
-      expect(formatCellValue(null)).toBe('NULL')
-    })
-
-    it('returns strings as-is', () => {
-      expect(formatCellValue('hello')).toBe('hello')
-    })
-
-    it('stringifies objects', () => {
-      expect(formatCellValue({ a: 1 })).toBe('{"a":1}')
-    })
-
-    it('stringifies numbers', () => {
-      expect(formatCellValue(42)).toBe('42')
-    })
-
-    it('stringifies booleans', () => {
-      expect(formatCellValue(true)).toBe('true')
-    })
-  })
-
   describe('formatResults', () => {
     it('should stringify object values', () => {
       const results = [{ id: 1, data: { nested: true } }]
@@ -105,6 +60,36 @@ describe('Results.utils', () => {
       const md = convertResultsToMarkdown(results)
       expect(md).toContain('{"role":"admin"}')
     })
+
+    it('should escape pipe characters so a value cannot split into extra columns', () => {
+      const results = [{ id: 1, name: 'a|b' }]
+      const md = convertResultsToMarkdown(results)
+      const rows = md!.split('\n')
+      // header + separator + one data row, not more
+      expect(rows).toHaveLength(3)
+      expect(rows[2]).toContain('a\\|b')
+    })
+
+    it('should escape backslashes so an escaped pipe cannot be forged', () => {
+      const results = [{ id: 1, name: 'a\\|b' }]
+      const md = convertResultsToMarkdown(results)
+      expect(md).toContain('a\\\\\\|b')
+    })
+
+    it('should replace newlines with <br> so a multiline value cannot create extra table rows', () => {
+      const results = [
+        { id: 1, query: 'select 1;\nselect 2;' },
+        { id: 2, query: 'select 3;\r\nselect 4;' },
+        { id: 3, query: 'select 5;\rselect 6;' },
+      ]
+      const md = convertResultsToMarkdown(results)
+      const rows = md!.split('\n')
+      // header + separator + 3 data rows, not more
+      expect(rows).toHaveLength(5)
+      expect(rows[2]).toContain('select 1;<br>select 2;')
+      expect(rows[3]).toContain('select 3;<br>select 4;')
+      expect(rows[4]).toContain('select 5;<br>select 6;')
+    })
   })
 
   describe('convertResultsToJSON', () => {
@@ -144,52 +129,6 @@ describe('Results.utils', () => {
     it('should use only the first row for headers', () => {
       const results = [{ id: 1 }, { id: 2, extra: 'bonus' }]
       expect(getResultsHeaders(results)).toEqual(['id'])
-    })
-  })
-
-  describe('isLargeValue', () => {
-    it('returns false for null', () => {
-      expect(isLargeValue(null)).toBe(false)
-    })
-
-    it('returns false for undefined', () => {
-      expect(isLargeValue(undefined)).toBe(false)
-    })
-
-    it('returns false for an empty string', () => {
-      expect(isLargeValue('')).toBe(false)
-    })
-
-    it('returns false for a short string under the threshold', () => {
-      expect(isLargeValue('hello')).toBe(false)
-    })
-
-    it('returns false for a string at the 60-char boundary', () => {
-      expect(isLargeValue('a'.repeat(60))).toBe(false)
-    })
-
-    it('returns true for a string just over the 60-char threshold', () => {
-      expect(isLargeValue('a'.repeat(61))).toBe(true)
-    })
-
-    it('returns true for a short string containing a newline', () => {
-      expect(isLargeValue('hello\nworld')).toBe(true)
-    })
-
-    it('returns true for an object', () => {
-      expect(isLargeValue({ a: 1 })).toBe(true)
-    })
-
-    it('returns true for an array', () => {
-      expect(isLargeValue([1, 2, 3])).toBe(true)
-    })
-
-    it('returns false for a number', () => {
-      expect(isLargeValue(42)).toBe(false)
-    })
-
-    it('returns false for a boolean', () => {
-      expect(isLargeValue(true)).toBe(false)
     })
   })
 

@@ -29,7 +29,7 @@ const { data, error } = await supabase.storage.createBucket('avatars', {
 })
 ```
 
-[Reference.](/docs/reference/javascript/storage-createbucket)
+[Reference.](/docs/reference/javascript/file-buckets-createbucket)
 
 </TabPanel>
 
@@ -94,6 +94,17 @@ supabase.storage.create_bucket(
 ```
 
 [Reference.](/docs/reference/python/storage-createbucket)
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var bucket = await supabase.Storage.CreateBucket("avatars", new BucketUpsertOptions { Public = true });
+```
+
+[Reference.](/docs/reference/csharp/create-bucket)
 
 </TabPanel>
 </$Show>

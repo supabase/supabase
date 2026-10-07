@@ -3,13 +3,14 @@ import { DocsPager, getBreadcrumbSegments } from '@/components/pager'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
+import { getAllDocs, getDocBySlug, getDocMetaBySlug } from '@/lib/docs'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
+/* eslint-disable turbo/no-undeclared-env-vars */
 
 import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 
-import { allDocs } from 'contentlayer/generated'
 import { ChevronRight } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -25,13 +26,7 @@ interface DocPageProps {
 
 async function getDocFromParams({ params }: { params: { slug: string[] } }) {
   const slug = params.slug?.join('/') || ''
-  const doc = allDocs.find((doc) => doc.slugAsParams === slug)
-
-  if (!doc) {
-    return null
-  }
-
-  return doc
+  return getDocMetaBySlug(slug)
 }
 
 export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
@@ -70,20 +65,26 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
 }
 
 export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
+  if (process.env.NODE_ENV === 'development') {
+    return []
+  }
+
+  const allDocs = await getAllDocs()
   return allDocs.map((doc) => ({
-    slug: doc.slugAsParams.split('/'),
+    slug: doc.slugAsParams ? doc.slugAsParams.split('/') : [],
   }))
 }
 
 export default async function DocPage(props: DocPageProps) {
   const params = await props.params
-  const doc = await getDocFromParams({ params })
+  const slug = params.slug?.join('/') || ''
+  const doc = await getDocBySlug(slug)
 
   if (!doc) {
     notFound()
   }
 
-  const toc = await getTableOfContents(doc.body.raw)
+  const toc = await getTableOfContents(doc.raw)
   const breadcrumbSegments = getBreadcrumbSegments(doc)
 
   return (
@@ -128,7 +129,7 @@ export default async function DocPage(props: DocPageProps) {
         <Separator className="mb-6" />
         <SourcePanel doc={doc} />
         <div className="pb-12">
-          <Mdx code={doc.body.code} />
+          <Mdx code={doc.code} />
         </div>
         <DocsPager doc={doc} />
       </div>

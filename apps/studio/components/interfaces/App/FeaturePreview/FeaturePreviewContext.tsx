@@ -1,4 +1,10 @@
-import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage, useFlag } from 'common'
+import {
+  FeatureFlagContext,
+  LOCAL_STORAGE_KEYS,
+  safeLocalStorage,
+  useFlag,
+  useParams,
+} from 'common'
 import { noop } from 'lodash'
 import { useQueryState } from 'nuqs'
 import {
@@ -13,6 +19,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
@@ -49,6 +56,14 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
           return { ...a, [b.key]: false }
         }
 
+        // A forced preview has become the default behavior, so it's on whatever
+        // the user stored previously — including an explicit opt-out. Applied
+        // here rather than in the individual `useIsXEnabled` helpers so that the
+        // feature preview modal reflects it too.
+        if (b.isForced) {
+          return { ...a, [b.key]: true }
+        }
+
         const defaultOptIn = b.isDefaultOptIn
         const localStorageValue = safeLocalStorage.getItem(b.key)
         return {
@@ -66,7 +81,6 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
       // flag-derived defaults (e.g. default opt-in) are reflected in `flags`.
       if (hasLoaded) setIsInitialized(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [hasLoaded])
 
   const value = {
@@ -74,8 +88,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
     isInitialized,
     onUpdateFlag: (key: string, value: boolean) => {
       safeLocalStorage.setItem(key, value ? 'true' : 'false')
-      const updatedFlags = { ...flags, [key]: value }
-      setFlags(updatedFlags)
+      setFlags((prevFlags) => ({ ...prevFlags, [key]: value }))
     },
   }
 
@@ -90,15 +103,13 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
-  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const { flags, isInitialized, onUpdateFlag } = useFeaturePreviewContext()
 
   const isLoading = !isInitialized
   const isEnabled = IS_PLATFORM && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
 
   const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
-  const isDefaultOptIn =
-    IS_PLATFORM && isInitialized && unifiedLogsDefaultOptIn && !hasToggledPreview
+  const isDefaultOptIn = IS_PLATFORM && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
@@ -128,16 +139,40 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
+/**
+ * Whether the SQL Editor saves snippets only on request. True when the user
+ * opted into the preview themselves *or* the `sqlEditorManualSaveForced` rollout
+ * has reached them — the preview's `isForced` flag folds the latter into `flags`.
+ */
 export const useIsSqlEditorManualSaveEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
-  return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
 export const useIsMarketplaceEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
+}
+
+export const useIsExplorerEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const isExplorerEnabled = useFlag('explorer')
+  return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
+}
+
+/** Three gates: the ConfigCat kill switch, the project's capability, and the user's opt-in. */
+export const useIsStorageVersioningEnabled = () => {
+  const { ref } = useParams()
+  const { flags } = useFeaturePreviewContext()
+  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref })
+  const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
+  return (
+    isStorageVersioningEnabled &&
+    isObjectVersioningAvailable &&
+    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
+  )
 }
 
 export const useFeaturePreviewModal = () => {

@@ -21,7 +21,7 @@ import {
   FormControl,
   FormField,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -147,11 +147,7 @@ export const DashboardPreferences = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button
-                      variant="default"
-                      type="button"
-                      onClick={() => form.reset(dashboardPreferences)}
-                    >
+                    <Button type="button" onClick={() => form.reset(dashboardPreferences)}>
                       Cancel
                     </Button>
                   )}
@@ -197,7 +193,7 @@ const DashboardQueriesDialog = () => {
 
         <DialogFooter>
           <DialogClose asChild className="opacity-100">
-            <Button variant="default">Understood</Button>
+            <Button>Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

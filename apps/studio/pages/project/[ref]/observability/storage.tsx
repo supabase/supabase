@@ -17,7 +17,7 @@ import {
 } from '@/components/interfaces/Reports/renderers/StorageRenderers'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
@@ -104,7 +104,6 @@ export const StorageReport: NextPageWithLayout = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={report.isLoading}
                   icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
                   className="w-7"
@@ -185,7 +184,7 @@ export const StorageReport: NextPageWithLayout = () => {
             params={params.networkTraffic}
             error={error.networkTraffic}
             title="Network Traffic"
-            tooltip="Ingress and egress of requests and responses respectively"
+            tooltip="Ingress is measured from request logs."
             data={data.networkTraffic || []}
             renderer={NetworkTrafficRenderer}
           />

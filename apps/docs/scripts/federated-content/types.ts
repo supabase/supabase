@@ -9,6 +9,8 @@ export interface FederatedPage {
     subtitle?: string
     description?: string
     tocVideo?: string
+    /** Path segment for the "Enable in dashboard" integration link, if any. */
+    dashboardIntegrationPath?: string
   }
   /** Path of the file in the remote repo, relative to `docsDir`. */
   remoteFile: string
@@ -39,6 +41,21 @@ export interface FederatedContentSource {
   docsDir: string
   /** Public site the remote docs are also published to, used to resolve unmapped links. */
   externalSite: string
+  /**
+   * Resolve `branch` to the latest matching release tag at fetch time,
+   * instead of using a fixed branch name. Useful for repos that tag docs
+   * releases separately from code (e.g. `docs_v1.2.3`).
+   */
+  latestTag?: {
+    /** Regex (as a string) tested against each tag name, newest first. */
+    pattern: string
+  }
+  /**
+   * Directory (relative to the repo root) holding image assets referenced by
+   * pages via `../assets/...`-style relative links. When set, such links are
+   * rewritten to `https://raw.githubusercontent.com/<org>/<repo>/<branch>/<assetsDir>/...`.
+   */
+  assetsDir?: string
   /**
    * Unmapped links fall back to `${externalSite}/${relativePath}${hash}`. Set
    * this when `externalSite` is a source-controlled host (e.g. a GitHub blob

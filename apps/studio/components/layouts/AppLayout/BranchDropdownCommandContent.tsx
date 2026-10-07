@@ -14,10 +14,10 @@ import {
 } from 'ui'
 
 import { BranchLink } from './BranchLink'
+import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
+import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Branch } from '@/data/branches/branches-query'
 import { useTrack } from '@/lib/telemetry/track'
-
-const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
 export interface BranchDropdownCommandContentProps {
   embedded: boolean
@@ -81,7 +81,6 @@ export function BranchDropdownCommandContent({
             </a>
           </Button>
           <Button
-            variant="default"
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"
@@ -149,48 +148,34 @@ export function BranchDropdownCommandContent({
               <p>Create branch</p>
             </div>
           </CommandItem>
-          <CommandItem
-            className="cursor-pointer w-full"
+          <CommandItemLink
+            href={`/project/${projectRef}/branches`}
+            className="cursor-pointer w-full gap-2"
             onSelect={() => {
               track('branch_selector_manage_clicked')
               onClose()
             }}
           >
-            <Link
-              href={`/project/${projectRef}/branches`}
-              className="w-full flex items-center gap-2"
-            >
-              <ListTree size={14} strokeWidth={1.5} />
-              <p>Manage branches</p>
-            </Link>
-          </CommandItem>
+            <ListTree size={14} strokeWidth={1.5} />
+            <p>Manage branches</p>
+          </CommandItemLink>
         </CommandGroup>
 
         <CommandSeparator />
 
         <CommandGroup>
-          <CommandItem
-            className="cursor-pointer w-full"
-            onSelect={() => {
-              onClose()
-              window?.open(BRANCHING_GITHUB_DISCUSSION_LINK, '_blank')?.focus()
-            }}
-            onClick={onClose}
+          <CommandItemLink
+            href={BRANCHING_GITHUB_DISCUSSION_LINK}
+            linkProps={{ target: '_blank', rel: 'noreferrer noopener' }}
+            className="cursor-pointer w-full gap-2"
+            onSelect={onClose}
           >
-            <a
-              target="_blank"
-              rel="noreferrer noopener"
-              href={BRANCHING_GITHUB_DISCUSSION_LINK}
-              onClick={onClose}
-              className="w-full flex gap-2"
-            >
-              <MessageCircle size={14} strokeWidth={1} className="mt-0.5" />
-              <div>
-                <p>Branching feedback</p>
-                <p className="text-lighter">Join GitHub Discussion</p>
-              </div>
-            </a>
-          </CommandItem>
+            <MessageCircle size={14} strokeWidth={1} className="mt-0.5" />
+            <div>
+              <p>Branching feedback</p>
+              <p className="text-lighter">Join GitHub Discussion</p>
+            </div>
+          </CommandItemLink>
         </CommandGroup>
       </CommandList>
     </Command>

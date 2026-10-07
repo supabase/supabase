@@ -1,5 +1,4 @@
 import type { Monaco } from '@monaco-editor/react'
-import type { UntrustedSqlFragment } from '@supabase/pg-meta'
 import {
   createContext,
   use,
@@ -103,7 +102,7 @@ export const SQLEditorProvider = ({
     []
   )
 
-  const getSqlFromEditor = useCallback((snippetContent?: UntrustedSqlFragment) => {
+  const getSqlFromEditor = useCallback((snippetContent?: string) => {
     const editorInstance = editorRef.current
     if (!editorInstance) return undefined
     return getEditorSql(editorInstance, snippetContent)

@@ -10,7 +10,7 @@ export type LoadBalancersVariables = {
   projectRef?: string
 }
 
-export type LoadBalancer = components['schemas']['LoadBalancerDetailResponse']
+export type LoadBalancer = components['schemas']['LoadBalancerDetailResponse_Output']
 
 export async function getLoadBalancers(
   { projectRef }: LoadBalancersVariables,

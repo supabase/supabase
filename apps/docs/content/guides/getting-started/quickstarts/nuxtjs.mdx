@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="nuxtjs" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create a Nuxt app
@@ -14,15 +16,19 @@ Create a Nuxt app using the `npx nuxi` command.
 npx nuxi@latest init my-app
 ```
 
-## 4. Install Agent Skills (optional)
+<Admonition type="note">
 
-Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
-
-To install, run the following command in the root of your project:
+The CLI prompts for a template, a package manager, and whether to initialize a git repository. Choose a minimal template, or pass flags to skip the prompts (required in non-interactive shells):
 
 ```bash
-npx skills add supabase/agent-skills
+npx nuxi@latest init my-app --template minimal --no-gitInit --packageManager npm
 ```
+
+</Admonition>
+
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
 
 ## 5. Install the Supabase client library
 
@@ -36,7 +42,7 @@ cd my-app && npm install @supabase/supabase-js
 
 ## 6. Declare Supabase environment variables
 
-Create a `.env` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=nuxt&tab=frameworks):
+Create a `.env` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=nuxt&connectTab=frameworks):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=nuxt">
@@ -66,20 +72,37 @@ export default defineNuxtConfig({
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "nuxt", "tab": "frameworks" }} />
 
-## 7. Query data from the app
+## 7. Create the Supabase client
 
-In `app.vue`, create a Supabase client using your config values and replace the existing content with the following code.
+Create a composable at `app/composables/useSupabase.ts` that builds the client from your config values. `useRuntimeConfig()` is only available inside a Nuxt context, such as a composable or a component's `setup`, so the client is created there rather than at the top level of a module. Nuxt auto-imports anything in `app/composables/`, so you don't need to import `useSupabase` where you use it.
 
-```vue name=app.vue
-<script setup>
+```ts name=app/composables/useSupabase.ts
 import { createClient } from '@supabase/supabase-js'
 
-const config = useRuntimeConfig()
-const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
+export function useSupabase() {
+  const config = useRuntimeConfig()
+  return createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
+}
+```
+
+## 8. Query data from the app
+
+In `app/app.vue`, replace the existing content with the following code.
+
+```vue name=app/app.vue
+<script setup>
+const supabase = useSupabase()
 const instruments = ref([])
+const error = ref(null)
 
 async function getInstruments() {
-  const { data } = await supabase.from('instruments').select()
+  const { data, error: fetchError } = await supabase.from('instruments').select()
+
+  if (fetchError) {
+    error.value = fetchError
+    return
+  }
+
   instruments.value = data
 }
 
@@ -89,13 +112,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <ul>
+  <p v-if="error">Error loading instruments: {{ error.message }}</p>
+  <ul v-else>
     <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
   </ul>
 </template>
 ```
 
-## 8. Start the app
+<Admonition type="note">
+
+This example fetches data in `onMounted`, so the instrument list appears after the page loads in the browser.
+
+</Admonition>
+
+## 9. Start the app
 
 Start the app, navigate to http://localhost:3000 in the browser, and you should see the list of instruments.
 
@@ -103,8 +133,17 @@ Start the app, navigate to http://localhost:3000 in the browser, and you should 
 npm run dev
 ```
 
-<Admonition type="tip">
+<Admonition type="note">
 
 The community-maintained [@nuxtjs/supabase](https://supabase.nuxtjs.org/) module provides an alternate DX for working with Supabase in Nuxt.
 
 </Admonition>
+
+<$Partial path="quickstart_going_to_production.mdx" />
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
+- Explore [drop-in UI components](/ui) for your Supabase app

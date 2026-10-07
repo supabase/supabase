@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "realtime-flow-tanstack",
-  "type": "registry:component",
   "title": "Realtime Flow",
   "description": "Real-time flow diagram editor for collaborative applications.",
   "dependencies": [
@@ -39,5 +38,6 @@
     "VITE_SUPABASE_URL": "",
     "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:component"
 }

@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
+import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldSection } from '@/components/layouts/Scaffold'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
@@ -44,11 +45,11 @@ export const ExtensionNotInstalled = ({
               Learn more
             </InlineLink>
           </p>
-          <Button variant="default" asChild className="mt-2" onClick={() => {}}>
+          <Button asChild className="mt-2" onClick={() => {}}>
             <Link
               href={
                 databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
+                  ? getServiceVersionsPath(projectRef)
                   : `/project/${projectRef}/database/extensions?filter=wrappers`
               }
             >
@@ -93,11 +94,11 @@ export const ExtensionNeedsUpgrade = ({
             Before reinstalling the wrapper extension, you must first remove all existing wrappers.
             Afterward, you can recreate the wrappers.
           </p>
-          <Button asChild variant="default">
+          <Button asChild>
             <Link
               href={
                 databaseNeedsUpgrading
-                  ? `/project/${projectRef}/settings/infrastructure`
+                  ? getServiceVersionsPath(projectRef)
                   : `/project/${projectRef}/database/extensions?filter=wrappers`
               }
             >
@@ -125,7 +126,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
       <ScaffoldSection isFullWidth>
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
-          <Button variant="default" loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+          <Button loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
             Install wrapper
           </Button>
         </Admonition>

@@ -11,16 +11,16 @@ updateNotifier: false
 enableGlobalVirtualStore: false
 
 catalog:
-  '@monaco-editor/react': ^4.7.0
+  '@monaco-editor/react': 4.8.0-rc.3
   '@sentry/nextjs': ^10.59.0
   '@sentry/tanstackstart-react': ^10.59.0
-  '@supabase/auth-js': 2.110.8
-  '@supabase/postgrest-js': 2.110.8
-  '@supabase/realtime-js': 2.110.8
-  '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.110.8
-  '@tanstack/react-router': ^1.169.2
-  '@tanstack/react-start': ^1.167.65
+  '@supabase/auth-js': 2.117.3
+  '@supabase/postgrest-js': 2.117.3
+  '@supabase/realtime-js': 2.117.3
+  '@supabase/ssr': 0.12.7
+  '@supabase/supabase-js': 2.117.3
+  '@tanstack/react-router': ^1.170.41
+  '@tanstack/react-start': ^1.168.60
   '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
@@ -32,14 +32,15 @@ catalog:
   # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
   '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
-  '@vitest/coverage-v8': ^4.1.4
-  '@vitest/ui': ^4.1.4
+  '@vitest/coverage-v8': ^5.0.0
+  '@vitest/ui': ^5.0.0
+  cn: ^0.4.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
-  next: 16.2.6
+  next: ^16.3.6
   next-themes: ^0.4.6
-  postcss: ^8.5.10
+  postcss: ^8.5.18
   radix-ui: ^1.4.3
   react: ^19.2.6
   react-dom: ^19.2.6
@@ -49,23 +50,35 @@ catalog:
   typescript: ~6.0.2
   valtio: ^2.3.2
   vite: ^8.0.16
-  vite-tsconfig-paths: ^6.1.1
-  vitest: ^4.1.4
+  velite: ^0.4.0
+  vitest: ^5.0.0
   zod: 3.25.76
 
 allowBuilds:
   '@parcel/watcher': false
   '@sentry/cli': false
+  '@supabase/build-icons@file:packages/build-icons': set this to true or false
+  '@supabase/pg-meta@file:packages/pg-meta': set this to true or false
+  ai-commands@file:packages/ai-commands: set this to true or false
+  api-types@file:packages/api-types: set this to true or false
+  common@file:packages/common: set this to true or false
+  config@file:packages/config: set this to true or false
   contentlayer2: false
   core-js: false
+  dev-tools@file:packages/dev-tools: set this to true or false
   es5-ext: false
   esbuild: false
+  icons@file:packages/icons: set this to true or false
   libpg-query: false
+  msgpackr-extract: false
   msw: false
   node-pty: true
   protobufjs: false
+  shared-data@file:packages/shared-data: set this to true or false
   sharp: false
   supabase: true
+  ui-patterns@file:packages/ui-patterns: set this to true or false
+  ui@file:packages/ui: set this to true or false
 
 minimumReleaseAge: 4320
 
@@ -79,16 +92,32 @@ minimumReleaseAgeExclude:
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
+  - '@astrojs/markdown-satteri@0.3.8'
+  - astro@7.2.6
+  - '@tanstack/react-router@1.170.41'
+  - '@tanstack/react-start-client@1.168.39'
+  - '@tanstack/react-start-rsc@0.1.59'
+  - '@tanstack/react-start-server@1.167.46'
+  - '@tanstack/react-start@1.168.60'
+  - '@tanstack/react-store@0.11.2'
+  - '@tanstack/router-core@1.171.34'
+  - '@tanstack/router-generator@1.167.40'
+  - '@tanstack/router-plugin@1.168.42'
+  - '@tanstack/start-client-core@1.170.34'
+  - '@tanstack/start-plugin-core@1.171.49'
+  - '@tanstack/start-server-core@1.169.39'
+  - '@tanstack/start-storage-context@1.167.36'
+  - '@tanstack/store@0.11.2'
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   'monaco-editor': 'catalog:'
-  '@mapbox/node-pre-gyp>tar': ^7.5.19
+  '@mapbox/node-pre-gyp>tar': ^7.5.21
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
   braintrust>uuid: ^11.1.1
-  cacache>tar: ^7.5.19
+  cacache>tar: ^7.5.21
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
   # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
@@ -98,12 +127,11 @@ overrides:
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   mdx-bundler>uuid: ^11.1.1
-  node-gyp>tar: ^7.5.19
+  node-gyp>tar: ^7.5.21
   nodemailer: ^7.0.11
   postcss: 'catalog:'
   qs: ^6.15.2
   refractor>prismjs: ^1.30.0
-  supabase>tar: ^7.5.19
   tmp: ^0.2.7
   vite>esbuild: ^0.28.1
   webpack: ^5.104.1
