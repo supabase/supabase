@@ -1,7 +1,7 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { screen } from '@testing-library/react'
-import { expect, test, vi } from 'vitest'
 import { Button } from 'ui'
+import { expect, test, vi } from 'vitest'
 
 import { AlertError } from './AlertError'
 import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
