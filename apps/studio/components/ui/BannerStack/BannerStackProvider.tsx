@@ -5,9 +5,8 @@ export const BANNER_ID = {
   TABLE_EDITOR_QUEUE_OPERATIONS: 'table-editor-queue-operations-banner',
   RLS_EVENT_TRIGGER: 'rls-event-trigger-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
-  PRIVACY_POLICY_UPDATE: 'privacy-policy-update-banner',
   LOGS_ALL_DEPRECATION: 'logs-all-deprecation-banner',
-  SELECT_26: 'select-2026-banner',
+  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-banner',
   EXPLORER: 'explorer-banner',
 } as const
 

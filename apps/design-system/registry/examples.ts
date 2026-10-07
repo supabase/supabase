@@ -386,6 +386,12 @@ export const examples: Registry = [
     files: ['example/combobox-demo.tsx'],
   },
   {
+    name: 'combobox-create-option',
+    type: 'components:example',
+    registryDependencies: ['command'],
+    files: ['example/combobox-create-option.tsx'],
+  },
+  {
     name: 'combobox-dropdown-menu',
     type: 'components:example',
     registryDependencies: ['command', 'dropdown-menu', 'button'],
@@ -873,6 +879,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['separator'],
     files: ['example/separator-demo.tsx'],
+  },
+  {
+    name: 'sidebar-demo',
+    type: 'components:example',
+    registryDependencies: ['sidebar'],
+    files: ['example/sidebar-demo.tsx'],
   },
   {
     name: 'sheet-confirm-on-close-demo',

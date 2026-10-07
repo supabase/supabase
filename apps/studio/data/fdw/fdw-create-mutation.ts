@@ -1,4 +1,9 @@
-import { getCreateFDWSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import {
+  getCreateFDWSql,
+  getCreateForeignDataWrapperSql,
+  joinSqlFragments,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta'
 import { wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -27,8 +32,17 @@ export type FDWCreateVariables = {
 }
 
 export async function createFDW({ projectRef, connectionString, ...rest }: FDWCreateVariables) {
-  const sql = wrapWithTransaction(getCreateFDWSql(rest))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const createForeignDataWrapperSql = getCreateForeignDataWrapperSql(rest.wrapperMeta)
+  const createServerSql = getCreateFDWSql(rest)
+  const sql = wrapWithTransaction(
+    joinSqlFragments([createForeignDataWrapperSql, createServerSql], '\n\n')
+  )
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['create-fdw'],
+  })
   return result
 }
 

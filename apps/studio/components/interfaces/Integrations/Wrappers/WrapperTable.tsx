@@ -49,11 +49,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   )
 
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
-  const isSharedWrapper = (wrapper: (typeof wrappers)[number]) =>
-    data?.some((other) => other.id !== wrapper.id && other.name === wrapper.name) ?? false
-  const selectedWrapper = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
-  const isSelectedWrapperShared = selectedWrapper !== undefined && isSharedWrapper(selectedWrapper)
-  const selectedWrapperToEdit = isSelectedWrapperShared ? undefined : selectedWrapper
+  const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
   const openedWrapperId = useRef<string | null>(null)
 
   useEffect(() => {
@@ -63,22 +59,11 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
       openedWrapperId.current = selectedWrapperIdToEdit
     } else if (isSuccess || isError) {
       if (openedWrapperId.current !== selectedWrapperIdToEdit) {
-        toast(
-          isSelectedWrapperShared
-            ? 'Shared wrappers cannot be edited in the dashboard. Use the SQL Editor to edit this connection.'
-            : 'Wrapper not found'
-        )
+        toast('Wrapper not found')
       }
       setSelectedWrapperToEdit(null)
     }
-  }, [
-    isError,
-    isSelectedWrapperShared,
-    isSuccess,
-    selectedWrapperIdToEdit,
-    selectedWrapperToEdit,
-    setSelectedWrapperToEdit,
-  ])
+  }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -96,7 +81,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             <TableRow>
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
-              <TableHead>Encrypted key</TableHead>
+              <TableHead>Encrypted keys</TableHead>
               <TableHead className="w-24">
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -104,7 +89,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
           </TableHeader>
           <TableBody>
             {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => (
-              <WrapperRow key={x.id} wrapper={x} isShared={isSharedWrapper(x)} />
+              <WrapperRow key={x.id} wrapper={x} />
             ))}
           </TableBody>
           <TableFooter

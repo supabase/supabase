@@ -25,7 +25,7 @@ Before members can use enterprise-managed authentication:
 
 1. **SSO must be configured** for your organization. See [Enable SSO for your organization](/docs/guides/platform/sso) if you haven't set this up yet.
 2. **Your identity provider must support issuing ID-JAGs** for MCP's Enterprise-Managed Authorization extension. Check with your IdP whether this is available and how to enable it.
-3. **The MCP client must be authorized for your organization.** An organization owner does this from [Authorized Apps](/dashboard/org/_/apps) in your organization settings, the same place you manage other third-party integrations.
+3. **The MCP client must be authorized for your organization.** An organization owner or admin does this once by connecting the MCP client to Supabase through the standard sign-in flow and approving it for your organization on the consent screen. The approved client then appears under [Authorized Apps](/dashboard/org/_/apps) in your organization settings, where you can review or revoke it.
 
 ## Who's involved
 
@@ -41,7 +41,7 @@ Before members can use enterprise-managed authentication:
 2. **MCP client exchanges that identity token for an ID-JAG, at the IdP.** This is a separate request the client makes to the IdP (an [RFC 8693](https://datatracker.ietf.org/doc/html/rfc8693) token exchange), asking for a token scoped specifically to Supabase. The IdP checks its own policy before issuing one.
 3. **IdP returns the ID-JAG to the MCP client.**
 4. **MCP client presents the ID-JAG to Supabase's OAuth server**, using it as a [JWT authorization grant](https://datatracker.ietf.org/doc/html/rfc7523), with no interactive consent screen.
-5. **Supabase validates the ID-JAG**, checking it against your IdP's public keys, confirming the member belongs to your organization with a matching SSO identity, and confirming an organization owner has authorized this MCP client. If everything checks out, Supabase issues a short-lived access token.
+5. **Supabase validates the ID-JAG**, checking it against your IdP's public keys, confirming the member belongs to your organization with a matching SSO identity, and confirming an organization owner or admin has authorized this MCP client. If everything checks out, Supabase issues a short-lived access token.
 6. **MCP client calls the Supabase MCP Server** using that access token, same as any other authenticated request.
 
 The access token from step 5 can't be refreshed. The MCP client repeats steps 2 through 5 whenever it needs a new one, and its access is always limited to what your organization's existing permissions already allow.
@@ -54,7 +54,7 @@ Without it, every member has to manually connect and authorize the MCP client ag
 - **No central control**: admins can't see or revoke the MCP client's access at the organization level; it's spread across individual user approvals.
 - **Inconsistent access**: a member's access through the MCP client isn't guaranteed to stay in sync with the role your IdP already assigns them.
 
-With enterprise-managed authentication, an organization owner authorizes the MCP client once for the whole organization. From then on, access follows your existing SSO sign-in, with no separate approval and no manual reconnection when a token expires.
+With enterprise-managed authentication, an organization owner or admin authorizes the MCP client once for the whole organization. From then on, access follows your existing SSO sign-in, with no separate approval and no manual reconnection when a token expires.
 
 ## Configuring your ID-JAG issuer
 
@@ -75,7 +75,7 @@ Once saved, Supabase uses this URL to fetch your IdP's public keys and verify ID
 ## Security considerations
 
 - **Access is always scoped to user.** An ID-JAG can never grant access beyond what the authenticated member already has permission to see.
-- **The MCP client must be explicitly authorized.** Adding an ID-JAG issuer alone doesn't grant it access; an organization owner still has to authorize it from [Authorized Apps](/dashboard/org/_/apps).
+- **The MCP client must be explicitly authorized.** Adding an ID-JAG issuer alone doesn't grant it access; an organization owner or admin still has to approve it once through the standard sign-in flow. Approved clients are listed under [Authorized Apps](/dashboard/org/_/apps).
 - **Access tokens are short-lived and non-renewable.** There's no refresh token.
 - **Revoke access at the source.** To cut off the MCP client for your whole organization, remove its authorization from [Authorized Apps](/dashboard/org/_/apps). To cut off a single member, remove them in Supabase dashboard.
 

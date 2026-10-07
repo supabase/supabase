@@ -1,0 +1,312 @@
+---
+id: 'platform-webhooks'
+title: 'Platform Webhooks'
+description: 'Receive HTTP notifications when events occur in your Supabase organization or project.'
+---
+
+Platform Webhooks send an HTTP request to a URL you control when something happens on your organization or one of its projects. For example, a project pausing and a member joining both raise events. Use them to build event-driven integrations without polling the Management API.
+
+<Admonition type="note" title="Platform Webhooks is an early access feature">
+
+Platform Webhooks is available to organizations on an early access allowlist. The API rejects a request from an organization outside the allowlist with `403` and the error code `access_disabled`.
+
+</Admonition>
+
+For the complete API reference, see [Organization Webhooks](/docs/reference/api/v2-organizations-slug-webhooks-endpoints-get) and [Project Webhooks](/docs/reference/api/v2-projects-ref-webhooks-endpoints-get) in the Management API reference.
+
+- [Set up an endpoint](#set-up-an-endpoint) creates the configuration that receives events.
+- [Verify webhook signature](#verify-webhook-signature) has the check your listener needs before it trusts a delivery.
+- [Send a test event](#send-a-test-event) triggers a test event to be sent to your listener.
+- [Delivery behavior](#delivery-behavior) covers retries and history retention.
+- [Idempotency and ordering](#idempotency-and-ordering) covers idempotency, duplicates, and arrival order.
+- [Best practices](#best-practices) covers best practices for writing a reliable, resilient webhook listener.
+
+## Concepts
+
+### Endpoints
+
+An _endpoint_ is a configuration for where and how to deliver events. It has a URL, a signing secret, the event types it subscribes to, and optional custom headers.
+
+You register an endpoint against an organization or a specific project within an organization. Each endpoint subscribes to one or more event types, or to `*` to receive all events.
+
+An endpoint is scoped to either an organization or a single project:
+
+- An **organization-scoped** endpoint receives every organization event and every project event across the organization.
+- A **project-scoped** endpoint receives events for that project only.
+
+Endpoint URLs must be publicly reachable and must resolve to a non-reserved IP address.
+
+### Events
+
+An _event_ represents something that happened in your organization or project. Each event has an ID, a type string such as `v1.project.paused`, a timestamp, and a payload.
+
+Each event type starts with a version, for example `v1`, that represents the specific `payload` shape. Different versions of the same event can have different payload shapes.
+
+A project event is delivered to both a matching project-scoped endpoint and any organization-scoped endpoints in the same organization. Each endpoint gets its own copy of the event, with its own `id`.
+
+For the full list of event types and their payloads, see [Platform Webhook Events](/docs/guides/platform/webhooks/events).
+
+### Deliveries
+
+A _delivery_ is one HTTP `POST` attempt for a specific event to a specific endpoint. Supabase records every delivery attempt along with its outcome, response status, and response body.
+
+### Envelope and payload
+
+Every delivery sends a JSON body with the following structure regardless of the type:
+
+```json
+{
+  "id": "<event UUID>",
+  "type": "<event-type>",
+  "timestamp": "<ISO 8601 UTC>",
+  "payload": {
+    "organization_slug": "<org-slug>",
+    "project_ref": "<project-ref>"
+    // event-specific fields
+  }
+}
+```
+
+For example:
+
+```json
+{
+  "id": "01941e0e-e04e-7e43-b8e5-c4d79862b8df",
+  "type": "v1.project.paused",
+  "timestamp": "2025-01-01T12:00:00.000Z",
+  "payload": {
+    "organization_slug": "my-org",
+    "project_ref": "abcdefghijklmnoprstu",
+    "reason": "inactivity",
+    "actor": null
+  }
+}
+```
+
+The `payload` object is event-specific. For organization-scoped events, `project_ref` is always `null`. For details on each event's payload fields, see [Platform Webhook Events](/docs/guides/platform/webhooks/events).
+
+### Versioning
+
+Each event type embeds a version prefix that identifies the payload schema. The `v1` in `v1.project.paused` means the payload follows the version 1 shape for that event. A new version is introduced when the payload changes in a breaking way — fields are removed, renamed, or given a different type.
+
+When Supabase introduces a new version, both versions are emitted simultaneously for a transition period. A handler built for `v1` keeps receiving `v1` events uninterrupted while you add support for `v2`. The transition window is finite, so treat an unrecognized version as a signal to upgrade your handler.
+
+New fields can be added to an existing version without a version bump. Design your handler to ignore fields it does not recognize so that it stays forward compatible within a version.
+
+## Set up an endpoint
+
+Create an endpoint through the Management API:
+
+- To create an organization-scoped endpoint: `POST https://api.supabase.com/v2/organizations/{organization_slug}/webhooks/endpoints`
+- To create a project-scoped endpoint: `POST https://api.supabase.com/v2/projects/{project_ref}/webhooks/endpoints`
+
+An endpoint takes these attributes:
+
+| Attribute        | Required | Notes                                                                                                                                                                                               |
+| ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `url`            | Yes      | Must use a domain that resolves to a non-reserved IP address. The API rejects a URL that resolves to a reserved range.                                                                              |
+| `event_types`    | Yes      | At least one type. An endpoint receives only the types you list. Use `*` to receive every event.                                                                                                    |
+| `signing_secret` | Yes      | 8 to 64 characters. Every delivery is signed with it.                                                                                                                                               |
+| `custom_headers` | No       | Extra request headers. Keys and values are strings, and each has to be a valid HTTP header.                                                                                                         |
+| `description`    | No       | Free text to identify the endpoint.                                                                                                                                                                 |
+| `enabled`        | No       | Defaults to `true`. When disabled, events already enqueued get a delivery record with `skipped` status but nothing is sent; events that arrive after disabling are dropped with no delivery record. |
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="org" queryGroup="scope">
+<TabPanel id="org" label="Organization scoped endpoint">
+
+```bash
+curl -X POST 'https://api.supabase.com/v2/organizations/{your-org-slug}/webhooks/endpoints' \
+  -H 'Authorization: Bearer <personal-access-token>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "data": {
+      "type": "endpoint",
+      "attributes": {
+        "url": "https://your-domain.com/webhooks/supabase",
+        "signing_secret": "your-signing-secret",
+        "description": "Track pause and restore events for all projects",
+        "event_types": [
+          { "type": "v1.project.paused" },
+          { "type": "v1.project.restored" }
+        ]
+      }
+    }
+  }'
+```
+
+</TabPanel>
+<TabPanel id="project" label="Project scoped endpoint">
+
+```bash
+curl -X POST 'https://api.supabase.com/v2/projects/{your-project-ref}/webhooks/endpoints' \
+  -H 'Authorization: Bearer <personal-access-token>' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "data": {
+      "type": "endpoint",
+      "attributes": {
+        "url": "https://your-domain.com/webhooks/supabase",
+        "signing_secret": "your-signing-secret",
+        "description": "Track pause and restore events for project <your-project-ref>",
+        "event_types": [
+          { "type": "v1.project.paused" },
+          { "type": "v1.project.restored" }
+        ]
+      }
+    }
+  }'
+```
+
+</TabPanel>
+</Tabs>
+
+To receive all event types, set `event_types` to `[{ "type": "*" }]`. Using `*` also covers event types added in the future, so design your handler to handle unrecognized types gracefully — see [Versioning](#versioning).
+
+A successful request returns `201` with the endpoint's ID, which you can use to send test events, list deliveries, and update or delete the endpoint.
+
+For the full set of operations, see the **Project webhooks** and **Organization webhooks** sections of the [Management API reference](/docs/reference/api/introduction). Every operation exists at both scopes.
+
+## Verify webhook signature
+
+Every delivery follows the [Standard Webhooks](https://www.standardwebhooks.com/) specification and carries these headers:
+
+| Header              | Description                                                                                             |
+| ------------------- | ------------------------------------------------------------------------------------------------------- |
+| `webhook-id`        | The event ID. It's the same across every retry of the same event.                                       |
+| `webhook-timestamp` | The Unix timestamp, in seconds, of when the delivery attempt was signed.                                |
+| `webhook-signature` | An HMAC-SHA256 signature over `{webhook-id}.{webhook-timestamp}.{raw body}`, in the form `v1,<base64>`. |
+
+Verify against the **raw request body** before you parse it as JSON:
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="base64" queryGroup="secret-format">
+<TabPanel id="base64" label="Base64 secret">
+
+If your `signing_secret` is a base64-encoded value prefixed with `whsec_`:
+
+```js
+import { Webhook } from 'standardwebhooks'
+
+const webhook = new Webhook(process.env.WEBHOOK_SECRET)
+
+try {
+  const event = webhook.verify(rawBody, {
+    'webhook-id': req.headers['webhook-id'],
+    'webhook-timestamp': req.headers['webhook-timestamp'],
+    'webhook-signature': req.headers['webhook-signature'],
+  })
+  // event is the verified, event.payload can be used
+} catch {
+  return res.status(400).send('Invalid signature')
+}
+```
+
+</TabPanel>
+<TabPanel id="raw" label="Plain string secret">
+
+If your `signing_secret` is a plain string:
+
+```js
+import { Webhook } from 'standardwebhooks'
+
+const webhook = new Webhook(process.env.WEBHOOK_SECRET, { format: 'raw' })
+
+try {
+  const event = webhook.verify(rawBody, {
+    'webhook-id': req.headers['webhook-id'],
+    'webhook-timestamp': req.headers['webhook-timestamp'],
+    'webhook-signature': req.headers['webhook-signature'],
+  })
+  // event is the verified, event.payload can be used
+} catch {
+  return res.status(400).send('Invalid signature')
+}
+```
+
+</TabPanel>
+</Tabs>
+
+For verification libraries in other languages, see the [Standard Webhooks documentation](https://www.standardwebhooks.com/).
+
+To rotate a signing secret without missing deliveries:
+
+1. Add the new secret to your listener, and accept signatures made with either the old or the new secret.
+2. Update the endpoint to use the new secret.
+3. Remove the old secret from your listener.
+
+## Send a test event
+
+Use a test event to verify connectivity end to end. It goes through the same pipeline as a real event and is stored in delivery history, except that automatic retries are disabled.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="org" queryGroup="scope">
+<TabPanel id="org" label="For organization scoped endpoint">
+
+```bash
+curl -X POST https://api.supabase.com/v2/organizations/{your-org-slug}/webhooks/endpoints/{your-endpoint-id}/test \
+  -H 'Authorization: Bearer <personal-access-token>' \
+  -H 'Content-Type: application/json' \
+  --data '{
+    "data": {
+      "type": "event",
+      "attributes": { "type": "v1.project.paused" }
+    }
+  }'
+```
+
+</TabPanel>
+<TabPanel id="project" label="For project scoped endpoint">
+
+```bash
+curl -X POST https://api.supabase.com/v2/projects/{your-project-ref}/webhooks/endpoints/{your-endpoint-id}/test \
+  -H 'Authorization: Bearer <personal-access-token>' \
+  -H 'Content-Type: application/json' \
+  --data '{
+    "data": {
+      "type": "event",
+      "attributes": { "type": "v1.project.paused" }
+    }
+  }'
+```
+
+</TabPanel>
+</Tabs>
+
+The event type in the body is optional. Without one, the API uses a type the endpoint subscribes to.
+
+A test event's payload includes `"is_test": true`, so check that field before you trigger any side effect.
+
+## Delivery behavior
+
+Supabase considers a delivery successful when your endpoint returns a `2xx` response within 20 seconds. A non-`2xx` response or a timeout counts as a failure and triggers a retry with exponential backoff:
+
+| Attempt   | Wait after the previous failure | Approximate time since the event |
+| --------- | ------------------------------- | -------------------------------- |
+| 1         | Not applicable                  | Immediately                      |
+| 2         | 10 seconds                      | ~10 seconds                      |
+| 3         | 30 seconds                      | ~40 seconds                      |
+| 4         | 1 minute 30 seconds             | ~2 minutes 10 seconds            |
+| 5 (final) | 4 minutes 30 seconds            | ~6 minutes 40 seconds            |
+
+After five failed attempts, the delivery is marked as failed with no further retries. Supabase does not notify you when this happens — check delivery history to find permanently failed deliveries.
+
+You can retry a delivery manually. A manual retry is a single attempt: if it fails, no automatic retries follow.
+
+Delivery history is retained for 14 days. An expired delivery is no longer listed and can't be retried.
+
+## Idempotency and ordering
+
+Deliveries are at-least-once: Supabase retries failed deliveries, so your endpoint may receive the same event more than once. Use the `id` field in the request body as a deduplication key. The same `id` always represents the same event.
+
+Deliveries and events may also arrive out of order due to network delays or hiccups. You need to design your webhook listener to account for duplicates and out-of-order events.
+
+## Best practices
+
+Best practices for consuming webhook events and building a reliable, production-grade webhook listener:
+
+- Always verify the webhook signature before processing an event.
+- Check the event type version prefix before processing a payload. For unsupported versions, return `2xx` without processing and log or alert on the unrecognized version — the transition window is finite, so upgrade your handler promptly.
+- Respond to a webhook immediately and process each event asynchronously, for example, on a job queue.
+- Keep track of already processed events in persistent storage to deduplicate them, for example, in a database.
+- Keep track of the last processed event's timestamp and discard stale events of the same type. Do not rely on the order of events.
+- Treat webhook events as a trigger for an action, rather than the state of a resource.
+- Use the webhook's automatic retries as a safeguard against network partitions or timeouts, not as a fallback for listener logic errors.
+- Periodically check delivery history for permanently failed deliveries. Supabase does not notify you when all retries are exhausted.
