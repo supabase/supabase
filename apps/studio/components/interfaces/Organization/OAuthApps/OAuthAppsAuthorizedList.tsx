@@ -62,10 +62,13 @@ export const OAuthAppsAuthorizedList = () => {
       </PageSectionMeta>
 
       <PageSectionContent className="space-y-4">
-        {(isPending || isLoadingPermissions) && (
+        {(isPending || isLoadingPermissions) && !isFetchingNextPage && (
           <div className="space-y-2">
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
+            <p aria-live="polite" className="sr-only">
+              Loading the authorized apps...
+            </p>
           </div>
         )}
 
@@ -126,7 +129,7 @@ export const OAuthAppsAuthorizedList = () => {
               </TableBody>
             </Table>
             <p aria-live="polite" className="sr-only">
-              {isFetchingNextPage ? 'Loading next page' : ''}
+              {isFetchingNextPage ? 'Loading more authorized apps...' : 'Authorized apps loaded'}
             </p>
           </Card>
         )}
