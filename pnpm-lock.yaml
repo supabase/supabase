@@ -710,7 +710,7 @@ importers:
         version: 1.6.6
       smol-toml:
         specifier: ^1.3.1
-        version: 1.8.0
+        version: 1.9.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
@@ -2955,7 +2955,7 @@ importers:
         version: 3.1.0
       smol-toml:
         specifier: ^1.6.1
-        version: 1.8.0
+        version: 1.9.0
       sonner:
         specifier: ^1.5.0
         version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -17182,8 +17182,8 @@ packages:
   smob@1.5.0:
     resolution: {integrity: sha512-g6T+p7QO8npa+/hNx9ohv1E5pVCmWrVCUzUXJyLdMmftX6ER0oiWY/w9knEonLpnOp6b6FenKnMfR8gqwWdwig==}
 
-  smol-toml@1.8.0:
-    resolution: {integrity: sha512-kCZr2V3ch9i00x8zXRhjUNVcjG9ijES5dDudkXvUVCT5QlJNQWElSJdZqyPemffHoLNUYwOcou0Fy+ojN0uHSQ==}
+  smol-toml@1.9.0:
+    resolution: {integrity: sha512-hpd+HLON7HdZXqYchMM/+LaTTbdK0AU3NngIJ4KVyWbY9bfQqdL9cD+4yf6dUoU2Ap4VsU0JkQi6FxAI1B2mXQ==}
     engines: {node: '>= 18'}
 
   snake-case@3.0.4:
@@ -19292,7 +19292,7 @@ snapshots:
       picomatch: 4.0.7
       retext-smartypants: 6.2.0
       shiki: 4.2.0
-      smol-toml: 1.8.0
+      smol-toml: 1.9.0
       unified: 11.0.5
 
   '@astrojs/markdown-remark@7.2.4(supports-color@8.1.1)':
@@ -25538,7 +25538,7 @@ snapshots:
       '@standard-schema/spec': 1.1.0
       dedent: 1.7.2(babel-plugin-macros@3.1.0)
       effect: 4.0.0-rc.112
-      smol-toml: 1.8.0
+      smol-toml: 1.9.0
     transitivePeerDependencies:
       - babel-plugin-macros
 
@@ -27885,7 +27885,7 @@ snapshots:
       picomatch: 4.0.5
       semver: 7.8.5
       shiki: 4.2.0
-      smol-toml: 1.8.0
+      smol-toml: 1.9.0
       svgo: 4.1.0
       tinyclip: 0.1.15
       tinyexec: 1.2.4
@@ -31960,7 +31960,7 @@ snapshots:
       oxc-parser: 0.143.0
       oxc-resolver: 11.24.2
       picomatch: 4.0.5
-      smol-toml: 1.8.0
+      smol-toml: 1.9.0
       strip-json-comments: 5.0.3
       tinyglobby: 0.2.17
       unbash: 4.0.10
@@ -36752,7 +36752,7 @@ snapshots:
 
   smob@1.5.0: {}
 
-  smol-toml@1.8.0: {}
+  smol-toml@1.9.0: {}
 
   snake-case@3.0.4:
     dependencies:
