@@ -1,4 +1,6 @@
-import { formatFilterURLParams } from '@/components/grid/SupabaseGrid.utils'
+import { useRouter } from 'next/router'
+
+import { formatFilterURLParams, getTableIdFromPath } from '@/components/grid/SupabaseGrid.utils'
 import { Filter } from '@/components/grid/types'
 import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
 import { useOptionalTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -35,4 +37,15 @@ export function useTableFilter() {
       snap.clearFilters()
     },
   }
+}
+
+/**
+ * URL filters for `tableId`, for callers outside the table state provider (e.g. the sidebar).
+ * `undefined` while the URL belongs to another table: under TanStack the URL moves to the next
+ * table before route params do.
+ */
+export function useUrlTableFilters(tableId: number): Filter[] | undefined {
+  const { asPath } = useRouter()
+  const { filters } = useTableFilter()
+  return getTableIdFromPath(asPath) === String(tableId) ? filters : undefined
 }

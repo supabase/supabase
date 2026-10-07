@@ -234,11 +234,15 @@ export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromis
   500
 )
 
+export function getTableIdFromPath(path: string) {
+  return path.split(/[?#]/)[0].match(/\/editor\/(\d+)\/?$/)?.[1]
+}
+
 function getLatestParams() {
   const queryParams = new URLSearchParams(window.location.search)
   const sort = queryParams.getAll('sort')
   const filter = queryParams.getAll('filter')
-  const tableId = window.location.pathname.match(/\/editor\/(\d+)\/?$/)?.[1]
+  const tableId = getTableIdFromPath(window.location.pathname)
   return { tableId, sort, filter }
 }
 

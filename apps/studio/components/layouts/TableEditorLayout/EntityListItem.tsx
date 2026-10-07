@@ -23,7 +23,7 @@ import {
 } from 'ui'
 
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useUrlTableFilters } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
@@ -88,7 +88,7 @@ export const EntityListItem = ({
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
-  const { filters } = useTableFilter()
+  const filters = useUrlTableFilters(entity.id)
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const { data: countData } = useTableRowsCountQuery(
     {
@@ -99,7 +99,7 @@ export const EntityListItem = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      enabled: isTableLikeEntityListItem(entity) && isActive,
+      enabled: isTableLikeEntityListItem(entity) && isActive && filters !== undefined,
     }
   )
   const rowCount = countData?.count
