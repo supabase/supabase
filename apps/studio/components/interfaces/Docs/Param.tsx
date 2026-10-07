@@ -52,13 +52,13 @@ const Param = ({
       </div>
       {format && (
         <div className="grid grid-cols-[auto_1fr] gap-y-2 gap-x-10 text-sm">
-          <label className="text-foreground-lighter">Type</label>
+          <span className="text-foreground-lighter">Type</span>
           <div className="text-foreground">{getColumnType(type, format)}</div>
-          <label className="text-foreground-lighter">Format</label>
+          <span className="text-foreground-lighter">Format</span>
           <div className="text-foreground">{format}</div>
           {description !== false && (
             <>
-              <label className="text-foreground-lighter">Description</label>
+              <span className="text-foreground-lighter">Description</span>
               <div className="text-foreground pt-1">
                 <Description
                   content={description?.toString()}
