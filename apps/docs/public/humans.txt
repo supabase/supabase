@@ -17,6 +17,7 @@ Alex Hall
 Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
+Alexis Aguilar
 Ali Waseem
 Alice Crosbie
 Allan S
@@ -87,6 +88,7 @@ David A. Ventimiglia
 David Alvarez
 David Birdsong
 David Camacho Cateura
+David McNeil
 David Weitzman
 David Whittington
 Davide Pellegatta

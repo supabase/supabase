@@ -4,20 +4,23 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { EditBucketModal } from '../FilesBuckets/EditBucketModal'
+import { EmptyBucketModal } from './EmptyBucketModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from '@/data/storage/buckets-query'
 import { render } from '@/tests/helpers'
 import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),
   name: `test`,
   owner: faker.string.uuid(),
-  public: false,
-  allowed_mime_types: [],
-  file_size_limit: undefined,
-  type: 'STANDARD',
+  public: faker.datatype.boolean(),
+  allowed_mime_types: faker.helpers.multiple(() => faker.system.mimeType(), {
+    count: { min: 1, max: 5 },
+  }),
+  file_size_limit: faker.number.int({ min: 0, max: 25165824 }),
+  type: faker.helpers.arrayElement(['STANDARD', 'ANALYTICS', undefined]),
   created_at: faker.date.recent().toISOString(),
   updated_at: faker.date.recent().toISOString(),
 }
@@ -30,7 +33,7 @@ const Page = ({ onClose }: { onClose: () => void }) => {
         Open
       </button>
 
-      <EditBucketModal
+      <EmptyBucketModal
         visible={open}
         bucket={bucket}
         onClose={() => {
@@ -42,8 +45,10 @@ const Page = ({ onClose }: { onClose: () => void }) => {
   )
 }
 
-describe(`EditBucketModal`, () => {
+describe(`EmptyBucketModal`, () => {
   beforeEach(() => {
+    // useParams
+    routerMock.setCurrentUrl(`/project/default/storage/buckets/test`)
     // useSelectedProject -> Project
     addAPIMock({
       method: `get`,
@@ -60,14 +65,23 @@ describe(`EditBucketModal`, () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // useBucketUpdateMutation
+    // useBucketEmptyMutation
     addAPIMock({
-      method: `patch`,
-      path: `/platform/storage/:ref/buckets/:id`,
+      method: `post`,
+      path: `/platform/storage/:ref/buckets/:id/empty`,
     })
+    // Called by useStorageExplorerStateSnapshot but seems
+    // to be unnecessary for successful test?
+    //
+    // useProjectSettingsV2Query -> ProjectSettings
+    // GET /platform/projects/:ref/settings
+    // useAPIKeysQuery -> APIKey[]
+    // GET /v1/projects/:ref/api-keys
+    // listBucketObjects -> ListBucketObjectsData
+    // POST /platform/storage/:ref/buckets/:id/objects/list
   })
 
-  it(`renders a dialog with a form`, async () => {
+  it(`renders a confirmation dialog`, async () => {
     const onClose = vi.fn()
     render(<Page onClose={onClose} />)
 
@@ -75,41 +89,7 @@ describe(`EditBucketModal`, () => {
     await userEvent.click(openButton)
     await screen.findByRole(`dialog`)
 
-    const nameInput = screen.getByLabelText(`Bucket name`)
-    expect(nameInput).toHaveValue(`test`)
-    expect(nameInput).toBeDisabled()
-
-    const publicToggle = screen.getByLabelText(`Public bucket`)
-    expect(publicToggle).not.toBeChecked()
-    await userEvent.click(publicToggle)
-    expect(publicToggle).toBeChecked()
-
-    const sizeLimitToggle = screen.getByLabelText(`Restrict file size`)
-    expect(sizeLimitToggle).not.toBeChecked()
-    await userEvent.click(sizeLimitToggle)
-    expect(sizeLimitToggle).toBeChecked()
-
-    const sizeLimitInput = screen.getByLabelText(`File size limit`)
-    expect(sizeLimitInput).toHaveValue(null)
-    await userEvent.type(sizeLimitInput, `25`)
-
-    const sizeLimitUnitSelect = screen.getByLabelText(`File size limit unit`)
-    expect(sizeLimitUnitSelect).toHaveTextContent(`MB`)
-    await userEvent.click(sizeLimitUnitSelect)
-    const mbOption = screen.getByRole(`option`, { name: `GB` })
-    await userEvent.click(mbOption)
-    expect(sizeLimitUnitSelect).toHaveTextContent(`GB`)
-
-    const mimeTypeToggle = screen.getByLabelText(`Restrict MIME types`)
-    expect(mimeTypeToggle).not.toBeChecked()
-    await userEvent.click(mimeTypeToggle)
-    expect(mimeTypeToggle).toBeChecked()
-
-    const mimeTypeInput = screen.getByLabelText(`Allowed MIME types`)
-    expect(mimeTypeInput).toHaveValue(``)
-    await userEvent.type(mimeTypeInput, `image/jpeg, image/png`)
-
-    const confirmButton = screen.getByRole(`button`, { name: `Save` })
+    const confirmButton = screen.getByRole(`button`, { name: `Empty bucket` })
 
     fireEvent.click(confirmButton)
 

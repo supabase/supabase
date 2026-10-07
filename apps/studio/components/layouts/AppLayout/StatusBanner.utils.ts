@@ -119,7 +119,7 @@ export function getBannerCopy(selection: BannerSelection): { title: string; desc
         selection.items.length > 1
           ? 'We are investigating multiple technical issues'
           : 'We are investigating a technical issue'
-      return { title, description: 'Follow the status page for updates' }
+      return { title, description: '' }
     }
     case 'maintenance': {
       const { scheduledEndAt } = selection.item
