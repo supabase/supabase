@@ -39,7 +39,8 @@ export const getTablePoliciesUrl = (
 export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unknown>[]) => {
   const objects = rows.map((row) => {
     const entries = table.columns.map(
-      ({ name }) => `${JSON.stringify(name)}:${JSON.stringify(row[name] ?? null)}`
+      ({ name }) =>
+        `${JSON.stringify(name)}:${JSON.stringify((Object.hasOwn(row, name) ? row[name] : null) ?? null)}`
     )
     return `{${entries.join(',')}}`
   })
@@ -54,7 +55,7 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   const valuesSets = rows
     .map((row) => {
       const values = table.columns.map(({ name, dataType, format }) => {
-        const val = row[name]
+        const val = Object.hasOwn(row, name) ? row[name] : undefined
 
         // We only check for NULL, array and JSON types, everything else we stringify
         // given that Postgres can implicitly cast the right type based on the column type
