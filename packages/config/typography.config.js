@@ -34,7 +34,7 @@ module.exports = {
             '--tw-prose-code': 'var(--foreground-default)',
             '--tw-prose-pre-code': 'var(--foreground-muted)',
             '--tw-prose-pre-bg': 'var(--background-surface-200)',
-            '--tw-prose-th-borders': 'var(--background-surface-300)',
+            '--tw-prose-th-borders': 'var(--border-default)',
             '--tw-prose-td-borders': 'var(--background-default)',
             '--tw-prose-invert-body': 'var(--background-default)',
             '--tw-prose-invert-headings': 'white',
@@ -115,7 +115,7 @@ module.exports = {
               borderRadius: 'var(--radius-lg)',
             },
             'tbody tr:not(:last-child) td': {
-              borderBottom: '1px solid var(--background-surface-200)',
+              borderBottom: '1px solid var(--border-muted)',
             },
             code: {
               fontWeight: '400',
@@ -212,7 +212,7 @@ module.exports = {
             '--tw-prose-code': 'var(--foreground-default)',
             '--tw-prose-pre-code': 'var(--foreground-muted)',
             '--tw-prose-pre-bg': 'var(--background-surface-200)',
-            '--tw-prose-th-borders': 'var(--background-surface-300)',
+            '--tw-prose-th-borders': 'var(--border-default)',
             '--tw-prose-td-borders': 'var(--background-default)',
             '--tw-prose-invert-body': 'var(--background-default)',
             '--tw-prose-invert-headings': 'white',
