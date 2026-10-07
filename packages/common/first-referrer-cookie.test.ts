@@ -229,6 +229,7 @@ describe('first-referrer-cookie', () => {
       expect(hasPaidSignals(new URL('https://supabase.com/?ttclid=abc'))).toBe(true)
       expect(hasPaidSignals(new URL('https://supabase.com/?twclid=abc'))).toBe(true)
       expect(hasPaidSignals(new URL('https://supabase.com/?li_fat_id=abc'))).toBe(true)
+      expect(hasPaidSignals(new URL('https://supabase.com/?oppref=abc'))).toBe(true)
     })
 
     it('detects paid utm_medium values', () => {
