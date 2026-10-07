@@ -51,7 +51,19 @@ create table public.role_permissions (
   unique (role, permission)
 );
 comment on table public.role_permissions is 'Application permissions for each role.';
+
+-- Secure the tables
+alter table public.user_roles enable row level security;
+alter table public.role_permissions enable row level security;
 ```
+
+<Admonition type="caution">
+
+Both tables decide what every user is allowed to do, so they need Row Level Security. Tables created in the `public` schema carry default privileges for `anon` and `authenticated`, so without `enable row level security` any signed-in user can read and write them — including inserting a row that grants themselves the `admin` role.
+
+Neither table gets a policy for `anon` or `authenticated`, because nothing should read them directly. The `authorize` function below is `security definer`, so it queries `role_permissions` on the caller's behalf without exposing it.
+
+</Admonition>
 
 <Admonition type="note">
 
