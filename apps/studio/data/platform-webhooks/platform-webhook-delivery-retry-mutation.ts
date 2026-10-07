@@ -2,7 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { platformWebhooksKeys } from './keys'
-import { retryWebhookDelivery, type WebhookScopeParams } from './platform-webhooks-fetchers'
+import {
+  isWebhookRateLimitError,
+  retryWebhookDelivery,
+  type WebhookScopeParams,
+} from './platform-webhooks-fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type WebhookDeliveryRetryVariables = {
@@ -38,7 +42,11 @@ export const useWebhookDeliveryRetryMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(`Failed to retry delivery: ${data.message}`)
+        if (isWebhookRateLimitError(data)) {
+          toast.error('Too many retries — wait a minute and try again (limit: 10 per minute).')
+        } else {
+          toast.error(`Failed to retry delivery: ${data.message}`)
+        }
       } else {
         onError(data, variables, context)
       }

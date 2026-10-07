@@ -219,6 +219,12 @@ export async function sendTestWebhookEvent(scope: WebhookScopeParams, id: string
   return data
 }
 
+// Retry and test-event are both "heavy rate-limited" to 10 requests/60s (per the API
+// docs) and return a generic "Rate limit exceeded" message with no retry-time hint —
+// this is the one case worth a friendlier, specific message than the raw backend text.
+export const isWebhookRateLimitError = (error: { message?: string }) =>
+  error.message === 'Rate limit exceeded'
+
 export async function retryWebhookDelivery(scope: WebhookScopeParams, id: string) {
   const { data, error } =
     scope.scope === 'organization'
