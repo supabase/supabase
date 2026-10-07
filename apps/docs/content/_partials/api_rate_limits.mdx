@@ -23,16 +23,6 @@ For example, you can make 120 requests to Project A and 120 requests to Project 
 
 `POST /v1/projects` is organization-scoped, using the `organization_slug` in the request body.
 
-### Rate limit response headers
-
-Every API response includes rate limit information following official [HTTP specification headers](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers):
-
-- `X-RateLimit-Limit` - The maximum number of requests allowed in the current time window
-- `X-RateLimit-Remaining` - The number of requests remaining before you hit the rate limit
-- `X-RateLimit-Reset` - The number of seconds remaining until your rate limit resets
-
-You can use these headers to monitor your usage and implement proactive rate limit handling before receiving a 429 response.
-
 ### How rate limits are tracked
 
 Your requests are identified and tracked using one of the following identifiers, in this order of priority:
@@ -47,6 +37,16 @@ Each identifier is combined with the scope (project, organization, or endpoint) 
 
 - **Personal access tokens**: the limit applies to the user, so all tokens created by the same user share it.
 - **OAuth apps**: the limit applies to the app, shared by everyone calling through it.
+
+### Rate limit response headers
+
+Every API response includes rate limit information following official [HTTP specification headers](https://datatracker.ietf.org/doc/html/draft-ietf-httpapi-ratelimit-headers):
+
+- `X-RateLimit-Limit` - The maximum number of requests allowed in the current time window
+- `X-RateLimit-Remaining` - The number of requests remaining before you hit the rate limit
+- `X-RateLimit-Reset` - The number of seconds remaining until your rate limit resets
+
+You can use these headers to monitor your usage and implement proactive rate limit handling before receiving a 429 response.
 
 ### Endpoint exceptions
 
