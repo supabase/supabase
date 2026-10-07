@@ -53,7 +53,7 @@ export default {
       if (error) console.log(e.twitter, error.message)
       return Response.json(
         {
-          msg: `Congrats, you are wrong https://itsjustpostgres.com/ 🎉 @${e.twitter} has been added to the draw!`,
+          error: `Congrats, you are wrong https://itsjustpostgres.com/ 🎉 @${e.twitter} has been added to the draw!`,
         },
         { status: 500 }
       )
