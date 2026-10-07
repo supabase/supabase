@@ -66,7 +66,7 @@ Voit myös [itse isännöidä](https://supabase.com/docs/guides/hosting/overview
 - [pg_graphql](http://github.com/supabase/pg_graphql/) PostgreSQL-laajennus, joka paljastaa GraphQL API:n
 - [Storage](https://github.com/supabase/storage-api) tarjoaa RESTful-rajapinnan S3:een tallennettujen tiedostojen hallintaan, jossa käytetään Postgresiä oikeuksien hallintaan.
 - [postgres-meta](https://github.com/supabase/postgres-meta) on RESTful API Postgresin hallintaan, jonka avulla voit hakea taulukoita, lisätä rooleja ja suorittaa kyselyitä jne.
-- [GoTrue](https://github.com/netlify/gotrue) on SWT-pohjainen API käyttäjien hallintaan ja SWT-tunnusten antamiseen.
+- [GoTrue](https://github.com/supabase/gotrue) on JWT-pohjainen API käyttäjien hallintaan ja JWT-tunnusten antamiseen.
 - [Kong](https://github.com/Kong/kong) on pilvipohjainen API-yhdyskäytävä.
 
 #### Asiakaskirjastot

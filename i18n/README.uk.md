@@ -66,7 +66,7 @@ Supabase - це [хостингова платформа](https://supabase.com/d
 - [pg_graphql](http://github.com/supabase/pg_graphql/) - розширення PostgreSQL, яке надає API GraphQL
 - [Storage](https://github.com/supabase/storage-api) надає RESTful інтерфейс для керування файлами, що зберігаються у S3, використовуючи Postgres для керування дозволами.
 - [postgres-meta](https://github.com/supabase/postgres-meta) - RESTful API для керування Postgres, що дозволяє отримувати таблиці, додавати ролі, виконувати запити тощо.
-- [GoTrue](https://github.com/netlify/gotrue) - API на основі SWT для керування користувачами та випуску токенів SWT.
+- [GoTrue](https://github.com/supabase/gotrue) - API на основі JWT для керування користувачами та випуску токенів JWT.
 - [Kong](https://github.com/Kong/kong) - хмарний API-шлюз.
 
 #### Клієнтські бібліотеки

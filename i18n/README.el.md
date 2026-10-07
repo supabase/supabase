@@ -66,7 +66,7 @@
 - [pg_graphql](http://github.com/supabase/pg_graphql/) μια επέκταση της PostgreSQL που εκθέτει ένα GraphQL API
 - [Storage](https://github.com/supabase/storage-api) παρέχει μια RESTful διεπαφή για τη διαχείριση αρχείων που είναι αποθηκευμένα στο S3, χρησιμοποιώντας το Postgres για τη διαχείριση των δικαιωμάτων.
 - [postgres-meta](https://github.com/supabase/postgres-meta) είναι ένα RESTful API για τη διαχείριση του Postgres σας, επιτρέποντάς σας να αντλείτε πίνακες, να προσθέτετε ρόλους και να εκτελείτε ερωτήματα κ.λπ.
-- το [GoTrue](https://github.com/netlify/gotrue) είναι ένα API βασισμένο στο SWT για τη διαχείριση χρηστών και την έκδοση SWT tokens.
+- το [GoTrue](https://github.com/supabase/gotrue) είναι ένα API βασισμένο στο JWT για τη διαχείριση χρηστών και την έκδοση JWT tokens.
 - το [Kong](https://github.com/Kong/kong) είναι μια πύλη API cloud-native.
 
 #### Βιβλιοθήκες πελατών

@@ -66,7 +66,7 @@ Supabase è una [piattaforma hosted](https://supabase.com/dashboard). È possibi
 - [pg_graphql](http://github.com/supabase/pg_graphql/) un'estensione di PostgreSQL che espone un'API GraphQL
 - [Storage](https://github.com/supabase/storage-api) fornisce un'interfaccia RESTful per la gestione dei file memorizzati in S3, utilizzando Postgres per gestire i permessi.
 - [postgres-meta](https://github.com/supabase/postgres-meta) è un'API RESTful per la gestione di Postgres, che consente di recuperare tabelle, aggiungere ruoli, eseguire query, ecc.
-- [GoTrue](https://github.com/netlify/gotrue) è un'API basata su SWT per la gestione degli utenti e l'emissione di token SWT.
+- [GoTrue](https://github.com/supabase/gotrue) è un'API basata su JWT per la gestione degli utenti e l'emissione di token JWT.
 - [Kong](https://github.com/Kong/kong) è un gateway API cloud-native.
 
 #### Librerie client
