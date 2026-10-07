@@ -1,4 +1,4 @@
-import { useFlag } from 'common'
+import { useFeatureFlags, useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { AuthorizedApps } from './AuthorizedApps'
@@ -13,12 +13,13 @@ import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 
 export const OAuthApps = () => {
   const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
+  const { hasLoaded } = useFeatureFlags()
   const showNewOAuthApps = oauthAppScopedGrants && USE_MOCKS
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
-        {showNewOAuthApps ? <OAuthAppsAuthorizedList /> : <AuthorizedApps />}
+        {hasLoaded ? showNewOAuthApps ? <OAuthAppsAuthorizedList /> : <AuthorizedApps /> : null}
       </PageContainer>
     </>
   )
