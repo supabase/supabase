@@ -199,7 +199,7 @@ export const CreditCodeRedemption = ({
           }}
         />
 
-        {/* Mounted before the redemption result arrives so screen readers announce updates */}
+        {/* screen reader */}
         <div role="status" aria-live="polite" className="sr-only">
           {!!codeRedemptionResult && `$${codeRedemptionResult.amount_cents / 100} credits applied.`}
           {!!partialRedemptionNotice && ` ${partialRedemptionNotice}`}
