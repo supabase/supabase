@@ -62,7 +62,12 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
         return initialValue
       }
 
-      return JSON.parse(item) as T
+      try {
+        return JSON.parse(item) as T
+      } catch {
+        console.warn(`Failed to parse localStorage value for "${key}"`)
+        return initialValue
+      }
     },
   })
 

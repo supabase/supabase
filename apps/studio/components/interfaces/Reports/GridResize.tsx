@@ -86,7 +86,12 @@ export const GridResize = ({
     const data = e.dataTransfer.getData('application/json')
     if (!data) return
 
-    const queryData = JSON.parse(data)
+    let queryData
+    try {
+      queryData = JSON.parse(data)
+    } catch {
+      return console.error('Invalid JSON dropped')
+    }
     const { label, sql, config } = queryData
     if (!label || !sql) return console.error('SQL and Label required')
 
