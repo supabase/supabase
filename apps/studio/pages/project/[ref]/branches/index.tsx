@@ -73,7 +73,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
-  const showEmptyState = isSuccessBranches && branches?.length === 0 && !isGithubConnected
+  const showEmptyState = isSuccessConnections && isSuccessBranches && previewBranches.length === 0
 
   const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches

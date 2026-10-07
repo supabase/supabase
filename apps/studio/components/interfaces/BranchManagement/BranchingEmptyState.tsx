@@ -23,7 +23,7 @@ export const BranchingEmptyState = ({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="p-0 grid grid-cols-2 divide-y md:divide-y-0 md:divide-x items-stretch">
+      <CardContent className="p-0 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x items-stretch">
         <div className="p-8">
           <div className="flex items-start gap-x-4">
             <div className="shrink-0 text-foreground-light">
@@ -41,6 +41,7 @@ export const BranchingEmptyState = ({
                 <CreateBranchButton />
                 <DocsButton
                   label="Learn more"
+                  topic="Branching via the dashboard"
                   href={`${DOCS_URL}/deployment/branching/dashboard`}
                 />
               </div>
@@ -76,6 +77,7 @@ export const BranchingEmptyState = ({
                 )}
                 <DocsButton
                   label="Learn more"
+                  topic="Branching GitHub integration"
                   href={`${DOCS_URL}/deployment/branching/github-integration`}
                 />
               </div>
