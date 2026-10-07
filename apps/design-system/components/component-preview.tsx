@@ -97,7 +97,7 @@ export function ComponentPreview({
       <div className={cn('@container mt-4 mb-12', wideClasses)}>
         <div
           className={cn(
-            'relative rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
+            'relative overflow-hidden rounded-tl-md rounded-tr-md border-t border-l border-r bg-studio'
           )}
         >
           {showGrid && (
@@ -141,7 +141,7 @@ export function ComponentPreview({
   return (
     <div className={cn('mt-4 mb-12', wideClasses)}>
       <div
-        className={cn('relative bg-studio', {
+        className={cn('relative overflow-hidden bg-studio', {
           'rounded-tl-md rounded-tr-md border-t border-l border-r': !hideCode,
           'rounded-md border': hideCode,
         })}

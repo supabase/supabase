@@ -21,6 +21,12 @@ export const TOPICS = [
     name: 'Comparison',
     description: 'How Supabase compares to other databases and platforms.',
     pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Rundowns',
+    description: 'How different technologies compare across a variety of facets.',
+    pinned: false,
     visible: false,
   },
   {
