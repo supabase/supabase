@@ -25,12 +25,8 @@ const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeMetadataSchema',
 ] as const
 
-// Fields entered only in "Use Supabase" mode (optional in the validation data).
-const DUCKLAKE_SUPABASE_FIELD_PATHS = [
-  'ducklakeCatalogProjectRef',
-  'ducklakeStorageProjectRef',
-  'ducklakeStorageBucket',
-] as const
+// Fields entered only in "Use current Supabase project" mode (optional in the validation data).
+const DUCKLAKE_SUPABASE_FIELD_PATHS = ['ducklakeStorageBucket'] as const
 
 type DucklakeFieldPath =
   | (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
@@ -52,11 +48,10 @@ type DucklakeValidationData = Pick<
     >
   >
 
-// Required fields per mode. "Use Supabase" only needs project refs + a bucket; the catalog URL and
-// S3 credentials are resolved by the platform API.
+// Required fields per mode. "Use current Supabase project" only needs a bucket; the catalog and
+// storage both live in the current project and the platform API resolves the catalog URL and S3
+// credentials.
 const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
-  { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-  { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
   { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
 ]
 

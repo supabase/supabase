@@ -504,13 +504,11 @@ describe('DestinationForm.utils DuckLake', () => {
 const baseDucklakeSupabaseFormData = {
   ...baseDucklakeFormData,
   ducklakeMode: 'supabase' as const,
-  ducklakeCatalogProjectRef: 'catalog-ref',
-  ducklakeStorageProjectRef: 'storage-ref',
   ducklakeStorageBucket: 'ducklake-data',
 }
 
 describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
-  it('builds DuckLake validation config from project refs in supabase mode', () => {
+  it('builds DuckLake validation config with the current project as catalog and storage in supabase mode', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
@@ -519,8 +517,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -528,7 +526,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
   })
 
-  it('builds DuckLake submit config from project refs in supabase mode', async () => {
+  it('builds DuckLake submit config with the current project as catalog and storage in supabase mode', async () => {
     const createS3AccessKey = vi.fn()
     const resolveNamespace = vi.fn()
 
@@ -542,8 +540,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -553,11 +551,9 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
-  it('returns required-field errors for missing supabase selections, ignoring custom fields', () => {
+  it('returns a required-field error for a missing bucket in supabase mode, ignoring custom fields', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeMode: 'supabase',
-      ducklakeCatalogProjectRef: '',
-      ducklakeStorageProjectRef: '',
       ducklakeStorageBucket: '',
       // Custom-mode fields are intentionally blank and must not be validated in supabase mode
       ducklakeCatalogUrl: '',
@@ -569,19 +565,13 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
       ducklakeMetadataSchema: '',
     })
 
-    expect(issues).toEqual([
-      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
-      { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
-    ])
+    expect(issues).toEqual([{ path: 'ducklakeStorageBucket', message: 'Bucket is required.' }])
   })
 
   it('accepts a complete supabase configuration', () => {
     expect(
       getDucklakeValidationIssues({
         ducklakeMode: 'supabase',
-        ducklakeCatalogProjectRef: 'catalog-ref',
-        ducklakeStorageProjectRef: 'storage-ref',
         ducklakeStorageBucket: 'ducklake-data',
         ducklakeCatalogUrl: '',
         ducklakeDataPath: '',

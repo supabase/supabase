@@ -179,10 +179,9 @@ export const DestinationForm = ({
         pipelineData,
         catalogToken,
         region: projectSettings?.region,
-        projectRef,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
+    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',

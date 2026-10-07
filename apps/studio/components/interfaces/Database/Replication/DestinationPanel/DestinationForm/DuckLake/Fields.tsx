@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { Check, Eye, EyeOff, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
@@ -32,11 +33,9 @@ import {
   ScrollArea,
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SelectionListState } from 'ui-patterns/SelectionListState'
@@ -45,10 +44,8 @@ import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
   DUCKLAKE_BUCKET_FIELD_COPY,
-  DUCKLAKE_CATALOG_PROJECT_FIELD_COPY,
   DUCKLAKE_CATALOG_URL_FIELD_COPY,
   DUCKLAKE_DATA_PATH_FIELD_COPY,
-  DUCKLAKE_STORAGE_PROJECT_FIELD_COPY,
 } from '../DestinationFormFieldCopy'
 import {
   isMetadataListErrorVisible,
@@ -60,19 +57,15 @@ import {
   DUCKLAKE_MODE_SUPABASE,
   type DucklakeMode,
 } from './DuckLake.constants'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
 import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from '@/lib/constants'
 
 const DUCKLAKE_MODE_OPTIONS = [
   {
     value: DUCKLAKE_MODE_SUPABASE,
-    label: 'Select Supabase projects',
+    label: 'Use current Supabase project',
     description:
-      'Choose projects for the Postgres catalog and Storage bucket. They can be the same project; Pipelines creates credentials.',
+      'Uses this project for the Postgres catalog and Storage bucket. Pipelines creates credentials.',
   },
   {
     value: DUCKLAKE_MODE_CUSTOM,
@@ -108,50 +101,14 @@ const DuckLakeModeSelector = ({
 }
 
 const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
-  const ducklakeStorageProjectRef = useWatch({
-    control: form.control,
-    name: 'ducklakeStorageProjectRef',
-  })
+  const { ref: projectRef } = useParams()
 
   const [showNewBucketDialog, setShowNewBucketDialog] = useState(false)
   const [newBucketName, setNewBucketName] = useState('')
 
-  const { data: organization } = useSelectedOrganizationQuery()
-  const { data: sourceProject } = useSelectedProjectQuery()
-  const sourceRegion = sourceProject?.region
-
-  const { data: projectsData } = useOrgProjectsInfiniteQuery(
-    { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
-    { enabled: !!organization?.slug }
-  )
-
-  const projects = useMemo(
-    () =>
-      (projectsData?.pages.flatMap((page) => page.projects) ?? []).filter(
-        (project) => !project.is_branch
-      ),
-    [projectsData]
-  )
-  const projectsByRef = useMemo(
-    () => new Map(projects.map((project) => [project.ref, project])),
-    [projects]
-  )
-  const storageProjectName =
-    projectsByRef.get(ducklakeStorageProjectRef ?? '')?.name ??
-    (ducklakeStorageProjectRef === sourceProject?.ref
-      ? sourceProject?.name
-      : ducklakeStorageProjectRef)
-
-  const regionForRef = (ref?: string) => {
-    if (!ref) return undefined
-    const region = projectsByRef.get(ref)?.region
-    if (region) return region
-    return ref === sourceProject?.ref ? sourceProject?.region : undefined
-  }
-
   const { mutate: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
     onSuccess: (_, vars) => {
-      form.setValue('ducklakeStorageBucket', vars.id)
+      form.setValue('ducklakeStorageBucket', vars.id, { shouldDirty: true, shouldValidate: true })
       setNewBucketName('')
       setShowNewBucketDialog(false)
     },
@@ -159,29 +116,17 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
 
   const handleCreateBucket = async () => {
     const name = newBucketName.trim()
-    if (!name || !ducklakeStorageProjectRef) return
+    if (!name || !projectRef) return
     if (name.includes('/')) {
       return toast.error('Bucket name cannot contain "/".')
     }
 
     createBucket({
-      projectRef: ducklakeStorageProjectRef,
+      projectRef,
       id: name,
       type: 'STANDARD',
       isPublic: false,
     })
-  }
-
-  const renderRegionWarning = (ref?: string) => {
-    const region = regionForRef(ref)
-    if (!region || !sourceRegion || region === sourceRegion) return null
-    return (
-      <Admonition
-        type="warning"
-        className="mb-0"
-        description={`This project is in ${region}, a different region than your source project (${sourceRegion}). Cross-region replication can add noticeable latency.`}
-      />
-    )
   }
 
   return (
@@ -189,34 +134,9 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Catalog</p>
         <p className="text-sm text-foreground-light">
-          DuckLake metadata is stored in the selected project’s Postgres database.
+          DuckLake metadata is stored in this project’s Postgres database.
         </p>
       </div>
-
-      <FormField
-        control={form.control}
-        name="ducklakeCatalogProjectRef"
-        render={({ field }) => (
-          <FormItemLayout
-            layout="horizontal"
-            label={DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.label}
-            description={
-              <div className="flex flex-col gap-y-2">
-                {renderRegionWarning(field.value)}
-                <span>{DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.description}</span>
-              </div>
-            }
-          >
-            <FormControl>
-              <ProjectSelection
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select a project"
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
 
       <FormField
         control={form.control}
@@ -237,38 +157,9 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
       <div className="flex flex-col gap-y-1">
         <p className="text-sm font-medium text-foreground">Object storage</p>
         <p className="text-sm text-foreground-light">
-          Replicated data files are written to a Storage bucket in the selected project.
+          Replicated data files are written to a Storage bucket in this project.
         </p>
       </div>
-
-      <FormField
-        control={form.control}
-        name="ducklakeStorageProjectRef"
-        render={({ field }) => (
-          <FormItemLayout
-            layout="horizontal"
-            label={DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.label}
-            description={
-              <div className="flex flex-col gap-y-2">
-                {renderRegionWarning(field.value)}
-                <span>{DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.description}</span>
-              </div>
-            }
-          >
-            <FormControl>
-              <ProjectSelection
-                value={field.value}
-                onChange={(value) => {
-                  field.onChange(value)
-                  // Buckets are project-scoped, so clear the selection when the project changes
-                  form.setValue('ducklakeStorageBucket', '')
-                }}
-                placeholder="Select a project"
-              />
-            </FormControl>
-          </FormItemLayout>
-        )}
-      />
 
       <FormField
         control={form.control}
@@ -281,7 +172,6 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
           >
             <FormControl>
               <BucketSelection
-                form={form}
                 value={field.value}
                 onChange={field.onChange}
                 onCreateBucket={() => setShowNewBucketDialog(true)}
@@ -295,9 +185,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
         <DialogContent size="small">
           <DialogHeader>
             <DialogTitle>New bucket</DialogTitle>
-            <DialogDescription>
-              Creates a private bucket in the selected Storage project ({storageProjectName}).
-            </DialogDescription>
+            <DialogDescription>Creates a private bucket in this project.</DialogDescription>
           </DialogHeader>
           <DialogSectionSeparator />
           <DialogSection className="flex flex-col gap-y-2">
@@ -635,9 +523,9 @@ export const DuckLakeFields = ({
 }) => {
   const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
     DUCKLAKE_MODE_SUPABASE) as DucklakeMode
-  // The platform API resolves "Use Supabase" config into a flat catalog URL + provisioned S3
+  // The platform API resolves the managed config into a flat catalog URL + provisioned S3
   // credentials before persisting, so an existing destination can only be edited as custom
-  // parameters — the original project selections aren't recoverable.
+  // parameters.
   const effectiveMode = editMode ? DUCKLAKE_MODE_CUSTOM : ducklakeMode
 
   return (
@@ -666,104 +554,18 @@ export const DuckLakeFields = ({
   )
 }
 
-const ProjectSelection = ({
-  value,
-  onChange,
-  placeholder,
-}: {
-  value: string | undefined
-  onChange: (value: string) => void
-  placeholder: string
-}) => {
-  const { data: organization } = useSelectedOrganizationQuery()
-
-  const {
-    data: projectsData,
-    isPending: isPendingProjects,
-    isFetching: isFetchingProjects,
-    isError: isErrorProjects,
-    refetch: refetchProjects,
-  } = useOrgProjectsInfiniteQuery(
-    { slug: organization?.slug, statuses: [PROJECT_STATUS.ACTIVE_HEALTHY] },
-    { enabled: !!organization?.slug }
-  )
-
-  const projects = useMemo(
-    () =>
-      (projectsData?.pages.flatMap((page) => page.projects) ?? []).filter(
-        (project) => !project.is_branch
-      ),
-    [projectsData]
-  )
-  const isProjectsErrorVisible = isMetadataListErrorVisible(isErrorProjects, projects.length)
-
-  const projectsByRef = useMemo(
-    () => new Map(projects.map((project) => [project.ref, project])),
-    [projects]
-  )
-
-  const projectLabel = (ref?: string) => {
-    if (!ref) return undefined
-    const project = projectsByRef.get(ref)
-    return project ? `${project.name} · ${project.ref}` : ref
-  }
-  const { handleOpenChange: handleRefreshProjectsOnOpen } = useRefreshOnOpen({
-    isEnabled: !!organization?.slug,
-    refetch: refetchProjects,
-  })
-
-  return (
-    <Select value={value || ''} onValueChange={onChange} onOpenChange={handleRefreshProjectsOnOpen}>
-      <SelectTrigger>{projectLabel(value) ?? placeholder}</SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
-          <SelectionListState
-            isLoading={isMetadataListLoading(
-              isPendingProjects || isFetchingProjects,
-              projects.length
-            )}
-            isError={isProjectsErrorVisible}
-            isEmpty={
-              !isMetadataListLoading(isPendingProjects || isFetchingProjects, projects.length) &&
-              !isProjectsErrorVisible &&
-              projects.length === 0
-            }
-            emptyLabel="No active projects available"
-            errorLabel="Unable to load projects"
-          />
-          {projects.map((project) => (
-            <SelectItem key={project.ref} value={project.ref}>
-              <div className="flex flex-col">
-                <span>{project.name}</span>
-                <span className="text-foreground-lighter">
-                  {project.ref} · {project.region}
-                </span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-  )
-}
-
 const BucketSelection = ({
-  form,
   value,
   onChange,
   onCreateBucket,
 }: {
-  form: UseFormReturn<DestinationPanelSchemaType>
   value: string | undefined
   onChange: (value: string) => void
   onCreateBucket: () => void
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const ducklakeStorageProjectRef = useWatch({
-    control: form.control,
-    name: 'ducklakeStorageProjectRef',
-  })
+  const { ref: projectRef } = useParams()
 
   const {
     data: bucketsData,
@@ -771,10 +573,7 @@ const BucketSelection = ({
     isFetching: isFetchingBuckets,
     isError: isErrorBuckets,
     refetch: refetchBuckets,
-  } = usePaginatedBucketsQuery(
-    { projectRef: ducklakeStorageProjectRef },
-    { enabled: !!ducklakeStorageProjectRef }
-  )
+  } = usePaginatedBucketsQuery({ projectRef }, { enabled: !!projectRef })
 
   const buckets = useMemo(
     () =>
@@ -789,17 +588,9 @@ const BucketSelection = ({
     buckets.length
   )
   const { handleOpenChange: handleRefreshBucketsOnOpen } = useRefreshOnOpen({
-    isEnabled: !!ducklakeStorageProjectRef,
+    isEnabled: !!projectRef,
     refetch: refetchBuckets,
   })
-
-  if (!ducklakeStorageProjectRef) {
-    return (
-      <ComboboxTrigger size="small" disabled>
-        Select a storage project first
-      </ComboboxTrigger>
-    )
-  }
 
   return (
     <Popover
