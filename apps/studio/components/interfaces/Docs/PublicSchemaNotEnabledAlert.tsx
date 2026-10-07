@@ -15,10 +15,10 @@ const PublicSchemaNotEnabledAlert = () => {
       </p>
       <Button asChild className="mt-1">
         <Link
-          href={`/project/${projectRef}/settings/api#postgrest-config`}
+          href={`/project/${projectRef}/integrations/data_api/settings`}
           className="no-underline!"
         >
-          View API settings
+          View Data API settings
         </Link>
       </Button>
     </Admonition>
