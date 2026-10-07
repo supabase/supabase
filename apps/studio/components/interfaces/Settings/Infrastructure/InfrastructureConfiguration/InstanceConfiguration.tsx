@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Globe2, Loader2, Network } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, FloatingPlate } from 'ui'
+import { Button, FloatingPlate, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DiagramFlow } from './DiagramFlow'
 import { SmoothstepEdge } from './Edge'
@@ -180,20 +180,40 @@ const InstanceConfigurationUI = () => {
               <FloatingPlate className="z-10 absolute top-4 right-4 items-center justify-center gap-x-2">
                 {isAws && (
                   <div className="flex items-center justify-center">
-                    <Button
-                      icon={<Network size={15} />}
-                      className={`rounded-r-none transition ${
-                        view === 'flow' ? 'opacity-100' : 'opacity-50'
-                      }`}
-                      onClick={() => setView('flow')}
-                    />
-                    <Button
-                      icon={<Globe2 size={15} />}
-                      className={`rounded-l-none transition ${
-                        view === 'map' ? 'opacity-100' : 'opacity-50'
-                      }`}
-                      onClick={() => setView('map')}
-                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          icon={<Network size={15} />}
+                          className={`rounded-r-none transition motion-reduce:transition-none ${
+                            view === 'flow' ? 'opacity-100' : 'opacity-50'
+                          }`}
+                          onClick={() => setView('flow')}
+                          aria-label="Show infrastructure as a diagram"
+                          aria-pressed={view === 'flow'}
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        Show infrastructure as a diagram
+                      </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          icon={<Globe2 size={15} />}
+                          className={`rounded-l-none transition motion-reduce:transition-none ${
+                            view === 'map' ? 'opacity-100' : 'opacity-50'
+                          }`}
+                          onClick={() => setView('map')}
+                          aria-label="Show infrastructure on the map"
+                          aria-pressed={view === 'map'}
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Show infrastructure on the map</TooltipContent>
+                    </Tooltip>
                   </div>
                 )}
               </FloatingPlate>
