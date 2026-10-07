@@ -15,6 +15,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
+import { onErrorChat } from '@/components/ui/AIAssistantPanel/AIAssistant.utils'
 import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
@@ -299,6 +300,7 @@ function createChatInstance(
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
+    onError: onErrorChat,
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
       fetch: async (url, init) => {
