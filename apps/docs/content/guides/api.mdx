@@ -42,3 +42,38 @@ The reflected API is designed to retain as much of Postgres' capability as possi
 - The Postgres security model - including Row Level Security, Roles, and Grants.
 
 The REST API resolves all requests to a single SQL statement leading to fast response times and high throughput.
+
+## Troubleshooting RPCs that return 404 [#rest-api-rpc-troubleshooting]
+
+When an RPC call returns `404` with `PGRST202` and says that PostgREST cannot find a function in the schema cache, first verify the function's exact signature rather than only its name. PostgREST resolves overloaded functions by their argument names and types.
+
+Check the function in Postgres:
+
+```sql
+select
+  n.nspname as schema_name,
+  p.proname as function_name,
+  pg_get_function_identity_arguments(p.oid) as identity_arguments
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where n.nspname = 'public'
+  and p.proname = 'your_function';
+```
+
+For a function to be callable through the Data API, the schema must be exposed and the caller must have `EXECUTE` privilege. For hosted projects, verify the function is included under **Settings > Data API > Exposed Functions** and that the expected role has permission:
+
+```sql
+select has_function_privilege(
+  'anon',
+  'public.your_function',
+  'execute'
+);
+```
+
+After changing the function definition or Data API exposure, reload the PostgREST schema cache:
+
+```sql
+notify pgrst, 'reload schema';
+```
+
+If the exact function signature, schema exposure, `EXECUTE` privilege, and schema-cache reload all check out but the RPC still returns `PGRST202`, the problem may be outside the database definition itself. Capture the full response body, the request path (including arguments), the timestamp, and the project region when contacting Supabase support. This helps distinguish function-resolution problems from a PostgREST cache or managed-service issue.
