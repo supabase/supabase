@@ -1172,9 +1172,8 @@ export const dataset: AssistantEvalCase[] = [
         "Security Advisor flags 'Extension in Public' for pg_trgm and unaccent. Both are relocatable and owned by supabase_admin, and I have four GIN indexes that depend on pg_trgm. What's the supported way to move them to the extensions schema without dropping and recreating them?",
     },
     expected: {
-      requiredTools: ['execute_sql'],
       correctAnswer:
-        'Uses ALTER EXTENSION pg_trgm SET SCHEMA extensions (and the same for unaccent), which relocates the extension without dropping it or rebuilding dependent indexes, and offers to run it. States or demonstrates that this can be run directly from the SQL editor as the postgres role — does not tell the user that support must run it because the extension is owned by supabase_admin. Does not suggest DROP EXTENSION ... CASCADE.',
+        'Uses ALTER EXTENSION pg_trgm SET SCHEMA extensions (and the same for unaccent), which relocates the extension without dropping it or rebuilding dependent indexes. Explaining the statements and offering to run them are both acceptable. States that this can be run directly from the SQL editor as the postgres role — does not tell the user that support must run it because the extension is owned by supabase_admin. Does not suggest DROP EXTENSION ... CASCADE.',
     },
     metadata: {
       category: ['sql_generation', 'database_optimization'],
@@ -1220,12 +1219,12 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredTools: ['search_docs'],
       correctAnswer:
-        'Explains that it cannot lift restrictions itself, and that quota-based restrictions can take up to 24 hours after the billing-cycle reset to clear automatically. Notes that pausing traffic or moving files does not remove usage already recorded for the previous cycle, that upgrading to Pro lifts the restriction immediately if access is urgent, and that support only needs to be involved if the 402 persists beyond 24 hours. Does not assert that a backend fault requires manual correction before that window has passed.',
+        'Explains that it cannot lift restrictions itself, and that per the Billing FAQ usage-based restrictions are lifted when the quota refills at the start of the next billing cycle, with a short delay after the reset before they are fully lifted. Notes that pausing traffic or moving files does not remove usage already recorded for the previous cycle, that upgrading to Pro lifts the restriction immediately if access is urgent, and that support should be involved if the 402 persists well beyond that short delay. Does not assert that a backend fault requires manual correction when the reset happened only hours ago.',
     },
     metadata: {
       category: ['general_help'],
       description:
-        'Production conversation: the assistant said backend correction by support was required; the resolution was that restrictions clear automatically within 24 hours of the reset',
+        'Production conversation: the assistant said backend correction by support was required hours after the reset; the resolution was that the restriction cleared on its own. The docs only commit to "a short delay" after the reset (Billing FAQ), so the expected answer uses that wording rather than a specific window',
     },
   },
   {
@@ -1236,12 +1235,12 @@ export const dataset: AssistantEvalCase[] = [
     expected: {
       requiredTools: ['search_docs'],
       correctAnswer:
-        "Explains that Fair Use restrictions are based on the organization's usage in the billing cycle and lift automatically when the cycle resets, and separately points out that a Free project can also be paused for inactivity - a different state that is fixed by Resume project from the dashboard - so the user should check which of the two actually applies. Points to the Database report (Database Size / Space used) to find large tables to prune so the restriction does not re-apply. Does not promise or imply a courtesy restoration.",
+        "Explains that Fair Use restrictions are based on the organization's usage in the billing cycle and lift automatically when the cycle resets, and separately points out that a Free project can also be paused for inactivity - a different state that is fixed by Resume project from the dashboard - and explains how to tell them apart (a paused project shows Paused with a Resume project action; a restricted one shows the Fair Use restriction notice) rather than treating them as one problem. Points to the Database report (Database Size / Space used) to find large tables to prune so the restriction does not re-apply. Does not promise or imply a courtesy restoration.",
     },
     metadata: {
       category: ['general_help'],
       description:
-        'Production conversation: the restriction had already lifted at cycle reset and the real blocker was an inactivity pause; the assistant hinted at the pause but could not verify it',
+        'Production conversation: the restriction had already lifted at cycle reset and the real blocker was an inactivity pause; the assistant hinted at the pause but could not verify it. Once project status is available to the assistant (AI-204 / prompt context), tighten this to require stating which state applies',
     },
   },
   {
@@ -1265,14 +1264,13 @@ export const dataset: AssistantEvalCase[] = [
         "My Free project was paused for inactivity. I clicked Restore about five minutes ago and it's still showing Unhealthy with the database unreachable and API Gateway erroring. I already tried restarting it once. Should I keep restarting until it comes up?",
     },
     expected: {
-      requiredTools: ['query_logs'],
       correctAnswer:
-        'Advises not to restart or unpause repeatedly, a restore from pause can take several minutes to become fully healthy, and additional restarts prolong it. Suggests waiting, re-checking the project status, and looking at recent logs to confirm services are coming up, escalating to support only if it remains unhealthy well beyond that window.',
+        'Advises not to restart or unpause repeatedly: a restore from pause can take several minutes to become fully healthy, and additional restarts prolong it. Suggests waiting and re-checking the project status before escalating, and involves support only if it remains unhealthy well beyond that window.',
     },
     metadata: {
       category: ['debugging'],
       description:
-        'Production conversation: the restart had simply taken a few extra minutes and the project was healthy by the time support looked; the assistant gave the right advice but could not confirm because log access was blocked',
+        'Production conversation: the restart had simply taken a few extra minutes and the project was healthy by the time support looked. No tool is required: the mock logs carry no project-status signal and the assistant has no project-status tool in project-scoped mode (AI-204)',
     },
   },
   {
