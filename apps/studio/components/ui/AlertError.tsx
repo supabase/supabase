@@ -62,7 +62,7 @@ export const AlertError = ({
         projectRef,
         orgSlug,
         subject,
-        error: error?.message,
+        errorMessage: error?.message,
       }}
     >
       {text}

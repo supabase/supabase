@@ -35,7 +35,7 @@ test('support is an inline link with the error context, not an action button', a
       category: SupportCategories.DASHBOARD_BUG,
       projectRef: 'default',
       subject: 'Failed to load',
-      error: 'Test error',
+      errorMessage: 'Test error',
     })
   )
   expect(screen.queryByRole('button', { name: /contact support/i })).not.toBeInTheDocument()
