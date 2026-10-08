@@ -1869,6 +1869,8 @@ export function createStorageExplorerState({
       // Get the range to select and reverse the order if necessary
       const rangeToSelect = columnItems
         .slice(start, end + 1)
+        // An archived row has no live object, so the bulk actions have nothing to act on.
+        .filter((item) => item.archived === undefined)
         // we need `columnIndex` in all item of `selectedItems`
         .map((item) => ({ ...item, columnIndex }))
       if (toItemIndex < lastSelectedItemIndex) {
