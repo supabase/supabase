@@ -32,6 +32,7 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
+  const isPipelineCreationPreviewEnabled = useFlag('pipelineCreationPreview')
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
@@ -42,6 +43,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
   return useMemo(() => {
     const previews: FeaturePreview[] = [
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
+        name: 'Stepped pipeline creation',
+        category: 'database',
+        enabled: isPipelineCreationPreviewEnabled,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+      },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
         name: 'Explorer & Notebooks',
@@ -153,6 +163,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
+    isPipelineCreationPreviewEnabled,
     isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
