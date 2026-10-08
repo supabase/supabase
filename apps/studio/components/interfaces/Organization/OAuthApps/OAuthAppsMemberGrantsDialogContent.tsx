@@ -60,8 +60,9 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   const statusText = useMemo(() => {
     if (isFetchingNextPage) return 'Loading more grants...'
     if (isPending) return 'Loading grants...'
+    if (isError) return ''
     return 'Grants loaded'
-  }, [isPending, isFetchingNextPage])
+  }, [isPending, isFetchingNextPage, isError])
 
   const isEmpty = !data || data.pages.length === 0 || data.pages[0].data.length === 0
 
@@ -76,6 +77,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       <p aria-live="polite" className="sr-only">
         {statusText}
       </p>
+
       {isPending && (
         <div className="space-y-2">
           <ShimmeringLoader />
