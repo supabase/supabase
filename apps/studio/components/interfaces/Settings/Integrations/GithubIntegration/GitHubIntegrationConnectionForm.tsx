@@ -22,6 +22,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ConnectGitHubButton } from './ConnectGitHubButton'
 import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
@@ -68,6 +69,9 @@ export const GitHubIntegrationConnectionForm = ({
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
+
+  const canManageGitHubConnection =
+    (!connection && !canCreateGitHubConnection) || (connection && !canUpdateGitHubConnection)
 
   const {
     gitHubAuthorization,
@@ -386,7 +390,9 @@ export const GitHubIntegrationConnectionForm = ({
     isCreatingConnection ||
     isUpdatingConnection ||
     isDeletingConnection ||
-    isLoadingRepositoryOptions
+    (!!gitHubAuthorization && isLoadingRepositoryOptions)
+
+  const isFieldDisabled = !canUpdateGitHubConnection || !gitHubAuthorization
 
   let repositoryDescription = 'Select the repository to connect to your project'
   if (connection) {
@@ -397,6 +403,21 @@ export const GitHubIntegrationConnectionForm = ({
 
   return (
     <>
+      {!gitHubAuthorization && !!currentRepositoryId && (
+        <Admonition
+          className="mb-4"
+          layout="responsive"
+          title="Authorize GitHub to manage integration settings"
+          description="Required to list your repositories and change this project's connection"
+          actions={
+            <ConnectGitHubButton
+              disabled={canManageGitHubConnection}
+              refetch={refetchRepositoryOptions}
+            />
+          }
+        />
+      )}
+
       <Form {...githubSettingsForm}>
         <form
           onSubmit={githubSettingsForm.handleSubmit(handleCreateOrUpdateConnection)}
@@ -410,10 +431,7 @@ export const GitHubIntegrationConnectionForm = ({
                 label="GitHub repository"
                 layout="flex-row-reverse"
                 description={repositoryDescription}
-                disabled={
-                  (!connection && !canCreateGitHubConnection) ||
-                  (connection && !canUpdateGitHubConnection)
-                }
+                disabled={canManageGitHubConnection}
                 selectedRepositoryName={connection?.repository.name}
                 repositories={githubRepos}
                 gitHubAuthorization={gitHubAuthorization}
@@ -427,7 +445,7 @@ export const GitHubIntegrationConnectionForm = ({
             </CardContent>
 
             <AnimatePresence>
-              {gitHubAuthorization !== null && !!currentRepositoryId && (
+              {!!currentRepositoryId && (
                 <motion.div
                   initial={{ opacity: 0, y: -16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -459,7 +477,7 @@ export const GitHubIntegrationConnectionForm = ({
                               {...field}
                               placeholder="."
                               autoComplete="off"
-                              disabled={!canUpdateGitHubConnection}
+                              disabled={isFieldDisabled}
                             />
                           </FormControl>
                         </FormItemLayout>
@@ -480,9 +498,10 @@ export const GitHubIntegrationConnectionForm = ({
                           >
                             <FormControl>
                               <Switch
+                                aria-label="Toggle deploy to production"
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={!canUpdateGitHubConnection}
+                                disabled={isFieldDisabled}
                               />
                             </FormControl>
                           </FormItemLayout>
@@ -509,7 +528,7 @@ export const GitHubIntegrationConnectionForm = ({
                                   <Input
                                     {...field}
                                     autoComplete="off"
-                                    disabled={!canUpdateGitHubConnection || !enableProductionSync}
+                                    disabled={isFieldDisabled || !enableProductionSync}
                                   />
                                 </FormControl>
                                 <div className="absolute top-2.5 right-3 flex items-center gap-2">
@@ -562,9 +581,14 @@ export const GitHubIntegrationConnectionForm = ({
                           >
                             <FormControl>
                               <Switch
+                                aria-label="Toggle automatic branching"
                                 checked={!hasAccessToBranching ? false : field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={!hasAccessToBranching || !canCreateGitHubConnection}
+                                disabled={
+                                  !hasAccessToBranching ||
+                                  !canCreateGitHubConnection ||
+                                  isFieldDisabled
+                                }
                               />
                             </FormControl>
                           </FormItemLayout>
@@ -596,7 +620,8 @@ export const GitHubIntegrationConnectionForm = ({
                                   disabled={
                                     !hasAccessToBranching ||
                                     !newBranchPerPr ||
-                                    !canUpdateGitHubConnection
+                                    !canUpdateGitHubConnection ||
+                                    isFieldDisabled
                                   }
                                 />
                               </FormControl>
@@ -615,12 +640,14 @@ export const GitHubIntegrationConnectionForm = ({
                             >
                               <FormControl>
                                 <Switch
+                                  aria-label="Toggle Suapbase changes only"
                                   checked={!hasAccessToBranching ? false : field.value}
                                   onCheckedChange={(val) => field.onChange(val)}
                                   disabled={
                                     !hasAccessToBranching ||
                                     !newBranchPerPr ||
-                                    !canUpdateGitHubConnection
+                                    !canUpdateGitHubConnection ||
+                                    isFieldDisabled
                                   }
                                 />
                               </FormControl>
