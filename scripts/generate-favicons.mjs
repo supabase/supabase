@@ -48,13 +48,7 @@ for (const [variant, relativeDirectory] of faviconTargets) {
       .toFile(path.join(directory, `android-icon-${size}x${size}.png`))
   }
   const manifestPath = path.join(directory, 'manifest.json')
-  let manifest
-  try {
-    manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error
-    manifest = { name: 'Supabase Knowledge Base', short_name: 'Supabase' }
-  }
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
   // Relative icon URLs resolve beside the manifest, including under /docs and /kb.
   manifest.icons = [192, 512].map((size) => ({
     src: `android-icon-${size}x${size}.png`,

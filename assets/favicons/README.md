@@ -61,4 +61,4 @@ WWW's historical Launch Week X favicon directory contains separate campaign artw
 node scripts/validate-favicons.mjs
 ```
 
-Validate dimensions, opacity, ICO directories, manifest targets, duplicate root icons and base-path declarations after regeneration. Inspect 16px and 32px renders against light and dark browser chrome as well as larger masters.
+The script checks dimensions, opacity, ICO entries and manifest icon URLs under different base paths. Check for duplicate icon declarations in the rendered page head separately. Inspect 16px and 32px renders against light and dark browser chrome as well as larger masters.
