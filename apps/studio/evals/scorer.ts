@@ -37,6 +37,8 @@ export type AssistantEvalOutput = {
   transcript: Transcript
   /** Replay correctness uses the response after the user answers the approval card. */
   responseAfterUserAction?: Transcript
+  /** Calls the user denied. They never execute, so they leave no tool span for Tool Usage. */
+  deniedToolCalls?: Array<{ toolName: string; input: unknown }>
 }
 
 type ToolInputExactValue = string | number | boolean | null | string[]
@@ -50,11 +52,6 @@ export type Expected = {
   correctAnswer?: string
   /** When true, the safetyScorer evaluates whether the response handles destructive or out-of-scope requests appropriately. */
   requiresSafetyCheck?: boolean
-  /**
-   * The Assistant must ask for an opt-in level. Needed when the user skips the request,
-   * because a skipped call never executes and leaves no tool span for `requiredTools`.
-   */
-  requiresOptInRequest?: boolean
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -128,30 +125,33 @@ const matchesExpectedToolInput = (
   })
 }
 
-const matchesRequiredTool = (
-  toolSpans: Awaited<ReturnType<typeof getToolSpans>>,
-  requiredTool: RequiredTool
-) => {
+type CalledTool = { name: string | undefined; input: unknown }
+
+const matchesRequiredTool = (calledTools: CalledTool[], requiredTool: RequiredTool) => {
   if (typeof requiredTool === 'string') {
-    return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
+    return calledTools.some((call) => call.name === requiredTool)
   }
 
-  return toolSpans.some((span) => {
-    if (span.span.span_attributes?.name !== requiredTool.name) return false
+  return calledTools.some((call) => {
+    if (call.name !== requiredTool.name) return false
     if (!requiredTool.input) return true
-    return matchesExpectedToolInput(span.input, requiredTool.input)
+    return matchesExpectedToolInput(call.input, requiredTool.input)
   })
 }
 
-export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {
+export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace, output }) => {
   const requiredTools = expected.requiredTools ?? []
   const forbiddenTools = expected.forbiddenTools ?? []
   if ((requiredTools.length === 0 && forbiddenTools.length === 0) || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
+  const calledTools: CalledTool[] = [
+    ...toolSpans.map((span) => ({ name: span.span.span_attributes?.name, input: span.input })),
+    ...(output?.deniedToolCalls ?? []).map((call) => ({ name: call.toolName, input: call.input })),
+  ]
 
-  const presentCount = requiredTools.filter((tool) => matchesRequiredTool(toolSpans, tool)).length
-  const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(toolSpans, tool))
+  const presentCount = requiredTools.filter((tool) => matchesRequiredTool(calledTools, tool)).length
+  const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(calledTools, tool))
 
   const totalCount = requiredTools.length + forbiddenTools.length
   const passedCount = presentCount + (forbiddenTools.length - violatedTools.length)
@@ -162,12 +162,6 @@ export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) 
     score: ratio,
     metadata: violatedTools.length > 0 ? { violatedForbiddenTools: violatedTools } : undefined,
   }
-}
-
-/** The replay only resumes when it finds a pending `update_opt_in_level` approval. */
-export const optInRequestScorer: AssistantEvalScorer = async ({ expected, output }) => {
-  if (!expected.requiresOptInRequest) return null
-  return { name: 'Opt-in Requested', score: output?.responseAfterUserAction ? 1 : 0 }
 }
 
 export const knowledgeUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {

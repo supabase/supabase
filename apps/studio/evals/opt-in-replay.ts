@@ -21,9 +21,14 @@ export function applyOptInDecision(
   message: UIMessage,
   decision: OptInDecision,
   currentLevel: AiOptInLevel
-): { message: UIMessage; level: AiOptInLevel } | null {
+): {
+  message: UIMessage
+  level: AiOptInLevel
+  deniedToolCalls: Array<{ toolName: string; input: unknown }>
+} | null {
   let level = currentLevel
   let isResolved = false
+  const deniedToolCalls: Array<{ toolName: string; input: unknown }> = []
 
   const parts = message.parts.map((part): UIMessage['parts'][number] => {
     if (part.type !== TOOL_PART_TYPE || part.state !== 'approval-requested' || !part.approval) {
@@ -34,6 +39,7 @@ export function applyOptInDecision(
     const requestedLevel = storedUpdateOptInLevelInputSchema.safeParse(part.input).data
       ?.requiredLevel
     const isApproved = decision !== 'skip'
+    if (!isApproved) deniedToolCalls.push({ toolName: 'update_opt_in_level', input: part.input })
     if (decision === 'accept') level = requestedLevel ?? currentLevel
     if (typeof decision === 'object') level = decision.chooses
 
@@ -50,7 +56,7 @@ export function applyOptInDecision(
     }
   })
 
-  return isResolved ? { message: { ...message, parts }, level } : null
+  return isResolved ? { message: { ...message, parts }, level, deniedToolCalls } : null
 }
 
 function describeDecision(decision: OptInDecision) {

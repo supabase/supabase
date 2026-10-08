@@ -2,7 +2,6 @@ import type { Trace } from 'braintrust'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  optInRequestScorer,
   toolUsageScorer,
   urlValidityScorer,
   type AssistantEvalOutput,
@@ -54,8 +53,11 @@ const mockToolTrace = (calls: Array<{ name: string; input?: unknown }>) => {
   return { trace: { getSpans } as unknown as Trace }
 }
 
-const runToolUsageScorer = (expected: Expected, trace?: Trace) =>
-  toolUsageScorer({ input: { prompt: 'irrelevant' }, expected, output: null, trace })
+const runToolUsageScorer = (
+  expected: Expected,
+  trace?: Trace,
+  output: AssistantEvalOutput | null = null
+) => toolUsageScorer({ input: { prompt: 'irrelevant' }, expected, output, trace })
 
 describe('scorers with online (null) output', () => {
   // Online scorers run against live production logs, which have no eval task
@@ -191,28 +193,35 @@ describe('toolUsageScorer', () => {
     )
     expect(result).toMatchObject({ score: 0 })
   })
-})
 
-describe('optInRequestScorer', () => {
-  const run = (expected: Expected, output: AssistantEvalOutput) =>
-    optInRequestScorer({ input: { prompt: 'x' }, expected, output })
+  describe('tool calls the user denied', () => {
+    const output: AssistantEvalOutput = {
+      finishReason: 'stop',
+      transcript: transcript('a'),
+      deniedToolCalls: [{ toolName: 'update_opt_in_level', input: { requiredLevel: 'schema' } }],
+    }
 
-  const asked = {
-    finishReason: 'stop',
-    transcript: transcript('a'),
-    responseAfterUserAction: transcript('b'),
-  } as const
+    it('counts a denied call as called', async () => {
+      const { trace } = mockToolTrace([])
+      const result = await runToolUsageScorer(
+        {
+          requiredTools: [
+            { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
+          ],
+        },
+        trace,
+        output
+      )
+      expect(result).toMatchObject({ score: 1 })
+    })
 
-  it('passes when the replay found the approval and resumed', async () => {
-    expect(await run({ requiresOptInRequest: true }, asked)).toMatchObject({ score: 1 })
-  })
-
-  it('fails when the model never asked', async () => {
-    const output = { finishReason: 'stop', transcript: transcript('a') } as const
-    expect(await run({ requiresOptInRequest: true }, output)).toMatchObject({ score: 0 })
-  })
-
-  it('skips cases that do not require a request', async () => {
-    expect(await run({}, asked)).toBeNull()
+    it('still scores 0 when the model never asked', async () => {
+      const { trace } = mockToolTrace([])
+      const result = await runToolUsageScorer({ requiredTools: ['update_opt_in_level'] }, trace, {
+        ...output,
+        deniedToolCalls: undefined,
+      })
+      expect(result).toMatchObject({ score: 0 })
+    })
   })
 })

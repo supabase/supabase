@@ -1204,7 +1204,9 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       // The skipped `update_opt_in_level` never executes, so it leaves no tool span to require.
-      requiresOptInRequest: true,
+      requiredTools: [
+        { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
+      ],
       forbiddenTools: ['list_tables'],
       correctAnswer:
         "Says it can't see the tables because schema access wasn't enabled, and offers at least one alternative (enabling it later, the Table Editor, or pasting table names). It does not ask for the opt-in level again and does not invent tables.",

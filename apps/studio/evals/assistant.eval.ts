@@ -11,7 +11,6 @@ import {
   docsFaithfulnessScorer,
   goalCompletionScorer,
   knowledgeUsageScorer,
-  optInRequestScorer,
   safetyScorer,
   toolUsageScorer,
   urlValidityScorer,
@@ -66,6 +65,7 @@ Eval('Assistant', {
     }
 
     const results = [await run([userMessage], aiOptInLevel)]
+    let deniedToolCalls: Array<{ toolName: string; input: unknown }> = []
 
     if (optInDecision && aiOptInLevel) {
       // Same two requests as production: the approval pauses the turn, then the answered
@@ -78,7 +78,10 @@ Eval('Assistant', {
       }
       const resumed =
         assistantMessage && applyOptInDecision(assistantMessage, optInDecision, aiOptInLevel)
-      if (resumed) results.push(await run([userMessage, resumed.message], resumed.level))
+      if (resumed) {
+        deniedToolCalls = resumed.deniedToolCalls
+        results.push(await run([userMessage, resumed.message], resumed.level))
+      }
     }
 
     const finishReason = await results[results.length - 1].finishReason
@@ -87,11 +90,15 @@ Eval('Assistant', {
     )
     const transcript =
       second && optInDecision ? joinTranscripts(first, second, optInDecision) : first
-    return { finishReason, transcript, ...(second && { responseAfterUserAction: second }) }
+    return {
+      finishReason,
+      transcript,
+      ...(second && { responseAfterUserAction: second }),
+      ...(deniedToolCalls.length > 0 && { deniedToolCalls }),
+    }
   },
   scores: [
     toolUsageScorer,
-    optInRequestScorer,
     knowledgeUsageScorer,
     sqlSyntaxScorer,
     sqlIdentifierQuotingScorer,
