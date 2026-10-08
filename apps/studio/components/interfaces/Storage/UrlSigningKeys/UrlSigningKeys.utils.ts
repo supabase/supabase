@@ -5,9 +5,11 @@ import type { UrlSigningKey } from '@/data/storage/url-signing-keys-query'
 /**
  * Splits storage JWKs into the groups shown in the UI. Keys of other kinds are ignored.
  *
- * - `signingKey`: the one key used to sign new URLs
- * - `standbyKeys`: not used for signing, but still validate URLs they signed
+ * - `activeKey`: the one key that signs new URLs (the API guarantees exactly one)
+ * - `standbyKeys`: don't sign new URLs, but still validate the URLs they signed
  * - `revokedKeys`: no longer validate any URL
+ *
+ * Note that the API's `active` flag means "not revoked", so standby keys are `active: true` too.
  */
 export const groupUrlSigningKeys = (keys: UrlSigningKey[]) => {
   const urlSigningKeys = keys.filter(
@@ -15,7 +17,7 @@ export const groupUrlSigningKeys = (keys: UrlSigningKey[]) => {
   )
 
   return {
-    signingKey: urlSigningKeys.find(
+    activeKey: urlSigningKeys.find(
       (key) => key.active && key.kind === URL_SIGNING_KEY_KIND.SIGNING
     ),
     standbyKeys: urlSigningKeys.filter(
@@ -23,12 +25,6 @@ export const groupUrlSigningKeys = (keys: UrlSigningKey[]) => {
     ),
     revokedKeys: urlSigningKeys.filter((key) => !key.active),
   }
-}
-
-export const getUrlSigningKeyStatusLabel = (key: UrlSigningKey) => {
-  if (!key.active) return 'Revoked'
-  if (key.kind === URL_SIGNING_KEY_KIND.SIGNING) return 'Signing'
-  return 'Standby'
 }
 
 const isUrlSigningKeyAlgorithm = (type: string): type is UrlSigningKeyAlgorithm =>

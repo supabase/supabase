@@ -61,17 +61,16 @@ export const UrlSigningKeys = () => {
 
   const {
     mutate: updateKey,
-    isPending: isReactivating,
-    variables: reactivatingKey,
+    isPending: isRestoring,
+    variables: restoringKey,
   } = useUrlSigningKeyUpdateMutation({
-    onSuccess: () => toast.success('URL signing key reactivated'),
+    onSuccess: () => toast.success('URL signing key restored to standby'),
   })
 
-  const { signingKey, standbyKeys, revokedKeys } = groupUrlSigningKeys(data ?? [])
-  const activeKeys = signingKey ? [signingKey, ...standbyKeys] : standbyKeys
+  const { activeKey, standbyKeys, revokedKeys } = groupUrlSigningKeys(data ?? [])
   // The API allows several standby keys, but we keep rotation simple with one
   const hasStandbyKey = standbyKeys.length > 0
-  const canCreateStandbyKey = canUpdateKeys && isProjectActive && !!data && !hasStandbyKey
+  const canCreateStandbyKey = canUpdateKeys && !hasStandbyKey
 
   const closeDialog = () => setDialog(undefined)
 
@@ -83,134 +82,129 @@ export const UrlSigningKeys = () => {
   return (
     <>
       <PageContainer>
-        <PageSection>
-          <PageSectionMeta>
-            <PageSectionSummary>
-              <PageSectionTitle>Active keys</PageSectionTitle>
-              <PageSectionDescription>
-                The signing key signs new URLs. Standby keys don't sign URLs but still validate the
-                ones they signed.
-              </PageSectionDescription>
-            </PageSectionSummary>
-            <PageSectionAside>
-              <ButtonTooltip
-                variant="primary"
-                icon={<Timer />}
-                disabled={!canCreateStandbyKey}
-                onClick={() => setDialog({ type: 'create' })}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: getCreateDisabledReason({
-                      canUpdateKeys,
-                      isProjectActive,
-                      hasStandbyKey,
-                    }),
-                  },
-                }}
-              >
-                Create standby key
-              </ButtonTooltip>
-            </PageSectionAside>
-          </PageSectionMeta>
-
-          <PageSectionContent>
-            {!isProjectActive && (
+        {!isProjectActive && (
+          <PageSection>
+            <PageSectionContent>
               <Admonition
                 type="warning"
                 title="Project is paused"
                 description="Restore your project to view and rotate its URL signing keys."
               />
-            )}
-            {isProjectActive && isPending && <GenericSkeletonLoader />}
-            {isError && <AlertError error={error} subject="Failed to retrieve URL signing keys" />}
-            {data && (
-              <UrlSigningKeysTable
-                keys={activeKeys}
-                renderActions={(key) =>
-                  key !== signingKey && (
-                    <>
-                      <ButtonTooltip
-                        variant="default"
-                        size="tiny"
-                        icon={<RotateCw />}
-                        className="hit-area-2"
-                        disabled={!canUpdateKeys}
-                        onClick={() => setDialog({ type: 'rotate', key })}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: canUpdateKeys
-                              ? undefined
-                              : 'You need additional permissions to rotate keys',
-                          },
-                        }}
-                      >
-                        Rotate
-                      </ButtonTooltip>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="default"
-                            icon={<EllipsisVertical />}
-                            aria-label="More actions"
-                            className="w-7 hit-area-2"
-                            disabled={!canUpdateKeys}
-                          />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent side="bottom" align="end" className="w-40">
-                          <DropdownMenuItem
-                            className="gap-x-2"
-                            onClick={() => setDialog({ type: 'revoke', key })}
-                          >
-                            <Trash2 size={14} />
-                            <span>Revoke key</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </>
-                  )
-                }
-              />
-            )}
-          </PageSectionContent>
-        </PageSection>
-
-        {revokedKeys.length > 0 && (
+            </PageSectionContent>
+          </PageSection>
+        )}
+        {isProjectActive && isPending && (
           <PageSection>
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Revoked keys</PageSectionTitle>
-                <PageSectionDescription>
-                  URLs signed with these keys are rejected. Reactivate a key to move it back to
-                  standby.
-                </PageSectionDescription>
-              </PageSectionSummary>
-            </PageSectionMeta>
             <PageSectionContent>
-              <UrlSigningKeysTable
-                keys={revokedKeys}
-                renderActions={(key) => (
+              <GenericSkeletonLoader />
+            </PageSectionContent>
+          </PageSection>
+        )}
+        {isError && (
+          <PageSection>
+            <PageSectionContent>
+              <AlertError error={error} subject="Failed to retrieve URL signing keys" />
+            </PageSectionContent>
+          </PageSection>
+        )}
+
+        {data && (
+          <>
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Active key</PageSectionTitle>
+                  <PageSectionDescription>
+                    Signs all new URLs. A project always has exactly one active key.
+                  </PageSectionDescription>
+                </PageSectionSummary>
+              </PageSectionMeta>
+              <PageSectionContent>
+                <UrlSigningKeysTable keys={activeKey ? [activeKey] : []} />
+              </PageSectionContent>
+            </PageSection>
+
+            <PageSection>
+              <PageSectionMeta>
+                <PageSectionSummary>
+                  <PageSectionTitle>Standby keys</PageSectionTitle>
+                  <PageSectionDescription>
+                    Don't sign new URLs, but still validate the URLs they signed. Rotate to make a
+                    standby key active.
+                  </PageSectionDescription>
+                </PageSectionSummary>
+                <PageSectionAside>
                   <ButtonTooltip
-                    variant="default"
-                    size="tiny"
-                    className="hit-area-2"
-                    loading={isReactivating && reactivatingKey?.kid === key.kid}
-                    disabled={!canUpdateKeys || hasStandbyKey || isReactivating}
-                    onClick={() => updateKey({ projectRef, kid: key.kid, active: true })}
+                    variant="primary"
+                    icon={<Timer />}
+                    disabled={!canCreateStandbyKey}
+                    onClick={() => setDialog({ type: 'create' })}
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: getReactivateDisabledReason({ canUpdateKeys, hasStandbyKey }),
+                        text: getCreateDisabledReason({ canUpdateKeys, hasStandbyKey }),
                       },
                     }}
                   >
-                    Reactivate
+                    Create standby key
                   </ButtonTooltip>
-                )}
-              />
-            </PageSectionContent>
-          </PageSection>
+                </PageSectionAside>
+              </PageSectionMeta>
+              <PageSectionContent>
+                <UrlSigningKeysTable
+                  keys={standbyKeys}
+                  emptyState={{
+                    title: 'No standby key',
+                    description: 'Create a standby key to rotate the active key.',
+                  }}
+                  renderActions={(key) => (
+                    <StandbyKeyActions
+                      canUpdateKeys={canUpdateKeys}
+                      onRotate={() => setDialog({ type: 'rotate', key })}
+                      onRevoke={() => setDialog({ type: 'revoke', key })}
+                    />
+                  )}
+                />
+              </PageSectionContent>
+            </PageSection>
+
+            {revokedKeys.length > 0 && (
+              <PageSection>
+                <PageSectionMeta>
+                  <PageSectionSummary>
+                    <PageSectionTitle>Revoked keys</PageSectionTitle>
+                    <PageSectionDescription>
+                      URLs signed with these keys are rejected. Restore a key to move it back to
+                      standby.
+                    </PageSectionDescription>
+                  </PageSectionSummary>
+                </PageSectionMeta>
+                <PageSectionContent>
+                  <UrlSigningKeysTable
+                    keys={revokedKeys}
+                    renderActions={(key) => (
+                      <ButtonTooltip
+                        variant="default"
+                        size="tiny"
+                        className="hit-area-2"
+                        loading={isRestoring && restoringKey?.kid === key.kid}
+                        disabled={!canUpdateKeys || hasStandbyKey || isRestoring}
+                        onClick={() => updateKey({ projectRef, kid: key.kid, active: true })}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: getRestoreDisabledReason({ canUpdateKeys, hasStandbyKey }),
+                          },
+                        }}
+                      >
+                        Restore
+                      </ButtonTooltip>
+                    )}
+                  />
+                </PageSectionContent>
+              </PageSection>
+            )}
+          </>
         )}
       </PageContainer>
 
@@ -222,7 +216,7 @@ export const UrlSigningKeys = () => {
       <RotateUrlSigningKeyDialog
         projectRef={projectRef}
         standbyKey={dialog?.type === 'rotate' ? dialog.key : undefined}
-        signingKey={signingKey}
+        activeKey={activeKey}
         onClose={closeDialog}
       />
       <RevokeUrlSigningKeyDialog
@@ -234,29 +228,72 @@ export const UrlSigningKeys = () => {
   )
 }
 
+const StandbyKeyActions = ({
+  canUpdateKeys,
+  onRotate,
+  onRevoke,
+}: {
+  canUpdateKeys: boolean
+  onRotate: () => void
+  onRevoke: () => void
+}) => (
+  <>
+    <ButtonTooltip
+      variant="default"
+      size="tiny"
+      icon={<RotateCw />}
+      className="hit-area-2"
+      disabled={!canUpdateKeys}
+      onClick={onRotate}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: canUpdateKeys ? undefined : 'You need additional permissions to rotate keys',
+        },
+      }}
+    >
+      Make active
+    </ButtonTooltip>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="default"
+          icon={<EllipsisVertical />}
+          aria-label="More actions"
+          className="w-7 hit-area-2"
+          disabled={!canUpdateKeys}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="bottom" align="end" className="w-40">
+        <DropdownMenuItem className="gap-x-2" onClick={onRevoke}>
+          <Trash2 size={14} />
+          <span>Revoke key</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </>
+)
+
 const getCreateDisabledReason = ({
   canUpdateKeys,
-  isProjectActive,
   hasStandbyKey,
 }: {
   canUpdateKeys: boolean
-  isProjectActive: boolean
   hasStandbyKey: boolean
 }) => {
   if (!canUpdateKeys) return 'You need additional permissions to create keys'
-  if (!isProjectActive) return 'Restore your project to create keys'
   if (hasStandbyKey) return 'Revoke the existing standby key to create a new one'
   return undefined
 }
 
-const getReactivateDisabledReason = ({
+const getRestoreDisabledReason = ({
   canUpdateKeys,
   hasStandbyKey,
 }: {
   canUpdateKeys: boolean
   hasStandbyKey: boolean
 }) => {
-  if (!canUpdateKeys) return 'You need additional permissions to reactivate keys'
-  if (hasStandbyKey) return 'Revoke the existing standby key to reactivate this one'
+  if (!canUpdateKeys) return 'You need additional permissions to restore keys'
+  if (hasStandbyKey) return 'Revoke the existing standby key to restore this one'
   return undefined
 }

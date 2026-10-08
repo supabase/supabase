@@ -1,28 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  getUrlSigningKeyAlgorithmLabel,
-  getUrlSigningKeyStatusLabel,
-  groupUrlSigningKeys,
-} from './UrlSigningKeys.utils'
+import { getUrlSigningKeyAlgorithmLabel, groupUrlSigningKeys } from './UrlSigningKeys.utils'
 
-const signing = { kid: 'signing', kind: 'storage-url-signing-key', type: 'ES256', active: true }
+const active = { kid: 'active', kind: 'storage-url-signing-key', type: 'ES256', active: true }
 const standby = { kid: 'standby', kind: 'storage-url-standby-key', type: 'HS512', active: true }
 const revoked = { kid: 'revoked', kind: 'storage-url-standby-key', type: 'HS512', active: false }
 
 describe('groupUrlSigningKeys', () => {
-  it('groups keys by kind and active state', () => {
-    expect(groupUrlSigningKeys([revoked, standby, signing])).toEqual({
-      signingKey: signing,
+  it('separates the active key from standby and revoked keys', () => {
+    expect(groupUrlSigningKeys([revoked, standby, active])).toEqual({
+      activeKey: active,
       standbyKeys: [standby],
       revokedKeys: [revoked],
     })
   })
 
+  it('does not treat non-revoked standby keys as the active key', () => {
+    expect(groupUrlSigningKeys([standby]).activeKey).toBeUndefined()
+  })
+
   it('ignores keys that are not URL signing keys', () => {
     const other = { kid: 'other', kind: 'something-else', type: 'ES256', active: false }
-    expect(groupUrlSigningKeys([signing, other])).toEqual({
-      signingKey: signing,
+    expect(groupUrlSigningKeys([active, other])).toEqual({
+      activeKey: active,
       standbyKeys: [],
       revokedKeys: [],
     })
@@ -30,18 +30,10 @@ describe('groupUrlSigningKeys', () => {
 
   it('returns empty groups when there are no keys', () => {
     expect(groupUrlSigningKeys([])).toEqual({
-      signingKey: undefined,
+      activeKey: undefined,
       standbyKeys: [],
       revokedKeys: [],
     })
-  })
-})
-
-describe('getUrlSigningKeyStatusLabel', () => {
-  it('labels keys by kind and active state', () => {
-    expect(getUrlSigningKeyStatusLabel(signing)).toBe('Signing')
-    expect(getUrlSigningKeyStatusLabel(standby)).toBe('Standby')
-    expect(getUrlSigningKeyStatusLabel(revoked)).toBe('Revoked')
   })
 })
 
