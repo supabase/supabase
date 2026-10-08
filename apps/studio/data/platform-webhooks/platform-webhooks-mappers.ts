@@ -22,11 +22,15 @@ const toWebhookEventTypes = (eventTypes: string[]): { type: WebhookEventType }[]
     .filter((result) => result.success)
     .map((result) => ({ type: result.data }))
 
-// Send `{}` rather than `null` for "no headers" — the OpenAPI spec allows `null` here,
-// but the backend's `custom_headers` column is NOT NULL and rejects it (observed as a
-// 500 / `23502` constraint violation when updating an endpoint with no headers).
-const toCustomHeaders = (headers: Array<{ key: string; value: string }>): Record<string, string> =>
-  Object.fromEntries(headers.map((header) => [header.key, header.value]))
+// `custom_headers` is optional — omit it entirely for "no headers" rather than sending
+// `null` (the column is NOT NULL and rejects it) or `{}` (per Paweł, prefer omitting an
+// optional field over sending an empty value for it).
+const toCustomHeaders = (
+  headers: Array<{ key: string; value: string }>
+): Record<string, string> | undefined =>
+  headers.length > 0
+    ? Object.fromEntries(headers.map((header) => [header.key, header.value]))
+    : undefined
 
 // The real API has no `name` field on an endpoint — it is never sent here.
 // See the comment on `WebhookEndpoint.name` in PlatformWebhooks.types.ts.
