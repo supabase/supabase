@@ -13,6 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  type DialogContentProps,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -20,12 +21,13 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useOAuthAppMemberGrantsQuery } from '@/data/oauth-apps/oauth-apps-member-grants-query'
 import type { OAuthApprovalItem, OAuthGrantItem } from '@/data/oauth-apps/types'
 
-export interface OAuthAppsMemberGrantsDialogProps {
+export interface OAuthAppsMemberGrantsDialogProps extends DialogContentProps {
   approval?: OAuthApprovalItem
 }
 
 export const OAuthAppsMemberGrantsDialogContent = ({
   approval,
+  ...props
 }: OAuthAppsMemberGrantsDialogProps) => {
   const { slug } = useParams()
   const {
@@ -57,7 +59,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   if (!approval) return null
 
   return (
-    <DialogContent size="small">
+    <DialogContent size="small" {...props}>
       <DialogHeader>
         <DialogTitle>Member grants for {approval.app.name}</DialogTitle>
       </DialogHeader>
