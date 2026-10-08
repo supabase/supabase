@@ -408,24 +408,29 @@ export const FileExplorerRow = ({
       ? archivedFolderObjects.map((object) => ({ archivedObjectId: object.id, path: object.path }))
       : [{ archivedObjectId, path: item.path }]
 
-    try {
-      await Promise.all(
-        targets.map(({ archivedObjectId, path }) =>
-          archivedObjectId && path
-            ? restoreArchivedObject({
-                projectRef,
-                bucketId: selectedBucket.id,
-                archivedObjectId,
-                path,
-              })
-            : Promise.resolve()
-        )
+    const results = await Promise.allSettled(
+      targets.map(({ archivedObjectId, path }) =>
+        archivedObjectId && path
+          ? restoreArchivedObject({
+              projectRef,
+              bucketId: selectedBucket.id,
+              archivedObjectId,
+              path,
+            })
+          : Promise.resolve()
       )
+    )
+
+    const failureCount = results.filter((result) => result.status === 'rejected').length
+    if (failureCount > 0) {
+      // The mutation reports each failure; this is what the batch as a whole did.
+      toast.error(`Could not restore ${failureCount} file${failureCount === 1 ? '' : 's'}`)
+    } else {
       toast.success(`Restored ${item.name}`)
-      await refetchAllOpenedFolders()
-    } catch {
-      // The mutation reports its own failure.
     }
+
+    // Whatever did restore is already live again.
+    await refetchAllOpenedFolders()
   }
 
   // An archived file has no live object, so downloading, copying a URL, renaming and
