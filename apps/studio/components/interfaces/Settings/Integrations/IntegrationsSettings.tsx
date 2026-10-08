@@ -1,4 +1,4 @@
-import { Card } from 'ui'
+import { Card, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
@@ -13,7 +13,7 @@ import { BASE_PATH } from '@/lib/constants'
 export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
   return (
     <img
-      className="border rounded-lg shadow-sm w-full sm:w-48 border-body"
+      className="border rounded-lg shadow-sm w-full sm:w-48"
       src={`${BASE_PATH}/img/integrations/covers/${title}-cover.png`}
       alt={`${title} cover`}
     />
@@ -51,10 +51,16 @@ const INTEGRATION_ICONS: Record<
   ),
 }
 
-export const IntegrationSectionIcon = ({ title }: { title: 'vercel' | 'github' | 'aws' }) => {
+export const IntegrationSectionIcon = ({
+  title,
+  className,
+}: {
+  title: 'vercel' | 'github' | 'aws'
+  className?: string
+}) => {
   return (
     <div className="shrink-0 text-foreground-light">
-      <Card className="flex h-14 w-14 shrink-0 items-center justify-center p-0">
+      <Card className={cn('flex h-14 w-14 shrink-0 items-center justify-center p-0', className)}>
         {INTEGRATION_ICONS[title]('h-5 w-5')}
       </Card>
     </div>

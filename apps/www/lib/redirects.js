@@ -2438,6 +2438,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/catalog/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/clickhouse-clickpipes',
+    destination: '/partners/catalog/clickhouse',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations',
     destination: '/partners/catalog',
   },
@@ -2469,7 +2479,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/cloudflare-workers',
-    destination: '/partners/catalog/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
   },
   {
     permanent: true,
@@ -2569,7 +2579,17 @@ module.exports = [
   {
     permanent: true,
     source: '/partners/integrations/atomic_crm',
-    destination: '/partners/catalog/atomic-crm',
+    destination: '/partners/catalog',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/clickhouse-clickpipes',
+    destination: '/partners/catalog/clickhouse',
   },
   {
     permanent: true,
@@ -3367,6 +3387,19 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
+  },
+  { permanent: true, source: '/signup', destination: '/dashboard/sign-up' },
+  { permanent: true, source: '/about', destination: '/company' },
+  { permanent: true, source: '/startups', destination: '/solutions/startups' },
+  {
+    permanent: true,
+    source: '/legal/subprocessors',
+    destination: '/legal/customer-resources/subprocessor-list',
+  },
+  {
+    permanent: true,
+    source: '/downloads/docs/Supabase\\+DPA\\+:version.pdf',
+    destination: '/legal/customer-resources/data-processing-addendum',
   },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },
