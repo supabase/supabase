@@ -7,9 +7,9 @@
   },
   "scripts": {
     "dev": "astro dev --port 3008",
-    "prebuild": "pnpm run generate:markdown",
     "build": "astro build",
-    "generate:markdown": "node --experimental-strip-types ./scripts/generate-markdown.mjs",
+    "postbuild": "pnpm run generate:markdown",
+    "generate:markdown": "node ./scripts/generate-markdown.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest --run"
@@ -21,6 +21,7 @@
     "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.2.6",
     "lucide-react": "*",
+    "markdown-for-agents": "^1.4.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "remark-gfm": "^4.0.1",

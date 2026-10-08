@@ -14,7 +14,37 @@
     }
   ],
   "rewrites": [
+    {
+      "source": "/kb/guides/:path+",
+      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
+      "destination": "/markdown/guides/:path+.md"
+    },
+    {
+      "source": "/kb/topics/:path+",
+      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
+      "destination": "/markdown/topics/:path+.md"
+    },
     { "source": "/kb", "destination": "/index.html" },
     { "source": "/kb/:path*", "destination": "/:path*" }
+  ],
+  "headers": [
+    {
+      "source": "/kb/guides/:path+",
+      "headers": [{ "key": "Vary", "value": "Accept" }]
+    },
+    {
+      "source": "/kb/topics/:path+",
+      "headers": [{ "key": "Vary", "value": "Accept" }]
+    },
+    {
+      "source": "/kb/guides/:path+",
+      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
+      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
+    },
+    {
+      "source": "/kb/topics/:path+",
+      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
+      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
+    }
   ]
 }
