@@ -48,8 +48,12 @@ import {
   getPendingSigningSecretReveal,
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
+  shouldRedirectFromWebhooks,
 } from './PlatformWebhooksPage.utils'
-import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useFeaturePreviewContext,
+  useIsPlatformWebhooksEnabled,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useWebhookDeliveriesQuery } from '@/data/platform-webhooks/platform-webhook-deliveries-query'
@@ -80,6 +84,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     enabled: scope === 'project',
   })
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+  const { isInitialized: isFeaturePreviewInitialized } = useFeaturePreviewContext()
 
   const isScopeReady = scope === 'organization' ? !!slug : !!ref
   const apiScope: WebhookScopeParams =
@@ -182,11 +187,17 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
   }
 
+  const shouldRedirect = shouldRedirectFromWebhooks({
+    areFlagsReady: isFeaturePreviewInitialized,
+    isScopeReady,
+    isEnabled: !!platformWebhooksEnabled,
+  })
+
   useEffect(() => {
-    if (!platformWebhooksEnabled) {
+    if (shouldRedirect) {
       router.replace(fallbackHref)
     }
-  }, [fallbackHref, platformWebhooksEnabled, router])
+  }, [fallbackHref, shouldRedirect, router])
 
   useEffect(() => {
     if (!isEndpointsLoaded) return
