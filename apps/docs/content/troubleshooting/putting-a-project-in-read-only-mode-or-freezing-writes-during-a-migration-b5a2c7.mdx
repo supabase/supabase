@@ -8,7 +8,7 @@ Supabase doesn't offer a dedicated maintenance or read-only mode for a project. 
 
 ## Make the database read-only
 
-To stop new sessions from writing, set `default_transaction_read_only` on the source database:
+To stop new connections from writing, set `default_transaction_read_only` on the source database:
 
 ```sql
 alter database your_database_name set default_transaction_read_only = true;
@@ -16,13 +16,14 @@ alter database your_database_name set default_transaction_read_only = true;
 
 This is a database-level default, so it's a soft freeze and not a complete block on writes:
 
-- Sessions that are already open keep their previous value until they reconnect.
-- A session can override the setting for itself.
+- Sessions and services that already have open connections keep their previous value until they reconnect. This can include the Data API, Auth, and Storage.
+- A session can override the setting for itself. The Data API runs write requests in explicit read-write transactions, so API requests might still write.
+- After they reconnect, Auth and Storage reject writes. Storage returns a read-only error. Auth returns a generic server error.
 - Connections through the transaction pooler (port `6543`) might not pick up the change straight away. Restart or reconnect your apps after you set it. For more on how pooled connections keep session state, see [Resolving 'cannot execute UPDATE in a read-only transaction' on transaction pooler connections](/docs/guides/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections-ef582c).
 
 ## Reduce writes from your application
 
-Pause writes in your application and any background jobs for the migration window. This gives the cleanest cutover. You can also put a maintenance page in front of your client apps.
+Because the database setting doesn't stop every write path, pausing writes in your application is the most reliable way to freeze writes. Pause writes from your application and any background jobs for the migration window. You can also put a maintenance page in front of your client apps.
 
 ## Re-enable writes
 
@@ -39,6 +40,8 @@ set transaction read write;
 alter database your_database_name set default_transaction_read_only = off;
 commit;
 ```
+
+While the setting is on, tools that need to run as read-write, such as the Supabase CLI's database commands, can fail. If that happens, run the SQL above in the [SQL Editor](/dashboard/project/_/sql/new) in the Dashboard. If you restart your project while the setting is on, some services might not start cleanly until you turn it off.
 
 ## If your database is read-only and you didn't set it
 
