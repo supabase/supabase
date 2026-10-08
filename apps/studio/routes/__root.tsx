@@ -314,8 +314,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       statusCode: match.permanent ? 308 : 307,
     })
   },
-  loader: async (): Promise<string> =>
-    !IS_PLATFORM && FAVICON_ROUTE === '/favicon' ? getCLIFaviconRoute() : FAVICON_ROUTE,
+  loader: async (): Promise<string> => {
+    if (IS_PLATFORM || FAVICON_ROUTE !== '/favicon') return FAVICON_ROUTE
+    try {
+      return await getCLIFaviconRoute()
+    } catch {
+      return FAVICON_ROUTE
+    }
+  },
   head: ({ loaderData }) => buildRootHead(loaderData),
   component: RootComponent,
   shellComponent: RootDocument,
