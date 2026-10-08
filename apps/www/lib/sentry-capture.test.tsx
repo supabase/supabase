@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { consentState } from 'common/consent-state'
 import { act } from 'react'
 import { createRoot } from 'react-dom/client'
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GlobalError from '../app/global-error'
 import CustomError from '../pages/_error'
@@ -34,8 +34,13 @@ beforeAll(async () => {
 })
 
 beforeEach(() => {
+  vi.spyOn(Math, 'random').mockReturnValue(0)
   envelopes.length = 0
   consentState.hasConsented = true
+})
+
+afterEach(() => {
+  vi.restoreAllMocks()
 })
 
 afterAll(async () => {

@@ -1,10 +1,8 @@
-import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { subscriptionHasHipaaAddon } from '../../Billing/Subscription/Subscription.utils'
 import { type SqlSnippetSource } from '../../SQLEditor/querySource'
 import { buildDebugPromptText } from '../../SQLEditor/SQLEditor.utils'
 import { useCreateChat } from '../hooks'
@@ -12,11 +10,8 @@ import { type QueryResult } from '../types'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { getSqlErrorLines } from '@/data/sql/utils'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 export const QueryResultError = ({
   error,
@@ -34,26 +29,6 @@ export const QueryResultError = ({
    * into that conversation's composer instead of abandoning it for a new chat. */
   onDebug?: (prompt: string) => void
 }) => {
-  const { ref } = useParams()
-
-  const { data: org } = useSelectedOrganizationQuery()
-  const { data: subscription, isSuccess: isSubscriptionResolved } = useOrgSubscriptionQuery({
-    orgSlug: org?.slug,
-  })
-  const { data: projectSettings, isSuccess: isProjectSettingsResolved } = useProjectSettingsV2Query(
-    {
-      projectRef: ref,
-    }
-  )
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription) && projectSettings?.is_sensitive
-  // Default deny until both eligibility queries have actually succeeded - a disabled or
-  // failed query also reports isLoading: false, so isLoading can't tell "confirmed no
-  // addon" apart from "don't know yet", and the assistant sends the SQL and error to an
-  // LLM. Self-hosted has no HIPAA concept at all (subscriptionHasHipaaAddon short-circuits
-  // to false there), so there's nothing to wait on outside of platform.
-  const isCheckingHipaaEligibility =
-    IS_PLATFORM && (!isSubscriptionResolved || !isProjectSettingsResolved)
-
   const { createChat, isCreating } = useCreateChat()
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
@@ -175,7 +150,7 @@ export const QueryResultError = ({
               </TooltipContent>
             </Tooltip>
           )}
-          {!hasHipaaAddon && !isCheckingHipaaEligibility && canDebug && (
+          {canDebug && (
             <AiAssistantDropdown
               telemetrySource="sql_debug"
               label="Debug with Assistant"

@@ -19,6 +19,7 @@ import type { EventTrigger } from './EventTriggerList.utils'
 import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
 import { getDatabaseFunctionsHref } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 
 interface EventTriggerListProps {
   filterString: string
@@ -64,32 +65,8 @@ export const EventTriggerList = ({
     return sortBy(filteredEventTriggers, (trigger) => trigger.name.toLocaleLowerCase())
   }, [eventTriggers, ownerFilter, filterString])
 
-  if (orderedTriggers.length === 0 && filterString.length === 0 && ownerFilter.length === 0) {
-    return (
-      <TableRow>
-        <TableCell colSpan={6}>
-          <p className="text-sm text-foreground">No event triggers created yet</p>
-          <p className="text-sm text-foreground-light">
-            There are no event triggers configured for this database
-          </p>
-        </TableCell>
-      </TableRow>
-    )
-  }
-
   if (orderedTriggers.length === 0 && (filterString.length > 0 || ownerFilter.length > 0)) {
-    return (
-      <TableRow>
-        <TableCell colSpan={6}>
-          <p className="text-sm text-foreground">No results found</p>
-          <p className="text-sm text-foreground-light">
-            {filterString.length > 0
-              ? `Your search for "${filterString}" did not return any results`
-              : 'No event triggers match the current filters'}
-          </p>
-        </TableCell>
-      </TableRow>
-    )
+    return <TableRowNoResults colSpan={6} search={filterString} />
   }
 
   return (
@@ -156,7 +133,7 @@ export const EventTriggerList = ({
             <TableCell>
               <div className="flex items-center justify-center">
                 {trigger.enabled_mode !== 'DISABLED' ? (
-                  <Check strokeWidth={2} className="text-brand" />
+                  <Check strokeWidth={2} className="text-primary" />
                 ) : (
                   <X strokeWidth={2} />
                 )}

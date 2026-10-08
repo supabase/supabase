@@ -216,8 +216,8 @@ export const ProjectUpgradeAlert = () => {
                               <code className="text-xs">
                                 {legacyAuthCustomRoles.map((role) => (
                                   <div key={role} className="pb-1">
-                                    ALTER ROLE <span className="text-brand">{role}</span> WITH
-                                    PASSWORD '<span className="text-brand">newpassword</span>';
+                                    ALTER ROLE <span className="text-primary">{role}</span> WITH
+                                    PASSWORD '<span className="text-primary">newpassword</span>';
                                   </div>
                                 ))}
                               </code>

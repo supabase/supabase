@@ -4,103 +4,52 @@ Our docs help developers to get started and keep succeeding with Supabase. We we
 
 If you'd like to contribute, see our list of [recommended issues](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22). We also welcome you to open a PR or a new issue with your question.
 
-Here are some general guidelines on writing docs for Supabase.
+How to write a docs page is covered by the [style guide](./style-guide/README.md). This file covers repo mechanics. If you write with an AI coding agent, these skills apply the style guide for you:
 
-## General principles
+- `/write-the-docs` to draft a new page.
+- `/edit-the-docs` to revise an existing page.
+- `/test-the-docs` to run the snippets you wrote.
+- `/review-the-docs` to check your work before you open a pull request.
 
-Write helpful, concise, and understandable documentation. We have a global audience whose members speak different native languages.
+See [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring) for the full set, including the skills that help you frame a page and place it in the information architecture.
 
-To make docs as clear as possible:
+## Style guide
 
-- Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
-- Write like you talk. Conversational English is easier for a global audience to understand and localize. Many readers who use English as an additional language learn conversational rather than academic English. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
-- Prefer short, direct sentences. Express one relationship at a time, and avoid unnecessary compound structures. This makes each sentence easier to understand, localize, and interpret consistently.
-- Cover one topic in each paragraph. Start a new paragraph whenever you change the topic. Don't worry about paragraphs being too short.
-- Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
-- Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
+The [style guide](./style-guide/README.md) covers how to write a docs page: voice,
+page structure, which components to use, and terminology. Start at its
+[README](./style-guide/README.md) for what the guide covers and how the files are ordered.
+
+| File                                                                     | Covers                                             |
+| ------------------------------------------------------------------------ | -------------------------------------------------- |
+| [`style-guide/WORD_LIST.md`](./style-guide/WORD_LIST.md)                 | Terminology, spelling, capitalization              |
+| [`style-guide/01-voice-and-tone.md`](./style-guide/01-voice-and-tone.md) | Person, tense, sentence length, brevity            |
+| [`style-guide/02-elements.md`](./style-guide/02-elements.md)             | Admonitions, code blocks, procedures, tabs, images |
+| [`style-guide/03-page-structure.md`](./style-guide/03-page-structure.md) | Document type, section grouping, chunking          |
+
+The rest of this file covers repo mechanics: where content lives, how to add a page,
+and how the reference docs are generated.
 
 ## AI agent skills for docs authoring
 
-If you're using an AI coding agent that reads `.agents/skills/`, such as Claude Code, Cursor, or Codex, invoke skills with `/name`, for example `/write-the-docs`. The canonical files live in `.agents/skills/` (`.claude/skills` is a symlink).
+Use these skills for every docs change you make with an AI coding agent: `/write-the-docs` to draft, and `/edit-the-docs` to revise an existing page. They apply the [style guide](./style-guide/README.md), so you don't have to hold it in your head.
+
+Skills work in any agent that reads `.agents/skills/`, such as Claude Code, Cursor, or Codex. Invoke a skill with `/name`, for example `/write-the-docs`. The canonical files live in `.agents/skills/` (`.claude/skills` is a symlink).
 
 ### Write the docs skills
 
 Use the [Write the docs](../../.agents/skills/pm-the-docs/reference/write-the-docs-checklist.md) checklist when product intent and code drive the change: net-new pages, or revising/restructuring existing ones.
 
-| Skill | Checklist stage | Use for |
-| --- | --- | --- |
-| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md) | Frame / shape | Audience, stage, why, content type, cross-repo scope (universe when you have Supabase org access, else OSS path) |
-| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md) | Frame / shape | Docs-app architecture, IA placement, where content lives |
-| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md) | Draft | Draft or revise content grounded in intent and code |
-| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md) | Draft / self-review | Run snippets in a Docker-isolated stack; verification report |
-| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft; verify a PR |
+| Skill                                                              | Checklist stage         | Use for                                                                                                          |
+| ------------------------------------------------------------------ | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| [`pm-the-docs`](../../.agents/skills/pm-the-docs/SKILL.md)         | Frame / shape           | Audience, stage, why, content type, cross-repo scope (universe when you have Supabase org access, else OSS path) |
+| [`ask-the-docs`](../../.agents/skills/ask-the-docs/SKILL.md)       | Frame / shape           | Docs-app architecture, IA placement, where content lives                                                         |
+| [`write-the-docs`](../../.agents/skills/write-the-docs/SKILL.md)   | Draft                   | Draft or revise content grounded in intent and code                                                              |
+| [`test-the-docs`](../../.agents/skills/test-the-docs/SKILL.md)     | Draft / self-review     | Run snippets in a Docker-isolated stack; verification report                                                     |
+| [`review-the-docs`](../../.agents/skills/review-the-docs/SKILL.md) | Self-review / PR review | Checking a draft; verify a PR                                                                                    |
 
 ### Edit existing pages
 
-Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story. 
-
-## Document types
-
-Supabase docs contain 4 types of documents. Before you start writing, think about what type of doc you need.
-
-### Explainers
-
-Explainers help the reader to learn a topic. They are conceptual and mostly prose-based. They can include:
-
-- A description of _what_ a feature is
-- Some reasons _why_ it is useful
-- Some examples of _when_ to use it
-- A high-level explanation of _how_ it works
-
-Explainers don't include:
-
-- Instructions on how to use it
-
-### Tutorials
-
-Tutorials are goal-oriented. They help a reader to finish a large, complex goal, such as setting up a web app that uses multiple Supabase features.
-
-Tutorials mix prose explanations with procedures. Procedures are lists of steps for the reader to follow. Tutorials provide context for why certain instructions are given.
-
-For inspiration, see [an example of a tutorial](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs).
-
-### Guides
-
-Guides are also goal-oriented, but they focus on shorter, more targeted tasks. For example, a guide might explain how to set up user login for an app.
-
-Guides contain mostly procedures: concise steps that readers can follow in sequence.
-
-Begin each guide with a sentence that declares its intent, such as `This guide explains how to set up email login.` This helps readers and agents confirm that the guide matches their goal and expected outcome.
-
-Keep procedures focused on what the reader must do. Move substantial background or conceptual explanations into a separate section or an explainer. Cross-reference the authoritative explanation instead of repeating it in the procedure. This keeps the action path scannable, gives readers optional depth, and maintains one source of truth.
-
-- Recommended: `This guide explains how to enable Row Level Security. To learn how Row Level Security controls access, see [Row Level Security](...).`
-- Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the guide helps the reader do.
-
-**Mixed information types:** When a guide contains substantial context or reference material, group sections by information type. Keep contextual and reference sections separate from the procedure group so that background information doesn't interrupt the action path.
-
-**Navigation:** Begin a long guide with a short outline of its major section groups. Link to each group and state when a reader should use it. Don't add section navigation to a short guide when the headings are already easy to scan.
-
-**Cross-references and glue:** Connect contextual sections to their corresponding procedures when the relationship helps readers navigate. Add a brief introduction to each section group, a transition when the information type changes, and an outcome after a procedure. Add links selectively rather than linking every adjacent section.
-
-For inspiration, see [an example of a guide](/docs/guides/auth/auth-email-passwordless).
-
-### Reference
-
-References are factual and to the point. Think of dictionary entries.
-
-References include:
-
-- Function parameters
-- Return types
-- Code samples
-- Warnings about critical errors, such as missteps that can cause data loss
-
-References don't include:
-
-- Explanations of the context for a feature
-- Examples of use cases
-- Multi-step instructions
+Use [`edit-the-docs`](../../.agents/skills/edit-the-docs/SKILL.md) for style, structure, or brevity on an existing page when you are not changing the product story.
 
 ## Repo organization
 
@@ -185,97 +134,9 @@ If you copy the same content multiple times across different files, create a **p
 
 To use a partial, import it into your MDX file. You can also set up a partial to automatically import by including it in the `components` within [`apps/docs/features/docs/MdxBase.shared.tsx`](https://github.com/supabase/supabase/blob/master/apps/docs/features/docs/MdxBase.shared.tsx).
 
-## Components and elements
+## Content listings
 
-Docs include normal Markdown elements such as lists and custom components such as admonitions, also known as callouts.
-
-Here are some guidelines for using elements:
-
-### Admonitions
-
-Admonitions draw reader attention to an important point or an aside. They highlight important information, but get less effective if they're overused.
-
-Use an admonition when a reader might otherwise miss information that affects the outcome of their task, or when you want to separate helpful but optional guidance from the main flow. Don't use an admonition for information that belongs in the main explanation or procedure.
-
-Use admonitions sparingly. Don't stack them on top of each other or use them as decoration.
-
-Begin every admonition with its impact and purpose: the "so what." Use the first sentence to tell the reader why the information matters, such as what could happen, what changes, or what benefit they gain. Add background or instructions after the impact is clear.
-
-For example:
-
-- Recommended: `Deleting this project permanently removes its database and backups. Export any data that you want to keep before you continue.`
-- Not recommended: `Before you continue, there are a few things that you should know about project deletion.`
-
-Choose the appropriate `type` for your admonition:
-
-- `danger`: Warn about actions or conditions that could cause data loss, expose sensitive data, or create another severe and difficult-to-reverse outcome. State the consequence first, and then explain how to avoid it.
-- `deprecation`: Identify a deprecated feature or behavior. State how the change affects the reader, and then provide the supported alternative or migration path.
-- `caution`: Warn about behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience but doesn't rise to the severity of `danger`.
-- `note`: Highlight an important prerequisite, constraint, clarification, or optional shortcut that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
-
-Structure an admonition with these props and content:
-
-- `title` (optional): Add a short callout title. Don't put Markdown or HTML headings inside an admonition. If the content needs a heading to structure the page, move the heading and its section outside the admonition.
-- `children`: Add rich body content such as paragraphs, lists, links, and code.
-- `actions` (optional): Add standalone calls to action so they remain separate from the body content. Keep contextual links and interactive examples in the body when they are part of the explanation.
-
-```mdx
-<Admonition
-  type="note"
-  title="Optional title"
-  actions={<Button>Continue</Button>}
->
-
-Your content here
-
-</Admonition>
-```
-
-### Blockquotes
-
-Don't use blockquotes.
-
-### Code blocks
-
-Keep code lines short to avoid scrolling. For example, you can split long shell commands with `\`.
-
-- **JavaScript/TypeScript**
-
-  The `supabase` repository uses Prettier, which also formats JS/TS in code blocks. Your PR is blocked from merging if the Prettier check fails. From the repository root, run `pnpm format`, or set up automatic formatting in your IDE.
-
-- **SQL**
-
-  Prefer lowercase for SQL. For example, `select * from table` rather than `SELECT * FROM table`.
-
-Optionally specify a filename for the code block by including it after the opening backticks and language specifier:
-
-````md
-```ts environment.ts
-
-```
-````
-
-Optionally highlight lines by using `mark=${lineNumber}`.
-
-````md
-```js mark=12:13
-
-```
-````
-
-### Emphasis
-
-Use **bold**, _italics_, and `code` formatting for distinct purposes. Don't use them interchangeably or to add visual emphasis alone.
-
-- **Bold**: Mark UI labels the reader interacts with, such as buttons, menu items, and field names. For example, `Click **Save**.` Also use bold for a term the reader must not miss, such as `**Never** commit your service role key.`
-- _Italics_: Introduce a new term the first time you define it, or reference a title, such as a book or a third-party product name written in italics by convention. Use italics sparingly. Don't use italics for UI labels or for general emphasis.
-- `Code`: Mark anything the reader types or copies verbatim, or anything the system reads literally. This includes filenames, paths, commands, flags, environment variables, function and parameter names, configuration keys, and literal values. For example, `` Set `SUPABASE_URL` in your `.env` file. ``
-
-If a phrase fits more than one category, pick the most specific one. A command name is `code`, not **bold**, even though the reader also interacts with it.
-
-### Content listings
-
-Overview and index pages use a single `<ContentListings id="..." />` component for curated link sections such as "Get started", "Next steps", "Examples", or "Resources". Refer to [`storage.data.ts`](data/content-listings/storage.data.ts) and [`storage.mdx`](content/guides/storage.mdx) for a full example.
+Overview and index pages use a single `<ContentListings id="..." />` component for curated link sections. For when to use one, see [the style guide](./style-guide/02-elements.md#content-listings). Refer to [`storage.data.ts`](data/content-listings/storage.data.ts) and [`storage.mdx`](content/guides/storage.mdx) for a full example.
 
 **Prompt to add content listings:**
 
@@ -294,164 +155,6 @@ Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
 3. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets). Use `cl-data` for a data export with a namespaced ID. Use `cl-inline` for an MDX component.
-
-
-### Footnotes
-
-Don't use footnotes.
-
-### Graphs
-
-Render diagrams, including flowcharts, sequence diagrams, and entity-relationship diagrams, by writing a fenced code block with `mermaid` as the language. The MDX renderer routes these blocks through the shared `Mermaid` component, so theming follows light and dark mode automatically.
-
-For the full list of supported diagram types and their syntax, see the [official Mermaid diagram reference](https://mermaid.js.org/intro/syntax-reference.html).
-
-Sequence diagram:
-
-````mdx
-```mermaid
-sequenceDiagram
-  participant User
-  participant Browser
-  participant Supabase
-
-  User->>Browser: Clicks "Sign in"
-  Browser->>Supabase: Request authorization
-  Supabase->>Browser: Return token
-```
-````
-
-The `flowchart` keyword accepts a direction such as `LR` or `TD`:
-
-````mdx
-```mermaid
-flowchart LR
-  A["content/**/*.md"] -->|Contentlayer| B[MDX]
-  B --> C[Rehype]
-  C -->|Our Plugin| D[SVG]
-  D -->|Base64| E[Embedded Images]
-```
-````
-
-A few tips:
-
-- Use a standard Mermaid diagram keyword, such as `sequenceDiagram`, `flowchart`, or `erDiagram`, on the first line of the block.
-- Keep diagrams focused on a single flow or concept. If a diagram gets too dense, split it into multiple smaller diagrams.
-- Wrap node labels that contain special characters in double quotes. Special characters include `*`, `/`, spaces, and punctuation. For example, use `A["content/**/*.md"]`.
-- Don't hardcode colors. The component themes the diagram automatically so it matches both light and dark mode.
-- Use diagrams to support the prose, not replace it. Explain the key takeaway in text near the diagram.
-
-### Images
-
-Images are uploaded in the `apps/docs/public/img` folder.
-
-For vector illustrations, use `.svg` files. For screenshots and non-vector graphics, use `.png` files. Supported browsers receive `.webp` versions automatically.
-
-Redact any sensitive information, such as API keys.
-
-### Links
-
-Use descriptive link text that tells the reader where the link goes. This is important for accessibility. For example, don't use `here` as link text.
-
-Keep link text concise. Use the shortest part of the link that is descriptive enough. For example, `see the [reference section](/link)` rather than `[see the reference section](/link)`.
-
-Don't include the `https://supabase.com` origin when linking to pages on `supabase.com`. Use a `/docs/...` path for a page in Supabase docs, such as `[getting started](/docs/guides/getting-started)`. Use a site-root path for a page outside docs, such as `[open the Supabase Dashboard](/dashboard)`.
-
-### Procedures
-
-Use a procedure when a human or agent must perform actions to reach an outcome. The procedural format makes that expectation explicit.
-
-Write sequential actions as an ordered list. Begin each step with an imperative verb, and include one action or a closely related set of actions per step. Give the reader enough context to know where to act.
-
-Apply the [Information Mapping chunking principle](https://informationmapping.com/blogs/news/writing-for-the-web-the-magical-number-seven-plus-or-minus-two) to procedures. Present 7 ± 2 related steps at a time. This gives readers a manageable chunk of five to nine actions. Aim for the lower end of the range when the task is complex or unfamiliar.
-
-If a procedure has more than nine steps, group related steps into named phases or smaller procedures. If one step contains multiple distinct actions, split it into separate steps. Don't add steps to reach a minimum. The range is a guideline for organizing information, not a required procedure length.
-
-An apparent one-step procedure can become two steps when there is a real orientation action. For example:
-
-1. Open a terminal in your project directory.
-2. Run `supabase start`.
-
-The first step establishes the operating context for both readers and agents. Don't add a redundant orientation step to a genuinely atomic instruction. For example, write `Click **Save**.` instead of adding `Locate the **Save** button` as a separate step.
-
-### Lists
-
-Use ordered lists for steps that must be taken one after the other. Use unordered lists when order doesn't matter.
-
-Use Arabic numerals (`1`, `2`, `3`) for ordered lists and dashes (`-`) for unordered lists.
-
-Don't nest lists more than two deep.
-
-```md
-1. List item
-2. List item
-   1. List item
-   2. List item
-3. List item
-   - List item
-   - List item
-     <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
-     - Overly nested list item
-```
-
-### Tabs
-
-Use tabs to provide alternative instructions for different platforms or languages.
-
-The optional `queryGroup` prop lets you link directly to a tab. For this example, use `/docs/my-page?packagemanager=npm`.
-
-```
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="npm"
-  queryGroup="packagemanager"
->
-<TabPanel id="npm" label="npm">
-
-// ...
-
-</TabPanel>
-<TabPanel id="yarn" label="Yarn">
-
-// ...
-
-</TabPanel>
-</Tabs>
-```
-
-### Videos
-
-Include videos as table of contents (TOC) videos instead of placing them in the main text.
-
-You can define a TOC video in the page frontmatter:
-
-```yaml
----
-tocVideo: 'rzglqRdZUQE'
----
-```
-
-## Styling, formatting, and grammar
-
-Grammar is useful when it makes your writing clearer. Use complete sentences by default because they identify the actor and action. This reduces ambiguity for readers, translators, and agents. Use sentence fragments only where they improve scanning, such as headings, labels, or short list items.
-
-Headings guide the reader's eye and organize the page, but they don't carry information by themselves. Make the content beneath a heading understandable without relying on the heading. The first sentence can restate the heading, even if it sounds redundant. Readers often skim headings and then return to the section that interests them, so use the opening sentence to confirm the context.
-
-Don't use parentheses for asides or supplementary information. Rewrite that information as part of the sentence or as a separate sentence. Use parentheses to introduce an acronym after spelling out its meaning, such as full-text search (FTS), or to mark an item as `(Optional)`. Parentheses that are required by Markdown links or code syntax aren't prose parentheticals.
-
-That said, a few rules help keep the docs concise, consistent, and clear:
-
-- Format headings in sentence case. Capitalize the first word and any proper nouns. All other words are lowercase. For example, `Set up authentication` rather than `Set Up Authentication`.
-- Use the Oxford comma. Place a comma before the `and` that marks the last item in a list. For example, use `functions, tables, and indexes` rather than `functions, tables and indexes`.
-- Use the present tense as much as possible. For example, `the AI assistant answers your question` rather than `the AI assistant will answer your question`.
-
-## Word usage and spelling
-
-Use American English. If in doubt, consult the [Merriam-Webster dictionary](https://www.merriam-webster.com/).
-
-Follow the [Supabase documentation word list](./WORD_LIST.md) for preferred spelling, capitalization, and usage. The word list includes the terminology rules checked by `supa-mdx-lint`. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
 
 ## Search
 

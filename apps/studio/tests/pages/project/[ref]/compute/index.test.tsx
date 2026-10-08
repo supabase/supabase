@@ -1,18 +1,19 @@
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { computeQueryOptions } from '@/data/compute/compute-query'
+import { API_URL } from '@/lib/constants'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
 import ComputePage from '@/pages/project/[ref]/compute/index'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
-type ListWorkersResponse = components['schemas']['V2ListWorkersResponse_Output']
-type WorkerDatum = ListWorkersResponse['data'][number]
+type ListComputeInstancesResponse = components['schemas']['V2ListComputeInstancesResponse_Output']
+type ComputeInstanceDatum = ListComputeInstancesResponse['data'][number]
 
 // `tests/vitestSetup.ts` mocks `common`'s useParams to always answer with this ref, so the page
 // reads it no matter what the router URL says.
@@ -20,10 +21,10 @@ const PROJECT_REF = 'default'
 
 const computeInstanceDatum = (
   id: string,
-  attributes: Partial<WorkerDatum['attributes']> = {}
-): WorkerDatum => ({
+  attributes: Partial<ComputeInstanceDatum['attributes']> = {}
+): ComputeInstanceDatum => ({
   id,
-  type: 'project_worker' as const,
+  type: 'project_compute_instance' as const,
   attributes: {
     build_state: 'active' as const,
     secret_generation: '1',
@@ -32,13 +33,13 @@ const computeInstanceDatum = (
   },
 })
 
-const mockComputeInstancesList = (instances: WorkerDatum[]) =>
-  addAPIMock({ method: 'get', path: '/v2/projects/:ref/workers', response: { data: instances } })
+const mockComputeInstancesList = (instances: ComputeInstanceDatum[]) =>
+  addAPIMock({ method: 'get', path: '/v2/projects/:ref/compute', response: { data: instances } })
 
 const mockComputeInstancesListFailure = (status: number) =>
   addAPIMock({
     method: 'get',
-    path: '/v2/projects/:ref/workers',
+    path: '/v2/projects/:ref/compute',
     response: () => HttpResponse.json<APIErrorBody>({ message: 'Denied' }, { status }),
   })
 
@@ -101,12 +102,29 @@ describe('/project/[ref]/compute', () => {
     expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 
-  it('explains that a project outside the alpha is not enrolled', async () => {
-    mockComputeInstancesListFailure(404)
+  it('points a project outside the alpha to the waitlist', async () => {
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/compute`, () =>
+        HttpResponse.json(
+          {
+            error: {
+              code: 'not_found.compute.not_enabled',
+              message: 'Compute is not available for this project',
+            },
+          },
+          { status: 404 }
+        )
+      )
+    )
 
     await renderComputePage()
 
-    expect(screen.getByText(`${PRODUCT_NAME} is not enabled for this project`)).toBeVisible()
+    expect(screen.getByText(`You don't have access to ${PRODUCT_NAME} yet`)).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Join waitlist' })).toHaveAttribute(
+      'href',
+      'https://supabase.com/compute'
+    )
+    expect(screen.queryByText('Failed to retrieve compute instances')).not.toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 
@@ -125,13 +143,15 @@ describe('/project/[ref]/compute', () => {
     let requestCount = 0
     addAPIMock({
       method: 'get',
-      path: '/v2/projects/:ref/workers',
-      response: (): HttpResponse<APIErrorBody> | HttpResponse<ListWorkersResponse> => {
+      path: '/v2/projects/:ref/compute',
+      response: (): HttpResponse<APIErrorBody> | HttpResponse<ListComputeInstancesResponse> => {
         if (requestCount++ === 0) {
           return HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 })
         }
 
-        return HttpResponse.json<ListWorkersResponse>({ data: [computeInstanceDatum('embed')] })
+        return HttpResponse.json<ListComputeInstancesResponse>({
+          data: [computeInstanceDatum('embed')],
+        })
       },
     })
 

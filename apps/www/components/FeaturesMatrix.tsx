@@ -213,7 +213,7 @@ export function FeaturesMatrix({ features }: FeaturesMatrixProps) {
                 <TableCell className="px-3 py-3 hover:bg-transparent!">
                   {selfHosted ? (
                     <div className="flex items-center gap-1.5">
-                      <Check size={14} className="text-brand shrink-0" />
+                      <Check size={14} className="text-primary shrink-0" />
                       {tooling && (
                         <a
                           href={tooling.link}

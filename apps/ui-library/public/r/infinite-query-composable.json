@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "infinite-query-composable",
-  "type": "registry:component",
   "title": "Infinite Query for Vue and Supabase",
   "description": "Vue Composable for infinite lists, fetching data from Supabase.",
   "dependencies": [
@@ -15,5 +14,6 @@
       "type": "registry:component",
       "target": "composables/useInfiniteQuery.ts"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

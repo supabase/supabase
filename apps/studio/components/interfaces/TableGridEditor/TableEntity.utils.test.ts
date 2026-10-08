@@ -1,8 +1,51 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatTableRowsToSQL, getTablePoliciesUrl } from './TableEntity.utils'
+import {
+  formatTableRowsToJSON,
+  formatTableRowsToSQL,
+  getTablePoliciesUrl,
+} from './TableEntity.utils'
 import type { SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+
+describe('TableEntity.utils: formatTableRowsToJSON', () => {
+  const table: SupaTable = {
+    id: 1,
+    type: ENTITY_TYPE.TABLE,
+    columns: [
+      { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+      { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+      { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      { name: 'meta', dataType: 'jsonb', format: 'jsonb', position: 3 },
+    ],
+    name: 'yearly_totals',
+    schema: 'public',
+    comment: undefined,
+    estimateRowCount: 1,
+  }
+
+  it('should follow column order, including integer-like column names', () => {
+    const rows = [{ idx: 0, '2023': 42, '2024': 99, id: 7, meta: { a: 1 } }]
+    expect(formatTableRowsToJSON(table, rows)).toBe(`[{"id":7,"2024":99,"2023":42,"meta":{"a":1}}]`)
+  })
+
+  it('should omit the grid idx key unless the table has an idx column', () => {
+    expect(formatTableRowsToJSON(table, [{ idx: 3, id: 1 }])).not.toContain('idx')
+
+    const withIdx: SupaTable = {
+      ...table,
+      columns: [{ name: 'idx', dataType: 'bigint', format: 'int8', position: 0 }],
+    }
+    expect(formatTableRowsToJSON(withIdx, [{ idx: 3 }])).toBe(`[{"idx":3}]`)
+  })
+
+  it('should emit null for missing columns and [] for no rows', () => {
+    expect(formatTableRowsToJSON(table, [{ id: 1 }])).toBe(
+      `[{"id":1,"2024":null,"2023":null,"meta":null}]`
+    )
+    expect(formatTableRowsToJSON(table, [])).toBe('[]')
+  })
+})
 
 describe('TableEntity.utils: formatTableRowsToSQL', () => {
   it('should format rows into a single SQL INSERT statement', () => {
@@ -25,7 +68,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2'), (3, 'Person 3');`
+    const expected = `INSERT INTO public.people (id, name) VALUES (1, 'Person 1'), (2, 'Person 2'), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -49,7 +92,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, null), (3, 'Person 3');`
+    const expected = `INSERT INTO public.people (id, name) VALUES (1, 'Person 1'), (2, null), (3, 'Person 3');`
     expect(result).toBe(expected)
   })
 
@@ -85,7 +128,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
       },
     ]
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."demo" ("id", "name", "tags", "metadata") VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version": 1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version": 1, "name": "O''Neil"}');`
+    const expected = `INSERT INTO public.demo (id, name, tags, metadata) VALUES (2, 'Person 1', ARRAY['tag-a','tag-c'], '{"version": 1}'), (3, 'ONeil', ARRAY['tag-a'], '{"version": 1, "name": "O''Neil"}');`
     expect(result).toBe(expected)
   })
 
@@ -116,7 +159,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "storage"."buckets" ("id", "public", "avif_autodetection", "file_size_limit", "allowed_mime_types") VALUES ('emails', true, false, 10485760, ARRAY['image/*','image/o''neil']);`
+    const expected = `INSERT INTO storage.buckets (id, public, avif_autodetection, file_size_limit, allowed_mime_types) VALUES ('emails', true, false, 10485760, ARRAY['image/*','image/o''neil']);`
     expect(result).toBe(expected)
   })
 
@@ -133,8 +176,48 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     const rows = [{ email: "o'neil@example.com" }]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."users" ("email") VALUES ('o''neil@example.com');`
+    const expected = `INSERT INTO public.users (email) VALUES ('o''neil@example.com');`
     expect(result).toBe(expected)
+  })
+
+  it('should keep values aligned with columns when column names are integer-like', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: '2024', dataType: 'bigint', format: 'int8', position: 1 },
+        { name: '2023', dataType: 'bigint', format: 'int8', position: 2 },
+      ],
+      name: 'yearly_totals',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    // JS hoists integer-like keys to the front of Object.entries, regardless of insertion order
+    const rows = [{ idx: 0, id: 7, '2024': 99, '2023': 42 }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO public.yearly_totals (id, "2024", "2023") VALUES (7, 99, 42);`
+    expect(result).toBe(expected)
+  })
+
+  it('should emit null for columns missing from a row', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'name', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'people',
+      schema: 'public',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+
+    const result = formatTableRowsToSQL(table, [{ id: 1 }])
+    expect(result).toBe(`INSERT INTO public.people (id, name) VALUES (1, null);`)
   })
 
   it('should return an empty string for empty rows', () => {
@@ -152,6 +235,26 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     }
     const result = formatTableRowsToSQL(table, [])
     expect(result).toBe('')
+  })
+
+  it('should escape double quotes in schema, table and column identifiers', () => {
+    const table: SupaTable = {
+      id: 1,
+      type: ENTITY_TYPE.TABLE,
+      columns: [
+        { name: 'id', dataType: 'bigint', format: 'int8', position: 0 },
+        { name: 'we"ird', dataType: 'text', format: 'text', position: 1 },
+      ],
+      name: 'pe"ople',
+      schema: 'pub"lic',
+      comment: undefined,
+      estimateRowCount: 1,
+    }
+    const rows = [{ id: 1, 'we"ird': 'value' }]
+
+    const result = formatTableRowsToSQL(table, rows)
+    const expected = `INSERT INTO "pub""lic"."pe""ople" (id, "we""ird") VALUES (1, 'value');`
+    expect(result).toBe(expected)
   })
 
   it('should remove the idx property', () => {
@@ -173,7 +276,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
     ]
 
     const result = formatTableRowsToSQL(table, rows)
-    const expected = `INSERT INTO "public"."people" ("id", "name") VALUES (1, 'Person 1'), (2, 'Person 2');`
+    const expected = `INSERT INTO public.people (id, name) VALUES (1, 'Person 1'), (2, 'Person 2');`
     expect(result).toBe(expected)
   })
 })

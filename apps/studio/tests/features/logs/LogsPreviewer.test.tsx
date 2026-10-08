@@ -6,10 +6,8 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { LOGS_API_MOCKS } from './logs.mocks'
 import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
-import {
-  calculateBarClickTimeRange,
-  LogsPreviewer,
-} from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import { calculateBarClickTimeRange } from '@/components/interfaces/Settings/Logs/LogsBarChart.utils'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 import useLogsPreview from '@/hooks/analytics/useLogsPreview'
 import { customRender, customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'

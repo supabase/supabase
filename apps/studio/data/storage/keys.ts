@@ -54,6 +54,49 @@ export const storageKeys = {
       ...(path ? [path] : []),
       ...(params ? [params] : []),
     ] as const,
+  folders: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'folders'] as const,
+  bucketLifecycle: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'lifecycle'] as const,
+  /** The policy is part of the key: the API derives each version's expiry from it. */
+  objectVersions: (
+    projectRef: string | undefined,
+    bucketId: string | undefined,
+    objectName: string | undefined,
+    lifecyclePolicy?: { expiryDays: number | null; maxVersions: number | null }
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'buckets',
+      bucketId,
+      'object-versions',
+      objectName,
+      ...(lifecyclePolicy ? [lifecyclePolicy] : []),
+    ] as const,
+  /** Omit `versionId` for a prefix that matches every version's URL for one object. */
+  fileUrl: ({
+    projectRef,
+    isBucketPublic,
+    bucketId,
+    path,
+    versionId,
+  }: {
+    projectRef?: string
+    isBucketPublic?: boolean
+    bucketId?: string
+    path: string
+    versionId?: string
+  }) =>
+    [
+      projectRef,
+      'buckets',
+      isBucketPublic,
+      bucketId,
+      'file',
+      path,
+      ...(versionId === undefined ? [] : [versionId]),
+    ] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({

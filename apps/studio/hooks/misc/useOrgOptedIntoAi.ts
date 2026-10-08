@@ -1,10 +1,6 @@
 import { z } from 'zod'
 
-import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
-import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, OPT_IN_TAGS } from '@/lib/constants'
 
 export const aiOptInLevelSchema = z.enum([
@@ -49,9 +45,7 @@ export function useOrgOptedIntoAi(): boolean {
 export function useOrgAiOptInLevel(): {
   aiOptInLevel: AiOptInLevel
   includeSchemaMetadata: boolean
-  isHipaaProjectDisallowed: boolean
 } {
-  const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
   // [Joshen] Default to disabled until migration to clean up existing opt in tags are completed
@@ -60,25 +54,9 @@ export function useOrgAiOptInLevel(): {
   const level = getAiOptInLevel(optInTags)
   const isOptedIntoAI = level !== 'disabled'
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef: selectedProject?.ref })
-  const isProjectSensitive = !!projectSettings?.is_sensitive
-
-  const preventProjectFromUsingAI = hasHipaaAddon && isProjectSensitive
-
   // [Joshen] For CLI / self-host, we'd default to 'schema' as opt in level
-  const aiOptInLevel = !IS_PLATFORM
-    ? 'schema'
-    : (isOptedIntoAI && !selectedProject) || (isOptedIntoAI && !preventProjectFromUsingAI)
-      ? level
-      : 'disabled'
+  const aiOptInLevel = !IS_PLATFORM ? 'schema' : isOptedIntoAI ? level : 'disabled'
   const includeSchemaMetadata = !IS_PLATFORM || aiOptInLevel !== 'disabled'
 
-  return {
-    aiOptInLevel,
-    includeSchemaMetadata,
-    isHipaaProjectDisallowed: preventProjectFromUsingAI,
-  }
+  return { aiOptInLevel, includeSchemaMetadata }
 }

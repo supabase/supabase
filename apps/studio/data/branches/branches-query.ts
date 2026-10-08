@@ -4,6 +4,7 @@ import { branchKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type BranchesVariables = {
@@ -22,13 +23,13 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
 
   if (error) {
     if ((error as ResponseError).message === 'Preview branching is not enabled for this project.') {
-      return []
+      return EMPTY_ARR
     } else {
       handleError(error)
     }
   }
 
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type BranchesData = Awaited<ReturnType<typeof getBranches>>

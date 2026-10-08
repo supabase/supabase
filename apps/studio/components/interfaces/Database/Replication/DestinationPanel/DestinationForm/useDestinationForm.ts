@@ -33,7 +33,7 @@ import { type ResponseError } from '@/types'
 
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
-  const { setRequestStatus } = usePipelineRequestStatus()
+  const { runWithRequestStatus } = usePipelineRequestStatus()
 
   const [hasRunValidation, setHasRunValidation] = useState(false)
   const [destinationValidationFailures, setDestinationValidationFailures] = useState<
@@ -68,7 +68,9 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
       onError: () => {},
     })
 
-  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation()
+  const { mutateAsync: startPipeline, isPending: startingPipeline } = useStartPipelineMutation({
+    onError: () => {},
+  })
 
   const isValidating = isValidatingDestination || isValidatingPipeline
 
@@ -248,41 +250,35 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
       }
 
       if (editMode && existingDestination) {
-        if (!existingDestination.pipelineId) return console.error('Pipeline id is required')
+        const pipelineId = existingDestination.pipelineId
+        if (!pipelineId) return console.error('Pipeline id is required')
 
-        await updateDestinationPipeline(
-          {
-            destinationId: existingDestination.destinationId,
-            pipelineId: existingDestination.pipelineId,
-            projectRef,
-            destinationName: data.name,
-            destinationConfig,
-            pipelineConfig,
-            sourceId,
-          },
-          { onSuccess }
+        const update = () =>
+          updateDestinationPipeline(
+            {
+              destinationId: existingDestination.destinationId,
+              pipelineId,
+              projectRef,
+              destinationName: data.name,
+              destinationConfig,
+              pipelineConfig,
+              sourceId,
+            },
+            { onSuccess }
+          )
+
+        await runWithRequestStatus(
+          pipelineId,
+          existingDestination.enabled
+            ? PipelineStatusRequestStatus.StopRequested
+            : PipelineStatusRequestStatus.None,
+          update
         )
-
-        // Set request status only right before starting, then fire and close
-        const snapshot =
-          existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
-        if (existingDestination.enabled) {
-          // The pipeline restarts automatically on the backend when its config is updated
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.RestartRequested,
-            snapshot
-          )
-          toast.success('Settings applied. Restarting the pipeline...')
-        } else {
-          setRequestStatus(
-            existingDestination.pipelineId,
-            PipelineStatusRequestStatus.StartRequested,
-            snapshot
-          )
-          toast.success('Settings applied. Starting the pipeline...')
-          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
-        }
+        toast.success(
+          existingDestination.enabled
+            ? 'Settings applied.'
+            : 'Settings applied. The pipeline remains stopped.'
+        )
         onClose()
       } else {
         const { pipeline_id: pipelineId } = await createDestinationPipeline(
@@ -295,18 +291,21 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
           },
           { onSuccess }
         )
-        // Set request status only right before starting, then fire and close
-        setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
-        toast.success('Pipeline created. Starting the pipeline...')
-        startPipeline({ projectRef, pipelineId })
+        // Creation has committed. Close the form even if starting fails, so retrying cannot
+        // create a duplicate pipeline; the new row offers its own start action.
         onClose()
+        await runWithRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, () =>
+          startPipeline({ projectRef, pipelineId })
+        )
+        toast.success('Pipeline created. Starting…')
       }
     } catch (error) {
-      const action = editMode
-        ? existingDestination?.enabled
+      let action = 'create and start pipeline'
+      if (editMode) {
+        action = existingDestination?.enabled
           ? 'apply changes and restart pipeline'
-          : 'apply changes and start pipeline'
-        : 'create and start pipeline'
+          : 'apply changes'
+      }
       toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
     }
   }

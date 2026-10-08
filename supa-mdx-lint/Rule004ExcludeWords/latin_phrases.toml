@@ -1,5 +1,0 @@
-description = "Prefer 'with', 'by', or 'through' instead of '%s', depending on context."
-level = "WARNING"
-words = [
-    "powered by"
-]

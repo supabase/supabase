@@ -50,7 +50,7 @@ const useVibeCodersContent: () => {
       h1: (
         <>
           <span className="block text-foreground">Your weekend prototype</span>
-          <span className="text-brand block md:ml-0">deserves production</span>
+          <span className="text-primary block md:ml-0">deserves production</span>
         </>
       ),
       subheader: [

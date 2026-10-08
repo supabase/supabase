@@ -36,6 +36,10 @@ vi.mock('@/components/interfaces/Explorer/hooks', () => ({
   useCreateChat: () => ({ openChat: vi.fn() }),
 }))
 
+vi.mock('./ExplorerProvider', () => ({
+  useExplorerDeleteItem: () => ({ confirmDelete: vi.fn() }),
+}))
+
 vi.mock('@/state/ai-assistant-state', () => ({
   useAiAssistantChatList: () => [
     { id: 'old-chat', name: 'Older investigation', updatedAt: new Date('2026-01-01') },
@@ -54,20 +58,20 @@ describe('ExplorerNavChats', () => {
   it('filters support chats, safely sorts rehydrated chats, and marks the route active', () => {
     customRender(<ExplorerNavChats />)
 
-    const chatButtons = screen.getAllByRole('button')
-    expect(chatButtons.map((button) => button.textContent)).toEqual([
+    const chatLinks = screen.getAllByRole('link')
+    expect(chatLinks.map((link) => link.textContent)).toEqual([
       'Recent investigation',
       'Older investigation',
       'Rehydrated chat',
     ])
-    expect(chatButtons[0]).toHaveClass('active')
+    expect(chatLinks[0]).toHaveClass('active')
     expect(screen.queryByText('Support conversation')).not.toBeInTheDocument()
 
     fireEvent.change(screen.getByRole('textbox', { name: 'Search chats' }), {
       target: { value: 'rehydrated' },
     })
 
-    expect(screen.getByRole('button')).toHaveTextContent('Rehydrated chat')
+    expect(screen.getByRole('link')).toHaveTextContent('Rehydrated chat')
     expect(screen.queryByText('Recent investigation')).not.toBeInTheDocument()
   })
 })

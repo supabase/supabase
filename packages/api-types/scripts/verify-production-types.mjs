@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { appendFile, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -12,7 +12,7 @@ const platformApiUrl =
   process.env.PLATFORM_API_OPENAPI_URL ?? 'https://api.supabase.com/api/platform-json'
 const fetchTimeout = 30_000
 
-const specifications = [
+export const specifications = [
   { name: 'api-v1', url: 'https://api.supabase.com/api/v1-json' },
   { name: 'api-v2', url: 'https://api.supabase.com/api/v2-json' },
   { name: 'platform', url: platformApiUrl },
@@ -66,53 +66,116 @@ export async function findMismatchedTypes(
   return mismatches.filter((filename) => filename !== undefined)
 }
 
+export async function reportTypeDifferences(
+  filenames,
+  {
+    generatedTypesDirectory,
+    typesDirectory,
+    summaryPath = process.env.GITHUB_STEP_SUMMARY,
+    log = console.log,
+  }
+) {
+  const summary = [
+    '## Production API type differences',
+    '',
+    'Committed types differ from production. `-` lines are committed; `+` lines are production.',
+    '',
+  ]
+
+  for (const filename of filenames) {
+    let diff
+    try {
+      const result = await run(
+        'diff',
+        [
+          '-u',
+          '--label',
+          `committed/${filename}`,
+          '--label',
+          `production/${filename}`,
+          join(typesDirectory, filename),
+          join(generatedTypesDirectory, filename),
+        ],
+        { maxBuffer: 32 * 1024 * 1024 }
+      )
+      diff = result.stdout
+    } catch (error) {
+      if (error.code !== 1) throw error
+      diff = error.stdout
+    }
+
+    log(`${filename}\n${diff}`)
+    const preview = diff.slice(0, 60_000)
+    const escaped = preview.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+    summary.push(`### ${filename}`, '', `<pre>${escaped}</pre>`, '')
+    if (preview.length < diff.length) {
+      summary.push('Diff preview truncated. See the verification step logs for the full diff.', '')
+    }
+  }
+
+  if (summaryPath) await appendFile(summaryPath, `${summary.join('\n')}\n`)
+}
+
+// Fetches the given OpenAPI specifications and generates types for them into
+// `generatedTypesDirectory`, formatted with the repository's Prettier config. Shared by
+// `verifyProductionTypes` (which generates into a throwaway directory to diff against the
+// committed types) and `generate-production-types.mjs` (which generates directly into the
+// committed types directory).
+export async function generateTypes(
+  specifications,
+  { temporaryDirectory, generatedTypesDirectory, runImpl = run, fetchImpl, writeFileImpl }
+) {
+  const config = await fetchOpenApiSpecifications(specifications, {
+    temporaryDirectory,
+    generatedTypesDirectory,
+    fetchImpl,
+    writeFileImpl,
+  })
+
+  await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
+  await runImpl(
+    'pnpm',
+    [
+      'exec',
+      'openapi-typescript',
+      '--redocly',
+      join(temporaryDirectory, 'redocly.yaml'),
+      '--alphabetize',
+      '--default-non-nullable=false',
+    ],
+    { cwd: packageDirectory }
+  )
+
+  // Prettier resolves its config from the formatted file's location. The generated files live
+  // in a temporary directory outside the repository, so pass the repository config explicitly
+  // or they are formatted with Prettier's defaults and never match the committed files.
+  const { stdout: prettierConfigPath } = await runImpl(
+    'pnpm',
+    ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
+    { cwd: packageDirectory }
+  )
+
+  await runImpl(
+    'pnpm',
+    [
+      'exec',
+      'prettier',
+      '--config',
+      prettierConfigPath.trim(),
+      '--write',
+      ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
+    ],
+    { cwd: packageDirectory }
+  )
+}
+
 export async function verifyProductionTypes() {
   const temporaryDirectory = await mkdtemp(join(tmpdir(), 'api-types-'))
   const generatedTypesDirectory = join(temporaryDirectory, 'types')
 
   try {
     await mkdir(generatedTypesDirectory)
-
-    const config = await fetchOpenApiSpecifications(specifications, {
-      temporaryDirectory,
-      generatedTypesDirectory,
-    })
-
-    await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
-    await run(
-      'pnpm',
-      [
-        'exec',
-        'openapi-typescript',
-        '--redocly',
-        join(temporaryDirectory, 'redocly.yaml'),
-        '--alphabetize',
-        '--default-non-nullable=false',
-      ],
-      { cwd: packageDirectory }
-    )
-
-    // Prettier resolves its config from the formatted file's location. The generated files live
-    // in a temporary directory outside the repository, so pass the repository config explicitly
-    // or they are formatted with Prettier's defaults and never match the committed files.
-    const { stdout: prettierConfigPath } = await run(
-      'pnpm',
-      ['exec', 'prettier', '--find-config-path', join(packageDirectory, 'package.json')],
-      { cwd: packageDirectory }
-    )
-
-    await run(
-      'pnpm',
-      [
-        'exec',
-        'prettier',
-        '--config',
-        prettierConfigPath.trim(),
-        '--write',
-        ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
-      ],
-      { cwd: packageDirectory }
-    )
+    await generateTypes(specifications, { temporaryDirectory, generatedTypesDirectory })
 
     const changedTypes = await findMismatchedTypes(specifications, {
       generatedTypesDirectory,
@@ -120,6 +183,7 @@ export async function verifyProductionTypes() {
     })
 
     if (changedTypes.length > 0) {
+      await reportTypeDifferences(changedTypes, { generatedTypesDirectory, typesDirectory })
       throw new Error(`Committed API types do not match production: ${changedTypes.join(', ')}`)
     }
   } finally {

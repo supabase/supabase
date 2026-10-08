@@ -6,7 +6,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PublicationsAvailability } from '@/components/interfaces/Database/Publications/PublicationsAvailability'
 import { PublicationsTables } from '@/components/interfaces/Database/Publications/PublicationsTables'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { NoPermission } from '@/components/ui/NoPermission'

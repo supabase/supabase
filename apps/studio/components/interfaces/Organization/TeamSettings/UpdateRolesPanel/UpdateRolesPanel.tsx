@@ -282,12 +282,19 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   const canAssignRole = rolesAddable.includes(role.id)
                                   const isOwnerRole = role.name === 'Owner'
                                   const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                                  const disabled = !canAssignRole || disabledForStripe
+
+                                  const isNoAccessRole = role.name === 'No-access'
+                                  const disabledForProjectRole =
+                                    !isApplyingRoleToAllProjects && isNoAccessRole
+                                  const disabled =
+                                    !canAssignRole || disabledForStripe || disabledForProjectRole
                                   const disabledReason = disabledForStripe
                                     ? 'Cannot be assigned in Stripe Projects organizations'
-                                    : !canAssignRole
-                                      ? 'Additional permissions required to assign role'
-                                      : undefined
+                                    : disabledForProjectRole
+                                      ? 'Cannot assign No-access role to project-scoped members'
+                                      : !canAssignRole
+                                        ? 'Additional permissions required to assign role'
+                                        : undefined
 
                                   return (
                                     <SelectItem
@@ -299,13 +306,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       <div className="flex flex-col gap-0.5 max-w-xs">
                                         <span>{role.name}</span>
                                         <span className="text-xs text-foreground-lighter">
-                                          {[
-                                            ROLE_DESCRIPTIONS[role.name] ??
-                                              'Permissions are based on the configured organization role.',
-                                            disabledReason,
-                                          ]
-                                            .filter(Boolean)
-                                            .join(' ')}
+                                          {ROLE_DESCRIPTIONS[role.name] ??
+                                            'Permissions are based on the configured organization role.'}
+                                          {disabledReason && ` ${disabledReason}`}
                                         </span>
                                       </div>
                                     </SelectItem>

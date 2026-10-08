@@ -5,7 +5,7 @@ import { Home } from 'icons'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
+import { Button, cn, Separator, SheetTitle, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
@@ -133,6 +133,7 @@ export function MobileMenuContent({
 
   return (
     <div className="flex flex-col h-full bg-background">
+      <SheetTitle className="sr-only">Project menu</SheetTitle>
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(

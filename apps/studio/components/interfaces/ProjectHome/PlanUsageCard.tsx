@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
@@ -43,6 +42,12 @@ const METRICS: MetricConfig[] = [
     label: 'Log Ingestion',
     unit: 'gigabytes',
     anchor: 'logIngestion',
+  },
+  {
+    key: PricingMetric.LOG_QUERYING,
+    label: 'Log Query',
+    unit: 'gigabytes',
+    anchor: 'logQuery',
   },
 ]
 
@@ -101,7 +106,7 @@ const ProgressRing = ({
         transform="rotate(-90 9 9)"
         className={cn(
           'transition-[stroke-dashoffset] duration-500',
-          isOver ? 'text-warning-600' : isApproaching ? 'text-warning' : 'text-brand'
+          isOver ? 'text-warning-600' : isApproaching ? 'text-warning' : 'text-primary'
         )}
       />
     </svg>
@@ -175,22 +180,14 @@ export const PlanUsageCard = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { data: usage, isSuccess, isError } = useOrgUsageQuery({ orgSlug: organization?.slug })
 
-  const logIngestionBillingEnabled = useFlag('logIngestionBillingEnabled')
-
-  const metricsIncludingLogIngestion = logIngestionBillingEnabled
-    ? METRICS
-    : METRICS.filter((m) => m.key !== PricingMetric.LOG_INGESTION)
-
   const visibleRows = isSuccess
-    ? metricsIncludingLogIngestion
-        .map((config) => {
-          const usageItem = usage.usages.find((u) => u.metric === config.key)
-          if (!usageItem) return null
-          if (!usageItem.available_in_plan) return null
-          if (!usageItem.pricing_free_units || usageItem.pricing_free_units <= 0) return null
-          return { config, usageItem }
-        })
-        .filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
+    ? METRICS.map((config) => {
+        const usageItem = usage.usages.find((u) => u.metric === config.key)
+        if (!usageItem) return null
+        if (!usageItem.available_in_plan) return null
+        if (!usageItem.pricing_free_units || usageItem.pricing_free_units <= 0) return null
+        return { config, usageItem }
+      }).filter((row): row is { config: MetricConfig; usageItem: OrgMetricsUsage } => row !== null)
     : []
 
   if (isError) return null
@@ -223,9 +220,7 @@ export const PlanUsageCard = () => {
                   orgSlug={organization?.slug ?? '_'}
                 />
               ))
-            : metricsIncludingLogIngestion.map((config) => (
-                <SkeletonMetricRow key={config.key} label={config.label} />
-              ))}
+            : METRICS.map((config) => <SkeletonMetricRow key={config.key} label={config.label} />)}
         </div>
       </div>
     </li>

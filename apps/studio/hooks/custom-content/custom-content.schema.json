@@ -105,6 +105,14 @@
     "ssl:certificate_url": {
       "type": "string",
       "description": "The URL of the SSL certificate"
+    },
+
+    "status_page:visibility_field_ids": {
+      "type": "array",
+      "description": "Deployment-mode visibility field IDs on incident.io response incidents. Element 0 is this build's own custom-field ID (empty string = default Supabase build); the rest are other modes' field IDs.",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [

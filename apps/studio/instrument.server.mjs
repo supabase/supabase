@@ -1,14 +1,9 @@
-// Server-side Sentry init for the TanStack Start runtime.
+// Server-side Sentry init for the TanStack Start runtime. Mirrors
+// sentry.server.config.ts (Next) with the `@sentry/tanstackstart-react` SDK.
+// server.ts imports it first so it runs before the route tree evaluates.
 //
-// Mirrors sentry.server.config.ts (the Next.js server init) but uses the
-// unified `@sentry/tanstackstart-react` SDK. Loaded:
-//   - self-hosted / e2e (scripts/serve.js): dynamically imported AFTER the
-//     .env files are read into process.env, so the DSN is available.
-//   - Vercel (api/server.js): imported at module top (gated to TanStack),
-//     Vercel injects env vars into process.env for us.
-//
-// Reads process.env at call time (unlike NEXT_PUBLIC_* which the client bundle
-// inlines at build time), so it must run after env loading on self-hosted.
+// Reads process.env at call time (NEXT_PUBLIC_* are inlined at build time
+// instead), so env files must be loaded before the server boots self-hosted.
 
 import * as Sentry from '@sentry/tanstackstart-react'
 

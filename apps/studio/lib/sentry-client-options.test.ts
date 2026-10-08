@@ -1,5 +1,5 @@
 import type { Event as SentryEvent, StackFrame } from '@sentry/react'
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildSentryClientOptions,
@@ -501,6 +501,7 @@ describe('which errors Studio sends to Sentry', () => {
   let restoreConsent: () => void
 
   beforeAll(async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0)
     vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'true')
     vi.resetModules()
     const { consentState } = await import('common')
@@ -515,7 +516,12 @@ describe('which errors Studio sends to Sentry', () => {
     beforeSend = options.beforeSend
   })
 
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   afterAll(() => {
+    vi.restoreAllMocks()
     restoreConsent?.()
     vi.unstubAllEnvs()
     vi.resetModules()
@@ -536,6 +542,37 @@ describe('which errors Studio sends to Sentry', () => {
       expect(await beforeSend(event, {})).toBe(event)
     }
   )
+
+  it('samples errors that did not crash the page once', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [{ value: 'Application error', stacktrace: { frames: [{ filename: 'app.js' }] } }],
+      },
+    }
+
+    expect(await beforeSend(event, {})).toBe(event)
+    expect(Math.random).toHaveBeenCalledOnce()
+    expect(event.tags?.codeSampleRate).toBe('0.01')
+  })
+
+  it('still applies Studio filters to page crashes', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      tags: { globalErrorBoundary: true },
+      exception: {
+        values: [
+          {
+            value: 'captcha.render is not a function',
+            stacktrace: { frames: [{ filename: 'api.js' }] },
+          },
+        ],
+      },
+    }
+
+    expect(await beforeSend(event, {})).toBeNull()
+    expect(Math.random).not.toHaveBeenCalled()
+  })
 
   it('drops errors with no code location when they did not crash the page', async () => {
     expect(

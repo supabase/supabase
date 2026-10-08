@@ -314,7 +314,7 @@ describe('maskReplayAttribute', () => {
     expect(maskReplayAttribute(name, value)).toBe(value)
   })
 
-  it.each(['dark', 'light', 'classic-dark', 'system'])(
+  it.each(['dark', 'light', 'system'])(
     'keeps data-theme=%o, which monaco.css and grid.css select on',
     (theme) => {
       expect(maskReplayAttribute('data-theme', theme)).toBe(theme)
@@ -360,11 +360,8 @@ describe('maskReplayAttribute', () => {
     expect(maskReplayAttribute('data-chart', 'chart-r1a')).toBe('chart-r1a')
   })
 
-  it.each([
-    ['data-index', '0'],
-    ['data-band', '3'],
-  ])('keeps %o, which a shipped stylesheet selects on by value', (name, value) => {
-    expect(maskReplayAttribute(name, value)).toBe(value)
+  it('keeps data-index, which monaco-editor selects on by value', () => {
+    expect(maskReplayAttribute('data-index', '0')).toBe('0')
   })
 
   it.each([

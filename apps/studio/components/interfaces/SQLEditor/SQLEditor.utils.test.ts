@@ -1271,8 +1271,8 @@ const makeEditor = ({
 }): IStandaloneCodeEditor =>
   ({
     getValue: () => value,
-    getSelection: () => (hasSelection ? ({ startLineNumber: 1 } as any) : null),
-    getModel: () => ({ getValueInRange: () => selectionValue }) as any,
+    getSelection: () => (hasSelection ? { startLineNumber: 1 } : null),
+    getModel: () => ({ getValueInRange: () => selectionValue }),
   }) as unknown as IStandaloneCodeEditor
 
 describe('SQLEditor.utils:getEditorSql', () => {

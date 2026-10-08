@@ -315,9 +315,6 @@ const RENDER_CRITICAL_ATTRIBUTES = new Set([
   // Integer index, selected on by monaco-editor's quick-input CSS
   // (`[data-index="0"] .quick-in...`) to drop the separator border on the first row.
   'data-index',
-  // 0 to 4, selected on by `Select26Promotion.module.css` as `.cell[data-band='N']`.
-  // The banner ships in Studio through `BannerSelect2026.tsx`.
-  'data-band',
   // Selected on by Studio's own stylesheets and by Radix's portal positioning.
   'data-footnote-ref',
   'data-radix-portal',
@@ -343,7 +340,7 @@ const RENDER_CRITICAL_ATTRIBUTES = new Set([
  * from the SQL editor and the data grid. Gated on the value so the attribute cannot
  * carry anything else.
  */
-const THEME_VALUES = new Set(['dark', 'light', 'classic-dark', 'system'])
+const THEME_VALUES = new Set(['dark', 'light', 'system'])
 
 /**
  * SVG presentation attributes that take either a plain value (`fill="#fff"`) or a

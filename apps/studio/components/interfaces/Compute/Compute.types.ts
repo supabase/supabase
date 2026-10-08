@@ -1,7 +1,7 @@
 import type { components } from 'api-types'
 
 type ComputeInstanceAttributes =
-  components['schemas']['V2WorkerResponse_Output']['data']['attributes']
+  components['schemas']['V2ComputeInstanceResponse_Output']['data']['attributes']
 
 export type ComputeInstanceBuildState = ComputeInstanceAttributes['build_state']
 

@@ -11,6 +11,7 @@ export type ConnectSheetPrefs = {
   method?: string
   type?: string
   mcpClient?: string
+  warehouseQueryEngine?: string
 }
 
 const DEFAULT_CONNECT_SHEET_PREFS: ConnectSheetPrefs = {}
@@ -32,6 +33,7 @@ export function useConnectSheetParams() {
     method: parseAsString,
     type: parseAsString,
     mcpClient: parseAsString,
+    warehouseQueryEngine: parseAsString,
   })
 
   const [storedPrefs, setStoredPrefs] = useLocalStorage<ConnectSheetPrefs>(

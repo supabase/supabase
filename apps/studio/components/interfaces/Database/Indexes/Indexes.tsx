@@ -28,6 +28,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -240,14 +241,7 @@ export const Indexes = () => {
                       </TableRow>
                     )}
                     {indexes.length === 0 && search.length > 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{search}" did not return any results
-                          </p>
-                        </TableCell>
-                      </TableRow>
+                      <TableRowNoResults colSpan={4} search={search} />
                     )}
                     {indexes.length > 0 &&
                       indexes.map((index) => (

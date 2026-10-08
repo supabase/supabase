@@ -141,7 +141,7 @@ function DatabaseChangesSkeleton() {
               <tr className="bg-surface-200">
                 <th className="border-b border-r border-default px-3 py-1.5 text-left font-normal">
                   <div className="flex items-center gap-1.5 overflow-hidden">
-                    <Key size={12} strokeWidth={2} className="text-brand rotate-45 shrink-0" />
+                    <Key size={12} strokeWidth={2} className="text-primary rotate-45 shrink-0" />
                     <span className="text-foreground text-xs font-medium">id</span>
                     <span className="text-foreground-light text-xs">int8</span>
                   </div>
@@ -177,7 +177,9 @@ function DatabaseChangesSkeleton() {
                     key={msg.id}
                     className={cn(
                       'transition-colors duration-500',
-                      tableFlashId === msg.id ? 'bg-brand/15 dark:bg-brand/5' : 'bg-surface-75'
+                      tableFlashId === msg.id
+                        ? 'bg-brand-default/15 dark:bg-brand-default/5'
+                        : 'bg-surface-75'
                     )}
                   >
                     <td className="border-b border-r border-default px-3 py-1.5 text-foreground-muted text-xs truncate max-w-0">
@@ -245,9 +247,9 @@ function DatabaseChangesSkeleton() {
                     className={cn(
                       'max-w-[75%] px-3 py-1.5 rounded-xl text-xs leading-snug transition-colors duration-500',
                       isAlice
-                        ? 'bg-brand/15 text-foreground rounded-br-sm'
+                        ? 'bg-brand-default/15 text-foreground rounded-br-sm'
                         : 'bg-surface-300 text-foreground rounded-bl-sm',
-                      chatFlashId === msg.id && 'ring-1 ring-brand/30'
+                      chatFlashId === msg.id && 'ring-1 ring-brand-default/30'
                     )}
                   >
                     {msg.text}
@@ -371,34 +373,45 @@ function PresenceSkeleton() {
       onMouseLeave={() => setHovered(false)}
       onMouseMove={handleMouseMove}
     >
-      {/* Stacked avatars — top right */}
-      <div className="absolute right-4 top-4 z-10 flex -space-x-2">
-        {PRESENCE_USERS.map((user) => (
+      {/* Stacked avatars — top right (inset so box-shadow rings clear overflow-hidden) */}
+      <div className="absolute right-5 top-3.5 z-10 flex -space-x-0.75 p-1">
+        {PRESENCE_USERS.map((user, i) => (
           <div
             key={user.name}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
+            className="relative flex h-6.5 w-6.5 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
             style={{
-              boxShadow: `0 0 0 2px hsl(var(--background-surface-75)), 0 0 0 4px ${user.color}`,
+              zIndex: i + 1,
+              // Colour ring, then card-coloured cutout outside so stacked discs separate
+              boxShadow: `0 0 0 1.5px ${user.color}, 0 0 0 4px var(--background-surface-75)`,
             }}
           >
             {user.initials}
           </div>
         ))}
-        {/* Your avatar — appears on hover */}
+        {/* Your avatar — appears on hover (width for layout, inner scale for pop-in) */}
         <motion.div
-          className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-200 text-[9px] font-medium text-foreground"
-          style={{
-            boxShadow: `0 0 0 2px hsl(var(--background-surface-75)), 0 0 0 4px ${YOU_COLOR}`,
-          }}
-          initial={{ opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }}
-          animate={
-            hovered
-              ? { opacity: 1, scale: 1, width: 28, marginLeft: -8 }
-              : { opacity: 0, scale: 0.5, width: 0, marginLeft: 0 }
-          }
-          transition={{ type: 'spring', duration: 0.47, bounce: 0 }}
+          className="relative shrink-0 min-w-0"
+          style={{ zIndex: PRESENCE_USERS.length + 1 }}
+          initial={false}
+          animate={{ width: hovered ? 26 : 0 }}
+          transition={{ type: 'spring', duration: 0.4, bounce: 0 }}
         >
-          You
+          <motion.div
+            className="flex h-6.5 w-6.5 items-center justify-center rounded-full bg-surface-100 text-[9px] font-medium text-foreground"
+            style={{
+              transformOrigin: 'center center',
+              boxShadow: `0 0 0 1.5px ${YOU_COLOR}, 0 0 0 4px var(--background-surface-75)`,
+            }}
+            initial={false}
+            animate={
+              hovered
+                ? { opacity: 1, scale: 1 }
+                : { opacity: 0, scale: 0.85, pointerEvents: 'none' }
+            }
+            transition={{ type: 'spring', duration: 0.4, bounce: 0 }}
+          >
+            You
+          </motion.div>
         </motion.div>
       </div>
 
@@ -566,7 +579,7 @@ function BroadcastSkeleton() {
             height="14"
             viewBox="0 0 24 24"
             fill="none"
-            className="text-brand"
+            className="text-primary"
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden
@@ -597,7 +610,7 @@ function BroadcastSkeleton() {
           <g key={i}>
             <path
               d={line.d}
-              stroke="hsl(var(--foreground-muted))"
+              stroke="var(--foreground-muted)"
               strokeWidth="2"
               strokeLinecap="round"
               opacity="0.15"
@@ -626,7 +639,9 @@ function BroadcastSkeleton() {
             key={i}
             className={cn(
               'absolute bottom-6 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-xl border bg-surface-100 shadow-xs dark:shadow-sm transition-all duration-300',
-              isFlashing ? 'border-brand text-brand' : 'border-border text-foreground-muted'
+              isFlashing
+                ? 'border-brand-default text-primary'
+                : 'border-border text-foreground-muted'
             )}
             style={{ left: `${xPercent}%` }}
           >
