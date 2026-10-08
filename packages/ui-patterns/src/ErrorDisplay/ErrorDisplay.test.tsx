@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ErrorDisplay } from './index'
-import type { ErrorDisplayStep } from './index'
+import type { ErrorDisplayAction, ErrorDisplayStep } from './index'
 
 function mockContainerWidth(width: number) {
   vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
@@ -34,6 +34,18 @@ const steps: ErrorDisplayStep[] = [
   },
 ]
 
+const actions: ErrorDisplayAction[] = [
+  {
+    id: 'guide',
+    label: 'View guide',
+    href: 'https://supabase.com/docs',
+  },
+  {
+    id: 'restart',
+    label: 'Restart project',
+  },
+]
+
 afterEach(() => {
   vi.restoreAllMocks()
 })
@@ -55,13 +67,17 @@ describe('ErrorDisplay layout switching', () => {
     expect(screen.getByRole('link', { name: /View guide/ })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Restart project' })).toBeInTheDocument()
     expect(screen.queryByText('Check the troubleshooting guide')).not.toBeInTheDocument()
+    expect(screen.getByRole('status').firstElementChild).toHaveClass('px-4', 'pb-3', 'pt-4')
   })
 
-  it('honours an explicit size over the container width', async () => {
-    mockContainerWidth(260)
-    render(<ErrorDisplay title="Failed to retrieve tables" size="full" steps={steps} />)
+  it('always matches Admonition responsive composition', () => {
+    mockContainerWidth(640)
+    render(<ErrorDisplay title="Failed to retrieve tables" actions={actions} />)
 
-    await waitFor(() => expect(screen.getByRole('status')).toHaveAttribute('data-size', 'full'))
+    const contentAndActions = screen.getByRole('heading').parentElement?.parentElement
+
+    expect(screen.getByRole('status')).toHaveClass('@container')
+    expect(contentAndActions).toHaveClass('flex-col', '@md:flex-row')
   })
 
   it.each(['info', 'warning'] as const)('uses role="status" for %s', (type) => {
@@ -86,12 +102,32 @@ describe('ErrorDisplay layout switching', () => {
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
 
+  it('can hide the icon like Admonition', () => {
+    mockContainerWidth(640)
+    render(
+      <ErrorDisplay
+        title="Schema cache is rebuilding"
+        icon={<span>Custom icon</span>}
+        showIcon={false}
+      />
+    )
+
+    expect(screen.queryByText('Custom icon')).not.toBeInTheDocument()
+  })
+
   it('renders nothing in place of the error when there is no raw error', () => {
     mockContainerWidth(640)
     render(<ErrorDisplay title="Approaching connection limit" description="92 of 100 in use." />)
 
     expect(screen.queryByRole('button', { name: 'Details' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Copy error details' })).not.toBeInTheDocument()
+  })
+
+  it('centres a title-only fallback instead of leaving it top-aligned', () => {
+    mockContainerWidth(640)
+    render(<ErrorDisplay title="Failed to retrieve tables" />)
+
+    expect(screen.getByRole('status').firstElementChild).toHaveClass('items-center')
   })
 })
 
@@ -109,44 +145,57 @@ describe('ErrorDisplay sizing', () => {
 })
 
 describe('ErrorDisplay error details', () => {
-  it('shows the raw error inline in the full layout', () => {
+  it('shows the raw error and request metadata together', () => {
     mockContainerWidth(640)
     render(
       <ErrorDisplay
-        size="full"
         title="Failed to retrieve tables"
         error={{ message: 'Connection terminated', requestId: 'req_8f2a91c' }}
       />
     )
 
-    expect(screen.queryByRole('button', { name: 'Details' })).not.toBeInTheDocument()
-    expect(screen.getByText('Connection terminated')).toBeInTheDocument()
-    expect(screen.getByText('req_8f2a91c')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Copy error details' })).toBeInTheDocument()
+    const details = screen.getByText(/Connection terminated/)
+    expect(details).toBeInTheDocument()
+    expect(details).toHaveClass('max-h-20', 'overflow-hidden')
+    expect(screen.getByText(/Request ID: req_8f2a91c/)).toBeInTheDocument()
   })
 
-  it('keeps the raw error behind a Details toggle in the compact layout', async () => {
-    const user = userEvent.setup()
-    mockContainerWidth(640)
+  it('shows the same raw error details in the compact layout', () => {
+    mockContainerWidth(260)
     render(
       <ErrorDisplay
-        size="compact"
         title="Failed to retrieve tables"
         error={{ message: 'Connection terminated', requestId: 'req_8f2a91c' }}
       />
     )
 
-    expect(screen.queryByText('Connection terminated')).not.toBeInTheDocument()
+    expect(screen.getByText(/Connection terminated/)).toBeInTheDocument()
+    expect(screen.getByText(/Request ID: req_8f2a91c/)).toBeInTheDocument()
+  })
 
-    const toggle = screen.getByRole('button', { name: 'Details' })
-    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+  it('expands and collapses an overflowing raw error inside its container', async () => {
+    const user = userEvent.setup()
+    vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(200)
+    vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(80)
+    mockContainerWidth(640)
 
-    await user.click(toggle)
+    render(
+      <ErrorDisplay
+        title="Failed to retrieve tables"
+        error={{ message: 'A verbose database error'.repeat(20) }}
+      />
+    )
 
-    expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    expect(screen.getByText('Connection terminated')).toBeInTheDocument()
-    expect(screen.getByText('req_8f2a91c')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Copy error details' })).toBeInTheDocument()
+    const details = screen.getByText(/A verbose database error/)
+    const showMore = await screen.findByRole('button', { name: 'Show more' })
+
+    expect(details).toHaveClass('max-h-20', 'overflow-hidden')
+    expect(showMore.parentElement).toHaveClass('bg-gradient-to-t')
+
+    await user.click(showMore)
+
+    expect(details).toHaveClass('max-h-64', 'overflow-auto')
+    expect(screen.getByRole('button', { name: 'Show less' })).toBeInTheDocument()
   })
 
   it('renders details before the step actions in the compact layout', async () => {
@@ -159,10 +208,45 @@ describe('ErrorDisplay error details', () => {
       />
     )
 
-    const details = await screen.findByRole('button', { name: 'Details' })
+    const details = await screen.findByText('Connection terminated')
     const firstAction = screen.getByRole('link', { name: /View guide/ })
 
     expect(details.compareDocumentPosition(firstAction)).toBe(Node.DOCUMENT_POSITION_FOLLOWING)
+  })
+})
+
+describe('ErrorDisplay recovery actions', () => {
+  it('exposes the first action and puts the rest in an overflow menu', async () => {
+    const user = userEvent.setup()
+    mockContainerWidth(640)
+    render(<ErrorDisplay title="Failed to retrieve tables" actions={actions} />)
+
+    const primary = screen.getByRole('link', { name: 'View guide' })
+    const menuTrigger = screen.getByRole('button', { name: 'More troubleshooting options' })
+
+    expect(primary).toBeInTheDocument()
+    expect(primary).toHaveClass('rounded-r-none')
+    expect(menuTrigger).toHaveClass('rounded-l-none', '-ml-px')
+    expect(screen.queryByText('Restart project')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'More troubleshooting options' }))
+
+    expect(screen.getByRole('menuitem', { name: /Restart project/ })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: 'Contact support' })).toBeInTheDocument()
+  })
+
+  it('exposes retry and moves every other action into the overflow menu', async () => {
+    const user = userEvent.setup()
+    mockContainerWidth(640)
+    render(<ErrorDisplay title="Failed to retrieve tables" actions={actions} onRetry={vi.fn()} />)
+
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'View guide' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'More troubleshooting options' }))
+
+    expect(screen.getByRole('menuitem', { name: 'View guide' })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /Restart project/ })).toBeInTheDocument()
   })
 })
 
@@ -323,23 +407,31 @@ describe('ErrorDisplay retry', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Try again' })).toBeEnabled())
   })
 
-  it('renders an icon-only retry button with a label in the compact layout', async () => {
+  it('keeps a labelled retry button in the compact layout', async () => {
     mockContainerWidth(260)
     render(<ErrorDisplay title="Failed to retrieve tables" onRetry={vi.fn()} />)
 
     const button = await screen.findByRole('button', { name: 'Try again' })
-    expect(button).toHaveTextContent('')
+    expect(button).toHaveTextContent('Try again')
   })
 })
 
-describe('ErrorDisplay support footer', () => {
-  it.each(['full', 'compact'] as const)('uses the same support copy in the %s layout', (size) => {
-    mockContainerWidth(640)
-    render(<ErrorDisplay size={size} title="Failed to retrieve tables" />)
+describe('ErrorDisplay support action', () => {
+  it.each([
+    ['full', 640],
+    ['compact', 260],
+  ] as const)(
+    'renders contact support directly when it is the only action in the %s layout',
+    (_layout, width) => {
+      mockContainerWidth(width)
+      render(<ErrorDisplay title="Failed to retrieve tables" />)
 
-    expect(screen.getByText('Still stuck?')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Contact support' })).toBeInTheDocument()
-  })
+      expect(screen.getByRole('link', { name: 'Contact support' })).toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: 'More troubleshooting options' })
+      ).not.toBeInTheDocument()
+    }
+  )
 })
 
 describe('ErrorDisplay support link', () => {

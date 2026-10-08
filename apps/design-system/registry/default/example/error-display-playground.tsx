@@ -12,41 +12,51 @@ import {
   Slider,
   Switch,
 } from 'ui'
-import { COMPACT_LAYOUT_BREAKPOINT, ErrorDisplay } from 'ui-patterns/ErrorDisplay'
-import type { ErrorDisplaySize, ErrorDisplayStep, ErrorDisplayType } from 'ui-patterns/ErrorDisplay'
+import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
+import type { ErrorDisplayAction, ErrorDisplayType } from 'ui-patterns/ErrorDisplay'
 
 const MIN_WIDTH = 240
 const MAX_WIDTH = 800
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const ALL_STEPS: ErrorDisplayStep[] = [
+type ContentScenario =
+  | 'description-and-verbose-error'
+  | 'description-and-concise-error'
+  | 'description-only'
+  | 'verbose-error-only'
+  | 'concise-error-only'
+
+const VERBOSE_ERROR = `Connection terminated due to connection timeout
+
+DETAIL: The connection pool could not acquire a database connection before the configured timeout elapsed.
+CONTEXT: while loading relations for schemas public, auth, storage, realtime, and extensions
+QUERY: select n.nspname as schema_name, c.relname as table_name, c.relkind from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.relkind in ('r', 'p', 'v', 'm', 'f')
+HINT: Check for long-running transactions, exhausted connection slots, or an unavailable database before retrying.
+
+Error: connection acquisition timed out after 30000ms
+    at acquireConnection (database-pool.ts:184:11)
+    at async loadTables (table-editor.ts:92:18)
+    at async Promise.all (index 0)`
+
+const ALL_ACTIONS: ErrorDisplayAction[] = [
   {
     id: 'guide',
-    title: 'Check the troubleshooting guide',
-    description: 'Diagnose connection timeouts step by step.',
-    action: { label: 'View guide', href: 'https://supabase.com/docs/guides/troubleshooting' },
+    label: 'View guide',
+    href: 'https://supabase.com/docs/guides/troubleshooting',
   },
   {
     id: 'ai',
-    title: 'Debug with AI',
-    description: 'Ask the assistant to diagnose this error.',
-    action: {
-      label: 'Debug with AI',
-      onClick: () => {
-        toast('Opening the assistant')
-      },
+    label: 'Debug with AI',
+    onClick: () => {
+      toast('Opening the assistant')
     },
   },
   {
     id: 'restart',
-    title: 'Restart your project',
-    description: 'Clears stale connections held by the pooler.',
-    action: {
-      label: 'Restart project',
-      onClick: () => {
-        toast.success('Opening the restart confirmation')
-      },
+    label: 'Restart project',
+    onClick: () => {
+      toast.success('Opening the restart confirmation')
     },
   },
 ]
@@ -62,15 +72,15 @@ function Control({ label, children }: { label: string; children: React.ReactNode
 
 export default function ErrorDisplayPlayground() {
   const [type, setType] = useState<ErrorDisplayType>('info')
-  const [size, setSize] = useState<ErrorDisplaySize>('auto')
-  const [stepCount, setStepCount] = useState(3)
-  const [hasError, setHasError] = useState(true)
-  const [hasDescription, setHasDescription] = useState(false)
+  const [content, setContent] = useState<ContentScenario>('description-and-verbose-error')
+  const [actionCount, setActionCount] = useState(3)
   const [hasRetry, setHasRetry] = useState(false)
+  const [hasIcon, setHasIcon] = useState(true)
   const [width, setWidth] = useState(560)
 
-  const resolvedSize =
-    size === 'auto' ? (width < COMPACT_LAYOUT_BREAKPOINT ? 'compact' : 'full') : size
+  const hasDescription = content.startsWith('description')
+  const hasError = content.includes('error')
+  const isVerboseError = content.includes('verbose')
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -88,21 +98,30 @@ export default function ErrorDisplayPlayground() {
           </Select>
         </Control>
 
-        <Control label="Size">
-          <Select value={size} onValueChange={(value) => setSize(value as ErrorDisplaySize)}>
+        <Control label="Content">
+          <Select value={content} onValueChange={(value) => setContent(value as ContentScenario)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="auto">auto</SelectItem>
-              <SelectItem value="compact">compact</SelectItem>
-              <SelectItem value="full">full</SelectItem>
+              <SelectItem value="description-and-verbose-error">
+                description + verbose error
+              </SelectItem>
+              <SelectItem value="description-and-concise-error">
+                description + concise error
+              </SelectItem>
+              <SelectItem value="description-only">description only</SelectItem>
+              <SelectItem value="verbose-error-only">verbose error only</SelectItem>
+              <SelectItem value="concise-error-only">concise error only</SelectItem>
             </SelectContent>
           </Select>
         </Control>
 
-        <Control label="Steps">
-          <Select value={String(stepCount)} onValueChange={(value) => setStepCount(Number(value))}>
+        <Control label="Actions">
+          <Select
+            value={String(actionCount)}
+            onValueChange={(value) => setActionCount(Number(value))}
+          >
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -115,19 +134,15 @@ export default function ErrorDisplayPlayground() {
           </Select>
         </Control>
 
-        <Control label="Description">
-          <Switch checked={hasDescription} onCheckedChange={setHasDescription} />
-        </Control>
-
-        <Control label="Raw error">
-          <Switch checked={hasError} onCheckedChange={setHasError} />
-        </Control>
-
         <Control label="Retry">
           <Switch checked={hasRetry} onCheckedChange={setHasRetry} />
         </Control>
 
-        <Control label={`Container width — ${Math.round(width)}px (${resolvedSize})`}>
+        <Control label="Icon">
+          <Switch checked={hasIcon} onCheckedChange={setHasIcon} />
+        </Control>
+
+        <Control label={`Container width — ${Math.round(width)}px`}>
           <Slider
             value={[width]}
             min={MIN_WIDTH}
@@ -146,7 +161,7 @@ export default function ErrorDisplayPlayground() {
       >
         <ErrorDisplay
           type={type}
-          size={size}
+          showIcon={hasIcon}
           title="Failed to retrieve tables"
           description={
             hasDescription
@@ -156,7 +171,9 @@ export default function ErrorDisplayPlayground() {
           error={
             hasError
               ? {
-                  message: 'Connection terminated due to connection timeout',
+                  message: isVerboseError
+                    ? VERBOSE_ERROR
+                    : 'Connection terminated due to connection timeout',
                   requestId: 'req_8f2a91c',
                   timestamp: '2026-10-07T14:02:51Z',
                 }
@@ -170,7 +187,7 @@ export default function ErrorDisplayPlayground() {
                 }
               : undefined
           }
-          steps={ALL_STEPS.slice(0, stepCount)}
+          actions={ALL_ACTIONS.slice(0, actionCount)}
           supportFormParams={{ projectRef: 'abcdefghijklmnopqrst' }}
           onContactSupport={(details) => console.log('Contact support', details)}
         />

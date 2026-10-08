@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type RefObject } from 'react'
 
 import { COMPACT_LAYOUT_BREAKPOINT } from './ErrorDisplay.constants'
-import type { ErrorDisplayDetails, ErrorDisplaySize, SupportFormParams } from './ErrorDisplay.types'
+import type { ErrorDisplayDetails, SupportFormParams } from './ErrorDisplay.types'
 
 export function formatErrorDetails(error: ErrorDisplayDetails, title?: string) {
   return [
@@ -58,8 +58,7 @@ export function useContainerWidth(ref: RefObject<HTMLElement | null>) {
   return width
 }
 
-export function resolveSize(size: ErrorDisplaySize, width: number | null) {
-  if (size !== 'auto') return size
+export function resolveSize(width: number | null) {
   return width !== null && width < COMPACT_LAYOUT_BREAKPOINT ? 'compact' : 'full'
 }
 

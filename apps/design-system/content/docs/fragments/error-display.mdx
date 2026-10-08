@@ -1,32 +1,33 @@
 ---
 title: Error Display
-description: A responsive card for surfacing a failure, its troubleshooting steps, and a route to support.
+description: A responsive card for surfacing a failure, its recovery actions, and a route to support.
 fragment: true
 ---
 
-ErrorDisplay states what failed, explains it in plain language, shows the raw error, and offers ordered troubleshooting steps. It shares its icon, border, background, and text tokens with [`Admonition`](/docs/fragments/admonition), so the two read as one family.
+ErrorDisplay states what failed, explains it in plain language, and offers the most useful recovery action. Less likely or more disruptive actions sit in an overflow menu. It shares its icon, border, background, and text tokens with [`Admonition`](/docs/fragments/admonition), so the two read as one family.
 
-It sizes itself to its **container**, not the viewport, so the same component works in a main content panel and in a 260px sidebar. Drag the width slider past 400px to watch `size="auto"` switch layouts.
+It sizes itself to its **container**, not the viewport, so the same component works in a main content panel and in a 260px sidebar. Drag the width slider past 400px to watch it adapt.
 
 <ComponentPreview name="error-display-playground" peekCode wide />
 
 ## Layouts
 
-`size="auto"` (the default) measures the container and switches at `COMPACT_LAYOUT_BREAKPOINT` (400px). Pass `size="compact"` or `size="full"` to force one.
+Action placement always follows Admonition's responsive composition: actions sit below the text in narrow containers and move to the right in wider containers. The frame keeps the same padding and typography at every width. Only sequential steps adapt at 400px.
 
-|        | Full (≥ 400px)                               | Compact (< 400px)                       |
-| ------ | -------------------------------------------- | --------------------------------------- |
-| Header | Icon, title, "Try again" button              | Icon, title, icon-only retry            |
-| Error  | Shown inline under the header                | Behind a "Details" toggle               |
-| Steps  | Numbered timeline, title only until expanded | Stacked buttons, description as tooltip |
+|         | Full (≥ 400px)                      | Compact (< 400px)                   |
+| ------- | ----------------------------------- | ----------------------------------- |
+| Header  | Icon, title, description, raw error | Icon, title, description, raw error |
+| Actions | Primary split button                | Primary split button                |
+| Steps   | Numbered timeline                   | Stacked actions                     |
 
 Rules that hold in both layouts:
 
-- The error sits between the header and the steps, and carries the request ID, timestamp, and a copy button. With no `error`, nothing is rendered in its place.
-- Steps are numbered only when there are two or more. A single step renders its action inline.
-- A numbered step shows only its number and title until it expands. Expanding reveals the description and the action. The first step is expanded on mount; pass `defaultOpenStep` to pick another.
-- Both layouts close with the same "Still stuck? Contact support" line, at the body's text size.
-- Retry is never a numbered step. It belongs in the header.
+- Raw technical details sit in one monochromatic monospace block with the title and description. Error code, request ID, and time follow the message in the same stream. Long content is initially capped and fades behind an inline "Show more" button.
+- The first action is exposed. Remaining actions and contact support appear in its dropdown.
+- When `onRetry` is supplied, "Try again" becomes the exposed action and every other action moves into the menu.
+- Use `steps` only for instructions that must be completed in sequence. Two or more steps render as a numbered timeline.
+- With no recovery actions, contact support renders as a direct button.
+- Always provide `description`, `error`, or preferably both. A title alone does not give enough context to recover.
 
 ## Usage
 
@@ -41,12 +42,11 @@ import { ErrorDisplay } from 'ui-patterns/ErrorDisplay'
   error={{ message: 'Connection terminated due to connection timeout', requestId: 'req_8f2a91c' }}
   onRetry={refetch}
   supportFormParams={{ projectRef }}
-  steps={[
+  actions={[
     {
       id: 'guide',
-      title: 'Check the troubleshooting guide',
-      description: 'Diagnose connection timeouts step by step.',
-      action: { label: 'View guide', href: `${DOCS_URL}/guides/troubleshooting` },
+      label: 'View guide',
+      href: `${DOCS_URL}/guides/troubleshooting`,
     },
   ]}
 />
@@ -56,7 +56,7 @@ In Studio, wire [`ErrorMatcher`](https://github.com/supabase/supabase/tree/maste
 
 `children` renders after the steps in both layouts. Use it for the dialogs your step actions open — they take no space until opened — or for anything else that has to sit inside the card. It doesn't get the compact treatment, so keep visible content short.
 
-For a control a button can't express — a split dropdown, say — give the action a `render`, which receives `{ block }` (`true` in the compact layout). `label` is still required: it's what the compact layout announces. Don't use it for an ordinary button, as it opts the step out of the built-in loading and link handling.
+For genuinely sequential troubleshooting, use `steps`. A step can provide a custom `render` control when a button cannot express it, such as a split dropdown.
 
 ```tsx
 action: { label: 'Debug with AI', render: ({ block }) => <AiAssistantDropdown block={block} /> }
@@ -70,13 +70,13 @@ action: { label: 'Debug with AI', render: ({ block }) => <AiAssistantDropdown bl
 | `warning`     | Nothing has failed yet, but it will without action | `status` |
 | `destructive` | Something failed and the user can't continue       | `alert`  |
 
-## Writing the steps
+## Writing the actions
 
-- **Order least to most disruptive.** Read a guide, then change a setting, then restart. The first step should be the cheapest thing that might work.
-- **Retry is not a step.** It's one click with no consequences, so it lives in the header. Numbering it implies a sequence that doesn't exist.
+- **Order most to least recommended.** The first action is exposed. Put lower-confidence or more disruptive options in the menu.
+- **Only supply retry when it is safe.** When supplied, it becomes the exposed action.
+- **Do not model independent alternatives as steps.** Numbering implies that the user must complete actions in sequence.
 - **Own the confirmation for anything that causes downtime.** ErrorDisplay fires `onClick` straight through — it has no inline confirmation. For restarts, failovers, and pausing a project, open a [`ConfirmationModal`](/docs/fragments/confirmation-modal) from the handler and state the consequence in active voice: "Restarting makes your database unavailable for about a minute."
-- **Label the action, not the step.** The step title says what you're doing ("Restart your project"); the action label is the button ("Restart project"). In the compact layout only the action label is visible, so it has to stand alone.
-- **One line per description.** It's revealed when the step expands in the full layout, and it's the button tooltip in the compact one — so it has to make sense without the title next to it.
+- **Use standalone labels.** Action labels begin with verbs and make sense both as buttons and menu items.
 
 ## Props
 
@@ -84,11 +84,11 @@ action: { label: 'Debug with AI', render: ({ block }) => <AiAssistantDropdown bl
 | ------------------- | -------------------------------------- | ------------------- | ----------------------------------------------------------------------- |
 | `title`             | `string`                               | —                   | What failed, phrased `Failed to <verb> <thing>`.                        |
 | `type`              | `'info' \| 'warning' \| 'destructive'` | `'info'`            | Matches the Admonition variant of the same name.                        |
-| `size`              | `'auto' \| 'compact' \| 'full'`        | `'auto'`            | `auto` switches on container width.                                     |
 | `description`       | `string?`                              | —                   | Plain-language sentence shown under the title.                          |
 | `error`             | `ErrorDisplayDetails?`                 | —                   | Raw error. Omit to drop it entirely.                                    |
-| `onRetry`           | `() => void \| Promise<void>`          | —                   | Shows a retry button in the header. Pending promises show a spinner.    |
-| `retryLabel`        | `string?`                              | `"Try again"`       | Retry button label, and its `aria-label` when icon-only.                |
+| `onRetry`           | `() => void \| Promise<void>`          | —                   | Makes retry the primary action. Pending promises show a spinner.        |
+| `retryLabel`        | `string?`                              | `"Try again"`       | Retry button label.                                                     |
+| `actions`           | `ErrorDisplayAction[]?`                | —                   | Independent actions, most to least recommended.                         |
 | `steps`             | `ErrorDisplayStep[]?`                  | —                   | Troubleshooting steps, least to most disruptive.                        |
 | `defaultOpenStep`   | `string?`                              | first step          | `id` of the step expanded on mount.                                     |
 | `onStepOpenChange`  | `(stepId: string \| null) => void`     | —                   | Fired when a step expands or collapses. `null` when all are collapsed.  |
@@ -97,6 +97,7 @@ action: { label: 'Debug with AI', render: ({ block }) => <AiAssistantDropdown bl
 | `supportFormParams` | `SupportFormParams?`                   | —                   | Params for the support URL. Error message and request ID are merged in. |
 | `supportLabel`      | `string?`                              | `"Contact support"` | Support link label.                                                     |
 | `icon`              | `ReactNode?`                           | Admonition icon     | Overrides the header icon.                                              |
+| `showIcon`          | `boolean?`                             | `true`              | Shows or hides the header icon.                                         |
 | `children`          | `ReactNode?`                           | —                   | Escape hatch for troubleshooting `steps` can't express.                 |
 | `onRender`          | `() => void?`                          | —                   | Fired once on mount — use for telemetry.                                |
 | `className`         | `string?`                              | —                   | Extra classes on the root element.                                      |
@@ -104,6 +105,14 @@ action: { label: 'Debug with AI', render: ({ block }) => <AiAssistantDropdown bl
 ### Step and error shapes
 
 ```ts
+type ErrorDisplayAction = {
+  id: string
+  label: string
+  onClick?: () => void | Promise<void>
+  href?: string
+  icon?: ReactNode
+}
+
 type ErrorDisplayStep = {
   id: string
   title: string // hidden in the compact layout

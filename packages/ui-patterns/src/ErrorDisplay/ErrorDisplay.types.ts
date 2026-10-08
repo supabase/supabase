@@ -2,8 +2,6 @@ import type { ComponentPropsWithoutRef, ReactNode } from 'react'
 
 export type ErrorDisplayType = 'info' | 'warning' | 'destructive'
 
-export type ErrorDisplaySize = 'auto' | 'compact' | 'full'
-
 export interface SupportFormParams {
   projectRef?: string
   orgSlug?: string
@@ -30,6 +28,23 @@ export interface ErrorDisplayDetails {
 
   /** When the error happened. Dates are formatted as an ISO string. */
   timestamp?: string | Date
+}
+
+export interface ErrorDisplayAction {
+  id: string
+
+  /**
+   * Button or menu item label. Starts with a verb.
+   * @example "View troubleshooting guide"
+   */
+  label: string
+
+  onClick?: () => void | Promise<void>
+
+  /** Renders the action as a link. External links get an external-link icon. */
+  href?: string
+
+  icon?: ReactNode
 }
 
 export interface ErrorDisplayStepAction {
@@ -80,13 +95,6 @@ export interface ErrorDisplayProps extends Omit<ComponentPropsWithoutRef<'div'>,
   type?: ErrorDisplayType
 
   /**
-   * Layout. `auto` switches on container width, not viewport width, so the same
-   * component can sit in a wide panel and a narrow sidebar.
-   * @default "auto"
-   */
-  size?: ErrorDisplaySize
-
-  /**
    * What failed.
    * @example "Failed to retrieve tables"
    */
@@ -106,6 +114,13 @@ export interface ErrorDisplayProps extends Omit<ComponentPropsWithoutRef<'div'>,
 
   /** @default "Try again" */
   retryLabel?: string
+
+  /**
+   * Independent recovery actions, ordered from most to least recommended. The
+   * first action is exposed and the rest are placed in an overflow menu. When
+   * `onRetry` is supplied, retry is exposed and every action moves into the menu.
+   */
+  actions?: ErrorDisplayAction[]
 
   /** Troubleshooting steps, ordered from least to most disruptive. */
   steps?: ErrorDisplayStep[]
@@ -133,6 +148,9 @@ export interface ErrorDisplayProps extends Omit<ComponentPropsWithoutRef<'div'>,
 
   /** Overrides the header icon. Defaults to the matching Admonition icon. */
   icon?: ReactNode
+
+  /** @default true */
+  showIcon?: boolean
 
   /**
    * Escape hatch for troubleshooting content that `steps` can't express, such as

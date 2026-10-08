@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, ChevronRight, Copy, ExternalLink, RefreshCw } from 'lucide-react'
+import { ChevronDown, ExternalLink, RefreshCw } from 'lucide-react'
 import { forwardRef, useCallback, useEffect, useId, useRef, useState } from 'react'
 import {
   Accordion,
@@ -10,10 +10,11 @@ import {
   alertVariants,
   Button,
   cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  copyToClipboard,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -23,6 +24,7 @@ import {
 import { AdmonitionTypeIcon } from '../Admonition/AdmonitionIcons'
 import { TYPE_STYLES } from './ErrorDisplay.constants'
 import type {
+  ErrorDisplayAction,
   ErrorDisplayDetails,
   ErrorDisplayProps,
   ErrorDisplayStep,
@@ -30,7 +32,6 @@ import type {
 } from './ErrorDisplay.types'
 import {
   buildSupportUrl,
-  formatErrorDetails,
   formatTimestamp,
   isExternalHref,
   resolveSize,
@@ -38,109 +39,73 @@ import {
   useRetry,
 } from './ErrorDisplay.utils'
 
-function CopyErrorDetailsButton({ error, title }: { error: ErrorDisplayDetails; title: string }) {
-  const [copied, setCopied] = useState(false)
+function ErrorDetails({ error }: { error: ErrorDisplayDetails }) {
+  const messageRef = useRef<HTMLPreElement>(null)
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [hasOverflow, setHasOverflow] = useState(false)
+  const details = [
+    error.message,
+    error.code && `Code: ${error.code}`,
+    error.requestId && `Request ID: ${error.requestId}`,
+    error.timestamp && `Time: ${formatTimestamp(error.timestamp)}`,
+  ]
+    .filter(Boolean)
+    .join('\n')
 
   useEffect(() => {
-    if (!copied) return
-    const timeout = setTimeout(() => setCopied(false), 2000)
-    return () => clearTimeout(timeout)
-  }, [copied])
+    const message = messageRef.current
+    if (!message || isExpanded) return
+
+    const updateOverflow = () => setHasOverflow(message.scrollHeight > message.clientHeight)
+    updateOverflow()
+
+    if (typeof ResizeObserver === 'undefined') return
+    const observer = new ResizeObserver(updateOverflow)
+    observer.observe(message)
+    return () => observer.disconnect()
+  }, [details, isExpanded])
 
   return (
-    <Button
-      size="tiny"
-      variant="text"
-      className="-mr-1 -mt-1 shrink-0 px-1"
-      aria-label={copied ? 'Error details copied' : 'Copy error details'}
-      icon={copied ? <Check /> : <Copy />}
-      onClick={() => copyToClipboard(formatErrorDetails(error, title), () => setCopied(true))}
-    />
-  )
-}
-
-function ErrorDetailsPanel({
-  error,
-  title,
-  type,
-  className,
-}: {
-  error: ErrorDisplayDetails
-  title: string
-  type: ErrorDisplayType
-  className?: string
-}) {
-  const style = TYPE_STYLES[type]
-  const meta = [
-    error.code && (['Code', error.code] as const),
-    error.requestId && (['Request ID', error.requestId] as const),
-    error.timestamp && (['Time', formatTimestamp(error.timestamp)] as const),
-  ].filter(Boolean) as (readonly [string, string])[]
-
-  return (
-    <div
-      className={cn(
-        'flex items-start gap-2 rounded-md border px-2.5 py-2',
-        style.border,
-        style.surface,
-        className
-      )}
-    >
-      <div className="min-w-0 flex-1">
-        <pre
+    <div className="mt-2 min-w-0 overflow-hidden rounded-md border border-default bg-surface-100 px-2.5 py-2 text-xs text-foreground-light">
+      <pre
+        ref={messageRef}
+        className={cn(
+          'whitespace-pre-wrap wrap-break-word font-mono text-xs normal-case text-foreground-light',
+          isExpanded ? 'max-h-64 overflow-auto' : 'max-h-20 overflow-hidden'
+        )}
+      >
+        {details}
+      </pre>
+      {(hasOverflow || isExpanded) && (
+        <div
           className={cn(
-            'max-h-32 overflow-auto whitespace-pre-wrap wrap-break-word font-mono text-xs normal-case',
-            style.mono
+            'relative z-10 -mx-2.5 -mb-2 flex px-2.5 pb-2',
+            !isExpanded && '-mt-8 bg-gradient-to-t pt-8',
+            !isExpanded && 'from-surface-100 via-surface-100/95'
           )}
         >
-          {error.message}
-        </pre>
-        {meta.length > 0 && (
-          <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-            {meta.map(([label, value]) => (
-              <div key={label} className="flex min-w-0 items-baseline gap-1.5">
-                <dt className="shrink-0 text-xs text-foreground-lighter">{label}</dt>
-                <dd className="truncate font-mono text-xs text-foreground-light">{value}</dd>
-              </div>
-            ))}
-          </dl>
-        )}
-      </div>
-      <CopyErrorDetailsButton error={error} title={title} />
+          <Button
+            size="tiny"
+            variant="text"
+            className="-ml-1 h-auto px-1 py-0.5"
+            onClick={() => setIsExpanded((expanded) => !expanded)}
+          >
+            {isExpanded ? 'Show less' : 'Show more'}
+          </Button>
+        </div>
+      )}
     </div>
-  )
-}
-
-function ErrorDetailsDisclosure(props: {
-  error: ErrorDisplayDetails
-  title: string
-  type: ErrorDisplayType
-}) {
-  return (
-    <Collapsible>
-      <CollapsibleTrigger className="group flex w-full items-center gap-1.5 rounded-xs py-1 text-xs text-foreground-light transition-colors hover:text-foreground focus-ring">
-        <ChevronRight
-          aria-hidden
-          size={12}
-          className="shrink-0 transition-transform group-data-open:rotate-90"
-        />
-        Details
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <ErrorDetailsPanel {...props} className="mt-1.5" />
-      </CollapsibleContent>
-    </Collapsible>
   )
 }
 
 function RetryButton({
   onRetry,
   label,
-  iconOnly,
+  className,
 }: {
   onRetry: () => void | Promise<void>
   label: string
-  iconOnly?: boolean
+  className?: string
 }) {
   const { isRetrying, retry } = useRetry(onRetry)
   const retryingLabel = 'Retrying...'
@@ -148,14 +113,158 @@ function RetryButton({
   return (
     <Button
       size="tiny"
-      className={cn('shrink-0', iconOnly && 'px-1')}
-      aria-label={iconOnly ? (isRetrying ? retryingLabel : label) : undefined}
+      className={className}
       loading={isRetrying}
-      icon={iconOnly || !isRetrying ? <RefreshCw /> : undefined}
+      icon={!isRetrying ? <RefreshCw /> : undefined}
       onClick={retry}
     >
-      {iconOnly ? undefined : isRetrying ? retryingLabel : label}
+      {isRetrying ? retryingLabel : label}
     </Button>
+  )
+}
+
+function RecoveryActionButton({
+  action,
+  block,
+  className,
+}: {
+  action: ErrorDisplayAction
+  block?: boolean
+  className?: string
+}) {
+  const [isRunning, setIsRunning] = useState(false)
+
+  const run = async () => {
+    setIsRunning(true)
+    try {
+      await action.onClick?.()
+    } finally {
+      setIsRunning(false)
+    }
+  }
+
+  if (action.href) {
+    const external = isExternalHref(action.href)
+    return (
+      <Button asChild size="tiny" block={block} icon={action.icon} className={className}>
+        <a
+          href={action.href}
+          target={external ? '_blank' : undefined}
+          rel={external ? 'noopener noreferrer' : undefined}
+          onClick={() => void action.onClick?.()}
+        >
+          {action.label}
+        </a>
+      </Button>
+    )
+  }
+
+  return (
+    <Button
+      size="tiny"
+      block={block}
+      icon={action.icon}
+      loading={isRunning}
+      className={className}
+      onClick={run}
+    >
+      {action.label}
+    </Button>
+  )
+}
+
+function RecoveryActions({
+  actions,
+  onRetry,
+  retryLabel,
+  supportHref,
+  supportLabel,
+  onContactSupport,
+}: {
+  actions: ErrorDisplayAction[]
+  onRetry?: () => void | Promise<void>
+  retryLabel: string
+  supportHref: string
+  supportLabel: string
+  onContactSupport: () => void
+}) {
+  const primaryAction = onRetry ? undefined : actions[0]
+  const secondaryActions = onRetry ? actions : actions.slice(1)
+  const hasPrimaryAction = !!onRetry || !!primaryAction
+  const primaryClassName = 'rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm'
+
+  if (!hasPrimaryAction) {
+    return (
+      <Button asChild size="tiny">
+        <a href={supportHref} target="_blank" rel="noopener noreferrer" onClick={onContactSupport}>
+          {supportLabel}
+        </a>
+      </Button>
+    )
+  }
+
+  return (
+    <div className="flex">
+      {hasPrimaryAction && (
+        <div>
+          {onRetry ? (
+            <RetryButton onRetry={onRetry} label={retryLabel} className={primaryClassName} />
+          ) : (
+            primaryAction && (
+              <RecoveryActionButton action={primaryAction} className={primaryClassName} />
+            )
+          )}
+        </div>
+      )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            size="tiny"
+            className={cn(
+              'shrink-0 px-[4px] py-[5px]',
+              hasPrimaryAction &&
+                'rounded-l-none -ml-px focus-visible:z-10 focus-visible:rounded-l-sm'
+            )}
+            icon={<ChevronDown />}
+            aria-label="More troubleshooting options"
+          >
+            {!hasPrimaryAction && 'Get help'}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-52">
+          {secondaryActions.map((action) =>
+            action.href ? (
+              <DropdownMenuItem key={action.id} asChild>
+                <a
+                  href={action.href}
+                  target={isExternalHref(action.href) ? '_blank' : undefined}
+                  rel={isExternalHref(action.href) ? 'noopener noreferrer' : undefined}
+                  onClick={() => void action.onClick?.()}
+                >
+                  {action.label}
+                </a>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem key={action.id} onSelect={() => void action.onClick?.()}>
+                {action.label}
+              </DropdownMenuItem>
+            )
+          )}
+          {secondaryActions.length > 0 && <DropdownMenuSeparator />}
+          <DropdownMenuItem asChild>
+            <a
+              href={supportHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={onContactSupport}
+            >
+              {supportLabel}
+            </a>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
@@ -257,51 +366,16 @@ function StepsTimeline({
   )
 }
 
-function SupportFooter({
-  href,
-  label,
-  onClick,
-  compact,
-  className,
-}: {
-  href: string
-  label: string
-  onClick: () => void
-  compact?: boolean
-  className?: string
-}) {
-  return (
-    <div
-      className={cn(
-        'flex items-center gap-1.5 text-foreground-light',
-        compact ? 'text-xs' : 'text-sm',
-        className
-      )}
-    >
-      <span>Still stuck?</span>
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onClick}
-        className="rounded-xs text-foreground underline underline-offset-2 transition-colors hover:text-foreground-light focus-ring"
-      >
-        {label}
-      </a>
-    </div>
-  )
-}
-
 export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
   (
     {
       type = 'info',
-      size = 'auto',
       title,
       description,
       error,
       onRetry,
       retryLabel = 'Try again',
+      actions,
       steps,
       defaultOpenStep,
       onStepOpenChange,
@@ -310,6 +384,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
       supportFormParams,
       supportLabel = 'Contact support',
       icon,
+      showIcon = true,
       children,
       className,
       onRender,
@@ -319,7 +394,7 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
   ) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const width = useContainerWidth(containerRef)
-    const resolvedSize = resolveSize(size, width)
+    const resolvedSize = resolveSize(width)
     const titleId = useId()
 
     const hasFired = useRef(false)
@@ -336,6 +411,8 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
     const visibleSteps = steps ?? []
     const isNumbered = visibleSteps.length > 1
     const admonitionType = TYPE_STYLES[type].admonition
+    const hasSupplementalContent = visibleSteps.length > 0 || !!children
+    const hasSupportingContent = !!description || !!error
 
     const setRefs = useCallback(
       (node: HTMLDivElement | null) => {
@@ -356,102 +433,92 @@ export const ErrorDisplay = forwardRef<HTMLDivElement, ErrorDisplayProps>(
         data-size={resolvedSize}
         className={cn(
           alertVariants({ variant: TYPE_STYLES[type].variant }),
-          'w-auto min-w-0 overflow-hidden p-0',
+          '@container w-auto min-w-0 overflow-hidden p-0',
           className
         )}
         {...props}
       >
         <div
-          className={cn('flex items-start gap-3', isCompact ? 'px-3 pb-2 pt-3' : 'px-4 pb-3 pt-4')}
+          className={cn(
+            'flex gap-3 px-4 pb-3 pt-4',
+            hasSupportingContent ? 'items-start' : 'items-center'
+          )}
         >
-          {icon ?? <AdmonitionTypeIcon type={admonitionType} />}
-          <div className="min-w-0 flex-1">
-            <h3 id={titleId} className="mt-0.5 text-sm font-medium text-foreground">
-              {title}
-            </h3>
-            {description && (
-              <p
-                className={cn(
-                  'mt-1 text-foreground-light',
-                  isCompact ? 'text-xs' : 'text-sm',
-                  isCompact && 'line-clamp-2'
-                )}
-              >
-                {description}
-              </p>
-            )}
+          {showIcon && (icon ?? <AdmonitionTypeIcon type={admonitionType} />)}
+          <div
+            className={cn('flex min-w-0 flex-1 flex-col', [
+              '@md:flex-row @md:items-center @md:justify-between',
+              '@md:gap-x-6 @lg:gap-x-8',
+            ])}
+          >
+            <div className={cn('min-w-0 flex-1', showIcon && hasSupportingContent && 'mt-0.5')}>
+              <h3 id={titleId} className="text-sm font-medium text-foreground">
+                {title}
+              </h3>
+              {description && <p className="mt-1 text-sm text-foreground-light">{description}</p>}
+              {error && <ErrorDetails error={error} />}
+            </div>
+            <div className="mt-3 flex flex-row items-start @md:mt-0 @md:items-center">
+              <RecoveryActions
+                actions={actions ?? []}
+                onRetry={onRetry}
+                retryLabel={retryLabel}
+                supportHref={href}
+                supportLabel={supportLabel}
+                onContactSupport={handleSupportClick}
+              />
+            </div>
           </div>
-          {onRetry && <RetryButton onRetry={onRetry} label={retryLabel} iconOnly={isCompact} />}
         </div>
 
-        {isCompact ? (
-          <div className="flex flex-col gap-4 px-3 pb-3">
-            {error && <ErrorDetailsDisclosure error={error} title={title} type={type} />}
-
-            {visibleSteps.length > 0 && (
-              <TooltipProvider delayDuration={200}>
-                <div className="flex flex-col gap-1.5">
-                  {visibleSteps.map((step) =>
-                    step.description ? (
-                      <Tooltip key={step.id}>
-                        <TooltipTrigger asChild>
-                          <div className="w-full">
-                            <StepAction step={step} block />
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" className="max-w-56">
-                          {step.description}
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      <StepAction key={step.id} step={step} block />
-                    )
+        {hasSupplementalContent && (
+          <div className="flex flex-col gap-3 px-4 pb-3">
+            {visibleSteps.length > 0 &&
+              (isCompact ? (
+                <TooltipProvider delayDuration={200}>
+                  <div className="flex flex-col gap-1.5">
+                    {visibleSteps.map((step) =>
+                      step.description ? (
+                        <Tooltip key={step.id}>
+                          <TooltipTrigger asChild>
+                            <div className="w-full">
+                              <StepAction step={step} block />
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-56">
+                            {step.description}
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <StepAction key={step.id} step={step} block />
+                      )
+                    )}
+                  </div>
+                </TooltipProvider>
+              ) : (
+                <div>
+                  {isNumbered ? (
+                    <StepsTimeline
+                      steps={visibleSteps}
+                      defaultOpenStep={defaultOpenStep}
+                      onStepOpenChange={onStepOpenChange}
+                      type={type}
+                    />
+                  ) : (
+                    <div className="py-1">
+                      {visibleSteps[0].description && (
+                        <p className="mb-2.5 text-sm text-foreground-light">
+                          {visibleSteps[0].description}
+                        </p>
+                      )}
+                      <StepAction step={visibleSteps[0]} />
+                    </div>
                   )}
                 </div>
-              </TooltipProvider>
-            )}
+              ))}
 
             {children}
-
-            <SupportFooter compact href={href} label={supportLabel} onClick={handleSupportClick} />
           </div>
-        ) : (
-          <>
-            {error && (
-              <ErrorDetailsPanel error={error} title={title} type={type} className="mx-4 mb-3" />
-            )}
-
-            {visibleSteps.length > 0 && (
-              <div className="px-4 pb-3">
-                {isNumbered ? (
-                  <StepsTimeline
-                    steps={visibleSteps}
-                    defaultOpenStep={defaultOpenStep}
-                    onStepOpenChange={onStepOpenChange}
-                    type={type}
-                  />
-                ) : (
-                  <div className="py-1">
-                    {visibleSteps[0].description && (
-                      <p className="mb-2.5 text-sm text-foreground-light">
-                        {visibleSteps[0].description}
-                      </p>
-                    )}
-                    <StepAction step={visibleSteps[0]} />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {children}
-
-            <SupportFooter
-              href={href}
-              label={supportLabel}
-              onClick={handleSupportClick}
-              className="px-4 pb-3"
-            />
-          </>
         )}
       </div>
     )
