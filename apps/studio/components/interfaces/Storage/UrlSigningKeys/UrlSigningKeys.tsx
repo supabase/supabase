@@ -61,10 +61,10 @@ export const UrlSigningKeys = () => {
 
   const {
     mutate: updateKey,
-    isPending: isRestoring,
-    variables: restoringKey,
+    isPending: isMovingToStandby,
+    variables: movingKey,
   } = useUrlSigningKeyUpdateMutation({
-    onSuccess: () => toast.success('URL signing key restored to standby'),
+    onSuccess: () => toast.success('URL signing key moved to standby'),
   })
 
   const { activeKey, standbyKeys, revokedKeys } = groupUrlSigningKeys(data ?? [])
@@ -174,8 +174,8 @@ export const UrlSigningKeys = () => {
                   <PageSectionSummary>
                     <PageSectionTitle>Revoked keys</PageSectionTitle>
                     <PageSectionDescription>
-                      URLs signed with these keys are rejected. Restore a key to move it back to
-                      standby.
+                      URLs signed with these keys are rejected. Move a key to standby to make it
+                      validate URLs again.
                     </PageSectionDescription>
                   </PageSectionSummary>
                 </PageSectionMeta>
@@ -187,17 +187,17 @@ export const UrlSigningKeys = () => {
                         variant="default"
                         size="tiny"
                         className="hit-area-2"
-                        loading={isRestoring && restoringKey?.kid === key.kid}
-                        disabled={!canUpdateKeys || hasStandbyKey || isRestoring}
+                        loading={isMovingToStandby && movingKey?.kid === key.kid}
+                        disabled={!canUpdateKeys || hasStandbyKey || isMovingToStandby}
                         onClick={() => updateKey({ projectRef, kid: key.kid, active: true })}
                         tooltip={{
                           content: {
                             side: 'bottom',
-                            text: getRestoreDisabledReason({ canUpdateKeys, hasStandbyKey }),
+                            text: getMoveToStandbyDisabledReason({ canUpdateKeys, hasStandbyKey }),
                           },
                         }}
                       >
-                        Restore
+                        Move to standby key
                       </ButtonTooltip>
                     )}
                   />
@@ -286,14 +286,14 @@ const getCreateDisabledReason = ({
   return undefined
 }
 
-const getRestoreDisabledReason = ({
+const getMoveToStandbyDisabledReason = ({
   canUpdateKeys,
   hasStandbyKey,
 }: {
   canUpdateKeys: boolean
   hasStandbyKey: boolean
 }) => {
-  if (!canUpdateKeys) return 'You need additional permissions to restore keys'
-  if (hasStandbyKey) return 'Revoke the existing standby key to restore this one'
+  if (!canUpdateKeys) return 'You need additional permissions to move keys to standby'
+  if (hasStandbyKey) return 'Revoke the existing standby key to move this one to standby'
   return undefined
 }
