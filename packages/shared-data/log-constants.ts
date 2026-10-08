@@ -333,6 +333,8 @@ const schemas: LogSchema[] = [
       { path: 'component', type: 'string' },
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },
+      { path: 'level', type: 'string' },
+      { path: 'metadata.cell', type: 'string' },
       { path: 'namespace', type: 'string' },
       { path: 'node_name', type: 'string' },
       { path: 'pod_name', type: 'string' },
