@@ -125,12 +125,14 @@ export function useSyncFiltersToUrl() {
       pushedUrlFiltersKeyRef.current = nextUrlFiltersKey
       pushFiltersToUrl(nextUrlFilters)
     }, 500)
-
-    // Cleanup on unmount or filter change
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
+    // No cleanup here: a re-run with identical filters (e.g. the filter bar re-applying them on
+    // blur) must not cancel the pending push. Real changes clear it above.
   }, [snap.filters])
+
+  // Cancel on unmount so a previous table's pending push can't land on the next table's URL.
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 }

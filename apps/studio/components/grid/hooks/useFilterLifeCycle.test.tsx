@@ -154,6 +154,30 @@ describe('useSyncFiltersToUrl', () => {
     expect(url.setParams).toHaveBeenCalledTimes(1)
   })
 
+  it('still pushes when identical filters are re-applied before the debounce fires', async () => {
+    const { rerender } = renderProbe()
+    await act(async () => snap.setFilters([red]))
+    act(() => vi.advanceTimersByTime(300))
+
+    // The filter bar re-applies the same filters on blur/Escape as a new array. valtio alone
+    // doesn't re-render for equal contents; the blur's own UI state update does.
+    await act(async () => snap.setFilters([{ ...red }]))
+    await rerender()
+    act(() => vi.advanceTimersByTime(500))
+
+    expect(url.setParams).toHaveBeenCalledTimes(1)
+    expect(url.setParams.mock.lastCall?.[0]({})).toEqual({ filter: ['name:eq:Red'] })
+  })
+
+  it('cancels a pending push on unmount', async () => {
+    const view = render(getUi())
+    await act(async () => snap.setFilters([red]))
+    view.unmount()
+    act(() => vi.advanceTimersByTime(1000))
+
+    expect(url.setParams).not.toHaveBeenCalled()
+  })
+
   it("ignores another table's URL while navigation is pending", async () => {
     const { rerender } = renderProbe()
 
