@@ -35,9 +35,11 @@ export const useArchivedObjectPurgeMutation = ({
     if (!archivedObjectId) throw new Error('archivedObjectId is required')
     if (!path) throw new Error('path is required')
 
-    const versions = await queryClient.fetchQuery(
-      objectVersionsQueryOptions({ projectRef, bucketId, path })
-    )
+    // A cached list is not good enough here: anything it predates would survive the purge.
+    const versions = await queryClient.fetchQuery({
+      ...objectVersionsQueryOptions({ projectRef, bucketId, path }),
+      staleTime: 0,
+    })
 
     const versionIds = new Set(versions.map((version) => version.versionId))
     versionIds.add(archivedObjectId)

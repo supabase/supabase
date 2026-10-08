@@ -29,6 +29,12 @@ export interface ArchivedObject {
   noncurrentVersions: ArchivedObjectVersion[]
 }
 
+export interface ArchivedObjectsResult {
+  objects: ArchivedObject[]
+  /** The bucket holds more rows than one listing run can carry, so `objects` is incomplete. */
+  isTruncated: boolean
+}
+
 export type ArchivedObjectsVariables = {
   projectRef?: string
   bucketId?: string
@@ -83,15 +89,30 @@ export const toArchivedObjects = (objects: StorageObjectV2[]): ArchivedObject[] 
   return archived.sort((a, b) => b.archivedAt.localeCompare(a.archivedAt))
 }
 
+/**
+ * The listing is ordered by name, so a page cap can cut a path's rows in half. `toArchivedObjects`
+ * would then group a fragment: a missing delete marker reads as a live object, and missing retained
+ * versions drop an archived one. Discard the trailing path rather than classify it on partial rows.
+ */
+export const dropPartialTrailingPath = (objects: StorageObjectV2[]): StorageObjectV2[] => {
+  const partialPath = objects.at(-1)?.name
+  if (partialPath === undefined) return objects
+
+  const kept = [...objects]
+  while (kept.length > 0 && kept[kept.length - 1].name === partialPath) kept.pop()
+  return kept
+}
+
 async function getArchivedObjects(
   { projectRef, bucketId }: ArchivedObjectsVariables,
   signal?: AbortSignal
-) {
+): Promise<ArchivedObjectsResult> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!bucketId) throw new Error('bucketId is required')
 
-  const objects: StorageObjectV2[] = []
+  let objects: StorageObjectV2[] = []
   let cursor: string | undefined
+  let isTruncated = false
 
   for (let page = 0; page < MAX_PAGES; page++) {
     const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/list-v2', {
@@ -112,9 +133,12 @@ async function getArchivedObjects(
 
     if (!data?.hasNext || !data.nextCursor) break
     cursor = data.nextCursor
+    isTruncated = page === MAX_PAGES - 1
   }
 
-  return toArchivedObjects(objects)
+  if (isTruncated) objects = dropPartialTrailingPath(objects)
+
+  return { objects: toArchivedObjects(objects), isTruncated }
 }
 
 export type ArchivedObjectsData = Awaited<ReturnType<typeof getArchivedObjects>>
