@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   description: 'Supabase blocks and starter apps for authentication, storage, realtime, and more',
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
+  manifest: `${BASE_PATH}/favicon/manifest.json`,
   openGraph: {
     type: 'article',
     authors: 'Supabase',

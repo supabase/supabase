@@ -16,6 +16,7 @@ export const metadata: Metadata = {
   title: 'Supabase Design System',
   description: 'Design resources for building consistent user experiences at Supabase.',
   icons: genFaviconData(BASE_PATH),
+  manifest: `${BASE_PATH}/favicon/manifest.json`,
 }
 
 export const viewport: Viewport = {

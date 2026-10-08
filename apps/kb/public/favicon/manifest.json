@@ -1,10 +1,6 @@
 {
-  "name": "Supabase Design System",
-  "short_name": "Supabase Design System",
-  "description": "Design resources for building consistent user experiences at Supabase.",
-  "display": "standalone",
-  "theme_color": "#1C1C1C",
-  "background_color": "#1C1C1C",
+  "name": "Supabase Knowledge Base",
+  "short_name": "Supabase",
   "icons": [
     {
       "src": "android-icon-192x192.png",

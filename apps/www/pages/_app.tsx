@@ -14,7 +14,6 @@ import {
   useThemeSandbox,
 } from 'common'
 import MetaFaviconsPagesRouter, {
-  DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
 import { DevToolbar, DevToolbarProvider } from 'dev-tools'
@@ -47,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const forceDarkMode = isDarkLaunchWeek
 
   const applicationName = 'Supabase'
-  const faviconRoute = DEFAULT_FAVICON_ROUTE
+  const faviconRoute = '/favicon'
   const themeColor = DEFAULT_FAVICON_THEME_COLOR
 
   // Advertise the .md version for AI agents on pages that have one.
@@ -70,7 +69,6 @@ export default function App({ Component, pageProps }: AppProps) {
         route={faviconRoute}
         themeColor={themeColor}
         includeManifest
-        includeMsApplicationConfig
         includeRssXmlFeed
       />
       <DefaultSeo
