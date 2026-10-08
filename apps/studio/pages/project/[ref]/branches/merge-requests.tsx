@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
+import { ArrowRight, GitMerge, MoreVertical, Shield, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
@@ -17,7 +17,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
 import {
   BranchManagementSection,
   BranchRow,
@@ -373,20 +372,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
           isUpdating={isUpdating}
         />
       }
-      secondaryActions={
-        <div className="flex items-center gap-x-2">
-          <Button
-            asChild
-            variant="text"
-            icon={<MessageCircle className="text-muted" strokeWidth={1} />}
-          >
-            <a target="_blank" rel="noreferrer" href={BRANCHING_GITHUB_DISCUSSION_LINK}>
-              Branching feedback
-            </a>
-          </Button>
-          <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-        </div>
-      }
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
     >
       {children}
     </PageLayout>
