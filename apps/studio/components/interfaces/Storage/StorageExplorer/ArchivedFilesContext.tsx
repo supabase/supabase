@@ -20,6 +20,8 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 interface ArchivedFilesContextValue {
   isOverlayEnabled: boolean
   archivedObjects: ArchivedObject[]
+  /** The bucket holds more rows than one listing run can carry, so `archivedObjects` is a subset. */
+  isListingTruncated: boolean
   selectedArchivedObject: ArchivedObject | undefined
   selectedArchivedVersion: ArchivedVersionRow | undefined
   setSelectedArchivedVersion: (version?: ArchivedVersionRow) => void
@@ -30,6 +32,7 @@ interface ArchivedFilesContextValue {
 const ArchivedFilesContext = createContext<ArchivedFilesContextValue>({
   isOverlayEnabled: false,
   archivedObjects: [],
+  isListingTruncated: false,
   selectedArchivedObject: undefined,
   selectedArchivedVersion: undefined,
   setSelectedArchivedVersion: () => {},
@@ -38,6 +41,9 @@ const ArchivedFilesContext = createContext<ArchivedFilesContextValue>({
 })
 
 export const useArchivedFilesContext = () => useContext(ArchivedFilesContext)
+
+/** Stable identity so an unanswered query doesn't re-render every overlay consumer. */
+const NO_ARCHIVED_OBJECTS: ArchivedObject[] = []
 
 /** Not gated on the bucket's versioning state: a suspended bucket can still be retaining files. */
 export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
@@ -51,10 +57,13 @@ export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
   const bucketId = selectedBucket?.id
   const isOverlayEnabled = isStorageVersioningEnabled && showArchivedInline
 
-  const { data: archivedObjects = [] } = useQuery({
+  const { data: listing } = useQuery({
     ...archivedObjectsQueryOptions({ projectRef, bucketId }),
     enabled: isOverlayEnabled && !!projectRef && !!bucketId,
   })
+
+  const archivedObjects = listing?.objects ?? NO_ARCHIVED_OBJECTS
+  const isListingTruncated = listing?.isTruncated ?? false
 
   const selectArchivedObject = useCallback(
     (archivedObjectId: string) => {
@@ -75,6 +84,7 @@ export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
     () => ({
       isOverlayEnabled,
       archivedObjects,
+      isListingTruncated,
       selectedArchivedObject,
       selectedArchivedVersion,
       setSelectedArchivedVersion,
@@ -84,6 +94,7 @@ export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
     [
       isOverlayEnabled,
       archivedObjects,
+      isListingTruncated,
       selectedArchivedObject,
       selectedArchivedVersion,
       selectArchivedObject,
