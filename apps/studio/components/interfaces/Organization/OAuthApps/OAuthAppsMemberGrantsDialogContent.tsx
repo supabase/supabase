@@ -56,13 +56,13 @@ export const OAuthAppsMemberGrantsDialogContent = ({
     }
   }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
 
-  const isEmpty = data.pages.length === 0 || data.pages[0].data.length === 0
-
   const statusText = useMemo(() => {
     if (isFetchingNextPage) return 'Loading more grants...'
     if (isPending) return 'Loading grants...'
     return 'Grants loaded'
   }, [isPending, isFetchingNextPage])
+
+  const isEmpty = !data || data.pages.length === 0 || data.pages[0].data.length === 0
 
   if (!approval) return null
 
@@ -73,7 +73,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       </DialogHeader>
 
       <p aria-live="polite" className="sr-only">
-        {isPending ? 'Loading grants...' : 'Grants loaded'}
+        {statusText}
       </p>
       {isPending && (
         <div className="space-y-2">
