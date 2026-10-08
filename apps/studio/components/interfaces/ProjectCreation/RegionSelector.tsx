@@ -188,12 +188,12 @@ export const RegionSelector = ({
   const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
   const [isOpen, setIsOpen] = useState(false)
   const [hasRevealedSpecificRegions, setHasRevealedSpecificRegions] = useState(false)
-  const areSpecificRegionsVisible =
-    !isSpecificRegionsLinkEnabled ||
-    hasRevealedSpecificRegions ||
-    isSpecificRegionSelected ||
-    !hasGeneralRegions
-  const showSpecificRegions = areSpecificRegionsVisible && !hideSpecificRegions
+  const isSpecificRegionsCollapsedBehindLink =
+    isSpecificRegionsLinkEnabled &&
+    hasGeneralRegions &&
+    !hasRevealedSpecificRegions &&
+    !isSpecificRegionSelected
+  const showSpecificRegions = !isSpecificRegionsCollapsedBehindLink && !hideSpecificRegions
 
   const handleRevealSpecificRegions = () => {
     setHasRevealedSpecificRegions(true)
@@ -406,7 +406,7 @@ export const RegionSelector = ({
                     </Select>
                   </FormControl>
 
-                  {!areSpecificRegionsVisible && (
+                  {isSpecificRegionsCollapsedBehindLink && (
                     <p className="text-sm text-foreground-lighter">
                       <button
                         type="button"
