@@ -586,10 +586,13 @@ Deno.serve(async (req) => {
             sms
         } = wh.verify(payload, headers);
         const messageBody = `Your OTP is: ${sms.otp}`;
-        const userPhoneNumber = user.phone;
-        const countryCode = userPhoneNumber.substring(1, userPhoneNumber.indexOf(userPhoneNumber.match(/\d/)!));
-
-        const useWhatsApp = latinAmericanCountryCodes.includes(countryCode);
+  const userPhoneNumber = user?.phone ?? '';
+  let useWhatsApp = false;
+  if (userPhoneNumber && userPhoneNumber.startsWith('+')) {
+    // take up to three characters after the '+' to capture 2- or 3-digit country codes
+    const countryCode = userPhoneNumber.substring(1, 4);
+    useWhatsApp = latinAmericanCountryCodes.some(code => countryCode.startsWith(code));
+  }
 
         const response = await sendMessage(
             messageBody,
