@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { toArchivedObjects } from './archived-objects-query'
+import { dropPartialTrailingPath, toArchivedObjects } from './archived-objects-query'
 
 type StorageObjectV2 = Parameters<typeof toArchivedObjects>[0][number]
 
@@ -106,5 +106,21 @@ describe('toArchivedObjects', () => {
 
   it('drops rows the API returned without a version id', () => {
     expect(toArchivedObjects([row({ is_delete_marker: true })])).toEqual([])
+  })
+})
+
+describe('dropPartialTrailingPath', () => {
+  it('drops every row of the path the listing stopped on', () => {
+    const kept = dropPartialTrailingPath([
+      row({ name: 'a.txt', version: 'a1' }),
+      row({ name: 'b.txt', version: 'b1' }),
+      row({ name: 'b.txt', version: 'b2' }),
+    ])
+
+    expect(kept.map((object) => object.name)).toEqual(['a.txt'])
+  })
+
+  it('leaves an empty listing alone', () => {
+    expect(dropPartialTrailingPath([])).toEqual([])
   })
 })
