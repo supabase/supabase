@@ -1,13 +1,14 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Building2, User } from 'lucide-react'
-import { ComponentProps, Fragment, useEffect } from 'react'
+import { ComponentProps, Fragment, useEffect, useMemo } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
   Button,
+  cn,
   DialogClose,
   DialogContent,
   DialogFooter,
@@ -55,6 +56,14 @@ export const OAuthAppsMemberGrantsDialogContent = ({
     }
   }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
 
+  const isEmpty = data.pages.length === 0 || data.pages[0].data.length === 0
+
+  const statusText = useMemo(() => {
+    if (isFetchingNextPage) return 'Loading more grants...'
+    if (isPending) return 'Loading grants...'
+    return 'Grants loaded'
+  }, [isPending, isFetchingNextPage])
+
   if (!approval) return null
 
   return (
@@ -63,6 +72,9 @@ export const OAuthAppsMemberGrantsDialogContent = ({
         <DialogTitle>Member grants for {approval.app.name}</DialogTitle>
       </DialogHeader>
 
+      <p aria-live="polite" className="sr-only">
+        {isPending ? 'Loading grants...' : 'Grants loaded'}
+      </p>
       {isPending && (
         <div className="space-y-2">
           <ShimmeringLoader />
@@ -73,26 +85,25 @@ export const OAuthAppsMemberGrantsDialogContent = ({
 
       {isSuccess && (
         <div className="px-4 max-h-90 overflow-y-auto">
-          {data.pages.length === 0 || data.pages[0].data.length === 0 ? (
-            <p className="text-sm text-foreground-lighter">
-              No grants have been authorized for this application.
-            </p>
-          ) : (
-            <>
-              <Accordion type="multiple">
-                {data.pages.map((page, pageIndex) => (
-                  <Fragment key={pageIndex}>
-                    {page.data.map((grant) => (
-                      <GrantAccordionItem key={grant.grant_id} grant={grant} />
-                    ))}
-                  </Fragment>
+          <p
+            className={cn('text-sm text-foreground-lighter', !isEmpty && 'sr-only')}
+            aria-live="polite"
+          >
+            {isEmpty ? 'No grants have been authorized for this application.' : ''}
+          </p>
+
+          <Accordion type="multiple">
+            {data.pages.map((page, pageIndex) => (
+              <Fragment key={pageIndex}>
+                {page.data.map((grant) => (
+                  <GrantAccordionItem key={grant.grant_id} grant={grant} />
                 ))}
-              </Accordion>
-              <p ref={sentinelRef} aria-live="polite" className="text-sm text-foreground-lighter">
-                {isFetchingNextPage ? 'Loading...' : ''}
-              </p>
-            </>
-          )}
+              </Fragment>
+            ))}
+          </Accordion>
+          <p ref={sentinelRef} className="text-sm text-foreground-lighter">
+            {isFetchingNextPage ? 'Loading...' : ''}
+          </p>
         </div>
       )}
 
