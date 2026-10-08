@@ -116,4 +116,19 @@ describe('useTableEditorFiltersSort setParams with overlapping pushes', () => {
       sort: [],
     })
   })
+
+  it('drops an unsettled push on Back/Forward even if it lands on the URL the push started from', async () => {
+    const { result } = renderHook(() => useTableEditorFiltersSort())
+    result.current.setParams((prev) => ({ ...prev, sort: ['id:desc'] }))
+
+    // The router is still on the starting URL, so only the popstate itself marks the push stale
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    result.current.setParams((prev) => ({ ...prev, filter: ['name:eq:Green'] }))
+
+    expect(router.push.mock.lastCall?.[0].query).toEqual({
+      ...initialQuery,
+      filter: ['name:eq:Green'],
+      sort: [],
+    })
+  })
 })

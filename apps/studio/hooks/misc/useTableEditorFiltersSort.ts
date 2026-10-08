@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { useLatest } from './useLatest'
 
@@ -38,6 +38,15 @@ export const useTableEditorFiltersSort = () => {
   const latestRouter = useLatest(router)
 
   const path = router.asPath.split(/[?#]/)[0]
+
+  // Back/Forward supersedes any in-flight push, even if it lands on the URL that push started from.
+  useEffect(() => {
+    const clearInFlightPush = () => {
+      inFlightPush = null
+    }
+    window.addEventListener('popstate', clearInFlightPush)
+    return () => window.removeEventListener('popstate', clearInFlightPush)
+  }, [])
 
   const urlParams = useMemo(() => {
     return new URLSearchParams(router.asPath.split('?')[1])
