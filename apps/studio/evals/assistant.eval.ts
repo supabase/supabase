@@ -86,7 +86,7 @@ Eval('Assistant', {
     )
     const transcript =
       second && optInDecision ? joinTranscripts(first, second, optInDecision) : first
-    return { finishReason, transcript }
+    return { finishReason, transcript, ...(second && { responseAfterUserAction: second }) }
   },
   scores: [
     toolUsageScorer,

@@ -1189,7 +1189,8 @@ export const dataset: AssistantEvalCase[] = [
         { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
         'list_tables',
       ],
-      correctAnswer: 'Lists the tables from the list_tables result.',
+      correctAnswer:
+        'Lists exactly these tables, with no others: user_documents, customers, projects, user_organizations. Extra detail such as columns or RLS status is fine.',
     },
     metadata: {
       category: ['general_help'],
@@ -1207,7 +1208,7 @@ export const dataset: AssistantEvalCase[] = [
       // A skipped call never executes, so it leaves no tool span to require.
       forbiddenTools: ['list_tables'],
       correctAnswer:
-        "Says it can't see the tables because schema access wasn't enabled, and suggests an alternative such as enabling it later or pasting the table names. It does not ask for the opt-in level again and does not invent tables.",
+        "Says it can't see the tables because schema access wasn't enabled, and offers at least one alternative (enabling it later, the Table Editor, or pasting table names). It does not ask for the opt-in level again and does not invent tables.",
     },
     metadata: {
       category: ['general_help'],
@@ -1223,7 +1224,8 @@ export const dataset: AssistantEvalCase[] = [
     },
     expected: {
       requiredTools: ['update_opt_in_level', 'list_tables'],
-      correctAnswer: 'Lists the tables from the list_tables result.',
+      correctAnswer:
+        'Lists exactly these tables, with no others: user_documents, customers, projects, user_organizations. Extra detail such as columns or RLS status is fine.',
     },
     metadata: {
       category: ['general_help'],

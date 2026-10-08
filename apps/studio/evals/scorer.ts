@@ -35,6 +35,8 @@ export type AssistantEvalInput = {
 export type AssistantEvalOutput = {
   finishReason: FinishReason
   transcript: Transcript
+  /** Replay correctness uses the response after the user answers the approval card. */
+  responseAfterUserAction?: Transcript
 }
 
 type ToolInputExactValue = string | number | boolean | null | string[]
@@ -335,6 +337,7 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
     {{output}}
 
     The assistant response may include tool call markers like [called execute_sql] followed by the inputs passed to those tools. Treat those tool inputs as part of what the assistant did.
+    A call to update_opt_in_level asks the user through an approval card, even without a prose question.
 
     Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
     - Include the expected answer or perform equivalent actions through tool calls
@@ -353,7 +356,7 @@ export const correctnessScorer: AssistantEvalScorer = async ({ expected, output 
   if (!expected.correctAnswer) return null
   // Correctness needs ground truth, so it only ever runs offline where the eval
   // task's transcript is present — no trace fallback needed.
-  const transcript = output?.transcript
+  const transcript = output?.responseAfterUserAction ?? output?.transcript
   if (!transcript?.lastAssistantTurnWithToolInputs) return null
 
   return await correctnessEvaluator({
