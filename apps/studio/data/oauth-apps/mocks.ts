@@ -379,18 +379,20 @@ const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
         approved_scopes: ['database:read', 'database:write', 'projects:read'],
         approved_at: '2026-08-18T09:12:00.000Z',
       },
-      {
-        grant_id: 'grant-vercel-developer',
-        kind: 'member_bound',
-        user: {
-          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000002',
-          email: 'developer@example.com',
-          avatar_url: 'https://avatars.example/developer.png',
-        },
-        projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
-        approved_scopes: ['projects:read'],
-        approved_at: '2026-08-16T11:30:00.000Z',
-      },
+      ...Array(50)
+        .keys()
+        .map((index) => ({
+          grant_id: `grant-vercel-developer-${index}`,
+          kind: 'member_bound',
+          user: {
+            gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
+            email: `developer${index}@example.com`,
+            avatar_url: 'https://avatars.example/developer.png',
+          },
+          projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
+          approved_scopes: ['projects:read'],
+          approved_at: '2026-08-16T11:30:00.000Z',
+        })),
     ],
     pagination: { next_cursor: null },
   },

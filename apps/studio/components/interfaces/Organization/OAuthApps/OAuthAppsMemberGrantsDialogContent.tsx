@@ -14,6 +14,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  ScrollArea,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -84,7 +85,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       {isError && <AlertError subject="Failed to retrieve grants" error={error} />}
 
       {isSuccess && (
-        <div className="px-4 max-h-90 overflow-y-auto">
+        <ScrollArea className="px-4 h-90">
           <p
             className={cn('text-sm text-foreground-lighter', !isEmpty && 'sr-only')}
             aria-live="polite"
@@ -104,7 +105,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
           <p ref={sentinelRef} className="text-sm text-foreground-lighter">
             {isFetchingNextPage ? 'Loading...' : ''}
           </p>
-        </div>
+        </ScrollArea>
       )}
 
       <DialogFooter>
