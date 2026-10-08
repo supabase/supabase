@@ -21,7 +21,9 @@ export type StatusBannerState =
 
 const HIDDEN: StatusBannerState = { type: 'hidden' }
 
-export function useStatusBanner(): StatusBannerState {
+export function useStatusBanner({
+  signedOut = false,
+}: { signedOut?: boolean } = {}): StatusBannerState {
   const isEmergencyOverride = useEmergencyIncidentOverride()
 
   const statusPageOptions = statusPageQueryOptions()
@@ -34,7 +36,7 @@ export function useStatusBanner(): StatusBannerState {
   const items = data?.items ?? []
 
   const userProjectRegions = useUserProjectRegions({
-    enabled: !isEmergencyOverride && items.length > 0,
+    enabled: !signedOut && !isEmergencyOverride && items.length > 0,
   })
 
   const [dismissedKeys, setDismissedKeys, { isSuccess: isDismissedKeysLoaded }] =
@@ -42,13 +44,12 @@ export function useStatusBanner(): StatusBannerState {
 
   if (isEmergencyOverride) return { type: 'override' }
 
-  if (data === undefined || userProjectRegions.status === 'loading' || !isDismissedKeysLoaded) {
-    return HIDDEN
-  }
+  if (data === undefined || !isDismissedKeysLoaded) return HIDDEN
+  if (!signedOut && userProjectRegions.status === 'loading') return HIDDEN
 
   const selection = selectBanner({
     items,
-    user: userProjectRegions.context,
+    user: signedOut || userProjectRegions.status !== 'resolved' ? null : userProjectRegions.context,
     dismissedKeys: new Set(dismissedKeys),
     nowMs: Date.now(),
   })

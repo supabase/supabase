@@ -45,12 +45,16 @@ import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
   hasSelectedOrganization: boolean
   instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
+  /** Hides specific regions and shows an upgrade prompt in their place */
+  showGeneralRegionsOnly?: boolean
+  isLoading?: boolean
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
@@ -72,12 +76,16 @@ export const RegionSelector = ({
   hasSelectedOrganization,
   instanceSize,
   layout = 'horizontal',
+  showGeneralRegionsOnly = false,
+  isLoading: isParentLoading = false,
 }: RegionSelectorProps) => {
   const { slug } = useParams()
+  const track = useTrack()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
   const dbRegion = useWatch({ control: form.control, name: 'dbRegion' })
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
+  const hideSpecificRegions = showGeneralRegionsOnly && !highAvailability
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
@@ -139,7 +147,8 @@ export const RegionSelector = ({
     ...region,
     restriction: getRegionRestriction(region),
   }))
-  const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
+  const isLoading =
+    isParentLoading || (smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion)
 
   const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
   const showNonProdFields = isLocalEnvironment || process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
@@ -300,60 +309,77 @@ export const RegionSelector = ({
                               )
                             })}
                           </SelectGroup>
-                          <SelectSeparator />
+                          {!hideSpecificRegions && <SelectSeparator />}
                         </>
                       )}
 
-                      <SelectGroup>
-                        <SelectLabel>
-                          {highAvailability ? 'High Availability Regions' : 'Specific regions'}
-                        </SelectLabel>
-                        {regionOptionsWithRestriction.map((value) => {
-                          const restrictionCopy =
-                            value.restriction !== undefined
-                              ? getRegionRestrictionCopy(value.restriction)
-                              : undefined
-                          return (
-                            <SelectItem
-                              key={value.code}
-                              value={value.name}
-                              className={cn(
-                                'w-full [&>:nth-child(2)]:w-full',
-                                restrictionCopy !== undefined && 'pointer-events-auto!'
-                              )}
-                            >
-                              <div className="flex flex-row items-center justify-between w-full gap-x-2">
-                                <div className="flex items-center gap-x-3">
-                                  <RegionFlag className="w-5" region={value.code} />
-                                  <div className="flex items-center gap-x-2">
-                                    <span className="text-foreground">{value.name}</span>
-                                    <span className="text-xs text-foreground-lighter font-mono">
-                                      {value.code}
-                                    </span>
+                      {!hideSpecificRegions && (
+                        <SelectGroup>
+                          <SelectLabel>
+                            {highAvailability ? 'High Availability Regions' : 'Specific regions'}
+                          </SelectLabel>
+                          {regionOptionsWithRestriction.map((value) => {
+                            const restrictionCopy =
+                              value.restriction !== undefined
+                                ? getRegionRestrictionCopy(value.restriction)
+                                : undefined
+                            return (
+                              <SelectItem
+                                key={value.code}
+                                value={value.name}
+                                className={cn(
+                                  'w-full [&>:nth-child(2)]:w-full',
+                                  restrictionCopy !== undefined && 'pointer-events-auto!'
+                                )}
+                              >
+                                <div className="flex flex-row items-center justify-between w-full gap-x-2">
+                                  <div className="flex items-center gap-x-3">
+                                    <RegionFlag className="w-5" region={value.code} />
+                                    <div className="flex items-center gap-x-2">
+                                      <span className="text-foreground">{value.name}</span>
+                                      <span className="text-xs text-foreground-lighter font-mono">
+                                        {value.code}
+                                      </span>
+                                    </div>
                                   </div>
+
+                                  {recommendedSpecificRegions.has(value.code) && (
+                                    <Badge variant="success" className="mr-1">
+                                      Recommended
+                                    </Badge>
+                                  )}
+
+                                  {restrictionCopy !== undefined && (
+                                    <Tooltip>
+                                      <TooltipTrigger>
+                                        <Badge variant="warning" className="mr-1">
+                                          {restrictionCopy.badge}
+                                        </Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
+                                    </Tooltip>
+                                  )}
                                 </div>
+                              </SelectItem>
+                            )
+                          })}
+                        </SelectGroup>
+                      )}
 
-                                {recommendedSpecificRegions.has(value.code) && (
-                                  <Badge variant="success" className="mr-1">
-                                    Recommended
-                                  </Badge>
-                                )}
-
-                                {restrictionCopy !== undefined && (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Badge variant="warning" className="mr-1">
-                                        {restrictionCopy.badge}
-                                      </Badge>
-                                    </TooltipTrigger>
-                                    <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </SelectItem>
-                          )
-                        })}
-                      </SelectGroup>
+                      {hideSpecificRegions && (
+                        <div
+                          className="border-t px-3 py-2.5 text-xs text-foreground-light"
+                          onPointerDown={(e) => e.stopPropagation()}
+                        >
+                          <InlineLink
+                            href={`/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`}
+                            onClick={() => track('free_tier_general_region_upgrade_clicked')}
+                          >
+                            Upgrade to Pro
+                          </InlineLink>{' '}
+                          to choose a specific region.
+                        </div>
+                      )}
                     </SelectContent>
                   </Select>
                 </FormControl>
