@@ -140,7 +140,7 @@ where p.prosrc ~* '\m(st_\w+|geometry|geography)\M'
   );
 ```
 
-For each function in the result, add `extensions` to its search path:
+For each function in the result, add `extensions` to the end of its current search path, and keep the schemas it already lists in the same order. For example, for a function with `search_path=public`, run:
 
 ```sql
 alter function public.my_function(integer)
@@ -159,25 +159,41 @@ You can't move PostGIS with `alter extension postgis set schema extensions`. Pos
 
 <Admonition type="danger">
 
-Dropping PostGIS deletes every column that uses a PostGIS type, such as `geometry` or `geography`, and the indexes, views, and functions that depend on them. Use this method only if your tables have no PostGIS columns, or if you can restore them from a backup.
+Dropping PostGIS deletes every column that uses a PostGIS type, such as `geometry` or `geography`, and the indexes, views, functions, and extensions that depend on them. Use this method only if your tables have no PostGIS columns, or if you can restore them from a backup.
 
 </Admonition>
 
 1. Back up your roles, schema, and data. For the commands, see [Back up database using the CLI](/docs/guides/platform/migrating-within-supabase/backup-restore#back-up-database-using-the-cli).
 2. Prepare your functions.
-3. Drop PostGIS:
+3. List the extensions that depend on PostGIS, such as `postgis_topology` and `postgis_raster`. The drop removes them too, so record the result:
 
    ```sql
+   select e.extname, e.extnamespace::regnamespace as schema
+   from pg_depend d
+   join pg_extension e on e.oid = d.objid
+   where d.classid = 'pg_extension'::regclass
+     and d.refobjid = (
+       select oid from pg_extension where extname = 'postgis'
+     );
+   ```
+
+4. Drop PostGIS and create it in the `extensions` schema in one transaction. If the `create` fails, the transaction rolls back and PostGIS stays where it was:
+
+   ```sql
+   begin;
    drop extension postgis cascade;
+   create extension postgis with schema extensions;
+   commit;
    ```
 
-4. Create PostGIS in the `extensions` schema:
+5. Re-create each extension from step 3. `postgis_raster` must be in the same schema as PostGIS, and `postgis_topology` creates its own `topology` schema:
 
    ```sql
-   create extension postgis with schema extensions;
+   create extension postgis_raster with schema extensions;
+   create extension postgis_topology;
    ```
 
-5. Re-create the PostGIS columns, indexes, views, and functions that the drop removed, and restore their data from your backup.
+6. Re-create the PostGIS columns, indexes, views, and functions that the drop removed, and restore their data from your backup. Do this before your app uses the database again.
 
 ### After the move
 
@@ -206,6 +222,8 @@ To keep PostGIS out of `public` on new projects, branches, and local databases, 
 ```sql
 create extension if not exists postgis with schema extensions;
 ```
+
+`if not exists` doesn't move PostGIS that's already installed in `public`. If an earlier migration creates PostGIS without a schema, change that migration. After you apply your migrations to a new database, check the schema with the query in [Check whether your project is affected](#check-whether-your-project-is-affected).
 
 ## Approaches that don't resolve the findings
 
