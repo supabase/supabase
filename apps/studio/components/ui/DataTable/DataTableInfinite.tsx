@@ -30,6 +30,7 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   emptyStateMessage?: string | ReactNode
   /** Overrides the subject shown in the error state, e.g. "Failed to retrieve X" */
   errorSubject?: string
+  rowDecorations?: ReadonlyMap<string, ReactNode>
 }
 
 // [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
@@ -45,6 +46,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   emptyStateMessage = 'No results found',
   errorSubject = 'Failed to retrieve data',
+  rowDecorations,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
   const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId, onSelectRow } =
@@ -142,16 +144,27 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         >
           {rows.length ? (
             rows.map((row) => (
-              <DataTableRow
-                key={row.id}
-                row={row}
-                table={table}
-                selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
-                onSelect={(event) => {
-                  if (onSelectRow) onSelectRow(row.id, event)
-                  else setOpenRowId(row.id === openRowId ? undefined : row.id)
-                }}
-              />
+              <Fragment key={row.id}>
+                <DataTableRow
+                  row={row}
+                  table={table}
+                  selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
+                  onSelect={(event) => {
+                    if (onSelectRow) onSelectRow(row.id, event)
+                    else setOpenRowId(row.id === openRowId ? undefined : row.id)
+                  }}
+                />
+                {rowDecorations?.has(row.id) && (
+                  <TableRow className="bg-surface-75 hover:bg-surface-75">
+                    <TableCell
+                      colSpan={table.getVisibleLeafColumns().length}
+                      className="px-2 py-1 text-xs text-foreground-lighter"
+                    >
+                      {rowDecorations.get(row.id)}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </Fragment>
             ))
           ) : isLoading ? (
             <Fragment>

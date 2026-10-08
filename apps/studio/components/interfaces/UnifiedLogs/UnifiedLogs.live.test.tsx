@@ -49,7 +49,14 @@ const createRow = (id: string) => ({
 
 afterEach(() => vi.useRealTimers())
 
-describe('UnifiedLogs Live counts', () => {
+const getLogSequence = () =>
+  screen.getAllByRole('row').flatMap((row) => {
+    if (row.hasAttribute('aria-selected')) return [row.id]
+    if (row.textContent?.match(/^Refresh \d{2}:\d{2}:\d{2}$/)) return ['refresh']
+    return []
+  })
+
+describe('UnifiedLogs Live counts and arrival batches', () => {
   it.each([false, true])(
     'refreshes totals and facets without counting overlap twice and pauses with otel=%s',
     async (useOtel) => {
@@ -97,25 +104,51 @@ describe('UnifiedLogs Live counts', () => {
       expect(screen.getByText('initial-log')).toBeInTheDocument()
 
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-      rows.push(createRow('first-arrival'))
+      rows.push(createRow('first-arrival'), {
+        ...createRow('late-arrival'),
+        timestamp: rows[0].timestamp - 30_000_000,
+      })
       fireEvent.click(screen.getByRole('button', { name: 'Live' }))
       await vi.waitFor(() => {
-        expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('2')
+        expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('3')
         expect(screen.getByText('first-arrival')).toBeInTheDocument()
-        expect(screen.getByText(/No more data to load/)).toHaveTextContent('2 of 2 rows')
+        expect(screen.getByText(/No more data to load/)).toHaveTextContent('3 of 3 rows')
       })
+      expect(getLogSequence()).toEqual(['first-arrival', 'late-arrival', 'refresh', 'initial-log'])
+      const separator = screen.getByText(/^Refresh \d{2}:\d{2}:\d{2}$/)
+      expect(separator).toHaveAttribute(
+        'colspan',
+        String(screen.getAllByRole('columnheader').length)
+      )
+      expect(separator.closest('tr')).not.toHaveAttribute('tabindex')
+      fireEvent.click(separator)
+      expect(
+        screen.getAllByRole('row').filter((row) => row.getAttribute('aria-selected') === 'true')
+      ).toHaveLength(0)
       await act(async () => {})
 
       rows.push(createRow('second-arrival'))
       await act(async () => vi.advanceTimersByTimeAsync(10_000))
       await vi.waitFor(() => {
-        expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('3')
+        expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('4')
         expect(screen.getByText('second-arrival')).toBeInTheDocument()
-        expect(screen.getByText(/No more data to load/)).toHaveTextContent('3 of 3 rows')
+        expect(screen.getByText(/No more data to load/)).toHaveTextContent('4 of 4 rows')
       })
+      expect(getLogSequence()).toEqual([
+        'second-arrival',
+        'refresh',
+        'first-arrival',
+        'late-arrival',
+        'refresh',
+        'initial-log',
+      ])
       expect(screen.getAllByText('initial-log')).toHaveLength(1)
       expect(screen.getAllByText('first-arrival')).toHaveLength(1)
       expect(requests).toHaveLength(7)
+
+      await act(async () => vi.advanceTimersByTimeAsync(10_000))
+      await vi.waitFor(() => expect(requests).toHaveLength(9))
+      expect(screen.getAllByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).toHaveLength(2)
 
       fireEvent.click(screen.getByRole('button', { name: 'Live' }))
       const requestsAfterPause = requests.length
@@ -123,7 +156,26 @@ describe('UnifiedLogs Live counts', () => {
       await act(async () => vi.advanceTimersByTimeAsync(30_000))
       expect(requests).toHaveLength(requestsAfterPause)
       expect(screen.queryByText('paused-arrival')).not.toBeInTheDocument()
-      expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('3')
+      expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('4')
+      expect(screen.getAllByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).toHaveLength(2)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Live' }))
+      await vi.waitFor(() => expect(screen.getByText('paused-arrival')).toBeInTheDocument())
+      expect(getLogSequence()).toEqual([
+        'paused-arrival',
+        'refresh',
+        'second-arrival',
+        'refresh',
+        'first-arrival',
+        'late-arrival',
+        'refresh',
+        'initial-log',
+      ])
+      await vi.waitFor(() =>
+        expect(screen.getByRole('button', { name: 'Refresh logs' })).toBeEnabled()
+      )
+      fireEvent.click(screen.getByRole('button', { name: 'Refresh logs' }))
+      expect(screen.queryByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).not.toBeInTheDocument()
       unmount()
     }
   )

@@ -13,9 +13,10 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
+import dayjs from 'dayjs'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -51,6 +52,7 @@ import {
   getFacetedUniqueValues,
   getLevelRowClassName,
 } from './UnifiedLogs.utils'
+import { useLiveLogBatches } from './useLiveLogBatches'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -67,7 +69,10 @@ import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelec
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import {
+  useUnifiedLogsBackend,
+  useUnifiedLogsInfiniteQuery,
+} from '@/data/logs/unified-logs-infinite-query'
 import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -94,6 +99,7 @@ export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
+  const useOtel = useUnifiedLogsBackend()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
@@ -188,11 +194,15 @@ export const UnifiedLogs = () => {
     isFetching,
     isFetchingNextPage,
     isFetchingPreviousPage,
+    isPlaceholderData,
     hasNextPage,
     refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+  } = useUnifiedLogsInfiniteQuery({
+    projectRef,
+    search: searchParameters,
+  })
 
   const {
     data: counts,
@@ -213,13 +223,8 @@ export const UnifiedLogs = () => {
     search: searchParameters,
   })
 
-  const fetchLiveLogs = useCallback(async () => {
-    const response = await fetchPreviousPage()
-    if (!response.isError) await refetchCounts()
-    return response
-  }, [fetchPreviousPage, refetchCounts])
-
   const refetchAllData = () => {
+    resetLiveBatches()
     refetchLogs()
     refetchCounts()
     refetchCharts()
@@ -230,10 +235,29 @@ export const UnifiedLogs = () => {
   // Only fade when filtering (not when loading more data or live mode)
   const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
 
-  const rawFlatData = useMemo(() => {
+  const rawFlatData = useMemo<ColumnSchema[]>(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
-  const flatData = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
+  const uniqueRows = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
+  const {
+    rows: flatData,
+    batches,
+    fetchLiveLogs,
+    resetLiveBatches,
+  } = useLiveLogBatches({
+    scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
+    rows: uniqueRows,
+    firstPage: unifiedLogsData?.pages[0],
+    isPlaceholderData,
+    fetchPreviousPage,
+    refetchCounts,
+  })
+  const rowDecorations = new Map(
+    batches.map((batch) => [
+      batch.ids[batch.ids.length - 1],
+      `Refresh ${dayjs(batch.refreshedAt).format('HH:mm:ss')}`,
+    ])
+  )
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -524,6 +548,7 @@ export const UnifiedLogs = () => {
                   )}
                 >
                   <DataTableInfinite
+                    rowDecorations={rowDecorations}
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
                     filterRows={filterDBRowCount}
