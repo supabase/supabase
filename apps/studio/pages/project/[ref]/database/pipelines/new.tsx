@@ -1,6 +1,9 @@
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
+import { useEffect } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useRouter } from '@/compat/next/router'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreatePipelineWizard } from '@/components/interfaces/Database/Replication/CreatePipeline/CreatePipelineWizard'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { IsolatedStudioFlowExit } from '@/components/layouts/Navigation/LayoutHeader/IsolatedStudioFlowClose'
@@ -15,10 +18,21 @@ import type { NextPageWithLayout } from '@/types'
 
 const DatabasePipelinesNewPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { ref: projectRef } = useParams()
+  const { isEnabled: isSteppedCreationEnabled, isLoading: isPreviewLoading } =
+    usePipelineCreationPreview()
+  useEffect(() => {
+    if (isPreviewLoading || isSteppedCreationEnabled || !projectRef) return
+    router.replace(`/project/${projectRef}/database/pipelines?destinationType=BigQuery`)
+  }, [isPreviewLoading, isSteppedCreationEnabled, projectRef, router])
   const { data: selectedProject, isPending } = useSelectedProjectQuery()
   const { isHighAvailability } = useHighAvailability()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
   const schemasHref = `/project/${selectedProject?.ref}/database/schemas`
+
+  if (isPreviewLoading || !isSteppedCreationEnabled) {
+    return <GenericSkeletonLoader />
+  }
 
   if (!showPgReplicate) {
     return (

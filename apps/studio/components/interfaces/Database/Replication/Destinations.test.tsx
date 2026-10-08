@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
+import { useQueryState } from 'nuqs'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
@@ -12,11 +13,15 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 const options = vi.hoisted(() => ({
+  stepped: true,
   legacy: false,
   hasAccess: true,
   isLoading: false,
   failEnable: false,
   failRefresh: false,
+}))
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({ isEnabled: options.stepped, isLoading: false }),
 }))
 vi.mock('./useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => !options.legacy,
@@ -30,7 +35,12 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 }))
 const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }))
 vi.mock('@/compat/next/router', () => ({ useRouter: () => router }))
-vi.mock('./DestinationPanel/DestinationPanel', () => ({ DestinationPanel: () => null }))
+vi.mock('./DestinationPanel/DestinationPanel', () => ({
+  DestinationPanel: () => {
+    const [type] = useQueryState('destinationType')
+    return type ? <h2>Creation sheet: {type}</h2> : null
+  },
+}))
 let isEnabled = false
 let enableGate: Promise<void> | undefined
 beforeEach(() => {
@@ -38,6 +48,7 @@ beforeEach(() => {
   router.replace.mockClear()
   isEnabled = false
   enableGate = undefined
+  options.stepped = true
   options.legacy = false
   options.hasAccess = true
   options.isLoading = false
@@ -241,4 +252,13 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
   )
   addPipeline()
   expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')
+})
+
+test('preview off keeps creation in the sheet', async () => {
+  options.stepped = false
+  isEnabled = true
+  await renderList()
+  addPipeline()
+  await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
+  expect(router.push).not.toHaveBeenCalled()
 })

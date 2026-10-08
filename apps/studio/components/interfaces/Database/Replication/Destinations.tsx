@@ -37,6 +37,7 @@ import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { useRouter } from '@/compat/next/router'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -94,6 +95,7 @@ const compareStatusNames = (
 
 export const Destinations = () => {
   const router = useRouter()
+  const { isEnabled: isSteppedCreationEnabled } = usePipelineCreationPreview()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -107,7 +109,7 @@ export const Destinations = () => {
   const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [urlDestinationType] = useQueryState(
+  const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
@@ -232,7 +234,11 @@ export const Destinations = () => {
       setShowEnablePipelinesDialog(true)
       return
     }
-    if (projectRef) router.push(getCreatePipelineHref(projectRef, 'BigQuery'))
+    if (isSteppedCreationEnabled && projectRef) {
+      router.push(getCreatePipelineHref(projectRef, 'BigQuery'))
+    } else {
+      setDestinationType('BigQuery')
+    }
   }
 
   const handleEnableDialogOpenChange = (open: boolean) => {
@@ -247,14 +253,19 @@ export const Destinations = () => {
       isPipelineDestinationType(type) &&
       queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
     ) {
-      if (projectRef) router.push(getCreatePipelineHref(projectRef, type))
+      if (isSteppedCreationEnabled && projectRef) {
+        router.push(getCreatePipelineHref(projectRef, type))
+      } else {
+        setDestinationType(type)
+      }
     }
   }
 
   useEffect(() => {
-    if (!projectRef || !isPipelineDestinationType(urlDestinationType)) return
+    if (!isSteppedCreationEnabled || !projectRef || !isPipelineDestinationType(urlDestinationType))
+      return
     router.replace(getCreatePipelineHref(projectRef, urlDestinationType))
-  }, [projectRef, router, urlDestinationType])
+  }, [isSteppedCreationEnabled, projectRef, router, urlDestinationType])
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
