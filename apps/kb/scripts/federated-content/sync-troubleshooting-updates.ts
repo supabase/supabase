@@ -3,8 +3,10 @@
 // a freshly computed one — never the discussion's live content — so this is
 // immune to whatever GitHub does internally to stored title/body. A null
 // checksum (a row created before this column existed) always counts as
-// changed. Run after sync-troubleshooting-entries.ts, from CI only. Pass
-// --dry-run to log without writing anything.
+// changed. Updates target the discussion directly via the row's stored
+// github_id — no need to list/paginate the category's discussions. Run after
+// sync-troubleshooting-entries.ts, from CI only. Pass --dry-run to log
+// without writing anything.
 import { createHash } from 'node:crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -15,10 +17,6 @@ import { createClient } from '@supabase/supabase-js'
 import matter from 'gray-matter'
 
 import { githubAuthOptions } from './github-auth.ts'
-
-const REPOSITORY_OWNER = 'supabase'
-const REPOSITORY_NAME = 'supabase'
-const TROUBLESHOOTING_CATEGORY_ID = 'DIC_kwDODMpXOc4CUvEr' // "Troubleshooting" discussion category
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url))
 const TROUBLESHOOTING_DIRECTORY = join(SCRIPT_DIR, '../../src/content/troubleshooting')
@@ -43,37 +41,6 @@ function computeChecksum(title: string, body: string): string {
   return createHash('sha256').update(JSON.stringify({ title, body })).digest('hex')
 }
 
-type Discussion = { id: string; url: string }
-
-async function listTroubleshootingDiscussions(): Promise<Discussion[]> {
-  const query = `
-    query getDiscussions($cursor: String) {
-      repository(owner: "${REPOSITORY_OWNER}", name: "${REPOSITORY_NAME}") {
-        discussions(first: 100, after: $cursor, categoryId: "${TROUBLESHOOTING_CATEGORY_ID}") {
-          pageInfo { hasNextPage endCursor }
-          nodes { id url }
-        }
-      }
-    }
-  `
-  const discussions: Discussion[] = []
-  let cursor: string | undefined
-  let hasNextPage = true
-
-  while (hasNextPage) {
-    const result = await octokit.graphql<{
-      repository: {
-        discussions: { nodes: Discussion[]; pageInfo: { hasNextPage: boolean; endCursor: string } }
-      }
-    }>(query, { cursor })
-    discussions.push(...result.repository.discussions.nodes)
-    hasNextPage = result.repository.discussions.pageInfo.hasNextPage
-    cursor = result.repository.discussions.pageInfo.endCursor
-  }
-
-  return discussions
-}
-
 async function updateDiscussion(discussionId: string, title: string, body: string): Promise<void> {
   const mutation = `
     mutation UpdateDiscussionMutation($discussionId: ID!, $title: String!, $body: String!) {
@@ -86,10 +53,7 @@ async function updateDiscussion(discussionId: string, title: string, body: strin
 }
 
 async function syncDiscussionUpdates() {
-  const [guides, discussions] = await Promise.all([
-    readLocalGuides(),
-    listTroubleshootingDiscussions(),
-  ])
+  const guides = await readLocalGuides()
   const db = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL as string,
     process.env.SUPABASE_SERVICE_ROLE_KEY as string
@@ -97,7 +61,7 @@ async function syncDiscussionUpdates() {
 
   const { data: rows, error } = await db
     .from('troubleshooting_entries')
-    .select('slug, github_url, checksum')
+    .select('slug, github_id, checksum')
     .in(
       'slug',
       guides.map((guide) => guide.slug)
@@ -105,7 +69,6 @@ async function syncDiscussionUpdates() {
   if (error) throw error
 
   const rowBySlug = new Map((rows ?? []).map((row) => [row.slug, row]))
-  const discussionByUrl = new Map(discussions.map((discussion) => [discussion.url, discussion]))
 
   let updatedCount = 0
   const failures: string[] = []
@@ -117,15 +80,6 @@ async function syncDiscussionUpdates() {
     const newChecksum = computeChecksum(guide.title, guide.body)
     if (row.checksum !== null && row.checksum === newChecksum) continue
 
-    const discussion = discussionByUrl.get(row.github_url)
-    if (!discussion) {
-      console.error(
-        `[sync-troubleshooting-updates] No discussion found for ${guide.slug} (${row.github_url})`
-      )
-      failures.push(guide.slug)
-      continue
-    }
-
     console.log(
       `[sync-troubleshooting-updates] Content changed for ${guide.slug}${DRY_RUN ? ' (dry run)' : ''}`
     )
@@ -135,7 +89,7 @@ async function syncDiscussionUpdates() {
     }
 
     try {
-      await updateDiscussion(discussion.id, guide.title, guide.body)
+      await updateDiscussion(row.github_id, guide.title, guide.body)
       const { error: updateError } = await db
         .from('troubleshooting_entries')
         .update({ checksum: newChecksum })

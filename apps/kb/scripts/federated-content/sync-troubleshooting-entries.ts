@@ -84,6 +84,7 @@ async function createNewGuides(
         const { error } = await db.from('troubleshooting_entries').insert({
           slug: guide.slug,
           github_url: discussion.url,
+          github_id: discussion.id,
           checksum: computeChecksum(guide.title, guide.body),
         })
         if (error) {
