@@ -180,7 +180,7 @@ export const Migrations = () => {
         header={`Migration: ${selectedMigration?.version}`}
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
-          <div className="flex items-center justify-end p-4 border-t border-overlay-border">
+          <div className="flex items-center justify-end p-4 border-t">
             <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
