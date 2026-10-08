@@ -81,12 +81,12 @@ export const GitHubIntegrationConnectionForm = ({
     refetch: refetchRepositoryOptions,
   } = useGitHubRepositoryOptions()
 
-  const { mutate: updateBranch } = useBranchUpdateMutation({
+  const { mutateAsync: updateBranch } = useBranchUpdateMutation({
     onSuccess: () => {
       toast.success('Production branch settings successfully updated')
     },
   })
-  const { mutate: createBranch } = useBranchCreateMutation({
+  const { mutateAsync: createBranch } = useBranchCreateMutation({
     onSuccess: () => {
       toast.success('Production branch settings successfully updated')
     },
@@ -103,7 +103,7 @@ export const GitHubIntegrationConnectionForm = ({
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
 
-  const { mutate: createConnection, isPending: isCreatingConnection } =
+  const { mutateAsync: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onError: (error) => {
         // Don't show error toast when connection already exists - the branch
@@ -121,7 +121,7 @@ export const GitHubIntegrationConnectionForm = ({
       },
     })
 
-  const { mutate: updateConnectionSettings, isPending: isUpdatingConnection } =
+  const { mutateAsync: updateConnectionSettings, isPending: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation()
 
   const prodBranch = existingBranches?.find((branch) => branch.is_default)
@@ -235,42 +235,39 @@ export const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    createConnection(
-      {
-        organizationId: selectedOrganization.id,
-        connection: {
-          installation_id: selectedRepo.installation_id,
-          project_ref: selectedProject.ref,
-          repository_id: Number(selectedRepo.id),
-          workdir: data.supabaseDirectory,
-          ...(hasAccessToBranching && {
-            supabase_changes_only: data.supabaseChangesOnly,
-            branch_limit: Number(data.branchLimit),
-            new_branch_per_pr: data.new_branch_per_pr ?? false,
-          }),
-        },
+    const connectionRequest = createConnection({
+      organizationId: selectedOrganization.id,
+      connection: {
+        installation_id: selectedRepo.installation_id,
+        project_ref: selectedProject.ref,
+        repository_id: Number(selectedRepo.id),
+        workdir: data.supabaseDirectory,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
-      {
-        onSuccess: () => {
-          toast.success('GitHub connection updated')
-          githubSettingsForm.reset(data, { keepDirtyValues: false })
-        },
-      }
-    )
+    })
 
-    if (!prodBranch) {
-      createBranch({
-        projectRef: selectedProject.ref,
-        branchName: 'main',
-        gitBranch: data.branchName,
-        is_default: true,
-      })
-    } else {
-      updateBranch({
-        branchRef: prodBranch.project_ref,
-        projectRef: selectedProject.ref,
-        gitBranch: data.branchName,
-      })
+    const branchRequest = prodBranch
+      ? updateBranch({
+          branchRef: prodBranch.project_ref,
+          projectRef: selectedProject.ref,
+          gitBranch: data.branchName,
+        })
+      : createBranch({
+          projectRef: selectedProject.ref,
+          branchName: 'main',
+          gitBranch: data.branchName,
+          is_default: true,
+        })
+
+    // Only re-baseline the form once both requests succeed, so a failure keeps the edits unsaved
+    const results = await Promise.allSettled([connectionRequest, branchRequest])
+    if (results.every((result) => result.status === 'fulfilled')) {
+      toast.success('GitHub connection updated')
+      githubSettingsForm.reset(data, { keepDirtyValues: false })
     }
   }
 
@@ -296,40 +293,41 @@ export const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    updateConnectionSettings(
-      {
-        connectionId: currentConnection.id,
-        organizationId: selectedOrganization.id,
-        connection: {
-          workdir: data.supabaseDirectory,
-          ...(hasAccessToBranching && {
-            supabase_changes_only: data.supabaseChangesOnly,
-            branch_limit: Number(data.branchLimit),
-            new_branch_per_pr: data.new_branch_per_pr ?? false,
-          }),
-        },
+    const connectionRequest = updateConnectionSettings({
+      connectionId: currentConnection.id,
+      organizationId: selectedOrganization.id,
+      connection: {
+        workdir: data.supabaseDirectory,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
-      { onSuccess: () => githubSettingsForm.reset(data, { keepDirtyValues: false }) }
-    )
+    })
 
-    if (prodBranch) {
-      updateBranch({
-        branchRef: prodBranch.project_ref,
-        projectRef: selectedProject.ref,
-        gitBranch: data.enableProductionSync ? data.branchName : '',
-        branchName: data.branchName || 'main',
-      })
-    } else {
-      // if for some reason, the project doesn't have a default branch yet, create it.
-      createBranch({
-        projectRef: selectedProject.ref,
-        gitBranch: data.enableProductionSync ? data.branchName : '',
-        branchName: data.branchName || 'main',
-        is_default: true,
-      })
-    }
+    // if for some reason, the project doesn't have a default branch yet, create it.
+    const branchRequest = prodBranch
+      ? updateBranch({
+          branchRef: prodBranch.project_ref,
+          projectRef: selectedProject.ref,
+          gitBranch: data.enableProductionSync ? data.branchName : '',
+          branchName: data.branchName || 'main',
+        })
+      : createBranch({
+          projectRef: selectedProject.ref,
+          gitBranch: data.enableProductionSync ? data.branchName : '',
+          branchName: data.branchName || 'main',
+          is_default: true,
+        })
 
     setIsConfirmingBranchChange(false)
+
+    // Only re-baseline the form once both requests succeed, so a failure keeps the edits unsaved
+    const results = await Promise.allSettled([connectionRequest, branchRequest])
+    if (results.every((result) => result.status === 'fulfilled')) {
+      githubSettingsForm.reset(data, { keepDirtyValues: false })
+    }
   }
 
   const onConfirmBranchChange = async () => {
