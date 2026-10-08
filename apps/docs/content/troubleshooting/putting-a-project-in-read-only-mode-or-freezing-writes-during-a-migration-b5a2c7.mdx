@@ -1,0 +1,51 @@
+---
+title = "Putting a project in read-only mode or freezing writes during a migration"
+topics = [ "database", "platform" ]
+keywords = [ "read-only", "read only", "default_transaction_read_only", "maintenance mode", "write freeze", "freeze writes", "pause writes", "migration", "cutover", "region", "dump and restore", "logical replication" ]
+---
+
+Supabase doesn't offer a dedicated maintenance or read-only mode for a project. During a migration, you can make the source database read-only at the Postgres level and reduce writes from your application.
+
+## Make the database read-only
+
+To stop new sessions from writing, set `default_transaction_read_only` on the source database:
+
+```sql
+alter database your_database_name set default_transaction_read_only = true;
+```
+
+This is a database-level default, so it's a soft freeze and not a complete block on writes:
+
+- Sessions that are already open keep their previous value until they reconnect.
+- A session can override the setting for itself.
+- Connections through the transaction pooler (port `6543`) might not pick up the change straight away. Restart or reconnect your apps after you set it. For more on how pooled connections keep session state, see [Resolving 'cannot execute UPDATE in a read-only transaction' on transaction pooler connections](/docs/guides/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections-ef582c).
+
+## Reduce writes from your application
+
+Pause writes in your application and any background jobs for the migration window. This gives the cleanest cutover. You can also put a maintenance page in front of your client apps.
+
+## Re-enable writes
+
+What you do after the migration depends on the method you used:
+
+- **Dump and restore:** If you keep the source project, re-enable writes when you finish.
+- **Logical replication:** Keep the source read-only, or decommission it. Don't re-enable writes, to avoid a split-brain scenario.
+
+To re-enable writes, run the following in a transaction that switches to read-write first. This covers the case where the database rejects the change because it's already read-only:
+
+```sql
+begin;
+set transaction read write;
+alter database your_database_name set default_transaction_read_only = off;
+commit;
+```
+
+## If your database is read-only and you didn't set it
+
+Supabase can put a project into read-only mode when disk usage passes 95%. This is separate from the steps above. For how it works and how to disable it, see [Database size](/docs/guides/platform/database-size).
+
+## Related guides
+
+- [Migrating to Supabase from Postgres](/docs/guides/platform/migrating-to-supabase/postgres)
+- [Backup and restore using the CLI](/docs/guides/platform/migrating-within-supabase/backup-restore)
+- [Change project region](/docs/guides/troubleshooting/change-project-region-eWJo5Z)
