@@ -12,9 +12,9 @@ import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 // check in again after we wrap up Vercel integration
 
 export const OAuthApps = () => {
-  const oauthAppScopedGrants = useFlag('OauthAppScopedGrants')
+  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
   const { hasLoaded } = useFeatureFlags()
-  const showNewOAuthApps = oauthAppScopedGrants && USE_MOCKS
+  const showNewOAuthApps = areOAuthAppScopedGrantsEnabled && USE_MOCKS
   return (
     <>
       <PageContainer size="default" className="pb-16">
