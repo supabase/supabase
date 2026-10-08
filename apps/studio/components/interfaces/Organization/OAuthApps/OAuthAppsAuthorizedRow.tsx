@@ -51,7 +51,6 @@ export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthori
         <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
-            console.log({ open })
             setIsDialogOpen(open)
             // When users close the dialogs, we need to restore the focus on the menu button
             // Done in a setTimeout because the dialog tries to restore focus on the trigger despite onCloseAutoFocus being cancelled in the dialog contents
