@@ -170,7 +170,7 @@ buttons.
   must read one of them in the owner, or the next refetch will discard array
   edits. (Good examples:
   `components/interfaces/Settings/Database/ConnectionLogging.tsx`,
-  `components/interfaces/Storage/EditBucketModal.tsx`.)
+  `components/interfaces/Storage/FilesBuckets/EditBucketModal.tsx`.)
 - **After a successful mutation, re-baseline the form** in `onSuccess` so the
   saved state becomes the new baseline (`isDirty` returns to false, Cancel now
   reverts to the saved values). Prefer what the server actually persisted: if the

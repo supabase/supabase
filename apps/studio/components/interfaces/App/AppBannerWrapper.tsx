@@ -10,7 +10,7 @@ import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusBanner } from '@/components/layouts/AppLayout/StatusBanner'
 import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
-import { BannerPrivacyPolicyUpdate } from '@/components/ui/BannerStack/Banners/BannerPrivacyPolicyUpdate'
+import { BannerTermsOfServiceUpdate } from '@/components/ui/BannerStack/Banners/BannerTermsOfServiceUpdate'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useTrack } from '@/lib/telemetry/track'
@@ -22,7 +22,10 @@ const LogsAllDeprecationExpiry = dayjs('2026-09-24T00:00:00Z')
 // setTimeout overflows above ~24.8 days; re-arm until the real expiry.
 const MAX_TIMEOUT_MS = 2_147_483_647
 
-export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
+export const AppBannerWrapper = ({
+  children,
+  signedOut = false,
+}: PropsWithChildren<{ signedOut?: boolean }>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
   const useStatusPageWidget = useFlag('incidentIoStatusPage')
@@ -31,29 +34,25 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const pathname = usePathname()
   const track = useTrack()
 
-  const [privacyPolicyUpdateAcknowledged, , { isSuccess: isPrivacyPolicyDismissalLoaded }] =
-    useLocalStorageQuery(LOCAL_STORAGE_KEYS.PRIVACY_POLICY_UPDATE, false)
+  const [isTermsUpdateAcknowledged, , { isSuccess: isTermsDismissalLoaded }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TERMS_OF_SERVICE_UPDATE,
+    false
+  )
 
   useEffect(() => {
-    if (!isPrivacyPolicyDismissalLoaded || pathname == null) return
+    if (!isTermsDismissalLoaded || pathname == null) return
 
-    if (isOrganizationLandingPath(pathname) && !privacyPolicyUpdateAcknowledged) {
+    if (IS_PLATFORM && isOrganizationLandingPath(pathname) && !isTermsUpdateAcknowledged) {
       addBanner({
-        id: BANNER_ID.PRIVACY_POLICY_UPDATE,
+        id: BANNER_ID.TERMS_OF_SERVICE_UPDATE,
         isDismissed: false,
-        content: <BannerPrivacyPolicyUpdate />,
-        priority: 0,
+        content: <BannerTermsOfServiceUpdate />,
+        priority: 3,
       })
     } else {
-      dismissBanner(BANNER_ID.PRIVACY_POLICY_UPDATE)
+      dismissBanner(BANNER_ID.TERMS_OF_SERVICE_UPDATE)
     }
-  }, [
-    pathname,
-    privacyPolicyUpdateAcknowledged,
-    isPrivacyPolicyDismissalLoaded,
-    addBanner,
-    dismissBanner,
-  ])
+  }, [pathname, isTermsDismissalLoaded, isTermsUpdateAcknowledged, addBanner, dismissBanner])
 
   const [isLogsAllDeprecationDismissed, , { isSuccess: isLogsAllDeprecationLoaded }] =
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.LOGS_ALL_DEPRECATION_2026_09_23, false)
@@ -119,7 +118,7 @@ export const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="flex flex-col">
       <div className="shrink-0">
-        {useStatusPageWidget ? <StatusBanner /> : <StatusPageBanner />}
+        {useStatusPageWidget ? <StatusBanner signedOut={signedOut} /> : <StatusPageBanner />}
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}

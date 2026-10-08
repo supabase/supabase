@@ -1,0 +1,124 @@
+---
+name: Flick Games
+title: How a two-person studio keeps two live games in sync on Supabase
+description: Flick Games is an indie UK studio running two live products, Art of Solitaire and Goalman, on Supabase. A single backend covers authentication, cross-device cloud saves, and remote content delivery across iOS, Android, and Steam for a team of two.
+author: wendie_cheung
+author_title: Product Marketing
+logo: /images/customers/logos/on-light/flick-games.png
+logo_inverse: /images/customers/logos/on-dark/flick-games.png
+tags:
+  - supabase
+date: '2026-10-06'
+company_url: https://flick.games
+stats: []
+misc:
+  [
+    {
+      label: 'Use case',
+      text: 'Cross-platform mobile and Steam games with unified authentication and cross-device cloud saves',
+    },
+    { label: 'Solutions', text: 'Database, Auth' },
+  ]
+about: 'Flick is an indie games studio based in the UK running two live games, Art of Solitaire and Goalman, built in Solar2D.'
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['gaming']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'indie_dev'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'Europe'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth']
+---
+
+<Quote img="ian-masters-flick.jpg" caption="Ian Masters, Founder and CEO, Flick Games">
+  When you run a game as a service, you worry about what's going to break while you're not at work,
+  over a weekend or on holiday. Just knowing how battle-tested Supabase is takes a level of stress
+  off.
+</Quote>
+
+[Flick](https://flick.games) is an indie games studio based in the UK. Ian Masters, the studio's founder, has been making video games for close to three decades. Alongside engineer Alan Thomson, he now runs two live products on Supabase: Art of Solitaire, a card game on iOS, Android, and Steam Early Access, and Goalman, a very silly penalty shootout browser game that launched in time for the World Cup.
+
+Art of Solitaire has built an audience that differs from the typical solitaire crowd. Where most classic solitaire games skew 65 and older, Flick's version pulls in players aged 18 to 25, largely on the strength of its art. The studio has commissioned more than 70 artists from around the world to design its card decks, adding a new one every month, including collaborations for Pride, Black History Month, and International Women's Month, and more.
+
+## The challenge
+
+Before landing on its current setup, Flick pieced together a different backend service for each platform, and none of them held up. Google Play Game Services and Game Center covered authentication on mobile, but treated Android and iOS as separate identities entirely, with no way to recognize the same player moving between them.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  Android users could only authenticate on Android. If they also had an iOS device, tough. We don't
+  know that they're the same person, and that's a pretty big problem.
+</Quote>
+
+Flick used ChilliConnect for backups and save data until Unity acquired it and shut the service down, forcing a move. The team evaluated Firebase, but it didn't fit how they worked, so they settled on each platform's native option: iCloud on iOS and Google Play on Android. That held up while Flick was mobile-only, but it was never cross-platform, and once Steam arrived as a third platform it stopped making sense.
+
+## Why they chose Supabase
+
+Adding a third channel meant Flick didn't want to bolt on a third separate backend service. Supabase covered authentication, database, and storage together, and the team could see it working almost immediately.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  It was just really easy to use. It had authentication, it had all the database stuff, it had
+  storage. It ticked loads of boxes very quickly.
+</Quote>
+
+## How Flick runs on Supabase
+
+Art of Solitaire's authentication now runs on a passwordless email flow through Supabase Auth, with no passwords stored anywhere. The studio recently migrated from a magic link players clicked in their email to a one-time code players type in directly, a change made to better support platforms like Steam Deck, which doesn't have its own email client.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  We were actually able to have both services live at the same time. So as people update the game
+  from one version to another, it never breaks, because both services are working simultaneously.
+</Quote>
+
+Rather than adopt a separate SDK for each platform, Flick built one lightweight Lua wrapper around Supabase's REST endpoints and reused it across iOS, Android, and Steam, so adding a platform never means maintaining another SDK in parallel.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  Supabase having REST endpoints is massive. There are some tools where they're SDK only, and that's
+  problematic when you're cross-platform, because you're suddenly managing two, three, four SDKs,
+  and they're not always kept in sync. Whereas REST endpoints with our Lua code base means we just
+  write a very lightweight wrapper and we're done. It's very easy for us to expand to other
+  platforms.
+</Quote>
+
+Steam added its own challenge: unlike iOS and Android, it has no native way to check whether a player has already made an in-game purchase. Flick now records every Steam transaction directly in Supabase, and even players who haven't logged in are tracked as anonymous Supabase users so the game still has somewhere to store their activity.
+
+## Keeping three platforms and one experience in sync
+
+Players who move between a phone and Steam expect their progress and purchases to already be there, so Flick built merge logic that reconciles saves across devices on login. Progress adds up rather than overwrites: currency collected on two different devices adds together instead of picking one number, and progress made offline catches up correctly once a device reconnects.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  That requires some sort of record of those things on all the devices that can then be married up
+  and turned into one single source of truth. We were able to do that through the Supabase database
+  tables.
+</Quote>
+
+Remote delivery solved a different problem for Flick: shipping new content without shipping a new build. Art of Solitaire's card decks used to ship embedded inside the game binary, which meant a store submission and approval cycle every time a new deck went out, and the team often had to turn a deck around on a tight deadline when an artist delivered late in the month. The studio now serves deck data remotely through Supabase, so a new deck can go out without a single update to the game itself.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  We can now roll decks out remotely. We don't have to update the game at all. It was always a big
+  source of stress that's now gone.
+</Quote>
+
+## The results
+
+Flick is two people running two live games, with backend work in place that would normally take a much bigger team to build.
+
+<Quote img="alan-thomson-flick.jpg" caption="Alan Thomson, Senior Engineer, Flick Games">
+  If we were to write all of this authentication, cloud saves, and remote config ourselves, the
+  stuff we use Supabase for, I think it's realistic to say we wouldn't have all of those features
+  built out for users. We've got limited resources so Supabase has really helped us be way ahead
+  from when we started.
+</Quote>
+
+For a team this size, cost matters every bit as much as capability.
+
+<Quote img="ian-masters-flick.jpg" caption="Ian Masters, Founder and CEO, Flick Games">
+  You're building a game, you hope it will be successful and grow, but the truth is most games
+  won't. Supabase's pricing is really accessible, and it feels like you're intentionally trying to
+  support smaller developers with that kind of structure.
+</Quote>
+
+## What's next
+
+Flick's next moves build on the same backend. The team is opening up an artist portal on its own website, powered by Supabase. The artists it commissions will be able to log in to test their assets today and, soon, upload them directly. Players will get a similar login to view their card collection outside the game itself.
+
+Separately, Art of Solitaire is collaborating with another Steam game, Forbidden Solitaire, still with a two-person team behind it.

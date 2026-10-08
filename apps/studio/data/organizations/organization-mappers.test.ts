@@ -31,6 +31,7 @@ const baseOrganizationResponse = {
 }
 
 const baseOrganizationSlugResponse = {
+  created_at: '2023-01-01T00:00:00Z',
   billing_email: 'billing@example.com',
   billing_partner: null,
   created_at: '2026-01-01T00:00:00.000Z',

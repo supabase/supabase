@@ -47,7 +47,7 @@ test('shows a project-details error instead of leaving Network bans loading', as
 
   expect(await screen.findByText('Failed to retrieve project details')).toBeVisible()
   expect(screen.getByText('Error: Project unavailable')).toBeVisible()
-  expect(screen.getByRole('link', { name: 'Contact support' })).toHaveAttribute(
+  expect(screen.getByRole('link', { name: /contact support/i })).toHaveAttribute(
     'href',
     expect.stringContaining('projectRef=default')
   )
