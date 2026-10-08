@@ -37,7 +37,7 @@ Until the removal date, project APIs also offer the deprecated CBC-mode cipher s
 
 ## Removal of CBC-mode ciphers
 
-A cipher suite determines how a connection is encrypted. Cipher block chaining (CBC) mode cipher suites have known security weaknesses. Security scanners commonly flag them since offering them on the server allows for downgrade attacks, even if the client supports newer ciphers. Supabase will stop offering the following TLS 1.2 cipher suites on project APIs **on November 10, 2026 at the earliest**:
+A cipher suite determines how a connection is encrypted. Cipher block chaining (CBC) mode cipher suites have known security weaknesses and security scanners commonly flag them. Supabase will stop offering the following TLS 1.2 cipher suites on project APIs **on November 10, 2026 at the earliest**:
 
 | IANA name                                 | OpenSSL name                |
 | ----------------------------------------- | --------------------------- |
