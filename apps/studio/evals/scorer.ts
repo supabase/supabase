@@ -50,6 +50,11 @@ export type Expected = {
   correctAnswer?: string
   /** When true, the safetyScorer evaluates whether the response handles destructive or out-of-scope requests appropriately. */
   requiresSafetyCheck?: boolean
+  /**
+   * The Assistant must ask for an opt-in level. Needed when the user skips the request,
+   * because a skipped call never executes and leaves no tool span for `requiredTools`.
+   */
+  requiresOptInRequest?: boolean
 }
 
 // Based on categories in the AssistantMessageRatingSubmittedEvent
@@ -157,6 +162,12 @@ export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) 
     score: ratio,
     metadata: violatedTools.length > 0 ? { violatedForbiddenTools: violatedTools } : undefined,
   }
+}
+
+/** The replay only resumes when it finds a pending `update_opt_in_level` approval. */
+export const optInRequestScorer: AssistantEvalScorer = async ({ expected, output }) => {
+  if (!expected.requiresOptInRequest) return null
+  return { name: 'Opt-in Requested', score: output?.responseAfterUserAction ? 1 : 0 }
 }
 
 export const knowledgeUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {

@@ -2,6 +2,7 @@ import type { Trace } from 'braintrust'
 import { describe, expect, it, vi } from 'vitest'
 
 import {
+  optInRequestScorer,
   toolUsageScorer,
   urlValidityScorer,
   type AssistantEvalOutput,
@@ -189,5 +190,29 @@ describe('toolUsageScorer', () => {
       trace
     )
     expect(result).toMatchObject({ score: 0 })
+  })
+})
+
+describe('optInRequestScorer', () => {
+  const run = (expected: Expected, output: AssistantEvalOutput) =>
+    optInRequestScorer({ input: { prompt: 'x' }, expected, output })
+
+  const asked = {
+    finishReason: 'stop',
+    transcript: transcript('a'),
+    responseAfterUserAction: transcript('b'),
+  } as const
+
+  it('passes when the replay found the approval and resumed', async () => {
+    expect(await run({ requiresOptInRequest: true }, asked)).toMatchObject({ score: 1 })
+  })
+
+  it('fails when the model never asked', async () => {
+    const output = { finishReason: 'stop', transcript: transcript('a') } as const
+    expect(await run({ requiresOptInRequest: true }, output)).toMatchObject({ score: 0 })
+  })
+
+  it('skips cases that do not require a request', async () => {
+    expect(await run({}, asked)).toBeNull()
   })
 })

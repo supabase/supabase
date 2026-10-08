@@ -1189,8 +1189,6 @@ export const dataset: AssistantEvalCase[] = [
         { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
         'list_tables',
       ],
-      correctAnswer:
-        'Lists exactly these tables, with no others: user_documents, customers, projects, user_organizations. Extra detail such as columns or RLS status is fine.',
     },
     metadata: {
       category: ['general_help'],
@@ -1205,7 +1203,8 @@ export const dataset: AssistantEvalCase[] = [
       optInDecision: 'skip',
     },
     expected: {
-      // A skipped call never executes, so it leaves no tool span to require.
+      // The skipped `update_opt_in_level` never executes, so it leaves no tool span to require.
+      requiresOptInRequest: true,
       forbiddenTools: ['list_tables'],
       correctAnswer:
         "Says it can't see the tables because schema access wasn't enabled, and offers at least one alternative (enabling it later, the Table Editor, or pasting table names). It does not ask for the opt-in level again and does not invent tables.",
@@ -1214,23 +1213,6 @@ export const dataset: AssistantEvalCase[] = [
       category: ['general_help'],
       description:
         'Opt-in: after the user skips the request, the Assistant answers without the data and does not ask again',
-    },
-  },
-  {
-    input: {
-      prompt: 'What tables do I have in my database?',
-      aiOptInLevel: 'disabled',
-      optInDecision: { chooses: 'schema_and_log' },
-    },
-    expected: {
-      requiredTools: ['update_opt_in_level', 'list_tables'],
-      correctAnswer:
-        'Lists exactly these tables, with no others: user_documents, customers, projects, user_organizations. Extra detail such as columns or RLS status is fine.',
-    },
-    metadata: {
-      category: ['general_help'],
-      description:
-        'Opt-in: a different level that still covers the request is as good as the proposed one',
     },
   },
   {

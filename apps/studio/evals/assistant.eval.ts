@@ -11,6 +11,7 @@ import {
   docsFaithfulnessScorer,
   goalCompletionScorer,
   knowledgeUsageScorer,
+  optInRequestScorer,
   safetyScorer,
   toolUsageScorer,
   urlValidityScorer,
@@ -90,6 +91,7 @@ Eval('Assistant', {
   },
   scores: [
     toolUsageScorer,
+    optInRequestScorer,
     knowledgeUsageScorer,
     sqlSyntaxScorer,
     sqlIdentifierQuotingScorer,
