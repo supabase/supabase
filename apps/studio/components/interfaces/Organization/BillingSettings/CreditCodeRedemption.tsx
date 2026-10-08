@@ -150,11 +150,21 @@ export const CreditCodeRedemption = ({
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
 
-  const alreadyRedeemedCents = codeRedemptionResult?.already_redeemed_partner_credits ?? 0
-  const partialRedemptionNotice =
-    !!codeRedemptionResult && alreadyRedeemedCents > 0
-      ? `Since you already redeemed $${alreadyRedeemedCents / 100} through other deals, we couldn't grant the full $${((alreadyRedeemedCents + codeRedemptionResult.amount_cents) / 100).toFixed(0)}.`
-      : undefined
+  function getRedemptionNotice() {
+    const redemptionIsReady = !!codeRedemptionResult
+    if (!redemptionIsReady) {
+      return undefined
+    }
+
+    const alreadyRedeemedCents = codeRedemptionResult.already_redeemed_partner_credits ?? 0
+    if (alreadyRedeemedCents) {
+      return undefined
+    }
+
+    return `Since you already redeemed $${alreadyRedeemedCents / 100} through other deals, we couldn't grant the full $${((alreadyRedeemedCents + codeRedemptionResult.amount_cents) / 100).toFixed(0)}.`
+  }
+
+  const redemptionNotice = getRedemptionNotice()
 
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
@@ -202,7 +212,7 @@ export const CreditCodeRedemption = ({
         {/* Mounted before the redemption result arrives so screen readers announce updates */}
         <div role="status" aria-live="polite" className="sr-only">
           {!!codeRedemptionResult && `$${codeRedemptionResult.amount_cents / 100} credits applied.`}
-          {!!partialRedemptionNotice && ` ${partialRedemptionNotice}`}
+          {redemptionNotice?.padStart(1, ' ')}
         </div>
 
         {!!codeRedemptionResult ? (
@@ -238,10 +248,10 @@ export const CreditCodeRedemption = ({
               </div>
             )}
 
-            {!!partialRedemptionNotice && (
+            {!!redemptionNotice && (
               <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
                 <Info className="h-4 w-4 shrink-0" />
-                <span>{partialRedemptionNotice}</span>
+                <span>{redemptionNotice}</span>
               </div>
             )}
 
