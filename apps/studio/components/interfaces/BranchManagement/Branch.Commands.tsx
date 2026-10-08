@@ -4,7 +4,6 @@ import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-p
 
 import { COMMAND_MENU_SECTIONS } from '../App/CommandMenu/CommandMenu.utils'
 import { orderCommandSectionsByPriority } from '../App/CommandMenu/ordering'
-import { BRANCHING_GITHUB_DISCUSSION_LINK } from './BranchManagement.constants'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -107,12 +106,4 @@ export function useBranchCommands() {
     ],
     { enabled: !!selectedProject }
   )
-
-  useRegisterCommands(COMMAND_MENU_SECTIONS.NAVIGATE, [
-    {
-      id: 'nav-branch-feedback',
-      name: 'Branching feedback',
-      route: BRANCHING_GITHUB_DISCUSSION_LINK,
-    },
-  ])
 }

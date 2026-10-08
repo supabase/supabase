@@ -159,27 +159,12 @@ const BranchesPage: NextPageWithLayout = () => {
 // directly. Same shape and identical body as before — accepts the page
 // content as `children` instead of capturing it from a closure.
 export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
-  const secondaryActions = (
-    <div className="flex items-center gap-x-2">
-      <Button
-        asChild
-        variant="text"
-        icon={<MessageCircle className="text-muted" strokeWidth={1} />}
-      >
-        <a target="_blank" rel="noreferrer" href={BRANCHING_GITHUB_DISCUSSION_LINK}>
-          Branching feedback
-        </a>
-      </Button>
-      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-    </div>
-  )
-
   return (
     <PageLayout
       title="Branches"
       subtitle="Manage your database preview branches and deployments"
       primaryActions={<CreateBranchButton />}
-      secondaryActions={secondaryActions}
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
     >
       {children}
     </PageLayout>

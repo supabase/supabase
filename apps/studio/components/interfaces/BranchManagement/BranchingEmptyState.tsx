@@ -23,7 +23,7 @@ export const BranchingEmptyState = ({
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="p-0 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x items-stretch">
+      <CardContent className="p-0 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x items-stretch">
         <div className="p-8">
           <div className="flex items-start gap-x-4">
             <div className="shrink-0 text-foreground-light">
