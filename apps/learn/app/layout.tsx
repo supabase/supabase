@@ -14,13 +14,15 @@ const inter = Inter({ subsets: ['latin'] })
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+
 export const metadata: Metadata = {
   applicationName: 'Learn Supabase',
   title: 'Learn Supabase',
   description: 'Learn Supabase.',
   metadataBase: new URL('https://supabase.com/learn'),
-  icons: genFaviconData(BASE_PATH),
-  manifest: `${BASE_PATH}/favicon/manifest.json`,
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
   openGraph: {
     type: 'article',
     authors: 'Supabase',

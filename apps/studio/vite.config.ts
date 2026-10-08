@@ -533,6 +533,11 @@ export default defineConfig(({ command, mode }) => {
   // ends up with a bare `process.env` reference.
   publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
 
+  // Keep CLI favicon selection consistent between the server and browser head.
+  publicEnvDefines['process.env.CURRENT_CLI_VERSION'] = JSON.stringify(
+    env.CURRENT_CLI_VERSION ?? ''
+  )
+
   // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
   // these at runtime in the browser. When a var is unset it gets no define
   // entry above, which would leave a literal `process.env.*` in the built

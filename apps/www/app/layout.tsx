@@ -12,6 +12,8 @@ import { APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 const site_title = `${APP_NAME} | The Postgres Development Platform`
 
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+
 export const metadata: Metadata = {
   title: site_title,
   description: DEFAULT_META_DESCRIPTION,
@@ -34,8 +36,8 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
   },
   // www serves from the site root (`basePath: ''` in next.config.mjs)
-  icons: genFaviconData(''),
-  manifest: '/favicon/manifest.json',
+  icons: genFaviconData('', FAVICON_ROUTE),
+  manifest: `${FAVICON_ROUTE}/manifest.json`,
 }
 
 export const viewport: Viewport = {

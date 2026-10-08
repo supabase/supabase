@@ -46,7 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const forceDarkMode = isDarkLaunchWeek
 
   const applicationName = 'Supabase'
-  const faviconRoute = '/favicon'
+  const faviconRoute = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
   const themeColor = DEFAULT_FAVICON_THEME_COLOR
 
   // Advertise the .md version for AI agents on pages that have one.

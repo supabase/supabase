@@ -1,18 +1,19 @@
 # Favicons
 
-The vector sources are exported from [Favicons](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4691-1489). Each master is a native 512×512 Figma component with a 96px background radius and 60% corner smoothing, equivalent to 3px at 16px. The 16, 32 and 48px previews are scaled instances of these components. Scale the vectors, never a small raster export. Preserve the variant-specific bolt gradients, shadows and proportions.
+The vector sources are exported from [Favicons](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4691-1489). Each master is a native 512×512 Figma component with a 96px background radius and 60% corner smoothing, equivalent to 3px at 16px. The 16, 32 and 48px previews are scaled instances of these components. Scale the vectors, never a small raster export. Preserve the variant-specific bolt gradients, shadows, proportions and local inset edge detail.
 
 | Source           | Original node | Master node | Consumers                                                         |
 | ---------------- | ------------- | ----------- | ----------------------------------------------------------------- |
 | `production.svg` | `4691:1519`   | `4696:14`   | Studio production and self-hosted, WWW, UI Library, Design System |
 | `docs.svg`       | `4691:1517`   | `4696:15`   | Docs, Learn, Knowledge Base                                       |
 | `staging.svg`    | `4691:1512`   | `4696:17`   | Hosted Studio non-production                                      |
+| `local.svg`      | `4691:1509`   | `4696:19`   | Local development in all apps, plus Studio CLI                    |
 
-[Favicons (old)](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4431-5215) contains historical explorations, not interchangeable production assets.
+The local artwork also corresponds to the manually revised [512px reference](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4691-1483). [Favicons (old)](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4431-5215) contains historical explorations, not interchangeable production assets.
 
 ## Generation
 
-The SVG backgrounds are flattened Figma vectors so 60% corner smoothing survives export.
+The SVG backgrounds are flattened Figma vectors so 60% corner smoothing survives export. Local corner grid marks are filled vectors, avoiding differences in dashed-stroke rendering.
 
 From the repository root, after `pnpm install`:
 
@@ -49,11 +50,11 @@ copy.remove()
 - `android-icon-192x192.png` and `android-icon-512x512.png`: rounded artwork with transparent corners, manifest purpose `any`, not `maskable`.
 - `manifest.json`: relative icon URLs resolve beside the manifest under any application base path. Existing non-icon settings are retained.
 
-Learn, UI Library and Design System use explicit layout declarations. Their `app/favicon.ico` copies are removed to avoid duplicate declarations. Shared declarations in `packages/common/MetaFavicons/icons.ts` serve Next.js pages/app routers, Studio TanStack and KB Astro. Applications select routes and detect their environments. Existing Studio environment routing is retained.
+Learn, UI Library and Design System use explicit layout declarations. Their `app/favicon.ico` copies are removed so Next.js does not also advertise production artwork during local development. Shared declarations in `packages/common/MetaFavicons/icons.ts` serve Next.js pages/app routers, Studio TanStack and KB Astro. Applications select routes and detect their environments. Next Studio retains its runtime CLI discovery; TanStack uses the synchronous CLI/environment configuration for its initial head.
 
 ## Other artwork
 
-WWW's historical Launch Week X favicon directory contains separate campaign artwork and remains unchanged. Its isolated legacy component has no current imports. Lite Studio keeps its independent production root ICO.
+WWW's historical Launch Week X favicon directory contains separate campaign artwork and remains unchanged. Its isolated legacy component has no current imports. Lite Studio keeps its independent production root ICO and explicitly selects the blue set during local development.
 
 ## Validation
 
@@ -62,3 +63,7 @@ node scripts/validate-favicons.mjs
 ```
 
 The script checks dimensions, opacity, ICO entries and manifest icon URLs under different base paths. Check for duplicate icon declarations in the rendered page head separately. Inspect 16px and 32px renders against light and dark browser chrome as well as larger masters.
+
+## Local development
+
+Next.js apps select `/favicon/local` when `NODE_ENV` is `development`; Astro and React Router use `import.meta.env.DEV`. Studio also recognises its explicit local environment and CLI mode. Production builds retain each app's normal branding. Manifest URLs follow the selected route and application base path.
