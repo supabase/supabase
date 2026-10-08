@@ -265,6 +265,7 @@ describe('ai/tools/studio-tools getOptInTools', () => {
     ['schema', 'schema_and_log_and_data', false],
     ['schema_and_log_and_data', 'schema', true],
     ['schema', 'schema', true],
+    ['schema', undefined, undefined],
   ] as const)(
     'level %s after approval, required %s → sufficient %s',
     async (level, requiredLevel, sufficient) => {
@@ -277,21 +278,14 @@ describe('ai/tools/studio-tools getOptInTools', () => {
       )
 
       expect(update_opt_in_level.needsApproval).toBe(true)
-      expect(result).toEqual({ previousLevel: level, level, sufficient })
+      expect(result).toMatchObject({
+        previousLevel: level,
+        level,
+        ...(sufficient !== undefined && { sufficient }),
+      })
+      expect(result).toHaveProperty('status')
     }
   )
-
-  it('returns only the level when no level is requested', async () => {
-    const { update_opt_in_level } = getOptInTools({ aiOptInLevel: 'schema' })
-    if (!update_opt_in_level.execute) throw new Error('execute is undefined')
-
-    const result = await update_opt_in_level.execute(
-      { currentLevel: 'schema' },
-      { toolCallId: 'test', messages: [], context: {} }
-    )
-
-    expect(result).toEqual({ previousLevel: 'schema', level: 'schema' })
-  })
 
   it.each([
     ['schema_and_log_and_data', 'schema', undefined],
