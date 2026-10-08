@@ -77,9 +77,9 @@ export const updateOptInLevelInputSchema = z.object({
     ),
 })
 
-/** Input as stored on the message. `currentLevel` is the org's level when the call was made. */
+/** Input as stored on the message. `levelWhenAsked` is the org's level when the call was made. */
 export const storedUpdateOptInLevelInputSchema = updateOptInLevelInputSchema.extend({
-  currentLevel: optInLevelSchema.optional(),
+  levelWhenAsked: optInLevelSchema.optional(),
 })
 
 export function isOptInLevelAtLeast(level: AiOptInLevel, minimum: AiOptInLevel): boolean {

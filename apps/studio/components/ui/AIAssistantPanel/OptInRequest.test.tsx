@@ -57,7 +57,7 @@ describe('OptInRequest', () => {
     render(
       <OptInRequest
         requiredLevel="schema_and_log_and_data"
-        output={{ level: 'disabled', sufficient: false }}
+        output={{ levelAfterReview: 'disabled', sufficient: false }}
         confirmState="success"
       />
     )
@@ -77,7 +77,7 @@ describe('OptInRequest', () => {
   it('reports the level it was raised at and what it changed to', () => {
     mockLevel.current = 'schema'
     render(
-      <OptInRequest levelAtRequest="disabled" output={{ level: 'schema' }} confirmState="success" />
+      <OptInRequest levelWhenAsked="disabled" output={{ levelAfterReview: 'schema' }} confirmState="success" />
     )
 
     expect(screen.getByText(/Your organization is set to Disabled/)).toBeInTheDocument()

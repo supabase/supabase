@@ -135,10 +135,10 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
 }
 
 // Rewritten at parse time so the stored input is what the card shows. A level the org already
-// has is a review request, and `currentLevel` outlives the user changing the setting.
+// has is a review request, and `levelWhenAsked` outlives the user changing the setting.
 export const createUpdateOptInLevelInputSchema = (aiOptInLevel: AiOptInLevel) =>
   updateOptInLevelInputSchema.transform(({ requiredLevel }) => ({
-    currentLevel: aiOptInLevel,
+    levelWhenAsked: aiOptInLevel,
     ...(requiredLevel && !isOptInLevelAtLeast(aiOptInLevel, requiredLevel) && { requiredLevel }),
   }))
 
@@ -149,19 +149,14 @@ export const getOptInTools = ({ aiOptInLevel }: { aiOptInLevel: AiOptInLevel }) 
       'Asks the user to review or change the organization-wide AI opt-in level. Call it with `requiredLevel` when a tool needs a higher level than the organization has or you need to read query results. Call it without `requiredLevel` whenever the user asks to change the setting, including lowering it. Do not call it again in the same chat after the user skipped it unless they ask.',
     inputSchema: createUpdateOptInLevelInputSchema(aiOptInLevel),
     needsApproval: true,
-    execute: async ({ currentLevel, requiredLevel }) => {
+    execute: async ({ requiredLevel }) => {
       const sufficient = !requiredLevel || isOptInLevelAtLeast(aiOptInLevel, requiredLevel)
-      const changed = currentLevel !== aiOptInLevel
-      let status = `The opt-in level is still ${aiOptInLevel}.`
-      if (changed) status = `The opt-in level changed from ${currentLevel} to ${aiOptInLevel}.`
-      if (!sufficient) {
-        status += ` It is below the requested ${requiredLevel}. If you still need that access, call update_opt_in_level again.`
-      }
       return {
-        previousLevel: currentLevel,
-        level: aiOptInLevel,
+        levelAfterReview: aiOptInLevel,
         ...(requiredLevel && { sufficient }),
-        status,
+        ...(!sufficient && {
+          status: `The opt-in level is still below the requested ${requiredLevel}. If you still need that access, call update_opt_in_level again.`,
+        }),
       }
     },
   }),

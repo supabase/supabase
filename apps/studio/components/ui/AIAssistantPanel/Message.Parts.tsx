@@ -290,7 +290,7 @@ function MessagePartUpdateOptInLevel({ toolPart }: { toolPart: ToolUIPart }) {
   return (
     <OptInRequest
       requiredLevel={parsedInput.data.requiredLevel}
-      levelAtRequest={parsedInput.data.currentLevel}
+      levelWhenAsked={parsedInput.data.levelWhenAsked}
       output={output}
       confirmState={confirmState}
       onApprove={onApprove}

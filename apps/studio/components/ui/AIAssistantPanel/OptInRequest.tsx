@@ -12,7 +12,7 @@ import { useOrgAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedI
 import { optInLevelSchema } from '@/lib/ai/tool-filter'
 
 const updateOptInLevelOutputSchema = z.object({
-  level: optInLevelSchema,
+  levelAfterReview: optInLevelSchema,
   sufficient: z.boolean().optional(),
 })
 
@@ -20,7 +20,7 @@ interface OptInRequestProps {
   /** Omitted when the Assistant is only asking the user to review the setting. */
   requiredLevel?: AiOptInLevel
   /** The org's level when the Assistant asked. Falls back to the live level on older chats. */
-  levelAtRequest?: AiOptInLevel
+  levelWhenAsked?: AiOptInLevel
   output?: unknown
   confirmState?: ConfirmFooterApprovalState
   onApprove?: () => void
@@ -30,7 +30,7 @@ interface OptInRequestProps {
 /** Approval card for `update_opt_in_level`. Saving in the modal approves, Skip denies. */
 export const OptInRequest = ({
   requiredLevel,
-  levelAtRequest,
+  levelWhenAsked,
   output,
   confirmState,
   onApprove,
@@ -38,7 +38,7 @@ export const OptInRequest = ({
 }: OptInRequestProps) => {
   const [isModalVisible, setIsModalVisible] = useState(false)
   const { aiOptInLevel: liveLevel } = useOrgAiOptInLevel()
-  const aiOptInLevel = levelAtRequest ?? liveLevel
+  const aiOptInLevel = levelWhenAsked ?? liveLevel
   const { can: canUpdateOrganization } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'organizations'
@@ -49,7 +49,7 @@ export const OptInRequest = ({
   // Saving a lower level still approves the call
   const isBelowRequest = confirmState === 'success' && result?.sufficient === false
 
-  const newLevel = result?.level
+  const newLevel = result?.levelAfterReview
   const successMessage =
     newLevel && newLevel !== aiOptInLevel
       ? `Opt-in level updated to ${AI_OPT_IN_LEVEL_LABELS[newLevel]}`

@@ -273,17 +273,18 @@ describe('ai/tools/studio-tools getOptInTools', () => {
       if (!update_opt_in_level.execute) throw new Error('execute is undefined')
 
       const result = await update_opt_in_level.execute(
-        { currentLevel: level, requiredLevel },
+        { levelWhenAsked: level, requiredLevel },
         { toolCallId: 'test', messages: [], context: {} }
       )
 
       expect(update_opt_in_level.needsApproval).toBe(true)
       expect(result).toMatchObject({
-        previousLevel: level,
-        level,
+        levelAfterReview: level,
         ...(sufficient !== undefined && { sufficient }),
       })
-      expect(result).toHaveProperty('status')
+      // Only an insufficient result carries an instruction for the model
+      if (sufficient === false) expect(result).toHaveProperty('status')
+      else expect(result).not.toHaveProperty('status')
     }
   )
 
@@ -293,6 +294,6 @@ describe('ai/tools/studio-tools getOptInTools', () => {
     ['schema', 'schema_and_log', 'schema_and_log'],
   ] as const)('at level %s, requested %s is stored as %s', (level, requested, stored) => {
     const parsed = createUpdateOptInLevelInputSchema(level).parse({ requiredLevel: requested })
-    expect(parsed).toEqual({ currentLevel: level, requiredLevel: stored })
+    expect(parsed).toEqual({ levelWhenAsked: level, requiredLevel: stored })
   })
 })
