@@ -35,10 +35,12 @@ function headersFor(prefix: string) {
     // from the CDN, so they live at the edge. Matches next.config's `/(.*?)`
     // block (CSP, X-Frame-Options, HSTS, etc.).
     { source: `${prefix}/(.*)`, headers: getSecurityHeaders() },
-    // Dynamic function responses must not be cached by any shared cache —
-    // handlers can still opt in with their own Cache-Control on the
-    // Response when a response IS safe to cache.
-    routes.cacheControl(`${prefix}/api/(.*)`, { private: true, noStore: true }),
+    // Deployment metadata sets its own cache policy based on lookup success.
+    // All other API paths retain the private default, including nested paths.
+    routes.cacheControl(`${prefix}/api/((?!get-deployment-commit/?$).*)`, {
+      private: true,
+      noStore: true,
+    }),
     routes.cacheControl(`${prefix}/_serverFn/(.*)`, { private: true, noStore: true }),
     // Hashed chunks are covered by Nitro (`/_vercel/immutable/*`, immutable).
     // Static images and favicons aren't content-hashed, so they can't be
@@ -47,6 +49,9 @@ function headersFor(prefix: string) {
     // favicon: max-age=86400 = 1 day).
     routes.cacheControl(`${prefix}/img/(.*)`, { public: true, maxAge: '30days' }),
     routes.cacheControl(`${prefix}/favicon/(.*)`, { public: true, maxAge: '1day' }),
+    // Deno declarations are public TypeScript assets. Keep this override
+    // scoped to /deno so dynamic response types remain handler-owned.
+    routes.header(`${prefix}/deno/(.*)\\.ts`, [{ key: 'content-type', value: 'text/typescript' }]),
   ]
 }
 

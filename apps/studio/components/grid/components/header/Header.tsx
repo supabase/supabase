@@ -24,7 +24,10 @@ import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import type { SupaRow } from '@/components/grid/types'
 import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  formatTableRowsToJSON,
+  formatTableRowsToSQL,
+} from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import {
   useExportAllRowsAsCsv,
   useExportAllRowsAsJson,
@@ -257,7 +260,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
       } else if (type === 'sql') {
         return formatTableRowsToSQL(snap.table, rows)
       } else {
-        return JSON.stringify(rows)
+        return formatTableRowsToJSON(snap.table, rows)
       }
     })()
 

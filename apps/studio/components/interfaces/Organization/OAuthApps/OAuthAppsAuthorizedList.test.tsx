@@ -70,7 +70,6 @@ describe('OAuthAppsAuthorizedList', () => {
     expect(await screen.findByText('Organization-wide')).toBeInTheDocument()
     expect(await screen.findByText(/All projects/)).toBeInTheDocument()
   })
-
   test('only offers Revoke to an admin on an active row', async () => {
     canRevoke = false
     const { rerender } = customRender(<OAuthAppsAuthorizedList />)

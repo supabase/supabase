@@ -1,18 +1,20 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Building2, User } from 'lucide-react'
-import { Fragment, useEffect } from 'react'
+import { ComponentProps, Fragment, useEffect, useMemo } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
   Button,
+  cn,
   DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  ScrollArea,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -20,12 +22,13 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useOAuthAppMemberGrantsQuery } from '@/data/oauth-apps/oauth-apps-member-grants-query'
 import type { OAuthApprovalItem, OAuthGrantItem } from '@/data/oauth-apps/types'
 
-export interface OAuthAppsMemberGrantsDialogProps {
+export interface OAuthAppsMemberGrantsDialogProps extends ComponentProps<typeof DialogContent> {
   approval?: OAuthApprovalItem
 }
 
 export const OAuthAppsMemberGrantsDialogContent = ({
   approval,
+  ...props
 }: OAuthAppsMemberGrantsDialogProps) => {
   const { slug } = useParams()
   const {
@@ -49,18 +52,31 @@ export const OAuthAppsMemberGrantsDialogContent = ({
   })
 
   useEffect(() => {
-    if (hasNextPage && entry?.isIntersecting) {
+    if (hasNextPage && entry?.isIntersecting && !isFetchingNextPage) {
       fetchNextPage()
     }
-  }, [hasNextPage, entry?.isIntersecting, fetchNextPage])
+  }, [hasNextPage, entry?.isIntersecting, fetchNextPage, isFetchingNextPage])
+
+  const statusText = useMemo(() => {
+    if (isFetchingNextPage) return 'Loading more grants...'
+    if (isPending) return 'Loading grants...'
+    if (isError) return ''
+    return 'Grants loaded'
+  }, [isPending, isFetchingNextPage, isError])
+
+  const isEmpty = !data || data.pages.length === 0 || data.pages[0].data.length === 0
 
   if (!approval) return null
 
   return (
-    <DialogContent size="small">
+    <DialogContent size="small" {...props}>
       <DialogHeader>
         <DialogTitle>Member grants for {approval.app.name}</DialogTitle>
       </DialogHeader>
+
+      <p aria-live="polite" className="sr-only">
+        {statusText}
+      </p>
 
       {isPending && (
         <div className="space-y-2">
@@ -71,28 +87,27 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       {isError && <AlertError subject="Failed to retrieve grants" error={error} />}
 
       {isSuccess && (
-        <div className="px-4 max-h-90 overflow-y-auto scrollbar-gutter-stable">
-          {data.pages.length === 0 ? (
-            <p className="text-sm text-foreground-lighter">
-              No grants have been authorized for this application.
-            </p>
-          ) : (
-            <>
-              <Accordion type="multiple">
-                {data.pages.map((page, pageIndex) => (
-                  <Fragment key={pageIndex}>
-                    {page.data.map((grant) => (
-                      <GrantAccordionItem key={grant.grant_id} grant={grant} />
-                    ))}
-                  </Fragment>
+        <ScrollArea className="px-4 h-90">
+          <p
+            className={cn('text-sm text-foreground-lighter', !isEmpty && 'sr-only')}
+            aria-live="polite"
+          >
+            {isEmpty ? 'No grants have been authorized for this application.' : ''}
+          </p>
+
+          <Accordion type="multiple" className="divide-y! divide-border!">
+            {data.pages.map((page, pageIndex) => (
+              <Fragment key={pageIndex}>
+                {page.data.map((grant) => (
+                  <GrantAccordionItem key={grant.grant_id} grant={grant} />
                 ))}
-              </Accordion>
-              <p ref={sentinelRef} aria-live="polite" className="text-sm text-foreground-lighter">
-                {isFetchingNextPage ? 'Loading...' : ''}
-              </p>
-            </>
-          )}
-        </div>
+              </Fragment>
+            ))}
+          </Accordion>
+          <p ref={sentinelRef} className="text-sm text-foreground-lighter">
+            {isFetchingNextPage ? 'Loading...' : ''}
+          </p>
+        </ScrollArea>
       )}
 
       <DialogFooter>
@@ -109,7 +124,7 @@ const GrantAccordionItem = ({ grant }: { grant: OAuthGrantItem }) => {
   const permissionCount = grant.approved_scopes.length
 
   return (
-    <AccordionItem value={grant.grant_id}>
+    <AccordionItem value={grant.grant_id} className="border-b-0">
       <AccordionTrigger className="hover:no-underline">
         {isOrganizationBound ? (
           <Building2 size={16} className="shrink-0 text-foreground-lighter rotate-0!" />

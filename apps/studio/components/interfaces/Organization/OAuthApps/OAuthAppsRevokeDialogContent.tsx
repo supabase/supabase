@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { ComponentProps, useEffect } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -10,18 +11,29 @@ import {
   DialogTitle,
 } from 'ui'
 
+import { AlertError } from '@/components/ui/AlertError'
 import { useOAuthAppRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-mutation'
 import type { OAuthApprovalItem } from '@/data/oauth-apps/types'
 
-export interface OAuthAppsRevokeDialogProps {
+export interface OAuthAppsRevokeDialogProps extends ComponentProps<typeof DialogContent> {
   approval?: OAuthApprovalItem
   onClose: () => void
 }
 
-export const OAuthAppsRevokeDialogContent = ({ approval, onClose }: OAuthAppsRevokeDialogProps) => {
+export const OAuthAppsRevokeDialogContent = ({
+  approval,
+  onClose,
+  ...props
+}: OAuthAppsRevokeDialogProps) => {
   const { slug } = useParams()
 
-  const { mutate: revokeApp, isPending } = useOAuthAppRevokeMutation({
+  const {
+    mutate: revokeApp,
+    isPending,
+    isError,
+    error,
+    reset,
+  } = useOAuthAppRevokeMutation({
     onSuccess: () => {
       toast.success(`Revoked access for ${approval?.app.name}`)
       onClose()
@@ -32,11 +44,18 @@ export const OAuthAppsRevokeDialogContent = ({ approval, onClose }: OAuthAppsRev
   const hasOrgGrant = Boolean(approval.org_grant)
 
   return (
-    <DialogContent size="small">
+    <DialogContent size="small" {...props}>
       <DialogHeader>
         <DialogTitle>Revoke access for {approval.app.name}</DialogTitle>
       </DialogHeader>
 
+      {isError && (
+        <AlertError
+          subject={`An error occurred while revoking this ${approval.app.name} grant`}
+          className="mb-0 rounded-none border-x-0"
+          error={error}
+        />
+      )}
       <DialogSection className="flex flex-col gap-4 text-sm text-foreground-light">
         <p>
           This revokes the app at{' '}
@@ -74,7 +93,7 @@ export const OAuthAppsRevokeDialogContent = ({ approval, onClose }: OAuthAppsRev
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button variant="default" disabled={isPending}>
+          <Button variant="default" disabled={isPending} onClick={() => reset()}>
             Cancel
           </Button>
         </DialogClose>
