@@ -48,13 +48,13 @@ export interface CategoryMeta {
 }
 
 export interface UsageCategoryOptions {
-  isStorageVersioningEnabled?: boolean
+  isStorageSizeSegmented?: boolean
 }
 
 export const USAGE_CATEGORIES: (
   subscription?: OrgSubscription,
   options?: UsageCategoryOptions
-) => CategoryMeta[] = (subscription, { isStorageVersioningEnabled = false } = {}) => {
+) => CategoryMeta[] = (subscription, { isStorageSizeSegmented = false } = {}) => {
   const egressAttributes: CategoryAttribute[] = [
     {
       anchor: 'egress',
@@ -194,7 +194,7 @@ export const USAGE_CATEGORIES: (
   databaseAndStorageSizeAttributes.push({
     anchor: 'storageSize',
     key: PricingMetric.STORAGE_SIZE,
-    attributes: isStorageVersioningEnabled
+    attributes: isStorageSizeSegmented
       ? STORAGE_SIZE_SEGMENTS.map(({ attributeKey, name, color }) => ({
           key: attributeKey,
           name,
@@ -204,11 +204,11 @@ export const USAGE_CATEGORIES: (
     name: 'Storage Size',
     chartPrefix: 'Average',
     unit: 'bytes',
-    description: isStorageVersioningEnabled
+    description: isStorageSizeSegmented
       ? 'Sum of all objects in your storage buckets, including noncurrent objects retained by object versioning.\nBilling is prorated down to the hour and will be displayed GB-Hrs.'
       : 'Sum of all objects in your storage buckets.\nBilling is prorated down to the hour and will be displayed GB-Hrs.',
     chartDescription: 'The data refreshes every hour.',
-    ...(isStorageVersioningEnabled && {
+    ...(isStorageSizeSegmented && {
       additionalInfo: () => <StorageRetentionBreakdown />,
     }),
     links: [

@@ -30,20 +30,18 @@ export type StorageRetentionUsageVariables = {
 
 export type StorageRetentionUsageError = ResponseError
 
-const EMPTY_USAGE: StorageRetentionUsage = {
-  totals: { current: 0, noncurrent: 0 },
-  daily: [],
-  byBucket: [],
-}
-
+/**
+ * `null` means the platform does not report retention usage for this organization. Callers must
+ * fall back to the unsegmented Storage Size figures rather than render it as zero retained data.
+ */
 async function getStorageRetentionUsage(
   { orgSlug }: StorageRetentionUsageVariables,
   _signal?: AbortSignal
-): Promise<StorageRetentionUsage> {
+): Promise<StorageRetentionUsage | null> {
   if (!orgSlug) throw new Error('orgSlug is required')
 
   // TODO(storage-versioning): call the real endpoint once the platform reports retention usage.
-  return EMPTY_USAGE
+  return null
 }
 
 export type StorageRetentionUsageData = Awaited<ReturnType<typeof getStorageRetentionUsage>>
@@ -52,5 +50,5 @@ export const storageRetentionUsageQueryOptions = ({ orgSlug }: StorageRetentionU
   queryOptions({
     queryKey: storageKeys.retentionUsage(orgSlug),
     queryFn: ({ signal }) => getStorageRetentionUsage({ orgSlug }, signal),
-    enabled: IS_PLATFORM && typeof orgSlug !== 'undefined',
+    enabled: IS_PLATFORM && !!orgSlug,
   })

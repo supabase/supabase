@@ -24,7 +24,8 @@ export const StorageRetentionBreakdown = () => {
       </div>
     )
   }
-  if (!isSuccess) return null
+  // `null` is the platform telling us it has no retention figures for this org yet.
+  if (!isSuccess || data === null) return null
 
   const { totals, byBucket } = data
   const bucketsWithNoncurrentData = byBucket.filter((bucket) => bucket.noncurrent > 0)
