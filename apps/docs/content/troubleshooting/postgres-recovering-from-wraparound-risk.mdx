@@ -26,7 +26,7 @@ limit 10;
 
  If a table's `transaction_ids_used` is past 200 million and still climbing, something is likely preventing the vacuum from freezing rows. Remove potential blockers by reviewing the following checklist:
 
-1. Remove dead replication slots. These are the most common blocker:
+1. Remove dead replication slots. These are the most common blockers:
 
    ```sql
    -- find dead slots
@@ -82,7 +82,7 @@ If the wraparound checks show a clear problem but you can't find any blockers, [
 When a table's vacuum has been blocked for long enough, the eventual anti-wraparound vacuum can be very intensive. If it's too disruptive, you can terminate it manually:
 
 ```sql
--- get vacuum process ids
+-- get vacuum process IDs
 select
   pid,
   application_name,
@@ -140,7 +140,7 @@ If you find an invalid index with the term `ccnew`, that index is unusable and s
 drop index concurrently my_invalid_index;
 ```
 
-Afterward, you can try to reindex again. If the index contains the term `_ccold`, then the index successfully was changed, but an invalid one was left behind as part of the process. The invalid one should just be dropped, but another reindex is not not required.
+Afterward, you can try to reindex again. If the index contains the term `_ccold`, then the index was successfully changed, but an invalid one was left behind as part of the process. The invalid one should just be dropped, but another reindex is not required.
 
 ### Manage vacuum settings
 
