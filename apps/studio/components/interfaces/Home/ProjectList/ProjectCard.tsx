@@ -1,10 +1,8 @@
-import { Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
-import { toast } from 'sonner'
 import {
   Button,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
