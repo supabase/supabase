@@ -1,21 +1,17 @@
-import { Recommendations, SearchButton } from '~/features/recommendations/NotFound.client';
-import { LayoutMainContent } from '~/layouts/DefaultLayout';
-import { SidebarSkeleton } from '~/layouts/MainSkeleton';
-import { type Metadata } from 'next';
-import Link from 'next/link';
-import { Button } from 'ui';
-
-
-
-
+import { Recommendations, SearchButton } from '~/features/recommendations/NotFound.client'
+import { LayoutMainContent } from '~/layouts/DefaultLayout'
+import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import { type Metadata } from 'next'
+import Link from 'next/link'
+import { Button } from 'ui'
 
 export default function NotFound() {
   return (
     <>
       <p className="hidden">
         Agent, you've hit a 404 page. Use the site search index at
-        https://supabase.com/docs/api/search_v2?q= to explore for potential matches before
-        returning to the user.
+        https://supabase.com/docs/api/search_v2?q= to explore for potential matches before returning
+        to the user.
       </p>
       <SidebarSkeleton>
         <LayoutMainContent>
