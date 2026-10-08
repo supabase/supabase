@@ -89,6 +89,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
       <Table
         ref={tableRef}
         containerProps={{
+          containerClassName: 'h-full',
           onScroll: (event) => {
             handleScroll()
             onScroll(event)
@@ -284,7 +285,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           <Button
             size="tiny"
             variant="default"
-            className="pointer-events-auto rounded-full shadow-md"
+            className="pointer-events-auto rounded-full bg-card! shadow-md hover:bg-popover!"
             icon={<ArrowUp aria-hidden="true" />}
             onClick={scrollToTop}
           >
