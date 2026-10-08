@@ -56,6 +56,8 @@ export const OAuthAppsAuthorizedList = () => {
     return 'Authorized apps loaded'
   }, [isPending, isLoadingPermissions, isFetchingNextPage])
 
+  const hasAuthorizedApps = isSuccess && data.pages.length > 0 && data.pages[0].data.length > 0
+
   return (
     <PageSection id="authorized-apps">
       <PageSectionMeta>
@@ -89,14 +91,29 @@ export const OAuthAppsAuthorizedList = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>App</TableHead>
-                  <TableHead>Access</TableHead>
+                  <TableHead
+                    className={cn(
+                      hasAuthorizedApps
+                        ? 'w-[62px] min-w-[62px] max-w-[62px]'
+                        : 'w-0 min-w-0 max-w-0 p-0',
+                      !hasAuthorizedApps && 'text-foreground-muted'
+                    )}
+                  >
+                    <span className="sr-only">Application icon</span>
+                  </TableHead>
+                  <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                    App
+                  </TableHead>
+                  <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                    Access
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.pages.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
-                    <TableCell colSpan={2}>
+                    <TableCell colSpan={3}>
+                      <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-foreground-lighter">
                         No apps have been authorized in this organization yet.
                       </p>
@@ -124,7 +141,7 @@ export const OAuthAppsAuthorizedList = () => {
                       ref={sentinelRef}
                       className={cn('[&>td]:hover:bg-inherit', !isFetchingNextPage && 'hidden')}
                     >
-                      <TableCell colSpan={2}>
+                      <TableCell colSpan={3}>
                         <p className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>
