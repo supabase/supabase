@@ -1,0 +1,214 @@
+---
+title = "Security Advisor flags spatial_ref_sys and other PostGIS objects in the public schema"
+topics = [ "database" ]
+keywords = [ "PostGIS", "spatial_ref_sys", "geometry_columns", "geography_columns", "st_estimatedextent", "Security Advisor", "RLS Disabled in Public", "is public, but RLS has not been enabled", "rls_disabled_in_public", "extension_in_public", "anon_security_definer_function_executable", "authenticated_security_definer_function_executable", "pg_graphql_anon_table_exposed", "Row Level Security", "RLS", "revoke", "grant", "supabase_admin", "extensions schema", "anon", "authenticated" ]
+
+[[errors]]
+code = "42501"
+message = "must be owner of table spatial_ref_sys"
+
+[[errors]]
+code = "01006"
+message = "no privileges could be revoked for \"spatial_ref_sys\""
+
+[[errors]]
+code = "42501"
+message = "must be owner of relation spatial_ref_sys"
+
+[[errors]]
+code = "XX000"
+message = "Cannot find SRID (4326) in spatial_ref_sys"
+
+[[errors]]
+code = "0A000"
+message = "extension \"postgis\" does not support SET SCHEMA"
+---
+
+When PostGIS is installed in the `public` schema, the [Security Advisor](/dashboard/project/_/advisors/security) reports findings on the objects that PostGIS creates there. The following table lists them:
+
+| Finding                                                                                             | Object                                                                                       |
+| --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| RLS Disabled in Public                                                                              | `public.spatial_ref_sys`                                                                     |
+| Extension in Public                                                                                 | The `postgis` extension                                                                      |
+| Public Can Execute SECURITY DEFINER Function, Signed-In Users Can Execute SECURITY DEFINER Function | `public.st_estimatedextent`                                                                  |
+| Public Can See Object in GraphQL Schema, Signed-In Users Can See Object in GraphQL Schema           | `spatial_ref_sys`, `geometry_columns`, and `geography_columns`, when `pg_graphql` is enabled |
+
+These objects don't hold your data. The main risk is that anyone with your project's anon key can change the coordinate system definitions in `spatial_ref_sys`, which breaks PostGIS queries. For details, see [What the findings expose](#what-the-findings-expose).
+
+You can't resolve these findings on the objects themselves. Enabling Row Level Security or creating a policy on `spatial_ref_sys` fails with the following error:
+
+```text
+ERROR:  42501: must be owner of table spatial_ref_sys
+```
+
+A `revoke` on these objects prints `WARNING: no privileges could be revoked` and changes nothing. The SQL Editor doesn't display warnings, and a migration that contains the `revoke` completes, so the statement looks successful.
+
+To resolve the findings, [move PostGIS to the `extensions` schema](#move-postgis-to-the-extensions-schema).
+
+## Check whether your project is affected
+
+To see which schema PostGIS is installed in, and whether the `anon` role can change `spatial_ref_sys`, run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+select
+  extnamespace::regnamespace as postgis_schema,
+  has_table_privilege(
+    'anon',
+    extnamespace::regnamespace || '.spatial_ref_sys',
+    'insert, update, delete'
+  ) as anon_can_write
+from pg_extension
+where extname = 'postgis';
+```
+
+If `postgis_schema` is `public`, the findings apply to your project. `anon_can_write` is `true` when the `anon` role can insert, update, or delete rows in `spatial_ref_sys`.
+
+### Check whether rows in `spatial_ref_sys` were changed
+
+To count the rows changed in `spatial_ref_sys` since the database statistics were last reset, run:
+
+```sql
+select n_tup_upd as rows_updated, n_tup_del as rows_deleted
+from pg_stat_user_tables
+where relname = 'spatial_ref_sys';
+```
+
+Both values are `0` when no row was changed or deleted. The statistics don't separate inserted rows from the rows that PostGIS loads when the extension is created, so use the logs to find inserts.
+
+To find the Data API requests that tried to insert, change, or delete rows, open [Explorer](/docs/guides/observability/advanced-log-filtering#studio), select a time range, and run:
+
+```sql
+select
+  timestamp,
+  log_attributes['request.method'] as method,
+  log_attributes['request.path'] as path
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '%/spatial_ref_sys%'
+  and log_attributes['request.method'] in ('POST', 'PATCH', 'PUT', 'DELETE')
+order by timestamp desc
+limit 100;
+```
+
+Logs are available only for the retention period of your plan.
+
+If rows were deleted or changed, [dropping and re-creating PostGIS](#drop-and-re-create-postgis-yourself) restores the original table. If you move PostGIS without dropping it, copy the missing rows from a project with the same PostGIS version. To find your version, run `select extversion from pg_extension where extname = 'postgis';`.
+
+## Why this happens
+
+Supabase creates extensions as the `supabase_admin` role, so `supabase_admin` owns `spatial_ref_sys` and every other PostGIS object. In the `public` schema, the default privileges of `supabase_admin` give `anon`, `authenticated`, and `service_role` all privileges on new tables and `execute` on new functions. PostGIS objects created in `public` receive these grants, and creating PostGIS in `public` again applies them again.
+
+Only a table's owner can enable Row Level Security on it or create policies for it. A role can revoke only the privileges that it granted, so the `postgres` role can't remove the grants that `supabase_admin` made. For more information, see the Postgres documentation on [`REVOKE`](https://www.postgresql.org/docs/current/sql-revoke.html).
+
+### What the findings expose
+
+`spatial_ref_sys` holds the coordinate system definitions that PostGIS ships with, and none of your data. Anyone with your project's anon key can insert, update, and delete its rows through the Data API. If a row that your queries use is changed or deleted, PostGIS functions that use that spatial reference ID (SRID) fail. For example, after the row for SRID 4326 is deleted, geography functions fail:
+
+```text
+ERROR:  Cannot find SRID (4326) in spatial_ref_sys
+```
+
+`st_estimatedextent` is a `security definer` function, so it runs with the privileges of `supabase_admin`. Any role that can call it can read the estimated bounding box of a geometry column in any table. This includes tables that the role can't select from. The Security Advisor names `/rest/v1/rpc/st_estimatedextent` as the path, but the function's parameters have no names, so the Data API can't call it and returns a `PGRST202` error. Roles that connect to the database directly, such as roles you create with `login`, can call it.
+
+`geometry_columns` and `geography_columns` list only the tables that the calling role can select from.
+
+These findings aren't false positives. The Security Advisor reports them for as long as PostGIS is installed in `public`.
+
+## Move PostGIS to the extensions schema
+
+By default, the Data API doesn't expose the `extensions` schema, and the Security Advisor doesn't check objects in it. Moving PostGIS there resolves all of these findings. Keep `extensions` out of the exposed schemas in your [Data API settings](/dashboard/project/_/settings/api), because the PostGIS objects keep their grants after the move. You can ask Supabase Support to move PostGIS, or drop and re-create it yourself.
+
+### Prepare your functions
+
+Your database's default search path includes `extensions`, so queries that use PostGIS functions and types without a schema name keep working after the move. Functions that set their own `search_path` keep the value they have. If that value doesn't include `extensions`, the function fails after the move with an error such as `function st_distance(extensions.geography, extensions.geography) does not exist`.
+
+To list your functions that use PostGIS and set a `search_path` without `extensions`, run:
+
+```sql
+select p.oid::regprocedure as function_name, p.proconfig as settings
+from pg_proc p
+where p.prosrc ~* '\m(st_\w+|geometry|geography)\M'
+  and not exists (
+    select 1 from pg_depend d
+    where d.objid = p.oid and d.deptype = 'e'
+  )
+  and exists (
+    select 1
+    from unnest(p.proconfig) as setting
+    where setting like 'search_path=%'
+      and setting not like '%extensions%'
+  );
+```
+
+For each function in the result, add `extensions` to its search path:
+
+```sql
+alter function public.my_function(integer)
+  set search_path = public, extensions;
+```
+
+If a function uses an empty search path and calls PostGIS with the `public.` prefix, such as `public.st_x(geom)`, change the prefix to `extensions.`.
+
+### Ask Supabase Support to move PostGIS
+
+[Contact Supabase Support](/dashboard/support/new) and ask them to move PostGIS to the `extensions` schema. Support moves the extension without dropping it, so your tables keep their PostGIS columns, data, and indexes, and views that use PostGIS keep working. The move runs in a single transaction, so it either completes or changes nothing. It doesn't restart your database. Prepare your functions before Support runs the move.
+
+### Drop and re-create PostGIS yourself
+
+You can't move PostGIS with `alter extension postgis set schema extensions`. PostGIS doesn't support moving to another schema, so the statement fails with `extension "postgis" does not support SET SCHEMA`. To move it yourself, drop it and create it again in `extensions`.
+
+<Admonition type="danger">
+
+Dropping PostGIS deletes every column that uses a PostGIS type, such as `geometry` or `geography`, and the indexes, views, and functions that depend on them. Use this method only if your tables have no PostGIS columns, or if you can restore them from a backup.
+
+</Admonition>
+
+1. Back up your roles, schema, and data. For the commands, see [Back up database using the CLI](/docs/guides/platform/migrating-within-supabase/backup-restore#back-up-database-using-the-cli).
+2. Prepare your functions.
+3. Drop PostGIS:
+
+   ```sql
+   drop extension postgis cascade;
+   ```
+
+4. Create PostGIS in the `extensions` schema:
+
+   ```sql
+   create extension postgis with schema extensions;
+   ```
+
+5. Re-create the PostGIS columns, indexes, views, and functions that the drop removed, and restore their data from your backup.
+
+### After the move
+
+If your project has [Database Webhooks](/docs/guides/database/webhooks) on tables with PostGIS columns, the webhooks fail with `permission denied for schema extensions`. To give the webhook role access to the PostGIS types, run:
+
+```sql
+grant usage on schema extensions to supabase_functions_admin;
+```
+
+If your app calls PostGIS functions through the Data API, such as with `supabase.rpc('st_distance')`, those calls stop working, because the Data API doesn't expose `extensions`. Create a function in `public` that calls the PostGIS function, and call your function with `supabase.rpc()` instead.
+
+## Confirm the fix
+
+1. Run the query from [Check whether your project is affected](#check-whether-your-project-is-affected). `postgis_schema` is `extensions`.
+
+   If Support moved PostGIS, `anon_can_write` can still be `true`, because the PostGIS objects keep their grants. The Data API can't reach them while `extensions` isn't an exposed schema.
+
+2. Open the [Security Advisor](/dashboard/project/_/advisors/security) and click **Rerun linter**. The findings for PostGIS objects no longer appear.
+3. Run the function-listing query from [Prepare your functions](#prepare-your-functions) again. It returns no rows.
+4. If you use Database Webhooks on tables with PostGIS columns, insert or update a row in one of those tables, and check that the webhook request is sent.
+
+## Keep PostGIS out of the public schema
+
+To keep PostGIS out of `public` on new projects, branches, and local databases, create it with a schema in your migrations:
+
+```sql
+create extension if not exists postgis with schema extensions;
+```
+
+## Approaches that don't resolve the findings
+
+Supabase doesn't recommend changing the grants on PostGIS objects, and can't guarantee that PostGIS keeps working correctly after such a change. Move PostGIS instead.
+
+Don't create a trigger on `spatial_ref_sys` to block writes. The `postgres` role can create the trigger but can't drop it, because only the table's owner can drop a trigger. Dropping it fails with `must be owner of relation spatial_ref_sys`.
