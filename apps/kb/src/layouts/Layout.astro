@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props
-const faviconRoute = '/favicon'
+const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 ---
 
 <!doctype html>

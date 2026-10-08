@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_BASE_PATH", "NEXT_PUBLIC_APP_URL"],
+      "env": ["NODE_ENV", "NEXT_PUBLIC_BASE_PATH", "NEXT_PUBLIC_APP_URL"],
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*", ".velite/**"],
     },
   },

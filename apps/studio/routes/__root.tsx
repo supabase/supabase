@@ -81,7 +81,7 @@ import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedO
 import { AuthProvider } from '@/lib/auth'
 import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
-import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+import { API_URL, BASE_PATH, IS_CLI, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
 import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
@@ -204,7 +204,17 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
 
 configureMonacoLoader()
 
-const FAVICON_ROUTE = IS_NON_PROD_ENV ? '/favicon/staging' : '/favicon'
+// Resolve favicon assets synchronously so the server-rendered head matches the environment.
+let FAVICON_ROUTE = '/favicon'
+if (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod')
+  FAVICON_ROUTE = '/favicon/staging'
+if (
+  process.env.NODE_ENV === 'development' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  IS_CLI
+) {
+  FAVICON_ROUTE = '/favicon/local'
+}
 const THEME_COLOR = '1E1E1E'
 const APPLICATION_NAME = 'Supabase Studio'
 

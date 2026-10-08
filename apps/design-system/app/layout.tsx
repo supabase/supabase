@@ -11,12 +11,14 @@ import { inter, manrope, sourceCodePro } from '@/lib/fonts'
 
 const className = `${inter.variable} ${manrope.variable} ${sourceCodePro.variable}`
 
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+
 export const metadata: Metadata = {
   applicationName: 'Supabase Design System',
   title: 'Supabase Design System',
   description: 'Design resources for building consistent user experiences at Supabase.',
-  icons: genFaviconData(BASE_PATH),
-  manifest: `${BASE_PATH}/favicon/manifest.json`,
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
 }
 
 export const viewport: Viewport = {
