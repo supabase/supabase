@@ -1,7 +1,7 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Building2, User } from 'lucide-react'
-import { Fragment, useEffect } from 'react'
+import { ComponentProps, Fragment, useEffect } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -13,7 +13,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  type DialogContentProps,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -21,7 +20,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useOAuthAppMemberGrantsQuery } from '@/data/oauth-apps/oauth-apps-member-grants-query'
 import type { OAuthApprovalItem, OAuthGrantItem } from '@/data/oauth-apps/types'
 
-export interface OAuthAppsMemberGrantsDialogProps extends DialogContentProps {
+export interface OAuthAppsMemberGrantsDialogProps extends ComponentProps<typeof DialogContent> {
   approval?: OAuthApprovalItem
 }
 
