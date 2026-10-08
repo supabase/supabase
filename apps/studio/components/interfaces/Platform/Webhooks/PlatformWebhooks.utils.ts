@@ -80,8 +80,6 @@ export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: str
   })
 }
 
-// Deliveries are already scoped to one endpoint by the query itself (the real API has
-// no "all deliveries" endpoint), so this only needs to filter by search text and sort.
 export const filterWebhookDeliveries = (deliveries: WebhookDelivery[], search: string) => {
   const normalizedSearch = normalizeSearch(search)
 

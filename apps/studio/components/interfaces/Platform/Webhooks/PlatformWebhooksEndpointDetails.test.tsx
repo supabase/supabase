@@ -69,8 +69,6 @@ const createDelivery = (overrides: Partial<WebhookDelivery>): WebhookDelivery =>
   ...overrides,
 })
 
-// 12 deliveries for this one endpoint, 8 of them "project"-flavored — mirrors the
-// shape the old mock seed used to provide, now defined locally since the mock is gone.
 const allDeliveries: WebhookDelivery[] = [
   createDelivery({
     id: 'org-delivery-1',
