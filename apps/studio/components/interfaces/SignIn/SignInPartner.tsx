@@ -15,6 +15,12 @@ export const SignInPartner = () => {
   const trackFunnelError = useTrackFunnelError()
 
   useEffect(() => {
+    // The sign-in exchange below is async, so the user can navigate away (or the
+    // component can otherwise unmount) before it settles. Without this guard the
+    // redirects at the bottom still fire on the stale mount and yank the user back
+    // to /sign-in-mfa or /sign-in regardless of where they've since navigated to.
+    let isMounted = true
+
     ;(async () => {
       const params = new URLSearchParams(window.location.hash.substring(1))
 
@@ -38,12 +44,16 @@ export const SignInPartner = () => {
             trackFunnelError('signin', classifyApiError('signin', error), 'form')
           }
         } finally {
-          router.replace({ pathname: '/sign-in-mfa', query: { method } })
+          if (isMounted) router.replace({ pathname: '/sign-in-mfa', query: { method } })
         }
       } else {
-        router.replace({ pathname: '/sign-in' })
+        if (isMounted) router.replace({ pathname: '/sign-in' })
       }
     })()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
