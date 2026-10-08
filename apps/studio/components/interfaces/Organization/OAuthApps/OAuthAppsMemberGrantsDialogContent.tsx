@@ -92,7 +92,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
             {isEmpty ? 'No grants have been authorized for this application.' : ''}
           </p>
 
-          <Accordion type="multiple">
+          <Accordion type="multiple" className="divide-y! divide-border!">
             {data.pages.map((page, pageIndex) => (
               <Fragment key={pageIndex}>
                 {page.data.map((grant) => (
@@ -121,7 +121,7 @@ const GrantAccordionItem = ({ grant }: { grant: OAuthGrantItem }) => {
   const permissionCount = grant.approved_scopes.length
 
   return (
-    <AccordionItem value={grant.grant_id}>
+    <AccordionItem value={grant.grant_id} className="border-b-0">
       <AccordionTrigger className="hover:no-underline">
         {isOrganizationBound ? (
           <Building2 size={16} className="shrink-0 text-foreground-lighter rotate-0!" />
