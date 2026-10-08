@@ -36,6 +36,7 @@ import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePrevi
 import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
+import { PipelineCreationPreview } from './PipelineCreationPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { StorageVersioningPreview } from './StorageVersioningPreview'
@@ -48,6 +49,7 @@ import { useTrack } from '@/lib/telemetry/track'
 const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [key: string]: ReactNode
 } = {
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION]: <PipelineCreationPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]: <PgDeltaDiffPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES]: <AdvisorRulesPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: <CLSPreview />,
