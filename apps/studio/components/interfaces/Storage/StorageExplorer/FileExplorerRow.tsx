@@ -539,7 +539,8 @@ export const FileExplorerRow = ({
                     />
                   </div>
                 )}
-                {isFile ? (
+                {/* An archived row has no live object, so none of the bulk actions apply to it. */}
+                {isFile && !isArchived ? (
                   <Checkbox
                     className={
                       isSelected
