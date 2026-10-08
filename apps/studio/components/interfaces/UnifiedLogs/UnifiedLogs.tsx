@@ -242,6 +242,9 @@ export const UnifiedLogs = () => {
   const {
     rows: flatData,
     batches,
+    unreadCount,
+    sessionKey,
+    acknowledgeLiveLogs,
     fetchLiveLogs,
     resetLiveBatches,
   } = useLiveLogBatches({
@@ -548,6 +551,14 @@ export const UnifiedLogs = () => {
                   )}
                 >
                   <DataTableInfinite
+                    scrollPreservation={{
+                      key: sessionKey,
+                      onScrollToTop: acknowledgeLiveLogs,
+                      scrollToTopLabel:
+                        unreadCount > 0
+                          ? `${unreadCount} new ${unreadCount === 1 ? 'log' : 'logs'}`
+                          : undefined,
+                    }}
                     rowDecorations={rowDecorations}
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}

@@ -7,6 +7,7 @@ type LiveLogSession = {
   generation: symbol
   batches: LiveLogBatch[]
   baselineIds: string[]
+  unreadCount: number
 }
 
 const createSession = (scope: string): LiveLogSession => ({
@@ -14,6 +15,7 @@ const createSession = (scope: string): LiveLogSession => ({
   generation: Symbol(),
   batches: [],
   baselineIds: [],
+  unreadCount: 0,
 })
 
 export function useLiveLogBatches<T extends { id: string }>({
@@ -68,6 +70,10 @@ export function useLiveLogBatches<T extends { id: string }>({
     setSession(nextSession)
   }, [])
 
+  const acknowledgeLiveLogs = useCallback(() => {
+    setSession((current) => (current.unreadCount === 0 ? current : { ...current, unreadCount: 0 }))
+  }, [])
+
   const fetchLiveLogs = useCallback(async () => {
     const previous = latest.current
     if (previous.isPlaceholderData) return
@@ -85,10 +91,15 @@ export function useLiveLogBatches<T extends { id: string }>({
       setSession((current) => {
         if (current.generation !== previous.session.generation) return current
         const batchedIds = new Set(current.batches.flatMap((entry) => entry.ids))
+        const newIds = batch?.ids.filter((id) => !batchedIds.has(id)) ?? []
         return {
           ...current,
-          batches: batch ? [batch, ...current.batches] : current.batches,
+          batches:
+            batch && newIds.length > 0
+              ? [{ ...batch, ids: newIds }, ...current.batches]
+              : current.batches,
           baselineIds: previous.rows.map((row) => row.id).filter((id) => !batchedIds.has(id)),
+          unreadCount: current.unreadCount + newIds.length,
         }
       })
     }
@@ -96,5 +107,13 @@ export function useLiveLogBatches<T extends { id: string }>({
     return response
   }, [])
 
-  return { rows: orderedRows, batches: currentSession.batches, fetchLiveLogs, resetLiveBatches }
+  return {
+    rows: orderedRows,
+    batches: currentSession.batches,
+    unreadCount: currentSession.unreadCount,
+    sessionKey: currentSession.generation,
+    acknowledgeLiveLogs,
+    fetchLiveLogs,
+    resetLiveBatches,
+  }
 }

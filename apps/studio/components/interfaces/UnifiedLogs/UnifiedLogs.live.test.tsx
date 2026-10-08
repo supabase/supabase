@@ -102,6 +102,7 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
       )
       await waitFor(() => expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('1'))
       expect(screen.getByText('initial-log')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /new logs?/ })).not.toBeInTheDocument()
 
       vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
       rows.push(createRow('first-arrival'), {
@@ -115,6 +116,7 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         expect(screen.getByText(/No more data to load/)).toHaveTextContent('3 of 3 rows')
       })
       expect(getLogSequence()).toEqual(['first-arrival', 'late-arrival', 'refresh', 'initial-log'])
+      expect(screen.getByRole('button', { name: '2 new logs' })).toBeVisible()
       const separator = screen.getByText(/^Refresh \d{2}:\d{2}:\d{2}$/)
       expect(separator).toHaveAttribute(
         'colspan',
@@ -144,11 +146,13 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
       ])
       expect(screen.getAllByText('initial-log')).toHaveLength(1)
       expect(screen.getAllByText('first-arrival')).toHaveLength(1)
+      expect(screen.getByRole('button', { name: '3 new logs' })).toBeVisible()
       expect(requests).toHaveLength(7)
 
       await act(async () => vi.advanceTimersByTimeAsync(10_000))
       await vi.waitFor(() => expect(requests).toHaveLength(9))
       expect(screen.getAllByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).toHaveLength(2)
+      expect(screen.getByRole('button', { name: '3 new logs' })).toBeVisible()
 
       fireEvent.click(screen.getByRole('button', { name: 'Live' }))
       const requestsAfterPause = requests.length
@@ -158,9 +162,13 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
       expect(screen.queryByText('paused-arrival')).not.toBeInTheDocument()
       expect(screen.getByLabelText('Postgres facet')).toHaveTextContent('4')
       expect(screen.getAllByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).toHaveLength(2)
+      fireEvent.click(screen.getByRole('button', { name: '3 new logs' }))
+      expect(screen.queryByRole('button', { name: /new logs?/ })).not.toBeInTheDocument()
+      expect(screen.getAllByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).toHaveLength(2)
 
       fireEvent.click(screen.getByRole('button', { name: 'Live' }))
       await vi.waitFor(() => expect(screen.getByText('paused-arrival')).toBeInTheDocument())
+      expect(screen.getByRole('button', { name: '1 new log' })).toBeVisible()
       expect(getLogSequence()).toEqual([
         'paused-arrival',
         'refresh',
@@ -175,6 +183,7 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         expect(screen.getByRole('button', { name: 'Refresh logs' })).toBeEnabled()
       )
       fireEvent.click(screen.getByRole('button', { name: 'Refresh logs' }))
+      expect(screen.queryByRole('button', { name: /new logs?/ })).not.toBeInTheDocument()
       expect(screen.queryByText(/^Refresh \d{2}:\d{2}:\d{2}$/)).not.toBeInTheDocument()
       unmount()
     }
