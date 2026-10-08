@@ -43,8 +43,7 @@ export const StorageExplorerContent = ({
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
-  const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } =
-    useArchivedFilesContext()
+  const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } = useArchivedFilesContext()
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)

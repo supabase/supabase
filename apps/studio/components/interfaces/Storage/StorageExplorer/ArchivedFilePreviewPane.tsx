@@ -17,6 +17,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useArchivedObjectPurgeMutation } from '@/data/storage/versioning/archived-object-purge-mutation'
 import { useArchivedObjectRestoreMutation } from '@/data/storage/versioning/archived-object-restore-mutation'
 import { useArchivedObjectVersionDeleteMutation } from '@/data/storage/versioning/archived-object-version-delete-mutation'
+import { useObjectVersionRestoreMutation } from '@/data/storage/versioning/object-version-restore-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -44,8 +45,13 @@ export const ArchivedFilePreviewPane = () => {
   const [isPurgeConfirmVisible, setIsPurgeConfirmVisible] = useState(false)
   const [versionToDelete, setVersionToDelete] = useState<ArchivedVersionRow>()
 
-  // Restoring any row un-archives the whole file; only the toast differs.
-  const { mutate: restoreObject, isPending: isRestoring } = useArchivedObjectRestoreMutation()
+  // Unarchiving promotes whichever version was current when the file was archived, so restoring
+  // an older one takes a second step.
+  const { mutateAsync: restoreObject, isPending: isUnarchiving } =
+    useArchivedObjectRestoreMutation()
+  const { mutateAsync: restoreVersion, isPending: isPromotingVersion } =
+    useObjectVersionRestoreMutation()
+  const isRestoring = isUnarchiving || isPromotingVersion
 
   const { mutate: purgeObject, isPending: isPurging } = useArchivedObjectPurgeMutation({
     onSuccess: () => {
@@ -68,23 +74,38 @@ export const ArchivedFilePreviewPane = () => {
   const mergedVersions = getMergedArchivedVersions(object)
   const hasOlderVersions = object.noncurrentVersions.length > 0
 
-  const handleRestore = (version?: ArchivedVersionRow) => {
+  const handleRestore = async (version?: ArchivedVersionRow) => {
     if (!projectRef || !selectedBucket?.id) return
-    restoreObject(
-      { projectRef, bucketId: selectedBucket.id, archivedObjectId: object.id, path: object.path },
-      {
-        onSuccess: async () => {
-          toast.success(
-            version && !version.wasCurrentAtArchive
-              ? `File restored — version ${shortVersion(version.versionId)} is now current`
-              : 'File restored'
-          )
-          clearArchivedSelection()
-          // The file is live again, and the live listing is the explorer's own state.
-          await refetchAllOpenedFolders()
-        },
+    const bucketId = selectedBucket.id
+    const isOlderVersion = version !== undefined && !version.wasCurrentAtArchive
+
+    try {
+      await restoreObject({
+        projectRef,
+        bucketId,
+        archivedObjectId: object.id,
+        path: object.path,
+      })
+      if (isOlderVersion) {
+        await restoreVersion({
+          projectRef,
+          bucketId,
+          path: object.path,
+          versionId: version.versionId,
+        })
       }
-    )
+
+      toast.success(
+        isOlderVersion
+          ? `File restored — version ${shortVersion(version.versionId)} is now current`
+          : 'File restored'
+      )
+      clearArchivedSelection()
+      // The file is live again, and the live listing is the explorer's own state.
+      await refetchAllOpenedFolders()
+    } catch {
+      // Both mutations report their own failures.
+    }
   }
 
   const handleDeleteVersion = () => {
@@ -154,6 +175,7 @@ export const ArchivedFilePreviewPane = () => {
             <ArchivedVersionRestoreWidget
               version={previewedVersion}
               path={object.path}
+              canUpdateFiles={canUpdateFiles}
               isRestoring={isRestoring}
               onRestore={() => handleRestore(previewedVersion)}
               onDismiss={() => setSelectedArchivedVersion(undefined)}

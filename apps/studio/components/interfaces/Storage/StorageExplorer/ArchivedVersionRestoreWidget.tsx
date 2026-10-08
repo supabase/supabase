@@ -1,16 +1,17 @@
 import dayjs from 'dayjs'
 import { RotateCcw, X } from 'lucide-react'
-import { Button } from 'ui'
 
 import type { ArchivedVersionRow } from './archivedVersions.utils'
 import { FilePreview } from './FilePreview'
 import { shortVersion } from './VersionHistory'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { formatBytes } from '@/lib/helpers'
 
 interface ArchivedVersionRestoreWidgetProps {
   version: ArchivedVersionRow
   /** Full path within the bucket, which is what the version endpoints address. */
   path: string
+  canUpdateFiles: boolean
   isRestoring: boolean
   onRestore: () => void
   onDismiss: () => void
@@ -20,6 +21,7 @@ interface ArchivedVersionRestoreWidgetProps {
 export const ArchivedVersionRestoreWidget = ({
   version,
   path,
+  canUpdateFiles,
   isRestoring,
   onRestore,
   onDismiss,
@@ -55,15 +57,22 @@ export const ArchivedVersionRestoreWidget = ({
       </p>
     </div>
 
-    <Button
+    <ButtonTooltip
       variant="primary"
       block
       icon={<RotateCcw size={14} />}
       loading={isRestoring}
+      disabled={!canUpdateFiles}
       onClick={onRestore}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: canUpdateFiles ? undefined : 'You need additional permissions to restore files',
+        },
+      }}
     >
       Restore as current version
-    </Button>
+    </ButtonTooltip>
 
     <p className="text-xs leading-relaxed text-foreground-lighter">
       The file leaves the archive and this becomes its current version. Every other retained version

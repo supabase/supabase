@@ -36,10 +36,13 @@ export const BucketVersioningPill = ({ bucket, showPrefix = true }: BucketVersio
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Badge variant={variant} className="shrink-0">
-          <FileStack size={12} aria-hidden />
-          {showPrefix ? `Versioning ${state.toLowerCase()}` : state}
-        </Badge>
+        {/* A Badge is a div, so the tooltip needs a focusable wrapper to be reachable by keyboard. */}
+        <span tabIndex={0} className="shrink-0">
+          <Badge variant={variant} className="cursor-help">
+            <FileStack size={12} aria-hidden />
+            {showPrefix ? `Versioning ${state.toLowerCase()}` : state}
+          </Badge>
+        </span>
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-64">
         {tooltip}

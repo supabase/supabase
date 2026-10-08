@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ArchivedFilePreviewPane } from '@/components/interfaces/Storage/StorageExplorer/ArchivedFilePreviewPane'
+import type { ArchivedVersionRow } from '@/components/interfaces/Storage/StorageExplorer/archivedVersions.utils'
 import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-query'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -21,8 +22,18 @@ const ARCHIVED_OBJECT: ArchivedObject = {
     action: 'initial upload',
     mimeType: 'image/png',
   },
-  noncurrentVersions: [],
+  noncurrentVersions: [
+    {
+      versionId: 'v-older',
+      size: 80,
+      createdAt: '2023-12-01T00:00:00Z',
+      action: 'initial upload',
+      mimeType: 'image/png',
+    },
+  ],
 }
+
+let selectedArchivedVersion: ArchivedVersionRow | undefined
 
 vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => ({
@@ -34,7 +45,7 @@ vi.mock('@/state/storage-explorer', () => ({
 vi.mock('@/components/interfaces/Storage/StorageExplorer/ArchivedFilesContext', () => ({
   useArchivedFilesContext: () => ({
     selectedArchivedObject: ARCHIVED_OBJECT,
-    selectedArchivedVersion: undefined,
+    selectedArchivedVersion,
     setSelectedArchivedVersion: vi.fn(),
     clearArchivedSelection,
   }),
@@ -48,6 +59,7 @@ describe('ArchivedFilePreviewPane', () => {
   let signed: unknown[] = []
   beforeEach(() => {
     signed = []
+    selectedArchivedVersion = undefined
     addAPIMock({
       method: 'post',
       path: '/platform/storage/:ref/buckets/:id/objects/sign',
@@ -61,11 +73,14 @@ describe('ArchivedFilePreviewPane', () => {
   it('signs the archived version, since the path itself resolves to the delete marker', async () => {
     render(<ArchivedFilePreviewPane />)
 
-    await waitFor(() => expect(signed).toHaveLength(1))
-    expect(signed[0]).toMatchObject({
-      path: 'images/gone.png',
-      options: { versionId: 'v-current' },
-    })
+    await waitFor(() =>
+      expect(signed).toContainEqual(
+        expect.objectContaining({
+          path: 'images/gone.png',
+          options: expect.objectContaining({ versionId: 'v-current' }),
+        })
+      )
+    )
   })
 
   it('refreshes the live listing after a restore, so the file reappears', async () => {
@@ -82,6 +97,50 @@ describe('ArchivedFilePreviewPane', () => {
     // Without this the archived row goes but the restored file stays invisible:
     // the live listing is the explorer's own state, not a React Query cache.
     await waitFor(() => expect(refetchAllOpenedFolders).toHaveBeenCalled())
+    expect(clearArchivedSelection).toHaveBeenCalled()
+  })
+
+  it('promotes the selected version after unarchiving, not just the one under the marker', async () => {
+    selectedArchivedVersion = {
+      versionId: 'v-older',
+      size: 80,
+      createdAt: '2023-12-01T00:00:00Z',
+      action: 'initial upload',
+      mimeType: 'image/png',
+      wasCurrentAtArchive: false,
+    }
+
+    const unarchived: unknown[] = []
+    const moved: unknown[] = []
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/storage/:ref/buckets/:id/objects',
+      response: async ({ request }) => {
+        unarchived.push(await request.json())
+        return Response.json({})
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/move',
+      response: async ({ request }) => {
+        moved.push(await request.json())
+        return Response.json({})
+      },
+    })
+
+    render(<ArchivedFilePreviewPane />)
+
+    await userEvent.click(screen.getByRole('button', { name: /restore as current version/i }))
+
+    // Removing the delete marker only promotes the version that was current at archive time.
+    await waitFor(() => expect(unarchived).toHaveLength(1))
+    await waitFor(() => expect(moved).toHaveLength(1))
+    expect(moved[0]).toMatchObject({
+      from: 'images/gone.png',
+      to: 'images/gone.png',
+      sourceVersionId: 'v-older',
+    })
     expect(clearArchivedSelection).toHaveBeenCalled()
   })
 })
