@@ -1,0 +1,246 @@
+_This guide explains how data flows through your use of Supabase’s Services, where it's processed, and what safeguards protect it. For detailed legal commitments, see our [Data Processing Addendum](/legal/customer-resources/data-processing-addendum) (DPA)._
+
+---
+
+## Regional Hosting & Data Location
+
+### Q: Where is my database hosted?
+
+**A:** Your database is hosted in the AWS region you select when you create your project. **You choose the region**—we don't select it for you.
+
+When you create a Supabase project, you pick from available AWS regions (see full list of available locations [here](/docs/guides/platform/regions)). Your PostgreSQL database, as well as Auth service and Storage objects are hosted in that region, alongside backups.
+
+**Note**: You can choose to execute your Edge Functions [from the same region](/docs/guides/functions/regional-invocation) as your database.
+
+---
+
+### Q: Does Supabase guarantee my data never leaves my selected region?
+
+**A:** No. While your core database and backups stay in your selected region, we process data outside that region in **four limited categories**:
+
+1. **Customer Account Information** — Your account setup, configuration, and billing data may be processed by centralized systems outside your region. This is the information you provide during registration and payment. We are controllers of this data.
+
+2. **Customer Support Requests** — Our support team, located globally to provide 24/7 coverage, may access your data when you request help, report issues, or when we identify and respond to security incidents. This access is logged and limited to what's necessary to resolve your issue. We are processors of this data.
+
+3. **Usage Information** — Telemetry, logs, and service metadata are processed outside your region to operate and secure the platform. This includes operational analytics, performance metrics, and platform health monitoring (not your application data). Logs are ingested and stored at EU-based data centers. Commonly, we are processors of this data.
+
+4. **Content Delivery** — If you use our Storage service, content may be cached or served through a global CDN outside your region, depending on your configuration and end-user locations. We are processors of this data.
+
+Depending on whether we act as a controller or a processor, our [Privacy Policy](/privacy) or our [Data Processing Addendum](/legal/customer-resources/data-processing-addendum) (DPA) describe these categories of data and the controls that govern them.
+
+---
+
+## Other Processing Locations
+
+### Q: What subprocessors does Supabase use, and where are they located?
+
+**A:** We use infrastructure and service providers in multiple regions to operate securely and reliably. Our subprocessor list includes current processing locations.
+
+All subprocessor agreements include data protection terms aligned with GDPR and other applicable privacy regulations. We update our subprocessor list regularly; check the [Legal Hub](/legal) for the current list, and subscribe there for updates.
+
+---
+
+### Q: What about Supabase, Inc. (the US affiliate)?
+
+**A:** Supabase Pte. Ltd. (Singapore) is the primary data processor under our agreements. Supabase, Inc. (United States) provides technical support and operational services. Your data flows to Supabase, Inc. only when necessary for support or operations, and it's governed by the same data protection obligations as Supabase Pte. Ltd.
+
+**Note**: Regarding marketplace activities, Supabase, Inc. is the primary data processor, with Supabase Pte. Ltd. ensuring support or operations.
+
+---
+
+## Support Access
+
+### Q: How does Supabase access my data for support?
+
+**A:** We access your data only when you request help or when we detect and respond to security incidents. Here's how it works:
+
+1. **Your Request** — When you contact support, our team reviews your issue and accesses only the information needed to troubleshoot (logs, configuration, sometimes a sample of your data).
+
+2. **Least Privilege** — Support staff can access only projects relevant to your request, and we log all access.
+
+3. **Security Incidents** — If we detect a threat to your data or our platform, we may investigate without your prior request. You'll be notified.
+
+4. **Geographic Distribution** — Our support team is distributed globally to provide 24/7 coverage. This means support staff may be in any timezone.
+
+All access is logged and governed by our [DPA](/legal/customer-resources/data-processing-addendum).
+
+---
+
+## International Data Transfers
+
+### Q: I'm in the EU/UK/Switzerland. How are my data transfers to Singapore and to the US compliant?
+
+**A:** Supabase transfers data to Singapore and to the US under the **Standard Contractual Clauses (SCCs)**, as incorporated in our [DPA](/legal/customer-resources/data-processing-addendum).
+
+**What this means:**
+
+- We implement supplementary technical safeguards (encryption, access controls, audit logging);
+- We've assessed our exposure to Singaporean and U.S. government access and implemented mitigations where applicable.
+
+Our [Transfer Impact Assessment](https://trust.supabase.io) (TIA) provides a detailed analysis of the legal framework, including:
+
+- Why the SCCs provide adequate protection;
+- Singaporean public authorities’ access to data and limitations;
+- FISA 702 and Executive Order 12333 applicability and limitations;
+- Redress mechanisms available under Executive Order 14086;
+- Our government access protocol and notification practices.
+
+**Bottom line:** We've analyzed the risks and implemented safeguards consistent with GDPR, UK GDPR and Swiss FADP requirements. If you have specific concerns about transfers, review our TIA or contact [Privacy](mailto:privacy@supabase.io).
+
+---
+
+### Q: What if UK/EU law changes regarding data transfers?
+
+**A:** We monitor developments and will update our practices if the legal framework changes. We commit to promptly notifying customers if a material change affects our ability to provide the safeguards described in our DPA or TIA.
+
+---
+
+## Technical Safeguards
+
+### Q: How is my data protected in transit and at rest?
+
+**A:** We implement multiple layers of protection:
+
+**In Transit:**
+
+- All data is encrypted using TLS 1.2 with modern ciphersuites for confidentiality and integrity;
+- Traffic flow logs enable us to detect and investigate any unusual access patterns.
+
+**At Rest:**
+
+- Database data and backups are encrypted using AES-256 encryption;
+- Encryption keys are generated per project and protected by FIPS 140-2 compliant Hardware Security Modules (HSMs). If you delete your project, the keys are destroyed and the data becomes inaccessible.
+
+**Access Control:**
+
+- Data is segmented by project; staff can access only what's necessary for their role.
+- All access is logged for audit purposes.
+
+For full technical details, see the Security section of our [DPA](/legal/customer-resources/data-processing-addendum), Schedule 1. Supabase is ISO 27001 and SOC 2 certified, as detailed [here](/security).
+
+---
+
+### Q: What about government access to my data?
+
+**A:** We take government access requests seriously and follow a strict protocol:
+
+1. **Review** — Our Legal team reviews every request to ensure it's valid and legally authorized;
+2. **Notification** — We'll notify you of the request unless a court order prohibits us (rare);
+3. **Challenge** — We'll challenge invalid, overly broad, or legally questionable requests;
+4. **Transparency** — We believe in transparency about our practices.
+
+Our TIA discusses the legal landscape in detail, including:
+
+- Singaporean framework applicable to public authorities requests;
+- FISA 702 applicability and why we believe access requests are unlikely for ordinary commercial data;
+- Redress mechanisms under Executive Order 14086;
+- Our safeguards and subprocessor certifications.
+
+We do not preemptively disclose Customer Data to any government without a valid legal request.
+
+---
+
+## Data Retention & Deletion
+
+### Q: How long do you retain my data for?
+
+**A:** Here's the general framework:
+
+- **Your Database** — We retain your database as long as you have an active Supabase project. If you delete your project, any Customer Data is deleted **within 30 days**.
+
+- **Backups** — We maintain automated backups for recovery purposes. Backup retention varies by plan (see your [plan documentation](/docs/guides/platform/backups)).
+
+- **Customer Account Information** — If you close your Supabase account, we retain account data as required by law (e.g., tax, billing, legal obligations) but delete personal information **up to 60 days** after account closure.
+
+- **Usage Information** — Logs and telemetry are retained for operational and security purposes. Specific deletion timeframes apply.
+
+If you need to know exact retention for your use case, contact [Privacy](mailto:privacy@supabase.io).
+
+---
+
+### Q: Can I export or delete my data before leaving Supabase?
+
+**A:** Yes. You can:
+
+- **Export** — Use our CLI, API, or built-in export tools to download your data in standard formats.
+- **Delete** — Delete projects, database records, or your entire account. Deletion is permanent. Meaning that deleted projects are not recoverable.
+
+---
+
+## Data Subject Rights
+
+### Q: I'm an EU/UK/Switzerland resident. What are my GDPR rights?
+
+**A:** You have rights under General Data Protection Regulation (GDPR), UK GDPR and Swiss Federal Act on Data Protection (FADP), including the right to:
+
+- **Access** — Request a copy of your personal data we hold.
+- **Rectification** — Correct inaccurate data.
+- **Erasure** — Request deletion ("right to be forgotten").
+- **Restriction** — Limit how we process your data.
+- **Portability** — Request your data in a structured format.
+- **Object** — Object to specific processing (e.g., marketing).
+
+To exercise these rights, contact [Privacy](mailto:privacy@supabase.io) or submit a request through your account settings (if available).
+
+**Timeline:** We'll respond to valid requests within **one month**, or notify you if an extension is needed.
+
+---
+
+### Q: What about California's CCPA/CPRA or other US state privacy laws?
+
+**A:** We comply with California’s Consumer Privacy Act (CCPA) and Privacy Rights Act (CPRA), alongside similar US state privacy laws. You have similar rights to those above (access, deletion, opt-out of sales/sharing) depending on your state.
+
+Submit requests to [Privacy](mailto:privacy@supabase.io) or use your account settings (if available).
+
+**Timeline:** We'll respond to valid requests within **45 days**, or notify you if an extension is needed.
+
+---
+
+### Q: I'm in Singapore. What are my PDPA rights?
+
+**A:** Singapore's Personal Data Protection Act (PDPA) provides individuals with rights including access to personal data, correction of inaccurate data, and the ability to opt out of direct marketing.
+
+To exercise these rights, contact [Privacy](mailto:privacy@supabase.io).
+
+**Timeline:** We'll respond to valid requests within **one month**, or notify you if an extension is needed.
+
+---
+
+## Documentation & Transparency
+
+### Q: Where can I see Supabase's legal commitments on data?
+
+**A:** We publish key documents on our [Legal Hub](/legal) and [Trust Center](https://trust.supabase.io):
+
+- **Privacy Policy** — Describes what personal data we collect about Supabase Customers and End Users, how we process and retain it, and your rights under GDPR, CCPA, and other applicable privacy laws.
+
+- **Data Processing Addendum (DPA)** — The binding legal agreement on how we process your data, including security obligations, subprocessor terms, and data subject rights.
+
+- **Transfer Impact Assessment (TIA)** — A detailed legal analysis of international data transfers to Singapore and the US, including safeguards, legal frameworks and mitigations.
+
+- **Subprocessor List** — Current list of all subprocessors, updated regularly.
+
+- **Security & Compliance Materials** — ISO 27001, SOC 2, HIPAA-readiness, and other certifications (if applicable to your plan).
+
+---
+
+### Q: How often is documentation updated?
+
+**A:** We update these documents as our operations, legal framework, or subprocessors change:
+
+- **Subprocessor List** — Updated as we add or remove providers. We notify customers of material changes, subscribe [here](/legal/customer-resources/subprocessor-list).
+- **DPA & TIA** — Reviewed annually or updated when legal requirements change or we implement new safeguards.
+
+---
+
+## Getting Help
+
+### Q: I have more specific questions about my data or a particular regulation.
+
+**A:** Reach out:
+
+- **General Data Questions** — [Support](/support)
+- **Privacy or Compliance** — [privacy@supabase.io](mailto:privacy@supabase.io)
+- **Commercial/Legal** — [legal@supabase.io](mailto:legal@supabase.io)
+- **Legal Hub -** [https://supabase.com/legal](/legal)
+- **Trust Center** — [trust.supabase.io](https://trust.supabase.io)

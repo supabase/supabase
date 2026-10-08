@@ -6,7 +6,7 @@ import {
   S3_MAX_NONCURRENT_VERSIONS,
   superRefineBucketVersioning,
   type BucketVersioningFormValues,
-} from './BucketVersioningFields.schema'
+} from './FilesBucket.schema'
 
 const values = (
   overrides: Partial<BucketVersioningFormValues> = {}
