@@ -1,7 +1,9 @@
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { useCallback } from 'react'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { ConfirmDeleteModal } from './ConfirmDeleteModal'
 import { ConfirmPurgeModal } from './ConfirmPurgeModal'
 import { CustomExpiryModal } from './CustomExpiryModal'
@@ -40,6 +42,7 @@ export const StorageExplorerContent = ({
     setIsSearching,
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
+  const { isOverlayEnabled, isListingTruncated } = useArchivedFilesContext()
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
@@ -99,6 +102,14 @@ export const StorageExplorerContent = ({
         />
       ) : (
         <FileExplorerHeaderSelection />
+      )}
+      {isOverlayEnabled && isListingTruncated && (
+        <Admonition
+          type="warning"
+          className="mb-0 rounded-none border-x-0 border-t-0"
+          title="Showing only some of this bucket's archived files"
+          description="The bucket holds more rows than one listing can carry. Archived files past that point aren't shown here and can't be restored or deleted from this view."
+        />
       )}
       <div className="flex flex-1 min-h-0">
         <FileExplorer

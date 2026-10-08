@@ -1,13 +1,14 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
-import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { getStorageItemPath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useArchivedObjectPurgeMutation } from '@/data/storage/versioning/archived-object-purge-mutation'
+import { archivedObjectsQueryOptions } from '@/data/storage/versioning/archived-objects-query'
 import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -24,7 +25,7 @@ export const ConfirmPurgeModal = () => {
     getAllItemsAlongFolder,
   } = useStorageExplorerStateSnapshot()
   const { clearPreviewedFile } = useStorageExplorerNavigation()
-  const { archivedObjects } = useArchivedFilesContext()
+  const queryClient = useQueryClient()
 
   const [isPurging, setIsPurging] = useState(false)
 
@@ -42,12 +43,26 @@ export const ConfirmPurgeModal = () => {
     path: string
   ) => {
     const liveItems = isArchivedFolder ? [] : await getAllItemsAlongFolder(folder)
+
+    // Not the overlay's copy: it is empty whenever "Show archived" is off, which would leave
+    // every archived descendant behind while the purge reported success.
+    const listing = await queryClient.fetchQuery({
+      ...archivedObjectsQueryOptions({ projectRef, bucketId }),
+      staleTime: 0,
+    })
+    if (listing.isTruncated) {
+      toast.error(
+        'This bucket holds more archived files than can be listed at once. Delete them one by one instead.'
+      )
+      throw new Error('Archived listing truncated')
+    }
+
     const archivedUnder = getArchivedObjectsUnderFolder({
       folderSegments: path.split('/'),
-      archivedObjects,
+      archivedObjects: listing.objects,
     })
 
-    await Promise.all([
+    const results = await Promise.allSettled([
       ...liveItems.map((item) =>
         purgeObject({ projectRef, bucketId, path: `${item.prefix}/${item.name}` })
       ),
@@ -60,6 +75,8 @@ export const ConfirmPurgeModal = () => {
         })
       ),
     ])
+
+    return results.filter((result) => result.status === 'rejected').length
   }
 
   const onConfirm = async () => {
@@ -71,17 +88,23 @@ export const ConfirmPurgeModal = () => {
     const path = itemToPurge.path ?? getStorageItemPath({ openedFolders }, itemToPurge)
     setIsPurging(true)
     try {
-      if (isFolder) await purgeFolder(projectRef, selectedBucket.id, itemToPurge, path)
-      else await purgeObject({ projectRef, bucketId: selectedBucket.id, path })
+      const failureCount = isFolder
+        ? await purgeFolder(projectRef, selectedBucket.id, itemToPurge, path)
+        : await purgeObject({ projectRef, bucketId: selectedBucket.id, path }).then(() => 0)
 
-      toast.success(`Permanently deleted ${itemToPurge.name}`)
-      // Purging from a row menu shouldn't close a preview of something else.
-      if (selectedFilePreview?.id === itemToPurge.id) clearPreviewedFile()
-      setItemToPurge(undefined)
-      await refetchAllOpenedFolders()
+      if (failureCount > 0) {
+        toast.error(`Could not delete ${failureCount} item${failureCount === 1 ? '' : 's'}`)
+      } else {
+        toast.success(`Permanently deleted ${itemToPurge.name}`)
+        // Purging from a row menu shouldn't close a preview of something else.
+        if (selectedFilePreview?.id === itemToPurge.id) clearPreviewedFile()
+        setItemToPurge(undefined)
+      }
     } catch {
-      // The mutations report their own failures.
+      // Both the truncated listing and the mutations report their own failures.
     } finally {
+      // Whatever did go through has already changed the listing.
+      await refetchAllOpenedFolders()
       setIsPurging(false)
     }
   }
