@@ -19,7 +19,7 @@ vi.mock('common', async (importOriginal) => {
       ...common.LOCAL_STORAGE_KEYS,
       UI_PREVIEW_PIPELINE_CREATION: 'supabase-ui-pipeline-creation',
     },
-    useFlag: (key: string) => key === 'pipelineCreationPreview' && rollout.enabled,
+    useFlag: (key: string) => key === 'pipelineCreationWizard' && rollout.enabled,
   }
 })
 
