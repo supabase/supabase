@@ -8,7 +8,6 @@ on:
       - 'apps/www/**/*.ts*'
       - 'apps/www/package.json'
       - 'apps/www/turbo.jsonc'
-      - 'apps/www/vercel.json'
       - 'scripts/upload-static-assets.sh'
       - 'packages/common/sentry.ts'
       - 'packages/common/sentry.test.ts'
@@ -16,7 +15,6 @@ on:
       - 'apps/www/next.config.js'
       - 'apps/www/lib/**/*.js'
       - 'apps/www/lib/**/*.mjs'
-      - 'apps/www/lib/**/*.json'
       - 'apps/www/content/md/**'
       - 'apps/www/scripts/**/*.mjs'
       - 'apps/www/internals/**/*.mjs'
@@ -68,12 +66,6 @@ jobs:
 
       - name: Install deps
         run: pnpm install --frozen-lockfile
-
-      - name: Check docs-redirects-md-variants.json is up to date
-        run: |
-          pnpm run generate:docs-redirects-md-variants
-          git diff --exit-code -- lib/bulk-redirects/docs-redirects-md-variants.json
-        working-directory: ./apps/www
 
       - name: Run tests
         run: pnpm run test

@@ -40,22 +40,6 @@ Choose **dynamic redirects** (in `lib/redirects.js`) for **pattern-based or cond
 
 Add static redirects (simple `/old → /new` mappings with **no** `:path*`, `:match*`, or regex patterns) to the appropriate file. Vercel reads all `.json` files from this folder and serves them at the edge.
 
-## Markdown Variants
-
-**`docs-redirects-md-variants.json` is a generated file — do not hand-edit it.**
-
-It's derived from any `/docs/guides/` redirects in `docs.json`. For example:
-
-- `/docs/guides/api/api-keys` → generates `/docs/guides/api/api-keys.md`
-
-Regenerate it after changing `docs.json`:
-
-```bash
-pnpm run generate:docs-redirects-md-variants
-```
-
-CI fails the build if this file is out of sync with `docs.json` (see `.github/workflows/www-tests.yml`).
-
 ## Deployment
 
-Vercel reads all `.json` files from this folder (via `vercel.json`'s `bulkRedirectsPath`) and serves them at the edge. There's no build-time generation step — `docs-redirects-md-variants.json` is committed directly, like `docs.json` and `blog.json`.
+Vercel reads all `.json` files from this folder (via `vercel.json`'s `bulkRedirectsPath`) and serves them at the edge. There's no build-time generation step — `docs.json` and `blog.json` are committed directly.
