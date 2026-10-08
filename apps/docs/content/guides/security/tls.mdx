@@ -10,7 +10,7 @@ These settings apply to your project's default domain, `<project_ref>.supabase.c
 
 <Admonition type="deprecation" title="Outdated TLS 1.2 cipher suites are deprecated">
 
-On November 10, 2026 at the earliest, clients on old, unsupported operating systems, or embedded devices that haven't been updated, might no longer be able to connect to your project's APIs. To check your clients, see [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
+On November 10, 2026, at the earliest, clients on old, unsupported operating systems, or embedded devices that haven't been updated might no longer be able to connect to your project's APIs. To check your clients, see [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
 
 </Admonition>
 
@@ -37,7 +37,7 @@ Until the removal date, project APIs also offer the deprecated CBC-mode cipher s
 
 ## Removal of CBC-mode ciphers
 
-A cipher suite determines how a connection is encrypted. Cipher block chaining (CBC) mode cipher suites have known security weaknesses and security scanners commonly flag them. Supabase will stop offering the following TLS 1.2 cipher suites on project APIs **on November 10, 2026 at the earliest**:
+A cipher suite determines how a connection is encrypted. Cipher block chaining (CBC) mode cipher suites have known security weaknesses and security scanners commonly flag them. Supabase will stop offering the following TLS 1.2 cipher suites on project APIs **on November 10, 2026, at the earliest**:
 
 | IANA name                                 | OpenSSL name                |
 | ----------------------------------------- | --------------------------- |
