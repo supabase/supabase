@@ -47,21 +47,6 @@ If you see these errors before the removal date, the CBC-mode removal isn't the 
 
 Check the TLS configuration your application actually uses: its operating system, runtime, and TLS library versions, and any TLS version or cipher suite settings in your code or configuration. A client that connects with TLS 1.3 isn't affected by the removal, whatever TLS 1.2 cipher suites it supports.
 
-For TLS 1.2, you can run a limited diagnostic probe with OpenSSL. The following command attempts a TLS 1.2 handshake that offers only the non-CBC cipher suites that project APIs support. It doesn't test TLS 1.3. If you use a custom domain, replace both occurrences of `<project_ref>.supabase.co` with your domain.
-
-On a machine that uses the same TLS library as the client, run:
-
-```bash
-openssl s_client -connect <project_ref>.supabase.co:443 -servername <project_ref>.supabase.co \
-  -tls1_2 -cipher 'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305' \
-  < /dev/null
-```
-
-Read the result as follows:
-
-- **The handshake succeeds:** The output shows the negotiated cipher. This shows only that this OpenSSL command, on this machine, can negotiate a non-CBC TLS 1.2 cipher suite. It doesn't show that your application is compatible, because your application might use a different TLS library, version, or settings.
-- **The handshake fails:** The failure doesn't prove that the client depends on CBC-mode ciphers. Other causes include a network or firewall problem, a proxy that intercepts TLS, a wrong hostname, or an OpenSSL build that differs from the TLS library your client uses. Check the error output and your application's TLS configuration before you conclude that the client is affected.
-
 ## Fix the client
 
 Update the client's operating system, runtime, or TLS library to a version that supports TLS 1.3 or a supported TLS 1.2 cipher suite.
