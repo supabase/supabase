@@ -27,6 +27,7 @@ import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
 } from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
@@ -69,6 +70,8 @@ export const GitHubIntegrationConnectionForm = ({
     PermissionAction.CREATE,
     'integrations.github_connections'
   )
+
+  const canManageGitHubConnection = canCreateGitHubConnection && canUpdateGitHubConnection
 
   const {
     gitHubAuthorization,
@@ -166,8 +169,8 @@ export const GitHubIntegrationConnectionForm = ({
     reValidateMode: 'onBlur',
     defaultValues: {
       repositoryId: connection?.repository.id.toString() || '',
+      branchName: prodBranch?.git_branch || 'main',
       enableProductionSync: true,
-      branchName: 'main',
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
@@ -357,30 +360,12 @@ export const GitHubIntegrationConnectionForm = ({
     }
   }
 
-  useEffect(() => {
-    if (connection) {
-      const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
-
-      githubSettingsForm.reset({
-        repositoryId: connection.repository.id.toString(),
-        enableProductionSync: hasGitBranch,
-        branchName: prodBranch?.git_branch || 'main',
-        new_branch_per_pr: connection.new_branch_per_pr,
-        supabaseDirectory: connection.workdir || '',
-        supabaseChangesOnly: connection.supabase_changes_only,
-        branchLimit: String(connection.branch_limit),
-      })
-    }
-  }, [connection, prodBranch, githubSettingsForm])
-
-  // Handle clearing branch name when production sync is disabled
-  useEffect(() => {
-    if (!enableProductionSync) {
-      githubSettingsForm.setValue('branchName', '')
-    } else if (enableProductionSync && !githubSettingsForm.getValues().branchName) {
-      githubSettingsForm.setValue('branchName', 'main')
-    }
-  }, [enableProductionSync, githubSettingsForm])
+  const handleToggleProductionSync = (isEnabled: boolean) => {
+    githubSettingsForm.setValue('enableProductionSync', isEnabled, { shouldDirty: true })
+    githubSettingsForm.setValue('branchName', isEnabled ? prodBranch?.git_branch || 'main' : '', {
+      shouldDirty: true,
+    })
+  }
 
   const isLoading =
     isLoadingEntitlements ||
@@ -397,6 +382,22 @@ export const GitHubIntegrationConnectionForm = ({
   } else if (gitHubAuthorization === null) {
     repositoryDescription = 'Connect GitHub to link a repository to this project'
   }
+
+  useEffect(() => {
+    if (connection) {
+      const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
+
+      githubSettingsForm.reset({
+        repositoryId: connection.repository.id.toString(),
+        enableProductionSync: hasGitBranch,
+        branchName: hasGitBranch ? (prodBranch?.git_branch ?? '') : '',
+        new_branch_per_pr: connection.new_branch_per_pr,
+        supabaseDirectory: connection.workdir || '',
+        supabaseChangesOnly: connection.supabase_changes_only,
+        branchLimit: String(connection.branch_limit),
+      })
+    }
+  }, [connection, prodBranch, githubSettingsForm])
 
   return (
     <>
@@ -423,7 +424,7 @@ export const GitHubIntegrationConnectionForm = ({
                 label="GitHub repository"
                 layout="flex-row-reverse"
                 description={repositoryDescription}
-                disabled={!gitHubAuthorization}
+                disabled={!gitHubAuthorization || !canManageGitHubConnection}
                 selectedRepositoryName={connection?.repository.name}
                 repositories={githubRepos}
                 gitHubAuthorization={gitHubAuthorization}
@@ -492,7 +493,7 @@ export const GitHubIntegrationConnectionForm = ({
                               <Switch
                                 aria-label="Toggle deploy to production"
                                 checked={field.value}
-                                onCheckedChange={field.onChange}
+                                onCheckedChange={handleToggleProductionSync}
                                 disabled={isFieldDisabled}
                               />
                             </FormControl>
@@ -671,22 +672,29 @@ export const GitHubIntegrationConnectionForm = ({
                           Cancel
                         </Button>
                       )}
-                      <Button
+                      <ButtonTooltip
                         variant="primary"
                         type="submit"
                         disabled={
                           !hasAccessToGitHubIntegration ||
-                          (!connection && !canCreateGitHubConnection) ||
-                          (connection && !canUpdateGitHubConnection) ||
                           isCheckingBranch ||
                           isLoading ||
+                          !canManageGitHubConnection ||
                           (!connection && !githubSettingsForm.getValues().repositoryId) ||
                           (connection && !githubSettingsForm.formState.isDirty)
                         }
                         loading={isLoading}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canManageGitHubConnection
+                              ? "You need additional permissions to update this project's GitHub integration settings"
+                              : undefined,
+                          },
+                        }}
                       >
                         {connection ? 'Save changes' : 'Enable integration'}
-                      </Button>
+                      </ButtonTooltip>
                     </div>
                   </CardFooter>
                 </motion.div>
