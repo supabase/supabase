@@ -81,6 +81,12 @@
         // alongside the rest of the Warehouse work so the values stay in one
         // place until the project-creation surface that consumes them lands.
         "components/interfaces/ProjectCreation/WarehouseFdwCustomImage.constants.ts": ["files"],
+        // Storage object versioning: the file preview panel that calls these
+        // lands in the next PR of the stack, which drops both entries.
+        "components/interfaces/Storage/BroomSparklesIcon.tsx": ["files"],
+        "data/storage/versioning/object-{purge,version-delete,version-restore}-mutation.ts": [
+          "files",
+        ],
       },
       // `vercel` is a globally installed CLI used by the `deploy:staging` script
       "ignoreBinaries": ["vercel"],

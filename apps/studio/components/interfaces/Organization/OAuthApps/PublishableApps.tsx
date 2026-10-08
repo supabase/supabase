@@ -198,14 +198,14 @@ export const PublishableApps = () => {
                   <TableHead
                     className={cn(
                       hasPublishedApps
-                        ? 'w-[62px] min-w-[62px] max-w-[62px]'
+                        ? 'w-[54px] min-w-[54px] max-w-[54px]'
                         : 'w-0 min-w-0 max-w-0 p-0',
                       !hasPublishedApps && 'text-foreground-muted'
                     )}
                   >
                     <span className="sr-only">Avatar</span>
                   </TableHead>
-                  <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>
+                  <TableHead className={cn('pl-0', !hasPublishedApps && 'text-foreground-muted')}>
                     Name
                   </TableHead>
                   <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>
