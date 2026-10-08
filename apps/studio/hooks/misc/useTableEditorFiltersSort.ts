@@ -1,6 +1,15 @@
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 
+// Filter and sort pushes come from separate hook instances but write the same URL, and the router
+// only reflects a push once it settles. Until then, a later push merges onto the in-flight query
+// instead of the stale `router.query`. It only applies while the router still shows the URL it was
+// built from, so a settled push or a Back/Forward makes it obsolete.
+let inFlightPush: { fromAsPath: string; query: ReturnType<typeof useRouter>['query'] } | null = null
+
+const toParamArray = (value: string | string[] | undefined) =>
+  value === undefined ? [] : ([] as string[]).concat(value)
+
 export const useTableEditorFiltersSort = () => {
   const router = useRouter()
 
@@ -25,23 +34,27 @@ export const useTableEditorFiltersSort = () => {
 
   const setParams = useCallback(
     (fn: (prevParams: SetParamsArgs) => SetParamsArgs) => {
-      const prevParams = { filter: filters, sort: sorts }
+      const pending = inFlightPush?.fromAsPath === router.asPath ? inFlightPush : null
+      const baseQuery = pending?.query ?? router.query
+      const prevParams = {
+        filter: toParamArray(baseQuery.filter),
+        sort: toParamArray(baseQuery.sort),
+      }
       const newParams = fn(prevParams)
 
       const hasFilter = newParams.filter !== undefined
       const hasSort = newParams.sort !== undefined
 
-      router.push(
-        {
-          query: {
-            ...router.query,
-            ...(hasFilter ? { filter: newParams.filter } : {}),
-            ...(hasSort ? { sort: newParams.sort } : {}),
-          },
-        },
-        undefined,
-        { shallow: true }
-      )
+      const query = {
+        ...baseQuery,
+        ...(hasFilter ? { filter: newParams.filter } : {}),
+        ...(hasSort ? { sort: newParams.sort } : {}),
+      }
+      const push = { fromAsPath: router.asPath, query }
+      inFlightPush = push
+      void router.push({ query }, undefined, { shallow: true }).finally(() => {
+        if (inFlightPush === push) inFlightPush = null
+      })
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [filters, sorts]
