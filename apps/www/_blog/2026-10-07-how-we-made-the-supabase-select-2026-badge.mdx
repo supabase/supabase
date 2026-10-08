@@ -1,0 +1,106 @@
+---
+title: 'How we made the Supabase Select 2026 badge'
+description: 'Every Supabase Select attendee walked away with a programmable badge. Here’s how it came together and what you can do with yours.'
+author: sam_meech_ward
+date: '2026-10-07'
+categories:
+  - developers
+tags:
+  - community
+  - select
+imgSocial: 'how-we-made-the-supabase-select-2026-badge/og.png'
+imgThumb: 'how-we-made-the-supabase-select-2026-badge/thumb.png'
+toc_depth: 2
+---
+
+<Img
+  alt="Supabase Select badges hanging from their lanyards"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/badges-on-lanyards.jpg"
+/>
+
+Every [Supabase Select](https://select.supabase.com/) attendee walked away with a programmable badge.
+
+During the conference it was an animated name tag with the schedule and a couple of games on it. Since then, people have turned it into a live flight tracker, an arcade game about dead tuples, and a language model that runs entirely on the badge.
+
+Here’s how it came together and what you can do with yours:
+
+## Why a badge
+
+I'd seen electronic badges at conferences like GitHub Universe and DEF CON and wanted Supabase to have one, partly because I love electronics and mostly because I think microcontrollers are an underused way for developers to get more out of the skills they already have.
+
+If you can build a web app or a mobile app, you already know most of what it takes to put a screen on your desk or a sensor in your room that does something useful when a reading changes. The hardware is inexpensive, and it sidestepped the recent memory price spike (Raspberry Pi raised prices on its computers several times while its microcontrollers stayed where they were). With a tool like Claude Code helping with the code, a first hardware project becomes an afternoon spent mostly on deciding what to make.
+
+The brief was to give people something that works as a name tag for two days and stays useful long after.
+
+## What's inside
+
+The badge is based on the [Pimoroni Tufty 2350](https://shop.pimoroni.com/products/tufty-2350) and ships with:
+
+- An RP2350 microcontroller
+- A color screen
+- A rechargeable battery
+- Onboard Wi-Fi and Bluetooth
+- Physical buttons (A, B, and C) you can map to anything
+
+## Making a thousand of them
+
+My first version was a board with a Raspberry Pi Pico, a screen, and a battery, attached so you could pull them apart and use them as a starter kit once the conference was over. I built one and showed it around, and it held up right until the question of making a thousand by hand.
+
+<Img
+  alt="The prototype badge: a Raspberry Pi Pico 2 W, a screen, and a battery holder on one board"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/prototype.jpg"
+/>
+
+For the real run, we went to Pimoroni, who build this kind of hardware professionally. The idea survived the handoff intact, and the final badge packages the same screen, battery, and programmable microcontroller into one board. I wrote the software that shipped on it: the name tag, the schedule, and the games. That was the least interesting thing the badge could do, but it was what everyone needed *at* Select.
+
+<Img
+  alt="The final badge in its clear case, showing an attendee name tag"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/final-badge.jpg"
+/>
+
+## What people have built so far
+
+…And here’s some cool stuff built by people at Select and people watching from home.
+
+- [Select Sky](https://x.com/jsmillerdev/status/2107160820455035216)
+
+  Joey (@jsmillerdev) built a live flight tracker with a radar view, individual flight tracking, and details like altitude and speed.
+
+- [A pocket food finder](https://x.com/Mike_demo/status/2106230900371382485)
+
+  Mike Demo (@Mike_demo) made a badge app that helps attendees find places to eat, with filters for vegan, vegetarian, gluten-free, kosher, and halal options. He wasn't at Select and joined in remotely.
+
+- [A game about collecting music notes](https://x.com/tiff_ishh/status/2107501144704761934)
+
+  Tiffany Collins (@tiff_ishh) turned hers into a game where the Tenor logo collects notes while dodging an angry composer.
+
+- [Dead Tuples](https://x.com/LFGAmy/status/2106146139166879956)
+
+  Amy Mayernik (@LFGAmy) watched the keynote from home and turned the OrioleDB section into an arcade game, where you vacuum dead rows before the table fills up and then unlock an OrioleDB mode that gives you a break from cleanup.
+
+- [A language model running locally](https://x.com/maddiedreese/status/2106147063759278250)
+
+  Maddie D. Reese (@maddiedreese) fit a tiny story-generation model onto the badge with an on-screen keyboard to prompt it, running entirely on the device.
+
+- [Muse on a badge](https://x.com/wobsoriano/status/2106252508587073877)
+
+  Robert Soriano (@wobsoriano) got home and had his badge running Muse before the week was out.
+
+Y’all, there are so many more in the [badge showcase](https://badge.select/showcase), and every one of them started from the same hardware and ended up somewhere I wouldn't have thought to go.
+
+## Hack your badge
+
+Everything you need is at [badge.select](https://badge.select/):
+
+- If you have a physical badge, the [first app guide](https://badge.select/guides/first-program) walks you through adding your own app over USB.
+- If you want a coding agent to help, the [badge project kit](https://badge.select/guides/code-with-an-agent) gives Claude Code the API reference and instructions it needs. You can try something like: "Read the project instructions and badge API reference. Build a pomodoro timer with a large countdown. Use A to start or pause, B to reset, and C to switch between work and break sessions."
+- If you weren't at Select, the [virtual badge](https://badge.select/virtual) and the [Make editor](https://badge.select/make) let you build in your browser.
+- If you want to go further, replace the firmware and work in C or Rust. There's already [a guide](https://badge.select/guides/apple-ii) for turning the badge into an Apple IIe emulator, with a physical USB keyboard and BASIC programs running on the badge itself.
+
+Good first projects are small and useful: a clock with exactly the display you want, a pomodoro timer beside your keyboard, a display that reads from your Supabase project over Wi-Fi, or a light that turns on when your coding agent needs you. With Supabase Realtime, the badge can react the moment something changes in your app. Your first change can be as small as making one button do something different.
+
+## Show us what you make
+
+Share your project on X with #SelectBadge so we can see it. We’re running a contest for the best badges through the end of October. 1st place gets $1,000 in Supabase credits plus passes to Supabase Select 2027 for you and three colleagues. 2nd and 3rd place each get $500 in Supabase credits.
+
+At Select, it was your name tag. What'll you make with it next?

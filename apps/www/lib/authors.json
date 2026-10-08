@@ -1087,5 +1087,13 @@
     "company": "AWS",
     "author_url": "https://www.linkedin.com/in/mrinali-umashankar-79064a194/",
     "author_image_url": "/images/blog/avatars/mrinali-umashankar.webp"
+  },
+  {
+    "author_id": "sam_meech_ward",
+    "author": "Sam Meech-Ward",
+    "username": "meech-ward",
+    "position": "DevRel",
+    "author_url": "https://x.com/meech_ward",
+    "author_image_url": "https://github.com/meech-ward.png"
   }
 ]
