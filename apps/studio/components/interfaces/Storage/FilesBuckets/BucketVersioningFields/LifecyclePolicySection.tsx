@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { AnimatePresence } from 'framer-motion'
 import { useEffect, useRef } from 'react'
-import { useFormContext, type Control } from 'react-hook-form'
+import type { UseFormReturn } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -14,7 +14,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import type { BucketVersioningFormValues } from './BucketVersioningFields.schema'
+import type { BucketFormValues } from '../FilesBucket.schema'
 import { ExpirationModeToggle } from './ExpirationModeToggle'
 import type { ExpirationMode } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { AlertError } from '@/components/ui/AlertError'
@@ -33,11 +33,10 @@ const SectionHeading = () => (
 )
 
 interface LifecyclePolicySectionProps {
-  control: Control<BucketVersioningFormValues>
+  form: UseFormReturn<BucketFormValues>
   hasDays: boolean
   hasVersions: boolean
   mode: ExpirationMode
-  onModeChange: (mode: ExpirationMode) => void
   /** The stored policy is still in flight, so there is nothing truthful to show yet. */
   isLoading?: boolean
   /** The stored policy holds rules these fields cannot represent, let alone round-trip. */
@@ -47,17 +46,16 @@ interface LifecyclePolicySectionProps {
 }
 
 export const LifecyclePolicySection = ({
-  control,
+  form,
   hasDays,
   hasVersions,
   mode,
-  onModeChange,
   isLoading = false,
   isUnsupported = false,
   error,
 }: LifecyclePolicySectionProps) => {
   const { ref } = useParams()
-  const { setValue } = useFormContext<BucketVersioningFormValues>()
+  const { control, setValue } = form
   const hasNoPolicy = !hasDays && !hasVersions
   const hasBothConditions = hasDays && hasVersions
 
@@ -171,7 +169,10 @@ export const LifecyclePolicySection = ({
       <AnimatePresence initial={false}>
         {hasBothConditions && (
           <FormSectionCollapse key="mode">
-            <ExpirationModeToggle mode={mode} onModeChange={onModeChange} />
+            <ExpirationModeToggle
+              mode={mode}
+              onModeChange={(value) => setValue('expiration_mode', value, { shouldDirty: true })}
+            />
           </FormSectionCollapse>
         )}
 
