@@ -1,8 +1,16 @@
 import { useEffect, useEffectEvent, useRef } from 'react'
 
 import { filtersToUrlParams, formatFilterURLParams } from '../SupabaseGrid.utils'
+import type { Filter } from '../types'
 import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
+
+const getUrlTableId = (path: string) => path.match(/\/editor\/(\d+)\/?$/)?.[1]
+
+const toUrlFilters = (filters: readonly Filter[]) =>
+  filtersToUrlParams(
+    filters.filter(({ value }) => value !== '' && value !== null && value !== undefined)
+  )
 
 /**
  * Hook to initialize filters from URL on mount.
@@ -26,15 +34,49 @@ export function useInitializeFiltersFromUrl() {
 }
 
 /**
- * Hook to sync filters from snap state to URL params.
- * This is a one-way sync: snap state → URL (for bookmarking/sharing).
- * Debounced by 500ms to avoid excessive URL updates.
+ * Hook to keep filters in snap state and URL params in sync.
+ * snap state → URL is debounced by 500ms to avoid excessive URL updates.
+ * URL → snap state covers URL changes that don't remount the grid (e.g. Back/Forward within the
+ * same table). The URL wins over a pending state → URL update since it reflects the user's latest
+ * navigation: a filter applied less than 500ms before Back/Forward is intentionally discarded rather
+ * than pushed over the entry the user navigated to.
  */
 export function useSyncFiltersToUrl() {
   const snap = useTableEditorTableStateSnapshot()
-  const { setParams } = useTableEditorFiltersSort()
+  const { path, filters: urlFilters, setParams } = useTableEditorFiltersSort()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const previousFiltersRef = useRef<string>('')
+
+  const urlFiltersKey = JSON.stringify(urlFilters)
+  // Under TanStack the URL moves to the next table before this grid unmounts.
+  const isOwnTableUrl = getUrlTableId(path) === String(snap.originalTable.id)
+  const lastUrlFiltersKeyRef = useRef(urlFiltersKey)
+  const pushedUrlFiltersKeyRef = useRef<string | null>(null)
+
+  const syncFiltersFromUrl = useEffectEvent(() => {
+    if (!isOwnTableUrl || urlFiltersKey === lastUrlFiltersKeyRef.current) return
+    lastUrlFiltersKeyRef.current = urlFiltersKey
+
+    // Our own debounced push arriving, or a URL that already matches state
+    const isOwnPush = urlFiltersKey === pushedUrlFiltersKeyRef.current
+    pushedUrlFiltersKeyRef.current = null
+    if (isOwnPush || urlFiltersKey === JSON.stringify(toUrlFilters(snap.filters))) return
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+    snap.setFilters(formatFilterURLParams(urlFilters))
+  })
+
+  useEffect(() => {
+    syncFiltersFromUrl()
+  }, [urlFiltersKey, isOwnTableUrl])
+
+  // An Effect Event so URL changes (new `setParams`) don't cancel a pending push.
+  const pushFiltersToUrl = useEffectEvent((filter: string[]) => {
+    setParams((prev) => ({ ...prev, filter }))
+  })
 
   useEffect(() => {
     // Serialize filters for comparison
@@ -52,21 +94,15 @@ export function useSyncFiltersToUrl() {
       clearTimeout(timeoutRef.current)
     }
 
+    // The URL already reflects these filters (e.g. they were just read from it)
+    const nextUrlFilters = toUrlFilters(snap.filters)
+    const nextUrlFiltersKey = JSON.stringify(nextUrlFilters)
+    if (nextUrlFiltersKey === lastUrlFiltersKeyRef.current) return
+
     // Debounce URL updates by 500ms
     timeoutRef.current = setTimeout(() => {
-      const completeFilters = snap.filters.filter((filter) => {
-        const value = filter.value
-        return value !== '' && value !== null && value !== undefined
-      })
-
-      // Convert filters to URL format
-      const urlFilters = filtersToUrlParams(completeFilters)
-
-      // Update URL params
-      setParams((prev) => ({
-        ...prev,
-        filter: urlFilters,
-      }))
+      pushedUrlFiltersKeyRef.current = nextUrlFiltersKey
+      pushFiltersToUrl(nextUrlFilters)
     }, 500)
 
     // Cleanup on unmount or filter change
@@ -75,5 +111,5 @@ export function useSyncFiltersToUrl() {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [snap.filters, setParams])
+  }, [snap.filters])
 }
