@@ -640,7 +640,7 @@ export const GitHubIntegrationConnectionForm = ({
                             >
                               <FormControl>
                                 <Switch
-                                  aria-label="Toggle Suapbase changes only"
+                                  aria-label="Toggle Supabase changes only"
                                   checked={!hasAccessToBranching ? false : field.value}
                                   onCheckedChange={(val) => field.onChange(val)}
                                   disabled={
