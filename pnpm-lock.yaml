@@ -817,6 +817,9 @@ importers:
       config:
         specifier: workspace:*
         version: link:../../packages/config
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
