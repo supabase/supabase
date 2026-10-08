@@ -15,8 +15,8 @@ import { Button } from 'ui'
  * This constant is the ONLY thing that needs to change on each update.
  */
 const CURRENT_PDF = {
-  file: 'October-8-2026.pdf',
-  displayDate: 'October 8, 2026',
+  file: 'June-1-2026.pdf',
+  displayDate: 'June 1, 2026',
 }
 
 const PDF_PATH = `/legal/subprocessor-list/${CURRENT_PDF.file}`
