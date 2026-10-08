@@ -157,7 +157,7 @@ export const CreditCodeRedemption = ({
     }
 
     const alreadyRedeemedCents = codeRedemptionResult.already_redeemed_partner_credits ?? 0
-    if (alreadyRedeemedCents) {
+    if (!alreadyRedeemedCents) {
       return undefined
     }
 
@@ -212,7 +212,7 @@ export const CreditCodeRedemption = ({
         {/* Mounted before the redemption result arrives so screen readers announce updates */}
         <div role="status" aria-live="polite" className="sr-only">
           {!!codeRedemptionResult && `$${codeRedemptionResult.amount_cents / 100} credits applied.`}
-          {redemptionNotice?.padStart(1, ' ')}
+          {redemptionNotice && ` ${redemptionNotice}`}
         </div>
 
         {!!codeRedemptionResult ? (
