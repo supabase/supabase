@@ -1,6 +1,7 @@
+import type { WebhookEventType } from '@/data/platform-webhooks/platform-webhooks-fetchers'
+
 // The full list of event types the real API accepts, identical for organization-scoped
-// and project-scoped endpoints. Mirrors `event_types[].type` in `api-v2.d.ts` — re-check
-// against the generated types if the backend adds event types.
+// and project-scoped endpoints.
 export const PLATFORM_WEBHOOK_EVENT_TYPES = [
   'v1.project.paused',
   'v1.project.created',
@@ -22,4 +23,4 @@ export const PLATFORM_WEBHOOK_EVENT_TYPES = [
   'v1.organization.member.role.updated',
   'v1.organization.billing.plan.upgraded',
   'v1.organization.billing.plan.downgraded',
-] as const
+] as const satisfies readonly WebhookEventType[]

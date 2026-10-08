@@ -13,18 +13,12 @@ import type {
 // so it's not part of the selectable catalog, but it's still a value the API accepts.
 const webhookEventTypeSchema = z.enum([...PLATFORM_WEBHOOK_EVENT_TYPES, '*'])
 
-// Drop (rather than throw on) event types our client catalog doesn't recognize —
-// e.g. the backend added one after this build shipped. Throwing here would make
-// editing any endpoint using it impossible until the client catalog catches up.
 const toWebhookEventTypes = (eventTypes: string[]): { type: WebhookEventType }[] =>
   eventTypes
     .map((eventType) => webhookEventTypeSchema.safeParse(eventType))
     .filter((result) => result.success)
     .map((result) => ({ type: result.data }))
 
-// `custom_headers` is optional — omit it entirely for "no headers" rather than sending
-// `null` (the column is NOT NULL and rejects it) or `{}` (per Paweł, prefer omitting an
-// optional field over sending an empty value for it).
 const toCustomHeaders = (
   headers: Array<{ key: string; value: string }>
 ): Record<string, string> | undefined =>
@@ -66,8 +60,6 @@ export const toWebhookEndpoint = (resource: WebhookEndpointResource): WebhookEnd
   description: resource.attributes.description ?? '',
   enabled: resource.attributes.enabled,
   eventTypes: resource.attributes.event_types.map((eventType) => eventType.type),
-  // The API stores headers as a `{ key: value }` object with no ids of its own —
-  // the key doubles as the id here since it's already unique within the object.
   customHeaders: Object.entries(resource.attributes.custom_headers ?? {}).map(([key, value]) => ({
     id: key,
     key,

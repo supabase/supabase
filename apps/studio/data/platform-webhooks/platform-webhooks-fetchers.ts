@@ -99,8 +99,6 @@ export async function regenerateWebhookEndpointSecret(
   id: string,
   signingSecret: string
 ) {
-  // The server never echoes `signing_secret` back — the caller already knows the
-  // value since it's client-chosen, so there's nothing to read from the response here.
   const body = {
     data: { type: 'endpoint' as const, attributes: { signing_secret: signingSecret } },
   }
@@ -182,8 +180,6 @@ export async function getWebhookDelivery(
 }
 
 export async function sendTestWebhookEvent(scope: WebhookScopeParams, id: string) {
-  // No event type specified — the backend picks one the endpoint is already
-  // subscribed to. See PlatformWebhooksPage.tsx for the simpler v1 scope decision.
   const { data, error } =
     scope.scope === 'organization'
       ? await post('/v2/organizations/{slug}/webhooks/endpoints/{id}/test', {
@@ -199,9 +195,7 @@ export async function sendTestWebhookEvent(scope: WebhookScopeParams, id: string
   return data
 }
 
-// Retry and test-event are both "heavy rate-limited" to 10 requests/60s (per the API
-// docs) and return a generic "Rate limit exceeded" message with no retry-time hint —
-// this is the one case worth a friendlier, specific message than the raw backend text.
+// Retry and test-event are rate-limited to 10 requests/60s.
 export const isWebhookRateLimitError = (error: { message?: string }) =>
   error.message === 'Rate limit exceeded'
 

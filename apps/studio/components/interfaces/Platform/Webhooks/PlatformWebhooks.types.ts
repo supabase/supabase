@@ -32,7 +32,6 @@ export interface WebhookDelivery {
   eventType?: string
   eventPayload?: Record<string, unknown>
   status: WebhookDeliveryStatus
-  // Always present in the real API (`0` if unavailable), unlike the old mock.
   responseCode: number
   responseBody: string | Record<string, string> | null
   responseHeaders: Record<string, string> | null
@@ -57,6 +56,5 @@ export interface UpsertWebhookEndpointInput {
   enabled: boolean
   eventTypes: string[]
   customHeaders: Array<Pick<WebhookHeader, 'key' | 'value'>>
-  // Required by the real API on create — the user chooses the secret, it's not server-generated.
   signingSecret: string
 }

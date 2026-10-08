@@ -5,9 +5,7 @@ const scopeId = (scope: WebhookScopeParams) =>
 
 export const platformWebhooksKeys = {
   endpoints: (scope: WebhookScopeParams, limit?: number, offset?: number) =>
-    ['platform-webhooks', scope.scope, scopeId(scope), 'endpoints', limit, offset].filter(
-      (value) => value !== undefined
-    ),
+    ['platform-webhooks', scope.scope, scopeId(scope), 'endpoints', { limit, offset }] as const,
   endpoint: (scope: WebhookScopeParams, id: string | undefined) =>
     ['platform-webhooks', scope.scope, scopeId(scope), 'endpoints', id] as const,
   deliveries: (
@@ -24,10 +22,8 @@ export const platformWebhooksKeys = {
       'endpoints',
       endpointId,
       'deliveries',
-      size,
-      after,
-      before,
-    ].filter((value) => value !== undefined),
+      { size, after, before },
+    ] as const,
   delivery: (scope: WebhookScopeParams, endpointId: string | undefined, id: string | undefined) =>
     [
       'platform-webhooks',
