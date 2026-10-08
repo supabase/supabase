@@ -1,10 +1,8 @@
-import { CopyIcon, GithubIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
+import { GithubIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
-import { toast } from 'sonner'
 import {
   Button,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
