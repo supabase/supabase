@@ -125,12 +125,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
         <FormItemLayout id={name} label={label} layout={layout} description={description}>
           {gitHubAuthorization === null && !currentRepositoryId ? (
             <FormControl>
-              <ConnectGitHubButton
-                id={name}
-                disabled={disabled}
-                onConnectClick={onConnectClick}
-                refetch={refetch}
-              />
+              <ConnectGitHubButton id={name} onConnectClick={onConnectClick} refetch={refetch} />
             </FormControl>
           ) : (
             <Popover open={isRepoSelectorOpen} onOpenChange={setIsRepoSelectorOpen}>

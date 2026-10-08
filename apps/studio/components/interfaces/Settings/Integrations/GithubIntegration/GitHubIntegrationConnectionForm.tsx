@@ -70,9 +70,6 @@ export const GitHubIntegrationConnectionForm = ({
     'integrations.github_connections'
   )
 
-  const canManageGitHubConnection =
-    (!connection && !canCreateGitHubConnection) || (connection && !canUpdateGitHubConnection)
-
   const {
     gitHubAuthorization,
     githubRepos,
@@ -409,12 +406,7 @@ export const GitHubIntegrationConnectionForm = ({
           layout="responsive"
           title="Authorize GitHub to manage integration settings"
           description="Required to list your repositories and change this project's connection"
-          actions={
-            <ConnectGitHubButton
-              disabled={canManageGitHubConnection}
-              refetch={refetchRepositoryOptions}
-            />
-          }
+          actions={<ConnectGitHubButton refetch={refetchRepositoryOptions} />}
         />
       )}
 
@@ -431,7 +423,7 @@ export const GitHubIntegrationConnectionForm = ({
                 label="GitHub repository"
                 layout="flex-row-reverse"
                 description={repositoryDescription}
-                disabled={canManageGitHubConnection}
+                disabled={!gitHubAuthorization}
                 selectedRepositoryName={connection?.repository.name}
                 repositories={githubRepos}
                 gitHubAuthorization={gitHubAuthorization}
