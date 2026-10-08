@@ -145,6 +145,7 @@ const CLICK_ID_KEYS = [
   'ttclid', // TikTok Ads
   'twclid', // X Ads (Twitter)
   'li_fat_id', // LinkedIn Ads
+  'oppref', // ChatGPT Ads (OpenAI)
 ] as const
 
 function pickParams(
