@@ -41,6 +41,8 @@ alter database your_database_name set default_transaction_read_only = off;
 commit;
 ```
 
+After you re-enable writes, restart or reconnect your applications and services. Connections that opened while the setting was on can stay read-only until they reconnect.
+
 While the setting is on, tools that need to run as read-write, such as the Supabase CLI's database commands, can fail. If that happens, run the SQL above in the [SQL Editor](/dashboard/project/_/sql/new) in the Dashboard. If you restart your project while the setting is on, some services might not start cleanly until you turn it off.
 
 ## If your database is read-only and you didn't set it
