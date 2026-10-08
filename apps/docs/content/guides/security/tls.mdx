@@ -8,9 +8,9 @@ Your project's APIs accept only HTTPS connections. Use the TLS versions and ciph
 
 These settings apply to your project's default domain, `<project_ref>.supabase.co`, and to [custom domains](/docs/guides/platform/custom-domains). It covers every service on that domain: Auth, the Data API, Storage, Realtime, and Edge Functions. For direct Postgres connections and connections through the pooler, see [Postgres SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 
-<Admonition type="deprecation" title="Cipher block chaining (CBC) ciphers are deprecated">
+<Admonition type="deprecation" title="Outdated TLS 1.2 cipher suites are deprecated">
 
-Supabase will stop offering CBC-mode cipher suites on TLS 1.2 for project APIs on November 10, 2026 at the earliest. After the removal, clients that support neither TLS 1.3 nor a non-CBC TLS 1.2 cipher suite can't connect to your project's APIs. Check your clients and update any that are affected before then. For the affected cipher suites and the steps, see [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
+On November 10, 2026 at the earliest, clients on old, unsupported operating systems, or embedded devices that haven't been updated, might no longer be able to connect to your project's APIs. To check your clients, see [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
 
 </Admonition>
 
@@ -37,7 +37,7 @@ Until the removal date, project APIs also offer the deprecated CBC-mode cipher s
 
 ## Removal of CBC-mode ciphers
 
-CBC-mode cipher suites are vulnerable to several known attacks, and security scanners commonly flag them. Supabase will stop offering the following TLS 1.2 cipher suites on project APIs **on November 10, 2026 at the earliest**:
+A cipher suite determines how a connection is encrypted. Cipher block chaining (CBC) mode cipher suites have known security weaknesses. Security scanners commonly flag them since offering them on the server allows for downgrade attacks, even if the client supports newer ciphers. Supabase will stop offering the following TLS 1.2 cipher suites on project APIs **on November 10, 2026 at the earliest**:
 
 | IANA name                                 | OpenSSL name                |
 | ----------------------------------------- | --------------------------- |
@@ -52,9 +52,9 @@ The date might move later based on customer feedback.
 
 A client is affected if it can't use TLS 1.3 and the only TLS 1.2 cipher suites it shares with project APIs are the CBC-mode ones. For the cipher suites that remain, see [Supported cipher suites](#supported-cipher-suites). After the removal, it fails during the TLS handshake and can't connect to your project's APIs.
 
-Clients that depend on CBC-mode ciphers typically run end-of-life software, for example:
+In September 2026, fewer than 0.0001% of connections to Supabase projects used these cipher suites. Clients that depend on them typically run end-of-life software, for example:
 
-- Unsupported versions of macOS, iOS, or Windows
+- Unsupported operating system versions
 - Embedded devices, such as smart TVs or set-top boxes, that no longer receive updates
 - HTTP clients or runtimes built against outdated TLS libraries
 
