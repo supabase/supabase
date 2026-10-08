@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'vitest'
 
-import { formatRowsForInsert, getRowFromSidePanel } from './SidePanelEditor.utils'
+import {
+  filterForeignRowValue,
+  formatRowsForInsert,
+  getRowFromSidePanel,
+} from './SidePanelEditor.utils'
 import type { SupaRow } from '@/components/grid/types'
 import type { SidePanel } from '@/state/table-editor'
 
@@ -213,5 +217,45 @@ describe('getRowFromSidePanel', () => {
       type: 'operation-queue',
     }
     expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
+  })
+})
+
+describe('filterForeignRowValue', () => {
+  test('restricts a composite FK value down to only the edited column', () => {
+    // e.g. the user double-clicked role_id, but the FK selector resolved values for
+    // every source column in the composite key (role_id + tenant_id)
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+
+    expect(filterForeignRowValue(value, 'role_id')).toEqual({ role_id: 'role-2' })
+  })
+
+  test('restricts down to whichever column of the composite key was actually edited', () => {
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+
+    expect(filterForeignRowValue(value, 'tenant_id')).toEqual({ tenant_id: 'tenant-B' })
+  })
+
+  test('leaves a single-column FK value unchanged', () => {
+    const value = { user_id: '123' }
+
+    expect(filterForeignRowValue(value, 'user_id')).toEqual({ user_id: '123' })
+  })
+
+  test('preserves a null value for the edited column (Set NULL action)', () => {
+    const value = { role_id: null, tenant_id: 'tenant-B' }
+
+    expect(filterForeignRowValue(value, 'role_id')).toEqual({ role_id: null })
+  })
+
+  test('passes the value through unchanged when no edited column is known', () => {
+    // The Row Editor panel flow doesn't track a single edited column since the user
+    // reviews every field before saving there
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+
+    expect(filterForeignRowValue(value, undefined)).toEqual(value)
+  })
+
+  test('returns undefined when the value itself is undefined', () => {
+    expect(filterForeignRowValue(undefined, 'role_id')).toBeUndefined()
   })
 })
