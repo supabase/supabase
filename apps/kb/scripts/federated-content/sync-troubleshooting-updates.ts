@@ -7,6 +7,8 @@
 // github_id — no need to list/paginate the category's discussions. Run after
 // sync-troubleshooting-entries.ts, from CI only. Pass --dry-run to log
 // without writing anything.
+import '../utils/dotenv.js'
+
 import { createHash } from 'node:crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'

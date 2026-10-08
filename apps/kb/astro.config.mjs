@@ -59,6 +59,7 @@ export default defineConfig({
       noExternal: ['lodash'],
     },
     plugins: [tailwindcss(), ssrLodashEs],
+    logLevel: 'error',
   },
   markdown: {
     shikiConfig: {

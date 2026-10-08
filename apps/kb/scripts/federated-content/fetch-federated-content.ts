@@ -2,6 +2,8 @@
 // repo's `guides` folder into src/content/troubleshooting/ (gitignored,
 // regenerated on every prebuild — see content.config.ts's `troubleshooting`
 // collection). No content processing: body text is written as fetched.
+import '../utils/dotenv.js'
+
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'

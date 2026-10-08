@@ -14,6 +14,8 @@
 // Delete this file, legacy-troubleshooting-slugs.json, its package.json script,
 // and its workflow step once all legacy rows are backfilled — safe to remove
 // as a unit, nothing else depends on it.
+import '../utils/dotenv.js'
+
 import { createClient } from '@supabase/supabase-js'
 
 import legacySlugs from './legacy-troubleshooting-slugs.json' with { type: 'json' }

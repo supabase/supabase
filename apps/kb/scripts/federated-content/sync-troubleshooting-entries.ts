@@ -2,6 +2,8 @@
 // have a troubleshooting_entries row yet. Run after fetch-federated-content.ts,
 // from CI only (never kb's own prebuild — this has real side effects). Pass
 // --dry-run to log what would be created without creating anything.
+import '../utils/dotenv.js'
+
 import { createHash } from 'node:crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
