@@ -383,7 +383,7 @@ const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
         .keys()
         .map((index) => ({
           grant_id: `grant-vercel-developer-${index}`,
-          kind: 'member_bound',
+          kind: 'member_bound' as const,
           user: {
             gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
             email: `developer${index}@example.com`,
