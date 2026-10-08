@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
+  DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
 } from 'ui'
@@ -73,6 +74,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       <DialogHeader>
         <DialogTitle>Member grants for {approval.app.name}</DialogTitle>
       </DialogHeader>
+      <DialogSectionSeparator />
 
       <p aria-live="polite" className="sr-only">
         {statusText}

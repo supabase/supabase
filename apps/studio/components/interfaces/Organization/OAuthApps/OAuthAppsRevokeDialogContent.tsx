@@ -8,6 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
 
@@ -48,14 +49,15 @@ export const OAuthAppsRevokeDialogContent = ({
       <DialogHeader>
         <DialogTitle>Revoke access for {approval.app.name}</DialogTitle>
       </DialogHeader>
-
+      <DialogSectionSeparator />
       {isError && (
         <AlertError
           subject={`An error occurred while revoking this ${approval.app.name} grant`}
-          className="mb-0 rounded-none border-x-0"
+          className="mb-0 rounded-none border-x-0 border-t-0"
           error={error}
         />
       )}
+
       <DialogSection className="flex flex-col gap-4 text-sm text-foreground-light">
         <p>
           This revokes the app at{' '}
