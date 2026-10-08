@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -105,9 +105,6 @@ export const GitHubIntegrationConnectionForm = ({
 
   const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
-      onSuccess: () => {
-        toast.success('GitHub connection updated')
-      },
       onError: (error) => {
         // Don't show error toast when connection already exists - the branch
         // settings update will still proceed and show its own success toast
@@ -163,6 +160,19 @@ export const GitHubIntegrationConnectionForm = ({
       }
     })
 
+  const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
+  const connectionValues: z.infer<typeof GitHubSettingsSchema> | undefined = connection
+    ? {
+        repositoryId: connection.repository.id.toString(),
+        enableProductionSync: hasGitBranch,
+        branchName: hasGitBranch ? (prodBranch?.git_branch ?? '') : '',
+        new_branch_per_pr: connection.new_branch_per_pr,
+        supabaseDirectory: connection.workdir || '',
+        supabaseChangesOnly: connection.supabase_changes_only,
+        branchLimit: String(connection.branch_limit),
+      }
+    : undefined
+
   const githubSettingsForm = useForm<z.infer<typeof GitHubSettingsSchema>>({
     resolver: zodResolver(GitHubSettingsSchema),
     mode: 'onSubmit',
@@ -176,6 +186,8 @@ export const GitHubIntegrationConnectionForm = ({
       supabaseChangesOnly: true,
       branchLimit: '3',
     },
+    values: connectionValues,
+    resetOptions: { keepDirtyValues: true },
   })
 
   const enableProductionSync = useWatch({
@@ -223,20 +235,28 @@ export const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    createConnection({
-      organizationId: selectedOrganization.id,
-      connection: {
-        installation_id: selectedRepo.installation_id,
-        project_ref: selectedProject.ref,
-        repository_id: Number(selectedRepo.id),
-        workdir: data.supabaseDirectory,
-        ...(hasAccessToBranching && {
-          supabase_changes_only: data.supabaseChangesOnly,
-          branch_limit: Number(data.branchLimit),
-          new_branch_per_pr: data.new_branch_per_pr ?? false,
-        }),
+    createConnection(
+      {
+        organizationId: selectedOrganization.id,
+        connection: {
+          installation_id: selectedRepo.installation_id,
+          project_ref: selectedProject.ref,
+          repository_id: Number(selectedRepo.id),
+          workdir: data.supabaseDirectory,
+          ...(hasAccessToBranching && {
+            supabase_changes_only: data.supabaseChangesOnly,
+            branch_limit: Number(data.branchLimit),
+            new_branch_per_pr: data.new_branch_per_pr ?? false,
+          }),
+        },
       },
-    })
+      {
+        onSuccess: () => {
+          toast.success('GitHub connection updated')
+          githubSettingsForm.reset(data, { keepDirtyValues: false })
+        },
+      }
+    )
 
     if (!prodBranch) {
       createBranch({
@@ -276,18 +296,21 @@ export const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    updateConnectionSettings({
-      connectionId: currentConnection.id,
-      organizationId: selectedOrganization.id,
-      connection: {
-        workdir: data.supabaseDirectory,
-        ...(hasAccessToBranching && {
-          supabase_changes_only: data.supabaseChangesOnly,
-          branch_limit: Number(data.branchLimit),
-          new_branch_per_pr: data.new_branch_per_pr ?? false,
-        }),
+    updateConnectionSettings(
+      {
+        connectionId: currentConnection.id,
+        organizationId: selectedOrganization.id,
+        connection: {
+          workdir: data.supabaseDirectory,
+          ...(hasAccessToBranching && {
+            supabase_changes_only: data.supabaseChangesOnly,
+            branch_limit: Number(data.branchLimit),
+            new_branch_per_pr: data.new_branch_per_pr ?? false,
+          }),
+        },
       },
-    })
+      { onSuccess: () => githubSettingsForm.reset(data, { keepDirtyValues: false }) }
+    )
 
     if (prodBranch) {
       updateBranch({
@@ -324,15 +347,18 @@ export const GitHubIntegrationConnectionForm = ({
         connectionId: connection.id,
       })
 
-      githubSettingsForm.reset({
-        repositoryId: '',
-        enableProductionSync: true,
-        branchName: 'main',
-        new_branch_per_pr: true,
-        supabaseDirectory: '.',
-        supabaseChangesOnly: true,
-        branchLimit: '3',
-      })
+      githubSettingsForm.reset(
+        {
+          repositoryId: '',
+          enableProductionSync: true,
+          branchName: 'main',
+          new_branch_per_pr: true,
+          supabaseDirectory: '.',
+          supabaseChangesOnly: true,
+          branchLimit: '3',
+        },
+        { keepDirtyValues: false }
+      )
     } catch (error) {
       console.error('Error removing integration:', error)
       toast.error('Failed to remove integration')
@@ -382,22 +408,6 @@ export const GitHubIntegrationConnectionForm = ({
   } else if (gitHubAuthorization === null) {
     repositoryDescription = 'Connect GitHub to link a repository to this project'
   }
-
-  useEffect(() => {
-    if (connection) {
-      const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
-
-      githubSettingsForm.reset({
-        repositoryId: connection.repository.id.toString(),
-        enableProductionSync: hasGitBranch,
-        branchName: hasGitBranch ? (prodBranch?.git_branch ?? '') : '',
-        new_branch_per_pr: connection.new_branch_per_pr,
-        supabaseDirectory: connection.workdir || '',
-        supabaseChangesOnly: connection.supabase_changes_only,
-        branchLimit: String(connection.branch_limit),
-      })
-    }
-  }, [connection, prodBranch, githubSettingsForm])
 
   return (
     <>
@@ -666,7 +676,9 @@ export const GitHubIntegrationConnectionForm = ({
                     <div className="flex space-x-2">
                       {githubSettingsForm.formState.isDirty && (
                         <Button
-                          onClick={() => githubSettingsForm.reset()}
+                          onClick={() =>
+                            githubSettingsForm.reset(connectionValues, { keepDirtyValues: false })
+                          }
                           disabled={!canUpdateGitHubConnection || isCheckingBranch}
                         >
                           Cancel
