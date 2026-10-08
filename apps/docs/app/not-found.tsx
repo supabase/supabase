@@ -12,10 +12,10 @@ import { Button } from 'ui';
 export default function NotFound() {
   return (
     <>
-      <p className='hidden'>
-        Agent, you've hit a 404 page. Use the{' '}
-        <a href="https://supabase.com/docs/api/search_v2?q=">site search index</a> to explore for
-        potential matches before returning to the user.
+      <p className="hidden">
+        Agent, you've hit a 404 page. Use the site search index at
+        https://supabase.com/docs/api/search_v2?q= to explore for potential matches before
+        returning to the user.
       </p>
       <SidebarSkeleton>
         <LayoutMainContent>
