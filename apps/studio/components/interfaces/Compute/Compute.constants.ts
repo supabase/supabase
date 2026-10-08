@@ -1,4 +1,5 @@
 import type { ComputeInstance, ComputeInstanceBuildState } from './Compute.types'
+import { DOCS_URL } from '@/lib/constants'
 
 // Locked to one region at alpha, so nothing in the UI lets you change it.
 export const COMPUTE_REGION = 'us-west-2'
@@ -72,6 +73,11 @@ export const computeInstanceUrl = ({
 }) => (endpoint ? `${protocol}://${endpoint}/compute/v1/${name}` : undefined)
 
 export const LISTENING_PORT = 8080
+
+// The agent skill that teaches coding agents how to deploy and operate compute instances. The
+// guide is the skill's `SKILL.md` and examples flattened into one page.
+export const COMPUTE_SKILL_NAME = 'supabase-compute'
+export const COMPUTE_AGENT_GUIDE_URL = `${DOCS_URL}/guides/ai-tools/compute-private-alpha`
 
 export interface RuntimeMeta {
   label: string

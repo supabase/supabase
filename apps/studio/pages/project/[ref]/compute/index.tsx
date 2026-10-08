@@ -7,6 +7,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
+  PageHeaderAside,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
@@ -15,6 +16,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { COMPUTE_AGENT_GUIDE_URL } from '@/components/interfaces/Compute/Compute.constants'
 import {
   isComputeForbidden,
   isComputeUnavailable,
@@ -26,6 +28,7 @@ import { ComputeLayout } from '@/components/layouts/ComputeLayout/ComputeLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { computeQueryOptions } from '@/data/compute/compute-query'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
@@ -64,6 +67,9 @@ const ComputePage: NextPageWithLayout = () => {
               Run fully managed compute in isolation next to your database
             </PageHeaderDescription>
           </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={COMPUTE_AGENT_GUIDE_URL} label="Agent guide" />
+          </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
 
