@@ -1,12 +1,9 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { PropsWithChildren, useEffect, useRef } from 'react'
-import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { createSupportFormUrl } from '@/components/interfaces/Support/SupportForm.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { InlineLink } from '@/components/ui/InlineLink'
-import { takeBreadcrumbSnapshot } from '@/lib/breadcrumbs'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -25,33 +22,7 @@ export interface AlertErrorProps {
   hideContactSupport?: boolean
 }
 
-export const ContactSupportButton = ({
-  projectRef,
-  orgSlug,
-  subject,
-  error,
-}: {
-  projectRef?: string
-  orgSlug?: string
-  subject?: string
-  error?: { message: string } | null
-}) => {
-  return (
-    <Button asChild className="w-min">
-      <SupportLink
-        queryParams={{
-          category: SupportCategories.DASHBOARD_BUG,
-          projectRef,
-          orgSlug,
-          subject,
-          error: error?.message,
-        }}
-      >
-        Contact support
-      </SupportLink>
-    </Button>
-  )
-}
+const SUPPORT_PHRASE_REGEX = /(contact support)/i
 
 // [Joshen] To standardize the language for all error UIs
 export const AlertError = ({
@@ -78,6 +49,34 @@ export const AlertError = ({
     ? '503 Service Temporarily Unavailable'
     : error?.message
 
+  const hasInlineSupportLink =
+    showInstructions && !hideContactSupport && SUPPORT_PHRASE_REGEX.test(description)
+  const canShowSupportFallback = !hideContactSupport && !hasInlineSupportLink
+
+  const renderSupportLink = (text: string, key?: number) => (
+    <SupportLink
+      key={key}
+      className={InlineLinkClassName}
+      queryParams={{
+        category: SupportCategories.DASHBOARD_BUG,
+        projectRef,
+        orgSlug,
+        subject,
+        error: error?.message,
+      }}
+    >
+      {text}
+    </SupportLink>
+  )
+
+  // Splitting with a capture group keeps the matched text, so it can be swapped for a link
+  const renderDescriptionWithSupportLink = (text: string) =>
+    text
+      .split(SUPPORT_PHRASE_REGEX)
+      .map((part, index) =>
+        SUPPORT_PHRASE_REGEX.test(part) ? renderSupportLink(part, index) : part
+      )
+
   useEffect(() => {
     if (!hasTrackedRef.current) {
       hasTrackedRef.current = true
@@ -88,22 +87,6 @@ export const AlertError = ({
       }
     }
   }, [track])
-
-  const renderSupportLink = (text: string, key?: number) => (
-    <InlineLink
-      key={key}
-      href={createSupportFormUrl({
-        category: SupportCategories.DASHBOARD_BUG,
-        projectRef,
-        orgSlug,
-        subject,
-        error: error?.message,
-      })}
-      onClick={() => takeBreadcrumbSnapshot()}
-    >
-      {text}
-    </InlineLink>
-  )
 
   return (
     <Admonition
@@ -121,18 +104,10 @@ export const AlertError = ({
           )}
           {showInstructions && (
             <p>
-              {description
-                .split(/(contact support)/i)
-                .map((part, index) =>
-                  !hideContactSupport && part.toLowerCase() === 'contact support'
-                    ? renderSupportLink(part, index)
-                    : part
-                )}
+              {hasInlineSupportLink ? renderDescriptionWithSupportLink(description) : description}
             </p>
           )}
-          {!hideContactSupport && (!showInstructions || !/contact support/i.test(description)) && (
-            <p>{renderSupportLink('Contact support')}</p>
-          )}
+          {canShowSupportFallback && <p>{renderSupportLink('Contact support')}</p>}
           {children}
         </>
       }
