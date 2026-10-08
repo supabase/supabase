@@ -8,6 +8,7 @@ type Query = Record<string, string | string[]>
 // Like the Next pages router: `query`/`asPath` only reflect a shallow push once it settles.
 const router = vi.hoisted(() => {
   const state = {
+    pathname: '/project/[ref]/editor/[id]',
     query: {} as Query,
     asPath: '',
     settles: [] as Array<() => void>,

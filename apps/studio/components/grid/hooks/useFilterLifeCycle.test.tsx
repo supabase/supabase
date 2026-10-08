@@ -62,6 +62,14 @@ const renderProbe = () => {
 
 const red = { column: 'name', operator: '=' as const, value: 'Red' }
 
+// Like a browser Back/Forward: the URL is already the destination when `popstate` fires, and the
+// router (here, the mocked URL source) catches up on the next render.
+const popStateTo = (filters: string[]) => {
+  const search = new URLSearchParams(filters.map((filter) => ['filter', filter]))
+  window.history.replaceState(null, '', `${url.path}?${search}`)
+  window.dispatchEvent(new PopStateEvent('popstate'))
+}
+
 describe('useSyncFiltersToUrl', () => {
   beforeEach(() => {
     vi.useFakeTimers()
@@ -120,7 +128,7 @@ describe('useSyncFiltersToUrl', () => {
     await act(async () => snap.setFilters([red]))
 
     // Back to the pre-sort entry: `filter` is unchanged, only `sort` differs
-    window.dispatchEvent(new PopStateEvent('popstate'))
+    await act(async () => popStateTo([]))
     url.sorts = []
     await rerender()
     act(() => vi.advanceTimersByTime(1000))
@@ -133,7 +141,7 @@ describe('useSyncFiltersToUrl', () => {
     const { rerender } = renderProbe()
     await act(async () => snap.setFilters([red]))
 
-    window.dispatchEvent(new PopStateEvent('popstate'))
+    await act(async () => popStateTo(['name:eq:Red']))
     url.filters = ['name:eq:Red']
     await rerender()
     act(() => vi.advanceTimersByTime(1000))

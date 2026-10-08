@@ -7,11 +7,13 @@ import {
   RouterProvider,
 } from '@tanstack/react-router'
 import { act, render, screen, waitFor } from '@testing-library/react'
+import { flushSync } from 'react-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from './useFilterLifeCycle'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import type { ForeignTable } from '@/data/table-editor/table-editor-types'
+import { useTableEditorFiltersSort } from '@/hooks/misc/useTableEditorFiltersSort'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 import {
   TableEditorTableStateContextProvider,
@@ -37,6 +39,7 @@ const table: ForeignTable = {
 }
 
 let snap: ReturnType<typeof useTableEditorTableStateSnapshot>
+let sortParams: ReturnType<typeof useTableEditorFiltersSort>
 
 function FiltersProbe() {
   snap = useTableEditorTableStateSnapshot()
@@ -45,11 +48,21 @@ function FiltersProbe() {
   return <output data-testid="filters">{snap.filters.map((f) => f.value).join(',')}</output>
 }
 
+// A separate instance, like the sort controls.
+function SortProbe() {
+  sortParams = useTableEditorFiltersSort()
+  return null
+}
+
 const getHistoryIndex = () => (window.history.state as { __TSR_index?: number }).__TSR_index
 
 async function renderTableAt(url: string) {
   window.history.replaceState(null, '', url)
   const history = createBrowserHistory()
+  // Browsers run microtasks between `popstate` listeners, so React renders (and runs effects for)
+  // the router's update before the hook's own listener. jsdom doesn't; flush here to match.
+  const flushReact = () => flushSync(() => {})
+  window.addEventListener('popstate', flushReact)
   const root = createRootRoute({ component: Outlet })
   const route = createRoute({
     getParentRoute: () => root,
@@ -57,6 +70,7 @@ async function renderTableAt(url: string) {
     component: () => (
       <TableEditorTableStateContextProvider projectRef="default" table={table}>
         <FiltersProbe />
+        <SortProbe />
       </TableEditorTableStateContextProvider>
     ),
   })
@@ -74,12 +88,16 @@ async function renderTableAt(url: string) {
     cleanup: () => {
       view.unmount()
       history.destroy()
+      window.removeEventListener('popstate', flushReact)
     },
   }
 }
 
 // Outlasts the 500ms state → URL debounce, so any sync push would have landed.
 const settle = () => act(() => new Promise((resolve) => setTimeout(resolve, 700)))
+
+const red = { column: 'name', operator: '=' as const, value: 'Red' }
+const filteredByRed = `${unfiltered}&filter=name%3Aeq%3ARed`
 
 describe('useSyncFiltersToUrl', () => {
   it('follows Back/Forward between entries of the same table without adding entries', async () => {
@@ -99,6 +117,49 @@ describe('useSyncFiltersToUrl', () => {
 
       await settle()
       expect(getHistoryIndex()).toBe(filteredIndex)
+      expect(window.location.search).toContain('filter=name%3Aeq%3ARed')
+    } finally {
+      cleanup()
+    }
+  })
+
+  it('discards a pending edit on Back to an entry that differs only by sort', async () => {
+    const { history, cleanup } = await renderTableAt(filteredByRed)
+
+    try {
+      await waitFor(() => expect(screen.getByTestId('filters')).toHaveTextContent('Red'))
+      await settle()
+      const unsortedIndex = getHistoryIndex()
+      await act(async () => sortParams.setParams((prev) => ({ ...prev, sort: ['name:asc'] })))
+      await waitFor(() => expect(window.location.search).toContain('sort='))
+
+      // Edit, then Back before the debounced push; the router's popstate listener runs first
+      await act(async () => snap.setFilters([{ ...red, value: 'Green' }]))
+      await act(async () => history.back())
+      await settle()
+
+      expect(screen.getByTestId('filters')).toHaveTextContent('Red')
+      expect(window.location.pathname + window.location.search).toBe(filteredByRed)
+      expect(getHistoryIndex()).toBe(unsortedIndex)
+    } finally {
+      cleanup()
+    }
+  })
+
+  it("builds a later sort push on the current URL, not the router's lagging query", async () => {
+    const { cleanup } = await renderTableAt(unfiltered)
+
+    try {
+      await act(async () => snap.setFilters([red]))
+      await waitFor(() => expect(window.location.search).toContain('filter=name%3Aeq%3ARed'))
+      await settle()
+
+      await act(async () => sortParams.setParams((prev) => ({ ...prev, sort: ['name:asc'] })))
+      await waitFor(() => expect(window.location.search).toContain('sort=name%3Aasc'))
+      expect(window.location.search).toContain('filter=name%3Aeq%3ARed')
+
+      await act(async () => sortParams.setParams((prev) => ({ ...prev, sort: [] })))
+      await waitFor(() => expect(window.location.search).not.toContain('sort='))
       expect(window.location.search).toContain('filter=name%3Aeq%3ARed')
     } finally {
       cleanup()
