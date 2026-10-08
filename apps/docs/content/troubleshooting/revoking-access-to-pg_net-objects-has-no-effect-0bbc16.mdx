@@ -90,7 +90,7 @@ Apart from the owner, `supabase_admin`, the tables in `net` have grants only for
 - `postgres`, for your functions and pg_cron jobs that call `net.http_get` or `net.http_post`.
 - `supabase_functions_admin`, for Database Webhooks.
 
-The pg_net worker also reads and writes the tables. It connects as the role in the `pg_net.username` setting. When that role is `postgres`, the worker depends on the `PUBLIC` grants too. On some projects the setting is empty, and the worker connects as `supabase_admin`, which doesn't need them. To check which role the worker uses on your project, run:
+The pg_net worker also reads and writes the tables. It connects as the role in the `pg_net.username` setting. When that role is `postgres`, the worker depends on the `PUBLIC` grants too. On some projects the setting is empty, and the worker connects as the bootstrap superuser, `supabase_admin`, which doesn't need them. To check which role the worker uses on your project, run the following in the SQL Editor:
 
 ```sql
 select usename
@@ -98,7 +98,7 @@ from pg_stat_activity
 where backend_type like 'pg_net%';
 ```
 
-If the query returns no rows, the worker isn't running.
+If the query returns no rows when you run it as `postgres`, the worker isn't running. Roles without the `pg_read_all_stats` privilege can't see the worker, so the query returns no rows for them either.
 
 ## Limit pg_net access on your project
 
