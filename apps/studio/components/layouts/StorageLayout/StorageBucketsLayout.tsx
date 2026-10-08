@@ -15,7 +15,14 @@ import {
 
 import { BUCKET_TYPES } from '@/components/interfaces/Storage/Storage.constants'
 import { useStorageV2Page } from '@/components/interfaces/Storage/Storage.utils'
+import { URL_SIGNING_KEYS_PAGE } from '@/components/interfaces/Storage/UrlSigningKeys/UrlSigningKeys.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
+
+const getPageHeaderConfig = (page: ReturnType<typeof useStorageV2Page>) => {
+  if (page === 'signing-keys') return URL_SIGNING_KEYS_PAGE
+  if (page === undefined || page === 's3') return undefined
+  return BUCKET_TYPES[page]
+}
 
 export const StorageBucketsLayout = ({
   title,
@@ -25,7 +32,7 @@ export const StorageBucketsLayout = ({
   const { ref } = useParams()
   const pathname = usePathname()
   const page = useStorageV2Page()
-  const config = !!page && page !== 's3' ? BUCKET_TYPES[page] : undefined
+  const config = getPageHeaderConfig(page)
 
   const navigationItems =
     page === 'files'

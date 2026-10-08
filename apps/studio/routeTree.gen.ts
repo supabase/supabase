@@ -209,6 +209,7 @@ import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$
 import { Route as ProjectRefSqlExamplesRouteImport } from './routes/project/$ref/sql/examples'
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
+import { Route as ProjectRefStorageSigningKeysRouteImport } from './routes/project/$ref/storage/signing-keys'
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
 import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$slug/webhooks/index'
 import { Route as AppOrgSlugWebhooksEndpointIdRouteImport } from './routes/_app/org/$slug/webhooks/$endpointId'
@@ -1404,6 +1405,12 @@ const ProjectRefStorageS3Route = ProjectRefStorageS3RouteImport.update({
   path: '/s3',
   getParentRoute: () => ProjectRefStorageRoute,
 } as any)
+const ProjectRefStorageSigningKeysRoute =
+  ProjectRefStorageSigningKeysRouteImport.update({
+    id: '/signing-keys',
+    path: '/signing-keys',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
 const AppOrgSlugPrivateAppsIndexRoute =
   AppOrgSlugPrivateAppsIndexRouteImport.update({
     id: '/$slug/private-apps/',
@@ -2329,6 +2336,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/storage/signing-keys': typeof ProjectRefStorageSigningKeysRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -2638,6 +2646,7 @@ export interface FileRoutesByTo {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/storage/signing-keys': typeof ProjectRefStorageSigningKeysRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -2965,6 +2974,7 @@ export interface FileRoutesById {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/storage/signing-keys': typeof ProjectRefStorageSigningKeysRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -3291,6 +3301,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/storage/signing-keys'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -3600,6 +3611,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/storage/signing-keys'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -3926,6 +3938,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/storage/signing-keys'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -5596,6 +5609,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefStorageS3RouteImport
       parentRoute: typeof ProjectRefStorageRoute
     }
+    '/project/$ref/storage/signing-keys': {
+      id: '/project/$ref/storage/signing-keys'
+      path: '/signing-keys'
+      fullPath: '/project/$ref/storage/signing-keys'
+      preLoaderRoute: typeof ProjectRefStorageSigningKeysRouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
     '/_app/org/$slug/private-apps/': {
       id: '/_app/org/$slug/private-apps/'
       path: '/$slug/private-apps'
@@ -7087,6 +7107,7 @@ const ProjectRefSqlRouteWithChildren = ProjectRefSqlRoute._addFileChildren(
 
 interface ProjectRefStorageRouteChildren {
   ProjectRefStorageS3Route: typeof ProjectRefStorageS3Route
+  ProjectRefStorageSigningKeysRoute: typeof ProjectRefStorageSigningKeysRoute
   ProjectRefStorageFilesPoliciesRoute: typeof ProjectRefStorageFilesPoliciesRoute
   ProjectRefStorageFilesSettingsRoute: typeof ProjectRefStorageFilesSettingsRoute
   ProjectRefStorageAnalyticsIndexRoute: typeof ProjectRefStorageAnalyticsIndexRoute
@@ -7099,6 +7120,7 @@ interface ProjectRefStorageRouteChildren {
 
 const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
   ProjectRefStorageS3Route: ProjectRefStorageS3Route,
+  ProjectRefStorageSigningKeysRoute: ProjectRefStorageSigningKeysRoute,
   ProjectRefStorageFilesPoliciesRoute: ProjectRefStorageFilesPoliciesRoute,
   ProjectRefStorageFilesSettingsRoute: ProjectRefStorageFilesSettingsRoute,
   ProjectRefStorageAnalyticsIndexRoute: ProjectRefStorageAnalyticsIndexRoute,

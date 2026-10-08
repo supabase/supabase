@@ -13,6 +13,7 @@ export const STORAGE_NAV_SHORTCUT_IDS = {
   NAV_STORAGE_ANALYTICS: 'nav.storage-analytics',
   NAV_STORAGE_VECTORS: 'nav.storage-vectors',
   NAV_STORAGE_S3: 'nav.storage-s3',
+  NAV_STORAGE_SIGNING_KEYS: 'nav.storage-signing-keys',
 }
 
 export type StorageNavShortcutId =
@@ -44,6 +45,13 @@ export const storageNavRegistry: RegistryDefinations<StorageNavShortcutId> = {
     id: STORAGE_NAV_SHORTCUT_IDS.NAV_STORAGE_S3,
     label: 'Go to S3 settings',
     sequence: ['S', '3'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_STORAGE,
+  },
+  [STORAGE_NAV_SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS]: {
+    id: STORAGE_NAV_SHORTCUT_IDS.NAV_STORAGE_SIGNING_KEYS,
+    label: 'Go to URL signing keys',
+    sequence: ['S', 'K'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_STORAGE,
   },

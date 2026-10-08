@@ -216,6 +216,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell — `/storage/*`
 
 - [x] A `routes/project/$ref/storage/s3.tsx` ← `pages/project/[ref]/storage/s3.tsx`
+- [x] A `routes/project/$ref/storage/signing-keys.tsx` ← `pages/project/[ref]/storage/signing-keys.tsx`
 - [x] A `routes/project/$ref/storage/files/index.tsx` ← `pages/project/[ref]/storage/files/index.tsx`
 - [x] A `routes/project/$ref/storage/files/policies.tsx` ← `pages/project/[ref]/storage/files/policies.tsx`
 - [x] A `routes/project/$ref/storage/files/settings.tsx` ← `pages/project/[ref]/storage/files/settings.tsx`
