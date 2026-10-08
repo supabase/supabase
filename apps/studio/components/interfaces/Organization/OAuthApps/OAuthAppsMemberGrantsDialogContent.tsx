@@ -73,7 +73,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
 
       {isSuccess && (
         <div className="px-4 max-h-90 overflow-y-auto">
-          {data.pages.length === 0 ? (
+          {data.pages.length === 0 || data.pages[0].data.length === 0 ? (
             <p className="text-sm text-foreground-lighter">
               No grants have been authorized for this application.
             </p>
