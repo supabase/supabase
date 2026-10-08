@@ -3,7 +3,6 @@ import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
 import DatabaseSizeUsage from './DatabaseSizeUsage'
 import { DiskUsage } from './DiskUsage'
-import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import { DataPoint } from '@/data/analytics/constants'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -23,6 +22,9 @@ export interface UsageSectionProps {
   currentBillingCycleSelected: boolean
   startDate?: string
   endDate?: string
+  /** Splits Storage Size into current and noncurrent objects. Only the owner of the retention
+   * query knows whether those figures are available. */
+  isStorageSizeSegmented?: boolean
 }
 
 const UsageSection = ({
@@ -34,6 +36,7 @@ const UsageSection = ({
   currentBillingCycleSelected,
   startDate,
   endDate,
+  isStorageSizeSegmented = false,
 }: UsageSectionProps) => {
   const {
     data: usage,
@@ -48,9 +51,7 @@ const UsageSection = ({
     end: !currentBillingCycleSelected && endDate ? new Date(endDate) : undefined,
   })
 
-  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-
-  const categoryMeta = USAGE_CATEGORIES(subscription, { isStorageVersioningEnabled }).find(
+  const categoryMeta = USAGE_CATEGORIES(subscription, { isStorageSizeSegmented }).find(
     (category) => category.key === categoryKey
   )
   if (!categoryMeta) return null
