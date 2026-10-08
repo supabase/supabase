@@ -5,14 +5,14 @@ const BackgroundPattern = ({ className }: { className?: string }) => {
     <div className={cn('absolute inset-x-0 top-0 h-1/2 w-full', className)}>
       <svg
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 w-full dark:opacity-50 [radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)] [-webkit-mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 w-full text-foreground/20 dark:text-foreground/30 [-webkit-mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)] [mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)]"
       >
         <defs>
           <pattern id="partner-grid" width="30" height="30" patternUnits="userSpaceOnUse">
             <path
               d="M30 0V30M0 30H30"
               fill="none"
-              stroke="hsl(var(--border-strong))"
+              stroke="currentColor"
               strokeWidth="1"
               strokeDasharray="6 6"
             />

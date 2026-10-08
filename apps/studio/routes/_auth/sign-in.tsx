@@ -16,6 +16,7 @@ function SignIn() {
         subheading="Sign in to your account"
         logoLinkToMarketingSite={true}
         inboundFlow="sign-in"
+        hasStatusBanner
       >
         <SignInPage dehydratedState={undefined} />
       </SignInLayout>

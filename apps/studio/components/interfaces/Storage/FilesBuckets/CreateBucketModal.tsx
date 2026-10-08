@@ -1,0 +1,404 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
+import { useState } from 'react'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
+import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { BucketVersioningFields } from './BucketVersioningFields/BucketVersioningFields'
+import { toLifecycleRules } from './BucketVersioningFields/BucketVersioningFields.lifecycle'
+import { BucketFormSchema, type BucketFormValues } from './FilesBucket.schema'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { StorageSizeUnits } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { PROJECT_VERSIONING_DEFAULTS } from '@/components/interfaces/Storage/StorageVersioning.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useBucketCreateMutation } from '@/data/storage/bucket-create-mutation'
+import { useBucketLifecycleUpdateMutation } from '@/data/storage/bucket-lifecycle-update-mutation'
+import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+
+const formId = 'create-storage-bucket-form'
+
+const DEFAULT_VALUES: BucketFormValues = {
+  name: '',
+  public: false,
+  has_file_size_limit: false,
+  formatted_size_limit: undefined,
+  allowed_mime_types: '',
+  enable_versioning: false,
+  version_expiry_days: PROJECT_VERSIONING_DEFAULTS.versionExpiryDays,
+  max_noncurrent_versions: PROJECT_VERSIONING_DEFAULTS.maxNoncurrentVersions,
+  expiration_mode: 'and',
+}
+
+interface CreateBucketModalProps {
+  open: boolean
+  onOpenChange: (value: boolean) => void
+}
+
+export const CreateBucketModal = ({ open, onOpenChange }: CreateBucketModalProps) => {
+  const { ref } = useParams()
+  const [selectedUnit, setSelectedUnit] = useState<string>(StorageSizeUnits.MB)
+  const [hasAllowedMimeTypes, setHasAllowedMimeTypes] = useState(false)
+
+  const { data } = useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
+  const { value, unit } = convertFromBytes(data?.fileSizeLimit ?? 0)
+  const formattedGlobalUploadLimit = `${value} ${unit}`
+
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+
+  const track = useTrack()
+  const { mutateAsync: createBucket, isPending: isCreatingBucket } = useBucketCreateMutation({
+    // [Joshen] Silencing the error here as it's being handled in onSubmit
+    onError: () => {},
+  })
+  const { mutateAsync: updateLifecycle, isPending: isUpdatingLifecycle } =
+    useBucketLifecycleUpdateMutation({ onError: () => {} })
+  const isSaving = isCreatingBucket || isUpdatingLifecycle
+
+  const form = useForm<BucketFormValues>({
+    resolver: zodResolver(BucketFormSchema),
+    defaultValues: DEFAULT_VALUES,
+    // Show numeric versioning bounds as the user types, not only on submit
+    mode: 'onChange',
+  })
+  const { formatted_size_limit: formattedSizeLimitError } = form.formState.errors
+  const isPublicBucket = useWatch({ control: form.control, name: 'public' })
+  const hasFileSizeLimit = useWatch({ control: form.control, name: 'has_file_size_limit' })
+
+  const onSubmit: SubmitHandler<BucketFormValues> = async (values) => {
+    if (!ref) return console.error('Project ref is required')
+
+    // [Joshen] Should shift this into superRefine in the form schema
+    try {
+      const fileSizeLimit =
+        values.has_file_size_limit && values.formatted_size_limit !== undefined
+          ? convertToBytes(values.formatted_size_limit, selectedUnit as StorageSizeUnits)
+          : undefined
+
+      const allowedMimeTypes =
+        hasAllowedMimeTypes && values.allowed_mime_types.length > 0
+          ? values.allowed_mime_types.split(',').map((x) => x.trim())
+          : undefined
+
+      if (!!fileSizeLimit && !!data?.fileSizeLimit && fileSizeLimit > data.fileSizeLimit) {
+        return form.setError('formatted_size_limit', {
+          type: 'manual',
+          message: 'exceed_global_limit',
+        })
+      }
+
+      const isVersioningEnabled = isStorageVersioningEnabled && values.enable_versioning
+
+      await createBucket({
+        projectRef: ref,
+        id: values.name,
+        type: 'STANDARD',
+        isPublic: values.public,
+        file_size_limit: fileSizeLimit,
+        allowed_mime_types: allowedMimeTypes,
+        // A bucket is only ever created DISABLED or ENABLED; suspending comes later.
+        versioning_status: isVersioningEnabled ? 'ENABLED' : 'DISABLED',
+      })
+
+      // A second call, and the bucket exists whether or not it lands, so its failure is
+      // reported against the policy rather than the creation the user would only retry.
+      const lifecycleRules = isVersioningEnabled ? toLifecycleRules(values) : []
+      let lifecycleError: string | undefined
+      if (lifecycleRules.length > 0) {
+        try {
+          await updateLifecycle({ projectRef: ref, bucketId: values.name, rules: lifecycleRules })
+        } catch (error) {
+          lifecycleError = error instanceof Error ? error.message : 'Unknown error'
+        }
+      }
+
+      track('storage_bucket_created', {
+        bucketType: 'STANDARD',
+        hasVersioningEnabled: isVersioningEnabled,
+      })
+
+      if (lifecycleError === undefined) {
+        toast.success(`Successfully created bucket ${values.name}`)
+      } else {
+        toast.error(
+          `Created bucket ${values.name}, but its retention policy was not saved: ${lifecycleError}`
+        )
+      }
+
+      form.reset()
+      setSelectedUnit(StorageSizeUnits.MB)
+      onOpenChange(false)
+    } catch (error: any) {
+      // Handle specific error cases for inline display
+      const errorMessage = error.message?.toLowerCase() || ''
+
+      if (
+        errorMessage.includes('mime type') &&
+        (errorMessage.includes('is not supported') || errorMessage.includes('not supported'))
+      ) {
+        // Set form error for the MIME types field
+        form.setError('allowed_mime_types', {
+          type: 'manual',
+          message: 'Invalid MIME type format. Please check your input.',
+        })
+      } else {
+        // For other errors, show a toast as fallback
+        toast.error(`Failed to create bucket: ${error.message}`)
+      }
+    }
+  }
+
+  const handleClose = () => {
+    form.reset()
+    setSelectedUnit(StorageSizeUnits.MB)
+    onOpenChange(false)
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        if (!open) {
+          handleClose()
+        }
+      }}
+    >
+      <DialogContent aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Create file bucket</DialogTitle>
+        </DialogHeader>
+
+        <DialogSectionSeparator />
+
+        <Form {...form}>
+          <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-2">
+              <FormField
+                key="name"
+                name="name"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Bucket name"
+                    labelOptional="Cannot be changed after creation"
+                  >
+                    <FormControl>
+                      <Input
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                        {...field}
+                        placeholder="Enter bucket name"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection className="space-y-3">
+              <FormField
+                key="public"
+                name="public"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    hideMessage
+                    label="Public bucket"
+                    description="Allow anyone to read objects without authorization"
+                    layout="flex"
+                  >
+                    <FormControl>
+                      <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+              {isPublicBucket && (
+                <Admonition
+                  type="warning"
+                  title="Public buckets are not protected"
+                  description="Users can read objects in public buckets without any authorization. Row level security (RLS) policies are still required for other operations such as object uploads and deletes."
+                />
+              )}
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection className="space-y-2">
+              <FormField
+                key="has_file_size_limit"
+                name="has_file_size_limit"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Restrict file size"
+                    description="Prevent uploading of files larger than a specified limit"
+                    layout="flex"
+                  >
+                    <FormControl>
+                      <Switch size="large" checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+
+              {hasFileSizeLimit && (
+                <div>
+                  <FormField
+                    key="formatted_size_limit"
+                    name="formatted_size_limit"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout hideMessage label="File size limit">
+                        <div className="grid grid-cols-12 gap-x-2">
+                          <div className="col-span-8">
+                            <FormControl>
+                              <Input type="number" min={0} placeholder="0" {...field} />
+                            </FormControl>
+                          </div>
+                          <div className="col-span-4">
+                            <Select value={selectedUnit} onValueChange={setSelectedUnit}>
+                              <SelectTrigger aria-label="File size limit unit" size="small">
+                                <SelectValue>{selectedUnit}</SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {Object.values(StorageSizeUnits).map((unit: string) => (
+                                  <SelectItem key={unit} value={unit} className="text-xs">
+                                    {unit}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                  {formattedSizeLimitError?.message === 'exceed_global_limit' && (
+                    <FormMessage className="mt-2">
+                      Exceeds global limit of {formattedGlobalUploadLimit}. Increase limit in{' '}
+                      <InlineLink
+                        className="text-destructive decoration-destructive-500 hover:decoration-destructive"
+                        href={`/project/${ref}/storage/settings`}
+                        onClick={() => onOpenChange(false)}
+                      >
+                        Storage Settings
+                      </InlineLink>{' '}
+                      first.
+                    </FormMessage>
+                  )}
+
+                  {IS_PLATFORM && (
+                    <p className="text-sm text-foreground-lighter mt-2">
+                      This project has a{' '}
+                      <InlineLink
+                        className="text-foreground-light hover:text-foreground"
+                        href={`/project/${ref}/storage/settings`}
+                        onClick={() => onOpenChange(false)}
+                      >
+                        global file size limit
+                      </InlineLink>{' '}
+                      of {formattedGlobalUploadLimit}.
+                    </p>
+                  )}
+                </div>
+              )}
+            </DialogSection>
+
+            <DialogSectionSeparator />
+
+            <DialogSection className="space-y-2">
+              <FormItemLayout
+                id="has_allowed_mime_types"
+                label="Restrict MIME types"
+                description="Allow only certain types of files to be uploaded"
+                layout="flex"
+              >
+                <FormControl>
+                  <Switch
+                    id="has_allowed_mime_types"
+                    size="large"
+                    checked={hasAllowedMimeTypes}
+                    onCheckedChange={setHasAllowedMimeTypes}
+                  />
+                </FormControl>
+              </FormItemLayout>
+              {hasAllowedMimeTypes && (
+                <FormField
+                  key="allowed_mime_types"
+                  name="allowed_mime_types"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Allowed MIME types"
+                      labelOptional="Comma separated values"
+                      description="Wildcards are allowed, e.g. image/*."
+                    >
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="e.g image/jpeg, image/png, audio/mpeg, video/mp4, etc"
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              )}
+            </DialogSection>
+
+            {isStorageVersioningEnabled && (
+              <BucketVersioningFields form={form} isPublicBucket={isPublicBucket} />
+            )}
+          </form>
+        </Form>
+
+        <DialogFooter>
+          <Button disabled={isSaving} onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            form={formId}
+            type="submit"
+            loading={isSaving}
+            disabled={isSaving}
+          >
+            Create
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

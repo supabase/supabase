@@ -1,0 +1,116 @@
+---
+title = "pg_dump fails with 'query would be affected by row-level security policy'"
+topics = [ "database" ]
+keywords = [ "pg_dump", "supabase db dump", "backup", "export", "read-only role", "pg_read_all_data", "bypassrls", "Row Level Security", "RLS", "backup role", "read replica" ]
+
+[[errors]]
+code = "42501"
+message = "query would be affected by row-level security policy for table"
+
+[[errors]]
+code = "42501"
+message = "permission denied to set role \"postgres\""
+
+[[errors]]
+code = "42501"
+message = "permission denied for large object"
+---
+
+When you run `pg_dump` as a role you created, the export stops at the first table that uses Row Level Security:
+
+```text
+pg_dump: error: query would be affected by row-level security policy for table "orders"
+```
+
+`pg_dump` turns off row security for its session, so it exports every row of a table or none. A role without the `bypassrls` attribute can't read every row, so the export fails. For more information, see the Postgres documentation on [`pg_dump`](https://www.postgresql.org/docs/current/app-pgdump.html).
+
+## Create a backup role
+
+Create a dedicated role that can read every table without the `postgres` password. Run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+create role backup_reader login password '<strong-password>' bypassrls;
+grant pg_read_all_data to backup_reader;
+alter role backup_reader set default_transaction_read_only = on;
+```
+
+Each statement does one job:
+
+- `bypassrls` lets `pg_dump` read every row.
+- `pg_read_all_data` is a predefined Postgres role. It lets `backup_reader` read every table, view, and sequence in every schema, including `auth` and `storage`.
+- `default_transaction_read_only` makes the role's sessions read-only by default, which prevents accidental writes.
+
+`pg_read_all_data` doesn't cover large objects. If your database has large objects, a full export fails with `permission denied for large object`.
+
+To export without large objects, add `--no-large-objects` to the `pg_dump` command. In `pg_dump` 15 and earlier, the option is `--no-blobs`.
+
+To include large objects, grant `select` on each one to `backup_reader`. Only a large object's owner, or a role that holds `select` on it with the grant option, can grant access to it.
+
+1. List the roles that own large objects:
+
+   ```sql
+   select distinct lomowner::regrole as owner from pg_largeobject_metadata;
+   ```
+
+2. Run the following block once as each of those roles:
+
+   ```sql
+   do $$
+   declare
+     r record;
+   begin
+     for r in
+       select oid from pg_largeobject_metadata
+       where lomowner = current_user::regrole
+     loop
+       execute format('grant select on large object %s to backup_reader', r.oid);
+     end loop;
+   end
+   $$;
+   ```
+
+To give another role you created the same access, run `alter role <role_name> bypassrls;` and `grant pg_read_all_data to <role_name>;`.
+
+## Run the export
+
+1. Open the [**Connect** panel](/dashboard/project/_?showConnect=true) and copy the session pooler or direct connection string.
+2. Change the username in the connection string, and remove the password from it. For the shared pooler, change `postgres.<project-ref>` to `backup_reader.<project-ref>`. For a direct connection, change `postgres` to `backup_reader`.
+3. Run `pg_dump` with the connection string. Use `pg_dump` from the same major Postgres version as your project, or a later one.
+
+   ```bash
+   pg_dump "postgresql://backup_reader.<project-ref>@<pooler-host>:5432/postgres" \
+     --password \
+     --file backup.sql
+   ```
+
+   `--password` prompts for the password. For a scheduled export, leave out `--password` and store the password in a password file. For the file format, see the Postgres documentation on [the password file](https://www.postgresql.org/docs/current/libpq-pgpass.html).
+
+To export specific schemas, add a `--schema` option for each one, for example `--schema=public --schema=auth --schema=storage`. An export with `--schema` leaves out large objects. To include them, also add `--large-objects`, which is `--blobs` in `pg_dump` 15 and earlier.
+
+Run `pg_dump` directly rather than `supabase db dump`. The Supabase CLI command switches to the `postgres` role during the export, so it fails for `backup_reader` with `permission denied to set role "postgres"`.
+
+The export contains [Vault](/docs/guides/database/vault) secrets in encrypted form only, because `backup_reader` can't decrypt them. The export doesn't include role passwords.
+
+If your project has a [Read Replica](/docs/guides/platform/read-replicas), you can export from the replica to keep the load off your Primary database. To find the replica's connection string, set **Source** to the replica in the **Connect** panel. A Read Replica is a copy of the Primary, including its roles, so `backup_reader` can also connect to the Primary with the same password.
+
+## What the backup role can still do
+
+A session as `backup_reader` can still write in these ways:
+
+- The session can run `set default_transaction_read_only = off`, because the setting is a default.
+- If the pg_net extension is enabled, the session can add rows to `net.http_request_queue`, which pg_net sends as HTTP requests. The role receives this privilege from `PUBLIC`.
+- The session can create large objects with functions such as `lo_create`, which `PUBLIC` can run.
+
+For the full list of privileges every role receives, see [Custom role inherits privileges that were not explicitly granted](/docs/guides/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c#what-every-role-receives-from-public).
+
+## Rotate the password
+
+Store the role's password only in the system that runs the export. If that system is compromised, change the password:
+
+```sql
+alter role backup_reader password '<new-strong-password>';
+```
+
+Connections through the shared pooler can fail for about 15 seconds after the change, until the pooler picks up the new password.
+
+Supabase backs up Pro, Team, and Enterprise Plan projects daily without any credentials. For more information about those backups, see [Database Backups](/docs/guides/platform/backups).

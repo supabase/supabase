@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getPublicUrlForBucketObject } from '@/data/storage/bucket-object-get-public-url-mutation'
 import { signBucketObject } from '@/data/storage/bucket-object-sign-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
+import { storageKeys } from '@/data/storage/keys'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 const DEFAULT_EXPIRY = 7 * 24 * 60 * 60 // in seconds, default to 1 week
@@ -43,7 +44,12 @@ export const useFetchFileUrlQuery = (
   { ...options }: UseCustomQueryOptions<string, ResponseError> = {}
 ) => {
   return useQuery<string, ResponseError, string>({
-    queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', path],
+    queryKey: storageKeys.fileUrl({
+      projectRef,
+      isBucketPublic: bucket.public,
+      bucketId: bucket.id,
+      path,
+    }),
     queryFn: () => fetchFileUrl(path, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY),
     staleTime: DEFAULT_EXPIRY * 1000,
     ...options,

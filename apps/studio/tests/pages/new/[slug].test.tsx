@@ -189,6 +189,15 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
+    path: '/platform/organizations/:slug',
+    response: {
+      ...(overrides.organizations?.[0] ?? mockOrg()),
+      created_at: '2026-01-01T00:00:00Z',
+      has_oriole_project: false,
+    },
+  })
+  addAPIMock({
+    method: 'get',
     path: '/platform/profile/permissions',
     // @ts-expect-error - Permission is bridged from the raw API shape, not the generated type
     response: () => HttpResponse.json<Permission[]>(overrides.permissions ?? ADMIN_PERMISSIONS),
@@ -276,13 +285,22 @@ const DEFAULT_FLAGS = {
   defaultRegionRestrictedPool: false,
   projectCreationRestrictedRegions: false,
   projectCreationSpecificRegionsLink: false,
+  freeTierGeneralRegionEnrollment: false,
+  freeTierGeneralRegionSelection: false,
 }
 
-async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
+async function renderWizard(
+  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
-      value={{ configcat: { ...DEFAULT_FLAGS, ...options.flags }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: { ...DEFAULT_FLAGS, ...options.flags },
+        posthog: {},
+        hasLoaded: true,
+        isConfigCatStale: options.isConfigCatStale,
+      }}
     >
       <Wizard dehydratedState={undefined} />
     </FeatureFlagContext.Provider>,
@@ -539,6 +557,112 @@ describe('project creation wizard', () => {
       await renderWizard()
 
       await screen.findByText('Error loading available regions')
+    })
+
+    describe('free tier general region experiment', () => {
+      test('keeps the region selector loading while flags are being re-evaluated', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+          isConfigCatStale: true,
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        expect(await screen.findByText('Loading available regions...')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toBeDisabled()
+      })
+
+      test('restricts the picker to general regions with an upgrade footer for a free-plan org in the test arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.queryByRole('option', { name: /North Virginia/ })).not.toBeInTheDocument()
+
+        const upgradeLink = screen.getByRole('link', { name: 'Upgrade to Pro' })
+        expect(upgradeLink).toHaveAttribute(
+          'href',
+          `/org/${ORG_SLUG}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`
+        )
+      })
+
+      test('shows the full region picker with no upgrade footer for a free-plan org in the control arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: false,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: /North Virginia/ })).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
+
+      test('the specific-regions link takes precedence when both flags are on', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            projectCreationSpecificRegionsLink: true,
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+        // The reveal button sits outside the open dropdown, so it is hidden from the a11y tree
+        expect(screen.getByText('Need a specific region?')).toBeInTheDocument()
+      })
+
+      test('shows the full region picker with no upgrade footer for a paid-plan org even when enrolled', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
     })
 
     describe('restricted regions', () => {

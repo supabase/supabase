@@ -941,16 +941,16 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
       bInheritance := False;
       IF v_pgversion < 100000 THEN
         -- Issue#11: handle parent schema
-        SELECT c2.relname parent, c2.relnamespace::regnamespace INTO v_parent, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2
-        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r';
+        SELECT c2.relname parent, n2.nspname INTO v_parent, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2, pg_namespace n2
+        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r' and n2.oid = c2.relnamespace;
         IF (v_parent IS NOT NULL) THEN
           bPartition   := True;
           bInheritance := True;
         END IF;
       ELSE
         -- Issue#11: handle parent schema
-        SELECT c2.relname parent, c1.relispartition, pg_get_expr(c1.relpartbound, c1.oid, true), c2.relnamespace::regnamespace INTO v_parent, bRelispartition, v_partbound, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2
-        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r';
+        SELECT c2.relname parent, c1.relispartition, pg_get_expr(c1.relpartbound, c1.oid, true), n2.nspname INTO v_parent, bRelispartition, v_partbound, v_parent_schema from pg_class c1, pg_namespace n, pg_inherits i, pg_class c2, pg_namespace n2
+        WHERE n.nspname = in_schema and n.oid = c1.relnamespace and c1.relname = in_table and c1.oid = i.inhrelid and i.inhparent = c2.oid and c1.relkind = 'r' and n2.oid = c2.relnamespace;
         IF (v_parent IS NOT NULL) THEN
           bPartition   := True;
           IF bRelispartition THEN
@@ -977,9 +977,9 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
         IF bInheritance THEN
           -- inheritance-based
           IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
-            v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '"( '|| E'\\n';
+            v_table_ddl := 'CREATE TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || '( '|| E'\\n';
           ELSE
-            v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || '( '|| E'\\n';
+            v_table_ddl := 'CREATE TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || '( '|| E'\\n';
           END IF;
 
           -- Jump to constraints section to add the check constraints
@@ -987,15 +987,15 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
           -- declarative-based
           IF v_relopts <> '' THEN
             IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
-              v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '" PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
+              v_table_ddl := 'CREATE TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || ' PARTITION OF ' || quote_ident(in_schema) || '.' || quote_ident(v_parent) || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
             ELSE
-              v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
+              v_table_ddl := 'CREATE TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || ' PARTITION OF ' || quote_ident(in_schema) || '.' || quote_ident(v_parent) || ' ' || v_partbound || v_relopts || ' ' || v_tablespace || '; ' || E'\\n';
             END IF;
           ELSE
             IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
-              v_table_ddl := 'CREATE TABLE ' || in_schema || '."' || in_table || '" PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
+              v_table_ddl := 'CREATE TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || ' PARTITION OF ' || quote_ident(in_schema) || '.' || quote_ident(v_parent) || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
             ELSE
-              v_table_ddl := 'CREATE TABLE ' || in_schema || '.' || in_table || ' PARTITION OF ' || in_schema || '.' || v_parent || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
+              v_table_ddl := 'CREATE TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || ' PARTITION OF ' || quote_ident(in_schema) || '.' || quote_ident(v_parent) || ' ' || v_partbound || ' ' || v_tablespace || '; ' || E'\\n';
             END IF;
           END IF;
           -- Jump to constraints and index section to add the check constraints and indexes and perhaps FKeys
@@ -1024,9 +1024,9 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
         -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');
         v_cnt1 := CASE WHEN in_table ~ '[A-Z]' THEN 1 ELSE 0 END;
         IF v_cnt1 > 0 THEN
-          v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '."' || in_table || '" (' || E'\\n';
+          v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || ' (' || E'\\n';
         ELSE
-          v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '.' || in_table || ' (' || E'\\n';
+          v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || quote_ident(in_schema) || '.' || quote_ident(in_table) || ' (' || E'\\n';
         END IF;
       END IF;
       -- RAISE NOTICE 'DEBUG2: tabledef so far: %', v_table_ddl;
@@ -1066,9 +1066,9 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
           SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
 
           IF v_cnt1 > 0 OR v_cnt2 > 0 THEN
-            v_table_ddl := v_table_ddl || '  "' || v_colrec.column_name || '" ';
+            v_table_ddl := v_table_ddl || '  ' || quote_ident(v_colrec.column_name) || ' ';
           ELSE
-            v_table_ddl := v_table_ddl || '  ' || v_colrec.column_name || ' ';
+            v_table_ddl := v_table_ddl || '  ' || quote_ident(v_colrec.column_name) || ' ';
           END IF;
 
           -- Issue#23: Handle autogenerated columns and rewrite as a simpler IF THEN ELSE branch instead of a much more complex embedded CASE STATEMENT
@@ -1078,7 +1078,7 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
           ELSEIF v_colrec.udt_name in ('geometry', 'box2d', 'box2df', 'box3d', 'geography', 'geometry_dump', 'gidx', 'spheroid', 'valid_detail') THEN
               v_temp = v_colrec.udt_name;
           ELSEIF v_colrec.data_type = 'USER-DEFINED' THEN
-              v_temp = v_colrec.udt_schema || '.' || v_colrec.udt_name;
+              v_temp = quote_ident(v_colrec.udt_schema) || '.' || quote_ident(v_colrec.udt_name);
           ELSEIF v_colrec.data_type = 'ARRAY' THEN
                 -- Issue#6 fix: handle arrays
               v_temp = pg_temp.pg_get_coldef(in_schema, in_table,v_colrec.column_name);
@@ -1152,12 +1152,12 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
                   v_constraint_def  := v_constraintrec.constraint_definition;
                   v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
                     || 'CONSTRAINT' || ' '
-                    || v_constraint_name || ' '
+                    || quote_ident(v_constraint_name) || ' '
                     || v_constraint_def
                     || ',' || E'\\n';
               ELSE
                 -- Issue#16 handle external PG def
-                SELECT 'ALTER TABLE ONLY ' || in_schema || '.' || c.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_pkey_def
+                SELECT 'ALTER TABLE ONLY ' || quote_ident(in_schema) || '.' || quote_ident(c.relname) || ' ADD CONSTRAINT ' || quote_ident(r.conname) || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_pkey_def
                 FROM pg_catalog.pg_constraint r, pg_class c, pg_namespace n where r.conrelid = c.oid and  r.contype = 'p' and n.oid = r.connamespace and n.nspname = in_schema AND c.relname = in_table and r.conname = v_constraint_name;
               END IF;
               IF bPartition THEN
@@ -1173,12 +1173,12 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
                   -- internal def
                   v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
                     || 'CONSTRAINT' || ' '
-                    || v_constraint_name || ' '
+                    || quote_ident(v_constraint_name) || ' '
                     || v_constraint_def
                     || ',' || E'\\n';
               ELSE
                   -- external def
-                  SELECT 'ALTER TABLE ONLY ' || n.nspname || '.' || c2.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_fkey_def
+                  SELECT 'ALTER TABLE ONLY ' || quote_ident(n.nspname) || '.' || quote_ident(c2.relname) || ' ADD CONSTRAINT ' || quote_ident(r.conname) || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_fkey_def
                   FROM pg_constraint r, pg_class c1, pg_namespace n, pg_class c2 where r.conrelid = c1.oid and  r.contype = 'f' and n.nspname = in_schema and n.oid = r.connamespace and r.conrelid = c2.oid and c2.relname = in_table;
                   v_fkey_defs = v_fkey_defs || v_fkey_def || E'\\n';
               END IF;
@@ -1186,7 +1186,7 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
               -- handle all other constraints besides PKEY and FKEYS as internal defs by default
               v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
                 || 'CONSTRAINT' || ' '
-                || v_constraint_name || ' '
+                || quote_ident(v_constraint_name) || ' '
                 || v_constraint_def
                 || ',' || E'\\n';
           END IF;
@@ -1222,12 +1222,12 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
                   v_constraint_def  := v_constraintrec.constraint_definition;
                   v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
                     || 'CONSTRAINT' || ' '
-                    || v_constraint_name || ' '
+                    || quote_ident(v_constraint_name) || ' '
                     || v_constraint_def
                     || ',' || E'\\n';
               ELSE
                 -- Issue#16 handle external PG def
-                SELECT 'ALTER TABLE ONLY ' || in_schema || '.' || c.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_pkey_def
+                SELECT 'ALTER TABLE ONLY ' || quote_ident(in_schema) || '.' || quote_ident(c.relname) || ' ADD CONSTRAINT ' || quote_ident(r.conname) || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_pkey_def
                 FROM pg_catalog.pg_constraint r, pg_class c, pg_namespace n where r.conrelid = c.oid and  r.contype = 'p' and n.oid = r.connamespace and n.nspname = in_schema AND c.relname = in_table;
               END IF;
               IF bPartition THEN
@@ -1243,12 +1243,12 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
                   -- internal def
                   v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
                     || 'CONSTRAINT' || ' '
-                    || v_constraint_name || ' '
+                    || quote_ident(v_constraint_name) || ' '
                     || v_constraint_def
                     || ',' || E'\\n';
               ELSE
                   -- external def
-                  SELECT 'ALTER TABLE ONLY ' || n.nspname || '.' || c2.relname || ' ADD CONSTRAINT ' || r.conname || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_fkey_def
+                  SELECT 'ALTER TABLE ONLY ' || quote_ident(n.nspname) || '.' || quote_ident(c2.relname) || ' ADD CONSTRAINT ' || quote_ident(r.conname) || ' ' || pg_catalog.pg_get_constraintdef(r.oid, true) || ';' INTO v_fkey_def
                   FROM pg_constraint r, pg_class c1, pg_namespace n, pg_class c2 where r.conrelid = c1.oid and  r.contype = 'f' and n.nspname = in_schema and n.oid = r.connamespace and r.conrelid = c2.oid and c2.relname = in_table and
                   r.conname = v_constraint_name and r.conparentid = 0;
                   v_fkey_defs = v_fkey_defs || v_fkey_def || E'\\n';
@@ -1257,7 +1257,7 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
               -- handle all other constraints besides PKEY and FKEYS as internal defs by default
               v_table_ddl := v_table_ddl || '  ' -- note: two char spacer to start, to indent the column
                 || 'CONSTRAINT' || ' '
-                || v_constraint_name || ' '
+                || quote_ident(v_constraint_name) || ' '
                 || v_constraint_def
                 || ',' || E'\\n';
           END IF;
@@ -1285,7 +1285,7 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
         -- Issue#11: handle parent schema
         -- v_table_ddl := v_table_ddl || ') INHERITS (' || in_schema || '.' || v_parent || ') ' || E'\\n' || v_relopts || ' ' || v_tablespace || ';' || E'\\n';
         IF v_parent_schema = '' OR v_parent_schema IS NULL THEN v_parent_schema = in_schema; END IF;
-        v_table_ddl := v_table_ddl || ') INHERITS (' || v_parent_schema || '.' || v_parent || ') ' || E'\\n' || v_relopts || ' ' || v_tablespace || ';' || E'\\n';
+        v_table_ddl := v_table_ddl || ') INHERITS (' || quote_ident(v_parent_schema) || '.' || quote_ident(v_parent) || ') ' || E'\\n' || v_relopts || ' ' || v_tablespace || ';' || E'\\n';
       END IF;
 
       IF v_pgversion >= 100000 AND NOT bPartition and NOT bInheritance THEN
@@ -1370,9 +1370,9 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
                 v_pos = POSITION(' WHERE ' IN v_temp);
                 v_temp2 = SUBSTRING(v_temp, v_pos);
                 v_temp  = SUBSTRING(v_temp, 1, v_pos);
-                v_table_ddl := v_table_ddl || v_temp || ' TABLESPACE ' || v_indexrec.tablespace || v_temp2 || ';' || E'\\n';
+                v_table_ddl := v_table_ddl || v_temp || ' TABLESPACE ' || quote_ident(v_indexrec.tablespace) || v_temp2 || ';' || E'\\n';
             ELSE
-                v_table_ddl := v_table_ddl || v_indexrec.indexdef || ' TABLESPACE ' || v_indexrec.tablespace || ';' || E'\\n';
+                v_table_ddl := v_table_ddl || v_indexrec.indexdef || ' TABLESPACE ' || quote_ident(v_indexrec.tablespace) || ';' || E'\\n';
             END IF;
         END IF;
 
@@ -1383,8 +1383,8 @@ const SCOPED_PG_GET_TABLEDEF_SQL: SafeSqlFragment = safeSql`
       IF  cmtcnt > 0 THEN
           FOR v_rec IN
             SELECT c.relname, 'COMMENT ON ' || CASE WHEN c.relkind in ('r','p') AND a.attname IS NULL THEN 'TABLE ' WHEN c.relkind in ('r','p') AND a.attname IS NOT NULL THEN 'COLUMN ' WHEN c.relkind = 'f' THEN 'FOREIGN TABLE '
-                  WHEN c.relkind = 'm' THEN 'MATERIALIZED VIEW ' WHEN c.relkind = 'v' THEN 'VIEW ' WHEN c.relkind = 'i' THEN 'INDEX ' WHEN c.relkind = 'S' THEN 'SEQUENCE ' ELSE 'XX' END || n.nspname || '.' ||
-                  CASE WHEN c.relkind in ('r','p') AND a.attname IS NOT NULL THEN quote_ident(c.relname) || '.' || a.attname ELSE quote_ident(c.relname) END || ' IS '   || quote_literal(d.description) || ';' as ddl
+                  WHEN c.relkind = 'm' THEN 'MATERIALIZED VIEW ' WHEN c.relkind = 'v' THEN 'VIEW ' WHEN c.relkind = 'i' THEN 'INDEX ' WHEN c.relkind = 'S' THEN 'SEQUENCE ' ELSE 'XX' END || quote_ident(n.nspname) || '.' ||
+                  CASE WHEN c.relkind in ('r','p') AND a.attname IS NOT NULL THEN quote_ident(c.relname) || '.' || quote_ident(a.attname) ELSE quote_ident(c.relname) END || ' IS '   || quote_literal(d.description) || ';' as ddl
             FROM pg_class c JOIN pg_namespace n ON (n.oid = c.relnamespace) LEFT JOIN pg_description d ON (c.oid = d.objoid) LEFT JOIN pg_attribute a ON (c.oid = a.attrelid AND a.attnum > 0 and a.attnum = d.objsubid)
             WHERE d.description IS NOT NULL AND n.nspname = in_schema AND c.relname = in_table ORDER BY 2 desc, ddl
           LOOP
