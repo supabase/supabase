@@ -2867,6 +2867,15 @@ export const platform: NavMenuConstant = {
             },
           ],
         },
+        {
+          name: 'Platform Webhooks',
+          url: '/guides/platform/webhooks',
+          enabled: fullPlatformEnabled,
+          items: [
+            { name: 'Overview', url: '/guides/platform/webhooks' as `/${string}` },
+            { name: 'Events', url: '/guides/platform/webhooks/events' as `/${string}` },
+          ],
+        },
       ],
     },
     {
