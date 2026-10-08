@@ -94,14 +94,14 @@ export const OAuthAppsAuthorizedList = () => {
                   <TableHead
                     className={cn(
                       hasAuthorizedApps
-                        ? 'w-[62px] min-w-[62px] max-w-[62px]'
+                        ? 'w-[54px] min-w-[54px] max-w-[54px]'
                         : 'w-0 min-w-0 max-w-0 p-0',
                       !hasAuthorizedApps && 'text-foreground-muted'
                     )}
                   >
                     <span className="sr-only">Application icon</span>
                   </TableHead>
-                  <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
+                  <TableHead className={cn('pl-0', !hasAuthorizedApps && 'text-foreground-muted')}>
                     App
                   </TableHead>
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>

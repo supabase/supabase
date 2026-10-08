@@ -10,7 +10,7 @@ export interface OAuthAppsAuthorizedRowProps {
 export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthorizedRowProps) => {
   return (
     <TableRow className={className}>
-      <TableCell>
+      <TableCell className="pr-2">
         <div
           className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full border border-control bg-cover bg-center bg-no-repeat text-xs"
           style={{ backgroundImage: approval.app.icon ? `url('${approval.app.icon}')` : 'none' }}
@@ -18,7 +18,7 @@ export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthori
           {!!approval.app.icon ? '' : approval.app.name[0]}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="pl-0">
         <div>
           <p className="min-w-0 truncate" title={approval.app.name}>
             {approval.app.name}
