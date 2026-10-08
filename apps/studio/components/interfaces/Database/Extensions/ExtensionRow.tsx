@@ -77,11 +77,9 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
             {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span tabIndex={0}>
-                    <Badge variant="warning" className="cursor-default">
-                      Deprecated
-                    </Badge>
-                  </span>
+                  <Badge variant="warning" className="cursor-default" tabIndex={0}>
+                    Deprecated
+                  </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
                   The extension is deprecated and will be removed in{' '}
