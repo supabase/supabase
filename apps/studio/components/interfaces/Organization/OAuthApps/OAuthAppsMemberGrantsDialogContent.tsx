@@ -72,7 +72,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
       {isError && <AlertError subject="Failed to retrieve grants" error={error} />}
 
       {isSuccess && (
-        <div className="px-4 max-h-90 overflow-y-auto scrollbar-gutter-stable">
+        <div className="px-4 max-h-90 overflow-y-auto">
           {data.pages.length === 0 ? (
             <p className="text-sm text-foreground-lighter">
               No grants have been authorized for this application.
