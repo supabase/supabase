@@ -78,7 +78,7 @@ export const EnableExtensionModal = ({
     >
       <DialogContent size="small" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Confirm to enable {extension.name}</DialogTitle>
+          <DialogTitle>Enable {extension.name}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -99,7 +99,7 @@ export const EnableExtensionModal = ({
 
         <DialogSection className="flex flex-col gap-y-4">
           <p className="text-sm text-foreground-light">
-            The following database extension will be enabled
+            The following database extension will be enabled:
           </p>
 
           <Card>
