@@ -10,7 +10,7 @@ These settings apply to your project's default domain, `<project_ref>.supabase.c
 
 <Admonition type="deprecation" title="Cipher block chaining (CBC) ciphers are deprecated">
 
-Clients that support only CBC-mode ciphers on TLS 1.2 can't connect to your project's APIs after the removal date. Check your clients and update any that are affected before then. For the date and the steps, see [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
+Supabase will stop offering CBC-mode cipher suites on TLS 1.2 for project APIs on November 10, 2026 at the earliest. After the removal, clients that support neither TLS 1.3 nor a non-CBC TLS 1.2 cipher suite can't connect to your project's APIs. Check your clients and update any that are affected before then. For the affected cipher suites and the steps, see [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
 
 </Admonition>
 
@@ -33,7 +33,7 @@ On TLS 1.2, project APIs offer the following cipher suites:
 | `TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384`       | `ECDHE-ECDSA-AES256-GCM-SHA384` |
 | `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384`         | `ECDHE-RSA-AES256-GCM-SHA384`   |
 
-Until the removal date, project APIs also offer the deprecated CBC-mode cipher suites listed under Removal of CBC-mode ciphers.
+Until the removal date, project APIs also offer the deprecated CBC-mode cipher suites listed under [Removal of CBC-mode ciphers](#removal-of-cbc-mode-ciphers).
 
 ## Removal of CBC-mode ciphers
 
@@ -50,7 +50,7 @@ The date might move later based on customer feedback.
 
 ### Affected clients
 
-A client is affected if the only cipher suites it shares with project APIs are the CBC-mode ones. For the cipher suites that remain, see [Supported cipher suites](#supported-cipher-suites). After the removal, it fails during the TLS handshake and can't connect to your project's APIs.
+A client is affected if it can't use TLS 1.3 and the only TLS 1.2 cipher suites it shares with project APIs are the CBC-mode ones. For the cipher suites that remain, see [Supported cipher suites](#supported-cipher-suites). After the removal, it fails during the TLS handshake and can't connect to your project's APIs.
 
 Clients that depend on CBC-mode ciphers typically run end-of-life software, for example:
 
@@ -63,13 +63,23 @@ Clients that depend on CBC-mode ciphers typically run end-of-life software, for 
 The removal doesn't affect the following connections:
 
 - TLS 1.3 connections
-- TLS 1.2 connections that negotiate a supported cipher suite
+- TLS 1.2 connections from clients that support at least one of the non-CBC cipher suites listed under [Supported cipher suites](#supported-cipher-suites)
 - Direct Postgres connections and connections through the pooler
 - The [Management API](/docs/reference/api/introduction) at `api.supabase.com`
 
+### Prepare for the removal
+
+1. List every client that connects to your project's APIs, on `<project_ref>.supabase.co` and on any custom domain. Include Realtime connections, servers, embedded devices, and third-party integrations.
+2. Include every client version that's still in use, not only the latest release. Users might keep running older versions of your mobile or desktop apps, on operating systems that no longer receive updates.
+3. For each client, check its operating system, runtime, and TLS library. See [Check whether a client is affected](#check-whether-a-client-is-affected).
+4. Update affected clients. See [Update affected clients](#update-affected-clients).
+5. After you update, test the application itself. Until the removal date, project APIs still offer CBC-mode cipher suites, so a request that succeeds now doesn't show that the client will keep working after the removal.
+
 ### Check whether a client is affected
 
-Test whether a client's TLS library can negotiate one of the supported TLS 1.2 cipher suites. If you use a custom domain, replace both occurrences of `<project_ref>.supabase.co` with your domain.
+Check the TLS configuration your application actually uses: its operating system, runtime, and TLS library versions, and any TLS version or cipher suite settings in your code or configuration. A client that connects with TLS 1.3 isn't affected, whatever TLS 1.2 cipher suites it supports.
+
+For TLS 1.2, you can run a limited diagnostic probe with OpenSSL. The following command attempts a TLS 1.2 handshake that offers only the non-CBC cipher suites listed under [Supported cipher suites](#supported-cipher-suites). It doesn't test TLS 1.3. If you use a custom domain, replace both occurrences of `<project_ref>.supabase.co` with your domain.
 
 On a machine that uses the same TLS library as the client, run:
 
@@ -79,7 +89,10 @@ openssl s_client -connect <project_ref>.supabase.co:443 -servername <project_ref
   < /dev/null
 ```
 
-If the handshake succeeds, the output shows the negotiated cipher, and the client keeps working after the removal. If the handshake fails, the client depends on a CBC-mode cipher.
+Read the result as follows:
+
+- **The handshake succeeds:** The output shows the negotiated cipher. This shows only that this OpenSSL command, on this machine, can negotiate a non-CBC TLS 1.2 cipher suite. It doesn't show that your application is compatible, because your application might use a different TLS library, version, or settings.
+- **The handshake fails:** The failure doesn't prove that the client depends on CBC-mode ciphers. Other causes include a network or firewall problem, a proxy that intercepts TLS, a wrong hostname, or an OpenSSL build that differs from the TLS library your client uses. Check the error output and your application's TLS configuration before you conclude that the client is affected.
 
 ### Update affected clients
 
