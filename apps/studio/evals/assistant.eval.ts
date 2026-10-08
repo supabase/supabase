@@ -3,7 +3,7 @@ import { readUIMessageStream, toUIMessageStream, type UIMessage } from 'ai'
 import { Eval } from 'braintrust'
 
 import { dataset } from './dataset'
-import { applyOptInDecision, joinTranscripts } from './opt-in-replay'
+import { applyOptInDecision, describePriorTurn } from './opt-in-replay'
 import {
   completenessScorer,
   concisenessScorer,
@@ -88,12 +88,14 @@ Eval('Assistant', {
     const [first, second] = await Promise.all(
       results.map(async (result) => buildTranscript(input.prompt, await result.steps))
     )
+    // Judges score the final request, with the first one and the user's answer as context
     const transcript =
-      second && optInDecision ? joinTranscripts(first, second, optInDecision) : first
+      second && optInDecision
+        ? { ...second, priorConversation: describePriorTurn(first, optInDecision) }
+        : first
     return {
       finishReason,
       transcript,
-      ...(second && { responseAfterUserAction: second }),
       ...(deniedToolCalls.length > 0 && { deniedToolCalls }),
     }
   },

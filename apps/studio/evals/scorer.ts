@@ -35,8 +35,6 @@ export type AssistantEvalInput = {
 export type AssistantEvalOutput = {
   finishReason: FinishReason
   transcript: Transcript
-  /** Replay correctness uses the response after the user answers the approval card. */
-  responseAfterUserAction?: Transcript
   /** Calls the user denied. They never execute, so they leave no tool span for Tool Usage. */
   deniedToolCalls?: Array<{ toolName: string; input: unknown }>
 }
@@ -361,7 +359,7 @@ export const correctnessScorer: AssistantEvalScorer = async ({ expected, output 
   if (!expected.correctAnswer) return null
   // Correctness needs ground truth, so it only ever runs offline where the eval
   // task's transcript is present — no trace fallback needed.
-  const transcript = output?.responseAfterUserAction ?? output?.transcript
+  const transcript = output?.transcript
   if (!transcript?.lastAssistantTurnWithToolInputs) return null
 
   return await correctnessEvaluator({

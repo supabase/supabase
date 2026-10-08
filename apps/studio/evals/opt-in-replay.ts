@@ -65,21 +65,9 @@ function describeDecision(decision: OptInDecision) {
   return `saved the ${decision.chooses} level`
 }
 
-/**
- * Joins the transcripts of the two requests with a marker, so a judge can tell the original
- * request from anything the Assistant does after the user answered.
- */
-export function joinTranscripts(first: Transcript, second: Transcript, decision: OptInDecision) {
-  const marker = `[user ${describeDecision(decision)}]`
-  const join = (a: string | null, b: string | null) =>
-    [a, marker, b].filter((part) => part !== null).join('\n')
-  return {
-    currentUserInput: first.currentUserInput,
-    priorConversation: first.priorConversation,
-    lastAssistantTurn: join(first.lastAssistantTurn, second.lastAssistantTurn),
-    lastAssistantTurnWithToolInputs: join(
-      first.lastAssistantTurnWithToolInputs,
-      second.lastAssistantTurnWithToolInputs
-    ),
-  }
+/** Request 1 plus the simulated answer, as the context a judge sees for request 2. */
+export function describePriorTurn(first: Transcript, decision: OptInDecision) {
+  return [first.lastAssistantTurnWithToolInputs, `[user ${describeDecision(decision)}]`]
+    .filter((part) => part !== null)
+    .join('\n')
 }

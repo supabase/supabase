@@ -1189,6 +1189,8 @@ export const dataset: AssistantEvalCase[] = [
         { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
         'list_tables',
       ],
+      correctAnswer:
+        'Answers with the tables list_tables returned instead of saying it lacks access.',
     },
     metadata: {
       category: ['general_help'],
