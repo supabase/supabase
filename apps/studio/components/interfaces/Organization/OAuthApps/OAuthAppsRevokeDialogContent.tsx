@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ComponentProps, useEffect } from 'react'
+import { ComponentProps } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -38,6 +38,10 @@ export const OAuthAppsRevokeDialogContent = ({
     onSuccess: () => {
       toast.success(`Revoked access for ${approval?.app.name}`)
       onClose()
+    },
+    onError: () => {
+      // Do nothing, we just want to avoid the default toast.
+      // Error is displayed in the AlertError below
     },
   })
 
