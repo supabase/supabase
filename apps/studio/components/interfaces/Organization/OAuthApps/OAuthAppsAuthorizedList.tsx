@@ -107,12 +107,15 @@ export const OAuthAppsAuthorizedList = () => {
                   <TableHead className={cn(!hasAuthorizedApps && 'text-foreground-muted')}>
                     Access
                   </TableHead>
+                  <TableHead className="text-right">
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {data.pages.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
-                    <TableCell colSpan={3}>
+                    <TableCell colSpan={4}>
                       <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-foreground-lighter">
                         No apps have been authorized in this organization yet.
@@ -141,7 +144,7 @@ export const OAuthAppsAuthorizedList = () => {
                       ref={sentinelRef}
                       className={cn('[&>td]:hover:bg-inherit', !isFetchingNextPage && 'hidden')}
                     >
-                      <TableCell colSpan={3}>
+                      <TableCell colSpan={4}>
                         <p className="text-sm text-foreground-lighter">
                           {isFetchingNextPage ? 'Loading...' : ''}
                         </p>
