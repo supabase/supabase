@@ -507,8 +507,8 @@ const baseDucklakeSupabaseFormData = {
   ducklakeStorageBucket: 'ducklake-data',
 }
 
-describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
-  it('builds DuckLake validation config with the current project as catalog and storage in supabase mode', () => {
+describe('DestinationForm.utils DuckLake (managed)', () => {
+  it('uses the current project for the catalog and storage during validation', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
@@ -526,7 +526,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
   })
 
-  it('builds DuckLake submit config with the current project as catalog and storage in supabase mode', async () => {
+  it('uses the current project for the catalog and storage during submission', async () => {
     const createS3AccessKey = vi.fn()
     const resolveNamespace = vi.fn()
 
@@ -551,7 +551,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
-  it('returns a required-field error for a missing bucket in supabase mode, ignoring custom fields', () => {
+  it('requires a bucket and ignores connection fields', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeMode: 'supabase',
       ducklakeStorageBucket: '',
@@ -568,7 +568,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     expect(issues).toEqual([{ path: 'ducklakeStorageBucket', message: 'Bucket is required.' }])
   })
 
-  it('accepts a complete supabase configuration', () => {
+  it('accepts a complete managed configuration', () => {
     expect(
       getDucklakeValidationIssues({
         ducklakeMode: 'supabase',

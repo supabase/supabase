@@ -63,15 +63,14 @@ import { usePaginatedBucketsQuery } from '@/data/storage/buckets-query'
 const DUCKLAKE_MODE_OPTIONS = [
   {
     value: DUCKLAKE_MODE_SUPABASE,
-    label: 'Use current Supabase project',
+    label: 'Use this Supabase project',
     description:
-      'Uses this project for the Postgres catalog and Storage bucket. Pipelines creates credentials.',
+      'Uses this project’s Postgres database and Storage. Pipelines creates the required credentials.',
   },
   {
     value: DUCKLAKE_MODE_CUSTOM,
     label: 'Enter connection details',
-    description:
-      'Provide a Postgres catalog URL and S3-compatible storage details and credentials.',
+    description: 'Provide a Postgres catalog URL and S3-compatible storage credentials.',
   },
 ] as const
 
@@ -114,7 +113,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
     },
   })
 
-  const handleCreateBucket = async () => {
+  const handleCreateBucket = () => {
     const name = newBucketName.trim()
     if (!name || !projectRef) return
     if (name.includes('/')) {

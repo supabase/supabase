@@ -318,9 +318,7 @@ const buildClickHouseConfig = (
   engine: data.clickhouseEngine,
 })
 
-// Builds the studio-side DuckLake config from form data, picking the right shape for the
-// selected mode. Managed mode always uses the current project for both the catalog and storage.
-// The create / update / validate mutations convert this to the API payload.
+// Managed mode always uses the current project for both the catalog and storage.
 const buildDucklakeConfig = (
   data: z.infer<typeof DestinationPanelFormSchema>,
   projectRef: string

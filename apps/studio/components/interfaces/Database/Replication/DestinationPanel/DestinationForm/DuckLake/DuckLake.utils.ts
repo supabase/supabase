@@ -14,7 +14,7 @@ export type DucklakeApiConfig = {
   metadata_schema?: string
 }
 
-// Fields entered when configuring DuckLake manually (always present in the validation data).
+// Fields entered when connecting to an existing DuckLake catalog and storage.
 const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeCatalogUrl',
   'ducklakeDataPath',
@@ -25,7 +25,7 @@ const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeMetadataSchema',
 ] as const
 
-// Fields entered only in "Use current Supabase project" mode (optional in the validation data).
+// Fields entered only in managed mode.
 const DUCKLAKE_SUPABASE_FIELD_PATHS = ['ducklakeStorageBucket'] as const
 
 type DucklakeFieldPath =
@@ -48,9 +48,8 @@ type DucklakeValidationData = Pick<
     >
   >
 
-// Required fields per mode. "Use current Supabase project" only needs a bucket; the catalog and
-// storage both live in the current project and the platform API resolves the catalog URL and S3
-// credentials.
+// Managed mode only needs a bucket. The platform API resolves the current project's catalog and
+// storage credentials.
 const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
   { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
 ]
