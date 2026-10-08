@@ -14,12 +14,18 @@ import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 export const OAuthApps = () => {
   const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
   const { hasLoaded } = useFeatureFlags()
-  const showNewOAuthApps = areOAuthAppScopedGrantsEnabled && USE_MOCKS
+  const shouldShowNewOAuthApps = areOAuthAppScopedGrantsEnabled && USE_MOCKS
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
-        {hasLoaded ? showNewOAuthApps ? <OAuthAppsAuthorizedList /> : <AuthorizedApps /> : null}
+        {hasLoaded ? (
+          shouldShowNewOAuthApps ? (
+            <OAuthAppsAuthorizedList />
+          ) : (
+            <AuthorizedApps />
+          )
+        ) : null}
       </PageContainer>
     </>
   )
