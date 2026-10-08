@@ -50,7 +50,7 @@ copy.remove()
 - `android-icon-192x192.png` and `android-icon-512x512.png`: rounded artwork with transparent corners, manifest purpose `any`, not `maskable`.
 - `manifest.json`: relative icon URLs resolve beside the manifest under any application base path. Existing non-icon settings are retained.
 
-Learn, UI Library and Design System use explicit layout declarations. Their `app/favicon.ico` copies are removed so Next.js does not also advertise production artwork during local development. Shared declarations in `packages/common/MetaFavicons/icons.ts` serve Next.js pages/app routers, Studio TanStack and KB Astro. Applications select routes and detect their environments. Next Studio retains its runtime CLI discovery; TanStack uses the synchronous CLI/environment configuration for its initial head.
+Learn, UI Library and Design System use explicit layout declarations. Their `app/favicon.ico` copies are removed so Next.js does not also advertise production artwork during local development. Shared declarations in `packages/common/MetaFavicons/icons.ts` serve Next.js pages/app routers, Studio TanStack and KB Astro. Applications select routes and detect their environments. Next Studio retains its runtime CLI discovery; TanStack reads CLI mode on the server at request time and passes the favicon route through its root loader.
 
 ## Other artwork
 
