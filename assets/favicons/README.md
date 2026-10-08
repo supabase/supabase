@@ -1,6 +1,6 @@
 # Favicons
 
-The vector sources are exported from [Favicons (New)](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4691-1489). Each master is a native 512×512 Figma component with a 96px background radius and 60% corner smoothing, equivalent to 3px at 16px. The 16, 32 and 48px previews are scaled instances of these components. Scale the vectors, never a small raster export. Preserve the variant-specific bolt gradients, shadows and proportions.
+The vector sources are exported from [Favicons](https://www.figma.com/design/WCja3lpEj1DeunV1d5zu5D/Design-System?node-id=4691-1489). Each master is a native 512×512 Figma component with a 96px background radius and 60% corner smoothing, equivalent to 3px at 16px. The 16, 32 and 48px previews are scaled instances of these components. Scale the vectors, never a small raster export. Preserve the variant-specific bolt gradients, shadows and proportions.
 
 | Source           | Original node | Master node | Consumers                                                         |
 | ---------------- | ------------- | ----------- | ----------------------------------------------------------------- |
