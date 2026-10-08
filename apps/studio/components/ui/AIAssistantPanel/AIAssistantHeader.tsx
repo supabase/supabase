@@ -27,6 +27,7 @@ import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIAssistantMetadataWarning } from './AIAssistantMetadataWarning'
 import { useIsExplorerEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCreateChat } from '@/components/interfaces/Explorer/hooks'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -111,8 +112,12 @@ export const AIAssistantHeader = ({
     enabled: shortcutsEnabled && !isChatLoading,
   })
 
+  // The opt-in level is an organization setting that only exists on the platform.
+  // Self-hosted and CLI Studio always share schema metadata (see useOrgAiOptInLevel).
+  const canOpenPermissionSettings = IS_PLATFORM
+
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS, () => setIsOptInModalOpen(true), {
-    enabled: shortcutsEnabled && !isChatLoading,
+    enabled: shortcutsEnabled && !isChatLoading && canOpenPermissionSettings,
   })
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, onSelectMaximise, {
@@ -186,6 +191,7 @@ export const AIAssistantHeader = ({
                 <ButtonTooltip
                   variant="text"
                   size="tiny"
+                  aria-label="More options"
                   icon={<MoreVertical />}
                   className="h-7 w-7 p-0"
                   disabled={isChatLoading}
@@ -202,21 +208,25 @@ export const AIAssistantHeader = ({
                     sequence={SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID].sequence}
                   />
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="justify-between"
-                  onClick={() => setIsOptInModalOpen(true)}
-                >
-                  <div className="flex items-center gap-x-2">
-                    <Settings size={14} />
-                    <span>Permission settings</span>
-                  </div>
-                  <ShortcutPills
-                    sequence={
-                      SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS].sequence
-                    }
-                  />
-                </DropdownMenuItem>
+                {canOpenPermissionSettings && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="justify-between"
+                      onClick={() => setIsOptInModalOpen(true)}
+                    >
+                      <div className="flex items-center gap-x-2">
+                        <Settings size={14} />
+                        <span>Permission settings</span>
+                      </div>
+                      <ShortcutPills
+                        sequence={
+                          SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS].sequence
+                        }
+                      />
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
