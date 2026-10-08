@@ -13,6 +13,7 @@ import {
 const url = vi.hoisted(() => ({
   path: '/project/default/editor/1',
   filters: [] as string[],
+  sorts: [] as string[],
   setParams: vi.fn(),
 }))
 vi.mock('@/hooks/misc/useTableEditorFiltersSort', () => ({
@@ -20,7 +21,7 @@ vi.mock('@/hooks/misc/useTableEditorFiltersSort', () => ({
   useTableEditorFiltersSort: () => ({
     path: url.path,
     filters: url.filters,
-    sorts: [],
+    sorts: url.sorts,
     setParams: (...args: unknown[]) => url.setParams(...args),
   }),
 }))
@@ -66,6 +67,7 @@ describe('useSyncFiltersToUrl', () => {
     vi.useFakeTimers()
     url.path = '/project/default/editor/1'
     url.filters = []
+    url.sorts = []
     url.setParams.mockClear()
   })
   afterEach(() => vi.useRealTimers())
@@ -110,6 +112,46 @@ describe('useSyncFiltersToUrl', () => {
     act(() => vi.advanceTimersByTime(500))
     expect(url.setParams).toHaveBeenCalledTimes(2)
     expect(url.setParams.mock.lastCall?.[0]({})).toEqual({ filter: ['name:eq:Green'] })
+  })
+
+  it('discards a pending edit on Back to an entry with the same filters', async () => {
+    url.sorts = ['name:asc']
+    const { rerender } = renderProbe()
+    await act(async () => snap.setFilters([red]))
+
+    // Back to the pre-sort entry: `filter` is unchanged, only `sort` differs
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    url.sorts = []
+    await rerender()
+    act(() => vi.advanceTimersByTime(1000))
+
+    expect(screen.getByTestId('filters')).toBeEmptyDOMElement()
+    expect(url.setParams).not.toHaveBeenCalled()
+  })
+
+  it('cancels a pending push on Back to an entry that already has the edited filters', async () => {
+    const { rerender } = renderProbe()
+    await act(async () => snap.setFilters([red]))
+
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    url.filters = ['name:eq:Red']
+    await rerender()
+    act(() => vi.advanceTimersByTime(1000))
+
+    expect(screen.getByTestId('filters')).toHaveTextContent('Red')
+    expect(url.setParams).not.toHaveBeenCalled()
+  })
+
+  it('keeps a pending filter edit when a sort changes the URL', async () => {
+    const { rerender } = renderProbe()
+    await act(async () => snap.setFilters([red]))
+
+    url.sorts = ['name:asc']
+    await rerender()
+    act(() => vi.advanceTimersByTime(500))
+
+    expect(screen.getByTestId('filters')).toHaveTextContent('Red')
+    expect(url.setParams).toHaveBeenCalledTimes(1)
   })
 
   it("ignores another table's URL while navigation is pending", async () => {

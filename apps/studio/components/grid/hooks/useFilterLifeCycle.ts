@@ -43,22 +43,43 @@ export function useInitializeFiltersFromUrl() {
  */
 export function useSyncFiltersToUrl() {
   const snap = useTableEditorTableStateSnapshot()
-  const { path, filters: urlFilters, setParams } = useTableEditorFiltersSort()
+  const { path, filters: urlFilters, sorts: urlSorts, setParams } = useTableEditorFiltersSort()
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const previousFiltersRef = useRef<string>('')
+  const isHistoryNavigationRef = useRef(false)
 
   const urlFiltersKey = JSON.stringify(urlFilters)
+  const urlSortsKey = JSON.stringify(urlSorts)
   // Under TanStack the URL moves to the next table before this grid unmounts.
   const isOwnTableUrl = getUrlTableId(path) === String(snap.originalTable.id)
   const lastUrlFiltersKeyRef = useRef(urlFiltersKey)
   const pushedUrlFiltersKeyRef = useRef<string | null>(null)
 
+  // Back/Forward cancels a pending push outright: other URL changes (e.g. a sort) must not drop
+  // an in-flight filter edit, but history navigation must never push over its destination.
+  useEffect(() => {
+    const handlePopState = () => {
+      isHistoryNavigationRef.current = true
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
   const syncFiltersFromUrl = useEffectEvent(() => {
-    if (!isOwnTableUrl || urlFiltersKey === lastUrlFiltersKeyRef.current) return
+    if (!isOwnTableUrl) return
+    // After Back/Forward, re-adopt the URL's filters even if the `filter` param didn't change,
+    // since an unpushed edit was discarded with its pending push.
+    const isHistoryNavigation = isHistoryNavigationRef.current
+    isHistoryNavigationRef.current = false
+    if (!isHistoryNavigation && urlFiltersKey === lastUrlFiltersKeyRef.current) return
     lastUrlFiltersKeyRef.current = urlFiltersKey
 
     // Our own debounced push arriving, or a URL that already matches state
-    const isOwnPush = urlFiltersKey === pushedUrlFiltersKeyRef.current
+    const isOwnPush = !isHistoryNavigation && urlFiltersKey === pushedUrlFiltersKeyRef.current
     pushedUrlFiltersKeyRef.current = null
     if (isOwnPush || urlFiltersKey === JSON.stringify(toUrlFilters(snap.filters))) return
 
@@ -71,7 +92,7 @@ export function useSyncFiltersToUrl() {
 
   useEffect(() => {
     syncFiltersFromUrl()
-  }, [urlFiltersKey, isOwnTableUrl])
+  }, [urlFiltersKey, urlSortsKey, isOwnTableUrl])
 
   // An Effect Event so URL changes (new `setParams`) don't cancel a pending push.
   const pushFiltersToUrl = useEffectEvent((filter: string[]) => {
