@@ -56,7 +56,8 @@ export const StorageExplorerContent = ({
 
   const onSelectAllItemsInColumn = (columnIndex: number) => {
     const columnFiles = columns[columnIndex].items
-      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE)
+      // An archived row has no live object, so the bulk actions have nothing to act on.
+      .filter((item) => item.type === STORAGE_ROW_TYPES.FILE && item.archived === undefined)
       .map((item) => {
         return { ...item, columnIndex }
       })
