@@ -110,7 +110,9 @@ export const EnableExtensionModal = ({
               </div>
               <div className="flex items-center justify-between px-4 py-2">
                 <p className="text-foreground-lighter">Schema</p>
-                <p className="text-foreground">{defaultSchema ?? 'extensions'}</p>
+                <p data-testid="enable-extension-schema" className="text-foreground">
+                  {defaultSchema ?? 'extensions'}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -137,7 +139,7 @@ export const EnableExtensionModal = ({
                 hideLineNumbers
                 wrapperClassName={cn('[&_pre]:px-3 [&_pre]:py-3')}
                 className="[&_code]:text-xs"
-                value={`create extension schema target_schema if not exists ${extension.name}`}
+                value={`create extension if not exists ${extension.name} schema target_schema;`}
               />
             </CollapsibleContent>
           </Collapsible>
