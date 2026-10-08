@@ -33,12 +33,18 @@ const SizeAndCounts = ({
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
   // The daily org stats don't segment Storage Size; that split comes from the retention endpoint.
-  const { data: retention, isPending: isLoadingRetention } = useQuery({
-    ...storageRetentionUsageQueryOptions({ orgSlug }),
-    enabled: isStorageVersioningEnabled,
+  const retentionQueryOptions = storageRetentionUsageQueryOptions({ orgSlug })
+  const { data: retention, isLoading: isLoadingRetention } = useQuery({
+    ...retentionQueryOptions,
+    enabled: retentionQueryOptions.enabled && isStorageVersioningEnabled,
   })
 
-  const storageSizeChartMeta = isStorageVersioningEnabled
+  // Segment Storage Size only once the retention endpoint has actually answered. Until then the
+  // unsegmented org stats are the only figures we can stand behind.
+  const isStorageSizeSegmented =
+    isStorageVersioningEnabled && (isLoadingRetention || retention != null)
+
+  const storageSizeChartMeta = isStorageSizeSegmented
     ? {
         isLoading: isLoadingRetention,
         margin: 14,
@@ -73,6 +79,7 @@ const SizeAndCounts = ({
       projectRef={projectRef}
       categoryKey="sizeCount"
       chartMeta={chartMeta}
+      isStorageSizeSegmented={isStorageSizeSegmented}
       subscription={subscription}
       currentBillingCycleSelected={currentBillingCycleSelected}
       startDate={startDate}
