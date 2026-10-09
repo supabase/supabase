@@ -202,8 +202,9 @@ export const deleteItem = async (page: Page, itemName: string) => {
   // Click delete option from context menu
   await page.getByRole('menuitem', { name: 'Delete' }).click()
 
-  // Confirm deletion in the modal
-  await page.getByRole('button', { name: 'Submit' }).click()
+  // Confirm deletion in the modal. The label says what it does rather than
+  // carrying ConfirmationModal's "Submit" default.
+  await page.getByRole('button', { name: 'Delete', exact: true }).click()
 
   // Wait for deletion to complete
   await page.waitForTimeout(1000)
