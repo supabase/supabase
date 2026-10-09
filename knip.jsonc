@@ -70,7 +70,6 @@
         // folder so everything else here stays gated.
         // TODO(FE-4330): remove — used from #50529, drop this entry in that PR.
         "data/oauth-apps/oauth-apps-approvals-query.ts": ["files"],
-        "data/oauth-apps/oauth-apps-authorized-apps-query.ts": ["files"],
         "data/oauth-apps/oauth-apps-grants-query.ts": ["files"],
         "data/oauth-apps/oauth-apps-member-grants-query.ts": ["files"],
         "data/oauth-apps/oauth-apps-preflight-validation-query.ts": ["files"],

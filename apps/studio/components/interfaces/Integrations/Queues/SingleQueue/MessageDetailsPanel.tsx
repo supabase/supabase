@@ -95,7 +95,7 @@ export const MessageDetailsPanel = ({
         <TooltipTrigger asChild>
           <Button
             variant="text"
-            className="absolute top-3 right-3 px-1"
+            className="absolute top-3 right-3 z-10 px-1"
             icon={<X />}
             onClick={() => setSelectedMessage(null)}
             aria-label="Close panel"
