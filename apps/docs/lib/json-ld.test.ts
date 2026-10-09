@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { breadcrumbListSchema } from './json-ld'
+import { breadcrumbListSchema, techArticleSchema } from './json-ld'
 
 describe('breadcrumbListSchema', () => {
   let warn: ReturnType<typeof vi.spyOn>
@@ -23,7 +23,7 @@ describe('breadcrumbListSchema', () => {
     })
 
     expect(result).not.toBeNull()
-    expect(result!.itemListElement).toHaveLength(4)
+    expect(result!.itemListElement).toHaveLength(3)
     for (const entry of result!.itemListElement) {
       expect(typeof entry.item).toBe('string')
       expect(entry.item).toMatch(/^https?:\/\//)
@@ -55,5 +55,49 @@ describe('breadcrumbListSchema', () => {
     const result = breadcrumbListSchema({ pathname: '/guides', chain: [] })
 
     expect(result).toBeNull()
+  })
+})
+
+describe('techArticleSchema', () => {
+  const url = 'https://supabase.com/docs/guides/auth/jwts'
+
+  it('describes the guide as a TechArticle on its own URL', () => {
+    const schema = techArticleSchema({
+      url,
+      headline: 'JWTs',
+      description: 'How JSON Web Tokens work.',
+    })
+
+    expect(schema['@context']).toBe('https://schema.org')
+    expect(schema['@type']).toBe('TechArticle')
+    expect(schema['@id']).toBe(`${url}#page`)
+    expect(schema.mainEntityOfPage).toEqual({ '@type': 'WebPage', '@id': url })
+    expect(schema.url).toBe(url)
+    expect(schema.headline).toBe('JWTs')
+    expect(schema.description).toBe('How JSON Web Tokens work.')
+    expect(schema.inLanguage).toBe('en')
+  })
+
+  it('omits description when none is given', () => {
+    const schema = techArticleSchema({ url, headline: 'JWTs' })
+
+    expect(schema.description).toBeUndefined()
+  })
+
+  it('omits date fields', () => {
+    const schema = techArticleSchema({ url, headline: 'JWTs' })
+
+    expect(schema).not.toHaveProperty('datePublished')
+    expect(schema).not.toHaveProperty('dateModified')
+  })
+
+  it('publishes under an inline Supabase organization', () => {
+    const schema = techArticleSchema({ url, headline: 'JWTs' })
+
+    expect(schema.publisher).toMatchObject({
+      '@type': 'Organization',
+      name: 'Supabase',
+      url: 'https://supabase.com',
+    })
   })
 })

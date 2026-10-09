@@ -1,8 +1,10 @@
 import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH } from '~/lib/constants'
+import type { BreadcrumbItem } from '~/lib/breadcrumbs'
+import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { apiReferenceSchema, breadcrumbListSchema, techArticleSchema } from '~/lib/json-ld'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -231,6 +233,93 @@ export async function generateReferenceMetadata(
   } else {
     return {}
   }
+}
+
+/**
+ * JSON-LD `@type` for reference pages, matched by pathname prefix. The first
+ * matching rule wins, and paths that match no rule get `APIReference`. To
+ * switch a whole section, edit or add its prefix here.
+ */
+const REFERENCE_JSON_LD_TYPE_RULES: ReadonlyArray<{
+  prefix: string
+  type: 'APIReference' | 'TechArticle'
+}> = [{ prefix: '/reference/self-hosting-', type: 'TechArticle' }]
+
+export function referenceJsonLdType(pathname: string) {
+  return (
+    REFERENCE_JSON_LD_TYPE_RULES.find((rule) => pathname.startsWith(rule.prefix))?.type ??
+    'APIReference'
+  )
+}
+
+/**
+ * Builds the JSON-LD for a reference page, or `null` for paths that aren't
+ * reference pages. `pathname` is relative to the docs base path.
+ */
+export async function generateReferenceJsonLd(slug: Array<string>) {
+  const parsedPath = parseReferencePath(slug)
+  let pathname: string
+  let headline: string
+  let description: string | undefined
+  let leafName: string
+  let parentCrumbs: BreadcrumbItem[] = []
+
+  if (parsedPath.__type === 'clientSdk') {
+    const { sdkId, maybeVersion, path } = parsedPath
+    const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
+    const flattenedSections = await getFlattenedSections(sdkId, version)
+
+    const displayName = REFERENCES[sdkId].name
+    const sectionTitle =
+      slug.length > 0
+        ? flattenedSections?.find((section) => section.slug === slug[0])?.title
+        : undefined
+    pathname = `/reference/${sdkId}${path[0] ? `/${path[0]}` : ''}`
+    headline = `${displayName} API Reference${sectionTitle ? `: ${sectionTitle}` : ''}`
+    description = `API reference for the ${displayName} Supabase SDK`
+    leafName = sectionTitle ?? displayName
+    if (path[0]) parentCrumbs = [{ name: displayName, url: `/reference/${sdkId}` }]
+  } else if (parsedPath.__type === 'cli') {
+    pathname = '/reference/cli'
+    headline = 'CLI Reference'
+    description = 'CLI reference for the Supabase CLI'
+    leafName = 'CLI'
+  } else if (parsedPath.__type === 'api') {
+    const operationSlug = parsedPath.path[0]
+    const flattenedSections = operationSlug
+      ? await getFlattenedSections('api', 'latest')
+      : undefined
+    const sectionTitle = flattenedSections?.find((section) => section.slug === operationSlug)?.title
+
+    pathname = operationSlug ? `/reference/api/${operationSlug}` : '/reference/api'
+    headline = `Management API${sectionTitle ? `: ${sectionTitle}` : ''}`
+    description = `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`
+    leafName = operationSlug ? (sectionTitle ?? operationSlug) : 'Management API'
+    if (operationSlug) parentCrumbs = [{ name: 'Management API', url: '/reference/api' }]
+  } else if (parsedPath.__type === 'self-hosting') {
+    const name = REFERENCES[parsedPath.servicePath.replaceAll('-', '_')].name
+    pathname = `/reference/${slug.join('/')}`
+    headline = name
+    leafName = name
+  } else {
+    return null
+  }
+
+  const input = { url: `${PROD_URL}${pathname}`, headline, description }
+  const pageSchema =
+    referenceJsonLdType(pathname) === 'TechArticle'
+      ? techArticleSchema(input)
+      : apiReferenceSchema(input)
+  const breadcrumbSchema = breadcrumbListSchema({
+    pathname,
+    chain: [
+      { name: 'API Reference', url: '/reference' },
+      ...parentCrumbs,
+      { name: leafName, url: pathname },
+    ],
+  })
+
+  return breadcrumbSchema ? [pageSchema, breadcrumbSchema] : [pageSchema]
 }
 
 export async function redirectNonexistentReferenceSection(
