@@ -149,10 +149,10 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         </TableCell>
 
         {/*
-          [Joshen] The div child here and all these classes is to properly add a left border
-          to make the sticky column more distinct
+          Left border on the absolute child makes the sticky column more distinct.
+          Sticky positioning/background come from ShadowScrollArea's stickyLastColumn.
         */}
-        <TableCell className="w-20 sticky bg-surface-100 right-0 relative">
+        <TableCell className="w-20 relative">
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">
             {isDisabling ? (
               <Loader2 className="animate-spin" size={16} />
