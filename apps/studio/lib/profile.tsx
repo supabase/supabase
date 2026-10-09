@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useIsLoggedIn, useUser } from 'common'
 import { useRouter } from 'next/router'
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from 'react'
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useSignOut } from './auth'
@@ -83,14 +83,9 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
     enabled: isLoggedIn,
   })
 
-  // Only attempt to create a profile once per user
-  const createProfileAttemptedForUserId = useRef<string | undefined>(undefined)
   const isProfileNotFound = isError && error?.message === "User's profile not found"
   useEffect(() => {
     if (!isProfileNotFound || !user?.id) return
-    if (createProfileAttemptedForUserId.current === user.id) return
-
-    createProfileAttemptedForUserId.current = user.id
     createProfile()
   }, [isProfileNotFound, user?.id, createProfile])
 
