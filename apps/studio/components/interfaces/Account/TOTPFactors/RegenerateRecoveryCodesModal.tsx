@@ -1,3 +1,4 @@
+import { RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 
@@ -16,25 +17,28 @@ export const RegenerateRecoveryCodesModal = () => {
     },
   })
 
+  const { mutate: regenerateCodes, isPending } = recoveryCodesRegenerateMutation
+
   return (
     <>
-      <Button onClick={() => setShowConfirm(true)}>Regenerate my recovery codes</Button>
+      <Button icon={<RefreshCw />} onClick={() => setShowConfirm(true)}>
+        Regenerate
+      </Button>
       <TextConfirmModal
         visible={showConfirm}
         size="small"
-        variant="destructive"
+        variant="warning"
         title="Regenerate my recovery codes"
         confirmPlaceholder="REGENERATE"
         confirmString="REGENERATE"
         confirmLabel="Regenerate"
-        loading={recoveryCodesRegenerateMutation.isPending}
-        onConfirm={() => {
-          recoveryCodesRegenerateMutation.mutate()
-        }}
+        loading={isPending}
+        onConfirm={() => regenerateCodes()}
         onCancel={() => setShowConfirm(false)}
       >
         <p className="text-sm">Your existing recovery codes won't work anymore.</p>
       </TextConfirmModal>
+
       <RecoveryCodesModal
         open={open}
         onOpenChange={(open) => setOpen(open)}

@@ -9,7 +9,7 @@ import type { ResponseError, UseCustomQueryOptions, VaultSecret } from '@/types'
 export const getVaultSecretsSql = () => {
   const sql = new Query()
     .from('secrets', 'vault')
-    .select(safeSql`id,name,description,secret,created_at,updated_at`)
+    .select(safeSql`id,key_id,name,description,secret,created_at,updated_at`)
     .toSql()
 
   return sql

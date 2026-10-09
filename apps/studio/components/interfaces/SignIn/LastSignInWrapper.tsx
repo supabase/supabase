@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react'
-import { Badge, cn } from 'ui'
+import { Badge, cn, controlRadiusBySize, FloatingPlate } from 'ui'
 
 import { LastSignInType, useLastSignIn } from '@/hooks/misc/useLastSignIn'
 
@@ -23,17 +23,22 @@ export function LastSignInWrapper({
   return (
     <div className="flex items-center relative">
       {isLastUsed && (
-        <Badge
-          variant="success"
-          className="absolute -right-4 -top-3 shadow-sm z-10 bg-brand-400 text-foreground pointer-events-none"
+        <FloatingPlate
+          rounded="full"
+          className="absolute -right-4 -top-3 z-10 shadow-sm pointer-events-none"
         >
-          Last used
-        </Badge>
+          <Badge variant="success">Last used</Badge>
+        </FloatingPlate>
       )}
       <div
-        className={cn('w-full', {
-          'outline outline-1 outline-offset-4 outline-foreground-lighter/50 rounded-md': isLastUsed,
-        })}
+        className={cn(
+          'w-full',
+          isLastUsed &&
+            cn(
+              'outline outline-1 outline-offset-4 outline-foreground-lighter/50',
+              controlRadiusBySize.large
+            )
+        )}
       >
         {children}
       </div>

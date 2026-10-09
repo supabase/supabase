@@ -32,6 +32,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
   UI_PREVIEW_EXPLORER: 'preview-explorer',
+  UI_PREVIEW_PIPELINE_CREATION: 'supabase-ui-pipeline-creation',
   UI_PREVIEW_STORAGE_VERSIONING: 'supabase-ui-storage-versioning',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
@@ -79,8 +80,8 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
+  TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-v4-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
-  PRIVACY_POLICY_UPDATE: 'privacy-policy-update-2026-09-16-dismissed',
   SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
@@ -168,6 +169,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
   LOCAL_STORAGE_KEYS.SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,

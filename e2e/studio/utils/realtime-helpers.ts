@@ -3,7 +3,9 @@ import { toUrl } from './to-url.js'
 
 export async function navigateToRealtimeInspector(page: Page, ref: string) {
   await page.goto(toUrl(`/project/${ref}/realtime/inspector`))
-  await expect(page.locator('text=Join a channel')).toBeVisible({ timeout: 30000 })
+  await expect(page.getByRole('button', { name: 'Join a channel' })).toBeVisible({
+    timeout: 30000,
+  })
 }
 
 export async function joinChannel(page: Page, channelName: string) {

@@ -193,7 +193,7 @@ export const SidePanelEditor = ({
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
