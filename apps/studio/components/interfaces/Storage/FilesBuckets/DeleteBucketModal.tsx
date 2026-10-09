@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { extractBucketNameFromDefinition } from './Storage.utils'
+import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'

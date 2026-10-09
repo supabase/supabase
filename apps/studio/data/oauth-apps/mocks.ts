@@ -218,7 +218,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelRoleValidation]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+    organizations: [NORTHWIND_TRADERS_READ_ONLY, CONTOSO_LABS],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelOptionalProjects]: {
     email: 'admin@example.com',
@@ -226,7 +226,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_READ_ONLY, CONTOSO_LABS, FABRIKAM_OWNER],
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS, FABRIKAM_OWNER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.vercelReconsentAllProjects]: {
     email: 'admin@example.com',
@@ -234,7 +234,7 @@ const MOCK_IDENTITIES: Record<string, OAuthAppsAuthorizeIdentity> = {
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBot]: {
     email: 'admin@example.com',
-    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS],
+    organizations: [NORTHWIND_TRADERS_DEVELOPER, CONTOSO_LABS, FABRIKAM_OWNER],
   },
   [OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide]: {
     email: 'admin@example.com',
@@ -314,7 +314,7 @@ const MOCK_APPS_BY_ID: Record<string, OAuthAppsAuthorizeRequest> = {
 
 // The current member's org-level role, keyed by org slug — same reasoning as MOCK_APPS_BY_ID.
 const MOCK_ORGANIZATIONS_BY_SLUG: Record<string, OAuthOrganizationRole> = {
-  'northwind-traders': NORTHWIND_TRADERS_READ_ONLY,
+  'northwind-traders': NORTHWIND_TRADERS_DEVELOPER,
   'tailspin-toys': TAILSPIN_TOYS_ADMIN,
   'fabrikam-industries': FABRIKAM_OWNER,
   'contoso-labs': CONTOSO_LABS,
@@ -331,7 +331,7 @@ const MOCK_APPROVALS: ListOAuthApprovalsResponse = {
         icon: null,
         created_by: '',
       },
-      grant_target: 'members',
+      grant_target: 'organization_and_members',
       org_grant: null,
     },
     {
@@ -379,18 +379,20 @@ const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
         approved_scopes: ['database:read', 'database:write', 'projects:read'],
         approved_at: '2026-08-18T09:12:00.000Z',
       },
-      {
-        grant_id: 'grant-vercel-developer',
-        kind: 'member_bound',
-        user: {
-          gotrue_id: 'b1d3e2f4-0000-4000-8000-000000000002',
-          email: 'developer@example.com',
-          avatar_url: 'https://avatars.example/developer.png',
-        },
-        projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
-        approved_scopes: ['projects:read'],
-        approved_at: '2026-08-16T11:30:00.000Z',
-      },
+      ...Array(50)
+        .keys()
+        .map((index) => ({
+          grant_id: `grant-vercel-developer-${index}`,
+          kind: 'member_bound' as const,
+          user: {
+            gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
+            email: `developer${index}@example.com`,
+            avatar_url: 'https://avatars.example/developer.png',
+          },
+          projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
+          approved_scopes: ['projects:read'],
+          approved_at: '2026-08-16T11:30:00.000Z',
+        })),
     ],
     pagination: { next_cursor: null },
   },
@@ -549,8 +551,9 @@ function evaluateGrantEligibility(
   organization: OAuthOrganizationRole
 ): OAuthAppsAuthorizePreflightResult {
   if (request.grant_kind === 'organization_bound') {
-    if (isOwnerOrAdmin(organization.default_role)) return { ok: true }
+    if (isOwnerOrAdmin(organization.default_role)) return { status: 'success' }
     return {
+      status: 'error',
       error_code: 'role_validation_failed',
       message: `Your ${organization.default_role.name} role cannot install this app for the organization.`,
       validation: { scope_target: 'organization', role: organization.default_role },
@@ -558,9 +561,11 @@ function evaluateGrantEligibility(
   }
 
   const failedScopes = request.scopes.filter(isWriteScope)
-  if (failedScopes.length === 0 || !isReadOnlyRole(organization.default_role)) return { ok: true }
+  if (failedScopes.length === 0 || !isReadOnlyRole(organization.default_role))
+    return { status: 'success' }
 
   return {
+    status: 'error',
     error_code: 'role_validation_failed',
     message: `Your ${organization.default_role.name} role cannot satisfy this app's scopes for all projects.`,
     validation: {
@@ -577,7 +582,7 @@ export function getMockOAuthAppsPreflightValidation(
 ): OAuthAppsAuthorizePreflightResult {
   const request = MOCK_APPS_BY_ID[appId]
   const organization = MOCK_ORGANIZATIONS_BY_SLUG[slug]
-  if (!request || !organization) return { ok: true }
+  if (!request || !organization) return { status: 'success' }
 
   return evaluateGrantEligibility(request, organization)
 }
@@ -607,6 +612,7 @@ export function getMockOAuthAppsAuthorizeApproveResult(
   if (blocked.length === 0) return approved
 
   return {
+    status: 'error',
     error_code: 'role_validation_failed',
     message: `Your role is read-only on ${blocked.length} of the selected projects.`,
     validation: {

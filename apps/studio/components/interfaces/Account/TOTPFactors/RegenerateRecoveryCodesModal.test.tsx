@@ -109,8 +109,8 @@ describe('RegenerateRecoveryCodesModal', () => {
       await within(await screen.findByRole('dialog')).findByRole('button', { name: 'Regenerate' })
     )
     await screen.findByText('Unable to generate recovery codes')
-    await screen.findByText(
-      'Try refreshing your browser, but if the issue persists for more than a few minutes, please reach out to us via support.'
+    expect(await screen.findByText(/Try refreshing your browser/)).toHaveTextContent(
+      'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.'
     )
 
     fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
