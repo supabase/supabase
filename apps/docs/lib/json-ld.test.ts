@@ -23,7 +23,7 @@ describe('breadcrumbListSchema', () => {
     })
 
     expect(result).not.toBeNull()
-    expect(result!.itemListElement).toHaveLength(4)
+    expect(result!.itemListElement).toHaveLength(3)
     for (const entry of result!.itemListElement) {
       expect(typeof entry.item).toBe('string')
       expect(entry.item).toMatch(/^https?:\/\//)

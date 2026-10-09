@@ -13,7 +13,6 @@ export function serializeJsonLd(schema: JsonLdSchema): string {
 type ValidCrumb = BreadcrumbItem & { url: string }
 
 const DOCS_ROOT: ValidCrumb = { name: 'Docs', url: '' }
-const GUIDES_ROOT: ValidCrumb = { name: 'Guides', url: '/guides' }
 
 interface BreadcrumbListSchemaInput {
   pathname: string
@@ -45,7 +44,7 @@ export function breadcrumbListSchema({ pathname, chain }: BreadcrumbListSchemaIn
 
   if (filteredChain.length === 0) return null
 
-  const fullChain: ValidCrumb[] = [DOCS_ROOT, GUIDES_ROOT, ...filteredChain]
+  const fullChain: ValidCrumb[] = [DOCS_ROOT, ...filteredChain]
 
   const itemListElement = fullChain.map((crumb, index) => {
     const isLeaf = index === fullChain.length - 1

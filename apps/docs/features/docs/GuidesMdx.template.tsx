@@ -80,7 +80,7 @@ const GuideTemplate = ({
         techArticleSchema({
           url: `${PROD_URL}${pathname}`,
           headline: mdToPlainText(meta.title),
-          description: meta.description ? mdToPlainText(meta.description) : undefined,
+          description: mdToPlainText(meta.description ?? meta.subtitle ?? '') || undefined,
         })
       )
     : null

@@ -1,9 +1,10 @@
 import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import type { BreadcrumbItem } from '~/lib/breadcrumbs'
 import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
-import { apiReferenceSchema, techArticleSchema } from '~/lib/json-ld'
+import { apiReferenceSchema, breadcrumbListSchema, techArticleSchema } from '~/lib/json-ld'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -260,6 +261,8 @@ export async function generateReferenceJsonLd(slug: Array<string>) {
   let pathname: string
   let headline: string
   let description: string | undefined
+  let leafName: string
+  let parentCrumbs: BreadcrumbItem[] = []
 
   if (parsedPath.__type === 'clientSdk') {
     const { sdkId, maybeVersion, path } = parsedPath
@@ -274,10 +277,13 @@ export async function generateReferenceJsonLd(slug: Array<string>) {
     pathname = `/reference/${sdkId}${path[0] ? `/${path[0]}` : ''}`
     headline = `${displayName} API Reference${sectionTitle ? `: ${sectionTitle}` : ''}`
     description = `API reference for the ${displayName} Supabase SDK`
+    leafName = sectionTitle ?? displayName
+    if (path[0]) parentCrumbs = [{ name: displayName, url: `/reference/${sdkId}` }]
   } else if (parsedPath.__type === 'cli') {
     pathname = '/reference/cli'
     headline = 'CLI Reference'
     description = 'CLI reference for the Supabase CLI'
+    leafName = 'CLI'
   } else if (parsedPath.__type === 'api') {
     const operationSlug = parsedPath.path[0]
     const flattenedSections = operationSlug
@@ -288,17 +294,31 @@ export async function generateReferenceJsonLd(slug: Array<string>) {
     pathname = operationSlug ? `/reference/api/${operationSlug}` : '/reference/api'
     headline = `Management API${sectionTitle ? `: ${sectionTitle}` : ''}`
     description = `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`
+    leafName = operationSlug ? (sectionTitle ?? operationSlug) : 'Management API'
+    if (operationSlug) parentCrumbs = [{ name: 'Management API', url: '/reference/api' }]
   } else if (parsedPath.__type === 'self-hosting') {
     pathname = `/reference/${slug.join('/')}`
     headline = 'Self-Hosting'
+    leafName = 'Self-Hosting'
   } else {
     return null
   }
 
   const input = { url: `${PROD_URL}${pathname}`, headline, description }
-  return referenceJsonLdType(pathname) === 'TechArticle'
-    ? techArticleSchema(input)
-    : apiReferenceSchema(input)
+  const pageSchema =
+    referenceJsonLdType(pathname) === 'TechArticle'
+      ? techArticleSchema(input)
+      : apiReferenceSchema(input)
+  const breadcrumbSchema = breadcrumbListSchema({
+    pathname,
+    chain: [
+      { name: 'API Reference', url: '/reference' },
+      ...parentCrumbs,
+      { name: leafName, url: pathname },
+    ],
+  })
+
+  return breadcrumbSchema ? [pageSchema, breadcrumbSchema] : [pageSchema]
 }
 
 export async function redirectNonexistentReferenceSection(
