@@ -8,6 +8,7 @@ import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 
+import { BASE_PATH } from './src/lib/constants.ts'
 import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import supabaseTheme from '../learn/lib/themes/supabase-2.json' with { type: 'json' }
 
@@ -44,7 +45,7 @@ const ssrLodashEs = {
 // https://astro.build/config
 export default defineConfig({
   site: 'https://supabase.com',
-  base: '/kb',
+  base: BASE_PATH,
   trailingSlash: 'ignore',
   integrations: [react(), // rehype-admonitions is a custom rehype plugin and Astro's default pipeline is
   // satteri, so .mdx gets its own unified processor. Plain .md stays on satteri.
@@ -58,6 +59,7 @@ export default defineConfig({
       noExternal: ['lodash'],
     },
     plugins: [tailwindcss(), ssrLodashEs],
+    logLevel: 'error',
   },
   markdown: {
     shikiConfig: {

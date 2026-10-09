@@ -3,16 +3,23 @@ import { Github } from 'lucide-react'
 import { Badge } from 'ui'
 
 import Layout from './Layout.astro'
-import { getTopicDescription, type Topic, topicToSlug } from '../lib/topics'
+import { getTopicDescription, type Topic, TOPIC_NAMES, topicToSlug } from '../lib/topics'
 
 interface Props {
 	title: string
 	description?: string
-	topics?: Topic[]
+	// string[], not Topic[]: federated collections (e.g. troubleshooting) pass
+	// through their source's own topic tags unprocessed, which aren't
+	// guaranteed to be members of kb's fixed Topic list.
+	topics?: string[]
 	github_url?: string
 }
 
 const { title, description, topics = [], github_url } = Astro.props
+
+function isKnownTopic(topic: string): topic is Topic {
+	return (TOPIC_NAMES as readonly string[]).includes(topic)
+}
 ---
 
 <Layout title={title} description={description}>
@@ -22,14 +29,18 @@ const { title, description, topics = [], github_url } = Astro.props
 		{
 			topics.length > 0 && (
 				<div class="flex flex-wrap gap-2">
-					{topics.map((topic) => (
-						<a
-							href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
-							title={getTopicDescription(topic)}
-						>
+					{topics.map((topic) =>
+						isKnownTopic(topic) ? (
+							<a
+								href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
+								title={getTopicDescription(topic)}
+							>
+								<Badge>{topic}</Badge>
+							</a>
+						) : (
 							<Badge>{topic}</Badge>
-						</a>
-					))}
+						)
+					)}
 				</div>
 			)
 		}

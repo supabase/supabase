@@ -1,11 +1,10 @@
 // @ts-check
 
 /**
- * This file is for utils needed in both the Next.js app build and the
- * troubleshooting sync script. Because of unsolved problems with imports, the
- * script is a mjs file instead of a ts file. Any dependencies that are needed
- * in both places are defined here, and then typed in Troubleshooting.utils.ts
- * as required.
+ * This file is for utils needed in both the Next.js app build and other
+ * scripts that read troubleshooting entries (e.g. search embeddings
+ * generation). Any dependencies that are needed in both places are defined
+ * here, and then typed in Troubleshooting.utils.ts as required.
  */
 
 import matter from 'gray-matter'

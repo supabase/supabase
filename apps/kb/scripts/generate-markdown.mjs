@@ -14,16 +14,16 @@ import { unified } from 'unified'
 import { visit } from 'unist-util-visit'
 import YAML from 'yaml'
 
+import { BASE_PATH } from '../src/lib/constants.ts'
 import { TOPICS, topicToSlug } from '../src/lib/topics.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
 const OUTPUT_DIR = path.join(SCRIPT_DIR, '..', 'public', 'markdown')
 
-// Production origin + Astro `base` — used to turn root-relative links into
-// full URLs so the exported file still makes sense read on its own.
+// Used to turn root-relative links into full URLs so the exported file still
+// makes sense read on its own.
 const SITE_ORIGIN = 'https://supabase.com'
-const BASE_PATH = '/kb'
 
 // Single processor reused for every file: parses GFM markdown to an mdast
 // tree and serializes it back, same extensions on both ends so nothing

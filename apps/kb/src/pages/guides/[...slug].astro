@@ -2,7 +2,7 @@
 import { getCollection, render } from 'astro:content'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import GuideLayout from '../../layouts/GuideLayout.astro'
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
@@ -17,6 +17,6 @@ const { title, description, topics, github_url } = guide.data
 const { Content } = await render(guide)
 ---
 
-<GuideLayout title={title} description={description} topics={topics} github_url={github_url}>
+<ArticleLayout title={title} description={description} topics={topics} github_url={github_url}>
 	<Content components={{ Admonition }} />
-</GuideLayout>
+</ArticleLayout>
