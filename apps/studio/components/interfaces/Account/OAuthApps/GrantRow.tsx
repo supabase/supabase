@@ -53,7 +53,7 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
       <TableCell>
         <TimestampInfo
           utcTimestamp={grant.approved_at ?? ''}
-          labelFormat="DD/MM/YYYY, HH:mm:ss"
+          labelFormat="DD MMM YYYY"
           className="text-sm"
         />
       </TableCell>
