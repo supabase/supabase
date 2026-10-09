@@ -38,7 +38,12 @@ const TableBody = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <tbody
     ref={ref}
-    className={cn('[&_tr:last-child]:border-0 [&>tr]:hover:bg-surface-200', className)}
+    className={cn(
+      '[&_tr:last-child]:border-0',
+      // :where() keeps this at lower specificity than a row's own hover:* class, so rows can opt out (e.g. loading/empty states)
+      '[:where(&)>tr]:hover:bg-surface-200',
+      className
+    )}
     {...props}
   />
 ))
