@@ -34,6 +34,20 @@ The badge is based on the [Pimoroni Tufty 2350](https://shop.pimoroni.com/produc
 - Onboard Wi-Fi and Bluetooth
 - Five physical buttons you can map to anything
 
+<video
+  className="rounded-md border m-0 w-full"
+  autoPlay
+  loop
+  muted
+  playsInline
+  aria-label="A badge on a table showing an animated name tag"
+>
+  <source
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/nametag.mp4"
+    type="video/mp4"
+  />
+</video>
+
 ## Making a thousand of them
 
 Our first iteration was a board with a Raspberry Pi Pico, a screen, and a battery, attached so you could pull them apart and use them as a starter kit once the conference was over. It was a great solution for building a modular conference badge, but assembling a thousand of them by hand was not feasible.
@@ -44,6 +58,20 @@ Our first iteration was a board with a Raspberry Pi Pico, a screen, and a batter
 />
 
 With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who build similar hardware - screen, battery and programmable microcontroller - but on a single board, greatly reducing the complexity of assembly. We wrote all the software that shipped on it: the name tag, the schedule, and the games. It was only a fraction of what the badge was capable of, but it was exactly what we needed _at_ Select.
+
+<video
+  className="rounded-md border m-0 w-full"
+  autoPlay
+  loop
+  muted
+  playsInline
+  aria-label="An attendee playing a game on their badge"
+>
+  <source
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/badge-game.mp4"
+    type="video/mp4"
+  />
+</video>
 
 <Img
   alt="The final badge in its clear case, showing an attendee name tag"
@@ -59,6 +87,20 @@ Charging 800 badges turned into a fun math problem. Each badge draws less than h
 The schedule app was meant to pull live updates over Wi-Fi, but the venue network wasn't going to cooperate. A laptop could stay connected from the far end of the parking lot, while the badges couldn't connect at all, and 800 badges sharing the 2.4 GHz band with every neighboring network was never going to be reliable. So the badges went offline-first. We set up our own router broadcasting the network name already saved on the badges, connected it to a cellular hotspot, and synced every badge’s schedule before the doors opened. Open the schedule app while connected, and it pulls the latest version.
 
 The last few days were an assembly line, one box at a time: charge it, sync the schedule, and back in the box. Two days before the doors opened, we were still working through the last boxes. On the day, we spotted attendees huddled around a laptop, already hacking their badges.
+
+<video
+  className="rounded-md border m-0 w-full"
+  autoPlay
+  loop
+  muted
+  playsInline
+  aria-label="An attendee holding up her badge at Supabase Select"
+>
+  <source
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/attendee.mp4"
+    type="video/mp4"
+  />
+</video>
 
 ## What people have built so far
 
