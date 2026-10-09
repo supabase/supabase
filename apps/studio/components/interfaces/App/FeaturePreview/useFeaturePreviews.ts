@@ -1,7 +1,8 @@
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { useMemo } from 'react'
 
 import { type BannerId } from '@/components/ui/BannerStack/BannerStackProvider'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { IS_PLATFORM } from '@/lib/constants'
 
 export type FeaturePreview = {
@@ -37,7 +38,9 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const isExplorerEnabled = useFlag('explorer')
-  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
+  const { ref } = useParams()
+  const { data: storageConfig } = useProjectStorageConfigQuery({ projectRef: ref })
+  const isStorageVersioningEnabled = !!storageConfig?.capabilities?.object_versioning
 
   const isSqlEditorManualSaveForced = useFlag('sqlEditorManualSaveForced')
 
