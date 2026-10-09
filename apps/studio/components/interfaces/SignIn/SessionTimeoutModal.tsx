@@ -13,9 +13,13 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
-import { CollapsibleAlert } from 'ui-patterns/collapsible-alert'
 
 import { SupportLink } from '../Support/SupportLink'
+import {
+  DialogDisclosure,
+  DialogDisclosureContent,
+  DialogDisclosureTrigger,
+} from '@/components/ui-patterns/Dialogs/DialogDisclosure'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 
 interface SessionTimeoutModalProps {
@@ -57,39 +61,44 @@ export const SessionTimeoutModal = ({
           <AlertDialogDescription asChild>
             <div className="space-y-4">
               <p>Please sign in again to continue.</p>
-              <CollapsibleAlert trigger="Having trouble?">
-                <div className="space-y-3 text-foreground-light">
-                  <p>
-                    Try a different browser or disable extensions that block network requests. If
-                    the problem persists:
-                  </p>
-                  <Button size="tiny" onClick={handleClearStorage}>
-                    Clear site data and reload
-                  </Button>
-                  <p>
-                    Still stuck?{' '}
-                    <SupportLink
-                      className={InlineLinkClassName}
-                      queryParams={{
-                        subject: 'Session expired',
-                        category: SupportCategories.LOGIN_ISSUES,
-                        ...(supportContext?.projectRef && {
-                          projectRef: supportContext.projectRef,
-                        }),
-                        ...(supportContext?.orgSlug && { orgSlug: supportContext.orgSlug }),
-                      }}
-                      onClick={onClose}
-                    >
-                      Contact support
-                    </SupportLink>{' '}
-                    and include a{' '}
-                    <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
-                      HAR file
-                    </InlineLink>{' '}
-                    from your session to help us investigate.
-                  </p>
-                </div>
-              </CollapsibleAlert>
+              <DialogDisclosure className="rounded-md border">
+                <DialogDisclosureTrigger className="rounded-t-md p-3 font-medium data-closed:rounded-md">
+                  Having trouble?
+                </DialogDisclosureTrigger>
+                <DialogDisclosureContent className="px-3 pb-3">
+                  <div className="space-y-3 text-foreground-light">
+                    <p>
+                      Try a different browser or disable extensions that block network requests. If
+                      the problem persists:
+                    </p>
+                    <Button size="tiny" onClick={handleClearStorage}>
+                      Clear site data and reload
+                    </Button>
+                    <p>
+                      Still stuck?{' '}
+                      <SupportLink
+                        className={InlineLinkClassName}
+                        queryParams={{
+                          subject: 'Session expired',
+                          category: SupportCategories.LOGIN_ISSUES,
+                          ...(supportContext?.projectRef && {
+                            projectRef: supportContext.projectRef,
+                          }),
+                          ...(supportContext?.orgSlug && { orgSlug: supportContext.orgSlug }),
+                        }}
+                        onClick={onClose}
+                      >
+                        Contact support
+                      </SupportLink>{' '}
+                      and include a{' '}
+                      <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
+                        HAR file
+                      </InlineLink>{' '}
+                      from your session to help us investigate.
+                    </p>
+                  </div>
+                </DialogDisclosureContent>
+              </DialogDisclosure>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

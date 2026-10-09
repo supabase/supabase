@@ -915,7 +915,7 @@ test.describe('Database Extensions', () => {
       ref,
       'query?key=database-extensions'
     )
-    await dialog.getByRole('button', { name: 'Enable extension' }).click()
+    await dialog.getByRole('button', { name: 'Enable', exact: true }).click()
     await enableWait
     await refetchWait
 

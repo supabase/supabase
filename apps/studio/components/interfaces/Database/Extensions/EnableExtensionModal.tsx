@@ -4,9 +4,6 @@ import {
   Card,
   CardContent,
   cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -18,8 +15,12 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
+import {
+  DialogDisclosure,
+  DialogDisclosureContent,
+  DialogDisclosureTrigger,
+} from '@/components/ui-patterns/Dialogs/DialogDisclosure'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -45,6 +46,7 @@ export const EnableExtensionModal = ({
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
   const defaultSchema =
     extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
+  const hasFixedSchema = defaultSchema != null
 
   const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
@@ -76,7 +78,7 @@ export const EnableExtensionModal = ({
         if (!open) onCancel()
       }}
     >
-      <DialogContent size="small" aria-describedby={undefined}>
+      <DialogContent size="small" className="min-w-0 overflow-hidden" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Enable {extension.name}</DialogTitle>
         </DialogHeader>
@@ -99,58 +101,68 @@ export const EnableExtensionModal = ({
 
         <DialogSection className="flex flex-col gap-y-4">
           <p className="text-sm text-foreground-light">
-            The following database extension will be enabled:
+            {hasFixedSchema
+              ? 'This extension must be installed in the schema below.'
+              : 'This extension will be installed in the schema below.'}
           </p>
 
           <Card>
             <CardContent className="divide-y text-sm p-0">
-              <div className="flex items-center justify-between px-4 py-2">
+              <div className="flex items-center justify-between px-3 py-2.5">
                 <p className="text-foreground-lighter">Extension</p>
-                <p className="text-foreground">{extension.name}</p>
+                <code className="text-code-inline">{extension.name}</code>
               </div>
-              <div className="flex items-center justify-between px-4 py-2">
+              <div className="flex items-center justify-between px-3 py-2.5">
                 <p className="text-foreground-lighter">Schema</p>
-                <p data-testid="enable-extension-schema" className="text-foreground">
+                <code data-testid="enable-extension-schema" className="text-code-inline">
                   {defaultSchema ?? 'extensions'}
-                </p>
+                </code>
               </div>
             </CardContent>
           </Card>
-
-          <Collapsible>
-            <CollapsibleTrigger
-              className={cn(
-                InlineLinkClassName,
-                'text-xs text-foreground-lighter data-open:text-foreground-light'
-              )}
-            >
-              Need to install this in a different schema?
-            </CollapsibleTrigger>
-            <CollapsibleContent className="[overflow-y:clip] data-closed:animate-collapsible-up data-open:animate-collapsible-down">
-              <div className="my-2 text-xs text-foreground-light flex flex-col gap-y-1">
-                <p>
-                  Installing in the extensions schema is highly recommended since some extensions
-                  are hard to move after installation.
-                </p>
-                <p>To use a different schema, run this in the SQL Editor:</p>
-              </div>
-              <CodeBlock
-                language="pgsql"
-                hideLineNumbers
-                wrapperClassName={cn('[&_pre]:px-3 [&_pre]:py-3')}
-                className="[&_code]:text-xs"
-                value={`create extension if not exists ${extension.name} schema target_schema;`}
-              />
-            </CollapsibleContent>
-          </Collapsible>
         </DialogSection>
+
+        {!hasFixedSchema && (
+          <>
+            <DialogSectionSeparator />
+            <DialogDisclosure>
+              <DialogDisclosureTrigger className="py-4 px-4 md:px-5">
+                <span>Install in a different schema</span>
+              </DialogDisclosureTrigger>
+              <DialogDisclosureContent>
+                <DialogSection className="pt-2 min-w-0 flex flex-col gap-y-3">
+                  <div className="text-sm text-foreground-light flex flex-col gap-y-3">
+                    <p>
+                      Installing in <code className="text-code-inline">public</code> can expose
+                      extension tables through the Data API. You may need support to enable RLS on
+                      those tables or move the extension.
+                    </p>
+                    <p>
+                      For another schema, cancel and use the SQL Editor. Replace{' '}
+                      <code className="text-code-inline">target_schema</code> with an existing
+                      schema name.
+                    </p>
+                  </div>
+                  <CodeBlock
+                    language="pgsql"
+                    hideLineNumbers
+                    wrapLongLines
+                    wrapperClassName={cn('min-w-0 max-w-full [&_pre]:px-3 [&_pre]:py-3')}
+                    className="[&_code]:text-xs"
+                    value={`create extension if not exists ${extension.name} schema target_schema;`}
+                  />
+                </DialogSection>
+              </DialogDisclosureContent>
+            </DialogDisclosure>
+          </>
+        )}
 
         <DialogFooter>
           <Button disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
           <Button variant="primary" loading={isEnabling} onClick={() => onConfirmEnable()}>
-            Enable extension
+            Enable
           </Button>
         </DialogFooter>
       </DialogContent>
