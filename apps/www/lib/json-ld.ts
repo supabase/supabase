@@ -219,3 +219,31 @@ export function techArticleSchema(input: TechArticleSchemaInput) {
     isPartOf: { '@id': SITE_ID },
   }
 }
+
+interface CollectionPageSchemaInput {
+  url: string
+  name: string
+  description?: string
+  items: Array<{ url: string; name: string }>
+}
+
+export function collectionPageSchema(input: CollectionPageSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': `${input.url}#page`,
+    url: input.url,
+    name: input.name,
+    description: input.description,
+    isPartOf: { '@id': SITE_ID },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: input.items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        url: item.url,
+        name: item.name,
+      })),
+    },
+  }
+}
