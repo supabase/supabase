@@ -1,4 +1,4 @@
-import { LockIcon, MoreVerticalIcon, X } from 'lucide-react'
+import { Lock, MoreVertical, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -74,7 +74,7 @@ export const OAuthAppsAuthorizedRow = ({
                 <DropdownMenuTrigger asChild>
                   <Button
                     ref={menuTriggerRef}
-                    icon={<MoreVerticalIcon />}
+                    icon={<MoreVertical />}
                     className="px-1"
                     aria-label="Manage app"
                     aria-describedby={undefined}
@@ -86,7 +86,7 @@ export const OAuthAppsAuthorizedRow = ({
             <DropdownMenuContent align="end" side="bottom" className="w-40">
               <DialogTrigger asChild>
                 <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('grants')}>
-                  <LockIcon size={14} />
+                  <Lock size={14} />
                   View grants
                 </DropdownMenuItem>
               </DialogTrigger>
