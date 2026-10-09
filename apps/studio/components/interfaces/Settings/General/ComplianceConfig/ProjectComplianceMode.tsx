@@ -13,11 +13,16 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { getComplianceRequirements } from './ComplianceConfig.utils'
+import { ComplianceRequirementRow } from './ComplianceRequirementRow'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useComplianceConfigUpdateMutation } from '@/data/config/project-compliance-config-mutation'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
+import { useSSLEnforcementQuery } from '@/data/ssl-enforcement/ssl-enforcement-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -65,6 +70,27 @@ export const ComplianceConfig = () => {
     if (!isLoading) setIsSensitive(initialIsSensitive)
   }, [isLoading])
 
+  const { data: sslEnforcement, isLoading: isLoadingSslEnforcement } = useSSLEnforcementQuery(
+    { projectRef: ref },
+    { enabled: isSensitive }
+  )
+  const { data: networkRestrictions, isLoading: isLoadingNetworkRestrictions } =
+    useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: isSensitive })
+  const { data: backups, isLoading: isLoadingBackups } = useBackupsQuery(
+    { projectRef: ref },
+    { enabled: isSensitive }
+  )
+
+  const complianceRequirements = getComplianceRequirements({
+    projectRef: ref,
+    sslEnforcement,
+    isLoadingSslEnforcement,
+    networkRestrictions,
+    isLoadingNetworkRestrictions,
+    backups,
+    isLoadingBackups,
+  })
+
   return (
     <PageSection id="compliance-configuration">
       <PageSectionMeta>
@@ -80,44 +106,56 @@ export const ComplianceConfig = () => {
       </PageSectionMeta>
       <PageSectionContent>
         <Card>
-          <CardContent className="flex flex-col gap-4 @lg:flex-row @lg:items-center @lg:justify-between">
-            <div className="space-y-2 max-w-2xl">
-              <p className="text-sm">Apply additional compliance controls to project</p>
-              <p className="text-sm text-foreground-light">
-                Enable security warnings in the{' '}
-                <InlineLink href={`/project/${ref}/advisors/security`}>Security Advisor</InlineLink>{' '}
-                to enforce requirements for managing sensitive data.
-              </p>
+          <CardContent className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 @lg:flex-row @lg:items-center @lg:justify-between">
+              <div className="space-y-2 max-w-2xl">
+                <p className="text-sm">Apply additional compliance controls to project</p>
+                <p className="text-sm text-foreground-light">
+                  Enable security warnings in the{' '}
+                  <InlineLink href={`/project/${ref}/advisors/security`}>
+                    Security Advisor
+                  </InlineLink>{' '}
+                  to enforce requirements for managing sensitive data.
+                </p>
+              </div>
+              <div className="flex items-center justify-end space-x-2">
+                {(isLoading || isSubmitting) && (
+                  <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                )}
+                {isError && (
+                  <AlertError error={error} subject="Failed to retrieve project settings" />
+                )}
+                {isSuccess && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
+                      <div>
+                        <Switch
+                          size="large"
+                          checked={isSensitive}
+                          disabled={isLoading || isSubmitting || !canUpdateComplianceConfig}
+                          onCheckedChange={toggleIsSensitive}
+                        />
+                      </div>
+                    </TooltipTrigger>
+                    {!canUpdateComplianceConfig && (
+                      <TooltipContent side="bottom" className="w-64 text-center">
+                        You need additional permissions to update the compliance configuration for
+                        your project
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                )}
+              </div>
             </div>
-            <div className="flex items-center justify-end space-x-2">
-              {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
-              )}
-              {isError && (
-                <AlertError error={error} subject="Failed to retrieve project settings" />
-              )}
-              {isSuccess && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    {/* [Joshen] Added div as tooltip is messing with data state property of toggle */}
-                    <div>
-                      <Switch
-                        size="large"
-                        checked={isSensitive}
-                        disabled={isLoading || isSubmitting || !canUpdateComplianceConfig}
-                        onCheckedChange={toggleIsSensitive}
-                      />
-                    </div>
-                  </TooltipTrigger>
-                  {!canUpdateComplianceConfig && (
-                    <TooltipContent side="bottom" className="w-64 text-center">
-                      You need additional permissions to update the compliance configuration for
-                      your project
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              )}
-            </div>
+
+            {isSensitive && (
+              <div className="flex flex-col gap-2 border-t pt-4">
+                {complianceRequirements.map((requirement) => (
+                  <ComplianceRequirementRow key={requirement.id} {...requirement} />
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </PageSectionContent>
