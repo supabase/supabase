@@ -2,7 +2,7 @@
 /** @jsxImportSource mdast-jsx */
 import type { Content, Root } from 'mdast'
 
-import { MCP_CLI_COMMANDS } from './clients.data'
+import { getCodexAuthenticateCommand, MCP_CLI_COMMANDS } from './clients.data'
 
 /**
  * Per-client setup instructions, authored once as mdast (via the mdast-jsx
@@ -78,10 +78,13 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
         <code lang="bash" value={MCP_CLI_COMMANDS['codex'].install!(url)} />
       </>
     ),
-    alternate: () => (
+    alternate: ({ url }) => (
       <>
         <paragraph>Authenticate with the MCP server:</paragraph>
-        <code lang="bash" value={MCP_CLI_COMMANDS['codex'].authenticate!} />
+        <code
+          lang="bash"
+          value={getCodexAuthenticateCommand(new URL(url).searchParams.get('read_only') === 'true')}
+        />
         <paragraph>
           Finally, run <inlineCode value="/mcp" /> inside Codex to verify authentication.
         </paragraph>
