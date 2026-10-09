@@ -3,7 +3,12 @@ import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
 import type { OrganizationAvailableRegionsData } from '@/data/organizations/organization-available-regions-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import {
+  DesiredInstanceSize,
+  instanceSizeSpecs,
+  PostgresEngine,
+  ReleaseChannel,
+} from '@/data/projects/new-project.constants'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
   return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
@@ -150,4 +155,50 @@ export function getRegionSelectionType({
   if (availableRegions.smartGroup.some((region) => region.name === dbRegion)) return 'general'
   if (availableRegions.specific.some((region) => region.name === dbRegion)) return 'specific'
   return undefined
+}
+
+export interface PostgresVersionDetails {
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
+}
+
+export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
+  if (!value) {
+    return { postgresEngine: undefined, releaseChannel: undefined }
+  }
+
+  const [postgresEngine, releaseChannel] = value.split('|')
+  return { postgresEngine, releaseChannel } as PostgresVersionDetails
+}
+
+/**
+ * Picks the engine + release channel to submit on project creation. The selector's value is used
+ * only when it matches the selected Postgres Type in Advanced Config. Otherwise, OrioleDB falls
+ * back to the available OrioleDB image, and Postgres falls back to the API default
+ */
+export function resolvePostgresVersion({
+  postgresVersionSelection,
+  useOrioleDb,
+  availableOrioleVersion,
+}: {
+  postgresVersionSelection: string
+  useOrioleDb: boolean
+  availableOrioleVersion?: {
+    postgres_engine: Exclude<PostgresEngine, '13' | '14'>
+    release_channel: ReleaseChannel
+  }
+}): PostgresVersionDetails {
+  const selection = extractPostgresVersionDetails(postgresVersionSelection)
+  const isSelectionOriole = !!selection.postgresEngine?.endsWith('oriole')
+
+  if (useOrioleDb) {
+    if (isSelectionOriole) return selection
+    return {
+      postgresEngine: availableOrioleVersion?.postgres_engine,
+      releaseChannel: availableOrioleVersion?.release_channel,
+    }
+  }
+
+  if (isSelectionOriole) return {}
+  return selection
 }

@@ -22,7 +22,6 @@ import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
 import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
-import { extractPostgresVersionDetails } from './PostgresVersionSelector'
 import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
@@ -37,6 +36,7 @@ import {
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
+  resolvePostgresVersion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -492,8 +492,11 @@ export const ProjectCreationForm = ({
       return
     }
 
-    const { postgresEngine, releaseChannel } =
-      extractPostgresVersionDetails(postgresVersionSelection)
+    const { postgresEngine, releaseChannel } = resolvePostgresVersion({
+      postgresVersionSelection,
+      useOrioleDb,
+      availableOrioleVersion,
+    })
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
     const selectedRegion = smartRegionEnabled
@@ -572,16 +575,8 @@ export const ProjectCreationForm = ({
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: highAvailability
-        ? HIGH_AVAILABILITY_POSTGRES_ENGINE
-        : useOrioleDb
-          ? availableOrioleVersion?.postgres_engine
-          : postgresEngine,
-      releaseChannel: highAvailability
-        ? HIGH_AVAILABILITY_RELEASE_CHANNEL
-        : useOrioleDb
-          ? availableOrioleVersion?.release_channel
-          : releaseChannel,
+      postgresEngine: highAvailability ? HIGH_AVAILABILITY_POSTGRES_ENGINE : postgresEngine,
+      releaseChannel: highAvailability ? HIGH_AVAILABILITY_RELEASE_CHANNEL : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(shouldIncludeGitHubFields
         ? {
@@ -834,11 +829,11 @@ export const ProjectCreationForm = ({
 
                     <SecurityOptions form={form} surface={surface} />
 
-                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
-
                     {showAdvancedConfig &&
                       !!availableOrioleVersion &&
                       highAvailability !== true && <AdvancedConfiguration form={form} />}
+
+                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
