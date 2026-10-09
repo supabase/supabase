@@ -1,21 +1,19 @@
 ---
 id: 'advisors'
 title: 'Advisors'
-description: 'Deterministic security and performance findings you or an agent can pull as part of ongoing observability.'
+description: 'Health, security, and performance checks you or an agent can run against a project.'
 ---
 
-Advisors are programmatic checks that ship with the platform. They inspect the live schema and return deterministic findings, such as missing indexes or incorrectly configured RLS policies.
+Advisors are deterministic checks that ship with the platform. They flag health, security, and performance issues in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes.
 
-Confirm each finding against the intended schema and access model. Search [Troubleshooting](/docs/guides/troubleshooting) for its check name or affected object; logs can provide additional context but are not required to establish a schema finding.
+You or an agent can run them from:
 
-You or an agent can pull the same checks from:
-
-- Studio: [Security Advisor](/dashboard/project/_/advisors/security) and [Performance Advisor](/dashboard/project/_/advisors/performance)
+- Studio: [Health Advisor](/dashboard/project/_/advisors/health), [Security Advisor](/dashboard/project/_/advisors/security), and [Performance Advisor](/dashboard/project/_/advisors/performance)
 - MCP: `get_advisors` with `type` set to `security` or `performance`
 - CLI: [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
-- Management API: [security advisors](/docs/reference/api/v1-get-security-advisors) and [performance advisors](/docs/reference/api/v1-get-performance-advisors)
+- Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) advisors
 
-Prioritize warning and error findings. Each finding names a check, severity, affected object, and remediation guidance. Informational findings provide context and do not always require a change. The advisors run automatically in Studio. After an authorized fix, rerun the relevant advisor and confirm that the finding no longer appears.
+Some findings may be intentional, so check them against your intended schema and access model before you change anything. Health findings can take a while to clear after a fix, since the check measures error rates over a period of time.
 
 ## Available checks
 

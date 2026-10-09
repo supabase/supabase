@@ -60,7 +60,7 @@ export function RotateKeyDialog({
         <DialogTitle>Rotate JWT signing key</DialogTitle>
         <DialogDescription>
           Change the key used by Supabase Auth to create new JSON Web Tokens. Non-expired tokens
-          remain <span className="text-brand">valid and accepted</span>!
+          remain <span className="text-primary">valid and accepted</span>!
         </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
@@ -140,7 +140,7 @@ export function RotateKeyDialog({
 
             <Label
               htmlFor="understands-standby"
-              className="flex items-top gap-4 text-sm leading-none"
+              className="flex items-start gap-4 text-sm leading-none"
             >
               <Checkbox
                 id="understands-standby"
@@ -175,7 +175,7 @@ export function RotateKeyDialog({
 
             <Label
               htmlFor="understands-previously-used"
-              className="flex items-top gap-4 text-sm leading-none"
+              className="flex items-start gap-4 text-sm leading-none"
             >
               <Checkbox
                 className="mt-0.5"
@@ -195,7 +195,7 @@ export function RotateKeyDialog({
                     text: (
                       <p>
                         Rotating the signing key only changes what key is used by Supabase Auth to
-                        issue <em className="text-brand not-italic">new tokens</em>
+                        issue <em className="text-primary not-italic">new tokens</em>
                         .<br />
                         <br />
                         To prevent users from being prematurely signed out, you have to manually
@@ -250,9 +250,11 @@ export function RotateKeyDialog({
                         <p>
                           Some of your Edge Functions are set up to require a JWT in the{' '}
                           <code>Authorization</code> header signed with the{' '}
-                          <em className="text-brand not-italic">legacy JWT secret</em>. Rotation
+                          <em className="text-primary not-italic">legacy JWT secret</em>. Rotation
                           causes{' '}
-                          <em className="text-brand not-italic">invocations by signed-in users</em>{' '}
+                          <em className="text-primary not-italic">
+                            invocations by signed-in users
+                          </em>{' '}
                           to fail with HTTP 401 Unauthorized, as the JWT no longer meets this
                           requirement.
                           <br />

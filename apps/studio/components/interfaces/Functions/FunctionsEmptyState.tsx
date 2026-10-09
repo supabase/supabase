@@ -49,7 +49,7 @@ export const FunctionsEmptyState = () => {
         <CardHeader>
           <CardTitle>{emptyStateTitle}</CardTitle>
         </CardHeader>
-        <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x divide-default items-stretch">
+        <CardContent className="p-0 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] divide-y md:divide-y-0 md:divide-x items-stretch">
           {/* Editor Option */}
           {IS_PLATFORM && (
             <>

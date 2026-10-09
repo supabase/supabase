@@ -102,7 +102,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
                   height={14}
                   width={72}
                 />
-                <span className="font-mono text-[11px] font-semibold text-brand tracking-wide">
+                <span className="font-mono text-[11px] font-semibold text-primary tracking-wide">
                   DOCS
                 </span>
               </div>

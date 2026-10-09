@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Card,
@@ -35,7 +35,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
 
-  const { data, isError } = useFDWsQuery({
+  const { data, isError, isSuccess } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -50,13 +50,20 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [selectedWrapperIdToEdit, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
+  const openedWrapperId = useRef<string | null>(null)
 
   useEffect(() => {
-    if (isError && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
-      toast('Wrapper not found')
+    if (!selectedWrapperIdToEdit) {
+      openedWrapperId.current = null
+    } else if (selectedWrapperToEdit) {
+      openedWrapperId.current = selectedWrapperIdToEdit
+    } else if (isSuccess || isError) {
+      if (openedWrapperId.current !== selectedWrapperIdToEdit) {
+        toast('Wrapper not found')
+      }
       setSelectedWrapperToEdit(null)
     }
-  }, [isError, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
+  }, [isError, isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -74,16 +81,16 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
             <TableRow>
               <TableHead className="w-[220px]">Name</TableHead>
               <TableHead>Tables</TableHead>
-              <TableHead>Encrypted key</TableHead>
+              <TableHead>Encrypted keys</TableHead>
               <TableHead className="w-24">
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => {
-              return <WrapperRow key={x.id} wrapper={x} />
-            })}
+            {(isLatest ? wrappers.slice(0, 3) : wrappers).map((x) => (
+              <WrapperRow key={x.id} wrapper={x} />
+            ))}
           </TableBody>
           <TableFooter
             className={cn(

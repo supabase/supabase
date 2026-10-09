@@ -20,7 +20,6 @@ import {
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import * as z from 'zod'
@@ -29,7 +28,7 @@ import { urlRegex } from '../Auth.constants'
 import { AUTH_TEMPLATE_RESET_TYPES } from '../EmailTemplates/EmailTemplates.constants'
 import { isBeforeFreeTierTemplateBlockCutoff } from '../EmailTemplates/EmailTemplates.utils'
 import { SmtpDisableConfirmationDialog } from './SmtpDisableConfirmationDialog'
-import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
+import { defaultDisabledSmtpFormValues, STORED_SECRET_PLACEHOLDER } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -474,10 +473,28 @@ export const SmtpForm = () => {
                           render={({ field }) => (
                             <FormItemLayout
                               label="Password"
-                              description="Password for your SMTP server. For security reasons, this password cannot be viewed once saved."
+                              description={
+                                isSmtpEnabled(authConfig)
+                                  ? 'Stored password is hidden. Enter a new password to replace it.'
+                                  : 'Password for your SMTP server.'
+                              }
                             >
                               <FormControl>
-                                <PasswordInput {...field} reveal copy disabled={!canUpdateConfig} />
+                                <Input
+                                  {...field}
+                                  type="password"
+                                  autoComplete="new-password"
+                                  data-1p-ignore
+                                  data-lpignore="true"
+                                  data-form-type="other"
+                                  data-bwignore
+                                  placeholder={
+                                    isSmtpEnabled(authConfig)
+                                      ? STORED_SECRET_PLACEHOLDER
+                                      : undefined
+                                  }
+                                  disabled={!canUpdateConfig}
+                                />
                               </FormControl>
                             </FormItemLayout>
                           )}

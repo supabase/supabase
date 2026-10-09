@@ -355,18 +355,3 @@ describe('contentListingItemSchema icon', () => {
     expect(result.success).toBe(false)
   })
 })
-
-describe('TelemetryEvent union', () => {
-  it('includes docs_content_listing_clicked', () => {
-    const event = {
-      action: 'docs_content_listing_clicked' as const,
-      properties: {
-        targetPath: '/guides/storage',
-        linkTitle: 'Storage',
-      },
-    }
-
-    const _typeCheck: import('common/telemetry-constants').TelemetryEvent = event
-    expect(_typeCheck.action).toBe('docs_content_listing_clicked')
-  })
-})

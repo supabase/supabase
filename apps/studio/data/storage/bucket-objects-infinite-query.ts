@@ -1,9 +1,8 @@
-import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
+import { infiniteQueryOptions } from '@tanstack/react-query'
 
-import { listBucketObjects, type StorageObject } from './bucket-objects-list-mutation'
+import { listBucketObjectsV2 } from './bucket-objects-list-mutation'
 import { storageKeys } from './keys'
 import type { components } from '@/data/api'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const DEFAULT_LIMIT = 200
 
@@ -11,45 +10,53 @@ type StorageObjectsQueryParams = {
   projectRef?: string
   bucketId?: string
   path: string
-  options?: Omit<NonNullable<components['schemas']['GetObjectsBody']['options']>, 'offset'>
+  options?: Omit<
+    components['schemas']['GetObjectsV2Body'],
+    'prefix' | 'cursor' | 'with_delimiter'
+  > & {
+    /** Not a real v2 API field: folded into `prefix` so v2 returns entries starting with it */
+    search?: string
+  }
 }
 
-export type StorageObjectsData = StorageObject[]
-export type StorageObjectsError = ResponseError
+export type StorageObjectsPage = components['schemas']['StorageListResponseV2_Output']
 
-export const useBucketObjectsInfiniteQuery = <TData = StorageObjectsData>(
+export const bucketObjectsInfiniteQueryOptions = (
   { projectRef, bucketId, path, options }: StorageObjectsQueryParams,
-  {
-    enabled = true,
-    ...queryOptions
-  }: UseCustomInfiniteQueryOptions<
-    StorageObjectsData,
-    StorageObjectsError,
-    InfiniteData<TData>,
-    readonly unknown[],
-    number
-  > = {}
+  { enabled = true }: { enabled?: boolean } = {}
 ) => {
-  const limit = options?.limit ?? DEFAULT_LIMIT
+  const { search, ...v2Options } = options ?? {}
+  // A trailing slash is required to browse a folder's contents with with_delimiter: true —
+  // without it, v2 treats e.g. "docs" as a partial name match against siblings like "docs-old"
+  // rather than descending into the folder.
+  const browsePrefix = path ? `${path}/` : ''
+  const prefix = search ? `${browsePrefix}${search}` : browsePrefix
+  const limit = v2Options.limit ?? DEFAULT_LIMIT
 
-  return useInfiniteQuery({
+  return infiniteQueryOptions({
+    // prefix and search are incorporated into the path.
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: storageKeys.objects(projectRef, bucketId, path, options),
     queryFn: ({ signal, pageParam }) =>
-      listBucketObjects(
+      listBucketObjectsV2(
         {
           projectRef: projectRef!,
           bucketId,
-          path,
-          options: { ...options, limit, offset: pageParam * limit },
+          prefix,
+          cursor: pageParam,
+          options: { ...v2Options, limit },
         },
         signal
-      ) as Promise<StorageObjectsData>,
+      ),
     enabled: enabled && !!projectRef && !!bucketId,
-    initialPageParam: 0,
-    getNextPageParam(lastPage, pages) {
-      if (lastPage.length < limit) return undefined
-      return pages.length
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage, _pages, lastPageParam) => {
+      if (!lastPage.hasNext) return undefined
+      // A backend that says there's more but doesn't advance the cursor would otherwise send
+      // fetchNextPage into an infinite loop re-fetching the same page forever; treat it as the
+      // end of the list instead.
+      if (!lastPage.nextCursor || lastPage.nextCursor === lastPageParam) return undefined
+      return lastPage.nextCursor
     },
-    ...queryOptions,
   })
 }

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  buildSchemasWithTables,
   buildSelectionFromPublicationTables,
   buildWarehouseSetupTargets,
   getSchemaCheckedState,
@@ -243,6 +244,59 @@ describe('WarehouseModePanel.utils:buildWarehouseSetupTargets', () => {
     expect(buildWarehouseSetupTargets(selection, schemas)).toEqual([
       { type: 'schema', schema: 'public' },
       { type: 'table', schema: 'auth', name: 'users' },
+    ])
+  })
+})
+
+describe('WarehouseModePanel.utils:buildSchemasWithTables', () => {
+  test('returns an empty array when there are no schemas', () => {
+    expect(buildSchemasWithTables([], [{ schema: 'public', name: 'orders' }])).toEqual([])
+  })
+
+  test('groups each schema with only its own tables', () => {
+    const schemas = [{ name: 'public' }, { name: 'analytics' }]
+    const tables = [
+      { schema: 'public', name: 'orders' },
+      { schema: 'analytics', name: 'events' },
+      { schema: 'public', name: 'customers' },
+    ]
+    expect(buildSchemasWithTables(schemas, tables)).toEqual([
+      { schema: 'analytics', tables: ['events'] },
+      { schema: 'public', tables: ['orders', 'customers'] },
+    ])
+  })
+
+  test('keeps schemas that have no tables', () => {
+    expect(buildSchemasWithTables([{ name: 'public' }], [])).toEqual([
+      { schema: 'public', tables: [] },
+    ])
+  })
+
+  test('excludes schemas that cannot be replicated', () => {
+    const schemas = [
+      { name: 'public' },
+      { name: 'vault' },
+      { name: 'pg_catalog' },
+      { name: WAREHOUSE_METADATA_SCHEMA },
+      { name: 'auth' },
+    ]
+    const tables = [
+      { schema: 'public', name: 'orders' },
+      { schema: 'vault', name: 'secrets' },
+      { schema: 'auth', name: 'users' },
+    ]
+    expect(buildSchemasWithTables(schemas, tables)).toEqual([
+      { schema: 'auth', tables: ['users'] },
+      { schema: 'public', tables: ['orders'] },
+    ])
+  })
+
+  test('sorts schemas by name', () => {
+    const schemas = [{ name: 'zebra' }, { name: 'public' }, { name: 'analytics' }]
+    expect(buildSchemasWithTables(schemas, []).map(({ schema }) => schema)).toEqual([
+      'analytics',
+      'public',
+      'zebra',
     ])
   })
 })

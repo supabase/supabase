@@ -19,8 +19,8 @@ const tableSchema = z
 export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
   let wrapperSchema = {
     // Common validation for all wrappers
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
-  } as Record<string, any>
+    server_name: z.string().min(1, 'Please provide a name for your server'),
+  } as Record<string, z.ZodTypeAny>
 
   // Add wrapper specific options
   wrapperMeta.server.options.forEach((option) => {
@@ -53,11 +53,11 @@ export const getWrapperCreationFormSchema = (wrapperMeta: WrapperMeta) => {
 export const getEditionFormSchema = (wrapperMeta: WrapperMeta) => {
   let wrapperSchema = {
     // Common validation for all wrappers
-    wrapper_name: z.string().min(1, 'Please provide a name for your wrapper'),
+    server_name: z.string().min(1, 'Please provide a name for your server'),
     tables: z
       .array(tableSchema, { required_error: 'Please provide at least one table' })
       .min(1, 'Please provide at least one table'),
-  } as Record<string, any>
+  } as Record<string, z.ZodTypeAny>
 
   // Add wrapper specific options
   wrapperMeta.server.options.forEach((option) => {
@@ -81,7 +81,7 @@ export const getTableFormSchema = (table: Table) => {
         type: z.string().min(1, 'Required'),
       })
     ),
-  } as Record<string, any>
+  } as Record<string, z.ZodTypeAny>
 
   table.options.forEach((option) => {
     if (option.required) {
@@ -108,6 +108,10 @@ export const getTableFormSchema = (table: Table) => {
   )
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(
     options.filter((option) => option.required).map((option) => option.name)
@@ -118,12 +122,12 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   )
   const requiredArrayOptions = Array.from(requiredArrayOptionsSet)
 
-  return (values: Record<string, any>) => {
+  return (values: Record<string, unknown>) => {
     const errors = Object.fromEntries(
       Object.entries(values)
-        .flatMap(([key, value]) =>
+        .flatMap(([key, value]): [string, unknown][] =>
           Array.isArray(value)
-            ? [[key, value], ...value.map((v, i) => [`${key}.${i}`, v])]
+            ? [[key, value], ...value.map((v, i): [string, unknown] => [`${key}.${i}`, v])]
             : [[key, value]]
         )
         .filter(([_key, value]) => {
@@ -132,6 +136,7 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
           if (
             idx !== undefined &&
             requiredOptionsSet.has(key) &&
+            isRecord(value) &&
             Object.keys(value).some((subKey) => requiredArrayOptionsSet.has(`${key}.${subKey}`))
           ) {
             const arrayOption = requiredArrayOptions.find((option) => option.startsWith(`${key}.`))
@@ -166,7 +171,7 @@ export interface FormattedWrapperTable {
   schema_name: string
   table_name: string
   object?: string // From options object for Firebase/Stripe
-  [key: string]: any // For other dynamic options from table.options
+  [key: string]: unknown // For other dynamic options from table.options
 }
 
 export const formatWrapperTables = (

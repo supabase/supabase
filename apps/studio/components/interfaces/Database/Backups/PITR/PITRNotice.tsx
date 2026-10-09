@@ -55,7 +55,7 @@ export const PITRNotice = () => {
           <p className="text-sm text-foreground-light">
             Database changes are logged every <span className="text-foreground">2 minutes</span>,
             with a total recovery period of up to{' '}
-            <span className="text-brand">{retentionPeriod} days</span>.
+            <span className="text-primary">{retentionPeriod} days</span>.
           </p>
         </div>
       </div>

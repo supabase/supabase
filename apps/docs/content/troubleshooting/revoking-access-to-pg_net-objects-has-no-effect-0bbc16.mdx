@@ -1,0 +1,116 @@
+---
+title = "Revoking access to pg_net objects has no effect: no privileges could be revoked"
+topics = [ "database" ]
+keywords = [ "pg_net", "net", "revoke", "grant", "PUBLIC", "privileges", "permissions", "least privilege", "http_request_queue", "_http_response", "http_post", "supabase_admin", "custom role" ]
+
+[[errors]]
+code = "01006"
+message = "no privileges could be revoked for \"net\""
+
+[[errors]]
+code = "01007"
+message = "no privileges were granted for \"net\""
+---
+
+When you run `revoke` on the `net` schema or its objects as the `postgres` role, the statement completes but access stays the same. Postgres prints a warning instead of an error:
+
+```text
+WARNING:  no privileges could be revoked for "net"
+```
+
+The same warning appears for `http_request_queue`, `_http_response`, and the `net.http_*` functions. A `grant` on these objects prints `no privileges were granted`. The SQL Editor doesn't display warnings, so the statement looks successful there.
+
+## Check which roles have access
+
+To list the privileges on the `net` schema and its tables, and the role that granted each one, run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+select
+  'schema net' as object,
+  case acl.grantee when 0 then 'PUBLIC' else acl.grantee::regrole::text end as grantee,
+  acl.grantor::regrole as grantor,
+  acl.privilege_type
+from pg_namespace n
+cross join lateral aclexplode(n.nspacl) as acl
+where n.nspname = 'net'
+union all
+select
+  c.relname,
+  case acl.grantee when 0 then 'PUBLIC' else acl.grantee::regrole::text end,
+  acl.grantor::regrole,
+  acl.privilege_type
+from pg_class c
+cross join lateral aclexplode(c.relacl) as acl
+where c.relnamespace = 'net'::regnamespace
+order by 1, 2, 4;
+```
+
+Every row has `supabase_admin` as the grantor. To check what one role can do, replace `my_role` and run:
+
+```sql
+select
+  has_schema_privilege('my_role', 'net', 'usage') as schema_usage,
+  has_table_privilege('my_role', 'net.http_request_queue', 'select') as read_queue,
+  has_function_privilege(
+    'my_role',
+    'net.http_post(text, jsonb, jsonb, jsonb, integer)',
+    'execute'
+  ) as call_http_post;
+```
+
+## Why the revoke has no effect
+
+Supabase creates the pg_net extension as the `supabase_admin` role, so `supabase_admin` owns the `net` schema and everything in it. In Postgres, a role can revoke only the privileges that it granted. For more information, see the Postgres documentation on [`REVOKE`](https://www.postgresql.org/docs/current/sql-revoke.html).
+
+The extension grants `usage` on the schema and all privileges on its tables and sequences to `PUBLIC`. On most projects, its functions are also executable by `PUBLIC`, which is the Postgres default for functions. For the projects where they aren't, see [Which roles can use pg_net](#which-roles-can-use-pg_net). When the extension is created, Supabase also grants `usage` on `net` to `postgres`, `anon`, `authenticated`, and `service_role`.
+
+The `postgres` role made none of these grants, so its `revoke` finds nothing to remove. It holds the privileges without the grant option, so its `grant` to another role does nothing either, and Postgres reports `no privileges were granted`.
+
+A grant to `PUBLIC` applies to every role, including roles you create later. Postgres has no way to exclude a single role from a `PUBLIC` grant.
+
+## Which roles can use pg_net
+
+The following table shows how each kind of role can reach the `net` schema.
+
+| Role                                            | Can use pg_net | Reason                                                                                                                          |
+| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `anon`, `authenticated`, `service_role`         | No, by default | These roles can't connect to the database directly, and the Data API doesn't expose `net` by default.                           |
+| `postgres` and any role you create with `login` | Yes            | The role can read and change rows in `net.http_request_queue` and `net._http_response`. The worker sends each row in the queue. |
+
+On some projects, only `postgres`, `anon`, `authenticated`, `service_role`, and `supabase_functions_admin` can call `net.http_get` and `net.http_post`. For the events that revoke `execute` from `PUBLIC`, see [When the default grants are applied](#when-the-default-grants-are-applied). A role you create can still add rows to the queue, and the worker sends them. To check a role, run the `has_function_privilege` query from [Check which roles have access](#check-which-roles-have-access).
+
+A row in `net.http_request_queue` holds the request's URL, headers, and body until the pg_net worker sends it. To check what a queued request exposes, see [Database roles can read request headers queued by pg_net](/docs/guides/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357).
+
+## Limit pg_net access on your project
+
+Supabase doesn't support changing the grants on pg_net objects for individual projects, so treat the default grants as a platform constraint.
+
+Removing the `PUBLIC` grants on the `net` tables breaks pg_net, because the `postgres` role reaches those tables only through them. Without the grants, a request function called as `postgres` fails with `permission denied for table http_request_queue`, which also breaks pg_cron jobs that call pg_net.
+
+To reduce what pg_net exposes:
+
+- Give the `login` attribute only to roles for services that you trust to send HTTP requests from your database.
+- Treat any credential you send in request headers as readable by every role that can connect to your database.
+- Keep `net` out of the exposed schemas in your [API settings](/dashboard/project/_/settings/api). If you expose it, `anon` and `authenticated` can read `net.http_request_queue` through the `PUBLIC` grants, including queued credentials.
+- If your project doesn't use pg_net, drop the extension. Dropping it removes the `net` schema and all of its grants.
+
+<Admonition type="danger">
+
+Dropping pg_net deletes unsent requests and stored responses, and stops Database Webhooks, which send their requests through pg_net. Before you drop it, check that `net.http_request_queue` is empty and that your project has no Database Webhooks.
+
+</Admonition>
+
+To drop the extension, run:
+
+```sql
+drop extension pg_net;
+```
+
+## When the default grants are applied
+
+Dropping and re-creating the extension doesn't remove the grants, because `create extension pg_net` applies all of them again. Two other events grant `usage` on `net` to `anon`, `authenticated`, and `service_role` again:
+
+- A major Postgres version upgrade.
+- Turning on Database Webhooks.
+
+A major Postgres version upgrade also revokes `execute` on `net.http_get` and `net.http_post` from `PUBLIC`, and grants it to `postgres`, `anon`, `authenticated`, `service_role`, and `supabase_functions_admin`. The same happens when pg_net 0.11 or earlier is enabled on a project.
