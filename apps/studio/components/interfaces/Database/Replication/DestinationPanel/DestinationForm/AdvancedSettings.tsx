@@ -8,7 +8,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -23,12 +22,13 @@ import { DestinationType } from '../DestinationPanel.types'
 import { BigQueryConnectionFields } from './BigQuery/ConnectionFields'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
-  DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
 } from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+import { DuckLakeConnectionFields } from './DuckLake/ConnectionFields'
+import { SnowflakeConnectionFields } from './Snowflake/ConnectionFields'
 
 const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
   error: 'Block startup',
@@ -63,31 +63,7 @@ export const AdvancedSettings = ({
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
-            {type === 'DuckLake' && (
-              <FormField
-                control={form.control}
-                name="ducklakePoolSize"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Pool size"
-                    description="Maximum concurrent connections this pipeline opens to the catalog. Choose 1 to 6."
-                  >
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min={1}
-                        max={6}
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder={String(DEFAULT_DUCKLAKE_POOL_SIZE)}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            )}
+            {type === 'DuckLake' && <DuckLakeConnectionFields control={form.control} />}
 
             <FormField
               control={form.control}
@@ -227,24 +203,7 @@ export const AdvancedSettings = ({
               </>
             )}
 
-            {type === 'Snowflake' && (
-              <FormField
-                control={form.control}
-                name="snowflakeRole"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Role"
-                    labelOptional="Optional"
-                    layout="horizontal"
-                    description="Role for SQL requests. Leave blank to use the service user’s default role."
-                  >
-                    <FormControl>
-                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            )}
+            {type === 'Snowflake' && <SnowflakeConnectionFields control={form.control} />}
           </AccordionContent>
         </AccordionItem>
       </Accordion>
