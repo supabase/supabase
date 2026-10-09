@@ -275,8 +275,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         <div className="pointer-events-none absolute inset-x-0 top-12 z-10 flex justify-center">
           <Button
             size="tiny"
-            variant="default"
-            className="pointer-events-auto rounded-full bg-card! shadow-md hover:bg-popover!"
+            variant="outline"
+            className="pointer-events-auto rounded-full border-stronger bg-card! shadow-sm hover:bg-popover!"
             icon={<ArrowUp aria-hidden="true" />}
             onClick={scrollToTop}
           >

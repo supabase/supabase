@@ -7,13 +7,29 @@ import { customRender } from '@/tests/lib/custom-render'
 
 describe('LogRefreshMarker', () => {
   it.each([
-    { columnIds: ['level', 'date', 'event_message'], leadingColumns: 1 },
-    { columnIds: ['date', 'event_message', 'level'], leadingColumns: 0 },
-    { columnIds: ['level', 'event_message', 'date'], leadingColumns: 2 },
-    { columnIds: ['level', 'event_message'], leadingColumns: 0 },
+    {
+      columnIds: ['level', 'date', 'log_type', 'status', 'event_message'],
+      cellSpans: [1, 1, 3],
+      timestampCellIndex: 1,
+    },
+    {
+      columnIds: ['date', 'event_message', 'level'],
+      cellSpans: [1, 2],
+      timestampCellIndex: 0,
+    },
+    {
+      columnIds: ['level', 'event_message', 'date'],
+      cellSpans: [2, 1],
+      timestampCellIndex: 1,
+    },
+    {
+      columnIds: ['level', 'event_message'],
+      cellSpans: [2],
+      timestampCellIndex: 0,
+    },
   ])(
     'follows visible column order $columnIds and the selected timezone',
-    ({ columnIds, leadingColumns }) => {
+    ({ columnIds, cellSpans, timestampCellIndex }) => {
       customRender(
         <TimestampInfoProvider timezone="Asia/Tokyo">
           <table>
@@ -28,14 +44,20 @@ describe('LogRefreshMarker', () => {
       )
 
       const cells = screen.getAllByRole('cell')
-      if (leadingColumns > 0) {
+      expect(cells.map((cell) => Number(cell.getAttribute('colspan') ?? 1))).toEqual(cellSpans)
+      expect(cellSpans.reduce((total, span) => total + span, 0)).toBe(columnIds.length)
+      if (timestampCellIndex > 0) {
         expect(cells[0]).toBeEmptyDOMElement()
-        expect(cells[0]).toHaveAttribute('colspan', String(leadingColumns))
       }
+      const timestamp = within(cells[timestampCellIndex]).getByText('09 Oct 26 19:35:00')
+      expect(timestamp).toBeVisible()
       const markerCell = cells[cells.length - 1]
-      expect(markerCell).toHaveAttribute('colspan', String(columnIds.length - leadingColumns))
-      expect(markerCell).toHaveTextContent('09 Oct 26 19:35:00Refresh')
+      if (timestampCellIndex < cells.length - 1) {
+        expect(cells[timestampCellIndex]).not.toHaveTextContent('Refresh')
+        expect(markerCell).not.toHaveTextContent('09 Oct 26 19:35:00')
+      }
       expect(within(markerCell).getByText('Refresh')).toBeVisible()
+      expect(within(markerCell).getByText('Refresh')).toHaveClass('uppercase')
       expect(screen.getByRole('row')).not.toHaveAttribute('aria-selected')
     }
   )
