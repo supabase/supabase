@@ -1879,8 +1879,12 @@ export function createStorageExplorerState({
 
     // ======== UI Helper functions ========
 
-    selectRangeItems: (columnIndex: number, toItemIndex: number) => {
+    selectRangeItems: (columnIndex: number, toItemId: string | null) => {
       const columnItems = state.columns[columnIndex].items
+      // Addressed by id, not by the row's own position: the rendered column can carry
+      // archived rows this list has never held, which shifts every index below them.
+      const toItemIndex = toItemId === null ? -1 : findIndex(columnItems, { id: toItemId })
+      if (toItemIndex === -1) return
       const toItem = columnItems[toItemIndex]
       const selectedItemIds = state.selectedItems.map((item) => item.id)
       const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
