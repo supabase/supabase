@@ -298,6 +298,10 @@
       "import": "./src/DatePicker/index.ts",
       "types": "./src/DatePicker/index.ts"
     },
+    "./DialogDisclosure": {
+      "import": "./src/DialogDisclosure.tsx",
+      "types": "./src/DialogDisclosure.tsx"
+    },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
       "types": "./src/Dialogs/ConfirmationModal.tsx"
@@ -701,10 +705,6 @@
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
-    },
-    "./collapsible-alert": {
-      "import": "./src/collapsible-alert.tsx",
-      "types": "./src/collapsible-alert.tsx"
     },
     "./consent": {
       "import": "./src/consent.tsx",
