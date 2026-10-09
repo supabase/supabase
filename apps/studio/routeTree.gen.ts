@@ -53,6 +53,7 @@ import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
+import { Route as AppAccountAppsRouteImport } from './routes/_app/account/apps'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
 import { Route as AppAccountSecurityRouteImport } from './routes/_app/account/security'
@@ -555,6 +556,11 @@ const ProjectChar91_Char93Route = ProjectChar91_Char93RouteImport.update({
   id: '/project/_',
   path: '/project/_',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppAccountAppsRoute = AppAccountAppsRouteImport.update({
+  id: '/apps',
+  path: '/apps',
+  getParentRoute: () => AppAccountRoute,
 } as any)
 const AppAccountAuditRoute = AppAccountAuditRouteImport.update({
   id: '/audit',
@@ -2188,6 +2194,7 @@ export interface FileRoutesByFullPath {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -2510,6 +2517,7 @@ export interface FileRoutesByTo {
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
   '/account/security': typeof AppAccountSecurityRoute
@@ -2824,6 +2832,7 @@ export interface FileRoutesById {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/_app/account/apps': typeof AppAccountAppsRoute
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
   '/_app/account/security': typeof AppAccountSecurityRoute
@@ -3150,6 +3159,7 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/account/apps'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -3472,6 +3482,7 @@ export interface FileRouteTypes {
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
+    | '/account/apps'
     | '/account/audit'
     | '/account/me'
     | '/account/security'
@@ -3785,6 +3796,7 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/_app/account/apps'
     | '/_app/account/audit'
     | '/_app/account/me'
     | '/_app/account/security'
@@ -4503,6 +4515,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/project/_'
       preLoaderRoute: typeof ProjectChar91_Char93RouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/account/apps': {
+      id: '/_app/account/apps'
+      path: '/apps'
+      fullPath: '/account/apps'
+      preLoaderRoute: typeof AppAccountAppsRouteImport
+      parentRoute: typeof AppAccountRoute
     }
     '/_app/account/audit': {
       id: '/_app/account/audit'
@@ -6468,6 +6487,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppAccountRouteChildren {
+  AppAccountAppsRoute: typeof AppAccountAppsRoute
   AppAccountAuditRoute: typeof AppAccountAuditRoute
   AppAccountMeRoute: typeof AppAccountMeRoute
   AppAccountSecurityRoute: typeof AppAccountSecurityRoute
@@ -6476,6 +6496,7 @@ interface AppAccountRouteChildren {
 }
 
 const AppAccountRouteChildren: AppAccountRouteChildren = {
+  AppAccountAppsRoute: AppAccountAppsRoute,
   AppAccountAuditRoute: AppAccountAuditRoute,
   AppAccountMeRoute: AppAccountMeRoute,
   AppAccountSecurityRoute: AppAccountSecurityRoute,
