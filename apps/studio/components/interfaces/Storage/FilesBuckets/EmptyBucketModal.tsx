@@ -12,7 +12,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useBucketEmptyMutation } from '@/data/storage/bucket-empty-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
@@ -27,8 +26,9 @@ export interface EmptyBucketModalProps {
 export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalProps) => {
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
-  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-  const isRetainingVersions = isStorageVersioningEnabled && hasVersioningHistory(bucket)
+  // Not gated on the feature preview: the retained data is destroyed either way, so the
+  // warning has to reflect the bucket rather than what the dashboard happens to be showing.
+  const isRetainingVersions = hasVersioningHistory(bucket)
 
   const { mutate: emptyBucket, isPending } = useBucketEmptyMutation({
     onSuccess: async () => {
