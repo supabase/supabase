@@ -69,7 +69,7 @@ Machine-readable output: `status` and `list` take `-o json`; the other compute c
 
 - Treat instances as stateless: they can be replaced at any time. Durable state belongs in the user's database or storage.
 - A request during boot answers `compute instance <name> is starting` — retry within a few seconds. A 503 with `Retry-After` means the instances are saturated — scale up.
-- A public instance must accept connections on `$PORT` within 50 seconds of starting. One that misses that window is stopped and relaunched with a growing backoff, and never becomes ready. Bind the port first; load heavy libraries and models afterwards (a startup thread, or lazily on the first request) — importing torch or opencv at module scope takes over a minute on a fresh instance. Download models at build time (`RUN python -c ...` in the Dockerfile), never on boot. A private instance runs its own loop and need not listen at all.
+- A public instance must accept connections on `$PORT` within 50 seconds of starting. One that misses that window is stopped and relaunched with a growing backoff, and never becomes ready. Bind the port first; load heavy libraries and models afterwards (a startup thread, or lazily on the first request) — importing `torch` or `opencv` at module scope takes over a minute on a fresh instance. Download models at build time (`RUN python -c ...` in the Dockerfile), never on boot. A private instance runs its own loop and need not listen at all.
 - Memory: `2gb` gives about 1.9 GiB to the app, `4gb` about 3.8 GiB. A process that grows past that is killed, and the instance replaced.
 - Python: set `ENV PYTHONUNBUFFERED=1` in the Dockerfile so `print` output reaches `logs` even when the process is killed mid-way.
 - Never guess at failures: `status` carries `state_reason` for a failed build, and `logs --kind builds` its history.
@@ -111,9 +111,9 @@ Omitting `--append` replaces the whole allowlist with only the CIDRs passed in t
 
 ## Examples
 
-The workflow above used `node`. These two show what the other runtimes are for.
+The workflow above used `--runtime node`. These two show what the other runtimes are for.
 
-### Deno: TypeScript, live streaming, no vendoring
+### Deno: TypeScript, live streaming, no pre-bundling
 
 Deno resolves imports at startup from your `deno.json`, so — unlike `node` — there is nothing to vendor: ship two small files and dependencies come from the registry.
 
@@ -169,7 +169,7 @@ supabase compute push ticker --project-ref <ref>
 curl -N https://<ref>.supabase.co/compute/v1/ticker/stream   # events tick in live
 ```
 
-### Dockerfile: any language — Python + FastAPI
+### Dockerfile: Any language — Python
 
 A `dockerfile` compute instance runs whatever the image runs; the platform builds it for you (network is available at build time, so `pip install` works). The only contract: serve HTTP on `$PORT` (default 8080).
 
@@ -181,6 +181,7 @@ supabase/compute/pyapi/
 ```
 
 ```dockerfile
+# Dockerfile
 FROM public.ecr.aws/docker/library/python:3.12-slim
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
@@ -190,7 +191,9 @@ COPY main.py .
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
 ```
 
-```
+```text
+# requirements.txt
+
 fastapi==0.117.1
 uvicorn==0.37.0
 ```
