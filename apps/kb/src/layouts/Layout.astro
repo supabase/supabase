@@ -2,13 +2,15 @@
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import '../styles/globals.css'
+import { serializeJsonLd } from '../lib/json-ld'
 
 interface Props {
 	title: string
 	description?: string
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description } = Astro.props
+const { title, description, jsonLd } = Astro.props
 ---
 
 <!doctype html>
@@ -61,6 +63,7 @@ const { title, description } = Astro.props
 		/>
 		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
 		<title>{title} | Supabase Knowledge Base</title>
+		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
 	</head>
 	<body>
 		<Header client:load />

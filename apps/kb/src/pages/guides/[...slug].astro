@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import GuideLayout from '../../layouts/GuideLayout.astro'
+import { breadcrumbListSchema, KB_BASE_URL, techArticleSchema } from '../../lib/json-ld'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
@@ -15,8 +16,23 @@ export async function getStaticPaths() {
 const { guide } = Astro.props
 const { title, description, topics, github_url } = guide.data
 const { Content } = await render(guide)
+
+const url = `${KB_BASE_URL}/guides/${guide.id}`
+const jsonLd = [
+	techArticleSchema({ url, headline: title, description }),
+	breadcrumbListSchema([
+		{ name: 'Knowledge Base', url: KB_BASE_URL },
+		{ name: title, url },
+	]),
+]
 ---
 
-<GuideLayout title={title} description={description} topics={topics} github_url={github_url}>
+<GuideLayout
+	title={title}
+	description={description}
+	topics={topics}
+	github_url={github_url}
+	jsonLd={jsonLd}
+>
 	<Content components={{ Admonition }} />
 </GuideLayout>

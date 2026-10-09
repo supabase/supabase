@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content'
 
 import Layout from '../../layouts/Layout.astro'
+import { breadcrumbListSchema, KB_BASE_URL } from '../../lib/json-ld'
 import { TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
@@ -20,9 +21,14 @@ export async function getStaticPaths() {
 }
 
 const { topic, description, guides } = Astro.props
+const url = `${KB_BASE_URL}/topics/${topicToSlug(topic)}`
+const jsonLd = breadcrumbListSchema([
+	{ name: 'Knowledge Base', url: KB_BASE_URL },
+	{ name: topic, url },
+])
 ---
 
-<Layout title={topic} description={description}>
+<Layout title={topic} description={description} jsonLd={jsonLd}>
 	<article class="prose max-w-3xl mx-auto px-6 py-16">
 		<h1>{topic}</h1>
 		<p class="lead">{description}</p>
