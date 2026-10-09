@@ -800,6 +800,7 @@ export const UsersV2 = () => {
         <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
         <ResizableInspectorLayout
           className="relative flex grow bg-alternative min-h-0"
+          autoSaveId="query-performance-layout-v1"
           mainPanelId="auth-users-table"
           inspectorPanelId="auth-user-details"
           inspectorLabel="User details"

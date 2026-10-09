@@ -7,6 +7,7 @@ type PanelSize = number | string
 interface ResizableInspectorLayoutProps {
   children: ReactNode
   inspector?: ReactNode
+  autoSaveId?: string
   orientation?: 'horizontal' | 'vertical'
   className?: string
   mainPanelClassName?: string
@@ -25,6 +26,7 @@ interface ResizableInspectorLayoutProps {
 export const ResizableInspectorLayout = ({
   children,
   inspector,
+  autoSaveId,
   orientation = 'horizontal',
   className,
   mainPanelClassName,
@@ -97,6 +99,7 @@ export const ResizableInspectorLayout = ({
   return (
     <ResizablePanelGroup
       elementRef={containerRef}
+      autoSaveId={autoSaveId}
       orientation={isSnapped ? 'horizontal' : orientation}
       className={cn('relative', className)}
       data-inspector-snapped={isSnapped ? '' : undefined}

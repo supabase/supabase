@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ResizableInspectorLayout } from './ResizableInspectorLayout'
 
-const { mockInspectorPanel, mockResize } = vi.hoisted(() => {
+const { mockInspectorPanel, mockResize, mockResizeState } = vi.hoisted(() => {
   const resize = vi.fn()
 
   return {
@@ -16,12 +16,16 @@ const { mockInspectorPanel, mockResize } = vi.hoisted(() => {
       resize,
     },
     mockResize: resize,
+    mockResizeState: {
+      onResize: undefined as ((size: { inPixels: number }) => void) | undefined,
+    },
   }
 })
 
 interface MockPanelGroupProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode
   elementRef?: Ref<HTMLDivElement>
+  autoSaveId?: string
   orientation?: 'horizontal' | 'vertical'
 }
 
@@ -29,7 +33,7 @@ interface MockPanelProps extends HTMLAttributes<HTMLElement> {
   children?: ReactNode
   id?: string
   panelRef?: unknown
-  onResize?: unknown
+  onResize?: (size: { inPixels: number }) => void
   defaultSize?: number | string
   minSize?: number | string
   maxSize?: number | string
@@ -46,8 +50,20 @@ vi.mock('ui', async () => {
   return {
     cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
     usePanelRef: () => React.useRef(mockInspectorPanel),
-    ResizablePanelGroup: ({ children, elementRef, orientation, ...props }: MockPanelGroupProps) => (
-      <div ref={elementRef} data-testid="inspector-group" data-orientation={orientation} {...props}>
+    ResizablePanelGroup: ({
+      children,
+      elementRef,
+      autoSaveId,
+      orientation,
+      ...props
+    }: MockPanelGroupProps) => (
+      <div
+        ref={elementRef}
+        data-testid="inspector-group"
+        data-auto-save-id={autoSaveId}
+        data-orientation={orientation}
+        {...props}
+      >
         {children}
       </div>
     ),
@@ -55,16 +71,22 @@ vi.mock('ui', async () => {
       children,
       id,
       panelRef: _panelRef,
-      onResize: _onResize,
+      onResize,
       defaultSize: _defaultSize,
       minSize: _minSize,
       maxSize: _maxSize,
       ...props
-    }: MockPanelProps) => (
-      <section data-testid={id} {...props}>
-        {children}
-      </section>
-    ),
+    }: MockPanelProps) => {
+      if (id === 'inspector-panel') {
+        mockResizeState.onResize = onResize
+      }
+
+      return (
+        <section data-testid={id} {...props}>
+          {children}
+        </section>
+      )
+    },
     ResizableHandle: ({ withHandle: _withHandle, disabled, ...props }: MockHandleProps) => (
       <div role="separator" aria-disabled={disabled} {...props} />
     ),
@@ -105,6 +127,7 @@ const resizeContainer = (width: number) => {
 describe('ResizableInspectorLayout', () => {
   beforeEach(() => {
     mockResize.mockClear()
+    mockResizeState.onResize = undefined
     vi.stubGlobal('ResizeObserver', MockResizeObserver)
     vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue({
       width: 612,
@@ -126,6 +149,7 @@ describe('ResizableInspectorLayout', () => {
   it('snaps the same inspector to the full container and restores its previous size', () => {
     render(
       <ResizableInspectorLayout
+        autoSaveId="test-inspector-layout"
         orientation="vertical"
         mainPanelId="main-panel"
         inspectorPanelId="inspector-panel"
@@ -143,10 +167,13 @@ describe('ResizableInspectorLayout', () => {
     const inspector = screen.getByRole('region', { name: 'Details' })
 
     expect(group).not.toHaveAttribute('data-inspector-snapped')
+    expect(group).toHaveAttribute('data-auto-save-id', 'test-inspector-layout')
     expect(group).toHaveAttribute('data-orientation', 'vertical')
 
     fireEvent.click(screen.getByRole('button', { name: 'Inspector count: 0' }))
     expect(screen.getByRole('button', { name: 'Inspector count: 1' })).toBeInTheDocument()
+
+    act(() => mockResizeState.onResize?.({ inPixels: 420 }))
 
     resizeContainer(393)
 
@@ -161,7 +188,7 @@ describe('ResizableInspectorLayout', () => {
 
     expect(group).not.toHaveAttribute('data-inspector-snapped')
     expect(group).toHaveAttribute('data-orientation', 'vertical')
-    expect(mockResize).toHaveBeenLastCalledWith(360)
+    expect(mockResize).toHaveBeenLastCalledWith(420)
     expect(screen.getByRole('region', { name: 'Details' })).toBe(inspector)
     expect(screen.getByRole('button', { name: 'Inspector count: 1' })).toBeInTheDocument()
   })
