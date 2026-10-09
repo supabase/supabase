@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
 import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
@@ -76,8 +75,9 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     deleteBucket({ projectRef, id: bucket.id })
   }
 
-  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-  const isRetainingVersions = isStorageVersioningEnabled && hasVersioningHistory(bucket)
+  // Not gated on the feature preview: the retained data is destroyed either way, so the
+  // warning has to reflect the bucket rather than what the dashboard happens to be showing.
+  const isRetainingVersions = hasVersioningHistory(bucket)
 
   return (
     <TextConfirmModal

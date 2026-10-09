@@ -138,6 +138,7 @@ const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] 
 )
 
 interface FileExplorerRowProps {
+  /** Part of the virtual list's row contract; the row addresses itself by `item.id`. */
   index: number
   item: StorageItem
   view: STORAGE_VIEWS
@@ -154,7 +155,6 @@ type RowOption = {
 }
 
 export const FileExplorerRow = ({
-  index: itemIndex,
   item,
   view = STORAGE_VIEWS.COLUMNS,
   columnIndex = 0,
@@ -222,7 +222,7 @@ export const FileExplorerRow = ({
   const onCheckItem = (isShiftKeyHeld: boolean) => {
     // Select a range if shift is held down
     if (isShiftKeyHeld && selectedItems.length !== 0) {
-      selectRangeItems(columnIndex, itemIndex)
+      selectRangeItems(columnIndex, item.id)
       return
     }
     if (find(selectedItems, (item) => itemWithColumnIndex.id === item.id) !== undefined) {

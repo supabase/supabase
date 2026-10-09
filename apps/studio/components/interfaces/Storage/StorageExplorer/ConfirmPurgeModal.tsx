@@ -12,6 +12,9 @@ import { archivedObjectsQueryOptions } from '@/data/storage/versioning/archived-
 import { useObjectPurgeMutation } from '@/data/storage/versioning/object-purge-mutation'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
+/** Thrown once the user has already been told, so the catch below stays quiet for it. */
+const TRUNCATED_LISTING = new Error('Archived listing truncated')
+
 /** Mounted once by the explorer. Confirmed separately from `ConfirmDeleteModal`, which archives. */
 export const ConfirmPurgeModal = () => {
   const {
@@ -54,7 +57,7 @@ export const ConfirmPurgeModal = () => {
       toast.error(
         'This bucket holds more archived files than can be listed at once. Delete them one by one instead.'
       )
-      throw new Error('Archived listing truncated')
+      throw TRUNCATED_LISTING
     }
 
     const archivedUnder = getArchivedObjectsUnderFolder({
@@ -100,8 +103,13 @@ export const ConfirmPurgeModal = () => {
         if (selectedFilePreview?.id === itemToPurge.id) clearPreviewedFile()
         setItemToPurge(undefined)
       }
-    } catch {
-      // Both the truncated listing and the mutations report their own failures.
+    } catch (error) {
+      // The purge mutations settle rather than throw, and report their own failures. What
+      // reaches here is a folder that couldn't be enumerated or whose archived listing
+      // couldn't be fetched — silent until now.
+      if (isFolder && error !== TRUNCATED_LISTING) {
+        toast.error(`Failed to delete ${itemToPurge.name}: ${(error as Error).message}`)
+      }
     } finally {
       // Whatever did go through has already changed the listing.
       await refetchAllOpenedFolders()

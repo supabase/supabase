@@ -2,6 +2,11 @@ import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createStorageExplorerState } from './storage-explorer'
+import {
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+} from '@/components/interfaces/Storage/Storage.constants'
+import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import { getQueryClient } from '@/data/query-client'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
@@ -127,5 +132,51 @@ describe('refetchAllOpenedFolders', () => {
     await state.refetchAllOpenedFolders()
 
     expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true)
+  })
+})
+
+describe('selectRangeItems', () => {
+  function makeFile(id: string): StorageItem {
+    return {
+      id,
+      name: `${id}.png`,
+      type: STORAGE_ROW_TYPES.FILE,
+      status: STORAGE_ROW_STATUS.READY,
+      metadata: null,
+      created_at: null,
+      updated_at: null,
+      last_accessed_at: null,
+      isCorrupted: false,
+    }
+  }
+
+  function createStateWithColumn(items: StorageItem[]) {
+    const state = createState(makeBucket('bucket-a'))
+    state.columns = [
+      { id: null, name: 'bucket-a', path: '', status: STORAGE_ROW_STATUS.READY, items },
+    ]
+    return state
+  }
+
+  it('resolves the range from the item id, not a rendered row position', () => {
+    const items = [makeFile('a'), makeFile('b'), makeFile('c')]
+    const state = createStateWithColumn(items)
+    state.setSelectedItems([{ ...items[0], columnIndex: 0 }])
+
+    // The rendered column interleaves archived rows, so 'c' sits at a higher index there
+    // than it does here. Addressing it by id is what keeps the two in agreement.
+    state.selectRangeItems(0, 'c')
+
+    expect(state.selectedItems.map((item) => item.id)).toEqual(['a', 'b', 'c'])
+  })
+
+  it('ignores an id the column does not hold', () => {
+    const items = [makeFile('a'), makeFile('b')]
+    const state = createStateWithColumn(items)
+    state.setSelectedItems([{ ...items[0], columnIndex: 0 }])
+
+    state.selectRangeItems(0, 'archived-only')
+
+    expect(state.selectedItems.map((item) => item.id)).toEqual(['a'])
   })
 })

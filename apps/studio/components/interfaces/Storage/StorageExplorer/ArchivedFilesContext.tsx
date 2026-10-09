@@ -8,7 +8,7 @@ import {
   type PropsWithChildren,
 } from 'react'
 
-import type { ArchivedVersionRow } from './archivedVersions.utils'
+import { getMergedArchivedVersions, type ArchivedVersionRow } from './archivedVersions.utils'
 import { useStoragePreference } from './useStoragePreference'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
@@ -51,8 +51,8 @@ export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
   const { showArchivedInline } = useStoragePreference(projectRef)
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
-  const [selectedArchivedObject, setSelectedArchivedObject] = useState<ArchivedObject>()
-  const [selectedArchivedVersion, setSelectedArchivedVersion] = useState<ArchivedVersionRow>()
+  const [selectedArchivedObjectId, setSelectedArchivedObjectId] = useState<string>()
+  const [selectedVersionId, setSelectedVersionId] = useState<string>()
 
   const bucketId = selectedBucket?.id
   const isOverlayEnabled = isStorageVersioningEnabled && showArchivedInline
@@ -65,19 +65,32 @@ export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
   const archivedObjects = listing?.objects ?? NO_ARCHIVED_OBJECTS
   const isListingTruncated = listing?.isTruncated ?? false
 
-  const selectArchivedObject = useCallback(
-    (archivedObjectId: string) => {
-      const object = archivedObjects.find((candidate) => candidate.id === archivedObjectId)
-      if (object === undefined) return
-      setSelectedArchivedVersion(undefined)
-      setSelectedArchivedObject(object)
-    },
-    [archivedObjects]
+  // Held by id and resolved against the listing rather than snapshotted: a snapshot outlives
+  // the listing it came from, so a purged version stays on show and a restored file — or one
+  // belonging to the bucket the user just left — keeps its pane open over nothing.
+  const selectedArchivedObject = archivedObjects.find(
+    (object) => object.id === selectedArchivedObjectId
   )
 
+  const selectedArchivedVersion = useMemo(() => {
+    if (selectedArchivedObject === undefined || selectedVersionId === undefined) return undefined
+    return getMergedArchivedVersions(selectedArchivedObject).find(
+      (version) => version.versionId === selectedVersionId
+    )
+  }, [selectedArchivedObject, selectedVersionId])
+
+  const selectArchivedObject = useCallback((archivedObjectId: string) => {
+    setSelectedVersionId(undefined)
+    setSelectedArchivedObjectId(archivedObjectId)
+  }, [])
+
+  const setSelectedArchivedVersion = useCallback((version?: ArchivedVersionRow) => {
+    setSelectedVersionId(version?.versionId)
+  }, [])
+
   const clearArchivedSelection = useCallback(() => {
-    setSelectedArchivedObject(undefined)
-    setSelectedArchivedVersion(undefined)
+    setSelectedArchivedObjectId(undefined)
+    setSelectedVersionId(undefined)
   }, [])
 
   const value = useMemo(
@@ -97,6 +110,7 @@ export const ArchivedFilesProvider = ({ children }: PropsWithChildren) => {
       isListingTruncated,
       selectedArchivedObject,
       selectedArchivedVersion,
+      setSelectedArchivedVersion,
       selectArchivedObject,
       clearArchivedSelection,
     ]
