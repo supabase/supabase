@@ -58,9 +58,9 @@ export const ConfirmDeleteModal = () => {
         selectedItemsToDelete.length === 1 &&
         selectedItemsToDelete[0].type === STORAGE_ROW_TYPES.FOLDER
       ) {
-        await deleteFolder(selectedItemsToDelete[0])
+        await deleteFolder(selectedItemsToDelete[0], { isArchive: isVersionedBucket })
       } else {
-        await deleteFiles({ files: selectedItemsToDelete })
+        await deleteFiles({ files: selectedItemsToDelete, isArchive: isVersionedBucket })
       }
     } catch (err) {
     } finally {
