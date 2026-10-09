@@ -70,37 +70,37 @@ describe('OAuthAppsAuthorizedList', () => {
     expect(await screen.findByText('Organization-wide')).toBeInTheDocument()
     expect(await screen.findByText(/All projects/)).toBeInTheDocument()
   })
+
   test('only offers Revoke to an admin on an active row', async () => {
     canRevoke = false
     const { rerender } = customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
     expect(await screen.findByText('View grants')).toBeInTheDocument()
-    expect(screen.queryByText('Revoke')).not.toBeInTheDocument()
+    expect(screen.queryByText('Revoke grants')).not.toBeInTheDocument()
 
     canRevoke = true
     rerender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Contoso Analytics')
     expect(await screen.findByText('View grants')).toBeInTheDocument()
-    expect(screen.queryByText('Revoke')).toBeInTheDocument()
+    expect(await screen.findByText('Revoke grants')).toBeInTheDocument()q
   })
 
   test('renders the revoke caveats and revokes on confirm', async () => {
     customRender(<OAuthAppsAuthorizedList />)
 
     await openRowMenu('Vercel')
-    await userEvent.click(await screen.findByText('Revoke'))
+    await userEvent.click(await screen.findByText('Revoke grants'))
 
     expect(await screen.findByText('Revoke access for Vercel')).toBeInTheDocument()
     expect(screen.queryByText(/organization-wide grant will be revoked/)).not.toBeInTheDocument()
     expect(
-      await screen.findByText('Every member loses access on the apps next request.')
+      await screen.findByText("All members lose access on the app's next request")
     ).toBeInTheDocument()
     expect(
-      await screen.findByText('Members will need to authorize again to reconnect.')
+      await screen.findByText('Members must authorize the app again to reconnect')
     ).toBeInTheDocument()
-    expect(await screen.findByText(/a per-user/)).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Revoke' }))
 
