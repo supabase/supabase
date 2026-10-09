@@ -1,6 +1,7 @@
 // GENERAL
 
 export * from './src/components/Button'
+export * from './src/components/FloatingPlate'
 export * from './src/components/Icon/IconBackground'
 
 // NAV
@@ -26,6 +27,7 @@ export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
+export { controlRadiusBySize } from './src/lib/raised-control-surface'
 
 // DATA ENTRY
 export * from './src/components/ExpandingTextArea'

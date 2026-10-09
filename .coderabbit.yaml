@@ -10,6 +10,7 @@ issue_enrichment:
     enabled: true
 
 reviews:
+  high_level_summary: false
   # Skip machine-generated / vendored files (mirrors .prettierignore). Keeps
   # reviews focused on hand-written code and preserves rate-limit budget on
   # large codegen diffs.
@@ -34,7 +35,7 @@ reviews:
         Strictly enforce event naming: [object]_[verb] in snake_case. Only approved
         verbs: opened, clicked, submitted, created, removed, updated, retrieved,
         intended, evaluated, added, enabled, disabled, copied, exposed, failed,
-        converted. Properties must be camelCase for new events (match existing
+        converted, completed. Properties must be camelCase for new events (match existing
         convention when adding to existing events). Flag any usage of
         useSendEventMutation. Verify @group Events and @source JSDoc tags are
         accurate. Check that new interfaces are added to the TelemetryEvent union type.
@@ -74,8 +75,8 @@ reviews:
         Flag style, terminology, and structure issues as usual. When a page has two or
         more of them, add one comment pointing the author at the `/write-the-docs` skill
         for new content or `/edit-the-docs` for an existing page (canonical files in
-        `.agents/skills/`); both apply apps/docs/CONTRIBUTING.md and
-        apps/docs/WORD_LIST.md. Skip that pointer on a single issue, so it stays a
+        `.agents/skills/`); both apply the docs style guide in
+        apps/docs/style-guide/. Skip that pointer on a single issue, so it stays a
         signal that the author isn't using the skills rather than boilerplate.
     - path: '{apps,packages}/**/*.{tsx,jsx,css,mdx}'
       instructions: |

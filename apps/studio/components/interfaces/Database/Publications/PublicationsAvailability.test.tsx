@@ -3,17 +3,17 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { PublicationsAvailability } from './PublicationsAvailability'
 
-const { mockUseHighAvailability } = vi.hoisted(() => ({
-  mockUseHighAvailability: vi.fn(),
+const { mockUseIsRealtimeUnavailable } = vi.hoisted(() => ({
+  mockUseIsRealtimeUnavailable: vi.fn(),
 }))
 
 vi.mock('@/hooks/misc/useHighAvailability', () => ({
-  useHighAvailability: mockUseHighAvailability,
+  useIsRealtimeUnavailable: mockUseIsRealtimeUnavailable,
 }))
 
 describe('PublicationsAvailability', () => {
-  it('shows the disabled empty state instead of page content for High Availability projects', () => {
-    mockUseHighAvailability.mockReturnValue({ isHighAvailability: true })
+  it('shows the disabled empty state instead of page content when Realtime is unavailable', () => {
+    mockUseIsRealtimeUnavailable.mockReturnValue({ isRealtimeUnavailable: true })
 
     render(
       <PublicationsAvailability>
@@ -32,8 +32,8 @@ describe('PublicationsAvailability', () => {
     expect(screen.queryByText('Publications content')).not.toBeInTheDocument()
   })
 
-  it('renders page content for non-High Availability projects', () => {
-    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false })
+  it('renders page content when Realtime is available', () => {
+    mockUseIsRealtimeUnavailable.mockReturnValue({ isRealtimeUnavailable: false })
 
     render(
       <PublicationsAvailability>

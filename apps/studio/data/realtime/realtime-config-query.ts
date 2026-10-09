@@ -25,6 +25,7 @@ export const REALTIME_DEFAULT_CONFIG = {
   max_payload_size_in_kb: 100,
   suspend: false,
   presence_enabled: true,
+  admin_suspended_at: null,
 } as const satisfies RealtimeConfigResponse
 
 export async function getRealtimeConfiguration(

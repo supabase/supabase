@@ -1,6 +1,17 @@
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM } from 'common'
-import { capitalize, chunk, compact, find, findIndex, has, isObject, uniq, uniqBy } from 'lodash'
+import {
+  capitalize,
+  chunk,
+  compact,
+  debounce,
+  find,
+  findIndex,
+  has,
+  isObject,
+  uniq,
+  uniqBy,
+} from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
@@ -21,11 +32,13 @@ import {
 } from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
+  describeUploadFailure,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
+  getStorageItemPath,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
@@ -43,6 +56,7 @@ import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
+import { storageKeys } from '@/data/storage/keys'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
@@ -91,6 +105,15 @@ export function createStorageExplorerState({
   const state = proxy({
     projectRef,
     connectionString,
+    itemSearchString: '',
+    debouncedSearchString: '',
+    setItemSearchString: (value: string) => {
+      state.itemSearchString = value
+      state.setDebouncedSearchString(value)
+    },
+    setDebouncedSearchString: debounce((value: string) => {
+      state.debouncedSearchString = value
+    }, 500),
     resumableUploadUrl,
     uploadProgresses: [] as UploadProgress[],
     selectedBucket: bucket as Bucket,
@@ -147,6 +170,12 @@ export function createStorageExplorerState({
     selectedItemsToDelete: [] as StorageItemWithColumn[],
     setSelectedItemsToDelete: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToDelete = items
+    },
+
+    // Separate from `selectedItemsToDelete`, which only archives on a versioned bucket.
+    itemToPurge: undefined as StorageItemWithColumn | undefined,
+    setItemToPurge: (item?: StorageItemWithColumn) => {
+      state.itemToPurge = item
     },
 
     selectedItemsToMove: [] as StorageItemWithColumn[],
@@ -400,7 +429,22 @@ export function createStorageExplorerState({
 
     refetchAllOpenedFolders: async () => {
       const paths = state.openedFolders.map((folder) => folder.name)
-      await state.fetchFoldersByPath({ paths })
+
+      if (state.itemSearchString && paths.length === 0) {
+        await state.fetchFoldersByPath({ paths, searchString: state.itemSearchString })
+      } else if (state.itemSearchString) {
+        await state.fetchFoldersByPath({ paths })
+        // Reapply the filter to the current column only.
+        await state.fetchFolderContents({
+          bucketId: state.selectedBucket.id,
+          folderId: state.openedFolders[paths.length - 1].id,
+          folderName: paths[paths.length - 1],
+          index: paths.length - 1,
+          searchString: state.itemSearchString,
+        })
+      } else {
+        await state.fetchFoldersByPath({ paths })
+      }
     },
 
     refreshAll: async () => {
@@ -777,6 +821,7 @@ export function createStorageExplorerState({
         folderId: folder.id,
         folderName: folder.name,
         index: columnIndex,
+        searchString: state.itemSearchString,
       })
     },
 
@@ -1459,6 +1504,82 @@ export function createStorageExplorerState({
       // TODO: invalidate the file preview cache when moving files
       await state.refetchAllOpenedFolders()
       state.setSelectedItemsToMove([])
+    },
+
+    /**
+     * Overwrites an object in place, which on a versioned bucket is what creates a new
+     * version. Not `uploadFiles`: that renames rather than overwrites on a name clash.
+     */
+    replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
+      const path = getStorageItemPath(state, item)
+      const toastId = toast.loading(`Uploading a new version of ${item.name}...`)
+
+      state.updateRowStatus({
+        name: item.name,
+        status: STORAGE_ROW_STATUS.LOADING,
+        columnIndex: item.columnIndex,
+      })
+
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: state.resumableUploadUrl,
+            retryDelays: [0, 200, 500, 1500, 3000, 5000],
+            // Without upsert the write is rejected as a conflict: the path exists.
+            headers: { 'x-source': 'supabase-dashboard', 'x-upsert': 'true' },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: state.selectedBucket.name,
+              objectName: path,
+              contentType: file.type || 'application/octet-stream',
+              cacheControl: '3600',
+            },
+            onBeforeRequest: async (req) => {
+              const { apiKey } = await getOrRefreshTemporaryApiKey(state.projectRef)
+              req.setHeader('apikey', apiKey)
+              if (!IS_PLATFORM) req.setHeader('Authorization', `Bearer ${apiKey}`)
+            },
+            onError: (error) => reject(error),
+            onSuccess: () => resolve(),
+          })
+
+          // No `findPreviousUploads`: a resumed upload would write the wrong file's bytes.
+          upload.start()
+        })
+
+        toast.success(`Uploaded a new version of ${item.name}`, { id: toastId })
+        await state.refetchAllOpenedFolders()
+        await Promise.all([
+          getQueryClient().invalidateQueries({
+            queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
+          }),
+          // The preview URL is cached for a week against the path, so without this the
+          // panel keeps rendering the bytes from before the replace.
+          getQueryClient().invalidateQueries({
+            queryKey: storageKeys.fileUrl({
+              projectRef: state.projectRef,
+              isBucketPublic: state.selectedBucket.public,
+              bucketId: state.selectedBucket.id,
+              path,
+            }),
+          }),
+        ])
+      } catch (error) {
+        const status =
+          error instanceof tus.DetailedError ? error.originalResponse?.getStatus() : undefined
+        const reason = describeUploadFailure({
+          status,
+          fallback: error instanceof Error ? error.message : 'the upload failed.',
+          allowedMimeTypes: state.selectedBucket.allowed_mime_types,
+        })
+        toast.error(`Failed to upload a new version of ${item.name}: ${reason}`, { id: toastId })
+        state.updateRowStatus({
+          name: item.name,
+          status: STORAGE_ROW_STATUS.READY,
+          columnIndex: item.columnIndex,
+        })
+      }
     },
 
     deleteFiles: async ({

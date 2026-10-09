@@ -4,6 +4,7 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
+import { reportEmptyBodyResponse } from './empty-body-diagnostics'
 import { ERROR_PATTERNS } from './error-patterns'
 import { API_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
@@ -73,8 +74,18 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
  * Normalize empty-body success responses by setting `Content-Length: 0` so the parser
  * short-circuits regardless of transport. Non-empty responses are returned untouched.
  */
-export async function normalizeEmptyBodyResponse(response: Response): Promise<Response> {
-  if (response.status === 204 || response.headers.has('Content-Length')) {
+export async function normalizeEmptyBodyResponse(
+  response: Response,
+  source?: { request: Request; schemaPath: string }
+): Promise<Response> {
+  if (response.status === 204) {
+    return response
+  }
+
+  if (response.headers.has('Content-Length')) {
+    if (source && response.headers.get('Content-Length') === '0') {
+      void reportEmptyBodyResponse({ ...source, response })
+    }
     return response
   }
 
@@ -82,6 +93,8 @@ export async function normalizeEmptyBodyResponse(response: Response): Promise<Re
   if (body.length > 0) {
     return response
   }
+
+  if (source) void reportEmptyBodyResponse({ ...source, response })
 
   const headers = new Headers(response.headers)
   headers.set('Content-Length', '0')
@@ -125,9 +138,9 @@ client.use(
   },
   {
     // Middleware to format errors
-    async onResponse({ request, response }) {
+    async onResponse({ request, response, schemaPath }) {
       if (response.ok) {
-        return normalizeEmptyBodyResponse(response)
+        return normalizeEmptyBodyResponse(response, { request, schemaPath })
       }
 
       // handle errors

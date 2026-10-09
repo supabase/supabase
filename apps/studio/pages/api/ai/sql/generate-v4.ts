@@ -12,7 +12,9 @@ import { NO_SCHEMA_ACCESS_MESSAGE } from '@/lib/ai/assistant-context'
 import {
   assistantMessageMetadataSchema,
   messagesIncludeLogsSnippets,
+  type AssistantMessageMetadata,
 } from '@/lib/ai/assistant-message-metadata'
+import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
@@ -28,10 +30,10 @@ import { getTools } from '@/lib/ai/tools'
 import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
-import { getURL } from '@/lib/helpers'
-import { trustedUserEmail } from '@/lib/server/configcat'
+import { getBasePathURL } from '@/lib/helpers'
+import { isServerFlagEnabled, trustedUserEmail } from '@/lib/server/configcat'
 
-export const maxDuration = 120
+export const maxDuration = 300
 
 export const config = {
   api: {
@@ -75,6 +77,7 @@ const requestBodySchema = z.object({
 })
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: JwtPayload) {
+  const requestStartedAt = Date.now()
   const authorization = req.headers.authorization
   const accessToken = authorization?.replace('Bearer ', '')
 
@@ -121,9 +124,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
   let hasAccessToAdvanceModel = false
-  let orgHasHipaaAddon: boolean | undefined
-  let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
+  let isHighComplianceProject: boolean | undefined
   let orgId: number | undefined
   let orgSlug: string | undefined
   let planId: string | undefined
@@ -139,12 +141,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
       aiOptInLevel = aiDetails.aiOptInLevel
       hasAccessToAdvanceModel = aiDetails.hasAccessToAdvanceModel
-      orgHasHipaaAddon = aiDetails.hasHipaaAddon
       orgId = aiDetails.orgId
       orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
-      projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
+      isHighComplianceProject = aiDetails.isHighComplianceProject
     } catch (error) {
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
@@ -152,12 +153,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+  const [explorerEnabled, useStatusPageWidget] = await Promise.all([
+    isExplorerEnabled(trustedUserEmail(claims?.email)),
+    isServerFlagEnabled('incidentIoStatusPage'),
+  ])
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
   let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-  if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
+  if (!isAssistantBaseModelId(effectiveModel) && (!hasAccessToAdvanceModel || envThrottled)) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
 
@@ -178,8 +182,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
-    // Fires when the response finishes streaming or the connection drops, which
-    // is what tears down the remote MCP connection opened in getTools.
+    // Fires when the connection drops. Aborting tears down the remote MCP connection opened
+    // in getTools. The TanStack adapter doesn't emit it, so settling the pipe below also aborts.
     res.on('close', () => abortController.abort())
 
     const tools = await getTools({
@@ -188,9 +192,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       authorization,
       aiOptInLevel,
       accessToken,
-      baseUrl: getURL(),
+      baseUrl: getBasePathURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
+      useStatusPageWidget,
       signal: abortController.signal,
     })
 
@@ -227,21 +232,20 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRef,
       chatId,
       chatName,
-      allowTracing: isTracingAllowed({
-        orgHasHipaaAddon,
-        projectIsSensitive,
-        projectRegion,
-      }),
+      allowTracing: isTracingAllowed({ projectRegion }),
       supportMode,
       userId,
       orgId,
       orgSlug,
       planId,
+      isHighComplianceProject,
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
       requestedModel,
+      effectiveModel,
       systemProviderOptions,
       abortSignal: abortController.signal,
+      timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },
       onSpanCreated: (spanId) => {
         res.setHeader('x-braintrust-span-id', spanId)
       },
@@ -270,13 +274,24 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
 
         return JSON.stringify(error)
       },
+      // The browser never receives an abort caused by its own disconnect, so any abort that
+      // reaches it is the deadline. Chat ignores abort chunks, so flag the message instead.
+      messageMetadata: ({ part }): AssistantMessageMetadata =>
+        part.type === 'abort' ? { timedOut: true } : undefined,
     })
 
-    pipeUIMessageStreamToResponse({
+    // Keep this asynchronous so the TanStack adapter can return the streaming
+    // Response immediately. Handle piping failures after headers have been sent.
+    // Abort here rather than in toUIMessageStream's onEnd: that callback rebuilds the response
+    // message, which fails on approval continuations without the client's original messages.
+    void pipeUIMessageStreamToResponse({
       response: res,
       stream,
       headers: { 'Content-Encoding': 'none' },
     })
+      .catch((error) => console.error('Error piping Assistant stream:', error))
+      // Runs when the stream finishes, aborts, or is cancelled.
+      .finally(() => abortController.abort())
   } catch (error) {
     console.error('Error in handlePost:', error)
     if (error instanceof Error) {

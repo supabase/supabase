@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { Table, TableBody } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationRow as DestinationRowComponent } from './DestinationRow'
@@ -68,12 +69,13 @@ const addDestinationMock = () =>
       }),
   })
 
-const addPipelinesMock = () =>
+const addPipelinesMock = (waitForResponse?: Promise<void>) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () =>
-      HttpResponse.json<ReplicationPipelinesResponse>({
+    response: async () => {
+      await waitForResponse
+      return HttpResponse.json<ReplicationPipelinesResponse>({
         pipelines: [
           {
             id: PIPELINE_ID,
@@ -89,7 +91,8 @@ const addPipelinesMock = () =>
             },
           },
         ],
-      }),
+      })
+    },
   })
 
 const addPipelineStatusMock = (statusName: ReplicationPipelineStatusResponse['status']['name']) =>
@@ -145,9 +148,41 @@ describe('DestinationRow', () => {
     addVersionMock()
   }
 
+  test('shows the destination before its pipeline details load', async () => {
+    let finishPipelineRequest = () => {}
+    const pendingPipeline = new Promise<void>((resolve) => {
+      finishPipelineRequest = resolve
+    })
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock(pendingPipeline)
+    addPipelineStatusMock('started')
+    addReplicationStatusMock(0)
+    addVersionMock()
+
+    customRender(
+      <Table>
+        <TableBody>
+          <DestinationRow destinationId={DESTINATION_ID} />
+        </TableBody>
+      </Table>
+    )
+
+    const row = (await screen.findByText('My BigQuery Destination')).closest('tr')
+    expect(row).toBeInTheDocument()
+    expect(row).not.toHaveAttribute('tabindex')
+    expect(screen.queryByRole('button', { name: 'Pipeline options' })).not.toBeInTheDocument()
+
+    await act(async () => finishPipelineRequest())
+
+    expect(await screen.findByText('supabase_realtime')).toBeInTheDocument()
+    expect(row).toHaveAttribute('tabindex', '0')
+    expect(screen.getByRole('button', { name: 'Pipeline options' })).toBeInTheDocument()
+  })
+
   test('waits for asynchronous shutdown before deleting the pipeline', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
     let isStopping = false
     let completeShutdown: () => void = () => {}
     const shutdown = new Promise<void>((resolve) => {
@@ -214,7 +249,7 @@ describe('DestinationRow', () => {
 
   test('keeps deletion retryable when shutdown status cannot be verified', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
     let isStopping = false
     const deleted = vi.fn()
     addAPIMock({
@@ -275,7 +310,7 @@ describe('DestinationRow', () => {
 
   test('navigates to the pipeline when the row is clicked', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
@@ -283,19 +318,19 @@ describe('DestinationRow', () => {
     expect(row).not.toBeNull()
     await userEvent.click(row!)
 
-    expect(routerMock.asPath).toBe(`/project/default/database/replication/${PIPELINE_ID}`)
+    expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
   })
 
   test('does not navigate when the row overflow menu is opened', async () => {
     addAllMocks()
-    routerMock.setCurrentUrl('/project/default/database/replication')
+    routerMock.setCurrentUrl('/project/default/database/pipelines')
 
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     await screen.findByText('supabase_realtime')
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
 
-    expect(routerMock.asPath).toBe('/project/default/database/replication')
+    expect(routerMock.asPath).toBe('/project/default/database/pipelines')
   })
 
   test('shows "Caught up" when confirmed_flush_lsn_bytes is 0', async () => {

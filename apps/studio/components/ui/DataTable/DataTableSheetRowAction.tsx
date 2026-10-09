@@ -13,6 +13,7 @@ import {
 import { ComponentPropsWithRef, useEffect, useState } from 'react'
 import {
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -25,9 +26,7 @@ import {
   isLogsFilterColumnValue,
   type LogsColumnFilterValue,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
-import CopyButton from '@/components/ui/CopyButton'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
-import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
 interface DataTableSheetRowActionProps<
   TData,
@@ -36,8 +35,9 @@ interface DataTableSheetRowActionProps<
   fieldValue?: TFields['value']
   filterFields: TFields[]
   value: string | number
-  table: Table<TData>
+  table?: Table<TData>
   label?: string
+  alignOffset?: number
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -48,10 +48,10 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   className,
   table,
   label,
+  alignOffset = 8,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
-  const { copy } = useCopyToClipboard()
   const [open, setOpen] = useState(false)
 
   /**
@@ -72,7 +72,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
   const column =
     !!fieldValue && !!field
-      ? table.getAllColumns().find((c) => c.id === fieldValue.toString())
+      ? table?.getAllColumns().find((c) => c.id === fieldValue.toString())
       : undefined
 
   function renderOptions() {
@@ -96,7 +96,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             className="flex items-center gap-2"
           >
             <Filter size={12} />
-            Add as filter for {column?.id}
+            Add filter
           </DropdownMenuItem>
         )
       case 'input':
@@ -111,7 +111,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             className="flex items-center gap-2"
           >
             <Filter size={12} />
-            Add as filter for {column?.id}
+            Add filter
           </DropdownMenuItem>
         )
       case 'slider':
@@ -182,42 +182,41 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     }
   }
 
-  if (!!field && !!column) {
-    return (
-      <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger
-          asChild
-          className={cn('rounded-md', 'focus-ring', 'relative py-0', className)}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowDown') {
-              // REMINDER: default behavior is to open the dropdown menu
-              // But because we use it to navigate between rows, we need to prevent it
-              // and only use "Enter" to select the option
-              e.preventDefault()
-            }
-            onKeyDown?.(e)
-          }}
-          {...props}
+  return (
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger
+        asChild
+        className={cn('focus-ring relative', className)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown') {
+            // REMINDER: default behavior is to open the dropdown menu
+            // But because we use it to navigate between rows, we need to prevent it
+            // and only use "Enter" to select the option
+            e.preventDefault()
+          }
+          onKeyDown?.(e)
+        }}
+        {...props}
+      >
+        {children}
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="start" alignOffset={alignOffset} side="bottom" className="w-56">
+        {!!field && !!column && (
+          <>
+            {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        <DropdownMenuItem
+          onSelect={() => copyToClipboard(String(value))}
+          className="flex items-center gap-2"
         >
-          {children}
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent align="end" side="bottom" className="w-56">
-          {renderOptions()}
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            onClick={() => copy(String(value), { timeout: 1000 })}
-            className="flex items-center gap-2"
-          >
-            <Copy size={12} />
-            Copy {label}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-
-  return <CopyButton iconOnly variant="text" text={String(value)} className="px-1" />
+          <Copy size={12} />
+          Copy {label}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }
