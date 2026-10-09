@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 
-import type { Timezone } from './PITR.types'
+import { fromUnixInTimezone } from './PITR.utils'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
@@ -12,8 +11,8 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface PITRStatusProps {
-  selectedTimezone: Timezone
-  onUpdateTimezone: (timezone: Timezone) => void
+  selectedTimezone: string
+  onUpdateTimezone: (timezone: string) => void
   onSetConfiguration: () => void
 }
 
@@ -31,15 +30,15 @@ const PITRStatus = ({
   const { earliestPhysicalBackupDateUnix, latestPhysicalBackupDateUnix } =
     backups?.physicalBackupData ?? {}
 
-  const earliestAvailableBackup = dayjs
-    .unix(earliestPhysicalBackupDateUnix ?? 0)
-    .tz(selectedTimezone?.utc[0])
-    .format('DD MMM YYYY, HH:mm:ss')
+  const earliestAvailableBackup = fromUnixInTimezone(
+    earliestPhysicalBackupDateUnix ?? 0,
+    selectedTimezone
+  ).format('DD MMM YYYY, HH:mm:ss')
 
-  const latestAvailableBackup = dayjs
-    .unix(latestPhysicalBackupDateUnix ?? 0)
-    .tz(selectedTimezone?.utc[0])
-    .format('DD MMM YYYY, HH:mm:ss')
+  const latestAvailableBackup = fromUnixInTimezone(
+    latestPhysicalBackupDateUnix ?? 0,
+    selectedTimezone
+  ).format('DD MMM YYYY, HH:mm:ss')
 
   const { can: canTriggerPhysicalBackup } = useAsyncCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
@@ -83,6 +82,7 @@ const PITRStatus = ({
             <TimezoneSelection
               selectedTimezone={selectedTimezone}
               onSelectTimezone={onUpdateTimezone}
+              referenceTimeUnix={latestPhysicalBackupDateUnix}
             />
           </div>
           <div className="flex items-center space-x-20">
