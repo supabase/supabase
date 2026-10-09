@@ -1,16 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertTriangle, Book, Github, Loader2 } from 'lucide-react'
+import { Book, Github, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { extensions } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Badge,
+  Button,
+  Switch,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'
 import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -67,18 +75,17 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               {extension.name}
             </span>
             {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
-              <ButtonTooltip
-                variant="warning"
-                icon={<AlertTriangle />}
-                className="rounded-full"
-                tooltip={{
-                  content: {
-                    text: `The extension is deprecated and will be removed in ${extensionMeta.deprecated.join(', ')}.`,
-                  },
-                }}
-              >
-                Deprecated
-              </ButtonTooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="warning" className="cursor-default" tabIndex={0}>
+                    Deprecated
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  The extension is deprecated and will be removed in{' '}
+                  {extensionMeta.deprecated.join(', ')}
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </TableCell>
