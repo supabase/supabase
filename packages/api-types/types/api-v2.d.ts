@@ -2573,6 +2573,8 @@ export interface components {
             }
             /** @description Postgres parameter overrides. Empty when the project runs entirely on defaults. */
             postgres_settings: {
+              autovacuum_max_workers?: number
+              autovacuum_work_mem?: string
               /** @description Default unit: s */
               checkpoint_timeout?: string
               cron_log_statement?: boolean
@@ -2606,6 +2608,8 @@ export interface components {
               max_wal_senders?: number
               max_wal_size?: string
               max_worker_processes?: number
+              pg_net_batch_size?: number
+              pg_stat_statements_max?: number
               /** @enum {string} */
               session_replication_role?: 'origin' | 'replica' | 'local'
               shared_buffers?: string
