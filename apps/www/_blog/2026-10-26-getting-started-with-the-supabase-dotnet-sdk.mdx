@@ -117,7 +117,7 @@ It also registers each sub-client on its own (`IPostgrestClient`, `IGotrueClient
 We built this extension to make it easy for you to setup the client, rather than having to wire it up yourself.
 A `Supabase.Client` builds its own `HttpClient` when you construct it. If you register as scoped or transient, every resolution creates a fresh `HttpClient` (and a fresh socket), which will exhausts the connection pool under load.
 `AddSupabase` wires the client through `IHttpClientFactory` so the handler is pooled and reused.
-To keep this consistent, it overrides any `HttpClient` or proxy you pass through `configureOptions`; however, your retry, Realtime, and other options remains untouched.
+To keep this consistent, it replaces any `HttpClient` you pass through `configureOptions`; your proxy, retry, Realtime, and other options still apply.
 
 ### Other apps
 
