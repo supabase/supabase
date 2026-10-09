@@ -7,6 +7,8 @@ title: 'Manage Realtime Peak Connections usage'
 
 Realtime Peak Connections are measured by tracking the highest number of concurrent connections for each project during the billing cycle. Regardless of fluctuations, only the peak count per project is used for billing, and the totals from all projects are summed. Only successful connections are counted, connection attempts are not included.
 
+Every WebSocket connection to Realtime counts, including connections from your own servers. In Edge Functions and other serverless runtimes, each worker that subscribes to a channel opens its own connection, so peak connections can far exceed your number of users. To send messages from a server without opening a connection, use the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api).
+
 ### Example
 
 For simplicity, this example assumes a billing cycle of only three days.
