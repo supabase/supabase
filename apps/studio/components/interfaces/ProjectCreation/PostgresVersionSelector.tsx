@@ -15,13 +15,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { smartRegionToExactRegion } from './ProjectCreation.utils'
 import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
-import { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-interface PostgresVersionDetails {
-  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
-  releaseChannel?: ReleaseChannel
-}
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
@@ -57,15 +51,6 @@ const formatValue = ({
   release_channel: string
 }) => {
   return `${postgres_engine}|${release_channel}`
-}
-
-export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
-  if (!value) {
-    return { postgresEngine: undefined, releaseChannel: undefined }
-  }
-
-  const [postgresEngine, releaseChannel] = value.split('|')
-  return { postgresEngine, releaseChannel } as PostgresVersionDetails
 }
 
 export const PostgresVersionSelector = ({

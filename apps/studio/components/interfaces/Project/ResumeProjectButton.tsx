@@ -22,10 +22,8 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { PostgresVersionSelector } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
