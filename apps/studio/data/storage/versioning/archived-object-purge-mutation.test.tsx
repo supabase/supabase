@@ -79,6 +79,14 @@ describe('useArchivedObjectPurgeMutation', () => {
     expect(deleted).toEqual([])
   })
 
+  it('stops rather than delete a version that went live mid-purge', async () => {
+    // The first round clears the history; by the second, the path has been written again.
+    mockListPages([[marker(), row('v2')], [row('v-new', { archived_at: null })]])
+
+    await expect(purge()).rejects.toThrow(/restored or replaced/)
+    expect(deleted).toEqual([[MARKER, 'v2']])
+  })
+
   it('gives up rather than spin when a round deletes nothing', async () => {
     mockListPages([[marker(), row('v1')]])
 

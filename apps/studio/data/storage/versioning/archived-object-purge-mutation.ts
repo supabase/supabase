@@ -69,6 +69,13 @@ export const useArchivedObjectPurgeMutation = ({
       await deleteVersions(versions)
 
       const remaining = await listVersions()
+      // Deleting the marker promotes nothing, so nothing here should be live. One that is
+      // arrived while the purge was running — a restore, or a new upload to the same path —
+      // and belongs to the user, not to the archive the next round would hand to `del`.
+      const live = remaining.find((version) => version.isCurrent)
+      if (live !== undefined && live.versionId !== archivedObjectId) {
+        throw new Error(`${path} was restored or replaced while it was being deleted`)
+      }
       // Nothing went away, so another round would spin rather than make progress.
       if (remaining.length >= versions.length) {
         throw new Error(`Some versions of ${path} could not be deleted`)
