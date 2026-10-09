@@ -604,7 +604,7 @@ export const fillTimeseries = (
   if (interval) {
     const match = interval.match(/^(\d+)(m|h|d|s)$/)
     if (match) {
-      step = parseInt(match[1], 10)
+      step = Math.max(1, parseInt(match[1], 10))
       const unitChar = match[2] as 'm' | 'h' | 'd' | 's'
       const unitMap = { s: 'second', m: 'minute', h: 'hour', d: 'day' } as const
       truncation = unitMap[unitChar]
@@ -620,6 +620,10 @@ export const fillTimeseries = (
   if (timeseriesData.length === 0 && !interval) {
     truncation = 'minute'
   }
+
+  const maxBuckets = 1000
+  const rangeInIntervals = maxDate.diff(minDate, truncation, true)
+  step = Math.max(step, Math.ceil(rangeInIntervals / (maxBuckets - 1)))
 
   const newData = timeseriesData.map((datum, index) => {
     const iso = dates[index].toISOString()
