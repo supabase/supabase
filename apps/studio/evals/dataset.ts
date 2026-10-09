@@ -1151,4 +1151,158 @@ export const dataset: AssistantEvalCase[] = [
         'A multi-part investigation explicitly meant to be referenced again later should route to create_notebook without naming it',
     },
   },
+  {
+    input: {
+      prompt:
+        "I accidentally ran `drop schema public cascade` in the SQL editor against my production project and lost every table. I'm on the Free plan so I know there's no PITR. Is there any way at all to get the data back?",
+    },
+    expected: {
+      correctAnswer:
+        'States that Supabase takes daily backups of active projects even on the Free plan; they become accessible after upgrading to a paid plan, after which the database can be restored from the scheduled backups page. Warns not to delete the project, since deleting it permanently removes those backups, and to stop application writes in the meantime. Does not claim that no backups exist for Free projects, and does not suggest PITR can be enabled retroactively.',
+    },
+    metadata: {
+      category: ['general_help', 'other'],
+      description:
+        'Free-plan data loss: the assistant said no backups existed; the actual resolution was that courtesy daily backups exist and are restorable after upgrading',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Security Advisor flags 'Extension in Public' for pg_trgm and unaccent. Both are relocatable and owned by supabase_admin, and I have four GIN indexes that depend on pg_trgm. What's the supported way to move them to the extensions schema without dropping and recreating them?",
+    },
+    expected: {
+      correctAnswer:
+        'Uses ALTER EXTENSION pg_trgm SET SCHEMA extensions (and the same for unaccent), which relocates the extension without dropping it or rebuilding dependent indexes. Explaining the statements and offering to run them are both acceptable. States that this can be run directly from the SQL editor as the postgres role — does not tell the user that support must run it because the extension is owned by supabase_admin. Does not suggest DROP EXTENSION ... CASCADE.',
+    },
+    metadata: {
+      category: ['sql_generation', 'database_optimization'],
+      description:
+        'Production conversation: the assistant gave the correct SQL but wrongly said the postgres role could not run it, so the customer waited 4 days for support to send the identical statement',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "My new project's API hostname returns NXDOMAIN from both 1.1.1.1 and 8.8.8.8, and `supabase projects api-keys --project-ref abcde12345fghij6789` returns 404. The dashboard shows the project fine. Can you confirm this is a provisioning problem on your side and escalate it?",
+    },
+    expected: {
+      correctAnswer:
+        'Treats a mistyped project ref as the most likely cause: the ref given is 19 characters rather than the standard 20, and NXDOMAIN together with a 404 from the Management API is exactly what a non-existent ref produces. Asks the user to copy the ref directly from the dashboard or CLI output and re-test that exact value, rather than accepting a re-typed ref as confirmation. Does not declare a confirmed provisioning or DNS outage, and does not claim to have escalated anything.',
+    },
+    metadata: {
+      category: ['debugging'],
+      description:
+        'Production conversation: the assistant spotted a one-character ref typo, then reversed itself and declared a "confirmed provisioning issue" after the customer re-typed the ref with a different typo',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Right after rotating my database password, my app gets 28P01 password authentication failed through the pooler, but a direct connection with the same new password works. I've triple-checked the credentials. Should I just rotate the password again?",
+    },
+    expected: {
+      correctAnswer:
+        'Explains that Supavisor keeps a per-node credential cache, so the first pooled connections after a password change can briefly fail with 28P01 even with the correct password; the failure itself triggers a cache refresh and a retry a few seconds later normally succeeds. Advises against rotating the password again, since that just restarts the same propagation window. Notes that the direct connection succeeding confirms the new credential is correct.',
+    },
+    metadata: {
+      category: ['debugging'],
+      description:
+        'Production conversation: pooler credential caching after rotation — the assistant matched the support answer; this case pins that behaviour so it does not regress',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "My org's billing cycle reset today and the usage page now shows Cached Egress 0 / 5 GB, but my project still returns 402 exceed_cached_egress_quota and Storage won't load. I've paused all public traffic. Can you lift the restriction?",
+    },
+    expected: {
+      requiredTools: ['search_docs'],
+      correctAnswer:
+        'Explains that it cannot lift restrictions itself, and that per the Billing FAQ usage-based restrictions are lifted when the quota refills at the start of the next billing cycle, with a short delay after the reset before they are fully lifted. Notes that pausing traffic or moving files does not remove usage already recorded for the previous cycle, that upgrading to Pro lifts the restriction immediately if access is urgent, and that support should be involved if the 402 persists well beyond that short delay. Does not assert that a backend fault requires manual correction when the reset happened only hours ago.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Production conversation: the assistant said backend correction by support was required hours after the reset; the resolution was that the restriction cleared on its own. The docs only commit to "a short delay" after the reset (Billing FAQ), so the expected answer uses that wording rather than a specific window',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "My project is restricted for 'DB Size Exceeded' and returns 402, but the usage on my dashboard looks within the Free plan limits. I need to stay on the Free plan — can you give me a one-time courtesy restore so I can get back in and fix it?",
+    },
+    expected: {
+      requiredTools: ['search_docs'],
+      correctAnswer:
+        "Explains that Fair Use restrictions are based on the organization's usage in the billing cycle and lift automatically when the cycle resets, and separately points out that a Free project can also be paused for inactivity - a different state that is fixed by Resume project from the dashboard - and explains how to tell them apart (a paused project shows Paused with a Resume project action; a restricted one shows the Fair Use restriction notice) rather than treating them as one problem. Points to the Database report (Database Size / Space used) to find large tables to prune so the restriction does not re-apply. Does not promise or imply a courtesy restoration.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Production conversation: the restriction had already lifted at cycle reset and the real blocker was an inactivity pause; the assistant hinted at the pause but could not verify it. Once project status is available to the assistant (AI-204 / prompt context), tighten this to require stating which state applies',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "In Settings > API Keys, when I click the Copy button next to the publishable key I just get an error toast saying 'unable to copy to clipboard'. What's wrong?",
+    },
+    expected: {
+      correctAnswer:
+        "Explains this is Studio's own error toast and does not indicate a problem with the key or project. It appears when the page is not focused at the moment Copy is clicked (for example DevTools or another window has focus), or on Safari, which rejects the clipboard call due to a known Studio bug. Suggests clicking on the page body first and retrying, or selecting the key text and copying it manually — noting the publishable key is safe to handle in the open. Does not lead with generic browser clipboard-permission or extension troubleshooting.",
+    },
+    metadata: {
+      category: ['debugging', 'general_help'],
+      description:
+        'Production conversation: the assistant produced generic browser troubleshooting; support identified the Studio focus check and the known Safari clipboard bug',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "My Free project was paused for inactivity. I clicked Restore about five minutes ago and it's still showing Unhealthy with the database unreachable and API Gateway erroring. I already tried restarting it once. Should I keep restarting until it comes up?",
+    },
+    expected: {
+      correctAnswer:
+        'Advises not to restart or unpause repeatedly: a restore from pause can take several minutes to become fully healthy, and additional restarts prolong it. Suggests waiting and re-checking the project status before escalating, and involves support only if it remains unhealthy well beyond that window.',
+    },
+    metadata: {
+      category: ['debugging'],
+      description:
+        'Production conversation: the restart had simply taken a few extra minutes and the project was healthy by the time support looked. No tool is required: the mock logs carry no project-status signal and the assistant has no project-status tool in project-scoped mode (AI-204)',
+    },
+  },
+  {
+    input: {
+      prompt:
+        "Auth and PostgREST have shown Unhealthy since I restarted my project. The database itself reports healthy, but CPU is pinned at 100%, disk usage keeps climbing, and sign-in returns HTTP 521 with an HTML error page. My app talks to the database mostly through RPC functions. What's going on?",
+    },
+    expected: {
+      requiredTools: ['search_docs', 'query_logs'],
+      correctAnswer:
+        "Recognises the combination of high CPU, disk filling, and Auth/PostgREST unresponsive while Postgres itself reports healthy as the documented PostgREST infinite-retry pattern, and asks about or checks for RPC functions that raise SQLSTATE 40001 (serialization_failure). PostgREST treats 40001 as transient and retries the transaction, so a function raising it for a conflict that never resolves loops forever, floods the Postgres logs with the same error, and fills the disk. Suggests checking the logs for repeated identical errors from one function, replacing the errcode with a plain `raise exception 'message'` (P0001) or `raise sqlstate 'PT409' using message = '...'` for a 409, then restarting the project to clear the stuck backends.",
+    },
+    metadata: {
+      category: ['debugging', 'sql_generation'],
+      description:
+        "Production conversation: support traced an Auth/PostgREST outage to an RPC raising SQLSTATE 40001 causing infinite PostgREST retries. Symptom-only prompt, per the support tester's heuristic (high CPU + disk filling + Auth/PostgREST down means check RPCs for 40001), so it tests the diagnostic leap rather than recall of a log line",
+    },
+  },
+  {
+    input: {
+      prompt:
+        'If I top up my organization with $300 in credits, do I get an invoice or receipt for that payment?',
+    },
+    expected: {
+      requiredTools: ['search_docs'],
+      correctAnswer:
+        "Yes, an invoice is issued once the payment is confirmed, and it can be viewed and downloaded from the organization's Billing page in the invoices section.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Production conversation the assistant fully resolved; the human reply added nothing. Pins the happy path',
+    },
+  },
 ]
