@@ -88,18 +88,20 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
               <TooltipContent>Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
-              {grant.projects != null && (
-                <DialogTrigger asChild>
-                  <DropdownMenuItem
-                    className="gap-x-2"
-                    onClick={() => setDialogContent('projects')}
-                  >
-                    <Boxes size={14} />
-                    View projects
-                  </DropdownMenuItem>
-                </DialogTrigger>
+              {grant.projects != null && grant.projects.length > 0 && (
+                <>
+                  <DialogTrigger asChild>
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onClick={() => setDialogContent('projects')}
+                    >
+                      <Boxes size={14} />
+                      View projects
+                    </DropdownMenuItem>
+                  </DialogTrigger>
+                  <DropdownMenuSeparator />
+                </>
               )}
-              <DropdownMenuSeparator />
               <DialogTrigger asChild>
                 <DropdownMenuItem
                   className="text-destructive gap-x-2"
