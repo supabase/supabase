@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { useForm } from 'react-hook-form'
-import { Form } from 'ui'
+import { Button, Form } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
@@ -15,10 +15,10 @@ const TestForm = ({ onSubmit }: { onSubmit: (data: DestinationPanelSchemaType) =
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <BigQueryConnectionFields control={form.control} />
-        <button type="submit">Submit</button>
-        <button type="button" onClick={() => form.reset()}>
+        <Button type="submit">Submit</Button>
+        <Button type="button" onClick={() => form.reset()}>
           Reset
-        </button>
+        </Button>
       </form>
     </Form>
   )
