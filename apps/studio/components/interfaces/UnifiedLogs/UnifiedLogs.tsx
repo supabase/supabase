@@ -29,6 +29,7 @@ import {
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogRefreshMarker } from './components/LogRefreshMarker'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
@@ -51,6 +52,7 @@ import {
   getFacetedUniqueValues,
   getLevelRowClassName,
 } from './UnifiedLogs.utils'
+import { useLiveLogBatches } from './useLiveLogBatches'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -67,7 +69,11 @@ import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelec
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import {
+  useUnifiedLogsBackend,
+  useUnifiedLogsInfiniteQuery,
+} from '@/data/logs/unified-logs-infinite-query'
+import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -93,6 +99,7 @@ export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
+  const useOtel = useUnifiedLogsBackend()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
@@ -185,13 +192,15 @@ export const UnifiedLogs = () => {
     isError,
     isLoading,
     isFetching,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
+    isPlaceholderData,
     hasNextPage,
     refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+  } = useUnifiedLogsInfiniteQuery({
+    projectRef,
+    search: searchParameters,
+  })
 
   const {
     data: counts,
@@ -213,25 +222,33 @@ export const UnifiedLogs = () => {
   })
 
   const refetchAllData = () => {
-    refetchLogs()
-    refetchCounts()
+    refreshLogs()
     refetchCharts()
   }
 
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
 
-  // Only fade when filtering (not when loading more data or live mode)
-  const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
-
-  const rawFlatData = useMemo(() => {
+  const rawFlatData = useMemo<ColumnSchema[]>(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
-  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
-  const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
-    })
-  }, [rawFlatData])
+  const uniqueRows = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
+  const {
+    rows: flatData,
+    batches,
+    unreadCount,
+    sessionKey,
+    acknowledgeLiveLogs,
+    fetchLiveLogs,
+    refreshLogs,
+  } = useLiveLogBatches({
+    scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
+    rows: uniqueRows,
+    firstPage: unifiedLogsData?.pages[0],
+    isPlaceholderData,
+    fetchPreviousPage,
+    refetchLogs,
+    refetchCounts,
+  })
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -299,6 +316,24 @@ export const UnifiedLogs = () => {
   })
 
   const selectedRows = table.getSelectedRowModel().rows
+  const visibleRowIds = new Set(table.getRowModel().rows.map((row) => row.id))
+  const visibleColumnIds = table.getVisibleLeafColumns().map((column) => column.id)
+  const rowDecorations = new Map(
+    batches.flatMap((batch) => {
+      const lastVisibleId = batch.ids.findLast((id) => visibleRowIds.has(id))
+      if (lastVisibleId === undefined) return []
+      return [
+        [
+          lastVisibleId,
+          <LogRefreshMarker
+            key={lastVisibleId}
+            refreshedAt={batch.refreshedAt}
+            columnIds={visibleColumnIds}
+          />,
+        ] as const,
+      ]
+    })
+  )
   const selectedRow =
     selectedRows.find((row) => row.id === selection.activeId) ?? selectedRows.at(-1)
   const openRowId = selectedRow?.id
@@ -474,12 +509,10 @@ export const UnifiedLogs = () => {
                   />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
-                  {fetchPreviousPage ? (
-                    <LiveButton
-                      fetchPreviousPage={fetchPreviousPage}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
-                  ) : null}
+                  <LiveButton
+                    fetchPreviousPage={fetchLiveLogs}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
                 </div>
               </div>
 
@@ -506,14 +539,7 @@ export const UnifiedLogs = () => {
               className="flex-1 border-t"
               orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
             >
-              <ResizablePanel
-                defaultSize="100"
-                minSize="10"
-                className={cn(
-                  'bg',
-                  isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
-                )}
-              >
+              <ResizablePanel defaultSize="100" minSize="10" className="bg">
                 <div
                   className={cn(
                     'h-full [&>div]:h-full',
@@ -524,6 +550,15 @@ export const UnifiedLogs = () => {
                   )}
                 >
                   <DataTableInfinite
+                    scrollPreservation={{
+                      key: sessionKey,
+                      onScrollToTop: acknowledgeLiveLogs,
+                      scrollToTopLabel:
+                        unreadCount > 0
+                          ? `${unreadCount} new ${unreadCount === 1 ? 'log' : 'logs'}`
+                          : undefined,
+                    }}
+                    rowDecorations={rowDecorations}
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
                     filterRows={filterDBRowCount}
