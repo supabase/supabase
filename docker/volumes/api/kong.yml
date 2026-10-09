@@ -387,13 +387,13 @@ services:
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth
-    _comment: 'Auth: /.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    _comment: 'Auth: $WELL_KNOWN_OAUTH_PATH -> http://auth:9999/.well-known/oauth-authorization-server'
     url: http://auth:9999/.well-known/oauth-authorization-server
     routes:
       - name: well-known-oauth
         strip_path: true
         paths:
-          - /.well-known/oauth-authorization-server
+          - $WELL_KNOWN_OAUTH_PATH
     plugins:
       - name: cors
 

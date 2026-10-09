@@ -46,4 +46,5 @@ services:
       SERVICE_ROLE_KEY_ASYMMETRIC: ${SERVICE_ROLE_KEY_ASYMMETRIC:-}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      JWT_ISSUER: ${API_EXTERNAL_URL}
     entrypoint: !override ["/bin/sh", "/home/kong/kong-entrypoint.sh"]

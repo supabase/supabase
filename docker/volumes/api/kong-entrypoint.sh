@@ -37,6 +37,32 @@ else
     export LUA_FUNCTIONS_EXPR="\$(nil)"
 fi
 
+# Build the OAuth 2.0 Authorization Server Metadata route path from JWT_ISSUER
+# (RFC 8414 section 3.1: the well-known segment is inserted between host and path)
+WELL_KNOWN_OAUTH_PATH="/.well-known/oauth-authorization-server"
+if [ -n "$JWT_ISSUER" ]; then
+  ISSUER="$JWT_ISSUER"
+
+  # RFC 8414: remove any terminating "/" before inserting the well-known segment
+  while [ "${ISSUER%/}" != "$ISSUER" ]; do
+    ISSUER="${ISSUER%/}"
+  done
+
+  case "$ISSUER" in
+  http://* | https://*) ;;
+  *)
+    echo "ERROR: JWT_ISSUER must start with http:// or https:// (got: $JWT_ISSUER)"
+    exit 1
+    ;;
+  esac
+
+  REST="${ISSUER#*://}"
+  case "$REST" in
+  */*) WELL_KNOWN_OAUTH_PATH="/.well-known/oauth-authorization-server/${REST#*/}" ;;
+  esac
+fi
+export WELL_KNOWN_OAUTH_PATH
+
 # Substitute environment variables in the Kong declarative config.
 # Uses awk instead of eval/echo to preserve YAML quoting (eval strips double
 # quotes, breaking "Header: value" patterns that YAML parses as mappings).

@@ -173,14 +173,15 @@ resources:
                                       - any: true
 
                       - match:
-                          prefix: /.well-known/oauth-authorization-server
+                          prefix: '${WELL_KNOWN_OAUTH_PATH}'
                         route:
                           cluster: auth
+                          prefix_rewrite: /.well-known/oauth-authorization-server
                           timeout: 30s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
-                              value: /.well-known/oauth-authorization-server
+                              value: '${WELL_KNOWN_OAUTH_PATH}'
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:

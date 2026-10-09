@@ -104,6 +104,7 @@ services:
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
       DASHBOARD_USERNAME: ${DASHBOARD_USERNAME}
       DASHBOARD_PASSWORD: ${DASHBOARD_PASSWORD}
+      JWT_ISSUER: ${API_EXTERNAL_URL}
     entrypoint: ["/bin/sh", "/docker-entrypoint.sh"]
 
   auth:
