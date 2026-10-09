@@ -706,10 +706,6 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
-    "./collapsible-alert": {
-      "import": "./src/collapsible-alert.tsx",
-      "types": "./src/collapsible-alert.tsx"
-    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"
