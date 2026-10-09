@@ -32,6 +32,7 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
+  const isPipelineCreationWizardAvailable = useFlag('pipelineCreationWizard')
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
@@ -42,6 +43,15 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
   return useMemo(() => {
     const previews: FeaturePreview[] = [
+      {
+        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
+        name: 'Pipeline creation wizard',
+        category: 'database',
+        enabled: isPipelineCreationWizardAvailable,
+        isNew: true,
+        isPlatformOnly: true,
+        isDefaultOptIn: false,
+      },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER,
         name: 'Explorer & Notebooks',
@@ -59,7 +69,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         category: 'observability',
         discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
         enabled: true,
-        isNew: true,
+        isNew: false,
         isPlatformOnly: true,
         isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/logs`,
@@ -76,7 +86,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF,
-        name: 'PG Delta Diff',
+        name: 'PG Delta diff',
         discussionsUrl: undefined,
         isNew: false,
         isPlatformOnly: true,
@@ -117,10 +127,10 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-        name: 'One-Click Integrations',
+        name: 'One-click Integrations',
         discussionsUrl: undefined,
         enabled: isMarketplaceEnabled,
-        isNew: true,
+        isNew: false,
         isPlatformOnly: false,
         isDefaultOptIn: true,
         getRoute: (ref?: string) => `/project/${ref}/integrations`,
@@ -130,7 +140,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         category: 'editors',
         name: 'Disable snippet auto-saving',
         discussionsUrl: undefined,
-        isNew: true,
+        isNew: false,
         isPlatformOnly: true,
         isDefaultOptIn: false,
         enabled: true,
@@ -153,6 +163,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
 
     return previews.sort((a, b) => Number(b.isNew) - Number(a.isNew))
   }, [
+    isPipelineCreationWizardAvailable,
     isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
