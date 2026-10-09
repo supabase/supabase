@@ -1,4 +1,5 @@
 ---
+import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import '../styles/globals.css'
@@ -9,6 +10,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props
+const faviconRoute = '/favicon'
 ---
 
 <!doctype html>
@@ -29,27 +31,8 @@ const { title, description } = Astro.props
 				} catch (_) {}
 			})()
 		</script>
-		<!-- Same favicon set as apps/docs (packages/common/MetaFavicons/app-router.ts).
-		     Files live in public/, which Astro's `base` config doesn't rewrite on its
-		     own, so the base is prepended by hand here — see
-		     https://docs.astro.build/en/reference/configuration-reference/#base -->
-		<link rel="icon" href={`${import.meta.env.BASE_URL}/favicon/favicon.ico`} type="image/x-icon" />
-		<link rel="shortcut icon" href={`${import.meta.env.BASE_URL}/favicon/favicon.ico`} />
-		<link rel="apple-touch-icon" sizes="57x57" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-57x57.png`} />
-		<link rel="apple-touch-icon" sizes="60x60" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-60x60.png`} />
-		<link rel="apple-touch-icon" sizes="72x72" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-72x72.png`} />
-		<link rel="apple-touch-icon" sizes="76x76" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-76x76.png`} />
-		<link rel="apple-touch-icon" sizes="114x114" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-114x114.png`} />
-		<link rel="apple-touch-icon" sizes="120x120" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-120x120.png`} />
-		<link rel="apple-touch-icon" sizes="144x144" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-144x144.png`} />
-		<link rel="apple-touch-icon" sizes="152x152" href={`${import.meta.env.BASE_URL}/favicon/apple-icon-152x152.png`} />
-		<link rel="icon" type="image/png" sizes="16x16" href={`${import.meta.env.BASE_URL}/favicon/favicon-16x16.png`} />
-		<link rel="icon" type="image/png" sizes="32x32" href={`${import.meta.env.BASE_URL}/favicon/favicon-32x32.png`} />
-		<link rel="icon" type="image/png" sizes="48x48" href={`${import.meta.env.BASE_URL}/favicon/favicon-48x48.png`} />
-		<link rel="icon" type="image/png" sizes="96x96" href={`${import.meta.env.BASE_URL}/favicon/favicon-96x96.png`} />
-		<link rel="icon" type="image/png" sizes="128x128" href={`${import.meta.env.BASE_URL}/favicon/favicon-128.png`} />
-		<link rel="icon" type="image/png" sizes="180x180" href={`${import.meta.env.BASE_URL}/favicon/favicon-180x180.png`} />
-		<link rel="icon" type="image/png" sizes="196x196" href={`${import.meta.env.BASE_URL}/favicon/favicon-196x196.png`} />
+		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
+		<link rel="manifest" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${faviconRoute}/manifest.json`} />
 		<meta name="generator" content={Astro.generator} />
 		<!-- Same Inter/Manrope fonts apps/docs loads via next/font, self-hosted there;
 		     loaded from Google Fonts here since kb has no next/font equivalent. -->

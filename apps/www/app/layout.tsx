@@ -35,6 +35,7 @@ export const metadata: Metadata = {
   },
   // www serves from the site root (`basePath: ''` in next.config.mjs)
   icons: genFaviconData(''),
+  manifest: '/favicon/manifest.json',
 }
 
 export const viewport: Viewport = {
