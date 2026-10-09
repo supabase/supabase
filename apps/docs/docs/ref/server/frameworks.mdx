@@ -5,11 +5,13 @@ title: Frameworks
 
 `@supabase/server` middleware runs inside Hono, H3, Elysia, NestJS, and TanStack Start through a bridge: one file you copy into your project. The bridge runs a `@supabase/middleware` entry array in the framework's own middleware slot. Your route handlers then read `supabase`, `jwtClaims`, and any other key the entries contribute from the place your framework keeps per-request state.
 
-The framework adapters (`@supabase/server/adapters/*`) predate the middleware engine. We are moving off them, and they will be deprecated soon. The bridges on this page replace them. If you use an adapter today, read "Moving off the adapters" below before you change anything. One step in that migration can open an endpoint up without an error.
+The framework adapters (`@supabase/server/adapters/*`) predate the middleware engine. They are deprecated and will be removed on December 1, 2026. The bridges on this page replace them. If you use an adapter today, read "Moving off the adapters" below before you change anything. One step in that migration can open an endpoint up without an error.
 
 <Admonition type="note" title="Versions">
 
 The bridges need `@supabase/server` 1.6.0 or later and Node 22 or later. `withRequiredClaims` shipped in 1.5.1 and the entry form of `withSupabase` in 1.6.0. Releases before 1.5.1 have no `/middleware/*` exports.
+
+The bridge file imports `@supabase/middleware`, so add it to your project as a direct dependency. `@supabase/server` depends on it, but a strict package manager such as pnpm does not let your code import a transitive dependency.
 
 </Admonition>
 
@@ -268,7 +270,7 @@ The bridge files live in the server repository under [`examples/frameworks`](htt
 
 Each adapter solved the same problem in a framework-specific way: build a `SupabaseContext` and stash it where the handler can reach it. That meant a published entry point, a peer dependency range, and a release cycle per framework, all to wrap one call. The engine replaced the model. A middleware is now an entry, a `(handler) => handler` wrapper over the Web `Request` and `Response` pair, and `withSupabaseClient()`, `withSupabaseAdminClient()`, `withRequiredClaims()`, and the rest are ordinary entries you compose. What remains is the bridge, and it belongs in your project, not in a package that has to track your framework's major versions.
 
-The adapters still work in v1 and will be deprecated soon. They will be removed in a future major. `withSupabase(config, handler)` from `@supabase/server` is not part of this change.
+The adapters are deprecated. They still work today and will be removed on December 1, 2026. `withSupabase(config, handler)` from `@supabase/server` is not part of this change.
 
 Three changes come with the migration. The first can open an endpoint up.
 
@@ -329,7 +331,7 @@ Neither entry answers a CORS preflight, and the short-circuits carry no CORS hea
 
 `withSupabase(config, handler)` still does the verify-then-reject work for you, and it is not deprecated. It wraps a fetch handler rather than composing into a framework chain, so it does not slot into a bridge. If an endpoint is already a plain fetch handler, staying on `withSupabase()` is a legitimate end state. It is also the only way to get the full `SupabaseContext`, `userClaims` and `authMode` included, behind an auth gate.
 
-To compose other entries around it, `withSupabase({ auth: 'user' })` with no handler is a `pipeline` entry placed by position. Entries before it run ahead of the auth gate. Entries after it receive the full `SupabaseContext`. Nesting, as in `withSupabase(config, entry(handler))`, still works. The entry form is alpha and needs 1.6.0 or later.
+To compose other entries around it, `withSupabase({ auth: 'user' })` with no handler is a `pipeline` entry placed by position. Entries before it run ahead of the auth gate. Entries after it receive the full `SupabaseContext`. Nesting, as in `withSupabase(config, entry(handler))`, still works. The entry form needs 1.6.0 or later.
 
 ```ts
 import { pipeline } from '@supabase/middleware'
@@ -458,6 +460,7 @@ Do the steps in order. The auth inventory comes before any code change, because 
   <RefSubLayout.Examples>
 
     ```bash
+    npm install @supabase/middleware
     mkdir -p src/lib
     curl --fail -o src/lib/supabase-middleware.ts \
       https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
@@ -614,7 +617,8 @@ contributes jwtClaims: null and falls through, turning a 401 endpoint into a
 auth: 'user'. Never compose withClaims() and withRequiredClaims() together;
 they share the jwtClaims key and that is a compile-time conflict.
 
-STEP 3: FETCH THE BRIDGE. Download
+STEP 3: FETCH THE BRIDGE. Add @supabase/middleware as a direct dependency of
+the project; the bridge imports it. Then download
 https://raw.githubusercontent.com/supabase/server/main/examples/frameworks/hono/supabase-middleware.ts
 and save it as src/lib/supabase-middleware.ts, verbatim. Do not "improve",
 condense, or drop comments from it.
