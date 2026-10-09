@@ -164,6 +164,7 @@ export const CreateNewProjectDialog = ({
                       <PasswordInput
                         id="db-password"
                         type="password"
+                        autoComplete="new-password"
                         placeholder="Type in a strong password"
                         value={field.value}
                         copy={field.value?.length > 0}
