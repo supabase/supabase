@@ -1,3 +1,6 @@
+import { useFeatureFlags, useFlag } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -14,6 +17,19 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const UserOAuthApps: NextPageWithLayout = () => {
+  const isOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
+  const { hasLoaded } = useFeatureFlags()
+  const router = useRouter()
+  useEffect(() => {
+    if (hasLoaded && !isOAuthAppScopedGrantsEnabled) {
+      router.replace('/404')
+    }
+  }, [hasLoaded, isOAuthAppScopedGrantsEnabled, router])
+
+  if (!hasLoaded) {
+    return null
+  }
+
   return (
     <>
       <PageHeader size="small">
