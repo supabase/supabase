@@ -1,3 +1,4 @@
+import type { Dayjs } from 'dayjs'
 import { CheckIcon, Globe } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
@@ -17,20 +18,21 @@ import {
 
 import { ALL_TIMEZONES } from './PITR.constants'
 import type { Timezone } from './PITR.types'
+import { getTimezoneLabel } from './PITR.utils'
 
 interface TimezoneSelectionProps {
   selectedTimezone: Timezone
+  date: Dayjs
   onSelectTimezone: (timezone: Timezone) => void
 }
 
 export const TimezoneSelection = ({
   selectedTimezone,
+  date,
   onSelectTimezone,
 }: TimezoneSelectionProps) => {
   const [open, setOpen] = useState(false)
   const listboxId = useId()
-
-  const timezoneOptions = ALL_TIMEZONES.map((option) => option.text)
 
   return (
     <div className="w-full">
@@ -45,11 +47,7 @@ export const TimezoneSelection = ({
           >
             <span className="flex min-w-0 items-center gap-2">
               <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
-              <span className="truncate">
-                {selectedTimezone
-                  ? timezoneOptions.find((option) => option === selectedTimezone.text)
-                  : 'Select timezone...'}
-              </span>
+              <span className="truncate">{getTimezoneLabel(selectedTimezone, date)}</span>
             </span>
           </ComboboxTrigger>
         </PopoverTrigger>
@@ -60,25 +58,20 @@ export const TimezoneSelection = ({
               <CommandEmpty>No timezones found...</CommandEmpty>
               <CommandGroup>
                 <ScrollArea className="h-72">
-                  {timezoneOptions.map((option) => (
+                  {ALL_TIMEZONES.map((option) => (
                     <CommandItem
-                      key={option}
-                      value={option}
-                      onSelect={(text) => {
-                        const selectedTimezone = ALL_TIMEZONES.find(
-                          (option) => option.text === text
-                        )
-                        if (selectedTimezone) {
-                          onSelectTimezone(selectedTimezone)
-                          setOpen(false)
-                        }
+                      key={option.value}
+                      value={getTimezoneLabel(option, date)}
+                      onSelect={() => {
+                        onSelectTimezone(option)
+                        setOpen(false)
                       }}
                     >
-                      {option}
+                      {getTimezoneLabel(option, date)}
                       <CheckIcon
                         className={cn(
                           'ml-auto h-4 w-4',
-                          selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
+                          selectedTimezone.value === option.value ? 'opacity-100' : 'opacity-0'
                         )}
                       />
                     </CommandItem>

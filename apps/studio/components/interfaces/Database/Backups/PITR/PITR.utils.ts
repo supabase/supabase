@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 
 import { ALL_TIMEZONES } from './PITR.constants'
-import type { Time } from './PITR.types'
+import type { Time, Timezone } from './PITR.types'
 import type { ProjectSelectedAddon } from '@/data/subscriptions/types'
 import { guessLocalTimezone } from '@/lib/dayjs'
 
@@ -26,6 +26,18 @@ export const getClientTimezone = () => {
     else return undefined
   })
   return timezone ?? (utcTz || ALL_TIMEZONES[0])
+}
+
+export const getTimezoneLabel = (timezone: Timezone, date: dayjs.Dayjs) => {
+  const offset =
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone.utc[0],
+      timeZoneName: 'longOffset',
+    })
+      .formatToParts(date.toDate())
+      .find((part) => part.type === 'timeZoneName')
+      ?.value.replace('GMT', '') || '+00:00'
+  return timezone.text.replace(/^\(UTC[^)]*\)/, `(UTC${offset})`)
 }
 
 export const formatNumberToTwoDigits = (number: Number) => {

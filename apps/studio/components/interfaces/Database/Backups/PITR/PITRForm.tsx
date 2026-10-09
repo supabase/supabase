@@ -179,6 +179,7 @@ export function PITRForm({
                     <div className="w-[350px]">
                       <TimezoneSelection
                         selectedTimezone={selectedTimezone}
+                        date={selectedDate}
                         onSelectTimezone={setSelectedTimezone}
                       />
                     </div>
