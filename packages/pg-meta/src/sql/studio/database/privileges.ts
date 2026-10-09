@@ -167,18 +167,20 @@ function getFunctionGrantsCTEs({
         n.nspname as schema_name,
         p.proname as name,
 
-        -- Aggregate EXECUTE across all overloads + all 3 roles
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'EXECUTE') as anon_execute,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'EXECUTE') as auth_execute,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'EXECUTE') as srv_execute
+        -- Use has_function_privilege rather than joining aclexplode() to
+        -- pg_roles. The default function ACL grants EXECUTE to PUBLIC, and
+        -- PUBLIC is represented in aclitem as grantee OID 0, which has no
+        -- pg_roles row, so access inherited through PUBLIC is never attributed
+        -- to the Data API roles and a callable function shows as revoked.
+        -- has_function_privilege resolves PUBLIC and role membership the same
+        -- way PostgreSQL does when actually executing the function.
+        bool_or(has_function_privilege('anon', p.oid, 'EXECUTE')) as anon_execute,
+        bool_or(has_function_privilege('authenticated', p.oid, 'EXECUTE')) as auth_execute,
+        bool_or(has_function_privilege('service_role', p.oid, 'EXECUTE')) as srv_execute
 
       from pg_proc p
       join pg_namespace n
         on n.oid = p.pronamespace
-      left join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) as acl
-        on true
-      left join pg_roles pr
-        on pr.oid = acl.grantee
       where p.prokind in ('f', 'w')
         ${IGNORED_SCHEMAS_LIST ? safeSql`and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : safeSql``}
         ${search ? safeSql`and (n.nspname || '.' || p.proname) ilike ${literal(`%${search}%`)}` : safeSql``}
