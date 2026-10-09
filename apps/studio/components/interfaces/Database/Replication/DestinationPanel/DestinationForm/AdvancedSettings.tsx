@@ -20,9 +20,9 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { BigQueryConnectionFields } from './BigQuery/ConnectionFields'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
-  DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
@@ -212,62 +212,7 @@ export const AdvancedSettings = ({
 
             {type === 'BigQuery' && (
               <>
-                <FormField
-                  control={form.control}
-                  name="connectionPoolSize"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Connection pool size"
-                      layout="horizontal"
-                      description="Number of BigQuery connections used for destination writes."
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder={String(DEFAULT_CONNECTION_POOL_SIZE)}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>connections</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="maxStalenessMins"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Maximum staleness"
-                      layout="horizontal"
-                      description="Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results."
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={0}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>minutes</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                <BigQueryConnectionFields control={form.control} />
 
                 <div className="flex flex-col gap-y-3">
                   <div className="flex flex-col gap-y-1">
