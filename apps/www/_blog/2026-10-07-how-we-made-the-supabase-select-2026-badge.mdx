@@ -9,7 +9,7 @@ tags:
   - community
   - select
 imgSocial: 'how-we-made-the-supabase-select-2026-badge/og.png'
-imgThumb: 'how-we-made-the-supabase-select-2026-badge/thumb.png'
+imgThumb: 'how-we-made-the-supabase-select-2026-badge/thumb.jpg'
 toc_depth: 2
 ---
 
@@ -19,10 +19,19 @@ During the conference it was an animated name tag with the schedule and a couple
 
 Here’s how we went about building the badges, and some ideas to push it even further.
 
-<Img
-  alt="Supabase Select badges hanging from their lanyards"
-  src="/images/blog/how-we-made-the-supabase-select-2026-badge/badges-on-lanyards.jpg"
-/>
+<video
+  className="rounded-md border m-0 w-full"
+  autoPlay
+  loop
+  muted
+  playsInline
+  aria-label="An attendee holding up her badge at Supabase Select"
+>
+  <source
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/attendee.mp4"
+    type="video/mp4"
+  />
+</video>
 
 ## What's inside
 
@@ -57,7 +66,52 @@ Our first iteration was a board with a Raspberry Pi Pico, a screen, and a batter
   src="/images/blog/how-we-made-the-supabase-select-2026-badge/prototype.jpg"
 />
 
-With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who build similar hardware - screen, battery and programmable microcontroller - but on a single board, greatly reducing the complexity of assembly. We wrote all the software that shipped on it: the name tag, the schedule, and the games. It was only a fraction of what the badge was capable of, but it was exactly what we needed _at_ Select.
+With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who build similar hardware - screen, battery and programmable microcontroller - but on a single board, greatly reducing the complexity of assembly.
+
+<Img
+  alt="The final badge in its clear case, showing an attendee name tag"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/final-badge.jpg"
+/>
+
+We wrote all the software that shipped on it: the name tag, the schedule, and the games. It was only a fraction of what the badge was capable of, but it was exactly what we needed _at_ Select.
+
+<video
+  className="rounded-md border m-0 w-full"
+  autoPlay
+  loop
+  muted
+  playsInline
+  aria-label="The badge's app launcher, moving through the name tag, schedule and game apps"
+>
+  <source
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/launcher.mp4"
+    type="video/mp4"
+  />
+</video>
+
+## Getting 800 badges ready
+
+The badges arrived two weeks before Select: 800 of them, in 20 boxes of 40, with flat batteries.
+
+Charging 800 badges turned into a fun math problem. Each badge draws less than half an amp, so we didn't need anything fancy: two 30-port USB charging hubs, the kind schools use to charge iPads overnight, and a pile of the cheapest cables we could find. A full charge takes about three hours. With 60 ports, that's 14 batches. Add an hour per batch for plugging, unplugging, and powering down, and it works out to about 56 hours of charging.
+
+The schedule app was meant to pull live updates over Wi-Fi, but the venue network wasn't going to cooperate. A laptop could stay connected from the far end of the parking lot, while the badges couldn't connect at all, and 800 badges sharing the 2.4 GHz band with every neighboring network was never going to be reliable. So the badges went offline-first. We set up our own router broadcasting the network name already saved on the badges, connected it to a cellular hotspot, and synced every badge’s schedule before the doors opened. Open the schedule app while connected, and it pulls the latest version.
+
+<video
+  className="rounded-md border m-0 w-full"
+  autoPlay
+  loop
+  muted
+  playsInline
+  aria-label="POOLER.SQL, one of the badge games, ending on a Postgres too_many_connections error"
+>
+  <source
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/pooler.mp4"
+    type="video/mp4"
+  />
+</video>
+
+The last few days were an assembly line, one box at a time: charge it, sync the schedule, and back in the box. Two days before the doors opened, we were still working through the last boxes. On the day, we spotted attendees huddled around a laptop, already hacking their badges.
 
 <video
   className="rounded-md border m-0 w-full"
@@ -69,35 +123,6 @@ With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who
 >
   <source
     src="/images/blog/how-we-made-the-supabase-select-2026-badge/badge-game.mp4"
-    type="video/mp4"
-  />
-</video>
-
-<Img
-  alt="The final badge in its clear case, showing an attendee name tag"
-  src="/images/blog/how-we-made-the-supabase-select-2026-badge/final-badge.jpg"
-/>
-
-## Getting 800 badges ready
-
-The badges arrived two weeks before Select: 800 of them, in 20 boxes of 40, with flat batteries.
-
-Charging 800 badges turned into a fun math problem. Each badge draws less than half an amp, so we didn't need anything fancy: two 30-port USB charging hubs, the kind schools use to charge iPads overnight, and a pile of the cheapest cables we could find. A full charge takes about three hours. With 60 ports, that's 14 batches. Add an hour per batch for plugging, unplugging, and powering down, and it works out to about 56 hours of charging.
-
-The schedule app was meant to pull live updates over Wi-Fi, but the venue network wasn't going to cooperate. A laptop could stay connected from the far end of the parking lot, while the badges couldn't connect at all, and 800 badges sharing the 2.4 GHz band with every neighboring network was never going to be reliable. So the badges went offline-first. We set up our own router broadcasting the network name already saved on the badges, connected it to a cellular hotspot, and synced every badge’s schedule before the doors opened. Open the schedule app while connected, and it pulls the latest version.
-
-The last few days were an assembly line, one box at a time: charge it, sync the schedule, and back in the box. Two days before the doors opened, we were still working through the last boxes. On the day, we spotted attendees huddled around a laptop, already hacking their badges.
-
-<video
-  className="rounded-md border m-0 w-full"
-  autoPlay
-  loop
-  muted
-  playsInline
-  aria-label="An attendee holding up her badge at Supabase Select"
->
-  <source
-    src="/images/blog/how-we-made-the-supabase-select-2026-badge/attendee.mp4"
     type="video/mp4"
   />
 </video>
