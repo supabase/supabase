@@ -3439,7 +3439,7 @@ module.exports = [
   {
     permanent: true,
     source: '/changelog/29260-upcoming-changes-to-supabase-api-keys',
-    destination: '/changelog',
+    destination: 'https://github.com/orgs/supabase/discussions/29260',
   },
   {
     permanent: true,
