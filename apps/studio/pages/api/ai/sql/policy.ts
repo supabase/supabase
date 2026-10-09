@@ -121,6 +121,8 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
         isExplorerEnabled: explorerEnabled,
         signal: toolsAbortController.signal,
       })
+      // One-shot generateText can't answer an approval request
+      delete tools.update_opt_in_level
 
       const { output } = await generateText({
         ...modelParams,
