@@ -42,7 +42,6 @@ const ChangelogDetailPage = ({
     headline: plainTitle,
     description: summary,
     datePublished: created_at,
-    dateModified: created_at,
   })
   const breadcrumbJsonLd = breadcrumbListSchema([
     { name: 'Changelog', url: 'https://supabase.com/changelog' },

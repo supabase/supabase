@@ -191,7 +191,6 @@ interface TechArticleSchemaInput {
   headline: string
   description?: string
   datePublished: string
-  dateModified: string
 }
 
 export function techArticleSchema(input: TechArticleSchemaInput) {
@@ -208,7 +207,6 @@ export function techArticleSchema(input: TechArticleSchemaInput) {
     description: input.description,
     inLanguage: 'en',
     datePublished: input.datePublished,
-    dateModified: input.dateModified,
     publisher: {
       '@type': 'Organization',
       '@id': ORG_ID,
