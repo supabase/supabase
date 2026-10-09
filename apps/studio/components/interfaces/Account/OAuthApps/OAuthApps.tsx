@@ -75,7 +75,7 @@ export const OAuthApps = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data.pages.length === 0 ? (
+                {data.pages.length === 0 || data.pages[0].data.length === 0 ? (
                   <TableRow className="[&>td]:hover:bg-inherit">
                     <TableCell colSpan={4}>
                       <p className="text-sm text-foreground-lighter">
