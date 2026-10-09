@@ -84,7 +84,7 @@ describe('OAuthAppsAuthorizedList', () => {
 
     await openRowMenu('Contoso Analytics')
     expect(await screen.findByText('View grants')).toBeInTheDocument()
-    expect(await screen.findByText('Revoke grants')).toBeInTheDocument()q
+    expect(await screen.findByText('Revoke grants')).toBeInTheDocument()
   })
 
   test('renders the revoke caveats and revokes on confirm', async () => {
