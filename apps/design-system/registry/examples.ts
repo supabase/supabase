@@ -552,6 +552,12 @@ export const examples: Registry = [
     files: ['example/dialog-demo.tsx'],
   },
   {
+    name: 'dialog-disclosure-demo',
+    type: 'components:example',
+    registryDependencies: ['dialog', 'collapsible', 'button'],
+    files: ['example/dialog-disclosure-demo.tsx'],
+  },
+  {
     name: 'dialog-close-button',
     type: 'components:example',
     registryDependencies: ['dialog', 'button'],

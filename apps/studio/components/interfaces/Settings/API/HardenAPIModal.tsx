@@ -14,12 +14,12 @@ import {
   WarningIcon,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-
 import {
   DialogDisclosure,
   DialogDisclosureContent,
   DialogDisclosureTrigger,
-} from '@/components/ui-patterns/Dialogs/DialogDisclosure'
+} from 'ui-patterns/DialogDisclosure'
+
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import InformationBox from '@/components/ui/InformationBox'

@@ -13,13 +13,13 @@ import {
   AlertDialogTitle,
   Button,
 } from 'ui'
-
-import { SupportLink } from '../Support/SupportLink'
 import {
   DialogDisclosure,
   DialogDisclosureContent,
   DialogDisclosureTrigger,
-} from '@/components/ui-patterns/Dialogs/DialogDisclosure'
+} from 'ui-patterns/DialogDisclosure'
+
+import { SupportLink } from '../Support/SupportLink'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 
 interface SessionTimeoutModalProps {

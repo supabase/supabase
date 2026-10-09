@@ -6,7 +6,7 @@ type DialogDisclosureTriggerProps = ComponentProps<typeof CollapsibleTrigger> & 
   icon?: ReactNode
 }
 
-export const DialogDisclosure = Collapsible
+export const DialogDisclosure: typeof Collapsible = Collapsible
 
 export const DialogDisclosureTrigger = ({
   children,

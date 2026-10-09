@@ -298,6 +298,10 @@
       "import": "./src/DatePicker/index.ts",
       "types": "./src/DatePicker/index.ts"
     },
+    "./DialogDisclosure": {
+      "import": "./src/DialogDisclosure.tsx",
+      "types": "./src/DialogDisclosure.tsx"
+    },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
       "types": "./src/Dialogs/ConfirmationModal.tsx"

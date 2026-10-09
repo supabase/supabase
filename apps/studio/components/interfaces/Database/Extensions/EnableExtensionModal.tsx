@@ -14,12 +14,12 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
-
 import {
   DialogDisclosure,
   DialogDisclosureContent,
   DialogDisclosureTrigger,
-} from '@/components/ui-patterns/Dialogs/DialogDisclosure'
+} from 'ui-patterns/DialogDisclosure'
+
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
@@ -130,7 +130,7 @@ export const EnableExtensionModal = ({
                 <span>Install in a different schema</span>
               </DialogDisclosureTrigger>
               <DialogDisclosureContent>
-                <DialogSection className="pt-2 min-w-0 flex flex-col gap-y-3">
+                <DialogSection className="pt-1 min-w-0 flex flex-col gap-y-3">
                   <div className="text-sm text-foreground-light flex flex-col gap-y-3">
                     <p>
                       Installing in <code className="text-code-inline">public</code> can expose
