@@ -12,11 +12,13 @@ import CTABanner from '@/components/CTABanner'
 import DefaultLayout from '@/components/Layouts/Default'
 import { getChangelogEntries, type ChangelogEntryFrontmatter } from '@/lib/changelog-repo'
 import { stripTitleMarkdown } from '@/lib/changelog.utils'
+import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '@/lib/json-ld'
 import mdxComponents from '@/lib/mdx/mdxComponents'
 import { mdxSerialize } from '@/lib/mdx/mdxSerialize'
 
 type PageProps = {
   title: string
+  summary: string
   created_at: string
   slug: string
   frontmatter: ChangelogEntryFrontmatter
@@ -26,6 +28,7 @@ type PageProps = {
 
 const ChangelogDetailPage = ({
   title,
+  summary,
   created_at,
   slug,
   frontmatter,
@@ -33,8 +36,28 @@ const ChangelogDetailPage = ({
   hasMarkdownVariant,
 }: PageProps) => {
   const plainTitle = stripTitleMarkdown(title)
+  const url = `https://supabase.com/changelog/${slug}`
+  const techArticleJsonLd = techArticleSchema({
+    url,
+    headline: plainTitle,
+    description: summary,
+    datePublished: created_at,
+    dateModified: created_at,
+  })
+  const breadcrumbJsonLd = breadcrumbListSchema([
+    { name: 'Changelog', url: 'https://supabase.com/changelog' },
+    { name: plainTitle, url },
+  ])
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(techArticleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbJsonLd) }}
+      />
       {hasMarkdownVariant && (
         <Head>
           <link rel="alternate" type="text/markdown" href={`/changelog/${slug}.md`} />
@@ -113,6 +136,7 @@ export const getStaticProps: GetStaticProps<PageProps> = async ({ params }) => {
   return {
     props: {
       title: entry.frontmatter.title,
+      summary: stripTitleMarkdown(entry.summary).replace(/\s+/g, ' '),
       created_at: entry.sortDate,
       slug: entry.slug,
       frontmatter: entry.frontmatter,

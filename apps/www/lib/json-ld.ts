@@ -185,3 +185,39 @@ export function blogPostingSchema(input: BlogPostingSchemaInput) {
     },
   }
 }
+
+interface TechArticleSchemaInput {
+  url: string
+  headline: string
+  description?: string
+  datePublished: string
+  dateModified: string
+}
+
+export function techArticleSchema(input: TechArticleSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    '@id': `${input.url}#page`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': input.url,
+    },
+    url: input.url,
+    headline: input.headline,
+    description: input.description,
+    inLanguage: 'en',
+    datePublished: input.datePublished,
+    dateModified: input.dateModified,
+    publisher: {
+      '@type': 'Organization',
+      '@id': ORG_ID,
+      name: SITE_NAME,
+      logo: {
+        '@type': 'ImageObject',
+        url: ORG_LOGO_URL,
+      },
+    },
+    isPartOf: { '@id': SITE_ID },
+  }
+}
