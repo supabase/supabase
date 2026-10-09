@@ -4,9 +4,10 @@ import {
   Button,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
 
@@ -31,22 +32,23 @@ export const GrantDisconnectDialogContent = ({
   })
 
   return (
-    <DialogContent size="small" {...props}>
+    <DialogContent size="medium" {...props}>
       <DialogHeader>
         <DialogTitle>Revoke access for {grant?.app?.name}</DialogTitle>
-        <DialogDescription asChild>
-          <div className="flex flex-col gap-4 text-sm text-foreground-light">
-            <p>
-              {grant?.app.name} loses access on its next request. Nobody else in your organization
-              is affected.
-            </p>
-            <p>
-              You can reconnect it at any time by authorizing again. You'll pick projects again when
-              you do.
-            </p>
-          </div>
-        </DialogDescription>
       </DialogHeader>
+      <DialogSectionSeparator />
+      <DialogSection>
+        <div className="flex flex-col gap-4 text-sm text-foreground-light">
+          <p>
+            {grant?.app.name} loses access on its next request. Nobody else in your organization is
+            affected.
+          </p>
+          <p>
+            You can reconnect it at any time by authorizing again. You'll pick projects again when
+            you do.
+          </p>
+        </div>
+      </DialogSection>
 
       <DialogFooter>
         <DialogClose asChild>
