@@ -193,11 +193,13 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 const DialogClose = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Close>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, asChild, ...props }, ref) => (
   <DialogPrimitive.Close
     ref={ref}
+    asChild={asChild}
     className={cn(
-      'opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+      !asChild &&
+        'opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
       className
     )}
     {...props}

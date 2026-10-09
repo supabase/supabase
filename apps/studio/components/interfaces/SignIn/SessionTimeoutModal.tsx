@@ -12,6 +12,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Button,
+  DialogSection,
+  DialogSectionSeparator,
 } from 'ui'
 import {
   DialogDisclosure,
@@ -58,50 +60,47 @@ export const SessionTimeoutModal = ({
       <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Session expired</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-4">
-              <p>Please sign in again to continue.</p>
-              <DialogDisclosure className="rounded-md border">
-                <DialogDisclosureTrigger className="rounded-t-md p-3 font-medium data-closed:rounded-md">
-                  Having trouble?
-                </DialogDisclosureTrigger>
-                <DialogDisclosureContent className="px-3 pb-3">
-                  <div className="space-y-3 text-foreground-light">
-                    <p>
-                      Try a different browser or disable extensions that block network requests. If
-                      the problem persists:
-                    </p>
-                    <Button size="tiny" onClick={handleClearStorage}>
-                      Clear site data and reload
-                    </Button>
-                    <p>
-                      Still stuck?{' '}
-                      <SupportLink
-                        className={InlineLinkClassName}
-                        queryParams={{
-                          subject: 'Session expired',
-                          category: SupportCategories.LOGIN_ISSUES,
-                          ...(supportContext?.projectRef && {
-                            projectRef: supportContext.projectRef,
-                          }),
-                          ...(supportContext?.orgSlug && { orgSlug: supportContext.orgSlug }),
-                        }}
-                        onClick={onClose}
-                      >
-                        Contact support
-                      </SupportLink>{' '}
-                      and include a{' '}
-                      <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
-                        HAR file
-                      </InlineLink>{' '}
-                      from your session to help us investigate.
-                    </p>
-                  </div>
-                </DialogDisclosureContent>
-              </DialogDisclosure>
-            </div>
-          </AlertDialogDescription>
+          <AlertDialogDescription>Please sign in again to continue.</AlertDialogDescription>
         </AlertDialogHeader>
+        <DialogSectionSeparator />
+        <DialogDisclosure>
+          <DialogDisclosureTrigger className="py-4 px-5">Having trouble?</DialogDisclosureTrigger>
+          <DialogDisclosureContent>
+            <DialogSection className="px-5 pt-1 text-sm">
+              <div className="space-y-3 text-foreground-light">
+                <p>
+                  Try a different browser or disable extensions that block network requests. If the
+                  problem persists:
+                </p>
+                <Button size="tiny" onClick={handleClearStorage}>
+                  Clear site data and reload
+                </Button>
+                <p>
+                  Still stuck?{' '}
+                  <SupportLink
+                    className={InlineLinkClassName}
+                    queryParams={{
+                      subject: 'Session expired',
+                      category: SupportCategories.LOGIN_ISSUES,
+                      ...(supportContext?.projectRef && {
+                        projectRef: supportContext.projectRef,
+                      }),
+                      ...(supportContext?.orgSlug && { orgSlug: supportContext.orgSlug }),
+                    }}
+                    onClick={onClose}
+                  >
+                    Contact support
+                  </SupportLink>{' '}
+                  and include a{' '}
+                  <InlineLink href="https://github.com/orgs/supabase/discussions/36540">
+                    HAR file
+                  </InlineLink>{' '}
+                  from your session to help us investigate.
+                </p>
+              </div>
+            </DialogSection>
+          </DialogDisclosureContent>
+        </DialogDisclosure>
         <AlertDialogFooter>
           <AlertDialogCancel>Close</AlertDialogCancel>
           <AlertDialogAction onClick={redirectToSignIn}>Sign in again</AlertDialogAction>

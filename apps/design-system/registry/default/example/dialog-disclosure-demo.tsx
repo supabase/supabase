@@ -21,33 +21,41 @@ export default function DialogDisclosureDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>View connection details</Button>
+        <Button>Export results</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent size="small">
         <DialogHeader>
-          <DialogTitle>Connection details</DialogTitle>
-          <DialogDescription>
-            Review how your application connects to this project.
-          </DialogDescription>
+          <DialogTitle>Export results</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>
-          <p className="text-sm text-foreground-light">This project uses direct connections.</p>
+          <p className="text-sm text-foreground-light">
+            All 250 rows will be downloaded as a CSV file.
+          </p>
         </DialogSection>
         <DialogSectionSeparator />
         <DialogDisclosure>
           <DialogDisclosureTrigger className="px-4 py-4 md:px-5">
-            When should I use pooling?
+            What’s included
           </DialogDisclosureTrigger>
           <DialogDisclosureContent>
-            <DialogSection className="pt-1 text-sm text-foreground-light">
-              Use connection pooling when your application opens many short-lived connections.
+            <DialogSection className="pt-1 text-sm text-foreground-light space-y-3">
+              <p>The file includes column names in the first row, followed by the query results.</p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li>Columns keep the same order as the results table.</li>
+                <li>Empty fields represent null values.</li>
+                <li>Values containing commas or line breaks are enclosed in double quotes.</li>
+              </ul>
+              <p>Open the file in a spreadsheet or import it into another tool.</p>
             </DialogSection>
           </DialogDisclosureContent>
         </DialogDisclosure>
         <DialogFooter>
           <DialogClose asChild>
-            <Button>Close</Button>
+            <Button>Cancel</Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button variant="primary">Download CSV</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

@@ -373,11 +373,7 @@ const AlertDialogCancel = React.forwardRef<
   return (
     <AlertDialogPrimitive.Cancel
       ref={ref}
-      className={cn(
-        buttonVariants({ variant: 'default', size: 'tiny' }),
-        'mt-2 sm:mt-0',
-        className
-      )}
+      className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), className)}
       disabled={disabled || alertDialogContext?.loading}
       {...props}
     />
