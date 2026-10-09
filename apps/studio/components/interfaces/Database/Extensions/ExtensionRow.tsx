@@ -81,7 +81,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
                     Deprecated
                   </Badge>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent side="bottom">
                   The extension is deprecated and will be removed in{' '}
                   {extensionMeta.deprecated.join(', ')}
                 </TooltipContent>
