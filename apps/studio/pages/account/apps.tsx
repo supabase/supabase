@@ -9,6 +9,7 @@ import {
 
 import { OAuthApps } from '@/components/interfaces/Account/OAuthApps/OAuthApps'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
+import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 
@@ -31,10 +32,10 @@ const UserOAuthApps: NextPageWithLayout = () => {
 }
 
 UserOAuthApps.getLayout = (page) => (
-  <DefaultLayout>
+  <AppLayout>
     <DefaultLayout headerTitle="Account">
       <AccountLayout title="OAuth Apps">{page}</AccountLayout>
     </DefaultLayout>
-  </DefaultLayout>
+  </AppLayout>
 )
 export default UserOAuthApps
