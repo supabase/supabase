@@ -38,19 +38,17 @@ const ALERT_MARKER_BY_LABEL = {
 
 /**
  * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
- * `getInternalLinkBaseUrl()`. Empty in local dev/CI (outside Vercel), which
- * keeps links relative there — resolved instead against whatever host is
- * serving the build.
+ * `getInternalLinkBaseUrl()`. Only production gets an origin. Everywhere else
+ * links stay relative, so they resolve against whatever host is serving the
+ * file. `VERCEL_URL` is not used because on a preview it is the per-deployment
+ * hostname, which is not the branch alias the page is served from.
  *
  * Resolution order:
  *  - `VERCEL_ENV=production` → `https://supabase.com`
- *  - `VERCEL_ENV=preview`    → `https://${VERCEL_URL}`
  *  - anything else          → ''
  */
 export function getInternalLinkBaseUrl() {
-  const env = process.env.VERCEL_ENV
-  if (env === 'production') return SITE_ORIGIN
-  if (env === 'preview' && process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`
+  if (process.env.VERCEL_ENV === 'production') return SITE_ORIGIN
   return ''
 }
 

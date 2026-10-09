@@ -30,14 +30,9 @@ describe('getInternalLinkBaseUrl', () => {
     expect(getInternalLinkBaseUrl()).toBe('https://supabase.com')
   })
 
-  it('returns the deployment URL when VERCEL_ENV=preview', () => {
+  it('stays relative on previews, even when VERCEL_URL is set to the deployment host', () => {
     process.env.VERCEL_ENV = 'preview'
-    process.env.VERCEL_URL = 'kb-git-fork-supabase.vercel.app'
-    expect(getInternalLinkBaseUrl()).toBe('https://kb-git-fork-supabase.vercel.app')
-  })
-
-  it('returns empty when preview is set but VERCEL_URL is missing', () => {
-    process.env.VERCEL_ENV = 'preview'
+    process.env.VERCEL_URL = 'kb-9ntxsgras-supabase.vercel.app'
     expect(getInternalLinkBaseUrl()).toBe('')
   })
 
