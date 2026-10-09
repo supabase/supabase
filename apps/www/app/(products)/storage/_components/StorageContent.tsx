@@ -27,18 +27,18 @@ export function StorageContent({
       <section id="bucket-types" className="border-t border-border" aria-label="Bucket types">
         <BucketTypesSection />
       </section>
+      <section id="api" className="border-t border-border" aria-label="API examples">
+        {apiSlot}
+      </section>
+      <section id="permissions" className="border-t border-border" aria-label="Permissions">
+        {permissionsSlot}
+      </section>
       <section
         id="object-versioning"
         className="border-t border-border"
         aria-label="Object versioning"
       >
         <ObjectVersioningSection />
-      </section>
-      <section id="api" className="border-t border-border" aria-label="API examples">
-        {apiSlot}
-      </section>
-      <section id="permissions" className="border-t border-border" aria-label="Permissions">
-        {permissionsSlot}
       </section>
       <section
         id="built-with-supabase"

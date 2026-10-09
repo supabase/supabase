@@ -1,9 +1,10 @@
 import { FeatureItem, type Feature } from '~/components/FeatureItem'
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { Archive, FileStack, RotateCcw, Timer } from 'lucide-react'
+import { Archive, FileStack, RotateCcw } from 'lucide-react'
 import { MarketingForm } from 'marketing/forms'
 import { Badge } from 'ui'
 
+import { BroomSparklesIcon } from './BroomSparklesIcon'
 import { getGoPageBySlug } from '@/lib/go'
 
 const GO_PAGE_SLUG = 'storage-object-versioning-early-access'
@@ -27,7 +28,8 @@ const highlights: Feature[] = [
     subheading: 'Put back an archived file, or roll a live one back to an earlier version.',
   },
   {
-    icon: Timer,
+    // The same icon Studio puts on a bucket's lifecycle policy.
+    icon: BroomSparklesIcon,
     heading: 'Lifecycle policies',
     subheading: 'Expire old versions by age, or keep a set number per file.',
   },
