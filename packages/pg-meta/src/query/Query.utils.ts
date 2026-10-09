@@ -295,7 +295,11 @@ function inTupleFilterSql(filter: Filter) {
 }
 
 function isFilterSql(filter: Filter) {
-  const filterValueTxt = String(filter.value)
+  // SQL keywords are case-insensitive, so normalize the value before matching
+  // it against the supported literals. Without this an uppercase value such as
+  // `NULL` falls through to the default branch and is emitted as a quoted
+  // string literal (`is 'NULL'`), which is invalid SQL.
+  const filterValueTxt = String(filter.value).toLowerCase()
   switch (filterValueTxt) {
     case 'null':
     case 'false':
