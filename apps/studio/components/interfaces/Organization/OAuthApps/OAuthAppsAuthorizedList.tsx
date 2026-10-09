@@ -27,6 +27,11 @@ export const OAuthAppsAuthorizedList = () => {
     'approved_oauth_apps'
   )
 
+  const { can: canRevokeOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.DELETE,
+    'approved_oauth_apps'
+  )
+
   const {
     data,
     isPending,
@@ -136,6 +141,7 @@ export const OAuthAppsAuthorizedList = () => {
                                 !isFetchingNextPage &&
                                 'border-none'
                             )}
+                            canRevoke={canRevokeOAuthApps}
                           />
                         ))}
                       </Fragment>
