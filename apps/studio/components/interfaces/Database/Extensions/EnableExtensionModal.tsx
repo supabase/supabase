@@ -134,12 +134,12 @@ export const EnableExtensionModal = ({
                 <DialogSection className="pt-1 min-w-0 flex flex-col gap-y-3">
                   <div className="text-sm text-foreground-light flex flex-col gap-y-3">
                     <p>
-                      Installing in <code className="text-code-inline">public</code> can expose
-                      extension tables through the Data API. You may need support to enable RLS on
-                      those tables or move the extension.
+                      We recommend using the <code className="text-code-inline">extensions</code>
+                      schema to keep extension objects separate from your own tables. Moving an
+                      extension to another schema later can be difficult.
                     </p>
                     <p>
-                      For another schema, cancel and use the SQL Editor. Replace{' '}
+                      To use another schema, run the following in the SQL Editor. Replace{' '}
                       <code className="text-code-inline">target_schema</code> with an existing
                       schema name.
                     </p>
