@@ -13,11 +13,15 @@ import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 const options = vi.hoisted(() => ({
+  stepped: true,
   legacy: false,
   hasAccess: true,
   isLoading: false,
   failEnable: false,
   failRefresh: false,
+}))
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({ isEnabled: options.stepped, isLoading: false }),
 }))
 vi.mock('./useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => !options.legacy,
@@ -29,6 +33,8 @@ vi.mock('./useIsETLPrivateAlpha', () => ({
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: options.hasAccess, isLoading: options.isLoading }),
 }))
+const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }))
+vi.mock('@/compat/next/router', () => ({ useRouter: () => router }))
 vi.mock('./DestinationPanel/DestinationPanel', () => ({
   DestinationPanel: () => {
     const [type] = useQueryState('destinationType')
@@ -38,8 +44,11 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
 let isEnabled = false
 let enableGate: Promise<void> | undefined
 beforeEach(() => {
+  router.push.mockClear()
+  router.replace.mockClear()
   isEnabled = false
   enableGate = undefined
+  options.stepped = true
   options.legacy = false
   options.hasAccess = true
   options.isLoading = false
@@ -144,13 +153,13 @@ test.each([true, false, 'retry', 'refresh error'])(
       if (enabled === 'retry') {
         await waitFor(() => expect(options.failEnable).toBe(false))
         await waitFor(() => expect(screen.getByRole('button', { name: 'Enable' })).toBeEnabled())
-        expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+        expect(router.push).not.toHaveBeenCalled()
         fireEvent.click(screen.getByRole('button', { name: 'Enable' }))
       }
     }
     if (enabled === 'refresh error') {
       await screen.findByRole('button', { name: 'Retry' })
-      expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+      expect(router.push).not.toHaveBeenCalled()
       options.failRefresh = false
       fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
       await waitFor(() =>
@@ -161,7 +170,11 @@ test.each([true, false, 'retry', 'refresh error'])(
       )
       addPipeline()
     }
-    await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
+    await waitFor(() =>
+      expect(router.push).toHaveBeenCalledWith(
+        '/project/default/database/pipelines/new?destinationType=BigQuery'
+      )
+    )
   }
 )
 test('dismissal during enablement prevents a late response opening creation', async () => {
@@ -180,14 +193,18 @@ test('dismissal during enablement prevents a late response opening creation', as
     ctrlKey: false,
   })
   expect(await screen.findByRole('menuitem', { name: 'Disable Pipelines' })).toBeInTheDocument()
-  expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+  expect(router.push).not.toHaveBeenCalled()
 })
 test('creation defaults to BigQuery regardless of legacy destination flags', async () => {
   options.legacy = true
   isEnabled = true
   await renderList()
   addPipeline()
-  await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
+  await waitFor(() =>
+    expect(router.push).toHaveBeenCalledWith(
+      '/project/default/database/pipelines/new?destinationType=BigQuery'
+    )
+  )
 })
 test.each(['loading', 'error'])('blocks creation when source status is %s', async (state) => {
   let finish: (() => void) | undefined
@@ -224,7 +241,7 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
   addPipeline()
   fireEvent.keyDown(document, { key: 'N', shiftKey: true })
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-  expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
+  expect(router.push).not.toHaveBeenCalled()
   if (state === 'error') fireEvent.click(await screen.findByRole('button', { name: 'Retry' }))
   else {
     await waitFor(() => expect(finish).toBeDefined())
@@ -235,4 +252,13 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
   )
   addPipeline()
   expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')
+})
+
+test('preview off keeps creation in the sheet', async () => {
+  options.stepped = false
+  isEnabled = true
+  await renderList()
+  addPipeline()
+  await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
+  expect(router.push).not.toHaveBeenCalled()
 })

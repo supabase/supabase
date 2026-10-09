@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react'
+import { ChevronsUpDown } from 'lucide-react'
 import React from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -179,5 +180,27 @@ describe('#Button', () => {
     render(<Button ref={ref}>Button</Button>)
 
     expect(ref.current).toBeInstanceOf(HTMLButtonElement)
+  })
+
+  it('preserves an explicit combobox role', () => {
+    render(
+      <Button role="combobox" variant="default" iconRight={<ChevronsUpDown />}>
+        Select publication
+      </Button>
+    )
+
+    const trigger = screen.getByRole('combobox')
+    expect(trigger).toHaveTextContent('Select publication')
+  })
+
+  it('preserves button semantics when given a dropdown icon', () => {
+    render(
+      <Button variant="default" iconRight={<ChevronsUpDown className="opacity-50" />}>
+        Choose schema
+      </Button>
+    )
+
+    expect(screen.getByRole('button')).toHaveTextContent('Choose schema')
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 })

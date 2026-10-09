@@ -97,6 +97,18 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
 
 // Helpers
 
+export const usePipelineCreationPreview = () => {
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const isAvailable = useFlag('pipelineCreationWizard') === true
+  const isEnabled =
+    IS_PLATFORM &&
+    isInitialized &&
+    isAvailable &&
+    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION] === true
+
+  return { isEnabled, isLoading: !isInitialized }
+}
+
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]

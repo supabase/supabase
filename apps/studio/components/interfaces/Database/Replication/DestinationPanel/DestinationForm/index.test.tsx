@@ -379,7 +379,7 @@ describe('DestinationForm edit submission', () => {
     await waitFor(() => expect(submitButton).toBeEnabled())
     fireEvent.click(submitButton)
 
-    expect(await screen.findByText('Select at least one table')).toBeInTheDocument()
+    expect(await screen.findByText('Select at least one table.')).toBeInTheDocument()
     expect(mocks.validateConfiguration).not.toHaveBeenCalled()
     expect(mocks.submitPipeline).not.toHaveBeenCalled()
   })

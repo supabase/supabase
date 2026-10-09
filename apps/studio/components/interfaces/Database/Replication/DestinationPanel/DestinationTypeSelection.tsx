@@ -1,5 +1,8 @@
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
+  cn,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectGroup,
@@ -19,6 +22,10 @@ import {
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
+import {
+  DESTINATION_TYPE_FIELD_COPY,
+  DESTINATION_TYPE_STAGE_DESCRIPTIONS,
+} from './DestinationForm/DestinationFormFieldCopy'
 import { DestinationType } from './DestinationPanel.types'
 
 interface DestinationTypeOption {
@@ -30,11 +37,19 @@ interface DestinationTypeOption {
 }
 
 interface DestinationTypeGroup {
-  label: NonNullable<DestinationTypeOption['stage']>
+  label: string | null
   options: DestinationTypeOption[]
 }
 
-export const DestinationTypeSelection = () => {
+interface DestinationTypeSelectionProps {
+  variant?: 'select' | 'radio'
+  className?: string
+}
+
+export const DestinationTypeSelection = ({
+  variant = 'select',
+  className,
+}: DestinationTypeSelectionProps) => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
@@ -60,6 +75,7 @@ export const DestinationTypeSelection = () => {
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
   const editMode = edit !== null
+  const isTypeLocked = editMode
 
   const { type: existingDestinationType } = useDestinationInformation({ id: edit })
   const destinationType = existingDestinationType ?? urlDestinationType
@@ -116,28 +132,68 @@ export const DestinationTypeSelection = () => {
   ]
 
   const visibleGroups = groups
-    .map((group) => ({ ...group, options: group.options.filter((option) => option.enabled) }))
+    .map((group) => ({
+      ...group,
+      options: group.options.filter(
+        (option) => option.enabled && (variant !== 'radio' || option.value !== 'Analytics Bucket')
+      ),
+    }))
     .filter((group) => group.options.length > 0)
-  const options = visibleGroups.flatMap((group) => group.options)
 
-  const selectedOption = options.find((option) => option.value === destinationType)
+  const allVisibleOptions = visibleGroups.flatMap((group) => group.options)
+  const selectedOption = allVisibleOptions.find((option) => option.value === destinationType)
 
-  const STAGE_DESCRIPTIONS: Record<
-    NonNullable<DestinationTypeOption['stage']>,
-    (type: DestinationType) => string
-  > = {
-    'Public Alpha': (type) => `${type} support is in public alpha.`,
-    Deprecated: (type) => `${type} is deprecated.`,
-  }
+  const STAGE_DESCRIPTIONS = DESTINATION_TYPE_STAGE_DESCRIPTIONS
 
   const stageDescription = selectedOption?.stage
     ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
     : null
 
+  if (variant === 'radio') {
+    return (
+      <div className={cn('space-y-6', className)} role="group" aria-label="Destination type">
+        {visibleGroups.map((group) => (
+          <div key={group.label ?? group.options[0]?.value} className="space-y-3">
+            {group.label ? (
+              <p className="text-xs uppercase tracking-wider text-foreground-lighter">
+                {group.label}
+              </p>
+            ) : null}
+            <RadioGroupStacked
+              disabled={isTypeLocked}
+              value={destinationType ?? undefined}
+              onValueChange={(value) => setDestinationType(value as DestinationType)}
+            >
+              {group.options.map((option) => (
+                <RadioGroupStackedItem
+                  key={option.value}
+                  id={`destination-type-${option.value}`}
+                  value={option.value}
+                  className="[&>div]:items-center [&>div]:py-3.5"
+                  label={
+                    <span className="flex items-center gap-x-3.5">
+                      <DestinationLogo type={option.value} size="medium" />
+                      <span className="flex flex-col">
+                        <span className="text-foreground font-medium">{option.label}</span>
+                        <span className="text-sm text-foreground-lighter text-balance">
+                          {option.description}
+                        </span>
+                      </span>
+                    </span>
+                  }
+                />
+              ))}
+            </RadioGroupStacked>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Destination type cannot be changed after creation.'}
+        {!editMode && DESTINATION_TYPE_FIELD_COPY.cannotChangeAfterCreation}
         {!editMode && stageDescription ? ' ' : null}
         {stageDescription}
       </span>
@@ -148,13 +204,13 @@ export const DestinationTypeSelection = () => {
       <FormItemLayout
         isReactForm={false}
         layout="horizontal"
-        className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+        className={cn('p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter', className)}
         label="Type"
         description={typeDescription}
       >
         <Select
-          disabled={editMode}
-          value={destinationType ?? ''}
+          disabled={isTypeLocked}
+          value={destinationType ?? undefined}
           onValueChange={(value) => setDestinationType(value as DestinationType)}
         >
           <SelectTrigger className="h-auto py-2">
@@ -169,9 +225,9 @@ export const DestinationTypeSelection = () => {
           </SelectTrigger>
           <SelectContent align="end">
             {visibleGroups.map((group, index) => (
-              <SelectGroup key={group.label}>
+              <SelectGroup key={group.label ?? group.options[0]?.value}>
                 {index > 0 && <SelectSeparator />}
-                <SelectLabel>{group.label}</SelectLabel>
+                {group.label ? <SelectLabel>{group.label}</SelectLabel> : null}
                 {group.options.map((option) => (
                   <SelectItem key={option.value} value={option.value} className="py-2">
                     <div className="flex items-center gap-x-3">

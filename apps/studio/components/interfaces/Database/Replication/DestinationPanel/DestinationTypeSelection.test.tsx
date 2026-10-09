@@ -141,4 +141,25 @@ describe('DestinationTypeSelection', () => {
 
     expect(await screen.findByRole('combobox')).toBeDisabled()
   })
+
+  test('radio variant lists public alpha destinations and excludes the deprecated destination', async () => {
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
+    mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
+    customRender(<DestinationTypeSelection variant="radio" />)
+
+    expect(await screen.findByRole('group', { name: 'Destination type' })).toBeInTheDocument()
+    expect(screen.getByText('Public Alpha')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /BigQuery/ })).toBeInTheDocument()
+    expect(screen.queryByText('Early Access')).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /DuckLake/ })).toBeInTheDocument()
+    expect(screen.queryByText('Deprecated')).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
+    expect(screen.queryByText('Cannot be changed after creation.')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Leave feedback' })).not.toBeInTheDocument()
+  })
 })

@@ -4,6 +4,7 @@ import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { DestinationType } from '../DestinationPanel.types'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useDestinationForm } from './useDestinationForm'
 import { replicationKeys } from '@/data/replication/keys'
@@ -37,11 +38,11 @@ const formData: DestinationPanelSchemaType = {
   connectionPoolSize: 5,
 }
 
-const renderDestinationForm = async () => {
+const renderDestinationForm = async (selectedType: DestinationType = 'BigQuery') => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const view = customRenderHook(
     () => ({
-      ...useDestinationForm({ selectedType: 'BigQuery' }),
+      ...useDestinationForm({ selectedType }),
       requestStatus: usePipelineRequestStatus().getRequestStatus(8),
     }),
     {
@@ -137,6 +138,187 @@ describe('useDestinationForm', () => {
       },
     })
   })
+
+  it.each([
+    {
+      type: 'BigQuery',
+      data: { serviceAccountKey: '{"type":"service_account"}' },
+      config: {
+        big_query: {
+          project_id: 'example-project',
+          dataset_id: 'analytics',
+          service_account_key: '{"type":"service_account"}',
+          connection_pool_size: 5,
+          max_staleness_mins: 0,
+        },
+      },
+    },
+    {
+      type: 'ClickHouse',
+      data: {
+        clickhouseUrl: 'https://example.clickhouse.cloud:8443',
+        clickhouseUser: 'default',
+        clickhousePassword: 'test-password',
+        clickhouseDatabase: 'analytics',
+        clickhouseEngine: 'replacing_merge_tree',
+      },
+      config: {
+        clickhouse: {
+          url: 'https://example.clickhouse.cloud:8443',
+          user: 'default',
+          password: 'test-password',
+          database: 'analytics',
+          engine: 'replacing_merge_tree',
+        },
+      },
+    },
+    {
+      type: 'Snowflake',
+      data: {
+        snowflakeAccountId: 'org-account',
+        snowflakeUser: 'PIPELINES',
+        snowflakePrivateKey: '-----BEGIN PRIVATE KEY-----\ntest-key\n-----END PRIVATE KEY-----',
+        snowflakePrivateKeyPassphrase: 'test-passphrase',
+        snowflakeRole: 'PIPELINES_ROLE',
+        snowflakeDatabase: 'ANALYTICS',
+        snowflakeSchema: 'PUBLIC',
+      },
+      config: {
+        snowflake: {
+          account_id: 'org-account',
+          user: 'PIPELINES',
+          private_key: '-----BEGIN PRIVATE KEY-----\ntest-key\n-----END PRIVATE KEY-----',
+          private_key_passphrase: 'test-passphrase',
+          role: 'PIPELINES_ROLE',
+          database: 'ANALYTICS',
+          schema: 'PUBLIC',
+        },
+      },
+    },
+    {
+      type: 'DuckLake',
+      data: {
+        ducklakeMode: 'supabase',
+        ducklakeCatalogProjectRef: 'catalog-project',
+        ducklakeStorageProjectRef: 'storage-project',
+        ducklakeStorageBucket: 'lake',
+        ducklakePoolSize: 3,
+        ducklakeMetadataSchema: 'metadata',
+      },
+      config: {
+        ducklake: {
+          catalog: {
+            type: 'supabase_project',
+            project_ref: 'catalog-project',
+            pool_size: 3,
+            metadata_schema: 'metadata',
+          },
+          storage: { type: 'supabase_storage', project_ref: 'storage-project', bucket: 'lake' },
+        },
+      },
+    },
+    {
+      type: 'DuckLake',
+      data: {
+        ducklakeMode: 'custom',
+        ducklakeCatalogUrl: 'postgres://user:password@localhost/catalog',
+        ducklakeDataPath: 's3://lake/data',
+        ducklakePoolSize: 2,
+        ducklakeS3AccessKeyId: 'test-key',
+        ducklakeS3SecretAccessKey: 'test-secret',
+        ducklakeS3Region: 'us-east-1',
+        ducklakeS3Endpoint: 'https://s3.example.com',
+        ducklakeS3UrlStyle: 'vhost',
+        ducklakeS3UseSsl: true,
+        ducklakeMetadataSchema: 'metadata',
+      },
+      config: {
+        ducklake: {
+          catalog_url: 'postgres://user:password@localhost/catalog',
+          data_path: 's3://lake/data',
+          pool_size: 2,
+          s3_access_key_id: 'test-key',
+          s3_secret_access_key: 'test-secret',
+          s3_region: 'us-east-1',
+          s3_endpoint: 'https://s3.example.com',
+          s3_url_style: 'vhost',
+          s3_use_ssl: true,
+          metadata_schema: 'metadata',
+        },
+      },
+    },
+  ] satisfies {
+    type: DestinationType
+    data: Partial<DestinationPanelSchemaType>
+    config: unknown
+  }[])(
+    'tests, validates, creates and starts $type with the same destination config',
+    async ({ type, data, config }) => {
+      const testedConfigs: unknown[] = []
+      const createdPipelines: unknown[] = []
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/destinations/validate',
+        response: async ({ request }) => {
+          testedConfigs.push(await request.json())
+          return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+            validation_failures: [],
+          })
+        },
+      })
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/destinations-pipelines',
+        response: async ({ request }) => {
+          createdPipelines.push(await request.json())
+          return HttpResponse.json<
+            components['schemas']['CreateDestinationPipelineResponse_Output']
+          >({ pipeline_id: 8, destination_id: 7 })
+        },
+      })
+      const { result } = await renderDestinationForm(type)
+      const values = { ...formData, ...data }
+      const onSuccess = vi.fn()
+      const onClose = vi.fn()
+      await act(async () => {
+        expect(
+          await result.current.validateDestinationConfiguration({
+            data: values,
+            onValidationFail: vi.fn(),
+          })
+        ).toEqual({ canContinue: true, warnings: [] })
+        expect(
+          await result.current.validateConfiguration({ data: values, onValidationFail: vi.fn() })
+        ).toEqual({ canContinue: true, warnings: [] })
+        await result.current.submitPipeline({ data: values, onSuccess, onClose })
+      })
+      expect(testedConfigs).toEqual([
+        { config },
+        expect.objectContaining({
+          config,
+          source_id: 42,
+          pipeline_config: expect.objectContaining({
+            publication_name: 'analytics',
+            table_sync_copy: { type: 'include_tables', table_ids: [101] },
+          }),
+        }),
+      ])
+      expect(createdPipelines).toEqual([
+        expect.objectContaining({
+          source_id: 42,
+          destination_name: 'Analytics',
+          destination_config: config,
+          pipeline_config: expect.objectContaining({
+            publication_name: 'analytics',
+            table_sync_copy: { type: 'include_tables', table_ids: [101] },
+          }),
+        }),
+      ])
+      expect(startRequests).toHaveBeenCalledOnce()
+      expect(onSuccess).toHaveBeenCalledOnce()
+      expect(onClose).toHaveBeenCalledOnce()
+    }
+  )
 
   it('closes a committed creation even if its start request fails', async () => {
     addAPIMock({
@@ -285,5 +467,85 @@ describe('useDestinationForm', () => {
     expect(onClose).not.toHaveBeenCalled()
     expect(startRequests).not.toHaveBeenCalled()
     expect(result.current.requestStatus).toBe(PipelineStatusRequestStatus.None)
+  })
+
+  it('validates only the destination while authorising the connection', async () => {
+    const destinationValidateRequests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async ({ request }) => {
+        destinationValidateRequests.push(await request.json())
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    const { result } = await renderDestinationForm()
+    await act(async () => {
+      expect(
+        await result.current.validateDestinationConfiguration({
+          data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+          onValidationFail: vi.fn(),
+        })
+      ).toEqual({ canContinue: true, warnings: [] })
+    })
+    expect(destinationValidateRequests).toHaveLength(1)
+    expect(validationRequests).toHaveLength(0)
+  })
+
+  it('shows destination request errors as persistent validation failures', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Invalid validation request' }, { status: 400 }),
+    })
+    const onValidationFail = vi.fn()
+    const { result } = await renderDestinationForm()
+    await act(async () => {
+      await result.current.validateDestinationConfiguration({
+        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+        onValidationFail,
+      })
+    })
+    expect(result.current.destinationValidationFailures).toEqual([
+      {
+        failure_type: 'critical',
+        name: 'Could not test connection',
+        reason:
+          "We couldn't test this destination. Check your credentials and connection settings, then try again.",
+      },
+    ])
+    expect(onValidationFail).toHaveBeenCalledOnce()
+  })
+
+  it('blocks the connection step when destination validation returns a critical failure', async () => {
+    const failure = {
+      failure_type: 'critical' as const,
+      name: 'BigQuery connection failed',
+      reason: 'Check the destination credentials.',
+    }
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: () =>
+        HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [failure],
+        }),
+    })
+    const onValidationFail = vi.fn()
+    const { result } = await renderDestinationForm()
+    let validationResult: Awaited<
+      ReturnType<typeof result.current.validateDestinationConfiguration>
+    >
+    await act(async () => {
+      validationResult = await result.current.validateDestinationConfiguration({
+        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+        onValidationFail,
+      })
+    })
+    expect(validationResult!).toEqual({ canContinue: false, warnings: [] })
+    expect(onValidationFail).toHaveBeenCalledOnce()
   })
 })
