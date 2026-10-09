@@ -136,6 +136,8 @@ const supabase = createClient('https://api.example.com', 'sb_publishable_...')
 
 Similarly, your Edge Functions will now be available at `https://api.example.com/functions/v1/your_function_name`, and your Storage objects at `https://api.example.com/storage/v1/object/public/your_file_path.ext`.
 
+Your custom domain supports the same TLS versions and cipher suites as your project's default domain. For details, see [TLS for project APIs](/docs/guides/security/tls).
+
 ### Remove a custom domain
 
 Removing a custom domain may cause some issues when using Supabase Auth with OAuth or SAML. You may have to reverse the changes made in the _[Prepare to activate your domain](#prepare-to-activate-your-domain)_ step above.

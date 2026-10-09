@@ -2,12 +2,12 @@ import { BookOpen } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsRealtimeUnavailable } from '@/hooks/misc/useHighAvailability'
 
 export const PublicationsAvailability = ({ children }: PropsWithChildren) => {
-  const { isHighAvailability } = useHighAvailability()
+  const { isRealtimeUnavailable } = useIsRealtimeUnavailable()
 
-  if (isHighAvailability) {
+  if (isRealtimeUnavailable) {
     return (
       <div className="flex h-full w-full items-center justify-center p-6">
         <HighAvailabilityDisabledEmptyState

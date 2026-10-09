@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { MessageSquare } from 'lucide-react'
-import { Button } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -14,7 +12,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
-import { PIPELINES_FEEDBACK_URL } from '@/components/interfaces/Database/Replication/Replication.constants'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { PipelinesLayout } from '@/components/layouts/DatabaseLayout/PipelinesLayout'
@@ -70,11 +67,6 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
           </PageHeaderSummary>
 
           <PageHeaderAside>
-            <Button asChild variant="default" icon={<MessageSquare />}>
-              <a href={PIPELINES_FEEDBACK_URL} target="_blank" rel="noreferrer noopener">
-                Leave feedback
-              </a>
-            </Button>
             <DocsButton href={`${DOCS_URL}/guides/database/replication/pipelines`} />
           </PageHeaderAside>
         </PageHeaderMeta>

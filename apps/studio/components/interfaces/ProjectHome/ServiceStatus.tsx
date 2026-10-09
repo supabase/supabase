@@ -14,7 +14,7 @@ import {
   useProjectServiceStatusQuery,
   type ServiceHealthResponse,
 } from '@/data/service-status/service-status-query'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsRealtimeUnavailable } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -104,7 +104,7 @@ const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { isRealtimeUnavailable } = useIsRealtimeUnavailable()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
@@ -140,7 +140,7 @@ export const ServiceStatus = () => {
       refetchInterval: (query) => {
         const data = query.state.data
         const isServiceUnhealthy = data?.some((service) => {
-          if (isHighAvailability && service.name === 'realtime') {
+          if (isRealtimeUnavailable && service.name === 'realtime') {
             return false
           }
           // if the postgrest service has an empty schema, postgrest has been disabled
@@ -220,7 +220,7 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            status: resolveRealtimeServiceStatus(isHighAvailability, realtimeStatus?.status),
+            status: resolveRealtimeServiceStatus(isRealtimeUnavailable, realtimeStatus?.status),
             logsUrl: isUnifiedLogsEnabled
               ? '/logs?filter=log_type:eq:realtime'
               : '/logs/realtime-logs',
