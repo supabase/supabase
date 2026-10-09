@@ -83,15 +83,21 @@ async function createNewGuides(
         if (DRY_RUN) return
 
         const discussion = await createDiscussion(guide.title, guide.body)
-        const { error } = await db.from('troubleshooting_entries').insert({
-          slug: guide.slug,
-          github_url: discussion.url,
-          github_id: discussion.id,
-          checksum: computeChecksum(guide.title, guide.body),
-        })
+        // upsert, not insert: a row can already exist here (matched by slug,
+        // just without a github_id yet) — onConflict updates it in place
+        // instead of colliding with the slug unique constraint.
+        const { error } = await db.from('troubleshooting_entries').upsert(
+          {
+            slug: guide.slug,
+            github_url: discussion.url,
+            github_id: discussion.id,
+            checksum: computeChecksum(guide.title, guide.body),
+          },
+          { onConflict: 'slug' }
+        )
         if (error) {
           console.error(
-            `[sync-troubleshooting-entries] DB insert failed for ${guide.slug}, rolling back discussion`
+            `[sync-troubleshooting-entries] DB upsert failed for ${guide.slug}, rolling back discussion`
           )
           await deleteDiscussion(discussion.id)
           throw error
@@ -118,15 +124,18 @@ async function syncNewDiscussions() {
 
   const { data: existing, error } = await db
     .from('troubleshooting_entries')
-    .select('slug')
+    .select('slug, github_id')
     .in(
       'slug',
       guides.map((guide) => guide.slug)
     )
   if (error) throw error
 
-  const existingSlugs = new Set((existing ?? []).map((row) => row.slug))
-  const newGuides = guides.filter((guide) => !existingSlugs.has(guide.slug))
+  // github_id present means a discussion already exists for that slug — the
+  // actual "already synced" signal, not mere row presence (a backfilled
+  // legacy row's slug can exist before it has a discussion).
+  const githubIdBySlug = new Map((existing ?? []).map((row) => [row.slug, row.github_id]))
+  const newGuides = guides.filter((guide) => !githubIdBySlug.get(guide.slug))
 
   if (newGuides.length === 0) {
     console.log('[sync-troubleshooting-entries] No new troubleshooting guides to sync.')
