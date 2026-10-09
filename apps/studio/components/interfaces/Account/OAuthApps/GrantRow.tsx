@@ -1,4 +1,4 @@
-import { MoreVertical } from 'lucide-react'
+import { Boxes, MoreVertical, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -89,16 +90,22 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
             <DropdownMenuContent align="end" side="bottom" className="w-40">
               {grant.projects != null && (
                 <DialogTrigger asChild>
-                  <DropdownMenuItem onClick={() => setDialogContent('projects')}>
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setDialogContent('projects')}
+                  >
+                    <Boxes size={14} />
                     View projects
                   </DropdownMenuItem>
                 </DialogTrigger>
               )}
+              <DropdownMenuSeparator />
               <DialogTrigger asChild>
                 <DropdownMenuItem
-                  className="text-destructive"
+                  className="text-destructive gap-x-2"
                   onClick={() => setDialogContent('disconnect')}
                 >
+                  <X size={14} />
                   Disconnect
                 </DropdownMenuItem>
               </DialogTrigger>
