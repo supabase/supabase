@@ -112,7 +112,7 @@ response = supabase.auth.sign_in_anonymously()
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-Call the [`SignInAnonymously()`](/docs/reference/csharp/sign-in-anonymously) method:
+Call the [`SignInAnonymously()`](/docs/reference/csharp/auth-signinanonymously) method:
 
 ```c#
 var session = await supabase.Auth.SignInAnonymously();
@@ -220,7 +220,7 @@ response = supabase.auth.update_user({
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-You can use the [`Update()`](/docs/reference/csharp/update-user) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
+You can use the [`Update()`](/docs/reference/csharp/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```c#
 var updateEmail = await supabase.Auth.Update(new UserAttributes { Email = "valid.email@supabase.io" });
@@ -306,7 +306,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 <$Show if="sdk:csharp">
 <TabPanel id="csharp" label="C#">
 
-You can use the [`LinkIdentity()`](/docs/reference/csharp/link-identity) method to link an OAuth identity to the anonymous user.
+You can use the [`LinkIdentity()`](/docs/reference/csharp/auth-linkidentity) method to link an OAuth identity to the anonymous user.
 
 ```c#
 var state = await supabase.Auth.LinkIdentity(Provider.Google, new SignInOptions { FlowType = OAuthFlowType.PKCE });
