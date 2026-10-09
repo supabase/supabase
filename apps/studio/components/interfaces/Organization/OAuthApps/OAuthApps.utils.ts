@@ -5,7 +5,7 @@ export type TrustedOAuthPartner = {
   nameMatchers: readonly string[]
   displayName: string
   icon: string
-  hasDistinctDarkIcon: boolean
+  hasDarkIcon: boolean
   /** Exact host or parent host for redirect_uri (subdomains allowed). */
   redirectHosts: readonly string[]
 }
@@ -21,28 +21,28 @@ export const TRUSTED_OAUTH_PARTNERS: readonly TrustedOAuthPartner[] = [
     nameMatchers: ['claude'],
     displayName: 'Claude',
     icon: 'claude',
-    hasDistinctDarkIcon: false,
+    hasDarkIcon: false,
     redirectHosts: ['claude.ai', 'anthropic.com'],
   },
   {
     nameMatchers: ['cursor'],
     displayName: 'Cursor',
     icon: 'cursor',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     redirectHosts: ['cursor.com', 'cursor.sh'],
   },
   {
     nameMatchers: ['chatgpt', 'openai'],
     displayName: 'ChatGPT',
     icon: 'openai',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     redirectHosts: ['chatgpt.com', 'openai.com'],
   },
   {
     nameMatchers: ['perplexity'],
     displayName: 'Perplexity',
     icon: 'perplexity',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     redirectHosts: ['perplexity.ai'],
   },
 ]
@@ -106,7 +106,7 @@ function curatedLogoForPartner(
   const customLogoUrl = getMcpClientIconSrc({
     icon: partner.icon,
     useDarkVariant,
-    hasDistinctDarkIcon: partner.hasDistinctDarkIcon,
+    hasDarkIcon: partner.hasDarkIcon,
   })
   if (!customLogoUrl) return null
   return { src: customLogoUrl, isKnownClient: true }

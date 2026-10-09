@@ -73,7 +73,7 @@ export interface McpClientData {
   label: string
   icon?: string
   /** When true, use -icon-dark.svg in dark theme; otherwise the same -icon.svg is used for both themes. */
-  hasDistinctDarkIcon?: boolean
+  hasDarkIcon?: boolean
   configFile?: string
   externalDocsUrl?: string
   transformConfig?: (config: McpClientBaseConfig) => McpClientConfig
@@ -103,7 +103,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'cursor',
     label: 'Cursor',
     icon: 'cursor',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '.cursor/mcp.json',
     externalDocsUrl: 'https://cursor.com/docs/mcp',
     generateDeepLink: (config) => {
@@ -143,7 +143,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'codex',
     label: 'Codex',
     icon: 'openai',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.codex/config.toml',
     externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
     transformConfig: (config): CodexMcpConfig => {
@@ -160,7 +160,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'grok',
     label: 'Grok',
     icon: 'grok',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.grok/config.toml',
     externalDocsUrl: 'https://docs.x.ai/build/features/mcp-servers',
     transformConfig: (config): GrokMcpConfig => {
@@ -177,7 +177,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'kimi',
     label: 'Kimi Code',
     icon: 'kimi',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '.kimi-code/mcp.json',
     externalDocsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/mcp.html',
     transformConfig: (config): KimiMcpConfig => {
@@ -211,7 +211,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'copilot-cli',
     label: 'GitHub Copilot',
     icon: 'copilot',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.copilot/mcp-config.json',
     externalDocsUrl:
       'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers',
@@ -246,7 +246,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'windsurf',
     label: 'Devin Desktop',
     icon: 'devin',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.config/devin/mcp_config.json',
     externalDocsUrl: '',
     transformConfig: (config): WindsurfMcpConfig => {
@@ -264,7 +264,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'warp',
     label: 'Warp',
     icon: 'warp',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.warp/.mcp.json',
     externalDocsUrl: 'https://docs.warp.dev/agents/capabilities/mcp',
     // No transformConfig: Warp natively supports remote MCP servers and accepts
@@ -275,7 +275,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'goose',
     label: 'Goose',
     icon: 'goose',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.config/goose/config.yaml',
     externalDocsUrl: 'https://block.github.io/goose/docs/category/getting-started',
     transformConfig: (config): GooseMcpConfig => {
@@ -308,7 +308,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'factory',
     label: 'Factory',
     icon: 'factory',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.factory/mcp.json',
     externalDocsUrl: 'https://docs.factory.ai/cli/configuration/mcp.md',
     transformConfig: (config): FactoryMcpConfig => {
@@ -326,7 +326,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'opencode',
     label: 'OpenCode',
     icon: 'opencode',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     configFile: '~/.config/opencode/opencode.json',
     externalDocsUrl: 'https://opencode.ai/docs/mcp-servers/',
     transformConfig: (config): OpenCodeMcpConfig => {
@@ -401,7 +401,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     key: 'chatgpt',
     label: 'ChatGPT',
     icon: 'openai',
-    hasDistinctDarkIcon: true,
+    hasDarkIcon: true,
     externalDocsUrl: 'https://chatgpt.com/features/apps/',
     generateDeepLink: () =>
       'https://chatgpt.com/apps/supabase/asdk_app_69d3e5ee6a708191baa733f7b8931995',
