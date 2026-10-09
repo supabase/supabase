@@ -26,7 +26,7 @@ const UserOAuthApps: NextPageWithLayout = () => {
     }
   }, [hasLoaded, isOAuthAppScopedGrantsEnabled, router])
 
-  if (!hasLoaded) {
+  if (!hasLoaded || !isOAuthAppScopedGrantsEnabled) {
     return null
   }
 
