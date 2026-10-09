@@ -18,17 +18,17 @@ toc_depth: 2
   src="/images/blog/how-we-made-the-supabase-select-2026-badge/badges-on-lanyards.jpg"
 />
 
-Every [Supabase Select](https://select.supabase.com/) attendee walked away with a programmable badge.
+Rather than yet another name tag destined for the trash, every [Supabase Select](https://select.supabase.com/) attendee received a programmable badge, that they can continue to hack long after the conference.
 
 During the conference it was an animated name tag with the schedule and a couple of games on it. Since then, people have turned it into a live flight tracker, an arcade game about dead tuples, and a language model that runs entirely on the badge.
 
-Here’s how it came together and what you can do with yours:
+Here’s how we went about building the badges, and some ideas to push it even further.
 
 ## Why a badge
 
 I'd seen electronic badges at conferences like GitHub Universe and DEF CON and wanted Supabase to have one, partly because I love electronics and mostly because I think microcontrollers are an underused way for developers to get more out of the skills they already have.
 
-If you can build a web app or a mobile app, you already know most of what it takes to put a screen on your desk or a sensor in your room that does something useful when a reading changes. The hardware is inexpensive, and it sidestepped the recent memory price spike (Raspberry Pi raised prices on its computers several times while its microcontrollers stayed where they were). With a tool like Claude Code helping with the code, a first hardware project becomes an afternoon spent mostly on deciding what to make.
+If you can build a web or mobile app, you already know most of what it takes to put a screen on your desk, or a sensor in your room that does something useful when a reading changes. The hardware is inexpensive, and was not affected by the recent price increase of memory - Raspberry Pi raised the price of their computers several times, while microcontrollers remained the same price. With a tool like Claude Code, a first hardware project becomes an afternoon spent mostly on deciding what to make.
 
 The brief was to give people something that works as a name tag for two days and stays useful long after.
 
@@ -44,14 +44,14 @@ The badge is based on the [Pimoroni Tufty 2350](https://shop.pimoroni.com/produc
 
 ## Making a thousand of them
 
-My first version was a board with a Raspberry Pi Pico, a screen, and a battery, attached so you could pull them apart and use them as a starter kit once the conference was over. I built one and showed it around, and it held up right until the question of making a thousand by hand.
+Our first iteration was a board with a Raspberry Pi Pico, a screen, and a battery, attached so you could pull them apart and use them as a starter kit once the conference was over. It was a great solution for building a modular conference badge, but assembling a thousand of them by hand was not feasible.
 
 <Img
   alt="The prototype badge: a Raspberry Pi Pico 2 W, a screen, and a battery holder on one board"
   src="/images/blog/how-we-made-the-supabase-select-2026-badge/prototype.jpg"
 />
 
-For the real run, we went to Pimoroni, who build this kind of hardware professionally. The idea survived the handoff intact, and the final badge packages the same screen, battery, and programmable microcontroller into one board. I wrote the software that shipped on it: the name tag, the schedule, and the games. That was the least interesting thing the badge could do, but it was what everyone needed _at_ Select.
+With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who build similar hardware - screen, battery and programmable microcontroller - but on a single board, greatly reducing the complexity of assembly. We wrote a custom OS and all the software required: the name tag, the schedule, and the games. It was only a fraction of what the badge was capable of, but it was exactly what we needed _at_ Select.
 
 <Img
   alt="The final badge in its clear case, showing an attendee name tag"
@@ -60,7 +60,7 @@ For the real run, we went to Pimoroni, who build this kind of hardware professio
 
 ## What people have built so far
 
-…And here’s some cool stuff built by people at Select and people watching from home.
+Check out these cool projects built by people at Select and others watching from home:
 
 - [Select Sky](https://x.com/jsmillerdev/status/2107160820455035216)
 
@@ -101,6 +101,6 @@ Good first projects are small and useful: a clock with exactly the display you w
 
 ## Show us what you make
 
-Share your project on X with #SelectBadge so we can see it. We’re running a contest for the best badges through the end of October. 1st place gets $1,000 in Supabase credits plus passes to Supabase Select 2027 for you and three colleagues. 2nd place gets $500 in Supabase credits and 3rd place gets $250.
+[Share your project on X with #SelectBadge](https://x.com/compose/post?text=I%20built%20this%20with%20my%20Supabase%20%23SelectBadge%21%20%F0%9F%9A%80%0A%0A) so we can see it. We’re running a contest for the best badges through the end of October. 1st place gets $1,000 in Supabase credits plus passes to Supabase Select 2027 for you and three colleagues. 2nd place gets $500 in Supabase credits and 3rd place gets $250.
 
 At Select, it was your name tag. What'll you make with it next?
