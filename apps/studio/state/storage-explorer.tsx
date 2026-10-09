@@ -595,7 +595,10 @@ export function createStorageExplorerState({
       } catch (error) {}
     },
 
-    deleteFolder: async (folder: StorageItemWithColumn) => {
+    deleteFolder: async (
+      folder: StorageItemWithColumn,
+      { isArchive = false }: { isArchive?: boolean } = {}
+    ) => {
       try {
         const isDeleteFolder = true
         const files = await state.getAllItemsAlongFolder(folder)
@@ -609,7 +612,7 @@ export function createStorageExplorerState({
             prefix: folder.path,
           })
         } else {
-          await state.deleteFiles({ files: files as any[], isDeleteFolder })
+          await state.deleteFiles({ files: files as any[], isDeleteFolder, isArchive })
         }
 
         state.popColumnAtIndex(folder.columnIndex)
@@ -626,9 +629,15 @@ export function createStorageExplorerState({
 
         await state.refetchAllOpenedFolders()
         state.setSelectedItemsToDelete([])
-        toast.success(`Successfully deleted ${folder.name}`)
+        toast.success(
+          isArchive ? `Successfully archived ${folder.name}` : `Successfully deleted ${folder.name}`
+        )
       } catch (error: any) {
-        toast.error(`Failed to delete folder: ${error.message}`)
+        toast.error(
+          isArchive
+            ? `Failed to archive folder: ${error.message}`
+            : `Failed to delete folder: ${error.message}`
+        )
       }
     },
 
@@ -1591,9 +1600,12 @@ export function createStorageExplorerState({
     deleteFiles: async ({
       files,
       isDeleteFolder = false,
+      isArchive = false,
     }: {
       files: (StorageItemWithColumn & { prefix?: string })[]
       isDeleteFolder?: boolean
+      /** On a versioned bucket the object survives behind a delete marker, so the copy says archive. */
+      isArchive?: boolean
     }) => {
       state.setSelectedFilePreview(undefined)
 
@@ -1613,7 +1625,19 @@ export function createStorageExplorerState({
 
       state.clearSelectedItems()
 
-      const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
+      const copy = isArchive
+        ? {
+            loading: `Archiving ${prefixes.length} file(s)...`,
+            success: `Successfully archived ${prefixes.length} file(s)`,
+            error: `Failed to archive ${prefixes.length} file(s)`,
+          }
+        : {
+            loading: `Deleting ${prefixes.length} file(s)...`,
+            success: `Successfully deleted ${prefixes.length} file(s)`,
+            error: `Failed to delete ${prefixes.length} file(s)`,
+          }
+
+      const toastId = toast.loading(copy.loading)
 
       try {
         await deleteBucketObject({
@@ -1634,7 +1658,7 @@ export function createStorageExplorerState({
             parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
           )
 
-          toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+          toast.success(copy.success, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
@@ -1647,7 +1671,7 @@ export function createStorageExplorerState({
         }
       } catch (err) {
         if (!isDeleteFolder) {
-          toast.error(`Failed to delete ${prefixes.length} file(s)`, {
+          toast.error(copy.error, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
