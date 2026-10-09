@@ -297,9 +297,10 @@ export async function generateReferenceJsonLd(slug: Array<string>) {
     leafName = operationSlug ? (sectionTitle ?? operationSlug) : 'Management API'
     if (operationSlug) parentCrumbs = [{ name: 'Management API', url: '/reference/api' }]
   } else if (parsedPath.__type === 'self-hosting') {
+    const name = REFERENCES[parsedPath.servicePath.replaceAll('-', '_')].name
     pathname = `/reference/${slug.join('/')}`
-    headline = 'Self-Hosting'
-    leafName = 'Self-Hosting'
+    headline = name
+    leafName = name
   } else {
     return null
   }
