@@ -1,3 +1,4 @@
+import { useReducedMotion } from 'common'
 import { RefObject, useLayoutEffect, useRef } from 'react'
 
 export type TableScrollPreservation = {
@@ -22,6 +23,9 @@ export function useTableScrollAnchor({
 }) {
   const anchor = useRef<ScrollAnchor | undefined>(undefined)
   const scrollPosition = useRef<{ key: symbol; top: number } | undefined>(undefined)
+  const smoothScrollCleanup = useRef<(() => void) | undefined>(undefined)
+  const currentScrollPreservation = useRef(scrollPreservation)
+  const prefersReducedMotion = useReducedMotion()
 
   const captureAnchor = () => {
     const table = tableRef.current
@@ -55,7 +59,10 @@ export function useTableScrollAnchor({
         : undefined
   }
 
+  useLayoutEffect(() => () => smoothScrollCleanup.current?.(), [scrollPreservation?.key])
+
   useLayoutEffect(() => {
+    currentScrollPreservation.current = scrollPreservation
     const table = tableRef.current
     const container = table?.parentElement
     const previous = anchor.current
@@ -63,6 +70,7 @@ export function useTableScrollAnchor({
       table &&
       container &&
       scrollPreservation &&
+      !smoothScrollCleanup.current &&
       previous?.key === scrollPreservation.key &&
       previous.scrollTop === container.scrollTop
     if (canRestoreAnchor) {
@@ -96,8 +104,48 @@ export function useTableScrollAnchor({
   const scrollToTop = () => {
     const container = tableRef.current?.parentElement
     if (!container) return
-    container.scrollTop = 0
-    captureAnchor()
+    smoothScrollCleanup.current?.()
+
+    if (!prefersReducedMotion && container.scrollTop > 1) {
+      let idleTimeout: ReturnType<typeof setTimeout>
+      const cleanupScroll = () => {
+        clearTimeout(idleTimeout)
+        container.removeEventListener('scroll', handleSmoothScroll)
+        container.removeEventListener('scrollend', finishScroll)
+        smoothScrollCleanup.current = undefined
+        captureAnchor()
+      }
+      const finishScroll = () => {
+        cleanupScroll()
+        if (container.scrollTop <= 1) currentScrollPreservation.current?.onScrollToTop()
+      }
+      const handleSmoothScroll = () => {
+        clearTimeout(idleTimeout)
+        if (container.scrollTop <= 1) {
+          finishScroll()
+        } else {
+          idleTimeout = setTimeout(finishScroll, 150)
+        }
+      }
+      smoothScrollCleanup.current = () => {
+        cleanupScroll()
+        container.scrollTo({
+          top: container.scrollTop,
+          left: container.scrollLeft,
+          behavior: 'instant',
+        })
+      }
+      container.addEventListener('scroll', handleSmoothScroll)
+      container.addEventListener('scrollend', finishScroll)
+      idleTimeout = setTimeout(finishScroll, 150)
+    }
+
+    container.scrollTo({
+      top: 0,
+      left: container.scrollLeft,
+      behavior: prefersReducedMotion ? 'instant' : 'smooth',
+    })
+    if (!smoothScrollCleanup.current) captureAnchor()
     scrollPreservation?.onScrollToTop()
   }
 

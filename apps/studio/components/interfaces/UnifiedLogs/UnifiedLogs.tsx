@@ -13,7 +13,6 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import dayjs from 'dayjs'
 import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -30,6 +29,7 @@ import {
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogRefreshMarker } from './components/LogRefreshMarker'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
@@ -224,9 +224,7 @@ export const UnifiedLogs = () => {
   })
 
   const refetchAllData = () => {
-    resetLiveBatches()
-    refetchLogs()
-    refetchCounts()
+    refreshLogs()
     refetchCharts()
   }
 
@@ -246,21 +244,16 @@ export const UnifiedLogs = () => {
     sessionKey,
     acknowledgeLiveLogs,
     fetchLiveLogs,
-    resetLiveBatches,
+    refreshLogs,
   } = useLiveLogBatches({
     scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
     rows: uniqueRows,
     firstPage: unifiedLogsData?.pages[0],
     isPlaceholderData,
     fetchPreviousPage,
+    refetchLogs,
     refetchCounts,
   })
-  const rowDecorations = new Map(
-    batches.map((batch) => [
-      batch.ids[batch.ids.length - 1],
-      `Refresh ${dayjs(batch.refreshedAt).format('HH:mm:ss')}`,
-    ])
-  )
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -328,6 +321,24 @@ export const UnifiedLogs = () => {
   })
 
   const selectedRows = table.getSelectedRowModel().rows
+  const visibleRowIds = new Set(table.getRowModel().rows.map((row) => row.id))
+  const visibleColumnIds = table.getVisibleLeafColumns().map((column) => column.id)
+  const rowDecorations = new Map(
+    batches.flatMap((batch) => {
+      const lastVisibleId = batch.ids.findLast((id) => visibleRowIds.has(id))
+      if (lastVisibleId === undefined) return []
+      return [
+        [
+          lastVisibleId,
+          <LogRefreshMarker
+            key={lastVisibleId}
+            refreshedAt={batch.refreshedAt}
+            columnIds={visibleColumnIds}
+          />,
+        ] as const,
+      ]
+    })
+  )
   const selectedRow =
     selectedRows.find((row) => row.id === selection.activeId) ?? selectedRows.at(-1)
   const openRowId = selectedRow?.id

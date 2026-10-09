@@ -163,16 +163,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     else setOpenRowId(row.id === openRowId ? undefined : row.id)
                   }}
                 />
-                {rowDecorations?.has(row.id) && (
-                  <TableRow className="bg-surface-75 hover:bg-surface-75">
-                    <TableCell
-                      colSpan={table.getVisibleLeafColumns().length}
-                      className="px-2 py-1 text-xs text-foreground-lighter"
-                    >
-                      {rowDecorations.get(row.id)}
-                    </TableCell>
-                  </TableRow>
-                )}
+                {rowDecorations?.get(row.id)}
               </Fragment>
             ))
           ) : isLoading ? (
