@@ -13,12 +13,15 @@ function AiTools({
   pageType,
   articleId,
   showAgentSetup = false,
+  headingClassName = 'block font-mono uppercase text-xs text-foreground-light mb-3',
   className,
 }: {
   pageType: MarkdownAffordancePageType
   /** ID of the rendered article, copied as HTML when the page's markdown can't be fetched. */
   articleId: string
   showAgentSetup?: boolean
+  /** Replaces the default heading classes so the heading can match the surrounding layout. */
+  headingClassName?: string
   className?: string
 }) {
   const path = usePathname()
@@ -41,11 +44,8 @@ function AiTools({
 
   return (
     <section className={cn(className)} aria-labelledby="ai-tools-title">
-      <h3
-        id="ai-tools-title"
-        className="block font-mono uppercase text-xs text-foreground-light mb-3"
-      >
-        AI Tools
+      <h3 id="ai-tools-title" className={headingClassName}>
+        AI tools
       </h3>
       <div className="flex flex-col gap-2">
         {showAgentSetup && (

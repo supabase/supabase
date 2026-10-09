@@ -103,6 +103,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
               <AiTools
                 pageType="troubleshooting"
                 articleId="sb-docs-troubleshooting-article-body"
+                headingClassName="text-sm text-foreground-lighter mb-3"
               />
               <hr className="my-6" aria-hidden />
               <Feedback className="px-0 mb-6 lg:mb-8" />
