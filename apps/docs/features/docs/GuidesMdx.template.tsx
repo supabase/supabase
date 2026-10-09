@@ -4,8 +4,9 @@ import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
+import { PROD_URL } from '~/lib/constants'
 import { type GuideFrontmatter } from '~/lib/docs'
-import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
+import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '~/lib/json-ld'
 import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { ExternalLink } from 'lucide-react'
@@ -74,6 +75,15 @@ const GuideTemplate = ({
   const breadcrumbChain = resolveBreadcrumbs(pathname)
   const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
   const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
+  const techArticleJsonLd = meta
+    ? serializeJsonLd(
+        techArticleSchema({
+          url: `${PROD_URL}${pathname}`,
+          headline: mdToPlainText(meta.title),
+          description: meta.description ? mdToPlainText(meta.description) : undefined,
+        })
+      )
+    : null
 
   return (
     <TocAnchorsProvider>
@@ -86,6 +96,12 @@ const GuideTemplate = ({
             'col-span-12 md:col-span-8'
           )}
         >
+          {techArticleJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: techArticleJsonLd }}
+            />
+          )}
           {breadcrumbJsonLd && (
             <script
               type="application/ld+json"

@@ -66,3 +66,59 @@ export function breadcrumbListSchema({ pathname, chain }: BreadcrumbListSchemaIn
     itemListElement,
   }
 }
+
+const PUBLISHER = {
+  '@type': 'Organization',
+  name: 'Supabase',
+  url: 'https://supabase.com',
+  logo: {
+    '@type': 'ImageObject',
+    url: 'https://supabase.com/images/og/supabase-og.png',
+  },
+}
+
+interface TechArticleSchemaInput {
+  url: string
+  headline: string
+  description?: string
+}
+
+export function techArticleSchema({ url, headline, description }: TechArticleSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    '@id': `${url}#page`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    url,
+    headline,
+    description,
+    inLanguage: 'en',
+    publisher: PUBLISHER,
+  }
+}
+
+interface ApiReferenceSchemaInput {
+  url: string
+  headline: string
+  description?: string
+}
+
+export function apiReferenceSchema({ url, headline, description }: ApiReferenceSchemaInput) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'APIReference',
+    '@id': `${url}#page`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': url,
+    },
+    url,
+    headline,
+    description,
+    inLanguage: 'en',
+    publisher: PUBLISHER,
+  }
+}

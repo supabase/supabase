@@ -1,8 +1,9 @@
 import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH } from '~/lib/constants'
+import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { apiReferenceSchema, techArticleSchema } from '~/lib/json-ld'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -231,6 +232,73 @@ export async function generateReferenceMetadata(
   } else {
     return {}
   }
+}
+
+/**
+ * JSON-LD `@type` for reference pages, matched by pathname prefix. The first
+ * matching rule wins, and paths that match no rule get `APIReference`. To
+ * switch a whole section, edit or add its prefix here.
+ */
+const REFERENCE_JSON_LD_TYPE_RULES: ReadonlyArray<{
+  prefix: string
+  type: 'APIReference' | 'TechArticle'
+}> = [{ prefix: '/reference/self-hosting-', type: 'TechArticle' }]
+
+export function referenceJsonLdType(pathname: string) {
+  return (
+    REFERENCE_JSON_LD_TYPE_RULES.find((rule) => pathname.startsWith(rule.prefix))?.type ??
+    'APIReference'
+  )
+}
+
+/**
+ * Builds the JSON-LD for a reference page, or `null` for paths that aren't
+ * reference pages. `pathname` is relative to the docs base path.
+ */
+export async function generateReferenceJsonLd(slug: Array<string>) {
+  const parsedPath = parseReferencePath(slug)
+  let pathname: string
+  let headline: string
+  let description: string | undefined
+
+  if (parsedPath.__type === 'clientSdk') {
+    const { sdkId, maybeVersion, path } = parsedPath
+    const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
+    const flattenedSections = await getFlattenedSections(sdkId, version)
+
+    const displayName = REFERENCES[sdkId].name
+    const sectionTitle =
+      slug.length > 0
+        ? flattenedSections?.find((section) => section.slug === slug[0])?.title
+        : undefined
+    pathname = `/reference/${sdkId}${path[0] ? `/${path[0]}` : ''}`
+    headline = `${displayName} API Reference${sectionTitle ? `: ${sectionTitle}` : ''}`
+    description = `API reference for the ${displayName} Supabase SDK`
+  } else if (parsedPath.__type === 'cli') {
+    pathname = '/reference/cli'
+    headline = 'CLI Reference'
+    description = 'CLI reference for the Supabase CLI'
+  } else if (parsedPath.__type === 'api') {
+    const operationSlug = parsedPath.path[0]
+    const flattenedSections = operationSlug
+      ? await getFlattenedSections('api', 'latest')
+      : undefined
+    const sectionTitle = flattenedSections?.find((section) => section.slug === operationSlug)?.title
+
+    pathname = operationSlug ? `/reference/api/${operationSlug}` : '/reference/api'
+    headline = `Management API${sectionTitle ? `: ${sectionTitle}` : ''}`
+    description = `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`
+  } else if (parsedPath.__type === 'self-hosting') {
+    pathname = `/reference/${slug.join('/')}`
+    headline = 'Self-Hosting'
+  } else {
+    return null
+  }
+
+  const input = { url: `${PROD_URL}${pathname}`, headline, description }
+  return referenceJsonLdType(pathname) === 'TechArticle'
+    ? techArticleSchema(input)
+    : apiReferenceSchema(input)
 }
 
 export async function redirectNonexistentReferenceSection(
