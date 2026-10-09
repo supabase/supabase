@@ -35,7 +35,10 @@ export const useProfileCreateMutation = ({
       if (isClientError && error.code !== 429) return false
       return failureCount < 3
     },
-    retryDelay: (failureCount) => Math.min(1000 * 2 ** failureCount, 8000),
+    retryDelay: (failureCount, error) => {
+      if (error.code === 429 && error.retryAfter) return error.retryAfter * 1000
+      return Math.min(1000 * 2 ** failureCount, 8000)
+    },
     async onSuccess(data, variables, context) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: profileKeys.profile() }),
