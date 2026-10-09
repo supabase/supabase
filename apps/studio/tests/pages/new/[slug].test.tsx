@@ -130,6 +130,7 @@ const AVAILABLE_REGIONS_WITH_FRANKFURT: RegionsInfo = {
 const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
   available_versions: [
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
+    { postgres_engine: '17', release_channel: 'beta', version: 'supabase-postgres-17.9.9.999' },
     {
       postgres_engine: '17-oriole',
       release_channel: 'beta',
