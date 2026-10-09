@@ -13,6 +13,7 @@ import {
   DatabaseZap,
   Eye,
   FileCode2,
+  FileStack,
   Folders,
   GitBranch,
   Globe,
@@ -1918,6 +1919,34 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Object versioning and lifecycle policies',
+    subtitle: 'Recover objects after an accidental overwrite or delete.',
+    description: `
+Writing to a path that already holds an object replaces it, and the bytes that were there are gone. Turn on object versioning for a bucket and Storage keeps the version it replaced instead. Deleting an object archives it rather than removing it, so you can put it back.
+
+## Key features
+1. Per-bucket opt-in: Turn versioning on for the buckets that need it. Every other bucket keeps working as it does today.
+2. Version IDs: Each retained version gets its own ID, so you can list, download, or restore any one of them.
+3. Archive on delete: A deleted object leaves the bucket listing and stays recoverable until you remove it for good.
+4. Lifecycle policies: Expire noncurrent versions after a set number of days, or keep up to 100 of the most recent ones.
+5. Suspend without losing history: Suspending versioning stops new versions. The ones you already have stay where they are.
+6. Dashboard and API: Browse, restore, and delete versions from the file preview panel, supabase-js, or the Storage API.
+
+## Good to know
+- Versioning applies from the moment you turn it on. Objects already in the bucket have no history behind them.
+- Retained versions count toward your bucket size and your storage usage. Lifecycle policies are how you keep that in check.
+- Egress is unaffected. Keeping a version costs nothing in bandwidth, only retrieving one does.
+`,
+    icon: FileStack,
+    products: [PRODUCT_SHORTNAMES.STORAGE],
+    heroImage: '',
+    slug: 'object-versioning',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
     },
   },
   // Functions
