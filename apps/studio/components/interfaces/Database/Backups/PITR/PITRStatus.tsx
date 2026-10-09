@@ -82,6 +82,7 @@ const PITRStatus = ({
           <div className="w-[350px]">
             <TimezoneSelection
               selectedTimezone={selectedTimezone}
+              date={dayjs.unix(latestPhysicalBackupDateUnix ?? 0)}
               onSelectTimezone={onUpdateTimezone}
             />
           </div>
