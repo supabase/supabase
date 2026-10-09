@@ -1,5 +1,6 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
 import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
+import { createClient } from '@supabase/supabase-js'
 import { stripIndent } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -16,7 +17,18 @@ import {
 } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!
+)
+
+const ENABLE_MCP_OAUTH = process.env.ENABLE_MCP_AUTH === 'true'
+
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
+
+const RESOURCE_METADATA_URL =
+  process.env.API_EXTERNAL_URL!.replace('/auth/v1', '') +
+  '/.well-known/oauth-protected-resource/mcp'
 
 const mcpQuerySchema = z.object({
   features: z
@@ -48,7 +60,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
+const isTokenValid = async (token: string): Promise<boolean> => {
+  const { error } = await supabase.auth.getClaims(token)
+  return !error
+}
+
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  if (ENABLE_MCP_OAUTH) {
+    const token = req.headers.authorization?.replace('Bearer ', '')
+
+    if (!token || !(await isTokenValid(token))) {
+      res.setHeader(
+        'WWW-Authenticate',
+        `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${RESOURCE_METADATA_URL}"`
+      )
+
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+  }
   const { error, data } = mcpQuerySchema.safeParse(req.query)
 
   if (error) {

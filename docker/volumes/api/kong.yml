@@ -397,6 +397,17 @@ services:
     plugins:
       - name: cors
 
+  # - name: well-known-mcp-oauth
+  #   _comment: 'Auth: /.well-known/oauth-protected-resource/mcp -> http://auth:9999/.well-known/oauth-protected-resource/mcp'
+  #   url: http://mcp-oauth:3000/.well-known/oauth-protected-resource/mcp
+  #   routes:
+  #     - name: well-known-mcp-oauth
+  #       strip_path: true
+  #       paths:
+  #         - /.well-known/oauth-protected-resource/mcp
+  #   plugins:
+  #     - name: cors
+
   ## Analytics routes
   ## Not used - Studio and Vector talk directly to analytics via Docker networking.
   ## If external access is needed, add routes with key-auth matching Logflare's x-api-key auth.
