@@ -49,11 +49,12 @@ export const OAuthAppsRevokeDialogContent = ({
   const hasOrgGrant = Boolean(approval.org_grant)
 
   return (
-    <DialogContent size="small" {...props}>
+    <DialogContent size="medium" {...props}>
       <DialogHeader>
         <DialogTitle>Revoke access for {approval.app.name}</DialogTitle>
       </DialogHeader>
       <DialogSectionSeparator />
+
       {isError && (
         <AlertError
           subject={`An error occurred while revoking this ${approval.app.name} grant`}
@@ -62,39 +63,17 @@ export const OAuthAppsRevokeDialogContent = ({
         />
       )}
 
-      <DialogSection className="flex flex-col gap-4 text-sm text-foreground-light">
+      <DialogSection className="flex flex-col gap-y-2 text-sm text-foreground-light">
         <p>
-          This revokes the app at{' '}
-          <span className="font-medium text-foreground">organization level</span> and affects{' '}
-          <span className="font-medium text-foreground">all users</span>.
+          Revoking access removes app for the{' '}
+          <span className="font-medium text-foreground">entire organization</span>:
         </p>
 
-        <div className="flex flex-col gap-2">
-          <p>Caveats:</p>
-          <ul className="flex flex-col gap-1">
-            {hasOrgGrant && (
-              <li className="flex gap-x-2">
-                <span aria-hidden>–</span>
-                <span>The organization-wide grant will be revoked.</span>
-              </li>
-            )}
-            <li className="flex gap-x-2">
-              <span aria-hidden>–</span>
-              <span>Every member loses access on the apps next request.</span>
-            </li>
-            <li className="flex gap-x-2">
-              <span aria-hidden>–</span>
-              <span>Members will need to authorize again to reconnect.</span>
-            </li>
-            <li className="flex gap-x-2">
-              <span aria-hidden>–</span>
-              <span>
-                This is <span className="font-medium text-foreground">not</span> a per-user
-                revocation.
-              </span>
-            </li>
-          </ul>
-        </div>
+        <ul className="flex flex-col gap-y-1 list-disc pl-6">
+          {hasOrgGrant && <li>The organization-wide grant is removed</li>}
+          <li>All members lose access on the app's next request</li>
+          <li>Members must authorize the app again to reconnect</li>
+        </ul>
       </DialogSection>
 
       <DialogFooter>

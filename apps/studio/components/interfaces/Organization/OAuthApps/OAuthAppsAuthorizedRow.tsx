@@ -1,4 +1,4 @@
-import { LockIcon, MoreVerticalIcon, XIcon } from 'lucide-react'
+import { LockIcon, MoreVerticalIcon, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -81,24 +81,21 @@ export const OAuthAppsAuthorizedRow = ({
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>Manage app</TooltipContent>
+              <TooltipContent side="bottom">Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
               <DialogTrigger asChild>
-                <DropdownMenuItem onClick={() => setDialogContent('grants')}>
-                  <LockIcon className="mr-2 h-4 w-4" />
+                <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('grants')}>
+                  <LockIcon size={14} />
                   View grants
                 </DropdownMenuItem>
               </DialogTrigger>
               <DropdownMenuSeparator />
               {canRevoke && (
                 <DialogTrigger asChild>
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onClick={() => setDialogContent('revoke')}
-                  >
-                    <XIcon className="mr-2 h-4 w-4" />
-                    Revoke
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('revoke')}>
+                    <X size={14} />
+                    Revoke grants
                   </DropdownMenuItem>
                 </DialogTrigger>
               )}
