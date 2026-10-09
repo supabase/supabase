@@ -96,10 +96,10 @@ and hosted; off Edge Functions pass `resourceServer` and `authorizationServer`.
 OAuth access tokens. OAuth tokens include `client_id`; ordinary product sessions
 do not. The included `whoami` tool exposes that difference.
 
-Composing `withSupabase` as a `pipeline` entry is alpha in `@supabase/server`
-and tracks `@supabase/middleware` 0.x. The nested form,
-`withOAuthProtectedResource(withSupabase(config, handleMcp))`, is stable and
-behaves the same.
+Composing `withSupabase` as a `pipeline` entry needs `@supabase/server` 1.6.0
+or later. The nested form,
+`withOAuthProtectedResource(withSupabase(config, handleMcp))`, behaves the
+same.
 
 Any holder of a valid user token can call this function directly. Treat its
 tools as an authenticated product API: keep RLS enabled, check authorization for
