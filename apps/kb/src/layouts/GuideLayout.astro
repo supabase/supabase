@@ -10,12 +10,13 @@ interface Props {
 	description?: string
 	topics?: Topic[]
 	github_url?: string
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description, topics = [], github_url } = Astro.props
+const { title, description, topics = [], github_url, jsonLd } = Astro.props
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} jsonLd={jsonLd}>
 	<article class="prose max-w-3xl mx-auto px-6 py-16">
 		<h1>{title}</h1>
 		{description && <p class="lead">{description}</p>}
