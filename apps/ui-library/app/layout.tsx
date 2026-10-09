@@ -20,13 +20,15 @@ const sourceCodePro = Source_Code_Pro({
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+
 export const metadata: Metadata = {
   applicationName: 'Supabase Library',
   title: 'Supabase Library',
   description: 'Supabase blocks and starter apps for authentication, storage, realtime, and more',
   metadataBase: new URL('https://supabase.com'),
-  icons: genFaviconData(BASE_PATH),
-  manifest: `${BASE_PATH}/favicon/manifest.json`,
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
   openGraph: {
     type: 'article',
     authors: 'Supabase',

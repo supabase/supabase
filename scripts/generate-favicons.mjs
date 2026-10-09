@@ -32,7 +32,7 @@ for (const [variant, relativeDirectory] of faviconTargets) {
   const directory = path.join(root, relativeDirectory)
   await mkdir(directory, { recursive: true })
   const svg = await readFile(path.join(root, `assets/favicons/${variant}.svg`))
-  const background = variant === 'staging' ? '#FFFFFF' : '#1C1C1C'
+  const background = variant === 'staging' ? '#FFFFFF' : variant === 'local' ? '#087BFF' : '#1C1C1C'
   const render = (size) => sharp(svg).resize(size, size)
   const images = await Promise.all(
     [16, 32, 48].map(async (size) => ({ size, data: await render(size).png().toBuffer() }))
@@ -60,4 +60,4 @@ for (const [variant, relativeDirectory] of faviconTargets) {
 }
 
 // Next.js layouts declare their icons explicitly. Do not add app/favicon.ico,
-// which would duplicate the shared icon declarations.
+// which would also advertise the production artwork during local development.

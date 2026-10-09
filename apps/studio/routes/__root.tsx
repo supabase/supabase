@@ -79,6 +79,7 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getCLIFaviconRoute } from '@/lib/cli-favicon'
 import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
@@ -204,11 +205,17 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
 
 configureMonacoLoader()
 
-const FAVICON_ROUTE = IS_NON_PROD_ENV ? '/favicon/staging' : '/favicon'
+// Build-time branding; CLI mode is resolved at runtime by the root loader.
+let FAVICON_ROUTE = '/favicon'
+if (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod')
+  FAVICON_ROUTE = '/favicon/staging'
+if (process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_ENVIRONMENT === 'local') {
+  FAVICON_ROUTE = '/favicon/local'
+}
 const THEME_COLOR = '1E1E1E'
 const APPLICATION_NAME = 'Supabase Studio'
 
-function buildRootHead() {
+function buildRootHead(faviconRoute = FAVICON_ROUTE) {
   const meta: Array<Record<string, string>> = [
     { charSet: 'utf-8' },
     { name: 'viewport', content: 'initial-scale=1.0, width=device-width' },
@@ -220,8 +227,8 @@ function buildRootHead() {
   ]
 
   const links: Array<Record<string, string>> = [
-    ...genFaviconLinks(BASE_PATH, FAVICON_ROUTE),
-    { rel: 'manifest', href: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json` },
+    ...genFaviconLinks(BASE_PATH, faviconRoute),
+    { rel: 'manifest', href: `${BASE_PATH}${faviconRoute}/manifest.json` },
   ]
 
   if (IS_PLATFORM) {
@@ -279,7 +286,6 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  head: buildRootHead,
   // Mirrors the redirect rules in `next.config.ts` / `vercel.ts`. Vercel's
   // edge layer already handles these for the platform deploy; this is the
   // self-hosted (Node-server) fallback and the client-side safety net.
@@ -308,6 +314,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       statusCode: match.permanent ? 308 : 307,
     })
   },
+  loader: async (): Promise<string> => {
+    if (IS_PLATFORM || FAVICON_ROUTE !== '/favicon') return FAVICON_ROUTE
+    try {
+      return await getCLIFaviconRoute()
+    } catch {
+      return FAVICON_ROUTE
+    }
+  },
+  head: ({ loaderData }) => buildRootHead(loaderData),
   component: RootComponent,
   shellComponent: RootDocument,
   notFoundComponent: NotFound,

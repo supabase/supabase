@@ -14,6 +14,10 @@ for (const [variant, directory] of faviconTargets) {
   const svg = await readFile(path.join(root, `assets/favicons/${variant}.svg`), 'utf8')
   assert.match(svg, /width="512" height="512"/)
   assert.match(svg, /M0 153\.6C0 99\.835/)
+  if (variant === 'local') {
+    assert.doesNotMatch(svg, /stroke-dasharray|stroke-width/)
+    assert.match(svg, /<path opacity="0.3"/)
+  }
   const ico = await readFile(file('favicon.ico'))
   assert.equal(ico.readUInt16LE(0), 0)
   assert.equal(ico.readUInt16LE(2), 1)
