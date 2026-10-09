@@ -104,12 +104,22 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
               </DialogTrigger>
             </DropdownMenuContent>
           </DropdownMenu>
-          {dialogContent === 'projects' && <GrantProjectsDialogContent grant={grant} />}
+          {dialogContent === 'projects' && (
+            <GrantProjectsDialogContent grant={grant} onCloseAutoFocus={preventDefault} />
+          )}
           {dialogContent === 'disconnect' && (
-            <GrantDisconnectDialogContent grant={grant} onClose={() => setIsDialogOpen(false)} />
+            <GrantDisconnectDialogContent
+              grant={grant}
+              onClose={() => setIsDialogOpen(false)}
+              onCloseAutoFocus={preventDefault}
+            />
           )}
         </Dialog>
       </TableCell>
     </TableRow>
   )
+}
+
+const preventDefault = (event: Event) => {
+  event.preventDefault()
 }

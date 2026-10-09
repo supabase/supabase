@@ -1,4 +1,5 @@
 import { BoxIcon } from 'lucide-react'
+import { ComponentProps } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -15,13 +16,20 @@ import {
 
 import { MemberOauthGrantItem } from '@/data/oauth-apps/types'
 
-export const GrantProjectsDialogContent = ({ grant }: { grant: MemberOauthGrantItem }) => {
+interface GrantProjectsDialogContentProps extends ComponentProps<typeof DialogContent> {
+  grant: MemberOauthGrantItem
+}
+
+export const GrantProjectsDialogContent = ({
+  grant,
+  ...props
+}: GrantProjectsDialogContentProps) => {
   return (
-    <DialogContent onCloseAutoFocus={(event) => event.preventDefault()}>
+    <DialogContent {...props}>
       <DialogHeader className="px-0 md:px-0">
         <DialogTitle className="px-4 md:px-5">Projects using {grant?.app.name}</DialogTitle>
         <DialogDescription asChild>
-          <div className="h-90 overflow-y-auto scrollbar-gutter-stable">
+          <div className="h-90 overflow-y-auto">
             <Accordion type="multiple">
               {grant?.projects?.map((project) => {
                 const permissionCount = grant.approved_scopes.length

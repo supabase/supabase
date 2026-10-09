@@ -1,3 +1,4 @@
+import { ComponentProps } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -12,13 +13,16 @@ import {
 import { useOAuthGrantRevokeMutation } from '@/data/oauth-apps/oauth-apps-revoke-grant-mutation'
 import { MemberOauthGrantItem } from '@/data/oauth-apps/types'
 
+interface GrantDisconnectDialogContentProps extends ComponentProps<typeof DialogContent> {
+  grant: MemberOauthGrantItem
+  onClose: () => void
+}
+
 export const GrantDisconnectDialogContent = ({
   grant,
   onClose,
-}: {
-  grant: MemberOauthGrantItem
-  onClose: () => void
-}) => {
+  ...props
+}: GrantDisconnectDialogContentProps) => {
   const { mutate: revokeGrant, isPending } = useOAuthGrantRevokeMutation({
     onSuccess: () => {
       toast.success(`Revoked access for ${grant?.app?.name}`)
@@ -27,7 +31,7 @@ export const GrantDisconnectDialogContent = ({
   })
 
   return (
-    <DialogContent size="small" onCloseAutoFocus={(event) => event.preventDefault()}>
+    <DialogContent size="small" {...props}>
       <DialogHeader>
         <DialogTitle>Revoke access for {grant?.app?.name}</DialogTitle>
         <DialogDescription asChild>
