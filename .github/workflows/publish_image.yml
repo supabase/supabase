@@ -62,6 +62,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          secrets: |
+            df_firewall_token=${{ secrets.DF_FIREWALL_TOKEN }}
 
   release_arm:
     needs: settings
@@ -105,6 +107,8 @@ jobs:
           platforms: linux/${{ env.arch }}
           tags: ${{ steps.meta.outputs.tags }}
           no-cache: true
+          secrets: |
+            df_firewall_token=${{ secrets.DF_FIREWALL_TOKEN }}
 
   merge_manifest:
     needs:
