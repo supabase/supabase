@@ -99,7 +99,7 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
 
 export const usePipelineCreationPreview = () => {
   const { flags, isInitialized } = useFeaturePreviewContext()
-  const isAvailable = useFlag('pipelineCreationWizard') === true
+  const isAvailable = useFlag('pipelineCreationWizard')
   const isEnabled =
     IS_PLATFORM &&
     isInitialized &&
