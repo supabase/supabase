@@ -27,7 +27,7 @@ const ENABLE_MCP_OAUTH = process.env.ENABLE_MCP_AUTH === 'true'
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
 
 const RESOURCE_METADATA_URL =
-  process.env.API_EXTERNAL_URL!.replace('/auth/v1', '') +
+  (process.env.API_EXTERNAL_URL || process.env.SUPABASE_PUBLIC_URL)?.replace('/auth/v1', '') +
   '/.well-known/oauth-protected-resource/mcp'
 
 const mcpQuerySchema = z.object({
