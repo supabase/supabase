@@ -208,7 +208,7 @@ export const TextConfirmModal = forwardRef<
                           </span>
                         </>
                       ) : (
-                        <span className="text-foreground break-all whitespace-pre">
+                        <span className="text-foreground break-all whitespace-pre-wrap">
                           {confirmString}
                         </span>
                       )}{' '}
