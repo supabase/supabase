@@ -35,7 +35,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
         href={`${blog.path}`}
         prefetch={false}
         key={blog.slug}
-        className="group w-full grid lg:grid-cols-12 gap-8 md:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
+        className="group w-full grid lg:grid-cols-12 gap-8 md:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 -mx-2 sm:-mx-4 p-2 sm:p-4 rounded-xl"
       >
         <div className="relative w-full aspect-[1.91/1] lg:col-span-6 overflow-hidden block group">
           <div className="relative w-full h-full shadow-lg border border-foreground/10 rounded-lg overflow-hidden">
@@ -59,20 +59,18 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
             <p className="p">{blog.description}</p>
           </div>
 
-          <div className="flex items-center justify-between gap-4 mt-4">
-            <div className="min-w-0 flex-1">
+          <div className="flex flex-col gap-2 mt-4">
+            <div className="min-w-0">
               <span className="sr-only">Author: </span>
               <AuthorAvatars authors={author} size="md" />
             </div>
-            <div className="text-foreground-lighter flex shrink-0 space-x-2 text-xs">
+            <div className="text-foreground-lighter flex items-center space-x-1.5 text-sm">
               <span>
                 <span className="sr-only">Published </span>
                 {blog.formattedDate}
               </span>
-              <span aria-hidden="true" className="hidden sm:inline">
-                ·
-              </span>
-              <span className="hidden sm:inline">{blog.readingTime}</span>
+              <span aria-hidden="true">·</span>
+              <span>{blog.readingTime}</span>
             </div>
           </div>
         </div>
