@@ -1,3 +1,4 @@
+import { ident, safeSql } from '@supabase/pg-meta'
 import { toast } from 'sonner'
 import {
   Button,
@@ -149,7 +150,7 @@ export const EnableExtensionModal = ({
                     wrapLongLines
                     wrapperClassName={cn('min-w-0 max-w-full [&_pre]:px-3 [&_pre]:py-3')}
                     className="[&_code]:text-xs"
-                    value={`create extension if not exists ${extension.name} schema target_schema;`}
+                    value={safeSql`create extension if not exists ${ident(extension.name)} schema target_schema;`}
                   />
                 </DialogSection>
               </DialogDisclosureContent>

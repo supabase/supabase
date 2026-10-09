@@ -900,7 +900,7 @@ test.describe('Database Extensions', () => {
     const dialog = page.getByRole('dialog')
     await expect(dialog, 'Enable extension dialog should be visible').toBeVisible()
     await expect(
-      dialog.getByText(`Confirm to enable ${EXTENSION_NAME}`),
+      dialog.getByRole('heading', { name: `Enable ${EXTENSION_NAME}`, exact: true }),
       'Dialog title should match extension name'
     ).toBeVisible()
     await expect(
