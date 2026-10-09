@@ -1,6 +1,6 @@
 ---
 title: 'How we made the Supabase Select 2026 badge'
-description: 'Every Supabase Select attendee walked away with a programmable badge. Here’s how it came together and what you can do with yours.'
+description: 'Every Supabase Select attendee walked away with a programmable badge. Here’s how we made 800 of them, and what you can do with yours.'
 author: sam_meech_ward
 date: '2026-10-07'
 categories:
@@ -13,24 +13,16 @@ imgThumb: 'how-we-made-the-supabase-select-2026-badge/thumb.png'
 toc_depth: 2
 ---
 
+[Supabase Select](https://select.supabase.com/) is our developer conference, and this year it took place in San Francisco on October 2. Rather than yet another name tag destined for the trash, every attendee received a programmable badge they can keep hacking on long after the conference.
+
+During the conference it was an animated name tag with the schedule and a couple of games on it. Since then, people have turned it into a [live flight tracker](https://x.com/jsmillerdev/status/2107160820455035216), an [arcade game about dead tuples](https://x.com/LFGAmy/status/2106146139166879956), and a [language model](https://x.com/maddiedreese/status/2106147063759278250) that runs entirely on the badge.
+
+Here’s how we went about building the badges, and some ideas to push it even further.
+
 <Img
   alt="Supabase Select badges hanging from their lanyards"
   src="/images/blog/how-we-made-the-supabase-select-2026-badge/badges-on-lanyards.jpg"
 />
-
-Rather than yet another name tag destined for the trash, every [Supabase Select](https://select.supabase.com/) attendee received a programmable badge, that they can continue to hack long after the conference.
-
-During the conference it was an animated name tag with the schedule and a couple of games on it. Since then, people have turned it into a live flight tracker, an arcade game about dead tuples, and a language model that runs entirely on the badge.
-
-Here’s how we went about building the badges, and some ideas to push it even further.
-
-## Why a badge
-
-I'd seen electronic badges at conferences like GitHub Universe and DEF CON and wanted Supabase to have one, partly because I love electronics and mostly because I think microcontrollers are an underused way for developers to get more out of the skills they already have.
-
-If you can build a web or mobile app, you already know most of what it takes to put a screen on your desk, or a sensor in your room that does something useful when a reading changes. The hardware is inexpensive, and was not affected by the recent price increase of memory - Raspberry Pi raised the price of their computers several times, while microcontrollers remained the same price. With a tool like Claude Code, a first hardware project becomes an afternoon spent mostly on deciding what to make.
-
-The brief was to give people something that works as a name tag for two days and stays useful long after.
 
 ## What's inside
 
@@ -40,7 +32,7 @@ The badge is based on the [Pimoroni Tufty 2350](https://shop.pimoroni.com/produc
 - A color screen
 - A rechargeable battery
 - Onboard Wi-Fi and Bluetooth
-- Physical buttons (A, B, and C) you can map to anything
+- Five physical buttons you can map to anything
 
 ## Making a thousand of them
 
@@ -51,12 +43,22 @@ Our first iteration was a board with a Raspberry Pi Pico, a screen, and a batter
   src="/images/blog/how-we-made-the-supabase-select-2026-badge/prototype.jpg"
 />
 
-With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who build similar hardware - screen, battery and programmable microcontroller - but on a single board, greatly reducing the complexity of assembly. We wrote a custom OS and all the software required: the name tag, the schedule, and the games. It was only a fraction of what the badge was capable of, but it was exactly what we needed _at_ Select.
+With our next iteration, we went with [Pimoroni](https://shop.pimoroni.com), who build similar hardware - screen, battery and programmable microcontroller - but on a single board, greatly reducing the complexity of assembly. We wrote all the software that shipped on it: the name tag, the schedule, and the games. It was only a fraction of what the badge was capable of, but it was exactly what we needed _at_ Select.
 
 <Img
   alt="The final badge in its clear case, showing an attendee name tag"
   src="/images/blog/how-we-made-the-supabase-select-2026-badge/final-badge.jpg"
 />
+
+## Getting 800 badges ready
+
+The badges arrived two weeks before Select: 800 of them, in 20 boxes of 40, with flat batteries.
+
+Charging 800 badges turned into a fun math problem. Each badge draws less than half an amp, so we didn't need anything fancy: two 30-port USB charging hubs, the kind schools use to charge iPads overnight, and a pile of the cheapest cables we could find. A full charge takes about three hours. With 60 ports, that's 14 batches. Add an hour per batch for plugging, unplugging, and powering down, and it works out to about 56 hours of charging.
+
+The schedule app was meant to pull live updates over Wi-Fi, but the venue network wasn't going to cooperate. A laptop could stay connected from the far end of the parking lot, while the badges couldn't connect at all, and 800 badges sharing the 2.4 GHz band with every neighboring network was never going to be reliable. So the badges went offline-first. We set up our own router broadcasting the network name already saved on the badges, connected it to a cellular hotspot, and synced every badge’s schedule before the doors opened. Open the schedule app while connected, and it pulls the latest version.
+
+The last few days were an assembly line, one box at a time: charge it, sync the schedule, and back in the box. Two days before the doors opened, we were still working through the last boxes. On the day, we spotted attendees huddled around a laptop, already hacking their badges.
 
 ## What people have built so far
 
@@ -86,9 +88,11 @@ Check out these cool projects built by people at Select and others watching from
 
   Robert Soriano (@wobsoriano) got home and had his badge running Muse before the week was out.
 
-Y’all, there are so many more in the [badge showcase](https://badge.select/showcase), and every one of them started from the same hardware and ended up somewhere I wouldn't have thought to go.
+There are many more in the [badge showcase](https://badge.select/showcase), and every one of them started from the same hardware and ended up somewhere we wouldn't have thought to go.
 
 ## Hack your badge
+
+If you can build a web or mobile app, you already know most of what it takes to put a screen on your desk, or a sensor in your room that does something useful when a reading changes. The hardware is inexpensive, and was not affected by the recent price increase of memory - Raspberry Pi raised the price of their computers several times, while microcontrollers remained the same price. With a tool like Claude Code, a first hardware project becomes an afternoon spent mostly on deciding what to make.
 
 Everything you need is at [badge.select](https://badge.select/):
 
