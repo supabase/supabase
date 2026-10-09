@@ -117,7 +117,7 @@ export const MfaAuthSettingsForm = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
   const isBranch = project?.parentRef !== project?.ref
 
   // Separate loading states for each form
@@ -322,7 +322,12 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading || isLoadingEntitlement || isLoadingEntitlementEnhanceSecurity) {
+  if (
+    isLoading ||
+    isLoadingProject ||
+    isLoadingEntitlement ||
+    isLoadingEntitlementEnhanceSecurity
+  ) {
     return (
       <PageSection>
         <PageSectionContent>
