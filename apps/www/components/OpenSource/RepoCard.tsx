@@ -48,7 +48,7 @@ const RepoCard = ({ repo, activeTab, index }: { repo: any; activeTab: number; in
               />
             </svg>
 
-            <p className="text-foreground group-hover:text-brand text-lg m-0 leading-none">
+            <p className="text-foreground group-hover:text-primary text-lg m-0 leading-none">
               {repo.name}
             </p>
           </div>

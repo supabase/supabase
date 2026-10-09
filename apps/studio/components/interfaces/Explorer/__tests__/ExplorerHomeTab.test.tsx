@@ -54,12 +54,23 @@ beforeEach(() => {
 afterEach(() => localStorage.clear())
 
 describe('Explorer home onboarding', () => {
-  it('lets the user complete onboarding with the start page and does not show it on return', async () => {
+  it('steps through onboarding, completes it with the start page, and does not show it on return', async () => {
     const user = userEvent.setup()
     const first = renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
-    expect(screen.getByRole('radio', { name: /^Start page/ })).toBeChecked()
-    await user.click(screen.getByRole('button', { name: 'Open Explorer' }))
+    expect(screen.getByText('Step 1 of 4')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument()
+
+    for (const name of ['Run SQL', 'Notebooks', 'Chat with your project']) {
+      await user.click(screen.getByRole('button', { name: 'Next' }))
+      expect(screen.getByRole('heading', { name })).toBeVisible()
+    }
+    expect(screen.getByText('Step 4 of 4')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Next' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Continue to Explorer' }))
     expect(await screen.findByLabelText('Start page chat')).toBeInTheDocument()
     first.unmount()
 
@@ -69,26 +80,23 @@ describe('Explorer home onboarding', () => {
     expect(createQuery).not.toHaveBeenCalled()
   })
 
-  it('supports keyboard selection and waits for completion before opening a query', async () => {
+  it('goes back to the previous step', async () => {
     const user = userEvent.setup()
     renderHome()
-    const startPage = await screen.findByRole('radio', { name: /^Start page/ })
-    await user.click(startPage)
-    // Radix defers moving focus; keep the key down until that focus event selects the radio.
-    await user.keyboard('{ArrowRight>}')
-    await waitFor(() => expect(screen.getByRole('radio', { name: /^SQL query/ })).toBeChecked())
-    await user.keyboard('{/ArrowRight}')
-    expect(createQuery).not.toHaveBeenCalled()
-    await user.click(screen.getByRole('button', { name: 'Open Explorer' }))
-    await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
+    await screen.findByRole('heading', { name: 'Welcome to Explorer' })
+    await user.click(screen.getByRole('button', { name: 'Next' }))
+    await user.click(screen.getByRole('button', { name: 'Back' }))
+    expect(screen.getByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
   })
 
-  it('shows onboarding for an unfinished query preference', async () => {
+  it('opens a query when onboarding is skipped and the saved preference is a query', async () => {
+    const user = userEvent.setup()
     seedPreferences('query', false)
     renderHome()
     expect(await screen.findByRole('heading', { name: 'Welcome to Explorer' })).toBeVisible()
-    expect(screen.getByRole('radio', { name: /^SQL query/ })).toBeChecked()
     expect(createQuery).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: 'Skip' }))
+    await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
   })
 
   it('opens one query for a returning user, even under Strict Mode', async () => {
@@ -115,16 +123,4 @@ describe('Explorer home onboarding', () => {
       await waitFor(() => expect(createQuery).toHaveBeenCalledExactlyOnceWith({ replace: true }))
     }
   )
-
-  it('keeps Learn more collapsed initially and supports expanding and collapsing with the keyboard', async () => {
-    const user = userEvent.setup()
-    renderHome()
-    const trigger = await screen.findByRole('button', { name: 'Learn more' })
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
-    expect(screen.queryByText('Where did my snippets go?')).not.toBeInTheDocument()
-    await user.click(trigger)
-    expect(screen.getByText('Where did my snippets go?')).toBeVisible()
-    await user.keyboard('{Enter}')
-    expect(trigger).toHaveAttribute('aria-expanded', 'false')
-  })
 })

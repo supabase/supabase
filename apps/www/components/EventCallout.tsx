@@ -25,7 +25,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
           )}
           {...props}
         >
-          <span className="uppercase text-brand font-mono">Webinar</span>
+          <span className="uppercase text-primary font-mono">Webinar</span>
           {/* <span className="uppercase px-2 text-xs">23 Oct</span> */}
           <span className="">Migrating to Supabase Auth / Good Tape</span>
           <ChevronRightIcon className="translate-x-0 transition-transform group-hover:translate-x-0.5 w-3 h-3 -ml-1" />
@@ -41,8 +41,8 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
           )}
           {...props}
         >
-          <VideoCameraIcon className="w-4 h-4 text-brand mr-2" />
-          <span className="py-1 uppercase text-brand font-mono">Webinar</span>
+          <VideoCameraIcon className="w-4 h-4 text-primary mr-2" />
+          <span className="py-1 uppercase text-primary font-mono">Webinar</span>
           <span className="py-1 uppercase mx-3 px-3 border-x">23 Oct</span>
           <span className="py-1">Migrating to Supabase Auth / Good Tape</span>
           <ChevronRightIcon className="translate-x-0 transition-transform group-hover:translate-x-0.5 w-3 h-3 ml-1.5" />
@@ -67,7 +67,7 @@ const EventCallout = ({ className, size = 'tiny', ...props }: PropsWithChildren<
             </div>
             <div className="flex flex-col gap-2 md:gap-3 grow max-w-xl xl:justify-center">
               <div className="flex flex-row text-sm">
-                <span className="uppercase text-brand font-mono">Webinar</span>
+                <span className="uppercase text-primary font-mono">Webinar</span>
                 <span className="mx-3 pl-3 border-l">23 Oct 2024 at 10AM PST</span>
               </div>
 

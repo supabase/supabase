@@ -133,7 +133,7 @@ export const EventTriggerList = ({
             <TableCell>
               <div className="flex items-center justify-center">
                 {trigger.enabled_mode !== 'DISABLED' ? (
-                  <Check strokeWidth={2} className="text-brand" />
+                  <Check strokeWidth={2} className="text-primary" />
                 ) : (
                   <X strokeWidth={2} />
                 )}

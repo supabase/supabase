@@ -19,7 +19,7 @@ export const RealtimeInspector = () => {
   const { data: project } = useSelectedProjectQuery()
 
   // Check if realtime publications are available
-  const { data: publications } = useDatabasePublicationsQuery({
+  const { data: publications, isSuccess: isPublicationsSuccess } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -55,10 +55,10 @@ export const RealtimeInspector = () => {
   const hasChannel = realtimeConfig.channelName.length > 0
   const isListening = realtimeConfig.enabled
 
-  // Once a channel is set, MessagesTable renders its own empty states (including
-  // the "Broadcast a message" entry point), so sending doesn't depend on a
-  // message having arrived first. EmptyRealtime is only the pre-channel onboarding.
-  const showMessagesTable = hasChannel || (logData ?? []).length > 0
+  // Only show setup guidance once publications confirm that Postgres Changes
+  // is not configured. An empty Inspector session does not imply Realtime is unused.
+  const showMessagesTable =
+    !isPublicationsSuccess || isRealtimeAvailable || hasChannel || (logData ?? []).length > 0
 
   const handleJoinChannel = useCallback(() => {
     if (!hasChannel) {

@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AnimatePresence } from 'framer-motion'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -37,6 +37,10 @@ import { KeyDetailsDialog } from './key-details-dialog'
 import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import {
+  getJWTSigningKeyLastUsedAt,
+  useApiKeysLastUsedQuery,
+} from '@/data/analytics/api-keys-last-used-query'
 import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from '@/data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
@@ -59,10 +63,24 @@ export const JWTSecretKeysTable = () => {
   const [selectedKey, setSelectedKey] = useState<JWTSigningKey>()
   const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
   const [shownDialog, setShownDialog] = useState<DialogType>()
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.SECRETS_READ,
     '*'
+  )
+  const now = useRef(new Date()).current
+  const {
+    data: lastUsedData,
+    isError: isLastUsedError,
+    isLoading: isLoadingLastUsed,
+  } = useApiKeysLastUsedQuery(
+    {
+      projectRef,
+      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: now.toISOString(),
+    },
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
   )
   const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
     {
@@ -129,6 +147,7 @@ export const JWTSecretKeysTable = () => {
     () => sortedKeys.filter((key) => key.status === 'revoked'),
     [sortedKeys]
   )
+  const getLastUsedAt = (keyId: string) => getJWTSigningKeyLastUsedAt(lastUsedData ?? [], keyId)
 
   const resetDialog = () => {
     setSelectedKey(undefined)
@@ -236,7 +255,9 @@ export const JWTSecretKeysTable = () => {
                       <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Type
                       </TableHead>
-                      <TableHead />
+                      <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        {IS_PLATFORM && showApiKeysLastUsed && 'Last used'}
+                      </TableHead>
                       <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                         Actions
                       </TableHead>
@@ -257,6 +278,10 @@ export const JWTSecretKeysTable = () => {
                           setShownDialog={setShownDialog}
                           handleStandbyKey={handleStandbyKey}
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                          lastUsedAt={getLastUsedAt(standbyKey.id)}
+                          isLoadingLastUsed={isLoadingLastUsed}
+                          isLastUsedError={isLastUsedError}
+                          isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                         />
                       )}
                       {inUseKey && (
@@ -269,6 +294,10 @@ export const JWTSecretKeysTable = () => {
                           handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                           legacyKey={legacyKey}
                           standbyKey={standbyKey}
+                          lastUsedAt={getLastUsedAt(inUseKey.id)}
+                          isLoadingLastUsed={isLoadingLastUsed}
+                          isLastUsedError={isLastUsedError}
+                          isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                         />
                       )}
                     </AnimatePresence>
@@ -283,7 +312,7 @@ export const JWTSecretKeysTable = () => {
               <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
-                <em className="text-brand not-italic">verify tokens</em> that are yet to expire.
+                <em className="text-primary not-italic">verify tokens</em> that are yet to expire.
                 Revoke once all tokens have expired.
               </p>
             </div>
@@ -302,6 +331,11 @@ export const JWTSecretKeysTable = () => {
                         <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                           Type
                         </TableHead>
+                        {IS_PLATFORM && showApiKeysLastUsed && (
+                          <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                            Last used
+                          </TableHead>
+                        )}
                         <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
                           Last rotated at
                         </TableHead>
@@ -323,6 +357,10 @@ export const JWTSecretKeysTable = () => {
                             setShownDialog={setShownDialog}
                             handleStandbyKey={handleStandbyKey}
                             handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                            lastUsedAt={getLastUsedAt(key.id)}
+                            isLoadingLastUsed={isLoadingLastUsed}
+                            isLastUsedError={isLastUsedError}
+                            isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                           />
                         ))}
                       </AnimatePresence>
@@ -367,6 +405,11 @@ export const JWTSecretKeysTable = () => {
                     <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
                       Type
                     </TableHead>
+                    {IS_PLATFORM && showApiKeysLastUsed && (
+                      <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
+                        Last used
+                      </TableHead>
+                    )}
                     <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
                       Last rotated at
                     </TableHead>
@@ -387,6 +430,10 @@ export const JWTSecretKeysTable = () => {
                         handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                         legacyKey={legacyKey}
                         standbyKey={standbyKey}
+                        lastUsedAt={getLastUsedAt(key.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
                       />
                     ))}
                   </AnimatePresence>

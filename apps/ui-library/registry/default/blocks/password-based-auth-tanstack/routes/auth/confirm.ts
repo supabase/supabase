@@ -44,12 +44,12 @@ const confirmFn = createServerFn({ method: 'GET' })
         type,
         token_hash,
       })
-      console.log(error?.message)
       if (!error) {
         // redirect user to specified redirect URL or root of app
         throw redirect({ href: next })
       } else {
         // redirect the user to an error page with some instructions
+        console.log(error?.message)
         throw redirect({
           to: `/auth/error`,
           search: { error: error?.message },

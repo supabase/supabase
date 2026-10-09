@@ -97,7 +97,7 @@ function DropZone({ onDrop: onDropFromParent, onClickUpload }: DropZoneProps) {
       onClick={onClickUpload}
     >
       <p className="text-sm">
-        Drag and drop, or <span className="text-brand">browse</span> your files
+        Drag and drop, or <span className="text-primary">browse</span> your files
       </p>
     </div>
   )

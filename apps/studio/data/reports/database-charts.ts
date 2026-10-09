@@ -13,6 +13,14 @@ import { resolveHighAvailability } from '@/hooks/misc/useHighAvailability.consta
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
+// High Availability projects run on volumes without a burst credit pool, so the
+// Disk IO Burst Balance chart has no data to show for them.
+export const shouldShowDiskIOBurstBalanceChart = (
+  project: Project | undefined,
+  isFlagEnabled: boolean
+): boolean =>
+  isFlagEnabled && hasBurstableIO(project?.infra_compute_size) && !resolveHighAvailability(project)
+
 export const getReportAttributesV2: (
   entitledFeatures: string[],
   project: Project,
@@ -42,12 +50,10 @@ export const getReportAttributesV2: (
     typeof provisionedDiskIops === 'number' && typeof computeIopsLimit === 'number'
       ? Math.min(provisionedDiskIops, computeIopsLimit)
       : provisionedDiskIops
-  // High Availability projects run on volumes without a burst credit pool, so the
-  // Disk IO Burst Balance chart has no data to show for them.
-  const showBurstBalanceChart =
-    !!showDiskIOBurstBalanceChart &&
-    hasBurstableIO(project?.infra_compute_size) &&
-    !isHighAvailability
+  const showBurstBalanceChart = shouldShowDiskIOBurstBalanceChart(
+    project,
+    !!showDiskIOBurstBalanceChart
+  )
   const baselineThroughputMBps = COMPUTE_DISK[computeVariantId]?.baselineThroughputMBps
   const baselineThroughputLabel =
     typeof baselineThroughputMBps === 'number' ? `${baselineThroughputMBps} MB/s` : 'its baseline'
@@ -413,7 +419,7 @@ export const getReportAttributesV2: (
     {
       id: 'disk-io-burst-balance',
       label: 'Disk IO Burst Balance',
-      titleTooltip: `The burst credit pool that smaller compute instances draw on to sustain IO above their baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
+      titleTooltip: `The EBS burst credit pool your compute draws on to sustain IO above its baseline. When the balance hits 0%, sustained throughput returns to its baseline of ${baselineThroughputLabel} until it refills.`,
       docsUrl: `${DOCS_URL}/guides/platform/compute-add-ons#disk-throughput-and-iops`,
       syncId: 'database-reports',
       hide: !showBurstBalanceChart,

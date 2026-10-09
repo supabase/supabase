@@ -6,11 +6,12 @@ import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
+import { NO_PROJECT_MARKER } from '../SupportForm.utils'
 import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../SupportFormPage'
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from '@/lib/constants'
+import type { StatusPageResponse } from '@/lib/status-page/status-page.schema'
 import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -142,6 +143,10 @@ const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoist
 
 const mockStudioVersion = `SHA ${mockCommitSha} deployed at ${dayjs(mockCommitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
 
+const { mockUseFlag } = vi.hoisted(() => ({
+  mockUseFlag: vi.fn().mockReturnValue(false),
+}))
+
 vi.mock('react-inlinesvg', () => ({
   __esModule: true,
   default: () => null,
@@ -190,6 +195,7 @@ vi.mock(import('common'), async (importOriginal) => {
     ...actual,
     useParams: vi.fn().mockReturnValue({ ref: 'default' }),
     useIsLoggedIn: vi.fn().mockReturnValue(true),
+    useFlag: mockUseFlag,
     isFeatureEnabled: vi.fn((feature: any, disabledFeatures: any) => {
       if (typeof feature === 'string') {
         if (feature === 'support:show_client_libraries') {
@@ -392,6 +398,7 @@ describe('SupportFormPage', () => {
   })
 
   beforeEach(async () => {
+    mockUseFlag.mockReset().mockReturnValue(false)
     mockUseDeploymentCommitQuery.mockReturnValue({
       data: { commitSha: mockCommitSha, commitTime: mockCommitTime },
     })
@@ -590,6 +597,48 @@ describe('SupportFormPage', () => {
     })
   })
 
+  test('flag on: shows an active incident from the new status page endpoint', async () => {
+    mockUseFlag.mockImplementation((name: string) => name === 'incidentIoStatusPage')
+
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json<StatusPageResponse>({
+          page_title: 'Supabase status',
+          page_url: 'https://status.supabase.com/',
+          ongoing_incidents: [
+            {
+              id: 'inc-1',
+              name: 'Elevated errors',
+              url: 'https://status.supabase.com/incidents/inc-1',
+              last_update_at: '2026-01-01T00:00:00Z',
+              last_update_message: null,
+              affected_components: [],
+              status: 'investigating',
+              current_worst_impact: 'full_outage',
+              visible: true,
+              show_banner: true,
+            },
+          ],
+          in_progress_maintenances: [],
+          scheduled_maintenances: [],
+        })
+      )
+    )
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
+    })
+
+    expect(await screen.findByText('Elevated errors')).toBeInTheDocument()
+    expect(
+      screen.getByText('We are investigating this issue. Follow the status page for updates.')
+    ).toBeInTheDocument()
+
+    expect(screen.queryByText('Try Supabase Assistant')).not.toBeInTheDocument()
+  })
+
   test('loading with initial params prefills the organization and project', async () => {
     renderSupportForm({ initialParams: { projectRef: 'project-3' } })
 
@@ -704,7 +753,6 @@ describe('SupportFormPage', () => {
 
     const payload = submitSpy.mock.calls[0]?.[0]
     expect(payload).toMatchObject({
-      projectRef: NO_PROJECT_MARKER,
       organizationSlug: 'org-1',
       allowSupportAccess: false,
     })
@@ -880,7 +928,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?error=${encodeURIComponent(initialError)}`),
+      value: createMockLocation(`?errorMessage=${encodeURIComponent(initialError)}`),
       writable: true,
     })
 
@@ -1143,7 +1191,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: createMockLocation('?projectRef=project-3&error=Connection timeout detected'),
+      value: createMockLocation('?projectRef=project-3&errorMessage=Connection timeout detected'),
       writable: true,
     })
 
@@ -1903,8 +1951,6 @@ describe('SupportFormPage', () => {
     expect(payload).toMatchObject({
       subject: 'Cannot access my account',
       category: 'Dashboard_bug',
-      projectRef: NO_PROJECT_MARKER,
-      organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
       allowSupportAccess: false,

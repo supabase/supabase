@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  applyResolvedThemeOverrides,
   applyThemeOverrides,
   clearThemeOverridesForMode,
   getThemeOverrideRange,
@@ -10,6 +9,7 @@ import {
   mergeThemeOverride,
   parseThemeOverridesByMode,
   resolveThemeOverrideMode,
+  resolveThemeOverridesForFlags,
   sliderValueToThemeOverride,
   THEME_OVERRIDE_DEFAULTS,
   THEME_OVERRIDE_KNOBS,
@@ -142,13 +142,16 @@ describe('theme override application', () => {
     expect(root.style.getPropertyValue('--contrast')).toBe('')
   })
 
-  it('removes stored settings from Classic Dark', () => {
+  it('applies a spot hue via --primary-hue and leaves brand and surface hues alone', () => {
     const root = document.createElement('html')
-    root.style.setProperty('--chroma', '0.04')
+    applyThemeOverrides(root, 'dark', { primaryHue: 48 })
 
-    applyResolvedThemeOverrides(root, 'classic-dark', 'dark', { chroma: 0.02 })
+    expect(root.style.getPropertyValue('--primary-hue')).toBe('48')
+    expect(root.style.getPropertyValue('--surface-hue')).toBe('')
+    expect(root.style.getPropertyValue('--brand-default')).toBe('')
 
-    expect(root.style.getPropertyValue('--chroma')).toBe('')
+    applyThemeOverrides(root, 'dark', {})
+    expect(root.style.getPropertyValue('--primary-hue')).toBe('')
   })
 
   it('reports whether a mode has overrides', () => {
@@ -156,9 +159,17 @@ describe('theme override application', () => {
     expect(hasThemeOverrides({ chroma: 0.02 })).toBe(true)
   })
 
+  it('strips spot hue when the employee-only flag is off', () => {
+    expect(
+      resolveThemeOverridesForFlags({ primaryHue: 48, chroma: 0.02 }, { isSpotColorEnabled: false })
+    ).toEqual({ chroma: 0.02 })
+    expect(
+      resolveThemeOverridesForFlags({ primaryHue: 48, chroma: 0.02 }, { isSpotColorEnabled: true })
+    ).toEqual({ primaryHue: 48, chroma: 0.02 })
+  })
+
   it('resolves classic dark as dark for legacy stored themes', () => {
     expect(resolveThemeOverrideMode('dark')).toBe('dark')
-    expect(resolveThemeOverrideMode('classic-dark')).toBe('dark')
     expect(resolveThemeOverrideMode('light')).toBe('light')
     expect(resolveThemeOverrideMode(undefined)).toBe('light')
   })

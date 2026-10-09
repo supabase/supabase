@@ -18,6 +18,7 @@ type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Ou
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const mocks = vi.hoisted(() => ({
+  isSaving: false,
   resetValidation: vi.fn(),
   submitPipeline: vi.fn(),
   validateConfiguration: vi.fn(),
@@ -191,7 +192,7 @@ vi.mock('./useDestinationForm', () => ({
   useDestinationForm: () => ({
     isValidating: false,
     validateConfiguration: mocks.validateConfiguration,
-    isSaving: false,
+    isSaving: mocks.isSaving,
     submitPipeline: mocks.submitPipeline,
     hasRunValidation: false,
     destinationValidationFailures: [],
@@ -252,6 +253,7 @@ vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketS
 describe('DestinationForm edit submission', () => {
   beforeEach(() => {
     pipelineTableIds = [101, 999]
+    mocks.isSaving = false
     mocks.submitPipeline.mockResolvedValue(undefined)
     mocks.validateConfiguration.mockResolvedValue({ canContinue: true, warnings: [] })
 
@@ -293,36 +295,73 @@ describe('DestinationForm edit submission', () => {
     })
   })
 
-  it('bypasses create validation and submits the pruned table policy with the existing batch', async () => {
-    const onClose = vi.fn()
+  it.each([true, false])(
+    'describes saving without claiming a stopped pipeline will start (enabled: %s)',
+    (enabled) => {
+      mocks.isSaving = true
+      customRender(
+        <DestinationForm
+          selectedType="BigQuery"
+          visible
+          existingDestination={{
+            ...existingDestination,
+            enabled,
+            statusName: enabled ? 'started' : 'stopped',
+          }}
+          onClose={vi.fn()}
+        />
+      )
+      expect(
+        screen.getByText(
+          enabled ? 'Updating destination and restarting pipeline...' : 'Updating destination...'
+        )
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Updating destination and starting pipeline...')
+      ).not.toBeInTheDocument()
+    }
+  )
 
-    customRender(
-      <DestinationForm
-        selectedType="BigQuery"
-        visible
-        existingDestination={existingDestination}
-        onClose={onClose}
-      />
-    )
+  it.each([true, false])(
+    'submits the pruned table policy with the existing batch (enabled: %s)',
+    async (enabled) => {
+      const destination = {
+        ...existingDestination,
+        enabled,
+        statusName: enabled ? 'started' : 'stopped',
+      }
+      const onClose = vi.fn()
 
-    const submitButton = screen.getByRole('button', { name: 'Apply and restart pipeline' })
-    await waitFor(() => expect(submitButton).toBeEnabled())
-    fireEvent.click(submitButton)
+      customRender(
+        <DestinationForm
+          selectedType="BigQuery"
+          visible
+          existingDestination={destination}
+          onClose={onClose}
+        />
+      )
 
-    await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
+      const submitButton = screen.getByRole('button', {
+        name: enabled ? 'Apply and restart pipeline' : 'Apply changes',
+      })
+      await waitFor(() => expect(submitButton).toBeEnabled())
+      fireEvent.click(submitButton)
 
-    expect(mocks.validateConfiguration).not.toHaveBeenCalled()
-    expect(mocks.submitPipeline).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        tableSyncCopyMode: 'include_tables',
-        tableSyncCopyTableIds: ['101'],
-      }),
-      existingDestination,
-      existingBatch,
-      onSuccess: expect.any(Function),
-      onClose,
-    })
-  })
+      await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
+
+      expect(mocks.validateConfiguration).not.toHaveBeenCalled()
+      expect(mocks.submitPipeline).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          tableSyncCopyMode: 'include_tables',
+          tableSyncCopyTableIds: ['101'],
+        }),
+        existingDestination: destination,
+        existingBatch,
+        onSuccess: expect.any(Function),
+        onClose,
+      })
+    }
+  )
 
   it('rejects an edit when every selected table has left the publication', async () => {
     pipelineTableIds = [999]

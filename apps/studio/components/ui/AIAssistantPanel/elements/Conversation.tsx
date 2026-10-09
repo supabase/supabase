@@ -1,13 +1,15 @@
 import { ArrowDownIcon } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
 import { useCallback } from 'react'
-import { Button, cn } from 'ui'
+import { Button, cn, FloatingPlate } from 'ui'
 import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 
 type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> & {
   children?: ReactNode
 }
-type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
+type ConversationContentProps = ComponentProps<typeof StickToBottom.Content> & {
+  scrollClassName?: string
+}
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
 /**
@@ -20,7 +22,7 @@ const FADE_GUTTER = 'inset-x-7'
 
 export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
-    className={cn('relative flex-1 overflow-y-auto', className)}
+    className={cn('relative min-h-0 flex-1 overflow-hidden', className)}
     initial="smooth"
     resize="smooth"
     role="log"
@@ -44,9 +46,25 @@ export const Conversation = ({ className, children, ...props }: ConversationProp
   </StickToBottom>
 )
 
-export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
-  <StickToBottom.Content className={cn(CONTENT_GUTTER, 'py-4', className)} {...props} />
-)
+export const ConversationContent = ({
+  className,
+  scrollClassName,
+  children,
+  ...props
+}: ConversationContentProps) => {
+  const context = useStickToBottomContext()
+
+  return (
+    <div
+      ref={context.scrollRef}
+      className={cn('h-full w-full overflow-auto overscroll-y-contain', scrollClassName)}
+    >
+      <div {...props} ref={context.contentRef} className={cn(CONTENT_GUTTER, 'py-4', className)}>
+        {typeof children === 'function' ? children(context) : children}
+      </div>
+    </div>
+  )
+}
 
 export const ConversationScrollButton = ({
   className,
@@ -60,14 +78,16 @@ export const ConversationScrollButton = ({
 
   return (
     !isAtBottom && (
-      <Button
-        className={cn('absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full', className)}
-        onClick={handleScrollToBottom}
-        size="tiny"
-        {...props}
-      >
-        <ArrowDownIcon className="size-4" />
-      </Button>
+      <FloatingPlate rounded="full" className="absolute bottom-4 left-[50%] translate-x-[-50%]">
+        <Button
+          className={cn('rounded-full', className)}
+          onClick={handleScrollToBottom}
+          size="tiny"
+          {...props}
+        >
+          <ArrowDownIcon className="size-4" />
+        </Button>
+      </FloatingPlate>
     )
   )
 }

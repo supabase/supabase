@@ -8,6 +8,7 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -22,6 +23,7 @@ import { DestinationType } from '../DestinationPanel.types'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
   DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
@@ -54,11 +56,39 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional settings to control the pipeline in more depth
+                {type === 'DuckLake'
+                  ? 'Adjust catalog connections and replication settings.'
+                  : 'Customize how the pipeline syncs and replicates data.'}
               </span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
+            {type === 'DuckLake' && (
+              <FormField
+                control={form.control}
+                name="ducklakePoolSize"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Pool size"
+                    description="Maximum concurrent connections this pipeline opens to the catalog. Choose 1 to 6."
+                  >
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="number"
+                        min={1}
+                        max={6}
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field)}
+                        placeholder={String(DEFAULT_DUCKLAKE_POOL_SIZE)}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -66,7 +96,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description="How long the pipeline waits before sending a partially filled batch."
+                  description="Maximum time before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
@@ -77,7 +107,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
+                        placeholder={String(DEFAULT_MAX_FILL_MS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -106,7 +136,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
+                        placeholder={String(DEFAULT_MAX_TABLE_SYNC_WORKERS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -135,7 +165,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
+                        placeholder={String(DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -200,7 +230,7 @@ export const AdvancedSettings = ({
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
+                            placeholder={String(DEFAULT_CONNECTION_POOL_SIZE)}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>
@@ -218,7 +248,7 @@ export const AdvancedSettings = ({
                     <FormItemLayout
                       label="Maximum staleness"
                       layout="horizontal"
-                      description="Set the maximum age of query results while BigQuery applies ongoing changes, or leave blank for the freshest results."
+                      description="Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results."
                     >
                       <FormControl>
                         <InputGroup>
@@ -250,6 +280,25 @@ export const AdvancedSettings = ({
                   <TableOptions control={form.control} />
                 </div>
               </>
+            )}
+
+            {type === 'Snowflake' && (
+              <FormField
+                control={form.control}
+                name="snowflakeRole"
+                render={({ field }) => (
+                  <FormItemLayout
+                    label="Role"
+                    labelOptional="Optional"
+                    layout="horizontal"
+                    description="Role for SQL requests. Leave blank to use the service user’s default role."
+                  >
+                    <FormControl>
+                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
             )}
           </AccordionContent>
         </AccordionItem>

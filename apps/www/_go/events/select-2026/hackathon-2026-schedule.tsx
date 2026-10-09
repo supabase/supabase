@@ -5,7 +5,7 @@ const todaySql = `-- SELECT HACKATHON  ·  October 3, 2026  ·  YC
 
 SELECT * FROM today WHERE you = 'building';
 
--- RUN OF SHOW
+-- SCHEDULE
 -- +---------+-----------------------------------+
 -- | time    | event                             |
 -- +---------+-----------------------------------+
@@ -14,13 +14,13 @@ SELECT * FROM today WHERE you = 'building';
 -- | 9:45 AM | kickoff (theme drops on stage)    |
 -- | 1:00 PM | lunch                             |
 -- | 5:30 PM | !! submissions close + happy hour |
--- | 6:15 PM | demos (top teams)                 |
+-- | 6:30 PM | demos (top teams)                 |
 -- | 7:30 PM | awards                            |
 -- +---------+-----------------------------------+
 
 -- CONNECT
--- host:     [wifi network]
--- password: [wifi password]
+-- host:     Y Combinator
+-- password: makesomething
 
 -- SUBMIT  (before 5:30 PM) — one submission per team, at hackathon.supabase.com
 INSERT INTO submissions (demo_video, screenshots, github_repo)
@@ -38,7 +38,7 @@ VALUES (...);
 
 -- HELP  (mentors roaming all day)
 SELECT * FROM mentors WHERE you.stuck = true;
--- help desk: [location]  ·  YC 560 hacking  ·  YC 580 demos
+-- help desk: booth and mentors  ·  YC 560 hacking  ·  YC 580 demos
 
 -- hackathon.supabase.com`
 

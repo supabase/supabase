@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
-  getAnalyticsBucketFDWName,
+  getAnalyticsBucketFDWServerName,
   getAnalyticsBucketS3KeyName,
 } from '@/components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/AnalyticsBucketDetails.utils'
 import {
@@ -49,15 +49,12 @@ export const useIcebergWrapperCreateMutation = () => {
       description: getAnalyticsBucketS3KeyName(bucketName),
     })
 
-    const wrapperName = getAnalyticsBucketFDWName(bucketName)
-
     const params: FDWCreateVariables = {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperName,
-        server_name: `${wrapperName}_server`,
+        server_name: getAnalyticsBucketFDWServerName(bucketName),
         vault_aws_access_key_id: createS3KeyData?.access_key,
         vault_aws_secret_access_key: createS3KeyData?.secret_key,
         vault_token: apiKey,

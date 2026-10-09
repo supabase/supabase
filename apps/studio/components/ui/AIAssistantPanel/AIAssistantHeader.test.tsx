@@ -50,7 +50,6 @@ const defaultProps = {
   onCloseAssistant: vi.fn(),
   showMetadataWarning: false,
   updatedOptInSinceMCP: true,
-  isHipaaProjectDisallowed: false,
   aiOptInLevel: 'full',
 }
 

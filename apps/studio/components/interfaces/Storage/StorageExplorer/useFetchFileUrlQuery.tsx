@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getPublicUrlForBucketObject } from '@/data/storage/bucket-object-get-public-url-mutation'
 import { signBucketObject } from '@/data/storage/bucket-object-sign-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
+import { storageKeys } from '@/data/storage/keys'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 const DEFAULT_EXPIRY = 7 * 24 * 60 * 60 // in seconds, default to 1 week
@@ -12,13 +13,18 @@ export const fetchFileUrl = async (
   projectRef: string,
   bucketId: string,
   isBucketPublic: boolean,
-  expiresIn?: number
+  expiresIn?: number,
+  versionId?: string
 ) => {
+  // Omitted rather than sent as `undefined`, so current-version requests are unchanged.
+  const options = versionId === undefined ? undefined : { versionId }
+
   if (isBucketPublic) {
     const data = await getPublicUrlForBucketObject({
       projectRef: projectRef,
       bucketId: bucketId,
       path: pathToFile,
+      options,
     })
     return data.publicUrl
   } else {
@@ -27,6 +33,7 @@ export const fetchFileUrl = async (
       bucketId: bucketId,
       path: pathToFile,
       expiresIn: expiresIn ?? DEFAULT_EXPIRY,
+      options,
     })
     return data.signedUrl
   }
@@ -36,15 +43,24 @@ type UseFileUrlQueryVariables = {
   path: string
   projectRef: string
   bucket: Bucket
+  /** Resolves a specific version of the object. Defaults to the current one. */
+  versionId?: string
 }
 
 export const useFetchFileUrlQuery = (
-  { path, projectRef, bucket }: UseFileUrlQueryVariables,
+  { path, projectRef, bucket, versionId }: UseFileUrlQueryVariables,
   { ...options }: UseCustomQueryOptions<string, ResponseError> = {}
 ) => {
   return useQuery<string, ResponseError, string>({
-    queryKey: [projectRef, 'buckets', bucket.public, bucket.id, 'file', path],
-    queryFn: () => fetchFileUrl(path, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY),
+    queryKey: storageKeys.fileUrl({
+      projectRef,
+      isBucketPublic: bucket.public,
+      bucketId: bucket.id,
+      path,
+      versionId,
+    }),
+    queryFn: () =>
+      fetchFileUrl(path, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY, versionId),
     staleTime: DEFAULT_EXPIRY * 1000,
     ...options,
   })
