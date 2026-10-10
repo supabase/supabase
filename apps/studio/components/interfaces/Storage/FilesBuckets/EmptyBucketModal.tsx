@@ -12,6 +12,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useBucketEmptyMutation } from '@/data/storage/bucket-empty-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -25,6 +26,9 @@ export interface EmptyBucketModalProps {
 export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalProps) => {
   const { ref: projectRef } = useParams()
   const { fetchFolderContents } = useStorageExplorerStateSnapshot()
+  // Not gated on the feature preview: the retained data is destroyed either way, so the
+  // warning has to reflect the bucket rather than what the dashboard happens to be showing.
+  const isRetainingVersions = hasVersioningHistory(bucket)
 
   const { mutate: emptyBucket, isPending } = useBucketEmptyMutation({
     onSuccess: async () => {
@@ -62,7 +66,11 @@ export const EmptyBucketModal = ({ visible, bucket, onClose }: EmptyBucketModalP
           type="destructive"
           className="rounded-none border-x-0 border-t-0"
           title="This action cannot be undone"
-          description="The contents of your bucket cannot be recovered once deleted."
+          description={
+            isRetainingVersions
+              ? 'Every live object, archived file and retained version in this bucket is permanently deleted and cannot be recovered.'
+              : 'The contents of your bucket cannot be recovered once deleted.'
+          }
         />
         <DialogSection>
           <p className="text-sm">

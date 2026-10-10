@@ -77,11 +77,6 @@
         // alongside the rest of the Warehouse work so the values stay in one
         // place until the project-creation surface that consumes them lands.
         "components/interfaces/ProjectCreation/WarehouseFdwCustomImage.constants.ts": ["files"],
-        // Storage object versioning: the archived explorer rows are the first
-        // consumer of these two, and that PR drops the entry.
-        "data/storage/versioning/archived-object-{purge,restore}-mutation.ts": ["files"],
-        // Consumed by the archived file preview pane, one PR further up.
-        "data/storage/versioning/archived-object-version-delete-mutation.ts": ["files"],
       },
       // `vercel` is a globally installed CLI used by the `deploy:staging` script
       "ignoreBinaries": ["vercel"],
