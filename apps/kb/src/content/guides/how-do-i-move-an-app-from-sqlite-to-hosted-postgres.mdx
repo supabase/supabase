@@ -1,0 +1,44 @@
+---
+title: 'How do I move an app from SQLite to hosted Postgres for production?'
+description: 'Create a hosted Postgres database, point your app at its connection string, recreate the schema with your migration tool, and copy the data across.'
+topics: ['Migration', 'Database']
+---
+
+Replace the SQLite file with a hosted Postgres database that every instance of your app can reach over the network. The steps are to create the database, switch your app's connection, recreate the schema, and copy the data.
+
+A SQLite file lives on one machine's disk. Once your app runs on more than one server, on serverless functions, or anywhere without a persistent disk, it needs a database server instead.
+
+## 1. Create the database
+
+Create a Supabase project. Every project is a dedicated Postgres database. Copy a connection string from the **Connect** dialog in the dashboard:
+
+- **Serverless or edge functions:** the shared pooler in transaction mode.
+- **A long-running server:** the direct connection, or session mode on IPv4-only networks.
+
+Store it in an environment variable such as `DATABASE_URL`, not in your code. See [Connect to your database](https://supabase.com/docs/guides/database/connecting-to-postgres).
+
+## 2. Switch your ORM or driver to Postgres
+
+Most ORMs support both databases. Change the dialect or provider from SQLite to Postgres and read the URL from the environment:
+
+- **Drizzle:** switch to `drizzle-orm/postgres-js` with the `postgres` driver, and set `prepare: false` when you use transaction mode.
+- **Prisma:** change the datasource provider to `postgresql`, and add `pgbouncer=true` to the URL for transaction mode.
+
+See [Can I use Supabase with Drizzle or Prisma without supabase-js?](/kb/guides/can-i-use-supabase-with-drizzle-or-prisma-without-supabase-js)
+
+## 3. Recreate the schema
+
+Generate migrations for Postgres rather than reusing SQLite ones. A few types behave differently:
+
+- Integer primary keys that auto-increment become `generated always as identity` columns or `serial`.
+- SQLite stores booleans as integers. Use Postgres `boolean`.
+- Dates stored as text or numbers should become `timestamptz`.
+- SQLite accepts values that don't match a column's declared type. Postgres rejects them, so clean the data first.
+
+## 4. Copy the data
+
+For small datasets, export tables to CSV and import them in the dashboard. For larger ones, use `pgloader` or the Postgres `COPY` command. See [Import data into Supabase](https://supabase.com/docs/guides/database/import-data).
+
+## When to keep SQLite
+
+If the app runs as a single process on one machine with a persistent disk, and nobody else needs to reach the data, SQLite is simpler to operate.
