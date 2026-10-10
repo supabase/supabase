@@ -168,9 +168,10 @@ function getFunctionGrantsCTEs({
         p.proname as name,
 
         -- Aggregate EXECUTE across all overloads + all 3 roles
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'EXECUTE') as anon_execute,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'EXECUTE') as auth_execute,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'EXECUTE') as srv_execute
+        -- acl.grantee = 0 is PUBLIC, which applies to all roles (e.g. default function EXECUTE)
+        bool_or((pr.rolname = 'anon' or acl.grantee = 0) and acl.privilege_type = 'EXECUTE') as anon_execute,
+        bool_or((pr.rolname = 'authenticated' or acl.grantee = 0) and acl.privilege_type = 'EXECUTE') as auth_execute,
+        bool_or((pr.rolname = 'service_role' or acl.grantee = 0) and acl.privilege_type = 'EXECUTE') as srv_execute
 
       from pg_proc p
       join pg_namespace n
