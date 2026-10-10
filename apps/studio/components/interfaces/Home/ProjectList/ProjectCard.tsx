@@ -1,10 +1,8 @@
-import { Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { Github, MoreVertical, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
-import { toast } from 'sonner'
 import {
   Button,
-  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -13,6 +11,7 @@ import {
 
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { ProjectRefCopyButton } from './ProjectRefCopyButton'
 import CardButton from '@/components/ui/CardButton'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -92,17 +91,6 @@ export const ProjectCard = ({
                           className="gap-x-2"
                           onClick={(e) => {
                             e.stopPropagation()
-                            copyToClipboard(projectRef)
-                            toast.success('Copied project ID to clipboard')
-                          }}
-                        >
-                          <Copy size={14} />
-                          <span>Copy project ID</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="gap-x-2"
-                          onClick={(e) => {
-                            e.stopPropagation()
                             router.push(`/project/${projectRef}/settings/general`)
                           }}
                         >
@@ -113,37 +101,40 @@ export const ProjectCard = ({
                     </DropdownMenu>
                   </div>
                 </div>
-                <p className="text-sm text-foreground-lighter">{project.region}</p>
+                <ProjectRefCopyButton projectRef={projectRef} />
               </div>
-              <div className="flex items-center gap-x-1.5 relative overflow-hidden">
-                {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
-                  <ComputeBadgeWrapper
-                    slug={slug}
-                    projectRef={project.ref}
-                    cloudProvider={project.cloud_provider}
-                    computeSize={getComputeSize(project)}
-                    resourceWarnings={resourceWarnings}
-                    badgeClassName="text-[10px] leading-none tracking-[0.07em]"
-                  />
-                )}
-                {isVercelIntegrated && (
-                  <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
-                    <InlineSVG
-                      src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
-                      title="Vercel Icon"
-                      className="w-3"
+              <div className="flex flex-col gap-y-2">
+                <p className="text-sm text-foreground-lighter">{project.region}</p>
+                <div className="flex items-center gap-x-1.5 relative overflow-hidden">
+                  {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
+                    <ComputeBadgeWrapper
+                      slug={slug}
+                      projectRef={project.ref}
+                      cloudProvider={project.cloud_provider}
+                      computeSize={getComputeSize(project)}
+                      resourceWarnings={resourceWarnings}
+                      badgeClassName="text-[10px] leading-none tracking-[0.07em]"
                     />
-                  </div>
-                )}
-                <PartnerIcon organization={{ managed_by: projectManagedBy }} />
-                {isGithubIntegrated && (
-                  <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
-                    <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
-                      <Github size={12} strokeWidth={1.5} />
+                  )}
+                  {isVercelIntegrated && (
+                    <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
+                      <InlineSVG
+                        src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+                        title="Vercel Icon"
+                        className="w-3"
+                      />
                     </div>
-                    <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
-                  </div>
-                )}
+                  )}
+                  <PartnerIcon organization={{ managed_by: projectManagedBy }} />
+                  {isGithubIntegrated && (
+                    <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
+                      <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
+                        <Github size={12} strokeWidth={1.5} />
+                      </div>
+                      <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           }
