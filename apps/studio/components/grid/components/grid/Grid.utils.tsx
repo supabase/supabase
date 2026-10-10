@@ -19,6 +19,8 @@ export function useOnRowsChange(rows: SupaRow[]) {
   return useCallback(
     (_rows: SupaRow[], data: RowsChangeData<SupaRow, unknown>) => {
       const rowData = _rows[data.indexes[0]]
+      if (!rowData) return
+
       const previousRow = rows.find((x) => x.idx == rowData.idx)
       if (!previousRow) return
 
