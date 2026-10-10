@@ -20,6 +20,7 @@ export const LOCAL_STORAGE_KEYS = {
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
   UI_TIMEZONE: 'supabase-ui-timezone',
+  UI_LOCALE: 'supabase-ui-locale',
   UI_THEME_OVERRIDES: 'supabase-ui-theme-overrides',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_PREVIEW_INLINE_EDITOR: 'supabase-ui-preview-inline-editor',
@@ -179,6 +180,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
   LOCAL_STORAGE_KEYS.EXPLORER_PREFERENCES,
   LOCAL_STORAGE_KEYS.UI_TIMEZONE,
+  LOCAL_STORAGE_KEYS.UI_LOCALE,
   LOCAL_STORAGE_KEYS.UI_THEME_OVERRIDES,
 ]
 
