@@ -1,10 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import {
-  CommandHeader,
-  CommandMenu,
-  CommandMenuInput,
-  CommandMenuList,
-} from 'ui-patterns/CommandMenu'
+import { CommandHeader, CommandMenu, CommandMenuInput } from 'ui-patterns/CommandMenu'
 import { useChangelogCommand } from 'ui-patterns/CommandMenu/prepackaged/Changelog'
 import { useDocsAiCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsAi'
 import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsSearch'
@@ -12,9 +7,12 @@ import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/Th
 
 import { useApiKeysCommands } from './ApiKeys'
 import { useApiUrlCommand } from './ApiUrl'
+import { CommandMenuFilterBar } from './CommandMenuFilterBar'
 import { useContextSearchCommands } from './ContextSearchCommands'
 import { useCreateCommands } from './CreateCommands'
+import { useDatabaseResourceCommands } from './DatabaseResourceCommands'
 import { useFeaturePreviewCommands } from './FeaturePreviews'
+import { FilterableCommandMenuList } from './FilterableCommandMenuList'
 import { orderCommandSectionsByPriority } from './ordering'
 import { useConfigureOrganizationCommand, useProjectSwitchCommand } from './OrgProjectSwitcher'
 import { useSupportCommands } from './Support'
@@ -33,7 +31,8 @@ export function CommandMenuInnerContent() {
       <CommandHeader>
         <CommandMenuInput />
       </CommandHeader>
-      <CommandMenuList />
+      <CommandMenuFilterBar />
+      <FilterableCommandMenuList />
     </>
   )
 }
@@ -61,6 +60,7 @@ export default function StudioCommandMenu() {
   useThemeSwitcherCommands()
   useContextSearchCommands()
   useFeaturePreviewCommands()
+  useDatabaseResourceCommands()
 
   return (
     <CommandMenu>
