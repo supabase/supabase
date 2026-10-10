@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { type NextRequest } from 'next/server'
 import { type LoaderFunctionArgs } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -33,7 +34,10 @@ const runners = {
     try {
       await GET(new Request(url) as NextRequest)
     } catch (thrown) {
-      return (thrown as { redirectTo: string }).redirectTo
+      if (typeof thrown === 'object' && thrown !== null && 'redirectTo' in thrown) {
+        return thrown.redirectTo
+      }
+      throw thrown
     }
     throw new Error('Expected a redirect')
   },
@@ -51,9 +55,11 @@ const destinations = [
   ['https://evil.example/agents', '/'],
   ['//evil.example/agents', '/'],
   ['/\\evil.example/agents', '/'],
+  ['/\t/evil.example/agents', '/'],
   ['/.//evil.example/agents', '/'],
   ['/a/..//evil.example/agents', '/'],
   ['/%2e//evil.example/agents', '/'],
+  ['/日本語', '/%E6%97%A5%E6%9C%AC%E8%AA%9E'],
 ] as const
 
 describe.each(Object.entries(runners))('%s email confirm route', (_name, run) => {
@@ -62,7 +68,7 @@ describe.each(Object.entries(runners))('%s email confirm route', (_name, run) =>
     verifyOtp.mockResolvedValue({ error: null })
   })
 
-  it.each(destinations)('sends next=%s to %s after verifying the token', async (next, expected) => {
+  it.each(destinations)('sends next=%j to %j after verifying the token', async (next, expected) => {
     expect(await run(confirmUrl(next))).toBe(expected)
     expect(verifyOtp).toHaveBeenCalledWith({ type: 'email', token_hash: 'test-hash' })
   })
@@ -88,7 +94,7 @@ describe('safeNextPath', () => {
     ['/.//evil.example', '/'],
     ['/..//evil.example', '/'],
     ['/./\\evil.example', '/'],
-  ])('maps %s to %s', (input, expected) => {
+  ])('maps %j to %j', (input, expected) => {
     expect(safeNextPath(input, '/', origin)).toBe(expected)
   })
 })
