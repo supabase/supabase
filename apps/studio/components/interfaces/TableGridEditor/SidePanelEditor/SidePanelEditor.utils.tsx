@@ -14,7 +14,7 @@ import pgMeta, {
 } from '@supabase/pg-meta'
 import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
-import { chunk, find, isEmpty, isEqual } from 'lodash'
+import { chunk, find, isEmpty, sortBy, xor } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
@@ -712,11 +712,17 @@ export const updateTable = async ({
   const queryClient = getQueryClient()
 
   // Prepare a check to see if primary keys to the tables were updated or not
-  const primaryKeyColumns = columns
-    .filter((column) => column.isPrimaryKey)
-    .map((column) => column.name)
-  const existingPrimaryKeyColumns = table.primary_keys.map((pk: PGTablePrimaryKey) => pk.name)
-  const isPrimaryKeyUpdated = !isEqual(primaryKeyColumns, existingPrimaryKeyColumns)
+  const existingPrimaryKeyIds = table.primary_keys.map(
+    (pk: PGTablePrimaryKey) => find(table.columns, { name: pk.name })?.id
+  )
+  const primaryKeyFields = columns.filter((column) => column.isPrimaryKey)
+  const primaryKeyIds = primaryKeyFields.map((column) => column.id)
+  const isPrimaryKeyUpdated = xor(existingPrimaryKeyIds, primaryKeyIds).length > 0
+
+  const primaryKeyColumns = sortBy(primaryKeyFields, (column) => {
+    const index = existingPrimaryKeyIds.indexOf(column.id)
+    return index === -1 ? Infinity : index
+  }).map((column) => column.name)
 
   if (isPrimaryKeyUpdated) {
     // Remove any primary key constraints first (we'll add it back later)
