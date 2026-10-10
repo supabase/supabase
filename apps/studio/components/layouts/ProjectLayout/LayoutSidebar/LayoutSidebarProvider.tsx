@@ -95,7 +95,8 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
         setSidebarLocalStorage(activeSidebar.id)
       } else {
         setSidebarLocalStorage('')
-        setSidebarUrlParam(null)
+        // Only write when set: a no-op nuqs write still queues a URL replace on the next tick.
+        if (sidebarURLParam !== null) setSidebarUrlParam(null)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

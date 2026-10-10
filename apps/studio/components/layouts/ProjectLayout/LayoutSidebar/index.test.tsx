@@ -21,13 +21,21 @@ vi.mock('@/components/ui/AdvisorPanel/AdvisorPanel', () => ({
   AdvisorPanel: () => <div data-testid="advisor-panel-sidebar">Advisor Panel</div>,
 }))
 
-vi.mock('nuqs', async () => {
-  let queryValue = 'ai-assistant'
-  return {
-    useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
-    parseAsString: () => {},
-  }
-})
+const sidebarParam = vi.hoisted(() => ({
+  value: 'ai-assistant' as string | null,
+  set: vi.fn(),
+}))
+
+vi.mock('nuqs', async () => ({
+  useQueryState: () => [
+    sidebarParam.value,
+    (v: string | null) => {
+      sidebarParam.set(v)
+      sidebarParam.value = v
+    },
+  ],
+  parseAsString: () => {},
+}))
 
 const mockProject = {
   id: 1,
@@ -99,6 +107,8 @@ describe('LayoutSidebar', () => {
   afterEach(() => {
     resetSidebarManagerState()
     localStorage.clear()
+    sidebarParam.value = 'ai-assistant'
+    sidebarParam.set.mockClear()
   })
 
   const renderSidebar = () =>
@@ -134,6 +144,33 @@ describe('LayoutSidebar', () => {
 
     const sidebar = await screen.findByTestId('ai-assistant-sidebar')
     expect(sidebar).toBeTruthy()
+  })
+
+  // A no-op nuqs write still queues a URL replace, which can undo a redirect made in the same commit
+  it("doesn't write the sidebar URL param on mount when it isn't set", async () => {
+    sidebarParam.value = null
+    renderSidebar()
+
+    await waitFor(() => {
+      expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeDefined()
+    })
+    expect(sidebarParam.set).not.toHaveBeenCalled()
+  })
+
+  it('clears the sidebar URL param when the active sidebar closes', async () => {
+    renderSidebar()
+    await waitFor(() => {
+      expect(sidebarManagerState.sidebars[SIDEBAR_KEYS.AI_ASSISTANT]).toBeDefined()
+    })
+    act(() => sidebarManagerState.openSidebar(SIDEBAR_KEYS.AI_ASSISTANT))
+    await screen.findByTestId('ai-assistant-sidebar')
+    // The provider clears `?sidebar=` on mount; put it back to have something to clear
+    sidebarParam.value = SIDEBAR_KEYS.AI_ASSISTANT
+    sidebarParam.set.mockClear()
+
+    act(() => sidebarManagerState.closeActive())
+
+    await waitFor(() => expect(sidebarParam.set).toHaveBeenCalledWith(null))
   })
 
   describe('at organization level', () => {
