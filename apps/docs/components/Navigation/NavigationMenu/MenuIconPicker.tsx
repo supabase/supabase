@@ -12,6 +12,7 @@ import {
   IconMenuDatabase,
   IconMenuDevCli,
   IconMenuEdgeFunctions,
+  IconMenuElixir,
   IconMenuFlutter,
   IconMenuGettingStarted,
   IconMenuGraphQL,
@@ -78,6 +79,8 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconMenuSwift width={width} height={height} className={className} />
     case 'reference-kotlin':
       return <IconMenuKotlin width={width} height={height} className={className} />
+    case 'reference-elixir':
+      return <IconMenuElixir width={width} height={height} className={className} />
     case 'reference-api':
       return <IconMenuApi width={width} height={height} className={className} />
     case 'dev-cli':
