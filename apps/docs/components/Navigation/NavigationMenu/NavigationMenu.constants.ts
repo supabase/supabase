@@ -541,18 +541,6 @@ export const gettingstarted: NavMenuConstant = {
   ],
 }
 
-export const cli = {
-  title: 'CLI',
-  items: [
-    { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
-    {
-      name: 'Using environment variables in config.toml',
-      url: '/guides/cli/using-environment-variables-in-config',
-    },
-  ],
-}
-
 export const NativeMobileLoginItems = [
   {
     name: 'Apple',
@@ -2693,6 +2681,7 @@ export const security: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Platform configuration', url: '/guides/security/platform-security' },
+        { name: 'TLS for project APIs', url: '/guides/security/tls' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Platform Audit Logs', url: '/guides/security/platform-audit-logs' },

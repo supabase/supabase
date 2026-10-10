@@ -50,7 +50,7 @@ export const ConfirmFooter = ({
     >
       <div role="status" className="min-w-0 flex flex-1 items-center gap-2">
         {outcome === 'success' && <Check className="size-3.5 shrink-0 text-primary" />}
-        {outcome === 'error' && <X className="size-3.5 shrink-0 text-danger" />}
+        {outcome === 'error' && <X className="size-3.5 shrink-0 text-destructive" />}
         <span>{message}</span>
       </div>
       {(showActions || action) && (

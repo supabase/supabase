@@ -17,6 +17,7 @@ Alex Hall
 Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
+Alexis Aguilar
 Ali Waseem
 Alice Crosbie
 Allan S
@@ -43,6 +44,7 @@ Beng Eu
 Benjamin Coenen
 Beth Long
 Bobbie Soedirgo
+Brad Deam
 Brad Gyger
 Brendan Stephens
 Brent Graveland
@@ -78,6 +80,7 @@ Connor Davis
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Chapman
 Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
@@ -87,6 +90,7 @@ David A. Ventimiglia
 David Alvarez
 David Birdsong
 David Camacho Cateura
+David McNeil
 David Weitzman
 David Whittington
 Davide Pellegatta
@@ -235,6 +239,7 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
 Mo Khan

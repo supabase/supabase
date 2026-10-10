@@ -38,6 +38,15 @@ export function getPathAlongOpenedFolders(
  * Returns the path to the folder at the given index in the openedFolders array,
  * joining all folders from the root up to (but not including) the given index.
  */
+/** The object's full path within the bucket; a row only knows its leaf name and column. */
+export function getStorageItemPath(
+  state: Pick<StorageExplorerState, 'openedFolders'>,
+  item: { name: string; columnIndex: number }
+): string {
+  const folderPath = getPathAlongFoldersToIndex(state, item.columnIndex)
+  return folderPath.length > 0 ? `${folderPath}/${item.name}` : item.name
+}
+
 export function getPathAlongFoldersToIndex(
   state: Pick<StorageExplorerState, 'openedFolders'>,
   index: number
@@ -315,4 +324,27 @@ const readEntriesPromise = async (directoryReader: FileSystemDirectoryReader) =>
   } catch (err) {
     console.error('readEntriesPromise error:', err)
   }
+}
+
+/**
+ * Storage rejects a write that breaks the bucket's own rules with a bare status and no
+ * usable message, so turn the ones a replace can hit into something actionable.
+ */
+export const describeUploadFailure = ({
+  status,
+  fallback,
+  allowedMimeTypes,
+}: {
+  status?: number
+  fallback: string
+  allowedMimeTypes?: string[] | null
+}) => {
+  if (status === 415) {
+    const allowed = allowedMimeTypes?.length
+      ? ` Allowed MIME types: ${allowedMimeTypes.join(', ')}.`
+      : ''
+    return `that file type is not allowed in this bucket.${allowed}`
+  }
+  if (status === 413) return 'the file exceeds the bucket file size limit.'
+  return fallback
 }

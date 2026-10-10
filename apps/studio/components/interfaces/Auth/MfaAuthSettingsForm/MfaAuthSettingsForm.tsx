@@ -47,6 +47,7 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
@@ -116,6 +117,8 @@ export const MfaAuthSettingsForm = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
+  const isBranch = project?.parentRef !== project?.ref
 
   // Separate loading states for each form
   const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
@@ -319,7 +322,12 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading || isLoadingEntitlement || isLoadingEntitlementEnhanceSecurity) {
+  if (
+    isLoading ||
+    isLoadingProject ||
+    isLoadingEntitlement ||
+    isLoadingEntitlementEnhanceSecurity
+  ) {
     return (
       <PageSection>
         <PageSectionContent>
@@ -333,8 +341,11 @@ export const MfaAuthSettingsForm = () => {
   const hasUpgradedPhoneMFA =
     authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 
+  // Auth add-ons aren't charged for on branches, so there's no price increase to confirm
+  const shouldConfirmPhoneMFACharge = hasUpgradedPhoneMFA && !isBranch
+
   const maybeConfirmPhoneMFAOrSubmit = () => {
-    if (hasUpgradedPhoneMFA) {
+    if (shouldConfirmPhoneMFACharge) {
       setIsConfirmationModalVisible(true)
     } else {
       phoneForm.handleSubmit(onSubmitPhoneForm)()

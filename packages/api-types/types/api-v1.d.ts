@@ -4034,6 +4034,8 @@ export interface components {
       message: string
     }
     PostgresConfigResponse_Output: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4067,6 +4069,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
@@ -4950,6 +4954,8 @@ export interface components {
      *       "statement_timeout": "60000ms"
      *     } */
     UpdatePostgresConfigBody: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4983,6 +4989,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       restart_database?: boolean
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'

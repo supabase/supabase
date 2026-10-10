@@ -330,6 +330,7 @@ export const getNotebookTools = (ctx: NotebookToolsContext = {}) => {
           id: notebook.id,
           name: notebook.name,
           updated_at: notebook.updated_at,
+          optInLevel: aiOptInLevel,
           cells,
         } satisfies NotebookRunOutput
       },
