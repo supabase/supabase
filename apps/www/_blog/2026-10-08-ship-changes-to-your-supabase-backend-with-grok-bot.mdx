@@ -1,0 +1,60 @@
+---
+title: 'Ship changes to your Supabase backend with Grok Bot'
+description: 'Supabase joins the SpaceXAI Partner Network: request a change in chat with Grok Bot, and Cursor builds and runs it on your Supabase backend.'
+author: shaziya_bandukia
+date: '2026-10-08'
+categories:
+  - product
+tags:
+  - ai
+  - integrations
+  - mcp
+imgSocial: '2026-10-08-ship-changes-to-your-supabase-backend-with-grok-bot/og.png'
+imgThumb: '2026-10-08-ship-changes-to-your-supabase-backend-with-grok-bot/thumb.png'
+toc_depth: 2
+---
+
+Supabase is joining the SpaceXAI Partner Network. With Grok Bot connected to Cursor, anyone on your team can request a change in chat, and Cursor builds and runs it against your Supabase backend through the [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp).
+
+## From a chat message to a shipped change
+
+Grok Bot takes a request from the person who needs it, in the place they already work, and hands it to Cursor as scoped engineering work. Cursor writes and runs the code, and through the Supabase MCP server it can query the database, inspect the schema, read logs, and deploy Supabase Edge Functions, all inside the one Supabase project where the data already lives.
+
+## Agents work the way developers do
+
+To see what that looks like in practice, we analyzed millions of Supabase tool calls from Cursor sessions. When an agent runs a query against a Supabase database, the next call is another query 92% of the time: it investigates, tests, fixes, and checks its work rather than looking something up and stopping. Ask why signups dropped last week, and Cursor narrows to a single broken referral source in a dozen steps.
+
+Mistakes don't break the loop. When a query fails, the next call is another `execute_sql` 79% of the time, and only about 2% of errors end the session, so a query written against `created` instead of `created_at` gets corrected without anyone stepping in. Tell Cursor a Stripe webhook is failing, and it pulls the logs, checks the payments table, patches the Edge Function, and redeploys.
+
+## Requests can come from anyone
+
+The person asking doesn't need to know which project holds the answer or which table to look in. Cursor already knows which Supabase project it's working in 53% of the time and lists projects to find the right one when it doesn't, then reads the schema with `list_tables` before it queries. When the person who made the request isn't watching the code, that's what keeps the work moving.
+
+## Add a security check to the loop
+
+Agents already verify their own changes: after an `apply_migration`, 81% of sessions follow up with a query or `list_tables` to confirm the change landed. `get_advisors` goes further and scans the project for issues like tables missing Row Level Security or unindexed foreign keys, which matters when requests can come from anyone and ship automatically.
+
+A simple Cursor rule makes the scan part of every schema change:
+
+```markdown
+---
+description: Run Supabase advisors after schema changes
+alwaysApply: true
+---
+
+After any apply_migration call, run get_advisors for both security and performance.
+If any issues are reported, explain them and propose a fix before continuing.
+```
+
+With that rule in place, a request to add a comments feature ships with RLS enabled and the security check already run.
+
+## Built in partnership with SpaceXAI
+
+Developers found the Supabase integration on their own, and it consistently ranks among the top community plugins for SpaceXAI's tools. Joining the Partner Network lets us support that demand directly and keep the integration a first-class experience as those tools evolve.
+
+{/* TODO: add quote from SpaceXAI */}
+
+## Get started
+
+- [Connect the Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp)
+- New to Supabase? [Start your project for free](https://supabase.com/dashboard), then connect it to Cursor
