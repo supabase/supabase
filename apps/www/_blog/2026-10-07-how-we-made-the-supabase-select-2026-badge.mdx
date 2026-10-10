@@ -81,35 +81,17 @@ We wrote all the software that shipped on it: the name tag, the schedule, and th
   loop
   muted
   playsInline
-  aria-label="The badge's app launcher, moving through the name tag, schedule and game apps"
+  aria-label="The badge launcher opening POOLER.SQL, which serves two queries before the connection drops"
 >
   <source
-    src="/images/blog/how-we-made-the-supabase-select-2026-badge/launcher.mp4"
+    src="/images/blog/how-we-made-the-supabase-select-2026-badge/badge-software.mp4"
     type="video/mp4"
   />
 </video>
 
 ## Getting 800 badges ready
 
-The badges arrived two weeks before Select: 800 of them, in 20 boxes of 40, with flat batteries.
-
-Charging 800 badges turned into a fun math problem. Each badge draws less than half an amp, so we didn't need anything fancy: two 30-port USB charging hubs, the kind schools use to charge iPads overnight, and a pile of the cheapest cables we could find. A full charge takes about three hours. With 60 ports, that's 14 batches. Add an hour per batch for plugging, unplugging, and powering down, and it works out to about 56 hours of charging.
-
-The schedule app was meant to pull live updates over Wi-Fi, but the venue network wasn't going to cooperate. A laptop could stay connected from the far end of the parking lot, while the badges couldn't connect at all, and 800 badges sharing the 2.4 GHz band with every neighboring network was never going to be reliable. So the badges went offline-first. We set up our own router broadcasting the network name already saved on the badges, connected it to a cellular hotspot, and synced every badge’s schedule before the doors opened. Open the schedule app while connected, and it pulls the latest version.
-
-<video
-  className="rounded-md border m-0 w-full"
-  autoPlay
-  loop
-  muted
-  playsInline
-  aria-label="POOLER.SQL, one of the badge games, ending on a Postgres too_many_connections error"
->
-  <source
-    src="/images/blog/how-we-made-the-supabase-select-2026-badge/pooler.mp4"
-    type="video/mp4"
-  />
-</video>
+The badges arrived two weeks before Select: 800 of them, in 20 boxes of 40.
 
 The last few days were an assembly line, one box at a time: charge it, sync the schedule, and back in the box. Two days before the doors opened, we were still working through the last boxes. On the day, we spotted attendees huddled around a laptop, already hacking their badges.
 
@@ -167,6 +149,11 @@ Everything you need is at [badge.select](https://badge.select/):
 - If you want a coding agent to help, the [badge project kit](https://badge.select/guides/code-with-an-agent) gives Claude Code the API reference and instructions it needs. You can try something like: "Read the project instructions and badge API reference. Build a pomodoro timer with a large countdown. Use A to start or pause, B to reset, and C to switch between work and break sessions."
 - If you weren't at Select, the [virtual badge](https://badge.select/virtual) and the [Make editor](https://badge.select/make) let you build in your browser.
 - If you want to go further, replace the firmware and work in C or Rust. There's already [a guide](https://badge.select/guides/apple-ii) for turning the badge into an Apple IIe emulator, with a physical USB keyboard and BASIC programs running on the badge itself.
+
+<Img
+  alt="The Make editor at badge.select: app code on the left, a virtual badge running it on the right"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/make-editor.png"
+/>
 
 Good first projects are small and useful: a clock with exactly the display you want, a pomodoro timer beside your keyboard, a display that reads from your Supabase project over Wi-Fi, or a light that turns on when your coding agent needs you. With Supabase Realtime, the badge can react the moment something changes in your app. Your first change can be as small as making one button do something different.
 
