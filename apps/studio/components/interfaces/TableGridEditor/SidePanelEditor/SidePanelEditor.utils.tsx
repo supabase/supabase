@@ -12,9 +12,14 @@ import pgMeta, {
   getUpdateIdentitySequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
-import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
+import {
+  joinSqlFragments,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from '@supabase/pg-meta/src/pg-format'
 import { Query } from '@supabase/pg-meta/src/query'
-import { chunk, find, isEmpty, isEqual } from 'lodash'
+import { find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
 
@@ -45,7 +50,7 @@ import {
   updateTable as updateTableMutation,
 } from '@/data/tables/table-update-mutation'
 import { getTables } from '@/data/tables/tables-query'
-import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
+import { isObject, isObjectContainingKeys, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import type { useTrack } from '@/lib/telemetry/track'
@@ -53,8 +58,9 @@ import type { DeepReadonly } from '@/lib/type-helpers'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import type { SidePanel } from '@/state/table-editor'
 
-const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
+export const IMPORT_SQL_SIZE_LIMIT = 900 * 1024
+export const IMPORT_CHUNK_TIMEOUT_MS = 60_000
 
 type Track = ReturnType<typeof useTrack>
 
@@ -928,6 +934,168 @@ export const formatRowsForInsert = ({
   })
 }
 
+export type ImportInsertBatch = {
+  rows: Record<string, unknown>[]
+  sql: SafeSqlFragment
+}
+
+/** Builds an import statement with the selected role applied to its execution. */
+function getImportInsertSql(
+  table: RetrieveTableResult,
+  rows: Record<string, unknown>[],
+  roleImpersonationState?: RoleImpersonationState
+) {
+  return wrapWithRoleImpersonation(
+    new Query().from(table.name, table.schema).insert(rows).toSql(),
+    roleImpersonationState
+  )
+}
+
+/** Measures the UTF-8 SQL payload, including escaped values and role setup. */
+function getSqlByteSize(sql: SafeSqlFragment) {
+  return new Blob([sql]).size
+}
+
+/** Explains why a single row cannot fit in a dashboard import request. */
+function getRowTooLargeError(maxSqlBytes: number) {
+  return new Error(
+    `A row in this import is too large to be imported through the dashboard. The generated SQL for a single row exceeds ${Math.floor(
+      maxSqlBytes / 1024
+    )}KB.`
+  )
+}
+
+/**
+ * Groups rows in order by escaped SQL bytes without rebuilding a growing statement.
+ * Measures each JSON row once and checks the complete SQL before emitting a batch.
+ */
+export function buildImportInsertBatches({
+  table,
+  rows,
+  roleImpersonationState,
+  maxSqlBytes = IMPORT_SQL_SIZE_LIMIT,
+}: {
+  table: RetrieveTableResult
+  rows: Record<string, unknown>[]
+  roleImpersonationState?: RoleImpersonationState
+  maxSqlBytes?: number
+}): ImportInsertBatch[] {
+  const batches: ImportInsertBatch[] = []
+  let batchRows: Record<string, unknown>[] = []
+  let batchBytes = 0
+  let hasBatchBackslash = false
+
+  /** Emits the completed batch only after verifying its complete SQL payload. */
+  const finishBatch = () => {
+    const sql = getImportInsertSql(table, batchRows, roleImpersonationState)
+    if (getSqlByteSize(sql) > maxSqlBytes) {
+      throw getRowTooLargeError(maxSqlBytes)
+    }
+    batches.push({ rows: batchRows, sql })
+    batchRows = []
+  }
+
+  for (const row of rows) {
+    // Query.insert stores the rows as one SQL-escaped JSON array. Its E prefix is
+    // shared by the entire literal, while commas add one byte per additional row.
+    const rowLiteral = literal(JSON.stringify(row))
+    const hasRowBackslash = rowLiteral.startsWith("E'")
+    const rowBytes = getSqlByteSize(rowLiteral) - 2 - Number(hasRowBackslash)
+    const additionalBytes = rowBytes + 1 + Number(hasRowBackslash && !hasBatchBackslash)
+
+    if (batchRows.length > 0 && batchBytes + additionalBytes > maxSqlBytes) {
+      finishBatch()
+    }
+
+    if (batchRows.length === 0) {
+      // A one-row statement captures this batch's columns and role-wrapper overhead.
+      batchBytes = getSqlByteSize(getImportInsertSql(table, [row], roleImpersonationState))
+      if (batchBytes > maxSqlBytes) {
+        throw getRowTooLargeError(maxSqlBytes)
+      }
+      hasBatchBackslash = hasRowBackslash
+    } else {
+      batchBytes += additionalBytes
+      hasBatchBackslash ||= hasRowBackslash
+    }
+
+    batchRows.push(row)
+  }
+
+  if (batchRows.length > 0) {
+    finishBatch()
+  }
+
+  return batches
+}
+
+/** Runs a size-bounded import statement with rate-limit retries and an abortable timeout. */
+export async function executeImportInsertBatch({
+  projectRef,
+  connectionString,
+  sql,
+  roleImpersonationState,
+  timeoutMs = IMPORT_CHUNK_TIMEOUT_MS,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  sql: SafeSqlFragment
+  roleImpersonationState?: RoleImpersonationState
+  timeoutMs?: number
+}) {
+  await executeWithRetry(() =>
+    executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql,
+        isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      },
+      AbortSignal.timeout(timeoutMs)
+    )
+  )
+}
+
+/** Advances identity/serial sequences after all rows have been imported successfully. */
+async function updateImportedRowsSequences({
+  projectRef,
+  connectionString,
+  table,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  table: RetrieveTableResult
+}) {
+  const sequenceColumns = (table.columns ?? []).filter(
+    (column) =>
+      column.is_identity ||
+      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
+  )
+
+  if (sequenceColumns.length === 0) {
+    return
+  }
+
+  const updateSequenceSQL = joinSqlFragments(
+    sequenceColumns.map((column) =>
+      getUpdateIdentitySequenceSQL({
+        schema: table.schema,
+        table: table.name,
+        column: column.name,
+      })
+    ),
+    ';\n'
+  )
+
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql: updateSequenceSQL,
+    queryKey: ['sequences', 'update-batch'],
+  })
+}
+
+/** Parses and imports uploaded CSV chunks, stopping parsing when an insert fails. */
 export async function insertRowsViaSpreadsheet({
   projectRef,
   connectionString,
@@ -951,6 +1119,15 @@ export async function insertRowsViaSpreadsheet({
   let insertError: unknown = undefined
   const t1 = new Date()
   return new Promise((resolve) => {
+    let isResolved = false
+
+    const resolveOnce = (value: { error: unknown }) => {
+      if (!isResolved) {
+        isResolved = true
+        resolve(value)
+      }
+    }
+
     Papa.parse(file, {
       header: true,
       // dynamicTyping has to be disabled so that "00001" doesn't get parsed as 1.
@@ -966,25 +1143,29 @@ export async function insertRowsViaSpreadsheet({
           headers: selectedHeaders,
           columns: table.columns,
           emptyStringAsNullHeaders,
-        })
+        }) as Record<string, unknown>[]
 
-        const insertQuery = wrapWithRoleImpersonation(
-          new Query().from(table.name, table.schema).insert(formattedData).toSql(),
-          roleImpersonationState
-        )
         try {
-          await executeWithRetry(() =>
-            executeSql({
+          const batches = buildImportInsertBatches({
+            table,
+            rows: formattedData,
+            roleImpersonationState,
+          })
+
+          for (const batch of batches) {
+            await executeImportInsertBatch({
               projectRef,
               connectionString,
-              sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+              sql: batch.sql,
+              roleImpersonationState,
             })
-          )
+          }
         } catch (error) {
           console.warn(error)
           insertError = error
           parser.abort()
+          resolveOnce({ error })
+          return
         }
 
         chunkNumber += 1
@@ -993,52 +1174,33 @@ export async function insertRowsViaSpreadsheet({
         onProgressUpdate(progressPercentage)
         parser.resume()
       },
-      complete: () => {
+      complete: async () => {
         const t2 = new Date()
         console.log(
           `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
         )
-        if (insertError === undefined) {
-          const sequenceColumns = (table.columns ?? []).filter(
-            (column) =>
-              column.is_identity ||
-              (typeof column.default_value === 'string' &&
-                column.default_value.includes('nextval('))
-          )
 
-          if (sequenceColumns.length === 0) {
-            resolve({ error: insertError })
-            return
-          }
-
-          const updateSequenceSQL = joinSqlFragments(
-            sequenceColumns.map((column) =>
-              getUpdateIdentitySequenceSQL({
-                schema: table.schema,
-                table: table.name,
-                column: column.name,
-              })
-            ),
-            ';\n'
-          )
-
-          executeSql({
-            projectRef,
-            connectionString,
-            sql: updateSequenceSQL,
-            queryKey: ['sequences', 'update-batch'],
-          })
-            .then(() => resolve({ error: insertError }))
-            .catch((error) => resolve({ error }))
+        if (insertError !== undefined) {
+          resolveOnce({ error: insertError })
           return
         }
 
-        resolve({ error: insertError })
+        try {
+          await updateImportedRowsSequences({
+            projectRef,
+            connectionString,
+            table,
+          })
+          resolveOnce({ error: insertError })
+        } catch (error) {
+          resolveOnce({ error })
+        }
       },
     })
   })
 }
 
+/** Imports pasted rows sequentially with byte-bounded statements and progress updates. */
 export async function insertTableRows({
   projectRef,
   connectionString,
@@ -1066,79 +1228,39 @@ export async function insertTableRows({
     headers: selectedHeaders,
     columns: table.columns,
     emptyStringAsNullHeaders,
-  })
+  }) as Record<string, unknown>[]
 
-  const batches = chunk(formattedRows, BATCH_SIZE)
-  const tasks = batches.map((batch) => {
-    return () => {
-      return Promise.race([
-        new Promise(async (resolve, reject) => {
-          const insertQuery = wrapWithRoleImpersonation(
-            new Query().from(table.name, table.schema).insert(batch).toSql(),
-            roleImpersonationState
-          )
-          try {
-            await executeSql({
-              projectRef,
-              connectionString,
-              sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-            })
-          } catch (error) {
-            insertError = error
-            reject(error)
-          }
+  try {
+    const batches = buildImportInsertBatches({
+      table,
+      rows: formattedRows,
+      roleImpersonationState,
+    })
 
-          insertProgress = insertProgress + batch.length / rows.length
-          resolve({})
-        }),
-        timeout(30_000),
-      ])
+    for (const batch of batches) {
+      await executeImportInsertBatch({
+        projectRef,
+        connectionString,
+        sql: batch.sql,
+        roleImpersonationState,
+      })
+
+      insertProgress = insertProgress + batch.rows.length / rows.length
+      onProgressUpdate(insertProgress * 100)
     }
-  })
-
-  const batchedPromises = chunk(tasks, 10)
-  for (const batchedPromise of batchedPromises) {
-    const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-    const failedBatch = res.find((result) => result.status === 'rejected')
-    if (failedBatch?.status === 'rejected') {
-      if (insertError === undefined) insertError = failedBatch.reason
-      break
-    }
-    onProgressUpdate(insertProgress * 100)
+  } catch (error) {
+    insertError = error
   }
 
   if (insertError !== undefined) {
     return { error: insertError }
   }
 
-  const sequenceColumns = (table.columns ?? []).filter(
-    (column) =>
-      column.is_identity ||
-      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
-  )
-
-  if (sequenceColumns.length === 0) {
-    return { error: insertError }
-  }
-
-  const updateSequenceSQL = joinSqlFragments(
-    sequenceColumns.map((column) =>
-      getUpdateIdentitySequenceSQL({
-        schema: table.schema,
-        table: table.name,
-        column: column.name,
-      })
-    ),
-    ';\n'
-  )
-
   try {
-    await executeSql({
+    await updateImportedRowsSequences({
       projectRef,
       connectionString,
-      sql: updateSequenceSQL,
-      queryKey: ['sequences', 'update-batch'],
+      table,
     })
     return { error: insertError }
   } catch (error) {
