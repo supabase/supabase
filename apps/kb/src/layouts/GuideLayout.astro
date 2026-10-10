@@ -1,7 +1,7 @@
 ---
 import { Github } from 'lucide-react'
 import { Badge } from 'ui'
-
+import { Admonition } from 'ui-patterns/Admonition'
 import Layout from './Layout.astro'
 import { getTopicDescription, type Topic, topicToSlug } from '../lib/topics'
 
@@ -10,9 +10,10 @@ interface Props {
 	description?: string
 	topics?: Topic[]
 	github_url?: string
+	aiAssisted?: boolean
 }
 
-const { title, description, topics = [], github_url } = Astro.props
+const { title, description, topics = [], github_url, aiAssisted } = Astro.props
 ---
 
 <Layout title={title} description={description}>
@@ -31,6 +32,14 @@ const { title, description, topics = [], github_url } = Astro.props
 						</a>
 					))}
 				</div>
+			)
+		}
+		{
+			aiAssisted && (
+				<Admonition type="warning">
+					This page was generated with AI assistance. Have feedback? Let us know on{' '}
+					<a href="https://github.com/supabase/supabase/issues">GitHub</a>.
+				</Admonition>
 			)
 		}
 		<slot />

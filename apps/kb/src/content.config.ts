@@ -18,6 +18,8 @@ const guides = defineCollection({
     // Surfaces the guide in the homepage's "Featured Guides" section.
     pinned: z.boolean().default(false),
     github_url: z.string().optional(),
+    // surfaces disclaimer message at the top of the article
+    aiAssisted: z.boolean().default(false),
   }),
 })
 
