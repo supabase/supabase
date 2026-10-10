@@ -1,6 +1,6 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { Axiom, Datadog, Grafana, Last9, Otlp, Sentry } from 'icons'
 import { BracesIcon, Cloud, Server } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 

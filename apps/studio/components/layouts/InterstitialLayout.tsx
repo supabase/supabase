@@ -1,5 +1,5 @@
-import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRightLeft } from 'lucide-react'
+import { motion, useReducedMotion } from 'motion/react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
 

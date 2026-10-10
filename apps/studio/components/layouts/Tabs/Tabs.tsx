@@ -8,8 +8,8 @@ import {
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Plus, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { ReactNode, useState } from 'react'
 import {

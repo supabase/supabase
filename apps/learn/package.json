@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "common": "workspace:*",
-    "framer-motion": "^11.18.2",
     "jotai": "^2.8.0",
     "lucide-react": "*",
+    "motion": "^11.18.2",
     "next": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",

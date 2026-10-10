@@ -1,7 +1,7 @@
 import MotionNumber from '@number-flow/react'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'

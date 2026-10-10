@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useMemo, type KeyboardEvent } from 'react'
 import { cn, TabsTrigger } from 'ui'
 

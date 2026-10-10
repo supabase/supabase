@@ -1,6 +1,6 @@
-import { motion, type Variants } from 'framer-motion'
 import { isArray } from 'lodash'
 import { Check, X } from 'lucide-react'
+import { motion, type Variants } from 'motion/react'
 import type { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'

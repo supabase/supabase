@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
 import { CircleDotDashed, GitMerge, X } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 

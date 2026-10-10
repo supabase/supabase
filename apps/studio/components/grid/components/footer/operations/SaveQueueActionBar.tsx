@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { Eye, MoreVertical, Trash } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { createPortal } from 'react-dom'
 import {
   Button,

@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { Button, SidePanel } from 'ui'
 
