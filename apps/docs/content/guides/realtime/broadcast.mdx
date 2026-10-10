@@ -296,6 +296,14 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
 
 ## Send messages
 
+<Admonition type="caution" title="Sending from a server or Edge Function">
+
+Subscribing to a channel only to send messages from a server can multiply your Realtime bill. Each subscribed process holds its own connection, and in Edge Functions every worker is a separate process. Each connection counts toward [Peak Connections](/docs/guides/platform/manage-your-usage/realtime-peak-connections) and is billed as a recipient of every message on the channel until it closes.
+
+To send from a server, use `channel.httpSend()` or the [REST API](#broadcast-using-the-rest-api), which don't open a connection. Subscribe only in code that needs to receive messages.
+
+</Admonition>
+
 ### Broadcast using the client libraries
 
 You can use the Supabase client libraries to send Broadcast messages.
@@ -616,6 +624,8 @@ curl -v \
 You can pass configuration options while initializing the Supabase Client.
 
 ### Self-send messages
+
+With self-send enabled, each message delivered back to the sender is billed as a received message. To confirm that the server received a message, use [acknowledgements](#acknowledge-messages) instead.
 
 <Tabs
   scrollable
