@@ -1699,16 +1699,10 @@ export const examples: Registry = [
     files: ['example/expanding-textarea-demo.tsx'],
   },
   {
-    name: 'error-display-demo',
+    name: 'error-display-playground',
     type: 'components:example',
-    registryDependencies: ['error-display'],
-    files: ['example/error-display-demo.tsx'],
-  },
-  {
-    name: 'error-display-with-children',
-    type: 'components:example',
-    registryDependencies: ['error-display'],
-    files: ['example/error-display-with-children.tsx'],
+    registryDependencies: ['error-display', 'select', 'slider', 'switch', 'label'],
+    files: ['example/error-display-playground.tsx'],
   },
   {
     name: 'logs-bar-chart',
