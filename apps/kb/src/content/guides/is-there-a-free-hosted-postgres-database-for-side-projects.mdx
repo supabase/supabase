@@ -1,0 +1,39 @@
+---
+title: 'Is there a free hosted Postgres database I can use for a side project?'
+description: 'Yes. The Supabase Free plan includes a dedicated 500 MB Postgres database per project at no cost, and it pauses after 7 days of low activity.'
+topics: ['Supabase Platform', 'Database']
+---
+
+Yes. The Supabase Free plan gives each project a dedicated Postgres database at no cost. It fits prototypes, side projects, and apps with light traffic.
+
+## What the Free plan includes
+
+- A 500 MB Postgres database per project, on shared CPU with 500 MB of RAM
+- Up to 2 active projects
+- 5 GB of egress and 1 GB of file storage
+- The Table Editor, the SQL Editor, and Postgres extensions such as pgvector
+- Community support
+
+You connect with a standard Postgres connection string, so your ORM and tools work the same way they would with any other Postgres server.
+
+## The trade-off: pausing
+
+Free projects pause after 7 days of low database activity. You get a warning email about a week before, and nothing is deleted. You can resume a paused project from the dashboard for up to a year. See [Do Supabase projects pause when they're inactive?](/kb/guides/do-supabase-projects-pause-when-inactive)
+
+A project that your app queries every day, even lightly, stays active.
+
+## Back it up yourself
+
+Daily backups start on the Pro plan. On the Free plan, export regularly with the Supabase CLI. A complete export takes three dumps, because `supabase db dump` exports only the schema by default:
+
+```shell
+supabase db dump --db-url "$DB_URL" -f roles.sql --role-only
+supabase db dump --db-url "$DB_URL" -f schema.sql
+supabase db dump --db-url "$DB_URL" -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"
+```
+
+See [Backup and restore using the CLI](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore) for how to restore them.
+
+## When to upgrade
+
+Move to the Pro plan when the project needs to be up without exceptions, outgrows 500 MB, or needs daily backups. Pro starts at $25 per month, includes one project on Micro compute, and projects on it never pause. See [How much does a single database-only Supabase project cost?](/kb/guides/how-much-does-a-database-only-supabase-project-cost)

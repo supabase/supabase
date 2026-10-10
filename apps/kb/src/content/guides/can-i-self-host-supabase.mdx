@@ -1,0 +1,32 @@
+---
+title: 'Can I self-host Supabase?'
+description: 'Yes. Supabase is open source and you can run it on your own servers with Docker, as a single project without some managed platform features.'
+topics: ['Supabase Platform', 'FAQ']
+---
+
+Yes. Supabase is open source, and you can run it on your own servers with [Docker](https://supabase.com/docs/guides/self-hosting/docker).
+
+## When self-hosting fits
+
+Self-hosting is a good choice when:
+
+- You need full control over where your data lives.
+- Compliance rules prevent you from using a managed service.
+- You want to run Supabase in an isolated network.
+
+For more details, refer to [Self-Hosting Supabase](https://supabase.com/docs/guides/self-hosting).
+
+## How it differs from the managed platform
+
+There are a [few differences](https://supabase.com/docs/guides/self-hosting#how-self-hosted-supabase-differs) between self-hosted and managed Supabase, including:
+
+- A self-hosted instance runs a **single project**. The dashboard doesn't manage multiple organizations or projects.
+- Most settings are configured through **environment variables** instead of the dashboard.
+- Some platform features aren't available, such as managed backups
+- You run upgrades, backups, monitoring, and security patches yourself.
+
+Refer to [Self-hosting](https://supabase.com/docs/guides/self-hosting) to get started.
+
+## Develop locally without self-hosting
+
+For local development, you don't need a self-hosted deployment. The Supabase CLI runs the stack on your machine using our [Local development workflow](https://supabase.com/docs/guides/local-development/cli-workflows).
