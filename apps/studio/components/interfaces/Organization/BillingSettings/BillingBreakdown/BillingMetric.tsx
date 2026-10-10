@@ -88,14 +88,14 @@ export const BillingMetric = ({
           {metric.anchor ? (
             <Link href={`/org/${slug}/usage#${metric.anchor}`} className="block w-full group">
               <div className="group flex items-center gap-1">
-                <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer items-center">
+                <div className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer flex items-center">
                   <span>{metric.name}</span>
                   {isLogMetricOnNonPlatformPlan && (
                     <Badge className="ml-2" variant={'warning'}>
                       Upcoming
                     </Badge>
                   )}
-                </p>
+                </div>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
                     <ChevronRight strokeWidth={1.5} size={16} className="transition" />
@@ -229,6 +229,20 @@ export const BillingMetric = ({
                   Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
                 </p>
               ))}
+
+            {isLogMetricOnNonPlatformPlan && (
+              <p className="text-foreground-light">
+                We're aware of some overreporting in this metric and are actively working on a fix —
+                numbers shown may be higher than expected.{' '}
+                <Link
+                  href="https://github.com/orgs/supabase/discussions/50925"
+                  target="_blank"
+                  className="transition text-primary hover:text-primary-hover underline"
+                >
+                  Share feedback on GitHub
+                </Link>
+              </p>
+            )}
 
             {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
               <table className="list-disc w-full">
