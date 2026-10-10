@@ -143,17 +143,17 @@ There are many more in the [badge showcase](https://badge.select/showcase), and 
 
 If you can build a web or mobile app, you already know most of what it takes to put a screen on your desk, or a sensor in your room that does something useful when a reading changes. The hardware is inexpensive, and was not affected by the recent price increase of memory - Raspberry Pi raised the price of their computers several times, while microcontrollers remained the same price. With a tool like Claude Code, a first hardware project becomes an afternoon spent mostly on deciding what to make.
 
+<Img
+  alt="The Make editor at badge.select: app code on the left, a virtual badge running it on the right"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/make-editor.png"
+/>
+
 Everything you need is at [badge.select](https://badge.select/):
 
 - If you have a physical badge, the [first app guide](https://badge.select/guides/first-program) walks you through adding your own app over USB.
 - If you want a coding agent to help, the [badge project kit](https://badge.select/guides/code-with-an-agent) gives Claude Code the API reference and instructions it needs. You can try something like: "Read the project instructions and badge API reference. Build a pomodoro timer with a large countdown. Use A to start or pause, B to reset, and C to switch between work and break sessions."
 - If you weren't at Select, the [virtual badge](https://badge.select/virtual) and the [Make editor](https://badge.select/make) let you build in your browser.
 - If you want to go further, replace the firmware and work in C or Rust. There's already [a guide](https://badge.select/guides/apple-ii) for turning the badge into an Apple IIe emulator, with a physical USB keyboard and BASIC programs running on the badge itself.
-
-<Img
-  alt="The Make editor at badge.select: app code on the left, a virtual badge running it on the right"
-  src="/images/blog/how-we-made-the-supabase-select-2026-badge/make-editor.png"
-/>
 
 Good first projects are small and useful: a clock with exactly the display you want, a pomodoro timer beside your keyboard, a display that reads from your Supabase project over Wi-Fi, or a light that turns on when your coding agent needs you. With Supabase Realtime, the badge can react the moment something changes in your app. Your first change can be as small as making one button do something different.
 
