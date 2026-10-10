@@ -253,6 +253,62 @@ describe('snippets.utils', () => {
     })
   })
 
+  describe('snippet names containing ".sql"', () => {
+    const createMockDirent = (name: string) => ({
+      name,
+      isDirectory: () => false,
+      isFile: () => true,
+    })
+
+    const mockRootDir = (fileNames: string[]) => {
+      mockedFS.access.mockResolvedValue(undefined)
+      mockedFS.readdir.mockResolvedValue(fileNames.map(createMockDirent) as any)
+      mockedFS.readFile.mockResolvedValue('SELECT 1;')
+      mockedFS.stat.mockResolvedValue({ birthtime: new Date('2023-01-01') } as any)
+    }
+
+    it('should only strip the trailing .sql extension when reading entries', async () => {
+      mockRootDir(['v1.sql migration.sql', 'users.sql.sql', 'a.sql.b.sql', 'plain.sql'])
+
+      const entries = await getFilesystemEntries()
+
+      expect(entries.map((e) => e.name)).toEqual([
+        'v1.sql migration',
+        'users.sql',
+        'a.sql.b',
+        'plain',
+      ])
+    })
+
+    it('should derive ids from the real filename on disk', async () => {
+      mockRootDir(['v1.sql migration.sql'])
+
+      const [entry] = await getFilesystemEntries()
+
+      expect(entry.id).toBe(generateDeterministicUuid([null, 'v1.sql migration.sql']))
+    })
+
+    it('should return the full snippet name in listings', async () => {
+      mockRootDir(['v1.sql migration.sql', 'users.sql.sql'])
+
+      const { snippets } = await getSnippets()
+
+      expect(snippets.map((s) => s.name).sort()).toEqual(['users.sql', 'v1.sql migration'])
+    })
+
+    it('should delete the file on disk for a name containing .sql', async () => {
+      mockRootDir(['v1.sql migration.sql'])
+      mockedFS.unlink.mockResolvedValue(undefined)
+      const id = generateDeterministicUuid([null, 'v1.sql migration.sql'])
+
+      await deleteSnippet(id)
+
+      expect(mockedFS.unlink).toHaveBeenCalledWith(
+        path.join(MOCK_SNIPPETS_DIR, 'v1.sql migration.sql')
+      )
+    })
+  })
+
   describe('getSnippet', () => {
     it('should get a specific snippet by id', async () => {
       const snippetName = 'test-snippet'
