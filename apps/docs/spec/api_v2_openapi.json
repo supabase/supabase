@@ -2437,11 +2437,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -2480,8 +2477,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -2524,18 +2524,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -2555,7 +2550,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -2596,7 +2591,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -2614,8 +2609,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -2656,7 +2651,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -2950,11 +2945,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -2993,8 +2985,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -3037,18 +3032,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -3068,7 +3058,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -3109,7 +3099,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -3127,8 +3117,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -3169,7 +3159,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -3571,11 +3561,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -3614,8 +3601,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -3658,18 +3648,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -3689,7 +3674,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -3730,7 +3715,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -3748,8 +3733,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -3790,7 +3775,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -4097,11 +4082,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -4140,8 +4122,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -4184,18 +4169,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -4214,8 +4194,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -4257,8 +4237,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -4278,7 +4258,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -4319,7 +4299,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -4337,8 +4317,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -4379,7 +4359,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -4684,11 +4664,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -4727,8 +4704,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -4771,18 +4751,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -4801,8 +4776,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -4844,8 +4819,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -4865,7 +4840,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -4906,7 +4881,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -4924,8 +4899,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -4966,7 +4941,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -5371,11 +5346,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -5414,8 +5386,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -5458,18 +5433,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -5488,8 +5458,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -5531,8 +5501,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -5552,7 +5522,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -5593,7 +5563,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -5611,8 +5581,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -5653,7 +5623,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -5988,11 +5958,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -6031,8 +5998,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -6075,18 +6045,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -6105,8 +6070,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -6148,8 +6113,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -6169,7 +6134,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -6210,7 +6175,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -6228,8 +6193,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -6270,7 +6235,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -6414,13 +6379,10 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": {
-                              "type": "string",
-                              "const": "bad_request.endpoint.test.disabled"
-                            },
+                            "code": { "type": "string", "const": "endpoint_disabled" },
                             "message": {
                               "type": "string",
-                              "const": "Bad Request: Endpoint is disabled"
+                              "const": "Webhook endpoint is disabled"
                             },
                             "description": { "type": "string" },
                             "links": {
@@ -6462,11 +6424,11 @@
                             "id": { "type": "string" },
                             "code": {
                               "type": "string",
-                              "const": "bad_request.endpoint.test.wrong_event_type"
+                              "const": "endpoint_event_type_not_subscribed"
                             },
                             "message": {
                               "type": "string",
-                              "const": "Bad Request: Provided event type is not subscribed to by the endpoint"
+                              "const": "Webhook endpoint is not subscribed to this event type"
                             },
                             "description": { "type": "string" },
                             "links": {
@@ -6512,8 +6474,8 @@
                   "EndpointTestDisabled": {
                     "value": {
                       "error": {
-                        "code": "bad_request.endpoint.test.disabled",
-                        "message": "Bad Request: Endpoint is disabled",
+                        "code": "endpoint_disabled",
+                        "message": "Webhook endpoint is disabled",
                         "description": "Endpoint is disabled, to send test event endpoint must first be enabled."
                       }
                     }
@@ -6521,8 +6483,8 @@
                   "EndpointTestWrongEventType": {
                     "value": {
                       "error": {
-                        "code": "bad_request.endpoint.test.wrong_event_type",
-                        "message": "Bad Request: Provided event type is not subscribed to by the endpoint",
+                        "code": "endpoint_event_type_not_subscribed",
+                        "message": "Webhook endpoint is not subscribed to this event type",
                         "description": "Only event types that the endpoint is subscribed to can be specified."
                       }
                     }
@@ -6602,11 +6564,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -6645,8 +6604,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -6689,18 +6651,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -6719,8 +6676,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -6762,8 +6719,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -6783,7 +6740,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -6824,7 +6781,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -6842,8 +6799,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -6884,7 +6841,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -7326,11 +7283,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -7369,8 +7323,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -7413,18 +7370,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -7443,8 +7395,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.delivery" },
-                        "message": { "type": "string", "const": "Not Found: Delivery not found" },
+                        "code": { "type": "string", "const": "delivery_not_found" },
+                        "message": { "type": "string", "const": "Webhook delivery not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -7486,8 +7438,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.delivery",
-                        "message": "Not Found: Delivery not found"
+                        "code": "delivery_not_found",
+                        "message": "Webhook delivery not found"
                       }
                     }
                   }
@@ -7507,7 +7459,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -7548,7 +7500,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -7566,8 +7518,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -7608,7 +7560,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -7810,11 +7762,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -7853,8 +7802,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -7897,18 +7849,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -7927,8 +7874,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.delivery" },
-                        "message": { "type": "string", "const": "Not Found: Delivery not found" },
+                        "code": { "type": "string", "const": "delivery_not_found" },
+                        "message": { "type": "string", "const": "Webhook delivery not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -7970,8 +7917,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.delivery",
-                        "message": "Not Found: Delivery not found"
+                        "code": "delivery_not_found",
+                        "message": "Webhook delivery not found"
                       }
                     }
                   }
@@ -7991,7 +7938,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -8032,7 +7979,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -8050,8 +7997,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -8092,7 +8039,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -8430,11 +8377,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -8473,8 +8417,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -8517,18 +8464,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -8548,7 +8490,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -8589,7 +8531,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -8607,8 +8549,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -8649,7 +8591,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -8941,11 +8883,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -8984,8 +8923,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -9028,18 +8970,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -9059,7 +8996,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -9100,7 +9037,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -9118,8 +9055,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -9160,7 +9097,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -9560,11 +9497,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -9603,8 +9537,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -9647,18 +9584,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -9678,7 +9610,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -9719,7 +9651,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -9737,8 +9669,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -9779,7 +9711,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -10084,11 +10016,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -10127,8 +10056,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -10171,18 +10103,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -10201,8 +10128,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -10244,8 +10171,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -10265,7 +10192,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -10306,7 +10233,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -10324,8 +10251,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -10366,7 +10293,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -10669,11 +10596,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -10712,8 +10636,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -10756,18 +10683,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -10786,8 +10708,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -10829,8 +10751,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -10850,7 +10772,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -10891,7 +10813,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -10909,8 +10831,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -10951,7 +10873,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -11354,11 +11276,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -11397,8 +11316,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -11441,18 +11363,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -11471,8 +11388,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -11514,8 +11431,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -11535,7 +11452,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -11576,7 +11493,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -11594,8 +11511,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -11636,7 +11553,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -11969,11 +11886,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -12012,8 +11926,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -12056,18 +11973,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -12086,8 +11998,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -12129,8 +12041,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -12150,7 +12062,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -12191,7 +12103,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -12209,8 +12121,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -12251,7 +12163,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -12393,13 +12305,10 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": {
-                              "type": "string",
-                              "const": "bad_request.endpoint.test.disabled"
-                            },
+                            "code": { "type": "string", "const": "endpoint_disabled" },
                             "message": {
                               "type": "string",
-                              "const": "Bad Request: Endpoint is disabled"
+                              "const": "Webhook endpoint is disabled"
                             },
                             "description": { "type": "string" },
                             "links": {
@@ -12441,11 +12350,11 @@
                             "id": { "type": "string" },
                             "code": {
                               "type": "string",
-                              "const": "bad_request.endpoint.test.wrong_event_type"
+                              "const": "endpoint_event_type_not_subscribed"
                             },
                             "message": {
                               "type": "string",
-                              "const": "Bad Request: Provided event type is not subscribed to by the endpoint"
+                              "const": "Webhook endpoint is not subscribed to this event type"
                             },
                             "description": { "type": "string" },
                             "links": {
@@ -12491,8 +12400,8 @@
                   "EndpointTestDisabled": {
                     "value": {
                       "error": {
-                        "code": "bad_request.endpoint.test.disabled",
-                        "message": "Bad Request: Endpoint is disabled",
+                        "code": "endpoint_disabled",
+                        "message": "Webhook endpoint is disabled",
                         "description": "Endpoint is disabled, to send test event endpoint must first be enabled."
                       }
                     }
@@ -12500,8 +12409,8 @@
                   "EndpointTestWrongEventType": {
                     "value": {
                       "error": {
-                        "code": "bad_request.endpoint.test.wrong_event_type",
-                        "message": "Bad Request: Provided event type is not subscribed to by the endpoint",
+                        "code": "endpoint_event_type_not_subscribed",
+                        "message": "Webhook endpoint is not subscribed to this event type",
                         "description": "Only event types that the endpoint is subscribed to can be specified."
                       }
                     }
@@ -12581,11 +12490,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -12624,8 +12530,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -12668,18 +12577,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -12698,8 +12602,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.endpoint" },
-                        "message": { "type": "string", "const": "Not Found: Endpoint not found" },
+                        "code": { "type": "string", "const": "endpoint_not_found" },
+                        "message": { "type": "string", "const": "Webhook endpoint not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -12741,8 +12645,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.endpoint",
-                        "message": "Not Found: Endpoint not found"
+                        "code": "endpoint_not_found",
+                        "message": "Webhook endpoint not found"
                       }
                     }
                   }
@@ -12762,7 +12666,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -12803,7 +12707,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -12821,8 +12725,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -12863,7 +12767,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -13303,11 +13207,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -13346,8 +13247,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -13390,18 +13294,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -13420,8 +13319,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.delivery" },
-                        "message": { "type": "string", "const": "Not Found: Delivery not found" },
+                        "code": { "type": "string", "const": "delivery_not_found" },
+                        "message": { "type": "string", "const": "Webhook delivery not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -13463,8 +13362,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.delivery",
-                        "message": "Not Found: Delivery not found"
+                        "code": "delivery_not_found",
+                        "message": "Webhook delivery not found"
                       }
                     }
                   }
@@ -13484,7 +13383,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -13525,7 +13424,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -13543,8 +13442,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -13585,7 +13484,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
@@ -13785,11 +13684,8 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.permission_denied" },
-                            "message": {
-                              "type": "string",
-                              "const": "Forbidden: Permission denied"
-                            },
+                            "code": { "type": "string", "const": "forbidden" },
+                            "message": { "type": "string", "const": "Forbidden" },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -13828,8 +13724,11 @@
                           "type": "object",
                           "properties": {
                             "id": { "type": "string" },
-                            "code": { "type": "string", "const": "forbidden.access_disabled" },
-                            "message": { "type": "string", "const": "Forbidden: Access disabled" },
+                            "code": { "type": "string", "const": "webhooks_access_disabled" },
+                            "message": {
+                              "type": "string",
+                              "const": "Webhooks access is disabled for this organization or project"
+                            },
                             "description": { "type": "string" },
                             "links": {
                               "type": "object",
@@ -13872,18 +13771,13 @@
                 },
                 "examples": {
                   "PermissionDenied": {
-                    "value": {
-                      "error": {
-                        "code": "forbidden.permission_denied",
-                        "message": "Forbidden: Permission denied"
-                      }
-                    }
+                    "value": { "error": { "code": "forbidden", "message": "Forbidden" } }
                   },
                   "AccessDisabled": {
                     "value": {
                       "error": {
-                        "code": "forbidden.access_disabled",
-                        "message": "Forbidden: Access disabled"
+                        "code": "webhooks_access_disabled",
+                        "message": "Webhooks access is disabled for this organization or project"
                       }
                     }
                   }
@@ -13902,8 +13796,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "not_found.delivery" },
-                        "message": { "type": "string", "const": "Not Found: Delivery not found" },
+                        "code": { "type": "string", "const": "delivery_not_found" },
+                        "message": { "type": "string", "const": "Webhook delivery not found" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -13945,8 +13839,8 @@
                   "Default example": {
                     "value": {
                       "error": {
-                        "code": "not_found.delivery",
-                        "message": "Not Found: Delivery not found"
+                        "code": "delivery_not_found",
+                        "message": "Webhook delivery not found"
                       }
                     }
                   }
@@ -13966,7 +13860,7 @@
                       "properties": {
                         "id": { "type": "string" },
                         "code": { "type": "string", "const": "request_timeout" },
-                        "message": { "type": "string", "const": "Request Timeout" },
+                        "message": { "type": "string", "const": "Request timed out" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -14007,7 +13901,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "request_timeout", "message": "Request Timeout" }
+                      "error": { "code": "request_timeout", "message": "Request timed out" }
                     }
                   }
                 }
@@ -14025,8 +13919,8 @@
                       "type": "object",
                       "properties": {
                         "id": { "type": "string" },
-                        "code": { "type": "string", "const": "too_many_requests" },
-                        "message": { "type": "string", "const": "Too Many Requests" },
+                        "code": { "type": "string", "const": "rate_limit_exceeded" },
+                        "message": { "type": "string", "const": "Rate limit exceeded" },
                         "description": { "type": "string" },
                         "links": {
                           "type": "object",
@@ -14067,7 +13961,7 @@
                 "examples": {
                   "Default example": {
                     "value": {
-                      "error": { "code": "too_many_requests", "message": "Too Many Requests" }
+                      "error": { "code": "rate_limit_exceeded", "message": "Rate limit exceeded" }
                     }
                   }
                 }
