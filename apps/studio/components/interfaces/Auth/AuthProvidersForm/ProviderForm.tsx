@@ -26,6 +26,7 @@ import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
+import { normalizeSmsTemplate } from '@/lib/sms-template'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -129,6 +130,10 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       if (doubleNegativeKeys.includes(x)) payload[x] = !values[x]
       if (payload[x] === '') payload[x] = null
     })
+
+    if (typeof payload.SMS_TEMPLATE === 'string') {
+      payload.SMS_TEMPLATE = normalizeSmsTemplate(payload.SMS_TEMPLATE)
+    }
 
     // The backend uses empty string to represent no required characters in the password
     if (payload.PASSWORD_REQUIRED_CHARACTERS === NO_REQUIRED_CHARACTERS) {
