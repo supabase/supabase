@@ -2,14 +2,17 @@ import type { FetchPreviousPageOptions } from '@tanstack/react-query'
 import { CirclePause, CirclePlay } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 
 import { useDataTable } from './providers/DataTableProvider'
+import { useLivePolling } from './useLivePolling'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const REFRESH_INTERVAL = 10_000
+const LIVE_MODE_PAUSED_TOAST_ID = 'live-mode-paused-for-inactivity'
 
 interface LiveButtonProps {
   searchParamsParser: any
@@ -19,26 +22,20 @@ interface LiveButtonProps {
 export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButtonProps) {
   const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
   const { table } = useDataTable()
+  const track = useTrack()
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick, { registerInCommandMenu: false })
 
+  useLivePolling({
+    isEnabled: Boolean(live),
+    poll: () => fetchPreviousPage?.() ?? Promise.resolve(undefined),
+    onIdle: handleIdle,
+  })
+
+  // The paused notice only makes sense while live mode is off, and only on this page.
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    async function fetchData() {
-      if (live) {
-        await fetchPreviousPage?.()
-        timeoutId = setTimeout(fetchData, REFRESH_INTERVAL)
-      } else {
-        clearTimeout(timeoutId)
-      }
-    }
-
-    fetchData()
-
-    return () => {
-      clearTimeout(timeoutId)
-    }
-  }, [live, fetchPreviousPage])
+    if (live) toast.dismiss(LIVE_MODE_PAUSED_TOAST_ID)
+  }, [live])
+  useEffect(() => () => void toast.dismiss(LIVE_MODE_PAUSED_TOAST_ID), [])
 
   // REMINDER: make sure to reset live when date is set
   // TODO: test properly
@@ -48,15 +45,34 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
     }
   }, [date, sort])
 
-  function handleClick() {
+  // Live mode always follows the newest logs, so turning it on or off clears any date range and sort.
+  function setLive(getLive: (wasLive: boolean) => boolean) {
     setSearch((prev) => ({
       ...prev,
-      live: !prev.live,
+      live: getLive(Boolean(prev.live)),
       date: null,
       sort: null,
     }))
     table.getColumn('date')?.setFilterValue(undefined)
     table.resetSorting()
+  }
+
+  function handleClick() {
+    setLive((wasLive) => !wasLive)
+  }
+
+  function handleIdle() {
+    setSearch((prev) => ({ ...prev, live: null }))
+    toast('Live mode paused after 15 minutes of inactivity', {
+      id: LIVE_MODE_PAUSED_TOAST_ID,
+      duration: Infinity,
+      action: { label: 'Resume live mode', onClick: handleResume },
+    })
+  }
+
+  function handleResume() {
+    track('unified_logs_live_mode_resume_button_clicked', { pauseReason: 'inactivity' })
+    setLive(() => true)
   }
 
   return (
