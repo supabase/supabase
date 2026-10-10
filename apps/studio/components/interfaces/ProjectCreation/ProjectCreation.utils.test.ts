@@ -137,6 +137,12 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
     )
   })
 
+  it('returns undefined when overridden, even if otherwise enrolled', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, isOverridden: true })
+    ).toBeUndefined()
+  })
+
   it('returns undefined for a paid plan', () => {
     expect(
       getFreeTierGeneralRegionExperimentVariant({ ...base, isFreePlan: false })

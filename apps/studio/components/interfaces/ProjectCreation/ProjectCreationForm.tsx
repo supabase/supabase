@@ -207,7 +207,10 @@ export const ProjectCreationForm = ({
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
+  // The specific-regions link owns the region selector, so the free tier experiment stays inactive
+  const isSpecificRegionsLinkEnabled = useFlag('projectCreationSpecificRegionsLink') === true
   const isResolvingFreeTierGeneralRegionExperiment =
+    !isSpecificRegionsLinkEnabled &&
     isFreePlan &&
     smartRegionEnabled &&
     (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
@@ -218,6 +221,7 @@ export const ProjectCreationForm = ({
     smartRegionEnabled,
     enrollmentFlag: freeTierGeneralRegionEnrollment,
     selectionFlag: freeTierGeneralRegionSelection,
+    isOverridden: isSpecificRegionsLinkEnabled,
   })
 
   // Read dirty state during render rather than depending on form.formState in the

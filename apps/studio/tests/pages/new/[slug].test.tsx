@@ -284,6 +284,7 @@ const DEFAULT_FLAGS = {
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
   projectCreationRestrictedRegions: false,
+  projectCreationSpecificRegionsLink: false,
   freeTierGeneralRegionEnrollment: false,
   freeTierGeneralRegionSelection: false,
 }
@@ -349,6 +350,12 @@ const getSelectTriggerByLabel = (labelText: string) => {
   const trigger = row?.querySelector('[role="combobox"]')
   if (!trigger) throw new Error(`No combobox trigger found near label "${labelText}"`)
   return trigger as HTMLElement
+}
+
+const submitAndReadRegionSelection = async (onRequest: ReturnType<typeof vi.fn>) => {
+  fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+  await waitFor(() => expect(onRequest).toHaveBeenCalled())
+  return onRequest.mock.calls[0][0].region_selection
 }
 
 // Region is selected explicitly because the smart-region auto-fill is unreliable (FE-3884).
@@ -503,6 +510,47 @@ describe('project creation wizard', () => {
       expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ name: 'Americas' })
     })
 
+    describe('specific regions behind a link', () => {
+      const SPECIFIC_REGIONS_LINK_FLAG = { projectCreationSpecificRegionsLink: true }
+
+      test('opens on the general regions alone', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+      })
+
+      test('the link reopens the dropdown on the full list with the general region still selected', async () => {
+        mockWizardEndpoints()
+        const onRequest = vi.fn()
+        mockCreateProject(onRequest)
+
+        await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
+
+        await fillProjectName('Specific Region Link Project')
+        await generateAndWaitForStrongPassword()
+        await selectRegion(/Americas/)
+
+        await user.click(screen.getByRole('button', { name: 'Need a specific region?' }))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.getByText('General regions')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+
+        await user.click(await screen.findByRole('option', { name: /East US/ }))
+
+        expect(
+          screen.queryByRole('button', { name: 'Need a specific region?' })
+        ).not.toBeInTheDocument()
+        expect(await submitAndReadRegionSelection(onRequest)).toMatchObject({ code: 'us-east-1' })
+      })
+    })
+
     test('shows an error state when available regions fail to load', async () => {
       mockWizardEndpoints({ availableRegions: 'error' })
 
@@ -574,6 +622,29 @@ describe('project creation wizard', () => {
         expect(await screen.findByText('Specific regions')).toBeInTheDocument()
         expect(screen.getByRole('option', { name: /North Virginia/ })).toBeInTheDocument()
         expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
+
+      test('the specific-regions link takes precedence when both flags are on', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            projectCreationSpecificRegionsLink: true,
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+        // The reveal button sits outside the open dropdown, so it is hidden from the a11y tree
+        expect(screen.getByText('Need a specific region?')).toBeInTheDocument()
       })
 
       test('shows the full region picker with no upgrade footer for a paid-plan org even when enrolled', async () => {
