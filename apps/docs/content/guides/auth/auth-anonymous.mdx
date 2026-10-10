@@ -402,7 +402,7 @@ async function resolveDataConflicts(anonymousUserId, existingUserId) {
 
 ## Abuse prevention and rate limits
 
-Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible CAPTCHA or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/deployment/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
+Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible CAPTCHA or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of [rate limits](/docs/guides/deployment/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
 
 ## Automatic cleanup
 
