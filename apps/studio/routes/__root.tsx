@@ -330,7 +330,7 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
       scope.setTag('routerErrorComponent', true)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
-        ;(error as Error & { sentryId?: string }).sentryId = eventId
+        Object.assign(error, { sentryId: eventId })
       }
     })
     console.error(error instanceof Error ? error.stack : error)

@@ -39,16 +39,16 @@ export const useVectorBucketCreateMutation = ({
 
   return useMutation<VectorBucketCreateData, ResponseError, VectorBucketCreateVariables>({
     mutationFn: (vars) => createVectorBucket(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: storageKeys.vectorBuckets(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to create vector bucket: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,
