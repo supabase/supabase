@@ -41,7 +41,7 @@ Chcete-li zjistit, jak přispívat, navštivte stránku [Začínáme](../DEVELOP
 - [x] Alfa: Testujeme Supabase s uzavřenou skupinou zákazníků
 - [x] Veřejná alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Ale buďte na nás mírní, je tu několik zádrhelů
 - [x] Veřejná beta verze: Dostatečně stabilní pro většinu případů použití mimo podniky
-- [ ] Veřejná: Všeobecná dostupnost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Veřejná: Všeobecná dostupnost [[status](https://supabase.com/features)]
 
 V současné době jsme ve fázi Public Beta. Sledujte "releases" tohoto repozitáře, abyste byli upozorněni na hlavní aktualizace.
 
