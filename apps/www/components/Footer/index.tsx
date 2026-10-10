@@ -180,7 +180,10 @@ const Footer = (props: Props) => {
                     Get product updates and news from Supabase.
                   </p>
                   <Input
+                    id="newsletter-email"
+                    name="email"
                     type="email"
+                    autoComplete="email"
                     placeholder="Your email"
                     aria-label="Email for newsletter"
                     value={newsletterEmail}
