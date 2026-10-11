@@ -79,3 +79,34 @@ export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
   description: 'Controls how ClickHouse stores and queries replicated changes.',
 } as const
+
+export const INITIAL_SYNC_LABELS = {
+  include_all_tables: 'All tables',
+  skip_all_tables: 'No tables',
+  include_tables: 'Selected tables only',
+  skip_tables: 'All except selected tables',
+}
+
+export const INITIAL_SYNC_FIELD_COPY = {
+  label: 'Initial sync',
+  description:
+    'Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
+}
+
+export const PUBLICATION_FIELD_COPY = {
+  label: 'Publication',
+  description: 'Tables in the selected publication will be replicated to this destination.',
+}
+
+export const getTableSyncSelectionDescription = ({
+  mode,
+  selectedCount,
+  tableCount,
+}: {
+  mode: 'include_tables' | 'skip_tables'
+  selectedCount: number
+  tableCount: number
+}) =>
+  mode === 'skip_tables'
+    ? `${selectedCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
+    : `${selectedCount} of ${tableCount} publication tables will run initial sync. Ongoing replication will still include every publication table.`

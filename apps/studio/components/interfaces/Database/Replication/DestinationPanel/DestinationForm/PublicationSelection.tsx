@@ -5,6 +5,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
+import { PUBLICATION_FIELD_COPY } from './DestinationFormFieldCopy'
 import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
@@ -56,7 +57,7 @@ export const PublicationSelection = ({
   }
 
   const publicationDescription = [
-    'Tables in the selected publication will be replicated to this destination.',
+    PUBLICATION_FIELD_COPY.description,
     isPartitionHandlingLoading ? 'Loading partition handling...' : partitionHandlingMessage,
   ]
     .filter(Boolean)
@@ -69,7 +70,7 @@ export const PublicationSelection = ({
       render={({ field }) => (
         <FormItemLayout
           layout="horizontal"
-          label="Publication"
+          label={PUBLICATION_FIELD_COPY.label}
           description={publicationDescription}
         >
           <span role="status" className="sr-only">
