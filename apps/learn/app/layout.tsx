@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description: 'Learn Supabase.',
   metadataBase: new URL('https://supabase.com/learn'),
   icons: genFaviconData(BASE_PATH),
+  manifest: `${BASE_PATH}/favicon/manifest.json`,
   openGraph: {
     type: 'article',
     authors: 'Supabase',

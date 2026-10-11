@@ -26,6 +26,7 @@ const metadata: Metadata = {
     'Supabase is the Postgres development platform providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
+  manifest: `${BASE_PATH}/favicon/manifest.json`,
   robots: {
     index: IS_PRODUCTION,
     follow: IS_PRODUCTION,
