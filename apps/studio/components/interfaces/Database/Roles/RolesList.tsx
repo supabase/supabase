@@ -248,9 +248,11 @@ export const RolesList = () => {
       </div>
 
       <div className="space-y-4">
-        <div>
+        <section aria-labelledby="supabase-service-roles">
           <div className="bg-surface-100 border border-default px-card py-3 rounded-t flex items-center space-x-4">
-            <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
+            <h2 id="supabase-service-roles" className="text-sm text-foreground-light">
+              Supabase service roles
+            </h2>
             <Badge variant="success">Protected</Badge>
           </div>
 
@@ -264,11 +266,18 @@ export const RolesList = () => {
                   onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
-        </div>
+        </section>
 
-        <div>
+        <section aria-labelledby="project-database-roles">
           <div className="bg-surface-100 border border-default px-card py-3 rounded-t">
-            <p className="text-sm text-foreground-light">Other database roles</p>
+            <div className="space-y-1">
+              <h2 id="project-database-roles" className="text-sm text-foreground-light">
+                Project database roles
+              </h2>
+              <p className="text-xs text-foreground-lighter">
+                Includes the <code>postgres</code> administrator role and custom roles.
+              </p>
+            </div>
           </div>
 
           {isLoading
@@ -281,7 +290,7 @@ export const RolesList = () => {
                   onSelectDelete={setSelectedRoleIdToDelete}
                 />
               ))}
-        </div>
+        </section>
       </div>
 
       {filterString.length > 0 && filteredRoles.length === 0 && (
