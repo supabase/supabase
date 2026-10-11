@@ -1,10 +1,12 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMemo } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Badge,
   Button,
+  Card,
+  CardContent,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -12,43 +14,18 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectSeparator,
-  SelectTrigger,
-  SelectValue,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import * as z from 'zod'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
-import { extensionsWithRecommendedSchemas } from './Extensions.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
 
 const orioleExtCallOuts = ['vector', 'postgis']
-
-const FormSchema = z.object({ name: z.string(), schema: z.string() }).superRefine((val, ctx) => {
-  if (val.schema === 'custom' && val.name.length === 0) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['name'],
-      message: 'Please provide a name for the schema',
-    })
-  }
-})
 
 interface EnableExtensionModalProps {
   visible: boolean
@@ -62,28 +39,8 @@ export const EnableExtensionModal = ({
   onCancel,
 }: EnableExtensionModalProps) => {
   const isOrioleDb = useIsOrioleDb()
+
   const { data: project } = useSelectedProjectQuery()
-  const { data: protectedSchemas } = useProtectedSchemas({ excludeSchemas: ['extensions'] })
-
-  const recommendedSchema = extensionsWithRecommendedSchemas[extension.name]
-
-  const { data: schemas = [], isPending: isLoading } = useSchemasQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: visible }
-  )
-  const visibleSchemas = useSchemasFilteredForHighAvailability(schemas)
-  const availableSchemas = useMemo(
-    () =>
-      visibleSchemas.filter(
-        (schema) =>
-          schema.name === recommendedSchema ||
-          !protectedSchemas.some((protectedSchema) => protectedSchema.name === schema.name)
-      ),
-    [visibleSchemas, recommendedSchema, protectedSchemas]
-  )
 
   // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
   const defaultSchema =
@@ -99,33 +56,16 @@ export const EnableExtensionModal = ({
     },
   })
 
-  const defaultValues = { name: extension.name, schema: recommendedSchema ?? 'extensions' }
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues,
-  })
-  const schema = useWatch({ control: form.control, name: 'schema' })
-
-  const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+  const onConfirmEnable = async () => {
     if (project === undefined) return console.error('Project is required')
-
-    const schema =
-      defaultSchema !== undefined && defaultSchema !== null
-        ? defaultSchema
-        : values.schema === 'custom'
-          ? values.name
-          : values.schema
 
     enableExtension({
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      schema,
+      schema: defaultSchema ?? 'extensions',
       name: extension.name,
       version: extension.default_version,
       cascade: true,
-      createSchema: !schema.startsWith('pg_'),
     })
   }
 
@@ -138,7 +78,7 @@ export const EnableExtensionModal = ({
     >
       <DialogContent size="small" aria-describedby={undefined}>
         <DialogHeader>
-          <DialogTitle>Enable {extension.name}</DialogTitle>
+          <DialogTitle>Confirm to enable {extension.name}</DialogTitle>
         </DialogHeader>
 
         <DialogSectionSeparator />
@@ -157,113 +97,59 @@ export const EnableExtensionModal = ({
           </Admonition>
         )}
 
-        <DialogSection>
-          <Form {...form}>
-            <form id="enable-extensions-form" onSubmit={form.handleSubmit(onSubmit)}>
-              {isLoading ? (
-                <div className="space-y-2">
-                  <ShimmeringLoader />
-                  <div className="w-3/4">
-                    <ShimmeringLoader />
-                  </div>
-                </div>
-              ) : !!defaultSchema ? (
-                <div className="flex flex-col gap-y-2">
-                  <FormItemLayout
-                    isReactForm={false}
-                    label="Select a schema to enable the extension for"
-                  >
-                    <Input disabled value={defaultSchema} />
-                  </FormItemLayout>
-                  <p className="text-sm text-foreground-light">
-                    Extension must be installed in the "{defaultSchema}" schema.
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-y-2">
-                  <FormField
-                    key="schema"
-                    name="schema"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        name="schema"
-                        label="Select a schema to enable the extension for"
-                      >
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={field.onChange}
-                            disabled={!!defaultSchema}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a schema" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="custom">
-                                Create a new schema{' '}
-                                <code className="text-code-inline">{extension.name}</code>
-                              </SelectItem>
-                              <SelectSeparator />
-                              {availableSchemas.map((schema) => {
-                                return (
-                                  <SelectItem key={schema.id} value={schema.name}>
-                                    {schema.name}
-                                    {schema.name === recommendedSchema ? (
-                                      <Badge className="ml-2" variant="success">
-                                        Recommended
-                                      </Badge>
-                                    ) : !defaultSchema && schema.name === 'extensions' ? (
-                                      <Badge className="ml-2">Default</Badge>
-                                    ) : null}
-                                  </SelectItem>
-                                )
-                              })}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
+        <DialogSection className="flex flex-col gap-y-4">
+          <p className="text-sm text-foreground-light">
+            The following database extension will be enabled
+          </p>
 
-                  {!!recommendedSchema && (
-                    <p className="text-sm text-foreground-light">
-                      Use the "{recommendedSchema}" schema for full compatibility with related
-                      features.
-                    </p>
-                  )}
+          <Card>
+            <CardContent className="divide-y text-sm p-0">
+              <div className="flex items-center justify-between px-4 py-2">
+                <p className="text-foreground-lighter">Extension</p>
+                <p className="text-foreground">{extension.name}</p>
+              </div>
+              <div className="flex items-center justify-between px-4 py-2">
+                <p className="text-foreground-lighter">Schema</p>
+                <p data-testid="enable-extension-schema" className="text-foreground">
+                  {defaultSchema ?? 'extensions'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-                  {schema === 'custom' && (
-                    <FormField
-                      key="name"
-                      name="name"
-                      control={form.control}
-                      render={({ field }) => (
-                        <FormItemLayout label="Schema name">
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                        </FormItemLayout>
-                      )}
-                    />
-                  )}
-                </div>
+          <Collapsible>
+            <CollapsibleTrigger
+              className={cn(
+                InlineLinkClassName,
+                'text-xs text-foreground-lighter data-open:text-foreground-light'
               )}
-            </form>
-          </Form>
+            >
+              Need to install this in a different schema?
+            </CollapsibleTrigger>
+            <CollapsibleContent className="[overflow-y:clip] data-closed:animate-collapsible-up data-open:animate-collapsible-down">
+              <div className="my-2 text-xs text-foreground-light flex flex-col gap-y-1">
+                <p>
+                  Installing in the extensions schema is highly recommended since some extensions
+                  are hard to move after installation.
+                </p>
+                <p>To use a different schema, run this in the SQL Editor:</p>
+              </div>
+              <CodeBlock
+                language="pgsql"
+                hideLineNumbers
+                wrapperClassName={cn('[&_pre]:px-3 [&_pre]:py-3')}
+                className="[&_code]:text-xs"
+                value={`create extension if not exists ${extension.name} schema target_schema;`}
+              />
+            </CollapsibleContent>
+          </Collapsible>
         </DialogSection>
 
         <DialogFooter>
           <Button disabled={isEnabling} onClick={() => onCancel()}>
             Cancel
           </Button>
-          <Button
-            variant="primary"
-            type="submit"
-            form="enable-extensions-form"
-            loading={isEnabling}
-            disabled={isLoading || isEnabling}
-          >
+          <Button variant="primary" loading={isEnabling} onClick={() => onConfirmEnable()}>
             Enable extension
           </Button>
         </DialogFooter>
