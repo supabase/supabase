@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Archive, Download, Move, Trash2, X } from 'lucide-react'
 import { Button } from 'ui'
 
-import { canArchiveInBucket } from '../StorageVersioning.constants'
+import { isVersioningActive } from '../StorageVersioning.constants'
 import { bulkActionBarClassName } from './storageExplorerChrome'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -25,7 +25,7 @@ export const FileExplorerHeaderSelection = () => {
   } = useStorageExplorerStateSnapshot()
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-  const canArchive = isStorageVersioningEnabled && canArchiveInBucket(selectedBucket)
+  const canArchive = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
 
   const count = selectedItems.length
 

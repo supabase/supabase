@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  canArchiveInBucket,
   getBucketVersioningState,
   hasVersioningHistory,
+  isVersioningActive,
   willRetainVersionOnWrite,
 } from './StorageVersioning.constants'
 import type { Bucket } from '@/data/storage/buckets-query'
@@ -24,12 +24,12 @@ describe('getBucketVersioningState', () => {
   })
 })
 
-describe('canArchiveInBucket', () => {
+describe('isVersioningActive', () => {
   it('only lets an enabled bucket soft-delete', () => {
-    expect(canArchiveInBucket(bucket('ENABLED'))).toBe(true)
-    expect(canArchiveInBucket(bucket('SUSPENDED'))).toBe(false)
-    expect(canArchiveInBucket(bucket('DISABLED'))).toBe(false)
-    expect(canArchiveInBucket(undefined)).toBe(false)
+    expect(isVersioningActive(bucket('ENABLED'))).toBe(true)
+    expect(isVersioningActive(bucket('SUSPENDED'))).toBe(false)
+    expect(isVersioningActive(bucket('DISABLED'))).toBe(false)
+    expect(isVersioningActive(undefined)).toBe(false)
   })
 })
 

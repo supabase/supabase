@@ -219,14 +219,16 @@ describe('FileExplorerRow', () => {
       expect(screen.queryByText('Upload new version')).not.toBeInTheDocument()
     })
 
-    it('still retains a version for a file that predates the suspension', async () => {
+    it('still reads "Replace file" for a file that predates the suspension', async () => {
       versioningEnabled.current = true
       selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
 
       await openFileMenu({ is_versioned: true })
 
-      expect(screen.getByText('Upload new version')).toBeInTheDocument()
-      // Retaining a version does not bring the archive action back.
+      // This write does retain one last version, but the label names the action taken,
+      // not the retention behind it. The version history is where that gets explained.
+      expect(screen.getByText('Replace file')).toBeInTheDocument()
+      expect(screen.queryByText('Upload new version')).not.toBeInTheDocument()
       expect(screen.getByText('Delete')).toBeInTheDocument()
       expect(screen.queryByText('Archive')).not.toBeInTheDocument()
     })

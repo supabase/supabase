@@ -14,17 +14,15 @@ const COPY = {
   suspended: {
     variant: 'warning' as const,
     state: 'Suspended',
-    tooltip: 'Existing versions stay retained, but new writes no longer create one.',
+    tooltip: 'Existing versions stay retained, but new writes are not versioned.',
   },
 }
 
 interface BucketVersioningPillProps {
   bucket?: Bucket
-  /** Drop the "Versioning" prefix where the surrounding UI already names the setting. */
   showPrefix?: boolean
 }
 
-/** Renders nothing for a never-versioned bucket, which by default is every bucket. */
 export const BucketVersioningPill = ({ bucket, showPrefix = true }: BucketVersioningPillProps) => {
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   const versioningState = getBucketVersioningState(bucket)
@@ -36,9 +34,8 @@ export const BucketVersioningPill = ({ bucket, showPrefix = true }: BucketVersio
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        {/* A Badge is a div, so the tooltip needs a focusable wrapper to be reachable by keyboard. */}
         <span tabIndex={0} className="shrink-0">
-          <Badge variant={variant} className="cursor-help">
+          <Badge variant={variant}>
             <FileStack size={12} aria-hidden />
             {showPrefix ? `Versioning ${state.toLowerCase()}` : state}
           </Badge>

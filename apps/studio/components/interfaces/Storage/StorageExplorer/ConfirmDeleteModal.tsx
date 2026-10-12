@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
-import { canArchiveInBucket, getBucketVersioningState } from '../StorageVersioning.constants'
+import { getBucketVersioningState, isVersioningActive } from '../StorageVersioning.constants'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -19,7 +19,7 @@ export const ConfirmDeleteModal = () => {
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   // Only an enabled bucket soft-deletes. A suspended bucket still writes a delete marker,
   // but the content deleted, so it reads as a plain delete.
-  const canArchive = isStorageVersioningEnabled && canArchiveInBucket(selectedBucket)
+  const canArchive = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
   const isSuspended =
     isStorageVersioningEnabled && getBucketVersioningState(selectedBucket) === 'suspended'
 

@@ -17,9 +17,9 @@ import { fromLifecycleRules } from '../FilesBuckets/BucketVersioningFields/Bucke
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
 import {
-  canArchiveInBucket,
   getBucketVersioningState,
   hasVersioningHistory,
+  isVersioningActive,
   willRetainVersionOnWrite,
 } from '../StorageVersioning.constants'
 import { FilePreview } from './FilePreview'
@@ -312,7 +312,10 @@ export const PreviewPane = () => {
 
   const currentVersion = versions?.find((version) => version.isCurrent)
   const hasVersions = isStorageVersioningEnabled && hasVersioningHistory(selectedBucket)
-  const canArchive = isStorageVersioningEnabled && canArchiveInBucket(selectedBucket)
+  const isActivelyVersioning = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
+  // The label names the action being taken, not the retention behind it: a suspended bucket
+  // reads "Replace file" even for a file that still has one retained version coming.
+  const replaceLabel = isActivelyVersioning ? 'Upload new version' : 'Replace file'
   // A suspended bucket only retains a copy when this particular file predates the suspension.
   const willRetainVersion =
     isStorageVersioningEnabled &&
@@ -380,7 +383,7 @@ export const PreviewPane = () => {
             size={size}
             isPublicBucket={!!selectedBucket?.public}
             hasVersions={hasVersions}
-            canArchive={canArchive}
+            canArchive={isActivelyVersioning}
             replacementAction={
               canUpdateFiles && isStorageVersioningEnabled ? (
                 <ButtonTooltip
@@ -388,12 +391,8 @@ export const PreviewPane = () => {
                   className="px-2"
                   icon={<Upload size={14} />}
                   onClick={onReplaceFile}
-                  tooltip={{
-                    content: {
-                      side: 'top',
-                      text: willRetainVersion ? 'Upload new version' : 'Replace file',
-                    },
-                  }}
+                  aria-label={replaceLabel}
+                  tooltip={{ content: { side: 'top', text: replaceLabel } }}
                 />
               ) : undefined
             }

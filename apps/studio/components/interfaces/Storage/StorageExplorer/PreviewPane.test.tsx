@@ -163,6 +163,32 @@ describe('PreviewPane', () => {
     expect(screen.queryByRole('button', { name: 'More delete options' })).not.toBeInTheDocument()
   })
 
+  describe('replace action label', () => {
+    it('reads "Upload new version" on an enabled bucket', async () => {
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+      renderPane({ is_versioned: true })
+
+      expect(await screen.findByRole('button', { name: 'Upload new version' })).toBeInTheDocument()
+    })
+
+    it('reads "Replace file" on a suspended bucket, even for a file that still retains one', async () => {
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+      renderPane({ is_versioned: true })
+
+      // The label names the action, not the retention. The Versions section explains that.
+      expect(await screen.findByRole('button', { name: 'Replace file' })).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Upload new version' })).not.toBeInTheDocument()
+    })
+
+    it('reads "Replace file" on a disabled bucket', async () => {
+      mockVersionListing([])
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'DISABLED' }
+      renderPane({ is_versioned: false })
+
+      expect(await screen.findByRole('button', { name: 'Replace file' })).toBeInTheDocument()
+    })
+  })
+
   describe('version history visibility', () => {
     it('shows it for a versioned file on a suspended bucket', async () => {
       selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }

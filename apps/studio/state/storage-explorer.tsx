@@ -45,10 +45,7 @@ import {
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import {
-  getBucketVersioningState,
-  willRetainVersionOnWrite,
-} from '@/components/interfaces/Storage/StorageVersioning.constants'
+import { isVersioningActive } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
 import { configKeys } from '@/data/config/keys'
@@ -1531,12 +1528,9 @@ export function createStorageExplorerState({
      */
     replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
       const path = getStorageItemPath(state, item)
-      // A suspended bucket overwrites "current" version unless this file predates the suspension.
-      const isRetainingVersion = willRetainVersionOnWrite({
-        versioningState: getBucketVersioningState(state.selectedBucket),
-        isObjectVersioned: item.is_versioned,
-      })
-      const copy = isRetainingVersion
+      // Mirrors the action label the user clicked, which follows the bucket rather than
+      // whether this particular write happens to retain a version.
+      const copy = isVersioningActive(state.selectedBucket)
         ? {
             loading: `Uploading a new version of ${item.name}...`,
             success: `Uploaded a new version of ${item.name}`,

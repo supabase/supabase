@@ -41,11 +41,7 @@ import {
 } from '../Storage.constants'
 import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
 import { ICON_STROKE_WIDTH, StorageRowIcon } from '../StorageRowIcon'
-import {
-  canArchiveInBucket,
-  getBucketVersioningState,
-  willRetainVersionOnWrite,
-} from '../StorageVersioning.constants'
+import { isVersioningActive } from '../StorageVersioning.constants'
 import { useArchivedFilesContext } from './ArchivedFilesContext'
 import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
@@ -204,14 +200,9 @@ export const FileExplorerRow = ({
     (isArchivedFile && selectedArchivedObject?.id === archivedObjectId)
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-  const canArchive = isStorageVersioningEnabled && canArchiveInBucket(selectedBucket)
-  // A suspended bucket only retains a copy when this particular file predates the suspension.
-  const willRetainVersion =
-    isStorageVersioningEnabled &&
-    willRetainVersionOnWrite({
-      versioningState: getBucketVersioningState(selectedBucket),
-      isObjectVersioned: item.is_versioned,
-    })
+  // Names the action being taken, not the retention behind it: a suspended bucket reads
+  // "Replace file" and "Delete" even for a file that still has one retained version coming.
+  const isActivelyVersioning = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
 
   const onSelectFile = (columnIndex: number) => {
     if (isArchivedFile) {
@@ -288,15 +279,15 @@ export const FileExplorerRow = ({
                 {
                   // Deleting a folder deletes everything under it, so on a versioned
                   // bucket the whole prefix is archived rather than removed.
-                  name: canArchive ? 'Archive' : 'Delete',
-                  icon: canArchive ? (
+                  name: isActivelyVersioning ? 'Archive' : 'Delete',
+                  icon: isActivelyVersioning ? (
                     <Archive size={12} className="text-foreground-light" />
                   ) : (
                     <Trash2 size={12} className="text-foreground-light" />
                   ),
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
-                ...(canArchive
+                ...(isActivelyVersioning
                   ? [
                       {
                         name: 'Delete permanently',
@@ -367,7 +358,7 @@ export const FileExplorerRow = ({
                         onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
                       },
                       {
-                        name: willRetainVersion ? 'Upload new version' : 'Replace file',
+                        name: isActivelyVersioning ? 'Upload new version' : 'Replace file',
                         icon: <Upload size={12} className="text-foreground-light" />,
                         onClick: onReplaceFile,
                       },
@@ -380,15 +371,15 @@ export const FileExplorerRow = ({
             ? [
                 {
                   // On a versioned bucket this is a soft delete, so it reads as Archive.
-                  name: canArchive ? 'Archive' : 'Delete',
-                  icon: canArchive ? (
+                  name: isActivelyVersioning ? 'Archive' : 'Delete',
+                  icon: isActivelyVersioning ? (
                     <Archive size={12} className="text-foreground-light" />
                   ) : (
                     <Trash2 size={12} className="text-foreground-light" />
                   ),
                   onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
                 },
-                ...(canArchive
+                ...(isActivelyVersioning
                   ? [
                       {
                         name: 'Delete permanently',

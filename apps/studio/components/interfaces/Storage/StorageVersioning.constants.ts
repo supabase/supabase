@@ -19,8 +19,11 @@ export const getBucketVersioningState = (bucket?: Bucket): BucketVersioningState
   }
 }
 
-/** Only an enabled bucket turns a delete into a recoverable archive. */
-export const canArchiveInBucket = (bucket?: Bucket) =>
+/**
+ * The bucket versions writes right now: a delete becomes a recoverable archive and an
+ * overwrite becomes a new version. Drives what the actions are called.
+ */
+export const isVersioningActive = (bucket?: Bucket) =>
   getBucketVersioningState(bucket) === 'enabled'
 
 /** A suspended bucket can still be retaining versions. */
