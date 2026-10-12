@@ -45,6 +45,7 @@ import {
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import { isVersioningActive } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
 import { configKeys } from '@/data/config/keys'
@@ -445,6 +446,12 @@ export function createStorageExplorerState({
       } else {
         await state.fetchFoldersByPath({ paths })
       }
+
+      // The archived overlay is part of what the explorer shows, and an archive or a
+      // restore moves an object across that boundary, so both halves refresh together.
+      await getQueryClient().invalidateQueries({
+        queryKey: storageKeys.archivedObjects(state.projectRef, state.selectedBucket?.id),
+      })
     },
 
     refreshAll: async () => {
@@ -589,7 +596,10 @@ export function createStorageExplorerState({
       } catch (error) {}
     },
 
-    deleteFolder: async (folder: StorageItemWithColumn) => {
+    deleteFolder: async (
+      folder: StorageItemWithColumn,
+      { isArchive = false }: { isArchive?: boolean } = {}
+    ) => {
       try {
         const isDeleteFolder = true
         const files = await state.getAllItemsAlongFolder(folder)
@@ -603,7 +613,7 @@ export function createStorageExplorerState({
             prefix: folder.path,
           })
         } else {
-          await state.deleteFiles({ files: files as any[], isDeleteFolder })
+          await state.deleteFiles({ files: files as any[], isDeleteFolder, isArchive })
         }
 
         state.popColumnAtIndex(folder.columnIndex)
@@ -620,9 +630,15 @@ export function createStorageExplorerState({
 
         await state.refetchAllOpenedFolders()
         state.setSelectedItemsToDelete([])
-        toast.success(`Successfully deleted ${folder.name}`)
+        toast.success(
+          isArchive ? `Successfully archived ${folder.name}` : `Successfully deleted ${folder.name}`
+        )
       } catch (error: any) {
-        toast.error(`Failed to delete folder: ${error.message}`)
+        toast.error(
+          isArchive
+            ? `Failed to archive folder: ${error.message}`
+            : `Failed to delete folder: ${error.message}`
+        )
       }
     },
 
@@ -1512,7 +1528,15 @@ export function createStorageExplorerState({
      */
     replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
       const path = getStorageItemPath(state, item)
-      const toastId = toast.loading(`Uploading a new version of ${item.name}...`)
+      // Mirrors the action label the user clicked, which follows the bucket rather than
+      // whether this particular write happens to retain a version.
+      const copy = isVersioningActive(state.selectedBucket)
+        ? {
+            loading: `Uploading a new version of ${item.name}...`,
+            success: `Uploaded a new version of ${item.name}`,
+          }
+        : { loading: `Replacing ${item.name}...`, success: `Replaced ${item.name}` }
+      const toastId = toast.loading(copy.loading)
 
       state.updateRowStatus({
         name: item.name,
@@ -1548,7 +1572,7 @@ export function createStorageExplorerState({
           upload.start()
         })
 
-        toast.success(`Uploaded a new version of ${item.name}`, { id: toastId })
+        toast.success(copy.success, { id: toastId })
         await state.refetchAllOpenedFolders()
         await Promise.all([
           getQueryClient().invalidateQueries({
@@ -1585,9 +1609,12 @@ export function createStorageExplorerState({
     deleteFiles: async ({
       files,
       isDeleteFolder = false,
+      isArchive = false,
     }: {
       files: (StorageItemWithColumn & { prefix?: string })[]
       isDeleteFolder?: boolean
+      /** On a versioned bucket the object survives behind a delete marker, so the copy says archive. */
+      isArchive?: boolean
     }) => {
       state.setSelectedFilePreview(undefined)
 
@@ -1607,7 +1634,19 @@ export function createStorageExplorerState({
 
       state.clearSelectedItems()
 
-      const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
+      const copy = isArchive
+        ? {
+            loading: `Archiving ${prefixes.length} file(s)...`,
+            success: `Successfully archived ${prefixes.length} file(s)`,
+            error: `Failed to archive ${prefixes.length} file(s)`,
+          }
+        : {
+            loading: `Deleting ${prefixes.length} file(s)...`,
+            success: `Successfully deleted ${prefixes.length} file(s)`,
+            error: `Failed to delete ${prefixes.length} file(s)`,
+          }
+
+      const toastId = toast.loading(copy.loading)
 
       try {
         await deleteBucketObject({
@@ -1628,7 +1667,7 @@ export function createStorageExplorerState({
             parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
           )
 
-          toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+          toast.success(copy.success, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
@@ -1641,7 +1680,7 @@ export function createStorageExplorerState({
         }
       } catch (err) {
         if (!isDeleteFolder) {
-          toast.error(`Failed to delete ${prefixes.length} file(s)`, {
+          toast.error(copy.error, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
@@ -1849,8 +1888,12 @@ export function createStorageExplorerState({
 
     // ======== UI Helper functions ========
 
-    selectRangeItems: (columnIndex: number, toItemIndex: number) => {
+    selectRangeItems: (columnIndex: number, toItemId: string | null) => {
       const columnItems = state.columns[columnIndex].items
+      // Addressed by id, not by the row's own position: the rendered column can carry
+      // archived rows this list has never held, which shifts every index below them.
+      const toItemIndex = toItemId === null ? -1 : findIndex(columnItems, { id: toItemId })
+      if (toItemIndex === -1) return
       const toItem = columnItems[toItemIndex]
       const selectedItemIds = state.selectedItems.map((item) => item.id)
       const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
@@ -1863,6 +1906,8 @@ export function createStorageExplorerState({
       // Get the range to select and reverse the order if necessary
       const rangeToSelect = columnItems
         .slice(start, end + 1)
+        // An archived row has no live object, so the bulk actions have nothing to act on.
+        .filter((item) => item.archived === undefined)
         // we need `columnIndex` in all item of `selectedItems`
         .map((item) => ({ ...item, columnIndex }))
       if (toItemIndex < lastSelectedItemIndex) {

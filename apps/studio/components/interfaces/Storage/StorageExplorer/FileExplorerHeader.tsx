@@ -43,10 +43,12 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
+import { hasVersioningHistory } from '../StorageVersioning.constants'
 import { pageChromeRowClassName } from './storageExplorerChrome'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useFileExplorerHeaderShortcuts } from './useFileExplorerHeaderShortcuts'
 import { useStoragePreference } from './useStoragePreference'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -153,6 +155,7 @@ export const FileExplorerHeader = ({
 
   const {
     projectRef,
+    selectedBucket,
     columns,
     refetchAllOpenedFolders,
     refreshAll,
@@ -168,7 +171,11 @@ export const FileExplorerHeader = ({
     setSortBy: setPreferenceSortBy,
     sortByOrder,
     setSortByOrder: setPreferenceSortByOrder,
+    showArchivedInline,
+    setShowArchivedInline,
   } = useStoragePreference(projectRef)
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const canShowArchivedToggle = isStorageVersioningEnabled && hasVersioningHistory(selectedBucket)
 
   const breadcrumbs = columns.map((column) => column.name)
   const isListView = view === STORAGE_VIEWS.LIST
@@ -396,6 +403,17 @@ export const FileExplorerHeader = ({
                       ))}
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
+                  {canShowArchivedToggle && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => setShowArchivedInline(!showArchivedInline)}>
+                        <div className="flex items-center justify-between w-full">
+                          <p>Show archived</p>
+                          {showArchivedInline && <Check size={16} className="text-brand" />}
+                        </div>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
