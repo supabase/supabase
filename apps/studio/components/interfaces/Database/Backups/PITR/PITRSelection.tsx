@@ -23,8 +23,7 @@ import {
 
 import { BackupsEmpty } from '../BackupsEmpty'
 import { BackupsStorageAlert } from '../BackupsStorageAlert'
-import type { Timezone } from './PITR.types'
-import { getClientTimezone, getTimezoneLabel } from './PITR.utils'
+import { getClientTimezone } from './PITR.utils'
 import { PITRForm } from './PITRForm'
 import PITRStatus from './PITRStatus'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -33,6 +32,7 @@ import { usePitrRestoreMutation } from '@/data/database/pitr-restore-mutation'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { getTimezoneLabel, type Timezone } from '@/lib/constants/timezones'
 
 export const PITRSelection = () => {
   const router = useRouter()

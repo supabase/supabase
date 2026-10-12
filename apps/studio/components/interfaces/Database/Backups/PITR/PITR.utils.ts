@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
-import { ALL_TIMEZONES } from './PITR.constants'
-import type { Time, Timezone } from './PITR.types'
+import type { Time } from './PITR.types'
 import type { ProjectSelectedAddon } from '@/data/subscriptions/types'
+import { findTimezoneByIana, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
 import { guessLocalTimezone } from '@/lib/dayjs'
 
 export const getPITRRetentionDuration = (addons: ProjectSelectedAddon[]) => {
@@ -19,25 +19,8 @@ export const getDatesBetweenRange = (startDate: dayjs.Dayjs, endDate: dayjs.Dayj
 }
 
 export const getClientTimezone = () => {
-  const defaultTz = guessLocalTimezone()
-  const utcTz = ALL_TIMEZONES.find((option) => option.value === 'UTC')
-  const timezone = ALL_TIMEZONES.find((option) => {
-    if (option.utc.includes(defaultTz)) return option
-    else return undefined
-  })
-  return timezone ?? (utcTz || ALL_TIMEZONES[0])
-}
-
-export const getTimezoneLabel = (timezone: Timezone, date: dayjs.Dayjs) => {
-  const offset =
-    new Intl.DateTimeFormat('en-US', {
-      timeZone: timezone.utc[0],
-      timeZoneName: 'longOffset',
-    })
-      .formatToParts(date.toDate())
-      .find((part) => part.type === 'timeZoneName')
-      ?.value.replace('GMT', '') || '+00:00'
-  return timezone.text.replace(/^\(UTC[^)]*\)/, `(UTC${offset})`)
+  const utcTimezone = TIMEZONES_BY_IANA.find((option) => option.value === 'UTC')
+  return findTimezoneByIana(guessLocalTimezone()) ?? utcTimezone ?? TIMEZONES_BY_IANA[0]
 }
 
 export const formatNumberToTwoDigits = (number: Number) => {

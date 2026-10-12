@@ -16,9 +16,7 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { ALL_TIMEZONES } from './PITR.constants'
-import type { Timezone } from './PITR.types'
-import { getTimezoneLabel } from './PITR.utils'
+import { getTimezoneLabel, TIMEZONES_BY_IANA, type Timezone } from '@/lib/constants/timezones'
 
 interface TimezoneSelectionProps {
   selectedTimezone: Timezone
@@ -58,7 +56,7 @@ export const TimezoneSelection = ({
               <CommandEmpty>No timezones found...</CommandEmpty>
               <CommandGroup>
                 <ScrollArea className="h-72">
-                  {ALL_TIMEZONES.map((option) => (
+                  {TIMEZONES_BY_IANA.map((option) => (
                     <CommandItem
                       key={option.value}
                       value={getTimezoneLabel(option, date)}

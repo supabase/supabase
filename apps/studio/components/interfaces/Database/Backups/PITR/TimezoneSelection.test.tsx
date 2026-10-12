@@ -4,15 +4,15 @@ import dayjs from 'dayjs'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { describe, expect, test, vi } from 'vitest'
 
-import { ALL_TIMEZONES } from './PITR.constants'
 import { TimezoneSelection } from './TimezoneSelection'
+import { findTimezoneByIana } from '@/lib/constants/timezones'
 import { customRender } from '@/tests/lib/custom-render'
 
 mockAnimationsApi()
 
 describe('TimezoneSelection', () => {
   test('updates Madrid offsets when the restore date crosses daylight saving time and preserves the selected timezone', async () => {
-    const madridTimezone = ALL_TIMEZONES.find((timezone) => timezone.utc.includes('Europe/Madrid'))
+    const madridTimezone = findTimezoneByIana('Europe/Madrid')
     if (!madridTimezone) throw new Error('Madrid timezone is missing from the timezone catalog')
 
     const user = userEvent.setup()
