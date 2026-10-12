@@ -36,13 +36,15 @@ Copy the `.env.example` file to `.env`.
 cp .env.example .env
 ```
 
-Update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks).
+Update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=hono).
 
 <Button variant="primary" asChild>
-  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=hono">
+    Open Connect panel
+  </a>
 </Button>
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "hono", "tab": "frameworks" }} />
 
 ## 7. Set up anonymous sign-ins
 
