@@ -158,9 +158,7 @@ export const DestinationTypeSelection = () => {
           onChange={(value) => setDestinationType(value)}
           renderLogo={(type) => <DestinationLogo type={type} />}
         />
-        <p className="mt-3 text-sm text-foreground-lighter">
-          Destination type cannot be changed after creation.
-        </p>
+        <p className="mt-3 text-sm text-foreground-lighter">{typeDescription}</p>
       </div>
     )
   }

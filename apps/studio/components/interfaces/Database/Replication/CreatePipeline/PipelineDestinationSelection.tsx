@@ -31,7 +31,7 @@ export const PipelineDestinationSelection = ({
 
   return (
     <div className="space-y-3">
-      <p className="text-sm text-foreground-light">Public alpha</p>
+      <p className="text-sm font-medium text-foreground">Destination type</p>
       <RadioGroupStacked
         aria-label="Destination type"
         orientation="vertical"
