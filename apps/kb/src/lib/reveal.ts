@@ -2,20 +2,11 @@ import type { CSSProperties } from 'react'
 
 type RevealStyle = CSSProperties & { '--reveal-index': number }
 
-// roughly when the hero copy starts fading in
-const ON_LOAD_OFFSET_MS = 300
-
 export const REVEAL_GROUP_CLASS = 'group/reveal'
 
 export const REVEAL_ITEM_CLASS = [
   'motion-safe:opacity-0 motion-safe:group-data-revealed/reveal:opacity-100',
   'motion-safe:group-data-[revealed=true]/reveal:animate-[reveal-up_500ms_var(--ease-out-strong)_calc(var(--reveal-offset,0ms)_+_min(var(--reveal-index),8)*60ms)_both]',
-].join(' ')
-
-// fade only, no translate: the hero canvases measure the copy while it reveals
-export const REVEAL_FADE_ITEM_CLASS = [
-  'motion-safe:opacity-0 motion-safe:group-data-revealed/reveal:opacity-100',
-  'motion-safe:group-data-[revealed=true]/reveal:animate-[reveal-fade_450ms_ease-out_calc(180ms_+_var(--reveal-index)*70ms)_both]',
 ].join(' ')
 
 export const bindRevealOnce = (element: HTMLElement | null) => {
@@ -34,7 +25,8 @@ export const bindRevealOnce = (element: HTMLElement | null) => {
       isFirstCheck = false
       if (!entry?.isIntersecting) return
       // groups already in view on load wait for the hero instead of beating it in
-      if (isOnScreenAtLoad) element.style.setProperty('--reveal-offset', `${ON_LOAD_OFFSET_MS}ms`)
+      // the offset lets the hero canvas start drawing before on-screen groups reveal
+      if (isOnScreenAtLoad) element.style.setProperty('--reveal-offset', '300ms')
       element.dataset.revealed = 'true'
       observer.disconnect()
     },

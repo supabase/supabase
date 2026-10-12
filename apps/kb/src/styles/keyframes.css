@@ -4,9 +4,3 @@
     translate: 0 12px;
   }
 }
-
-@keyframes reveal-fade {
-  from {
-    opacity: 0;
-  }
-}
