@@ -85,7 +85,7 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>Manage app</TooltipContent>
+              <TooltipContent side="bottom">Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
               {grant.projects != null && grant.projects.length > 0 && (
