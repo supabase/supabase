@@ -266,7 +266,7 @@ export const OAuthAppsAuthorizeScreen = ({
       title={`Authorize ${request.name}`}
       description={
         appDetailsQuery.data?.existing_grant
-          ? `You authorized ${request.name} for this organization on ${dayjs(appDetailsQuery.data.existing_grant.approved_at).format('D MMM YYYY')}. It's now asking for more access.`
+          ? `You authorized ${request.name} for this organization on ${dayjs(appDetailsQuery.data.existing_grant.approved_at).format('D MMM YYYY')}. It's now asking for different access.`
           : 'This application wants to access your Supabase Account'
       }
     >
@@ -355,7 +355,7 @@ export const OAuthAppsAuthorizeScreen = ({
             <Button
               block
               variant={primaryActionVariant}
-              loading={isSubmitting}
+              loading={isSubmitting || appDetailsQuery.isPending}
               disabled={cannotApprove}
               aria-label={primaryActionLabel}
               onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}
