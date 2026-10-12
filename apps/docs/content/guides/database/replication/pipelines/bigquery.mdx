@@ -65,7 +65,7 @@ Expand **Advanced settings** for BigQuery-specific options:
 
 | Setting                  | Behavior                                                                                                                                                                                                                                                                            |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Connection pool size** | Default: `4` connections. Storage Write API connections for destination writes. More connections can improve throughput but use more resources.                                                                                                                                     |
+| **Connection pool size** | Default: `4` connections. Storage Write API connections for destination writes.                                                                                                                                                                                                     |
 | **Maximum staleness**    | Default: Freshest results. Maximum data age in whole minutes while BigQuery applies CDC changes. For example, `15` allows results up to 15 minutes stale and can reduce query-time merge cost. Unset gives the freshest results. Applies only when a table is created or recreated. |
 
 ## Table partitioning and clustering
