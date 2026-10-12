@@ -2,11 +2,6 @@ import { Registry } from './schema'
 
 export const examples: Registry = [
   {
-    name: 'pipeline-destination-selection',
-    type: 'components:example',
-    files: ['example/pipeline-destination-selection.tsx'],
-  },
-  {
     name: 'accordion-demo',
     type: 'components:example',
     registryDependencies: ['accordion'],
