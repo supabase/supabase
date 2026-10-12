@@ -19,21 +19,16 @@ export const RegenerateRecoveryCodesModal = ({
     onStart?.()
     setStage('confirm')
   }
-  const triggerProps = { onClick: handleStart, isPending: mutation.isPending }
-
   return (
     <>
-      {children ? (
-        children(triggerProps)
-      ) : (
-        <Button
-          icon={<RefreshCwIcon />}
-          onClick={triggerProps.onClick}
-          loading={triggerProps.isPending}
-        >
-          Regenerate
-        </Button>
-      )}
+      {(
+        children ??
+        (({ onClick, isPending }) => (
+          <Button icon={<RefreshCwIcon />} onClick={onClick} loading={isPending}>
+            Regenerate
+          </Button>
+        ))
+      )({ onClick: handleStart, isPending: mutation.isPending })}
       <TextConfirmModal
         visible={stage === 'confirm'}
         size="small"
