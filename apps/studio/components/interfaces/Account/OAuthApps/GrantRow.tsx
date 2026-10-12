@@ -104,11 +104,11 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
               )}
               <DialogTrigger asChild>
                 <DropdownMenuItem
-                  className="text-destructive gap-x-2"
+                  className="gap-x-2"
                   onClick={() => setDialogContent('disconnect')}
                 >
                   <X size={14} />
-                  Disconnect
+                  Revoke access
                 </DropdownMenuItem>
               </DialogTrigger>
             </DropdownMenuContent>

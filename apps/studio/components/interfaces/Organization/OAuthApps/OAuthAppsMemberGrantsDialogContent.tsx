@@ -1,12 +1,8 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Building, User } from 'lucide-react'
-import { ComponentProps, Fragment, useEffect, useMemo } from 'react'
+import { ComponentProps, useEffect, useMemo } from 'react'
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
   Button,
   cn,
   DialogClose,
@@ -19,6 +15,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { OAuthGrantAccordion, OAuthGrantAccordionItem } from './OAuthGrantAccordionItem'
 import { AlertError } from '@/components/ui/AlertError'
 import { useOAuthAppMemberGrantsQuery } from '@/data/oauth-apps/oauth-apps-member-grants-query'
 import type { OAuthApprovalItem, OAuthGrantItem } from '@/data/oauth-apps/types'
@@ -66,7 +63,8 @@ export const OAuthAppsMemberGrantsDialogContent = ({
     return 'Grants loaded'
   }, [isPending, isFetchingNextPage, isError])
 
-  const isEmpty = !data || data.pages.length === 0 || data.pages[0].data.length === 0
+  const memberGrants = data?.pages.flatMap((page) => page.data) ?? []
+  const isEmpty = memberGrants.length === 0
 
   if (!approval) return null
 
@@ -98,15 +96,11 @@ export const OAuthAppsMemberGrantsDialogContent = ({
             {isEmpty ? 'No grants have been authorized for this application.' : ''}
           </p>
 
-          <Accordion type="multiple" className="divide-y! divide-border!">
-            {data.pages.map((page, pageIndex) => (
-              <Fragment key={pageIndex}>
-                {page.data.map((grant) => (
-                  <GrantAccordionItem key={grant.grant_id} grant={grant} />
-                ))}
-              </Fragment>
+          <OAuthGrantAccordion>
+            {memberGrants.map((grant) => (
+              <GrantAccordionItem key={grant.grant_id} grant={grant} />
             ))}
-          </Accordion>
+          </OAuthGrantAccordion>
           <p ref={sentinelRef} className="text-sm text-foreground-lighter">
             {isFetchingNextPage ? 'Loading...' : ''}
           </p>
@@ -125,44 +119,24 @@ export const OAuthAppsMemberGrantsDialogContent = ({
 const GrantAccordionItem = ({ grant }: { grant: OAuthGrantItem }) => {
   const isOrganizationBound = grant.kind === 'organization_bound'
   const permissionCount = grant.approved_scopes.length
+  const Icon = isOrganizationBound ? Building : User
+
+  const projectsSummary =
+    grant.projects == null
+      ? 'All projects'
+      : `${grant.projects.length} ${pluralize(grant.projects.length, 'project')}`
 
   return (
-    <AccordionItem value={grant.grant_id} className="border-b-0">
-      <AccordionTrigger className="hover:no-underline gap-x-4 py-3.5">
-        {isOrganizationBound ? (
-          <Building size={16} className="shrink-0 text-foreground-lighter rotate-0!" />
-        ) : (
-          <User size={16} className="shrink-0 text-foreground-lighter rotate-0!" />
-        )}
-        <div className="min-w-0 flex-1 flex flex-col gap-y-1">
-          <p className="truncate text-sm text-foreground">{getGrantLabel(grant)}</p>
-          <p className="text-xs text-foreground-lighter">
-            {grant.projects == null
-              ? 'All projects'
-              : `${grant.projects.length} ${pluralize(grant.projects.length, 'project')}`}
-            {' · '}
-            {permissionCount} {pluralize(permissionCount, 'permission')}
-          </p>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <div className="flex flex-col gap-y-2 pl-8">
-          {grant.projects != null && grant.projects.length > 0 && (
-            <div className="flex flex-col gap-1">
-              <p className="font-mono text-xs uppercase text-foreground-light">Projects</p>
-              <p className="text-xs text-foreground">
-                {grant.projects.map((project) => project.name).join(', ')}
-              </p>
-            </div>
-          )}
-
-          <div className="flex flex-col gap-1">
-            <p className="font-mono text-xs uppercase text-foreground-light">Permissions</p>
-            <p className="text-xs text-foreground">{grant.approved_scopes.join(', ')}</p>
-          </div>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
+    <OAuthGrantAccordionItem
+      value={grant.grant_id}
+      icon={<Icon size={16} />}
+      title={getGrantLabel(grant)}
+      description={`${projectsSummary} · ${permissionCount} ${pluralize(permissionCount, 'permission')}`}
+      sections={[
+        { label: 'Projects', values: grant.projects?.map((project) => project.name) ?? [] },
+        { label: 'Permissions', values: grant.approved_scopes },
+      ]}
+    />
   )
 }
 

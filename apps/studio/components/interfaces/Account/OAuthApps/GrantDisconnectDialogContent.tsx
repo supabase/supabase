@@ -32,7 +32,7 @@ export const GrantDisconnectDialogContent = ({
   })
 
   return (
-    <DialogContent size="medium" {...props}>
+    <DialogContent size="small" {...props}>
       <DialogHeader>
         <DialogTitle>Revoke access for {grant?.app?.name}</DialogTitle>
       </DialogHeader>
@@ -40,13 +40,10 @@ export const GrantDisconnectDialogContent = ({
       <DialogSection>
         <div className="flex flex-col gap-4 text-sm text-foreground-light">
           <p>
-            {grant?.app.name} loses access on its next request. Nobody else in your organization is
-            affected.
+            {grant?.app.name} will no longer be able to access your projects. To reconnect,
+            authorize {grant?.app.name} again and reselect your projects.
           </p>
-          <p>
-            You can reconnect it at any time by authorizing again. You'll pick projects again when
-            you do.
-          </p>
+          <p>Other organization members won't be affected.</p>
         </div>
       </DialogSection>
 
@@ -63,7 +60,7 @@ export const GrantDisconnectDialogContent = ({
             if (grant) revokeGrant({ slug: grant.organization.slug, grantId: grant.grant_id })
           }}
         >
-          Disconnect
+          Revoke
         </Button>
       </DialogFooter>
     </DialogContent>
