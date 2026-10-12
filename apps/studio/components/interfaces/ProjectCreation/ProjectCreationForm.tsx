@@ -34,6 +34,7 @@ import {
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
+  getSpecificRegionsLinkVariant,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
@@ -209,8 +210,13 @@ export const ProjectCreationForm = ({
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   // Only free-plan orgs get the specific-regions link collapse behavior. When active for an
   // org, it owns the region selector, so the free tier experiment stays inactive for that org.
-  const isSpecificRegionsLinkEnabled =
-    useFlag('projectCreationSpecificRegionsLink') === true && isFreePlan
+  const specificRegionsLinkFlag = useFlag('projectCreationSpecificRegionsLink') === true
+  const isSpecificRegionsLinkEnabled = specificRegionsLinkFlag && isFreePlan
+  const specificRegionsLinkVariant = getSpecificRegionsLinkVariant({
+    isFreePlan,
+    smartRegionEnabled,
+    linkFlag: specificRegionsLinkFlag,
+  })
   const isResolvingFreeTierGeneralRegionExperiment =
     !isSpecificRegionsLinkEnabled &&
     isFreePlan &&
@@ -373,6 +379,7 @@ export const ProjectCreationForm = ({
         ? getRegionSelectionType({
             dbRegion: form.getValues('dbRegion'),
             availableRegions: availableRegionsData?.all,
+            isDbRegionDirty,
           })
         : undefined
       track(
@@ -389,6 +396,9 @@ export const ProjectCreationForm = ({
           }),
           ...(freeTierGeneralRegionExperimentVariant !== undefined && {
             freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
+          }),
+          ...(specificRegionsLinkVariant !== undefined && {
+            specificRegionsLinkExperiment: specificRegionsLinkVariant,
           }),
           ...(regionSelectionType !== undefined && { regionSelectionType }),
         },
