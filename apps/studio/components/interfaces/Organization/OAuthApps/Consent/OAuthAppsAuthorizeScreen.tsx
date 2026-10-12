@@ -1,4 +1,3 @@
-import { useQueries } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
@@ -266,8 +265,8 @@ export const OAuthAppsAuthorizeScreen = ({
       logo={<LogoPair left={<DestinationLogo name={request.name} />} right={<SupabaseLogo />} />}
       title={`Authorize ${request.name}`}
       description={
-        orgAppDetails.existing_grant
-          ? `You authorized ${request.name} for this organization on ${dayjs(orgAppDetails.existing_grant.approved_at).format('D MMM YYYY')}. It's now asking for more access.`
+        appDetailsQuery.data?.existing_grant
+          ? `You authorized ${request.name} for this organization on ${dayjs(appDetailsQuery.data.existing_grant.approved_at).format('D MMM YYYY')}. It's now asking for more access.`
           : 'This application wants to access your Supabase Account'
       }
     >
@@ -323,10 +322,10 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <section className="flex flex-col gap-3">
                 <p className="text-sm text-foreground">Permissions requested</p>
-                {orgAppDetails.existing_grant?.approved_scopes ? (
+                {appDetailsQuery.data?.existing_grant?.approved_scopes ? (
                   <ScopeGroupCardWithDiff
                     scopes={request.scopes}
-                    previousScopes={orgAppDetails.existing_grant.approved_scopes}
+                    previousScopes={appDetailsQuery.data.existing_grant.approved_scopes}
                   />
                 ) : (
                   <ScopeGroupCard scopes={request.scopes} />
