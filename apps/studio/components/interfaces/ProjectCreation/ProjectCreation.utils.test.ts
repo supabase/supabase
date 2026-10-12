@@ -215,6 +215,16 @@ describe('getRegionSelectionType', () => {
     ).toBe('auto')
   })
 
+  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'Nonexistent',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBeUndefined()
+  })
+
   it('classifies a touched field normally', () => {
     expect(
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })

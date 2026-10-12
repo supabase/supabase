@@ -147,7 +147,8 @@ type GetRegionSelectionTypeArgs = {
 /**
  * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
  * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
- * by the user (e.g. us-east-1, 'specific'). Returns undefined if dbRegion matches neither list.
+ * by the user (e.g. us-east-1, 'specific'). Returns undefined if dbRegion matches neither list,
+ * regardless of whether the field was touched.
  */
 export function getRegionSelectionType({
   dbRegion,
@@ -155,10 +156,11 @@ export function getRegionSelectionType({
   isDbRegionDirty = true,
 }: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
   if (!dbRegion || !availableRegions) return undefined
+  const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
+  const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
+  if (!isGeneral && !isSpecific) return undefined
   if (!isDbRegionDirty) return 'auto'
-  if (availableRegions.smartGroup.some((region) => region.name === dbRegion)) return 'general'
-  if (availableRegions.specific.some((region) => region.name === dbRegion)) return 'specific'
-  return undefined
+  return isGeneral ? 'general' : 'specific'
 }
 
 export type SpecificRegionsLinkVariant = 'test' | 'control'
