@@ -1,3 +1,5 @@
+import type { components } from 'api-types'
+
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from './Storage.constants'
 import { PolicyFormField } from './StoragePolicies/StoragePolicies.types'
 
@@ -38,6 +40,8 @@ export interface StorageItem {
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
+  /** Set on a row synthesized from the archived list; absent on a synthesized folder. */
+  archived?: { archivedObjectId?: string }
 }
 
 export type StorageItemWithColumn = StorageItem & { columnIndex: number }
@@ -51,3 +55,7 @@ export interface StorageItemMetadata {
   lastModified: string
   mimetype: string
 }
+
+/** A folder entry as returned by the storage list-v2 endpoint's `folders` array */
+export type StorageObjectV2Folder =
+  components['schemas']['StorageListResponseV2_Output']['folders'][number]

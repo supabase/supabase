@@ -45,7 +45,7 @@ export const AnimatedCursors = () => {
         <MousePointer2 size={20} />
       </motion.div>
       <motion.div
-        className="absolute text-brand"
+        className="absolute text-primary"
         animate={{ x: cursor2Position.x, y: cursor2Position.y }}
         transition={{
           duration: 1.2,

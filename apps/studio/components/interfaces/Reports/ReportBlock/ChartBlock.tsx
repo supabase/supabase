@@ -156,15 +156,15 @@ export const ChartBlock = ({
     if (!threshold) return 'var(--chart-1)'
     if (threshold.check === 'gt') {
       return value >= threshold.danger
-        ? 'var(--chart-destructive)'
+        ? 'var(--chart-status-destructive)'
         : value >= threshold.warning
-          ? 'var(--chart-warning)'
+          ? 'var(--chart-status-warning)'
           : 'var(--chart-1)'
     } else {
       return value <= threshold.danger
-        ? 'var(--chart-destructive)'
+        ? 'var(--chart-status-destructive)'
         : value <= threshold.warning
-          ? 'var(--chart-warning)'
+          ? 'var(--chart-status-warning)'
           : 'var(--chart-1)'
     }
   }

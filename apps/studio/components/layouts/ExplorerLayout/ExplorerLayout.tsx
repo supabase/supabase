@@ -1,7 +1,5 @@
-import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
-import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
   cn,
@@ -12,7 +10,6 @@ import {
   TabsTrigger,
 } from 'ui'
 
-import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
 import { type ExplorerResourceType } from './ExplorerLayout.constants'
@@ -20,6 +17,9 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerPreferencesDropdown } from './ExplorerPreferencesDropdown'
+import { ExplorerProvider } from './ExplorerProvider'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
 import { ExplorerQueryTabCoordinator } from '@/components/interfaces/Explorer/ExplorerQueryTabCoordinator'
 import {
@@ -27,8 +27,7 @@ import {
   useCreateNotebook,
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
-import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
-import { useTrack } from '@/lib/telemetry/track'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -43,16 +42,12 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
-  const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
+  const { setLastVisitedExplorerTab } = useDashboardHistory()
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+  const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   const [section, setSection] = useState<ExplorerResourceType>()
-
-  const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
-
-  useEffect(() => {
-    if (ref) setIsTemporarySqlEditorVisit(false)
-  }, [ref, setIsTemporarySqlEditorVisit])
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =
@@ -65,66 +60,49 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
     entity: browserTitle?.entity ?? activeTabLabel,
   }
 
+  const handleTabChange = (id: string) => {
+    if (id === EXPLORER_HOME_TAB_ID) setLastVisitedExplorerTab(undefined)
+  }
+
   return (
-    <ProjectLayoutWithAuth
-      product="Explorer"
-      browserTitle={mergedBrowserTitle}
-      productMenuHeader={
-        <ExplorerNavHeader
-          section={section}
-          onBack={() => setSection(undefined)}
-          rootAction={<BackToSqlEditorButton />}
-        />
-      }
-      productMenu={
-        <div className="relative h-full overflow-hidden">
-          <AnimatePresence mode="wait">
-            {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
-            {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
-            {section === 'chat' && <ExplorerNavChats key="chats" />}
-          </AnimatePresence>
-        </div>
-      }
-    >
-      <ExplorerQueryTabCoordinator />
-
-      <ExplorerNotebookTabCoordinator />
-
-      <div className="flex flex-col h-full">
-        <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
-          <EditorTabs
-            isCollapseButtonHidden
-            customTabs={<HomeTabButton />}
-            newTabButton={<NewTabButton />}
+    <ExplorerProvider>
+      <ProjectLayoutWithAuth
+        product="Explorer"
+        browserTitle={mergedBrowserTitle}
+        productMenuHeader={
+          <ExplorerNavHeader
+            section={section}
+            onBack={() => setSection(undefined)}
+            rootAction={<ExplorerPreferencesDropdown />}
           />
+        }
+        productMenu={
+          <div className="relative h-full overflow-hidden">
+            <AnimatePresence mode="wait">
+              {section === undefined && <ExplorerNavHome key="home" onSelectSection={setSection} />}
+              {section === 'notebook' && <ExplorerNavNotebooks key="notebooks" />}
+              {section === 'chat' && <ExplorerNavChats key="chats" />}
+            </AnimatePresence>
+          </div>
+        }
+      >
+        <ExplorerQueryTabCoordinator />
+
+        <ExplorerNotebookTabCoordinator />
+
+        <div className="flex flex-col h-full">
+          <div className={cn('h-10 md:min-h-(--header-height) flex items-center bg-surface-100')}>
+            <EditorTabs
+              isCollapseButtonHidden
+              customTabs={shouldShowHomeTab ? <HomeTabButton /> : undefined}
+              newTabButton={<NewTabButton />}
+              onTabChange={handleTabChange}
+            />
+          </div>
+          <div className="flex-grow min-h-0">{children}</div>
         </div>
-        <div className="flex-grow min-h-0">{children}</div>
-      </div>
-    </ProjectLayoutWithAuth>
-  )
-}
-
-const BackToSqlEditorButton = () => {
-  const { ref } = useParams()
-  const track = useTrack()
-  const { setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
-
-  if (!ref) return null
-
-  return (
-    <EditorNavigationButton
-      asChild
-      tooltip="Temporarily switch to SQL Editor to access your snippets"
-    >
-      <Link
-        href={`/project/${ref}/sql`}
-        aria-label="Switch to SQL Editor"
-        onClick={() => {
-          setIsTemporary(true)
-          track('explorer_temp_access_sql_editor_clicked')
-        }}
-      />
-    </EditorNavigationButton>
+      </ProjectLayoutWithAuth>
+    </ExplorerProvider>
   )
 }
 

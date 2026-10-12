@@ -115,7 +115,7 @@ const SQLEditorResultsPanel = () => {
 
   return isLoading ? (
     <div className="flex h-full w-full items-center justify-center">
-      <Loader2 className="animate-spin text-brand" />
+      <Loader2 className="animate-spin text-primary" />
     </div>
   ) : (
     <UtilityPanel

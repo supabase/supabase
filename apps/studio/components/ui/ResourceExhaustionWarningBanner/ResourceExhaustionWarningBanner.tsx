@@ -15,20 +15,82 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { RESOURCE_WARNING_MESSAGES } from './ResourceExhaustionWarningBanner.constants'
 import {
+  isResourceWarningMessageKey,
+  RESOURCE_WARNING_MESSAGES,
+  type ResourceWarningMessageKey,
+} from './ResourceExhaustionWarningBanner.constants'
+import {
+  applyResourceList,
+  getResourceWarningAiPrompt,
   getResourceWarningCorrectionUrl,
+  getTroubleshootItems,
   getWarningContent,
   isComputeUpgradeWarning,
+  type TroubleshootItem,
 } from './ResourceExhaustionWarningBanner.utils'
 import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useShowDiskIOBurstBalanceChart } from '@/hooks/misc/useShowDiskIOBurstBalanceChart'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
+type LinkedTroubleshootItem = Extract<TroubleshootItem, { kind: 'metrics' | 'docs' }>
+type ConfiguredResourceWarning = Exclude<ResourceWarningMessageKey, 'multiple_resource_warnings'>
+
+const isConfiguredResourceWarning = (property: string): property is ConfiguredResourceWarning =>
+  isResourceWarningMessageKey(property) && property !== 'multiple_resource_warnings'
+
+const MULTIPLE_RESOURCE_WARNING_NO_AI_DESCRIPTION =
+  'Use the Troubleshoot menu to review the affected resources and resolve these warnings.'
+const MULTIPLE_RESOURCE_MIXED_SEVERITY_TITLE =
+  "Resource warnings for {resources} are affecting your project's performance"
+
+const TroubleshootMenuItem = ({
+  item,
+  onTroubleshootClick,
+  onAskAI,
+}: {
+  item: TroubleshootItem
+  onTroubleshootClick: (item: LinkedTroubleshootItem) => void
+  onAskAI: () => void
+}) => {
+  if (item.kind === 'ai') {
+    return (
+      <DropdownMenuItem className="flex items-center gap-x-2 cursor-pointer" onClick={onAskAI}>
+        <Sparkles size={14} />
+        {item.menuLabel}
+      </DropdownMenuItem>
+    )
+  }
+  if (item.kind === 'metrics') {
+    return (
+      <DropdownMenuItem asChild onClick={() => onTroubleshootClick(item)}>
+        <Link href={item.href} className="flex items-center gap-x-2 cursor-pointer">
+          <ChartLine size={14} />
+          {item.menuLabel}
+        </Link>
+      </DropdownMenuItem>
+    )
+  }
+  return (
+    <DropdownMenuItem asChild onClick={() => onTroubleshootClick(item)}>
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-center gap-x-2 cursor-pointer"
+      >
+        <BookOpen size={14} />
+        {item.menuLabel}
+      </a>
+    </DropdownMenuItem>
+  )
+}
 
 export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
@@ -45,6 +107,7 @@ export const ResourceExhaustionWarningBanner = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const track = useTrack()
+  const showBurstBalanceChart = useShowDiskIOBurstBalanceChart()
   const { data: resourceWarnings } = useResourceWarningsQuery({ ref: ref })
   // [Joshen Cleanup] JFYI this client side filtering can be cleaned up once BE changes are live which will only return the warnings based on the provided ref
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -52,62 +115,65 @@ export const ResourceExhaustionWarningBanner = () => {
   )
 
   // [Joshen] Read only takes higher precedence over multiple resource warnings
-  const activeWarnings =
+  const activeWarnings: ConfiguredResourceWarning[] =
     projectResourceWarnings !== undefined
       ? projectResourceWarnings.is_readonly_mode_enabled
         ? ['is_readonly_mode_enabled']
         : Object.keys(projectResourceWarnings).filter(
-            (property) =>
+            (property): property is ConfiguredResourceWarning =>
               property !== 'project' &&
               property !== 'is_readonly_mode_enabled' &&
-              projectResourceWarnings[property as keyof typeof projectResourceWarnings] !== null
+              isConfiguredResourceWarning(property) &&
+              projectResourceWarnings[property] !== null
           )
       : []
 
   const hasCriticalWarning =
     projectResourceWarnings !== undefined
-      ? activeWarnings.some(
-          (x) => projectResourceWarnings[x as keyof typeof projectResourceWarnings] === 'critical'
-        )
+      ? activeWarnings.some((warningType) => projectResourceWarnings[warningType] === 'critical')
       : false
+  const hasWarningSeverity =
+    projectResourceWarnings !== undefined
+      ? activeWarnings.some((warningType) => projectResourceWarnings[warningType] === 'warning')
+      : false
+  const hasMixedWarningSeverities = hasCriticalWarning && hasWarningSeverity
   const isCritical = activeWarnings.includes('is_readonly_mode_enabled') || hasCriticalWarning
 
   const warningContent =
     projectResourceWarnings !== undefined
       ? getWarningContent(projectResourceWarnings, activeWarnings[0], 'bannerContent')
       : undefined
+  const aiPrompt = getResourceWarningAiPrompt(activeWarnings)
+  const multipleWarningDescription =
+    aiPrompt === undefined
+      ? MULTIPLE_RESOURCE_WARNING_NO_AI_DESCRIPTION
+      : RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
+          hasCriticalWarning ? 'critical' : 'warning'
+        ].description
+  const multipleWarningTitle = hasMixedWarningSeverities
+    ? MULTIPLE_RESOURCE_MIXED_SEVERITY_TITLE
+    : RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
+        hasCriticalWarning ? 'critical' : 'warning'
+      ].title
 
   const title = applyDiskIoBaseline(
-    activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
-          hasCriticalWarning ? 'critical' : 'warning'
-        ].title
-      : warningContent?.title
+    applyResourceList(
+      activeWarnings.length > 1 ? multipleWarningTitle : warningContent?.title,
+      activeWarnings
+    )
   )
 
   const description = applyDiskIoBaseline(
-    activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.bannerContent[
-          hasCriticalWarning ? 'critical' : 'warning'
-        ].description
-      : warningContent?.description
+    applyResourceList(
+      activeWarnings.length > 1 ? multipleWarningDescription : warningContent?.description,
+      activeWarnings
+    )
   )
-
-  const learnMoreUrl =
-    activeWarnings.length > 1
-      ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.docsUrl
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.docsUrl
-
-  const singleWarningMessage =
-    activeWarnings.length === 1 ? RESOURCE_WARNING_MESSAGES[activeWarnings[0]] : undefined
-  const metricsHref = singleWarningMessage?.metricsHref?.replace('[ref]', ref ?? 'default')
 
   const metric =
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.metric
+      : RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.metric
 
   const isFreePlan = organization?.plan?.id === 'free'
 
@@ -126,17 +192,16 @@ export const ResourceExhaustionWarningBanner = () => {
     if (isComputeUpgradeMetric) return 'Upgrade compute'
     return activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.buttonText
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.buttonText
+      : RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.buttonText
   })()
 
-  const aiPrompt =
-    activeWarnings.length > 1
-      ? isComputeUpgradeMetric
-        ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.aiPrompt
-        : undefined
-      : RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
-          ?.aiPrompt
+  const troubleshootItems = getTroubleshootItems({
+    activeWarnings,
+    projectRef: ref ?? 'default',
+    aiPrompt,
+    showBurstBalanceChart,
+  })
+  const soleTroubleshootItem = troubleshootItems.length === 1 ? troubleshootItems[0] : undefined
 
   const handleAskAI = () => {
     track('resource_exhaustion_banner_ai_assistant_clicked', {
@@ -144,6 +209,15 @@ export const ResourceExhaustionWarningBanner = () => {
     })
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialInput: aiPrompt })
+  }
+
+  const handleTroubleshootClick = (item: LinkedTroubleshootItem) => {
+    track('resource_exhaustion_banner_troubleshoot_clicked', {
+      troubleshootAction: item.kind,
+      warningType: item.warningType,
+      warningTypes: activeWarnings,
+      destination: item.href,
+    })
   }
 
   const hasNoWarnings = activeWarnings.length === 0
@@ -163,8 +237,7 @@ export const ResourceExhaustionWarningBanner = () => {
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
-  const activeWarning =
-    RESOURCE_WARNING_MESSAGES[activeWarnings[0] as keyof typeof RESOURCE_WARNING_MESSAGES]
+  const activeWarning = RESOURCE_WARNING_MESSAGES[activeWarnings[0]]
   const restrictToRoutes = activeWarning?.restrictToRoutes
 
   const isVisible =
@@ -206,57 +279,48 @@ export const ResourceExhaustionWarningBanner = () => {
         <AlertDescription>{description}</AlertDescription>
       </div>
       <div className="flex items-center gap-x-2">
-        {learnMoreUrl !== undefined && aiPrompt !== undefined ? (
+        {troubleshootItems.length >= 2 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="default"
-                icon={<Wrench size={14} />}
-                iconRight={<ChevronDown size={14} />}
-              >
+              <Button icon={<Wrench size={14} />} iconRight={<ChevronDown size={14} />}>
                 Troubleshoot
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {metricsHref !== undefined && (
-                <DropdownMenuItem asChild>
-                  <Link href={metricsHref} className="flex items-center gap-x-2 cursor-pointer">
-                    <ChartLine size={14} />
-                    View metrics
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem asChild>
-                <a
-                  href={learnMoreUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-x-2 cursor-pointer"
-                >
-                  <BookOpen size={14} />
-                  Documentation
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="flex items-center gap-x-2 cursor-pointer"
-                onClick={handleAskAI}
-              >
-                <Sparkles size={14} />
-                Ask AI Assistant
-              </DropdownMenuItem>
+              {troubleshootItems.map((item) => (
+                <TroubleshootMenuItem
+                  key={item.kind === 'ai' ? 'ai' : `${item.kind}-${item.warningType}`}
+                  item={item}
+                  onTroubleshootClick={handleTroubleshootClick}
+                  onAskAI={handleAskAI}
+                />
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
-        ) : learnMoreUrl !== undefined ? (
-          <Button asChild variant="default" icon={<BookOpen size={14} />}>
-            <a href={learnMoreUrl} target="_blank" rel="noreferrer">
-              Learn more
+        )}
+        {soleTroubleshootItem?.kind === 'metrics' && (
+          <Button
+            asChild
+            icon={<ChartLine size={14} />}
+            onClick={() => handleTroubleshootClick(soleTroubleshootItem)}
+          >
+            <Link href={soleTroubleshootItem.href}>{soleTroubleshootItem.buttonLabel}</Link>
+          </Button>
+        )}
+        {soleTroubleshootItem?.kind === 'docs' && (
+          <Button
+            asChild
+            icon={<BookOpen size={14} />}
+            onClick={() => handleTroubleshootClick(soleTroubleshootItem)}
+          >
+            <a href={soleTroubleshootItem.href} target="_blank" rel="noreferrer">
+              {soleTroubleshootItem.buttonLabel}
             </a>
           </Button>
-        ) : aiPrompt !== undefined ? (
-          <Button variant="default" onClick={handleAskAI}>
-            Ask AI Assistant
-          </Button>
-        ) : null}
+        )}
+        {soleTroubleshootItem?.kind === 'ai' && (
+          <Button onClick={handleAskAI}>{soleTroubleshootItem.buttonLabel}</Button>
+        )}
         {correctionUrl !== undefined && (
           <Button
             asChild

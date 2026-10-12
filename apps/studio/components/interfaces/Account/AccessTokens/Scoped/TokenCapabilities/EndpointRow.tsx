@@ -95,7 +95,7 @@ export const EndpointRow = ({
       </span>
       <span className="shrink-0 pl-2">
         {showCopiedIcon ? (
-          <Check size={14} className="text-brand" />
+          <Check size={14} className="text-primary" />
         ) : (
           <Copy
             size={14}

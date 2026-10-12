@@ -5,7 +5,7 @@ import { Home } from 'icons'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
+import { Button, cn, Separator, SheetTitle, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
@@ -65,7 +65,7 @@ export function MobileMenuContent({
     'realtime:all',
   ])
   const authOverviewPageEnabled = useFlag('authOverviewPage')
-  const workersEnabled = useFlag('workers')
+  const computeEnabled = useFlag('compute')
 
   const toolRoutes = useGenerateToolRoutes()
   const productRoutes = useMemo(
@@ -76,7 +76,7 @@ export function MobileMenuContent({
         storage: storageEnabled,
         realtime: realtimeEnabled,
         authOverviewPage: authOverviewPageEnabled,
-        workers: workersEnabled,
+        compute: computeEnabled,
       }),
     [
       ref,
@@ -86,7 +86,7 @@ export function MobileMenuContent({
       storageEnabled,
       realtimeEnabled,
       authOverviewPageEnabled,
-      workersEnabled,
+      computeEnabled,
     ]
   )
   const otherRoutes = useGenerateOtherRoutes()
@@ -133,6 +133,7 @@ export function MobileMenuContent({
 
   return (
     <div className="flex flex-col h-full bg-background">
+      <SheetTitle className="sr-only">Project menu</SheetTitle>
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(

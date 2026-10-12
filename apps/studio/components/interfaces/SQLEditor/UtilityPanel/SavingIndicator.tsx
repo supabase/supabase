@@ -59,7 +59,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
         {showSavedText ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check className="text-brand" size={14} strokeWidth={3} />
+              <Check className="text-primary" size={14} strokeWidth={3} />
             </TooltipTrigger>
             <TooltipContent side="bottom">All changes saved</TooltipContent>
           </Tooltip>

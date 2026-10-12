@@ -31,7 +31,7 @@ const CTABanner = ({ darkerBg, className }: Props) => {
       </div>
       <div className="flex items-center justify-center gap-2 col-span-12 mt-4">
         <Button variant="primary" asChild size="medium">
-          <Link
+          <a
             href={getDashboardCtaHref(isLoggedIn)}
             onClick={() =>
               sendTelemetryEvent({
@@ -41,9 +41,9 @@ const CTABanner = ({ darkerBg, className }: Props) => {
             }
           >
             Start your project
-          </Link>
+          </a>
         </Button>
-        <Button asChild size="medium" variant="default">
+        <Button asChild size="medium">
           <Link
             href="/contact/sales"
             onClick={() =>

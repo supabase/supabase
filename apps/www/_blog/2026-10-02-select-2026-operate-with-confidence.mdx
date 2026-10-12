@@ -1,0 +1,128 @@
+---
+title: 'Operate with confidence'
+description: 'More data, more tools and more control so your agent has what it needs to observe your project, investigate issues and propose fixes, autonomously.'
+author: steven_eubank, joshenlim, cemal_kilic, riccardo_busetti, joe_sciarrino
+date: '2026-10-02T10:25:00'
+categories:
+  - product
+tags:
+  - ai
+  - mcp
+  - observability
+imgSocial: 'select-2026-operate-with-confidence/og.png'
+imgThumb: 'select-2026-operate-with-confidence/thumb.png'
+toc_depth: 2
+---
+
+Today at Supabase Select, we announced new tools that let your coding agent find production problems, test fixes, and report back, and new controls that set what the agent can access and when it stops to ask you first.
+
+Diagnosing a production problem today means reading logs, usage charts, and database reports separately and correlating them yourself. Your agent could already read that data, but it had no procedure for investigating and no safe place to test a fix.
+
+For an agent to confidently operate a project:
+
+- It needs [data](#data) to observe
+- It needs [knowledge](#knowledge) on what to look for in that data
+- It needs [autonomy](#autonomy) to test and validate fixes in its own environment
+- It needs [permission](#permissions) to do only what is required
+
+## Data
+
+### query_logs
+
+Previously your agents were limited in what logs they could access via our MCP. We’ve introduced a new MCP tool that gives your agents raw access to your project logs via SQL, which enables more in-depth and precise investigations.
+
+### More advisor checks
+
+<Img
+  alt="Health Advisor in the Supabase dashboard flagging persistently high Data API and Edge Function error rates"
+  src="/images/blog/select-2026-operate-with-confidence/health-check.png"
+  wide
+/>
+
+Programmatic checks can catch obvious issues and provide signal for an agent to investigate further. Advisor previously focused on security and performance checks. We’ve now extended it to health. Advisor will signal when error rates go beyond what is considered normal across Data API, Auth, Storage, and Edge Functions. Checks run on demand from the dashboard or the Management API, and results show up under a new Health tab on the Advisors page.
+
+### Database Connections
+
+<Img
+  alt="Database Connections page showing connections, active queries, idle in transaction, and blocked queries"
+  src="/images/blog/select-2026-operate-with-confidence/connections.png"
+  wide
+/>
+
+See which sessions hold connections, which queries run long, which are idle in a transaction, which are blocked, and who holds the lock. You can cancel a query or terminate its connection from there. It's on by default for every project, including self-hosted.
+
+### Introducing Notebooks
+
+<Img
+  alt="A notebook in Explorer combining markdown notes with database queries and charts"
+  src="/images/blog/select-2026-operate-with-confidence/notebooks.png"
+  wide
+/>
+
+A notebook is a file in your supabase folder that combines saved database or log queries with markdown notes. Run Notebooks yourself or get your agents to run them as part of their ongoing observations. You can create notebooks directly in the dashboard via the Assistant, then pull them down locally as files with `supabase notebooks pull` if needed. You can also create notebooks locally (including with your own agent) and push them with `supabase notebooks push` to make them accessible in the dashboard.
+
+Notebooks can be found in the new Explorer, an evolution of the SQL editor, which is rolling out to every project through October 12. Once it reaches your project, you can turn it on under Feature Previews in the dashboard. Notebook CLI tools are available in the beta version of our CLI.
+
+## Knowledge
+
+### Updated Skills
+
+Supabase skills now point to a living document of common health, security, performance, and resource signals your agent should watch for and how to monitor those signals.
+
+```bash
+npm install supabase --save-dev
+npx plugins add supabase-community/supabase-plugin
+```
+
+## Autonomy
+
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+  <source src="/images/blog/select-2026-operate-with-confidence/autonomy.mp4" type="video/mp4" />
+</video>
+
+Agents operate best in code. Today at Supabase Select we announced several improvements to how Supabase projects are expressed as code, and how that code can run in more environments. This is an important upgrade for the observing → detection → resolving loop: it lets agents test and validate proposed fixes in their own environment before opening a PR. That environment may not be your local machine.
+
+Read more about pg-delta and upgrades to the local runtime in the [Build post](https://supabase.com/blog/select-2026-build-anything).
+
+## Permissions
+
+Give your agent only the access it needs to do its job, and get alerted when it attempts a riskier action.
+
+### Enterprise-Managed Auth for MCP
+
+Your company decides who can connect to the Supabase MCP server through its identity provider, starting with Okta. Each token is short-lived and bound to the member who signed in. To cut off access, remove the app from Authorized Apps, or remove the member. This is generally available.
+
+### Scoped Personal Access Tokens
+
+Limit a token to the organizations, projects, and permissions you choose. Start with a read-only token. It's generally available and is now the default for new tokens created in the dashboard.
+
+### MCP Elicitations
+
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+  <source
+    src="/images/blog/select-2026-operate-with-confidence/mcp-elicitations.mp4"
+    type="video/mp4"
+  />
+</video>
+
+Before the agent creates a paid project or branch, the Supabase MCP server asks you to confirm the resource, rate, and billing interval in your agent client, then waits for your answer. It also asks for confirmation before running SQL that could delete data. This helps prevent unwanted charges and data loss, but it’s not a guarantee. Your agent client must support elicitations for the prompt to appear.
+
+## Supabase Pipelines
+
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+  <source src="/images/blog/select-2026-operate-with-confidence/pipelines.mp4" type="video/mp4" />
+</video>
+
+Pipelines stream your Postgres data to analytical destinations in near real time, so heavy analytics queries don’t impact primary Postgres. Create a pipeline in the dashboard, choose the destination, and select the tables to replicate. The initial sync starts, and schema changes are detected and applied to the destination automatically. The dashboard shows each pipeline's health and the status of every replicated table.
+
+Pipelines are in public alpha on the Pro, Team, and Enterprise plans, with BigQuery, ClickHouse, DuckLake, and Snowflake as destinations.
+
+## Getting started
+
+Setting up an agent that autonomously observes your project, detects issues, and proposes fixes can be daunting, but it’s really only a prompt away with your favorite agent harness. We’ve created a few prompts and suggested schedules to set your agent up for success.
+
+- [Health](https://supabase.com/docs/guides/observability/automate-with-agents/health)
+- [Security](https://supabase.com/docs/guides/observability/automate-with-agents/security)
+- [Performance](https://supabase.com/docs/guides/observability/automate-with-agents/performance)
+- [Resources](https://supabase.com/docs/guides/observability/automate-with-agents/usage)
+- Supabase Pipelines: on a paid plan, open Database, then Pipelines in the Dashboard, add a BigQuery, ClickHouse, DuckLake, or Snowflake destination, and pick your tables. [Docs](https://supabase.com/docs/guides/database/replication/pipelines).

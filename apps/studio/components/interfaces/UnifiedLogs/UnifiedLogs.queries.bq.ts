@@ -9,6 +9,7 @@ import dayjs from 'dayjs'
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -31,7 +32,7 @@ const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge functio
  * to the cheap two-source set. With `=` filters, narrows to those values. With
  * `<>` filters, excludes them from the full set.
  */
-const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
+export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
   if (filters.length === 0) return [...DEFAULT_LOG_TYPES]
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
@@ -73,16 +74,18 @@ const buildConditions = (
       const likeOp = isNeq ? NOT_LIKE_OP : LIKE_OP
       const joinAndOr = isNeq ? ' AND ' : ' OR '
 
-      if (key === 'event_message' && (operator === '~~*' || operator === '!~~*')) {
+      if (
+        (key === 'event_message' || key === 'pathname') &&
+        (operator === '~~*' || operator === '!~~*')
+      ) {
         // BigQuery has no ILIKE; emulate via LOWER(col) (NOT) LIKE LOWER('%v%').
         // Auto-wrap with `%…%` unless the user already included one. Multiple
         // ILIKE values join with OR; NOT ILIKE joins with AND (row must contain
         // none of the given substrings).
-        const pattern = (v: string) => (v.includes('%') ? v : '%' + v + '%')
         const likeKeyword = operator === '!~~*' ? safeSql`NOT LIKE` : safeSql`LIKE`
         const join = operator === '!~~*' ? ' AND ' : ' OR '
         const branches = values.map(
-          (v) => safeSql`LOWER(${col}) ${likeKeyword} LOWER(${lit(pattern(v))})`
+          (v) => safeSql`LOWER(${col}) ${likeKeyword} LOWER(${lit(wrapIlikePattern(v))})`
         )
         conditions.push(safeSql`(${joinSqlFragments(branches, join)})`)
       } else if (key === 'host' || key === 'pathname') {
@@ -427,6 +430,7 @@ export const getFacetCountCTE = ({
   const facetSearchClause = facetSearch
     ? safeSql`AND ${facetCol} LIKE ${lit('%' + facetSearch + '%')}`
     : safeSql``
+  const facetOrder = facet === 'pathname' ? safeSql`ORDER BY count DESC` : safeSql``
 
   const where =
     baseConditions.length > 0
@@ -440,6 +444,7 @@ ${cteName} AS (
   ${where}
   ${facetSearchClause}
   GROUP BY ${facetCol}
+  ${facetOrder}
   LIMIT ${lit(MAX_FACETS_QUANTITY)}
 )
 `
@@ -487,8 +492,7 @@ level_counts AS (
 
 -- Variable facets: open-ended values still need GROUP BY
 ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
-${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })},
-${getFacetCountCTE({ search, facet: 'pathname', cteName: safeSql`pathname_count` })}
+${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })}
 
 SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
@@ -502,7 +506,6 @@ UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
 UNION ALL SELECT 'level', 'error', error_count FROM level_counts
 UNION ALL SELECT dimension, value, count FROM method_count
 UNION ALL SELECT dimension, value, count FROM status_count
-UNION ALL SELECT dimension, value, count FROM pathname_count
 `
 }
 

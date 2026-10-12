@@ -1,6 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
+import type { ExplorerQueryLocation } from 'common/telemetry-constants'
 import { CodeSquare, Eye, EyeOff } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
@@ -18,7 +19,6 @@ import { resolveLogTimeRange } from '../../QuerySources/LogTimeRange.utils'
 import {
   ExplorerQuery,
   ExplorerQueryEditor,
-  ExplorerQueryFooter,
   ExplorerQueryResults,
   ExplorerQueryViewport,
 } from '../ExplorerQuery'
@@ -31,6 +31,7 @@ import {
 } from '../ExplorerToolbar'
 import { type QueryDisplay, type QueryResult } from '../types'
 import { DisplaySettingsButton } from './DisplaySettingsButton'
+import { QueryResultFooter } from './QueryResultFooter'
 import { QueryResultRenderer } from './QueryResultRenderer'
 import { QueryRunButton } from './QueryRunButton'
 import { QuerySourceMenu } from './QuerySourceMenu'
@@ -73,6 +74,7 @@ import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { detectOS } from '@/lib/helpers'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   isRoleImpersonationEnabled,
   type RoleImpersonationController,
@@ -116,10 +118,13 @@ export type QueryEditorHandle = {
   getSql: () => string
   /** Formats the editor's SQL in place and commits the result, same as the SQL Editor's Prettify SQL action. */
   prettify: () => Promise<void>
+  /** The last result this cell produced in this session, or undefined if it hasn't been run. */
+  getResult: () => QueryResult | undefined
 }
 
 type QueryEditorProps = {
   id: string
+  location?: ExplorerQueryLocation
   isReadOnly?: boolean
   variant: 'embedded' | 'viewport'
   title: string
@@ -152,6 +157,7 @@ type QueryEditorProps = {
 export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(function QueryEditor(
   {
     id,
+    location,
     isReadOnly = false,
     variant,
     title,
@@ -177,6 +183,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   ref
 ) {
   const os = detectOS()
+  const track = useTrack()
   const sql = query.uncheckedSql
   const sqlRef = useLatest<string>(sql)
   const onSqlCommitRef = useLatest(onSqlCommit)
@@ -188,6 +195,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
   const columns = Object.keys(result?.rows?.[0] ?? {})
   const rowLimit = query._tag === 'database' ? query.rowLimit : undefined
   const databaseIdentifier = query._tag === 'database' ? query.database_identifier : undefined
+  const resultsRowCount = (result?.rows ?? []).length
 
   const [promptInput, setPromptInput] = useState('')
   const [pendingRun, setPendingRun] = useState<{ sql: string; issues: PotentialIssues }>()
@@ -257,13 +265,33 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     }
 
     onRun?.()
+
     const querySnapshot = { sql: rawSql, source: query._tag }
+    const runProperties = location
+      ? { ...location, runId: crypto.randomUUID(), source: query._tag }
+      : undefined
+    const groups = { project: project.ref }
+
+    if (runProperties) track('explorer_query_submitted', runProperties, groups)
+
+    const trackRunResult = (
+      failureReason?: 'logs_unavailable' | 'connection_unavailable' | 'execution_error'
+    ) => {
+      if (!runProperties) return
+      if (failureReason) {
+        track('explorer_query_failed', { ...runProperties, failureReason }, groups)
+      } else {
+        track('explorer_query_completed', runProperties, groups)
+      }
+    }
+
     // [Joshen] This is deliberate to commit the sql, rather than the passed rawSql
     // As we want to save the cell's content into the store, rather than what's getting run
     onSqlCommit?.(sql)
 
     if (query._tag === 'logs') {
       if (!isOtelLogsEnabled) {
+        trackRunResult('logs_unavailable')
         onResultChange({
           error: { message: "Querying logs isn't available for this project yet." },
           ...querySnapshot,
@@ -277,12 +305,17 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
         range: resolveLogTimeRange(query.time_range),
         endpoint: QUERY_SOURCE_REGISTRY.logs.endpoint,
       }).then(
-        (data) =>
+        (data) => {
+          trackRunResult()
           onResultChange({
             rows: data.rows as readonly Record<string, unknown>[],
             ...querySnapshot,
-          }),
-        (error) => onResultChange({ error, ...querySnapshot })
+          })
+        },
+        (error) => {
+          trackRunResult('execution_error')
+          onResultChange({ error, ...querySnapshot })
+        }
       )
       return
     }
@@ -291,6 +324,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     const limitedSql = applyAutoLimit(safeSql, rowLimit)
 
     if (!isValidConnString(connectionString)) {
+      trackRunResult('connection_unavailable')
       onResultChange({
         error: { message: 'Unable to run query: Connection string is missing' },
         ...querySnapshot,
@@ -307,8 +341,14 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     }).then(
-      (data) => onResultChange({ rows: data.result, ...querySnapshot }),
-      (error) => onResultChange({ error, ...querySnapshot })
+      (data) => {
+        trackRunResult()
+        onResultChange({ rows: data.result, ...querySnapshot })
+      },
+      (error) => {
+        trackRunResult('execution_error')
+        onResultChange({ error, ...querySnapshot })
+      }
     )
   }
 
@@ -379,6 +419,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
     run: (force = false) => handleRunQuery({ shouldForce: force }),
     getSql: () => sqlRef.current,
     prettify: handlePrettify,
+    getResult: () => result,
   }))
 
   useEffect(() => {
@@ -437,6 +478,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           options={{
             minimap: { enabled: false },
             padding: { top: 8 },
+            scrollBeyondLastLine: true,
           }}
           onInputChange={(value) => onSqlChange(value ?? '')}
           onMount={(editor, monaco) => {
@@ -508,7 +550,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
                 )}
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="default" size="tiny" onClick={() => setPendingProposal(null)}>
+                <Button size="tiny" onClick={() => setPendingProposal(null)}>
                   Discard
                 </Button>
                 <Button variant="primary" size="tiny" onClick={acceptSqlProposal}>
@@ -531,7 +573,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
 
   return (
     <>
-      <Shell className={cn(variant === 'embedded' && 'mx-auto max-w-6xl', className)}>
+      <Shell className={className}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
             <CodeSquare size={16} strokeWidth={2} />
@@ -611,15 +653,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           </>
         )}
 
-        <ExplorerQueryFooter className="flex items-center gap-x-2">
-          <p>{(result?.rows ?? []).length.toLocaleString()} rows</p>
-          {rowLimit && (
-            <>
-              <p>·</p>
-              <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
-            </>
-          )}
-        </ExplorerQueryFooter>
+        <QueryResultFooter
+          results={result?.rows}
+          count={resultsRowCount}
+          rowLimit={rowLimit}
+          fileName={title}
+        />
       </Shell>
 
       {query._tag === 'database' && (

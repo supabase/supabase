@@ -1,0 +1,193 @@
+---
+title = "Custom role inherits privileges that were not explicitly granted"
+topics = [ "database" ]
+keywords = [ "PUBLIC", "privileges", "permissions", "custom role", "least privilege", "grant", "revoke", "noinherit", "default privileges", "temporary", "lo_create", "template1", "pg_net", "has_table_privilege" ]
+
+[[errors]]
+code = "01006"
+message = "no privileges could be revoked for \"template1\""
+
+[[errors]]
+code = "01006"
+message = "no privileges could be revoked for \"lo_create\""
+---
+
+A role you create can use objects without an explicit grant. For example, it can read tables in the `net` schema, create temporary tables, or create large objects. Privilege checks such as `has_table_privilege` return `true` for these objects. When you run some revokes as `postgres`, they print `WARNING: no privileges could be revoked` and change nothing.
+
+The role receives these privileges from `PUBLIC`, which stands for every role in the database, including roles you create later.
+
+A role you create to limit a service or a person can therefore do more than you intended. When pg_net is enabled, any role that can connect to your database can read the request headers that pg_net queues, including API keys. It can also queue HTTP requests of its own. Any role can use disk space by creating temporary tables and large objects.
+
+## Find privileges you didn't grant
+
+To find privileges you didn't grant, list what the role can access and compare it with your own grants. The following queries check schema `usage` and the table and sequence privileges they name. They don't check column-level grants or `execute` on functions. To list the schemas a role can use, replace `app_svc` and run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+select nspname as schema
+from pg_namespace
+where
+  has_schema_privilege('app_svc', oid, 'usage')
+  and nspname not in ('pg_catalog', 'information_schema')
+  and nspname not like 'pg\_%'
+order by 1;
+```
+
+To list the tables, views, and sequences the role can read or change in those schemas, run:
+
+```sql
+select
+  n.nspname as schema,
+  c.relname as object,
+  string_agg(p.privilege, ', ' order by p.privilege) as privileges
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+cross join unnest(
+  array['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'USAGE']
+) as p(privilege)
+where c.relkind in ('r', 'p', 'v', 'm', 'f', 'S')
+  and n.nspname not in ('pg_catalog', 'information_schema')
+  and has_schema_privilege('app_svc', n.oid, 'usage')
+  and case
+    when c.relkind = 'S' then
+      case
+        when p.privilege in ('USAGE', 'SELECT', 'UPDATE')
+          then has_sequence_privilege('app_svc', c.oid, p.privilege)
+        else false
+      end
+    else
+      case
+        when p.privilege = 'USAGE' then false
+        else has_table_privilege('app_svc', c.oid, p.privilege)
+      end
+  end
+group by 1, 2
+order by 1, 2;
+```
+
+The results are the role's effective privileges. Access you didn't grant directly can come from `PUBLIC`, from a role it's a member of, or from owning the object. To see who holds privileges on an object, check its access control list:
+
+```sql
+select relacl from pg_class where oid = 'net.http_request_queue'::regclass;
+```
+
+An entry that starts with `=`, such as `=arwdDxtm/supabase_admin`, is a grant to `PUBLIC`.
+
+## What every role receives from PUBLIC
+
+A role holds everything granted to `PUBLIC` in addition to its own grants. The `noinherit` attribute doesn't affect privileges granted to `PUBLIC`, because `PUBLIC` isn't a role membership.
+
+On a Supabase project, a role you create can use the `public` schema, the system catalogs, and the `net` schema when the pg_net extension is enabled. Other Supabase schemas, such as `auth`, `storage`, `extensions`, `vault`, and `cron`, don't grant `usage` to `PUBLIC`.
+
+The following table lists what `PUBLIC` holds and whether the `postgres` role can revoke it.
+
+| Object                                           | What `PUBLIC` holds                                                                                                                        | Can `postgres` revoke it |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| `postgres` database                              | `connect` and `temporary`                                                                                                                  | Yes                      |
+| `template1` database                             | `connect`. The database holds none of your data.                                                                                           | No                       |
+| `public` schema                                  | `usage`, and `execute` on functions you create there                                                                                       | Yes                      |
+| `net` schema                                     | `usage`, all privileges on `net.http_request_queue` and `net._http_response`, and on most projects `execute` on the `net.http_*` functions | No                       |
+| Functions in `cron` and `extensions`             | `execute`, which a role can't use without `usage` on the schema                                                                            | Not needed               |
+| Large-object functions such as `lo_create`       | `execute`. A role can create large objects in the database.                                                                                | No                       |
+| System catalogs such as `pg_class` and `pg_proc` | Read access to the names and definitions of database objects                                                                               | No                       |
+
+The `postgres` role owns the `postgres` database, and through it the `public` schema, so it can revoke the `PUBLIC` grants on those. Supabase roles own the other objects, so a revoke on them prints the `no privileges could be revoked` warning. For the pg_net grants, see [Revoking access to pg_net objects has no effect](/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16).
+
+Extensions you enable can grant more privileges to `PUBLIC`. After you enable an extension, check the role again.
+
+## Revoke PUBLIC privileges on objects you own
+
+You can revoke the `PUBLIC` grants on the `public` schema, on the `postgres` database, and on functions you create.
+
+<Admonition type="danger">
+
+Revoking `connect` on the `postgres` database from `PUBLIC` disconnects the Data API, Auth, Storage, and other Supabase services, because their roles connect through that grant. Leave `connect` granted to `PUBLIC`.
+
+</Admonition>
+
+### Functions you create
+
+To stop `PUBLIC` from running functions that `postgres` creates after the change, update the default privileges without naming a schema:
+
+```sql
+alter default privileges for role postgres
+  revoke execute on functions from public;
+```
+
+A default privilege set with `in schema` can't remove the `PUBLIC` default for functions, because Postgres adds schema defaults to the global ones.
+
+The Supabase defaults also grant `execute` to `anon`, `authenticated`, and `service_role` on functions that `postgres` creates in `public`. Those roles keep their access. If you changed those defaults, or create functions as another role, grant `execute` to the API roles that need it.
+
+To check the default privileges for functions, run:
+
+```sql
+select defaclrole::regrole as owner, defaclnamespace::regnamespace as schema, defaclacl
+from pg_default_acl
+where defaclobjtype = 'f';
+```
+
+Functions in other schemas don't get those grants. If a Row Level Security policy calls a helper function outside `public`, grant `execute` on it to the roles the policy applies to:
+
+```sql
+grant execute on function private.is_admin() to authenticated;
+```
+
+To revoke `execute` from `PUBLIC` on a function that already exists, run:
+
+```sql
+revoke execute on function public.my_function() from public;
+```
+
+### The public schema
+
+To stop roles you create from using the `public` schema without a grant, run:
+
+```sql
+revoke usage on schema public from public;
+```
+
+The `postgres`, `anon`, `authenticated`, and `service_role` roles keep their own `usage` grants, so the Data API keeps working. Other roles lose access to the schema unless they have their own grant, so grant `usage` to each role you create that needs it. Test the change on a [preview branch](/docs/guides/deployment/branching) before you apply it to production.
+
+### Temporary tables
+
+To allow temporary tables only for roles that you grant `temporary` to, run:
+
+```sql
+revoke temporary on database postgres from public;
+```
+
+Grant `temporary` back to each role that needs it. If your Data API functions create temporary tables, also grant it to `authenticated`. Test this change on a preview branch too.
+
+### Confirm the change
+
+To confirm that the role lost the privileges you revoked, replace `app_svc` and `public.my_function()` and run:
+
+```sql
+select
+  has_schema_privilege('app_svc', 'public', 'usage') as can_use_public_schema,
+  has_database_privilege('app_svc', 'postgres', 'temporary') as can_create_temp_tables,
+  has_function_privilege('app_svc', 'public.my_function()', 'execute') as can_run_my_function;
+```
+
+Each column returns `false` unless the role still receives the privilege from its own grant or from a role it's a member of.
+
+## Grant only what a service needs
+
+Give each service its own role, and grant only the schemas and tables it uses. The following example creates a role that can read and add orders in an `app` schema:
+
+```sql
+create role app_svc login password '<strong-password>';
+grant usage on schema app to app_svc;
+grant select, insert on app.orders to app_svc;
+grant usage on sequence app.orders_id_seq to app_svc;
+```
+
+A role you create is subject to Row Level Security on tables it doesn't own, unless you give it the `bypassrls` attribute. A table's owner bypasses its policies unless you run `alter table <table_name> force row level security`.
+
+Don't grant the role membership in `postgres` or in other Supabase roles, because a member role inherits all of their privileges. For more information about roles, see [Postgres Roles](/docs/guides/database/postgres/roles).
+
+## Settings that don't restrict a role
+
+Some settings look like restrictions, but a session can change them. Use grants to restrict a role.
+
+- `default_transaction_read_only`: a session can run `set default_transaction_read_only = off` and then write. Use it to prevent accidental writes only.
+- `search_path`: a session can set its own search path or use schema-qualified names.

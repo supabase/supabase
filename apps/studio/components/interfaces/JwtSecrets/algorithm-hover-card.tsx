@@ -53,7 +53,7 @@ export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProp
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-brand hover:text-brand-600 flex items-center"
+                  className="text-xs text-primary hover:text-primary-hover flex items-center"
                 >
                   <ExternalLink className="w-3 h-3 mr-1 shrink-0" />
                   <span className="truncate">{link.label}</span>

@@ -507,7 +507,7 @@ export const LintCTA = ({
   const linkText = lintInfo.linkText
 
   return (
-    <Button asChild variant="default">
+    <Button asChild>
       <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>

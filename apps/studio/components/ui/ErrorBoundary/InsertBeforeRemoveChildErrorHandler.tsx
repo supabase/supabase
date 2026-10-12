@@ -54,7 +54,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
       </div>
 
       <div className="flex gap-x-2 justify-center items-center">
-        <Button asChild variant="default" icon={<ExternalLink />}>
+        <Button asChild icon={<ExternalLink />}>
           <a
             target="_blank"
             rel="noreferrer"
@@ -79,7 +79,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
           category: SupportCategories.DASHBOARD_BUG,
           subject: `Client error: Failed to execute '${isRemoveChildError ? 'removeChild' : 'insertBefore'}' on 'Node'`,
           sid: sentryIssueId,
-          error: urlMessage,
+          errorMessage: urlMessage,
         }}
       >
         Still stuck?

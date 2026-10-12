@@ -83,6 +83,9 @@ server {
 
     location /functions {
         proxy_pass http://api_gw_upstream;
+
+        # Outlast the runtime's 150s request idle timeout, matching the API gateway.
+        proxy_read_timeout 160s;
     }
 
     location /mcp {
@@ -90,6 +93,10 @@ server {
     }
 
     location /sso {
+        proxy_pass http://api_gw_upstream;
+    }
+
+    location = /.well-known/oauth-authorization-server {
         proxy_pass http://api_gw_upstream;
     }
 }

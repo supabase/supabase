@@ -12,7 +12,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 const { creditRedemptionProps } = vi.hoisted(() => ({
   creditRedemptionProps: vi.fn(),

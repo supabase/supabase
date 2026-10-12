@@ -1,4 +1,4 @@
-import { Auth, EdgeFunctions, Realtime, Storage, Workers } from 'icons'
+import { Auth, Compute, EdgeFunctions, Realtime, Storage } from 'icons'
 import { Box, Cable, Code2, Database, Network } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -25,7 +25,7 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
   supavisor: Cable,
   pgbouncer: Cable,
   multigres: Network,
-  workers: Workers,
+  compute: Compute,
 }
 
 export const LogTypeIcon = ({
@@ -38,8 +38,10 @@ export const LogTypeIcon = ({
 
   return (
     <Tooltip>
-      <TooltipTrigger>
-        <Icon size={size} strokeWidth={strokeWidth} className={className} />
+      <TooltipTrigger asChild>
+        <span className="inline-flex" role="img" aria-label={type}>
+          <Icon size={size} strokeWidth={strokeWidth} className={className} />
+        </span>
       </TooltipTrigger>
       <TooltipContent side="left">
         <div className="text-xs">{type}</div>

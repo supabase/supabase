@@ -35,11 +35,11 @@ export const AddCellDropdown = ({ cellId }: AddCellDropdownProps) => {
       <DropdownMenuContent align="start" className="w-40">
         <DropdownMenuItem className="gap-x-2" onClick={() => onSelectAddCell('query')}>
           <SquareCode size={14} />
-          <span>Add query cell</span>
+          <span>Add query</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => onSelectAddCell('markdown')}>
           <FileText size={14} />
-          <span>Add markdown cell</span>
+          <span>Add markdown</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

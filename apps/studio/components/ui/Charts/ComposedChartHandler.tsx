@@ -60,7 +60,7 @@ export interface ComposedChartHandlerProps {
 /**
  * Wrapper component that handles intersection observer logic for lazy loading
  */
-const LazyChartWrapper = ({ children }: PropsWithChildren) => {
+const LazyChartWrapper = ({ id, children }: PropsWithChildren<{ id: string }>) => {
   const [isVisible, setIsVisible] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -91,7 +91,7 @@ const LazyChartWrapper = ({ children }: PropsWithChildren) => {
   }, [])
 
   return (
-    <div ref={ref}>
+    <div ref={ref} id={id} className="scroll-mt-16">
       {React.cloneElement(children as React.ReactElement<{ isVisible: boolean }>, { isVisible })}
     </div>
   )
@@ -291,9 +291,8 @@ const ComposedChartHandler = ({
     <Panel
       noMargin
       noHideOverflow
-      className={cn('relative w-full scroll-mt-16', className)}
+      className={cn('relative w-full', className)}
       wrapWithLoading={false}
-      id={id ?? label.toLowerCase().replaceAll(' ', '-')}
     >
       <Panel.Content className="flex flex-col gap-4">
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
@@ -385,8 +384,9 @@ const useAttributeQueries = (
 export function LazyComposedChartHandler(props: ComposedChartHandlerProps) {
   if (props.hide) return null
 
+  const anchorId = props.id ?? props.label.toLowerCase().replaceAll(' ', '-')
   return (
-    <LazyChartWrapper>
+    <LazyChartWrapper id={anchorId}>
       <ComposedChartHandler {...props} />
     </LazyChartWrapper>
   )

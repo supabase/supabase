@@ -80,7 +80,7 @@ const ProductModulesHeader = (props: Types) => (
               {/* {props.icon && <ProductIcon icon={props.icon} />} */}
               {props.title && (
                 <span
-                  className="text-brand font-mono uppercase tracking-widest text-sm"
+                  className="text-primary font-mono uppercase tracking-widest text-sm"
                   key={`product-name-${props.title}`}
                 >
                   {props.title}
@@ -110,14 +110,14 @@ const ProductModulesHeader = (props: Types) => (
             </Button>
           )}
           {props.video && (
-            <Button variant="default" size="small" icon={<PlayCircle />} asChild>
+            <Button size="small" icon={<PlayCircle />} asChild>
               <Link href={props.video} as={props.video}>
                 Watch video
               </Link>
             </Button>
           )}
           {props.secondaryCta && (
-            <Button variant="default" size="small" asChild>
+            <Button size="small" asChild>
               <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
                 {props.secondaryCta.label}
               </Link>

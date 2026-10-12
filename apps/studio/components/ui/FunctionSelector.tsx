@@ -147,7 +147,7 @@ const FunctionSelector = ({
                       >
                         <span>{func.name}</span>
                         {value === func.name && (
-                          <Check className="text-brand" size={14} strokeWidth={2} />
+                          <Check className="text-primary" size={14} strokeWidth={2} />
                         )}
                       </CommandItem>
                     ))}

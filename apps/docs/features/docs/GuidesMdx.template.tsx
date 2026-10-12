@@ -6,6 +6,7 @@ import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { type GuideFrontmatter } from '~/lib/docs'
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
+import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { ExternalLink } from 'lucide-react'
 import { type ReactNode } from 'react'
@@ -135,6 +136,7 @@ const GuideTemplate = ({
         </div>
         <GuidesSidebar
           video={meta?.tocVideo}
+          videoTitle={meta?.title ? mdToPlainText(meta.title) : undefined}
           hideToc={hideToc}
           className={cn(
             'hidden md:flex',

@@ -210,7 +210,7 @@ limit 10;
 
 <Admonition type="caution">
 
-The records in the `cron.job_run_details` table are not cleaned up automatically. They are also not removed when jobs are unscheduled, which will take up disk space in your database.
+The records in the `cron.job_run_details` table are not cleaned up automatically. They are also not removed when jobs are unscheduled, which will take up disk space in your database. Schedule a cleanup Job to remove old records (see [Clean up job run history](#clean-up-job-run-history) below).
 
 </Admonition>
 
@@ -232,6 +232,22 @@ select cron.schedule (
   'saturday-cleanup', -- name of the cron job
   '30 3 * * 6', -- Saturday at 3:30AM (GMT)
   $$ delete from events where event_time < now() - interval '1 week' $$
+);
+```
+
+### Clean up job run history
+
+{/* <!-- vale off --> */}
+
+`cron.job_run_details` grows with every Job run and is never cleaned up automatically, even after a Job is unscheduled. Schedule a Job to delete old records, keeping only the last 7 days:
+
+{/* <!-- vale on --> */}
+
+```sql
+select cron.schedule(
+  'job-run-details-cleanup', -- name of the cron job
+  '0 0 * * *', -- daily at midnight (GMT)
+  $$ delete from cron.job_run_details where end_time < now() - interval '7 days' $$
 );
 ```
 

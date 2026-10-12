@@ -136,9 +136,7 @@ export const LogsQueryPanel = ({
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" iconRight={<ChevronDown />}>
-                  Insert source
-                </Button>
+                <Button iconRight={<ChevronDown />}>Insert source</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="bottom"
@@ -161,9 +159,7 @@ export const LogsQueryPanel = ({
             {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" iconRight={<ChevronDown />}>
-                    Templates
-                  </Button>
+                  <Button iconRight={<ChevronDown />}>Templates</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="start">
                   {templates
@@ -267,7 +263,7 @@ export const LogsQueryPanel = ({
                         href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand"
+                        className="text-primary"
                       >
                         unnesting joins
                         <ExternalLink
@@ -284,7 +280,6 @@ export const LogsQueryPanel = ({
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <Button
-                        variant="default"
                         role="combobox"
                         size={'small'}
                         aria-expanded={open}
@@ -385,7 +380,7 @@ const Field = ({
         {isCopied ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check size={14} strokeWidth={3} className="text-brand" />
+              <Check size={14} strokeWidth={3} className="text-primary" />
             </TooltipTrigger>
             <TooltipContent side="bottom">Copied</TooltipContent>
           </Tooltip>

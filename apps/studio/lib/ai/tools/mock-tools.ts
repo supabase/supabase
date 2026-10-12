@@ -1,8 +1,8 @@
 import assert from 'node:assert'
-import { tool, type ToolExecutionOptions, type ToolSet } from 'ai'
+import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
-import { getStudioTools } from '../tools/studio-tools'
+import { getOptInTools, getStudioTools } from '../tools/studio-tools'
 import { getNotebookTools } from './notebook-tools'
 import {
   applyNotebookOperations,
@@ -15,7 +15,8 @@ import type {
   CellWire,
   NotebookWire,
 } from '@/data/content/notebooks/notebook-schema'
-import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -238,7 +239,17 @@ function createMockedStudioTools() {
     Object.entries(studioTools).map(([name, baseTool]) => {
       // Always mock execute_sql and deploy_edge_function with needsApproval disabled
       if (name === 'execute_sql') {
-        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+        return [
+          name,
+          {
+            ...baseTool,
+            needsApproval: false,
+            execute: async () => ({
+              rows: [] as unknown[],
+              optInLevel: 'schema_and_log_and_data' as const,
+            }),
+          },
+        ]
       }
       if (name === 'deploy_edge_function') {
         return [
@@ -502,6 +513,7 @@ function createMockNotebookTools(store: MockNotebookStore) {
           id,
           name: notebook.name,
           updated_at: notebook.updated_at,
+          optInLevel: 'schema_and_log_and_data' as const,
           cells: notebook.content.cells.flatMap((cell) =>
             cell._tag === 'markdown_cell'
               ? []
@@ -591,33 +603,20 @@ export type MockToolOverrides = {
  * These mirror tool names used in prompts so the model can call them,
  * but return stable, static data for repeatable tests.
  *
- * Note: search_docs uses the real implementation
+ * Note: search_docs uses the real implementation.
  */
-export async function getMockTools(overrides: MockToolOverrides | undefined, signal: AbortSignal) {
+export async function getMockTools(
+  overrides: MockToolOverrides | undefined,
+  aiOptInLevel: AiOptInLevel = 'schema_and_log_and_data'
+) {
   const mockedStudioTools = createMockedStudioTools()
   const notebookStore = createMockNotebookStore()
 
-  // Every tool here is a deterministic mock except `search_docs`, which uses the
-  // real implementation. We source it from an in-process MCP server directly
-  // (rather than `getMcpTools`, which always talks to the remote server) so the
-  // eval harness stays hermetic: the in-process server needs no live remote
-  // endpoint or real access token. See AI-897 for how to point evals at the
-  // remote MCP server instead.
-  const mcpClient = await createInProcessSupabaseMCPClient({
-    accessToken: 'mock-access-token',
-    projectRef: 'mock-project-ref',
-  })
-  // The caller owns this signal and aborts it once generation is done, which
-  // closes the client opened here (search_docs executes during generation, so
-  // the connection must stay open until then).
-  signal.addEventListener('abort', () => void mcpClient.close().catch(() => {}), { once: true })
+  const search_docs = await createSearchDocsTool()
 
-  const { search_docs } = (await mcpClient.tools()) as ToolSet
-
-  assert(search_docs, 'search_docs tool not available from MCP server')
-
-  return {
+  const tools = {
     ...mockedStudioTools,
+    ...getOptInTools({ aiOptInLevel }),
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),
@@ -627,4 +626,8 @@ export async function getMockTools(overrides: MockToolOverrides | undefined, sig
     list_policies: createMockListPoliciesTool(),
     ...createMockNotebookTools(notebookStore),
   }
+
+  assert(tools.search_docs, 'search_docs tool is missing from the eval harness')
+
+  return tools
 }

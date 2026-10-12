@@ -10,7 +10,7 @@ import { useApiKeysCommands } from './ApiKeys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ApiKeyResponse = components['schemas']['ApiKeyResponse']
+type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 
 const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedProjectQuery } =
   vi.hoisted(() => ({

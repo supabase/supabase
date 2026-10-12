@@ -2,8 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback, useMemo } from 'react'
 
-import { convertProjectConfigToGitHubConfig } from '@/components/interfaces/ConfigDrift/github-config-convert'
-import { getConfigDriftSummary } from '@/components/interfaces/ConfigDrift/github-config-drift'
+import {
+  formatGitHubConfigDecodeMessage,
+  fromDashboardProjectConfig,
+  getConfigDriftSummary,
+  type GitHubConfigDriftSummary,
+} from '@/components/interfaces/ConfigDrift/github-config-drift'
 import type { Branch } from '@/data/branches/branches-query'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConfigQuery } from '@/data/config/github-config-query'
@@ -11,6 +15,16 @@ import { projectConfigV2QueryOptions } from '@/data/config/project-config-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+
+const EMPTY_SUMMARY: GitHubConfigDriftSummary = {
+  driftedFields: [],
+  matchedFields: [],
+  unmanagedFields: [],
+}
+
+type ConfigDriftMemoResult =
+  | { status: 'success'; summary: GitHubConfigDriftSummary }
+  | { status: 'error'; source: 'project-config' | 'config-toml'; error: Error }
 
 export function getGitBranchName(branch?: Branch): string | undefined {
   return branch?.git_branch?.trim() || (branch?.is_default ? undefined : branch?.name?.trim())
@@ -59,14 +73,36 @@ export function useSelectedGitHubConfigDrift() {
     [branchesRefetch, connectionRefetch, projectConfigRefetch, githubConfigRefetch]
   )
 
-  const summary = useMemo(() => {
-    const dashboardConfig = convertProjectConfigToGitHubConfig(projectConfigQuery.data?.attributes)
+  const driftResult = useMemo((): ConfigDriftMemoResult => {
+    let dashboardConfig
+    try {
+      dashboardConfig = fromDashboardProjectConfig(projectConfigQuery.data?.attributes)
+    } catch (error) {
+      console.error('Failed to read project configuration:', error)
+      return {
+        status: 'error',
+        source: 'project-config',
+        error: new Error('Could not read the project configuration returned by the API.'),
+      }
+    }
 
-    return getConfigDriftSummary({
-      dashboardConfig: dashboardConfig,
+    const result = getConfigDriftSummary({
+      dashboardConfig,
       githubConfig: githubConfigQuery.data?.config,
     })
+    if (result.status === 'invalid-config') {
+      return {
+        status: 'error',
+        source: 'config-toml',
+        error: new Error(formatGitHubConfigDecodeMessage(result.issues)),
+      }
+    }
+
+    return { status: 'success', summary: result.summary }
   }, [projectConfigQuery.data?.attributes, githubConfigQuery.data?.config])
+
+  const summary = driftResult.status === 'success' ? driftResult.summary : EMPTY_SUMMARY
+  const conversionError = driftResult.status === 'error' ? driftResult.error : undefined
 
   const activeQueries = [
     projectQuery,
@@ -77,16 +113,23 @@ export function useSelectedGitHubConfigDrift() {
   const isReady =
     shouldLoad && hasConnection && projectConfigQuery.isSuccess && githubConfigQuery.isSuccess
   const issueCount = summary.driftedFields.length
+  const queryError = activeQueries.find((query) => query.error)?.error
+  let errorSource: 'query' | 'project-config' | 'config-toml' | undefined = undefined
+  if (queryError) {
+    errorSource = 'query'
+  } else if (driftResult.status === 'error') {
+    errorSource = driftResult.source
+  }
 
   return {
     requestedGitBranch: gitBranch,
     isReady,
     isPending: activeQueries.some((query) => query.isPending),
     isFetching: activeQueries.some((query) => query.isFetching),
-    isError: activeQueries.some((query) => query.isError),
-    error: activeQueries.find((query) => query.error)?.error,
+    isError: activeQueries.some((query) => query.isError) || conversionError !== undefined,
+    error: queryError ?? conversionError,
+    errorSource,
     hasConfigurationIssues: isReady && issueCount > 0,
-    unmanagedFields: summary.unmanagedFields,
     summary,
     refetch,
   }

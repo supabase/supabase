@@ -17,7 +17,7 @@ export default function DialogDemo() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Edit profile</Button>
+        <Button>Edit profile</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" centered={false}>
         <DialogHeader>

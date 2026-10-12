@@ -98,7 +98,7 @@ export const ResponseCodeFormatter = ({ value }: { value: string }) => {
     case '1':
       return <ResponseCodeItem>{value}</ResponseCodeItem>
     case '2':
-      return <ResponseCodeItem className="bg-surface-100 text-brand">{value}</ResponseCodeItem>
+      return <ResponseCodeItem className="bg-surface-100 text-primary">{value}</ResponseCodeItem>
     // 5XX responses
     case '5':
       return <ResponseCodeItem className="bg-red-300 text-red-1100">{value}</ResponseCodeItem>

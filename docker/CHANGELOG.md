@@ -10,6 +10,41 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
+## Upcoming deprecations
+
+⚠️ The following optional Compose override files and their associated services will be removed in a future release:
+
+- `docker-compose.kong.yml` - Kong API gateway (superseded by Envoy)
+- `docker-compose.s3.yml` - S3-compatible storage via MinIO (use the RustFS override instead)
+- `docker-compose.pg15.yml` - Postgres 15 (Postgres 17 has been the default since [0.6.0](#060---2026-06-17))
+
+If you depend on any of these overrides, plan to migrate before they are removed.
+
+---
+
+## [0.8.2](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.2) - 2026-09-23
+
+### Documentation
+- Added a new how-to guide [Custom OAuth/OIDC Providers](https://supabase.com/docs/guides/self-hosting/self-hosted-custom-oauth-providers) - PR [#49971](https://github.com/supabase/supabase/pull/49971) (via [@singh-inder](https://github.com/singh-inder/))
+
+### Utils and tests
+- Fixed `setup.sh` to work for non-root Docker users - PR [#50653](https://github.com/supabase/supabase/pull/50653) (via [@oliveres](https://github.com/oliveres), [@Harsh4r0ra](https://github.com/Harsh4r0ra), and [@melcheikh](https://github.com/melcheikh))
+
+### API gateway
+- Added `/.well-known/oauth-authorization-server` route to Caddy and nginx configuration (requires `volumes/proxy/caddy/Caddyfile` and `volumes/proxy/nginx/supabase-nginx.conf.tpl` update) - PR [#50306](https://github.com/supabase/supabase/pull/50306) (via [@mandar1045](https://github.com/mandar1045))
+
+### Storage
+- Added `volumes/storage/.gitkeep` to simplify the initial setup with rootless Docker - PR [#50299](https://github.com/supabase/supabase/pull/50299) (via [@sidgaikwad](https://github.com/sidgaikwad))
+
+### Edge Runtime
+- Updated main worker to follow the `{ code, message }` format for errors (requires `volumes/functions/main/index.ts` update) - PR [#48012](https://github.com/supabase/supabase/pull/48012) (via [@7ttp](https://github.com/7ttp))
+
+### Postgres
+- ⚠️ Removed `app.settings.jwt_secret` from the database initialization - PR [#45003](https://github.com/supabase/supabase/pull/45003) (via [@rxxbyy](https://github.com/rxxbyy))
+- ⚠️ Added an additional grant for `supabase_functions_admin` on database initialization - PR [#46526](https://github.com/supabase/supabase/pull/46526) (via [@narendraio](https://github.com/narendraio))
+
+---
+
 ## [0.8.1](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.1) - 2026-09-09
 
 ### Configuration

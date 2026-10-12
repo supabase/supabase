@@ -3,7 +3,8 @@ import { Table, TableBody } from 'ui'
 
 import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
-import { BucketTableEmptyState, BucketTableHeader, BucketTableRow } from './BucketTable'
+import { BucketTableHeader, BucketTableRow } from './BucketTable'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
 import { Bucket } from '@/data/storage/buckets-query'
 
@@ -15,8 +16,16 @@ type BucketsTableProps = {
   pagination: BucketsTablePaginationProps
 }
 
+// [Joshen] To investigate: There's a lot of duplicate logic + components between
+// this FilesBuckets/BucketsTable and BucketsPickerDialog/BucketsTable. Check separately
+// if they can be cleaned up and consolidated. The latter should take precedence as it aims to
+// reduce footprint on the giant StorageExplorerState.
+
 export const BucketsTable = (props: BucketsTableProps) => {
+  // [Joshen] To investigate: Can't we just default to virtualized?
+  // Do we need to dynamically decide whether to use a virtualized or unvirtualized one?
   const isVirtualized = props.buckets.length > 50
+
   return isVirtualized ? (
     <BucketsTableVirtualized {...props} />
   ) : (
@@ -43,7 +52,11 @@ const BucketsTableUnvirtualized = ({
       <BucketTableHeader mode="standard" hasBuckets={buckets.length > 0} />
       <TableBody>
         {showSearchEmptyState ? (
-          <BucketTableEmptyState mode="standard" filterString={filterString} />
+          <TableRowNoResults
+            className="[&>td]:hover:bg-inherit"
+            colSpan={5}
+            search={filterString}
+          />
         ) : (
           buckets.map((bucket) => (
             <BucketTableRow
@@ -89,7 +102,11 @@ const BucketsTableVirtualized = ({
         paddingColSpan={5}
         emptyContent={
           showSearchEmptyState ? (
-            <BucketTableEmptyState mode="virtualized" filterString={filterString} />
+            <TableRowNoResults
+              className="[&>td]:hover:bg-inherit"
+              colSpan={5}
+              search={filterString}
+            />
           ) : undefined
         }
         trailingContent={

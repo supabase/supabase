@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Globe2, Loader2, Network } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { Button } from 'ui'
+import { Button, FloatingPlate } from 'ui'
 
 import { DiagramFlow } from './DiagramFlow'
 import { SmoothstepEdge } from './Edge'
@@ -177,11 +177,10 @@ const InstanceConfigurationUI = () => {
         {isSuccessReplicas && !isLoadingProject && (
           <>
             {infrastructureReadReplicas && (
-              <div className="z-10 absolute top-4 right-4 flex items-center justify-center gap-x-2">
+              <FloatingPlate className="z-10 absolute top-4 right-4 items-center justify-center gap-x-2">
                 {isAws && (
                   <div className="flex items-center justify-center">
                     <Button
-                      variant="default"
                       icon={<Network size={15} />}
                       className={`rounded-r-none transition ${
                         view === 'flow' ? 'opacity-100' : 'opacity-50'
@@ -189,7 +188,6 @@ const InstanceConfigurationUI = () => {
                       onClick={() => setView('flow')}
                     />
                     <Button
-                      variant="default"
                       icon={<Globe2 size={15} />}
                       className={`rounded-l-none transition ${
                         view === 'map' ? 'opacity-100' : 'opacity-50'
@@ -198,7 +196,7 @@ const InstanceConfigurationUI = () => {
                     />
                   </div>
                 )}
-              </div>
+              </FloatingPlate>
             )}
             {view === 'flow' ? (
               <DiagramFlow

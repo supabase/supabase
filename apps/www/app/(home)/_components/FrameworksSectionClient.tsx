@@ -6,6 +6,7 @@ import { useState } from 'react'
 import { cn } from 'ui'
 
 import SectionContainerWithCn from '../../../components/Layouts/SectionContainerWithCn'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 type Framework = {
   name: string
@@ -19,6 +20,27 @@ type Framework = {
 export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[] }) {
   const [activeIdx, setActiveIdx] = useState(0)
   const active = frameworks[activeIdx]
+  const docsLinkLabel = (
+    <>
+      {`Read docs for ${active.name}`}
+      <svg
+        width={12}
+        height={12}
+        viewBox="0 0 12 12"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="shrink-0"
+      >
+        <path
+          d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </>
+  )
 
   const handleTabChange = (index: number) => {
     setActiveIdx(index)
@@ -112,28 +134,21 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
                   />
                 </motion.div>
               </AnimatePresence>
-              <Link
-                href={active.docsUrl}
-                className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
-              >
-                {`Read docs for ${active.name}`}
-                <svg
-                  width={12}
-                  height={12}
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="shrink-0"
+              {isCrossZoneHref(active.docsUrl) ? (
+                <a
+                  href={active.docsUrl}
+                  className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
                 >
-                  <path
-                    d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Link>
+                  {docsLinkLabel}
+                </a>
+              ) : (
+                <Link
+                  href={active.docsUrl}
+                  className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
+                >
+                  {docsLinkLabel}
+                </Link>
+              )}
             </div>
           </div>
         </div>

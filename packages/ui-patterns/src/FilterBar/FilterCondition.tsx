@@ -9,6 +9,7 @@ import { useFilterBar } from './FilterBarContext'
 import { useDeferredBlur, useHighlightNavigation } from './hooks'
 import { buildOperatorItems, buildPropertyChangeItems, buildValueItems } from './menuItems'
 import { FilterCondition as FilterConditionType } from './types'
+import { isCustomOptionObject } from './utils'
 
 export type FilterConditionProps = {
   condition: FilterConditionType
@@ -40,8 +41,10 @@ export function FilterCondition({
     handlePropertyChange,
     handleKeyDown,
     handleRemoveCondition,
+    rootRef,
     handleSelectMenuItem,
     setActiveInput,
+    setHighlightedConditionPath,
     variant,
   } = useFilterBar()
 
@@ -59,6 +62,11 @@ export function FilterCondition({
 
   const conditionOperator = condition.operator ?? ''
   const conditionValue = (condition.value ?? '').toString()
+  const hasFormattedCustomValue = !!property?.formatValue && isCustomOptionObject(property.options)
+  const displayedValue =
+    (!isActive || hasFormattedCustomValue) && property?.formatValue
+      ? property.formatValue(condition.value)
+      : localValue
 
   // Reset "has typed" state when focus changes
   useEffect(() => {
@@ -215,7 +223,7 @@ export function FilterCondition({
     valueItems.length,
     (index) => {
       const item = valueItems[index]
-      if (!item) return
+      if (!item || item.disabled) return
       if (item.isCustom) {
         setShowValueCustom(true)
       } else {
@@ -247,9 +255,19 @@ export function FilterCondition({
     [handleInputChange, path]
   )
 
-  const onRemove = useCallback(() => {
-    handleRemoveCondition(path)
-  }, [handleRemoveCondition, path])
+  const onRemove = useCallback(
+    (event?: React.MouseEvent<HTMLButtonElement>) => {
+      handleRemoveCondition(path)
+      if (event?.detail === 0) {
+        window.setTimeout(() => {
+          rootRef.current
+            ?.querySelector<HTMLInputElement>('[data-testid="filter-bar-freeform-input"]')
+            ?.focus()
+        }, 0)
+      }
+    },
+    [handleRemoveCondition, path, rootRef]
+  )
 
   if (!property) return null
 
@@ -257,10 +275,12 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 h-[26px] bg-muted group shrink-0',
-        variant === 'pill' ? 'rounded-sm border' : 'border-r',
-        isHighlighted && 'ring-2 ring-primary'
+        'relative flex items-stretch px-0 bg-muted group shrink-0',
+        variant === 'pill' ? 'h-[26px] rounded-sm border' : 'self-stretch border-r',
+        isHighlighted &&
+          (variant === 'pill' ? 'ring-2 ring-ring' : 'rounded-sm ring-2 ring-inset ring-ring')
       )}
+      onFocusCapture={() => setHighlightedConditionPath(null)}
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
     >
@@ -274,7 +294,7 @@ export function FilterCondition({
                 onChange={(e) => setPropertySearchText(e.target.value)}
                 onBlur={handlePropertyBlur}
                 onKeyDown={handlePropertyKeyDown}
-                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs md:text-xs leading-4 hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
                 placeholder={property.label}
                 autoFocus
                 aria-label={`Change property from ${property.label}`}
@@ -286,15 +306,22 @@ export function FilterCondition({
                 data-form-type="other"
               />
             ) : null}
-            <span
-              className={cn(
-                'text-xs pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors',
-                isPropertyActive && 'invisible'
-              )}
-              onClick={() => handleLabelClick(path)}
-            >
-              {property.label}
-            </span>
+            {isPropertyActive ? (
+              <span className="invisible text-xs leading-4 pl-2 pr-1 shrink-0 whitespace-nowrap h-full flex items-center">
+                {property.label}
+              </span>
+            ) : (
+              <button
+                type="button"
+                tabIndex={0}
+                className="text-xs leading-4 pl-2 pr-1 shrink-0 whitespace-nowrap text-foreground-light h-full flex items-center cursor-pointer hover:text-foreground transition-colors"
+                aria-label={`Change property from ${property.label}`}
+                onFocus={() => handleLabelClick(path)}
+                onClick={() => handleLabelClick(path)}
+              >
+                {property.label}
+              </button>
+            )}
           </div>
         </PopoverAnchor>
         <PopoverContent
@@ -335,7 +362,7 @@ export function FilterCondition({
               className="h-full border-none bg-transparent py-0 px-1 text-center text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
-              tabIndex={-1}
+              tabIndex={0}
               autoComplete="off"
               data-1p-ignore
               data-lpignore="true"
@@ -374,21 +401,28 @@ export function FilterCondition({
             <Input
               ref={valueRef}
               type="text"
-              value={localValue}
+              value={displayedValue}
+              readOnly={hasFormattedCustomValue}
               onChange={onValueChange}
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
               onKeyDown={handleValueKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
+              className={cn(
+                'h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs hover:border-transparent focus:border-transparent focus-visible:border-transparent focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0',
+                hasFormattedCustomValue &&
+                  'focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring'
+              )}
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
-              tabIndex={-1}
+              tabIndex={0}
               autoComplete="off"
               data-1p-ignore
               data-lpignore="true"
               data-form-type="other"
             />
-            <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
+            <span className="invisible whitespace-pre text-xs block px-1">
+              {displayedValue || ' '}
+            </span>
           </div>
         </PopoverAnchor>
         <PopoverContent
@@ -421,11 +455,13 @@ export function FilterCondition({
             })
           ) : (
             <DefaultCommandList
+              showSelection
               items={valueItems}
               highlightedIndex={valHighlightedIndex}
-              onSelect={(item) =>
+              onSelect={(item) => {
+                if (item.disabled) return
                 item.isCustom ? setShowValueCustom(true) : handleSelectMenuItem(item)
-              }
+              }}
               includeIcon
             />
           )}
@@ -442,9 +478,8 @@ export function FilterCondition({
           />
         }
         onClick={onRemove}
-        className="group hover:text-foreground hover:!bg-surface-600 rounded-none px-1 h-auto py-0"
+        className="group relative !h-[18px] !w-[18px] shrink-0 self-center m-[3px] rounded-sm !p-0 hover:text-foreground hover:!bg-surface-600 focus-visible:z-20 focus-visible:!bg-transparent focus-visible:ring-2 focus-visible:ring-offset-0"
         aria-label={`Remove ${property.label} filter`}
-        tabIndex={-1}
         data-testid={`filter-remove-${property.name}`}
       />
     </div>

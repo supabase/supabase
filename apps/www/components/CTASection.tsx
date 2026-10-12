@@ -20,7 +20,7 @@ export function CTASection() {
         </h2>
         <div className="flex items-center gap-2">
           <Button variant="primary" asChild size="medium">
-            <Link
+            <a
               href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
                 sendTelemetryEvent({
@@ -30,9 +30,9 @@ export function CTASection() {
               }
             >
               Start your project
-            </Link>
+            </a>
           </Button>
-          <Button asChild size="medium" variant="default">
+          <Button asChild size="medium">
             <Link
               href="/contact/sales"
               onClick={() =>

@@ -38,7 +38,7 @@ const extractLeadingStatus = (s?: string) => {
 }
 
 export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
-  if (row.log_type === 'workers') {
+  if (row.log_type === 'compute') {
     return { status: null, method: null, pathname: null }
   }
 
@@ -58,7 +58,7 @@ export const extractLogMetadata = (row: UnifiedLogMetadataRow) => {
 }
 
 export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
-  const isWorkersLog = row.log_type === 'workers'
+  const isComputeLog = row.log_type === 'compute'
   const { status, method, pathname } = extractLogMetadata(row)
 
   const mappedRow = {
@@ -68,14 +68,14 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     pathname,
     status,
     timestamp: row.timestamp,
-    level: isWorkersLog ? null : row.level,
+    level: isComputeLog ? null : row.level,
     event_message: row.event_message ?? '',
     log_type: row.log_type,
     log_count: row.log_count ?? null,
     logs: row.logs ?? [],
-    auth_user: isWorkersLog ? null : row.auth_user || null,
+    auth_user: isComputeLog ? null : row.auth_user || null,
   }
 
-  if (isWorkersLog) return { ...mappedRow, metadata: row.metadata ?? null }
+  if (isComputeLog) return { ...mappedRow, metadata: row.metadata ?? null }
   return mappedRow
 }

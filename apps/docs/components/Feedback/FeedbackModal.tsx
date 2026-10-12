@@ -94,7 +94,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
                     href="https://supabase.com/dashboard/support/new"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand-link hover:underline"
+                    className="text-primary hover:underline"
                   >
                     support request
                   </a>
@@ -106,7 +106,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
         </Form>
         <DialogFooter>
           <div className="flex items-center justify-end gap-2">
-            <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
+            <Button type="reset" onClick={handleCancel} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button

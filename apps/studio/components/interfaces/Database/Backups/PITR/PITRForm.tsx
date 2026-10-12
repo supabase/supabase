@@ -3,7 +3,6 @@ import { HelpCircle } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Calendar, cn } from 'ui'
 
-import { type Timezone } from './PITR.types'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
@@ -15,6 +14,7 @@ import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import InformationBox from '@/components/ui/InformationBox'
+import type { Timezone } from '@/lib/constants/timezones'
 
 type Props = {
   onSubmit: (data: {
@@ -108,7 +108,6 @@ export function PITRForm({
         footer={
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
-              variant="default"
               disabled={disabled || !selectedDate || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
@@ -180,6 +179,7 @@ export function PITRForm({
                     <div className="w-[350px]">
                       <TimezoneSelection
                         selectedTimezone={selectedTimezone}
+                        date={selectedDate}
                         onSelectTimezone={setSelectedTimezone}
                       />
                     </div>

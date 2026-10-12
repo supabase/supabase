@@ -96,7 +96,7 @@ const BuildingState = () => {
                       Browse the Supabase{' '}
                       <Link
                         href={`${DOCS_URL}`}
-                        className="mb-0 text-brand transition-colors hover:text-brand-600"
+                        className="mb-0 text-primary transition-colors hover:text-primary-hover"
                         target="_blank"
                         rel="noreferrer"
                       >
@@ -124,7 +124,7 @@ const BuildingState = () => {
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Button asChild variant="default">
+                        <Button asChild>
                           <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>

@@ -39,7 +39,7 @@ export const CopyEnvButton = ({
   }, [serverOptions, values])
 
   return (
-    <Button variant="default" loading={isLoading} icon={<Copy />} onClick={onCopy}>
+    <Button loading={isLoading} icon={<Copy />} onClick={onCopy}>
       Copy all
     </Button>
   )

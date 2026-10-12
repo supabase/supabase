@@ -1,4 +1,4 @@
-import { ListTree, MessageCircle, Plus } from 'lucide-react'
+import { ListTree, Plus } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -17,8 +17,6 @@ import { BranchLink } from './BranchLink'
 import { CommandItemLink } from '@/components/ui/CommandItemLink'
 import type { Branch } from '@/data/branches/branches-query'
 import { useTrack } from '@/lib/telemetry/track'
-
-const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
 export interface BranchDropdownCommandContentProps {
   embedded: boolean
@@ -65,24 +63,6 @@ export function BranchDropdownCommandContent({
             </Link>
           </Button>
           <Button
-            variant="text"
-            size="small"
-            asChild
-            block
-            icon={<MessageCircle size={14} strokeWidth={1.5} />}
-          >
-            <a
-              target="_blank"
-              rel="noreferrer noopener"
-              href={BRANCHING_GITHUB_DISCUSSION_LINK}
-              onClick={onClose}
-              className="text-xs text-foreground-light hover:text-foreground"
-            >
-              Branching feedback
-            </a>
-          </Button>
-          <Button
-            variant="default"
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"
@@ -160,23 +140,6 @@ export function BranchDropdownCommandContent({
           >
             <ListTree size={14} strokeWidth={1.5} />
             <p>Manage branches</p>
-          </CommandItemLink>
-        </CommandGroup>
-
-        <CommandSeparator />
-
-        <CommandGroup>
-          <CommandItemLink
-            href={BRANCHING_GITHUB_DISCUSSION_LINK}
-            linkProps={{ target: '_blank', rel: 'noreferrer noopener' }}
-            className="cursor-pointer w-full gap-2"
-            onSelect={onClose}
-          >
-            <MessageCircle size={14} strokeWidth={1} className="mt-0.5" />
-            <div>
-              <p>Branching feedback</p>
-              <p className="text-lighter">Join GitHub Discussion</p>
-            </div>
           </CommandItemLink>
         </CommandGroup>
       </CommandList>

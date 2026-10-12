@@ -68,7 +68,7 @@ export const ComplianceConfig = () => {
   return (
     <PageSection id="compliance-configuration">
       <PageSectionMeta>
-        <div className="flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
+        <div className="w-full flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
           <PageSectionSummary>
             <PageSectionTitle>High Compliance Configuration</PageSectionTitle>
             <PageSectionDescription>

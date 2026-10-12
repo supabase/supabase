@@ -120,7 +120,7 @@ export function getOperationIcon(operation: string): LucideIcon {
 export function getOperationColor(operation: string): string {
   const op = operation.toLowerCase()
   if (op.includes('seq scan')) return 'text-warning'
-  if (op.includes('index')) return 'text-brand'
+  if (op.includes('index')) return 'text-primary'
   if (op.includes('join')) return 'text-foreground-light'
   if (op.includes('sort') || op.includes('aggregate')) return 'text-foreground-light'
   return 'text-foreground-light'
@@ -154,7 +154,7 @@ export function getScanBarColor(operation: string): string {
     op.includes('index only scan') ||
     op.includes('bitmap index scan')
   ) {
-    return 'bg-brand/20'
+    return 'bg-brand-default/20'
   }
 
   // Sequential scans are yellow

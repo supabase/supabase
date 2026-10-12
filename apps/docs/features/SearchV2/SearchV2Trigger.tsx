@@ -1,0 +1,89 @@
+'use client'
+
+import { Search } from 'lucide-react'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { cn, KeyboardShortcut } from 'ui'
+
+import { SearchV2Dialog } from './SearchV2Dialog'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
+
+interface SearchV2TriggerProps {
+  className?: string
+  placeholder?: ReactNode
+}
+
+export function SearchV2Trigger({ className, placeholder = 'Search...' }: SearchV2TriggerProps) {
+  const [open, setOpen] = useState(false)
+  const sendTelemetryEvent = useSendTelemetryEvent()
+
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      setOpen(next)
+      if (!next) {
+        sendTelemetryEvent({ action: 'docs_search_v2_closed' })
+      }
+    },
+    [sendTelemetryEvent]
+  )
+
+  useEffect(() => {
+    function openOnKeyDown(event: globalThis.KeyboardEvent) {
+      if (event.key === 'k' && event.metaKey) {
+        /**
+         * This two methods prevent, first search V1 dialog to open and second
+         * browser propietary search commands to be fired, repectively.
+         */
+        event.stopImmediatePropagation()
+        event.preventDefault()
+
+        setOpen(true)
+        sendTelemetryEvent({
+          action: 'docs_search_v2_opened',
+          properties: { triggerType: 'keyboard_shortcut' },
+        })
+      }
+    }
+
+    window.addEventListener('keydown', openOnKeyDown, { capture: true })
+
+    return () => {
+      window.removeEventListener('keydown', openOnKeyDown, { capture: true })
+    }
+  }, [sendTelemetryEvent])
+
+  return (
+    <>
+      <button
+        type="button"
+        tabIndex={0}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => {
+          setOpen(true)
+          sendTelemetryEvent({
+            action: 'docs_search_v2_opened',
+            properties: { triggerType: 'search_input' },
+          })
+        }}
+        className={cn(
+          'cursor-pointer',
+          'grow md:min-w-44 xl:min-w-56 h-[30px] rounded-md',
+          'pl-2 pr-1',
+          'flex items-center justify-between',
+          'border border-default bg-surface-75 text-foreground-lighter shadow-(--shadow-codeblock)',
+          'hover:border-strong hover:text-foreground-light',
+          'focus-ring',
+          'transition-colors',
+          className
+        )}
+      >
+        <div className="flex items-center gap-2">
+          <Search aria-hidden className="size-4 shrink-0" strokeWidth={2.25} />
+          <p className="flex pr-2 text-sm">{placeholder}</p>
+        </div>
+        <KeyboardShortcut keys={['Meta', 'k']} aria-hidden className="hidden md:inline-flex" />
+      </button>
+      <SearchV2Dialog open={open} onOpenChange={handleOpenChange} />
+    </>
+  )
+}

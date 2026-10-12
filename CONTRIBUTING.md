@@ -27,5 +27,9 @@ Prior to submitting your PR, please conduct the following pre-flight checks:
 
 - Run `npm run build` locally to ensure that your code builds successfully without having to wait on us to approve Vercel Preview deploys.
 - Ensure that the Prettier tests run successfully on your PR.
+- If your PR changes docs content, use the docs authoring [agent skills](https://github.com/supabase/supabase/tree/master/.agents/skills). They apply the [docs style guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) for you.
+  - `/write-the-docs` to draft a new page, or `/edit-the-docs` to revise an existing page.
+  - `/test-the-docs` to run any snippets you added.
+  - `/review-the-docs` to self-review before you open the PR.
 
 Running these before you create the PR will help reduce back and forth with the team.

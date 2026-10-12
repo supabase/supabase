@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getLogDataForMetadataVisibility } from './ServiceFlowPanel'
+import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 
 describe('getLogDataForMetadataVisibility', () => {
   const logData = {

@@ -136,7 +136,7 @@ export const CreateClerkAuthIntegrationDialog = ({
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
           <Button

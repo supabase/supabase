@@ -102,7 +102,7 @@ export const PipelineCostDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Confirm to create and start pipeline</DialogTitle>
+          <DialogTitle>Create and start pipeline</DialogTitle>
           <DialogDescription>
             Review the estimated costs before you create and start the pipeline.
           </DialogDescription>
@@ -269,7 +269,7 @@ export const PipelineCostDialog = ({
         )}
 
         <DialogFooter>
-          <Button variant="default" disabled={isConfirming} onClick={() => onOpenChange(false)}>
+          <Button disabled={isConfirming} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button

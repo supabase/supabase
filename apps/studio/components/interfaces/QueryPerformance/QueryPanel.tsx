@@ -71,13 +71,13 @@ export const QueryPanelScoreSection = ({
                 {after > before ? (
                   <ArrowUp size={14} className="text-warning" />
                 ) : (
-                  <ArrowDown size={14} className="text-brand" />
+                  <ArrowDown size={14} className="text-primary" />
                 )}
                 {before !== 0 && !isNaN(before) && isFinite(before) && (
                   <span
                     className={cn(
                       'font-mono tracking-tighter',
-                      after > before ? 'text-warning' : 'text-brand'
+                      after > before ? 'text-warning' : 'text-primary'
                     )}
                   >
                     {(((before - after) / before) * 100).toFixed(2)}%

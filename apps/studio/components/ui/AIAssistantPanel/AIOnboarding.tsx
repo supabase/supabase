@@ -60,7 +60,7 @@ export const AIOnboarding = ({
                 key={template.title}
                 type="button"
                 tabIndex={0}
-                className="rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className="rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onClick={() => {
                   onValueChange(template.initialMessage)
                   onFocusInput?.()

@@ -511,9 +511,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
           </form>
         </Form>
         <SheetFooter>
-          <Button variant="default" onClick={confirmOnClose}>
-            Cancel
-          </Button>
+          <Button onClick={confirmOnClose}>Cancel</Button>
           <Button variant="primary" type="submit" form={FORM_ID} loading={isCreating || isUpdating}>
             {isEditMode ? 'Update provider' : 'Create and enable provider'}
           </Button>

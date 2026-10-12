@@ -25,7 +25,7 @@ export const CustomDocument = ({ doc }: CustomDocumentProps) => {
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <div className="@lg:flex items-center justify-center h-full">
-            <Button asChild variant="default" iconRight={<ExternalLink />}>
+            <Button asChild iconRight={<ExternalLink />}>
               <a download href={doc.action.url} target="_blank" rel="noreferrer noopener">
                 {doc.action.text}
               </a>
