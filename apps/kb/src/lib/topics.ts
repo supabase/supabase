@@ -100,6 +100,10 @@ export const FORMAT_TOPICS: Topic[] = [
   'Tutorial',
 ]
 
+// federated collections tag with their own vocabulary, which may not match kb's topics
+export const isKnownTopic = (topic: string): topic is Topic =>
+  TOPIC_NAMES.some((name) => name === topic)
+
 export function getTopicDescription(topic: Topic): string {
   return TOPICS.find((t) => t.name === topic)!.description
 }
