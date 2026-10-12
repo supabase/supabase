@@ -63,10 +63,10 @@ export const AdvisorPanelBody = ({
   hasProjectRef = true,
   projectNameByRef,
 }: AdvisorPanelBodyProps) => {
-  // Notifications are the only items that exist without a project, so the notice replaces
-  // the list whenever the user has narrowed to categories that need one.
+  // Security includes account advice even when no project is selected.
   const needsProject =
-    categoryFilters.length > 0 && categoryFilters.every((category) => category !== 'messages')
+    categoryFilters.length > 0 &&
+    categoryFilters.every((category) => category !== 'messages' && category !== 'security')
   if (!hasProjectRef && needsProject) {
     return <NoProjectNotice />
   }
@@ -96,6 +96,7 @@ export const AdvisorPanelBody = ({
       <EmptyAdvisor
         categoryFilters={categoryFilters}
         hasFilters={hasAnyFilters}
+        hasProjectRef={hasProjectRef}
         onClearFilters={onClearFilters}
       />
     )

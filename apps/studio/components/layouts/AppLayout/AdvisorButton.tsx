@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { cn } from 'ui'
 
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { useAccountRecoveryAdvice } from '@/components/ui/AdvisorPanel/useAccountRecoveryAdvice'
 import { useAdvisorSignals } from '@/components/ui/AdvisorPanel/useAdvisorSignals'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useProjectLintsQuery } from '@/data/lint/lint-query'
@@ -17,6 +18,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
 
   const { data: lints } = useProjectLintsQuery({ projectRef })
   const { data: signalItems } = useAdvisorSignals({ projectRef })
+  const accountRecoveryAdvice = useAccountRecoveryAdvice()
 
   const { data: notificationsData } = useNotificationsV2Query(
     { filters: {}, limit: 20 },
@@ -33,8 +35,10 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const hasCriticalIssues =
     hasCriticalNotifications ||
     hasCriticalSignals ||
+    accountRecoveryAdvice?.severity === 'critical' ||
     (Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR'))
-  const hasWarningIssues = hasSignals && !hasCriticalIssues
+  const hasWarningIssues =
+    (hasSignals || accountRecoveryAdvice?.severity === 'warning') && !hasCriticalIssues
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 

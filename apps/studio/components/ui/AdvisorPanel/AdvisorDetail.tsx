@@ -1,5 +1,6 @@
 import { noop } from 'lodash'
 
+import { AdvisorAccountDetail } from './AdvisorAccountDetail'
 import type { AdvisorItem } from './AdvisorPanel.types'
 import { AdvisorSignalDetail } from './AdvisorSignalDetail'
 import { NotificationDetail } from './NotificationDetail'
@@ -33,6 +34,14 @@ export const AdvisorDetail = ({
     return (
       <div className="px-6 py-6">
         <AdvisorSignalDetail item={item} />
+      </div>
+    )
+  }
+
+  if (item.source === 'account') {
+    return (
+      <div className="px-6 py-6">
+        <AdvisorAccountDetail item={item} />
       </div>
     )
   }

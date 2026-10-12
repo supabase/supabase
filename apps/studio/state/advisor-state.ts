@@ -6,7 +6,7 @@ export const advisorSeveritySchema = z.enum(['critical', 'warning', 'info'])
 
 export type AdvisorCategory = z.infer<typeof advisorCategorySchema>
 export type AdvisorSeverity = z.infer<typeof advisorSeveritySchema>
-export type AdvisorItemSource = 'lint' | 'notification' | 'signal'
+export type AdvisorItemSource = 'lint' | 'notification' | 'signal' | 'account'
 
 const createInitialState = () => ({
   // An empty selection means every category is shown, matching the severity filter

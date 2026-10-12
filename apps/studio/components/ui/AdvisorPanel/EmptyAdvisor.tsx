@@ -29,12 +29,14 @@ interface EmptyAdvisorProps {
    * these can hide items the user would otherwise see, so we can't claim nothing was found.
    */
   hasFilters: boolean
+  hasProjectRef?: boolean
   onClearFilters: () => void
 }
 
 export const EmptyAdvisor = ({
   categoryFilters,
   hasFilters,
+  hasProjectRef = true,
   onClearFilters,
 }: EmptyAdvisorProps) => {
   const singleCategory = categoryFilters.length === 1 ? categoryFilters[0] : undefined
@@ -45,6 +47,13 @@ export const EmptyAdvisor = ({
       return {
         heading: 'No items found',
         message: 'No advisor items match your current filters',
+      }
+    }
+
+    if (singleCategory === 'security' && !hasProjectRef) {
+      return {
+        heading: 'No account security advice',
+        message: 'No account security advice is available',
       }
     }
 

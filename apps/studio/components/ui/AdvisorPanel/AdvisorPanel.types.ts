@@ -40,4 +40,14 @@ export type AdvisorSignalItem = AdvisorBaseItem & {
   sourceData: { type: 'banned-ip'; ip: string }
 }
 
-export type AdvisorItem = AdvisorLintItem | AdvisorNotificationItem | AdvisorSignalItem
+export type AdvisorAccountItem = AdvisorBaseItem & {
+  source: 'account'
+  type: 'recovery-codes-missing' | 'recovery-codes-exhausted' | 'recovery-codes-low'
+  summary: string
+}
+
+export type AdvisorItem =
+  | AdvisorLintItem
+  | AdvisorNotificationItem
+  | AdvisorSignalItem
+  | AdvisorAccountItem
