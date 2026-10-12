@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as AccountRecoveryRouteImport } from './routes/account-recovery'
 import { Route as AuthorizeRouteImport } from './routes/authorize'
 import { Route as AwsMarketplaceOnboardingRouteImport } from './routes/aws-marketplace-onboarding'
 import { Route as ClaimProjectRouteImport } from './routes/claim-project'
@@ -345,6 +346,11 @@ const AppRoute = AppRouteImport.update({
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRecoveryRoute = AccountRecoveryRouteImport.update({
+  id: '/account-recovery',
+  path: '/account-recovery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthorizeRoute = AuthorizeRouteImport.update({
@@ -2147,6 +2153,7 @@ const ApiV1ProjectsRefConfigAuthSigningKeysLegacyRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account-recovery': typeof AccountRecoveryRoute
   '/authorize': typeof AuthorizeRoute
   '/aws-marketplace-onboarding': typeof AwsMarketplaceOnboardingRoute
   '/claim-project': typeof ClaimProjectRoute
@@ -2471,6 +2478,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account-recovery': typeof AccountRecoveryRoute
   '/authorize': typeof AuthorizeRoute
   '/aws-marketplace-onboarding': typeof AwsMarketplaceOnboardingRoute
   '/claim-project': typeof ClaimProjectRoute
@@ -2783,6 +2791,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/account-recovery': typeof AccountRecoveryRoute
   '/authorize': typeof AuthorizeRoute
   '/aws-marketplace-onboarding': typeof AwsMarketplaceOnboardingRoute
   '/claim-project': typeof ClaimProjectRoute
@@ -3109,6 +3118,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account-recovery'
     | '/authorize'
     | '/aws-marketplace-onboarding'
     | '/claim-project'
@@ -3433,6 +3443,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account-recovery'
     | '/authorize'
     | '/aws-marketplace-onboarding'
     | '/claim-project'
@@ -3744,6 +3755,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/_auth'
+    | '/account-recovery'
     | '/authorize'
     | '/aws-marketplace-onboarding'
     | '/claim-project'
@@ -4071,6 +4083,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  AccountRecoveryRoute: typeof AccountRecoveryRoute
   AuthorizeRoute: typeof AuthorizeRoute
   AwsMarketplaceOnboardingRoute: typeof AwsMarketplaceOnboardingRoute
   ClaimProjectRoute: typeof ClaimProjectRoute
@@ -4215,6 +4228,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-recovery': {
+      id: '/account-recovery'
+      path: '/account-recovery'
+      fullPath: '/account-recovery'
+      preLoaderRoute: typeof AccountRecoveryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/authorize': {
@@ -7205,6 +7225,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  AccountRecoveryRoute: AccountRecoveryRoute,
   AuthorizeRoute: AuthorizeRoute,
   AwsMarketplaceOnboardingRoute: AwsMarketplaceOnboardingRoute,
   ClaimProjectRoute: ClaimProjectRoute,
