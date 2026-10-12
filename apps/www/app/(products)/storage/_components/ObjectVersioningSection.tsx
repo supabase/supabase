@@ -1,8 +1,9 @@
 import { FeatureItem, type Feature } from '~/components/FeatureItem'
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { Archive, FileStack, RotateCcw } from 'lucide-react'
+import { Archive, ArrowUpRight, FileStack, RotateCcw } from 'lucide-react'
 import { MarketingForm } from 'marketing/forms'
-import { Badge } from 'ui'
+import Link from 'next/link'
+import { Badge, Button } from 'ui'
 
 import { BroomSparklesIcon } from './BroomSparklesIcon'
 import { getGoPageBySlug } from '@/lib/go'
@@ -12,23 +13,21 @@ const FORM_ID = 'form'
 
 const highlights: Feature[] = [
   {
-    // The same icon Studio puts on a versioned bucket.
     icon: FileStack,
     heading: 'Version history',
-    subheading: 'Every overwrite keeps the copy it replaced.',
+    subheading: 'Every upsert keeps the copy it replaced.',
   },
   {
     icon: Archive,
     heading: 'Archive instead of delete',
-    subheading: 'A deleted file leaves the listing but stays recoverable.',
+    subheading: 'A soft-deleted file stays recoverable.',
   },
   {
     icon: RotateCcw,
     heading: 'Restore',
-    subheading: 'Put back an archived file, or roll a live one back to an earlier version.',
+    subheading: 'Recover an archived file or an earlier version.',
   },
   {
-    // The same icon Studio puts on a bucket's lifecycle policy.
     icon: BroomSparklesIcon,
     heading: 'Lifecycle policies',
     subheading: 'Expire old versions by age, or keep a set number per file.',
@@ -51,21 +50,29 @@ export function ObjectVersioningSection() {
   return (
     <SectionContainerWithCn>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col items-start gap-4">
           <div>
             <Badge variant="warning">Private Alpha</Badge>
           </div>
           <h3 className="text-2xl md:text-4xl text-foreground-lighter">
-            Storage
+            Recover any file with
             <br />
             <span className="text-foreground">Object versioning</span>
           </h3>
           <p className="text-foreground-light">
-            Turn on versioning for a bucket and Storage keeps the previous copy every time a file
-            changes. Deleting a file archives it instead of destroying it. Restore any version when
-            you need it, and set lifecycle policies to expire the rest.
+            With versioning enabled on a bucket, Storage keeps previous versions of an object when
+            it's overwritten or deleted, so you can restore any of them when you need to.
+          </p>
+          <p className="text-foreground-light">
+            Lifecycle policies control how many versions are kept and for how long, so storage costs
+            stay predictable.
           </p>
           <p className="text-foreground-lighter text-sm">{form.description}</p>
+          <Button size="small" iconRight={<ArrowUpRight />} asChild>
+            <Link href="#" target="_blank">
+              Documentation
+            </Link>
+          </Button>
         </div>
         <MarketingForm
           fields={form.fields}

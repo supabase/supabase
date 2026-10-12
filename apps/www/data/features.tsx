@@ -1923,22 +1923,30 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
   },
   {
     title: 'Object versioning and lifecycle policies',
-    subtitle: 'Recover objects after an accidental overwrite or delete.',
+    subtitle: 'Recover deleted and overwritten files in Supabase Storage.',
     description: `
-Writing to a path that already holds an object replaces it, and the bytes that were there are gone. Turn on object versioning for a bucket and Storage keeps the version it replaced instead. Deleting an object archives it rather than removing it, so you can put it back.
+By default, overwriting or deleting an object in Supabase Storage removes the previous data permanently. With object versioning enabled on a bucket, Storage keeps the previous version on every overwrite and soft-deletes objects instead of removing them, so you can recover from accidental deletes, bad uploads, and faulty scripts.
 
 ## Key features
-1. Per-bucket opt-in: Turn versioning on for the buckets that need it. Every other bucket keeps working as it does today.
-2. Version IDs: Each retained version gets its own ID, so you can list, download, or restore any one of them.
-3. Archive on delete: A deleted object leaves the bucket listing and stays recoverable until you remove it for good.
-4. Lifecycle policies: Expire noncurrent versions after a set number of days, or keep up to 100 of the most recent ones.
-5. Suspend without losing history: Suspending versioning stops new versions. The ones you already have stay where they are.
-6. Dashboard and API: Browse, restore, and delete versions from the file preview panel, supabase-js, or the Storage API.
+1. Per-bucket opt-in: Enable versioning only on the buckets that need it. Other buckets are unaffected.
+2. Version history: Every overwrite creates a new version with a unique version ID. List, download, or restore any version.
+3. Soft delete: Deleted objects are hidden from listings but stay recoverable until permanently deleted.
+4. Restore: Recover a deleted object, or roll a file back to an earlier version.
+5. Lifecycle policies: Expire noncurrent versions after a set number of days, or keep up to the 100 most recent per object.
+6. Suspend versioning: Stop creating new versions without losing existing ones.
+7. Dashboard and API: Manage versions from the file preview panel, supabase-js, or the Storage API.
+
+## Common use cases
+- Recover files deleted by mistake from the dashboard or by application code
+- Roll back an object replaced by an upsert or a bad upload
+- Undo bulk changes made by a faulty script or scheduled job
+- Keep a change history for user-uploaded documents and assets
 
 ## Good to know
-- Versioning applies from the moment you turn it on. Objects already in the bucket have no history behind them.
-- Retained versions count toward your bucket size and your storage usage. Lifecycle policies are how you keep that in check.
-- Egress is unaffected. Keeping a version costs nothing in bandwidth, only retrieving one does.
+- Existing reads and listings return the current version, so no client changes are required.
+- Versioning applies to changes made after it's enabled. Objects already in the bucket have no prior history.
+- Retained versions count toward storage usage and are billed as regular storage. Use lifecycle policies to control cost.
+- Retaining versions adds no egress. Only downloading a version does.
 `,
     icon: FileStack,
     products: [PRODUCT_SHORTNAMES.STORAGE],
