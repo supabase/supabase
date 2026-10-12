@@ -32,7 +32,7 @@ Your application can keep reading and writing data during initial sync. Copying 
 
 <Admonition type="caution" title="Schedule schema changes after initial sync">
 
-Wait until affected tables are **Live** before changing their structure, publication settings, or shared objects such as enum types. Schedule table truncations after initial sync too. A migration or truncation waiting for a copy can also make application queries wait.
+Wait until affected tables are **Live** before changing their structure, published columns, or shared objects such as enum types. Schedule table truncations after initial sync too. A migration or truncation waiting for a copy can also make application queries wait.
 
 </Admonition>
 
@@ -139,7 +139,7 @@ Use the three-dot actions menu on a pipeline row:
 - **Start pipeline**: Begin replication for a stopped pipeline
 - **Update available**: Review and apply the latest managed pipeline version when an update is available
 - **Stop pipeline**: Finish in-flight work and stop. Shutdown can take several minutes. WAL accumulates and pipeline-hour billing continues while stopped.
-- **Restart pipeline**: Restart with the saved settings and replication progress. Before restarting during initial sync, review the [Pipeline restarts and recovery](#pipeline-restarts-and-recovery) section.
+- **Restart pipeline**: Restart with the saved settings and replication progress. Use this after adding or removing publication tables. Before restarting during initial sync, review the [Pipeline restarts and recovery](#pipeline-restarts-and-recovery) section.
 - **Edit pipeline**: Modify settings like credentials, initial sync selection, or advanced options. Click **Apply and restart pipeline** for an active pipeline or **Apply and start pipeline** for a stopped pipeline.
 - **Delete pipeline**: Delete the pipeline and stop replication. Already replicated data remains at the destination.
 
@@ -151,13 +151,13 @@ View publications and their tables in [**Database > Publications**](/dashboard/p
 
 <Admonition type="note">
 
-`FOR TABLES IN SCHEMA` includes new tables automatically. Pipelines discovers them when it starts. To exclude an implicitly included table, change the publication scope or use an explicit table list; `ALTER PUBLICATION ... DROP TABLE` cannot exclude it.
+`FOR TABLES IN SCHEMA` includes new tables automatically. Restart the pipeline to discover them, or start it if it is stopped. To exclude an implicitly included table, change the publication scope or use an explicit table list; `ALTER PUBLICATION ... DROP TABLE` cannot exclude it.
 
 </Admonition>
 
 These examples use the `pub_users_orders` publication from the [SQL example](#publication-for-specific-tables). Replace it and the table names with your own; tables must already exist.
 
-Stop every pipeline using the publication and wait until each is **Stopped** before changing its membership. Unfinished initial syncs might [restart from scratch](#pipeline-restarts-and-recovery).
+After updating the publication, restart each running pipeline that uses it, or start it if it is stopped. Unfinished initial syncs might [restart from scratch](#pipeline-restarts-and-recovery).
 
 #### Adding tables to replication
 
@@ -168,7 +168,7 @@ Stop every pipeline using the publication and wait until each is **Stopped** bef
    add table products, categories;
    ```
 
-2. Review the [initial sync selection](#choosing-which-tables-to-copy) for the added tables, then start each pipeline using the publication.
+2. Review the [initial sync selection](#choosing-which-tables-to-copy) for the added tables. From the pipeline's three-dot actions menu, select **Restart pipeline** if it is running, or **Start pipeline** if it is stopped.
 
 #### Removing tables from replication
 
@@ -179,11 +179,11 @@ Stop every pipeline using the publication and wait until each is **Stopped** bef
    drop table orders, products;
    ```
 
-2. Start each pipeline using the publication.
+2. From the pipeline's three-dot actions menu, select **Restart pipeline** if it is running, or **Start pipeline** if it is stopped.
 
-After startup, Pipelines removes its replication state for those tables. Source tables and destination tables, including data already replicated, remain unchanged. Pipelines using other publications that still include the tables are unaffected.
+When the pipeline starts or restarts, it removes its replication state for those tables. Source tables and destination tables, including data already replicated, remain unchanged. Pipelines using other publications that still include the tables are unaffected.
 
-You can delete the destination tables yourself after startup removes their replication state. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
+You can delete the destination tables yourself after the pipeline applies the removal. **Don't modify or delete tables still managed by Pipelines**; doing so can stop replication and require a [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables).
 
 ### Pipeline restarts and recovery
 
@@ -226,7 +226,7 @@ create publication pub_application_schemas
 for tables in schema public, analytics;
 ```
 
-Both schemas must already exist. This includes their existing and future tables without including the internal `etl` schema. Stop affected pipelines before adding tables in these schemas. Start them again to discover the new tables. See [Postgres schema publications](https://www.postgresql.org/docs/15/sql-createpublication.html) for syntax and requirements.
+Both schemas must already exist. This includes their existing and future tables without including the internal `etl` schema. After adding tables in these schemas, select **Restart pipeline** to discover them, or **Start pipeline** if the pipeline is stopped. See [Postgres schema publications](https://www.postgresql.org/docs/15/sql-createpublication.html) for syntax and requirements.
 
 ### Publication for all tables
 
@@ -331,7 +331,7 @@ A [table restart](/docs/guides/database/replication/pipelines-monitoring#restart
 
 ### Other publication changes
 
-Only column-list changes on already tracked tables are supported while the pipeline runs. Stop affected pipelines before changing membership, row filters, published operations, or partition publication mode, then start them again.
+Publication changes take effect in different ways. For table membership changes, follow [Adding or removing tables](#adding-or-removing-tables). For other changes, use the guidance in this table:
 
 | Change                                                                 | When it takes effect                                                                                                                                    |
 | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -354,7 +354,7 @@ Use these rules when changing replicated tables or objects they depend on:
 | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Application reads, inserts, updates, and deletes                                                   | Continue during initial sync and ongoing replication.                                                                                                                                                  |
 | Supported column changes, including which columns are published                                    | Wait until affected tables are **Live**, then run one migration at a time. Avoid overlapping table and publication changes.                                                                            |
-| Add or remove tables from a publication                                                            | Follow the stop, change, and start steps in the [Adding or removing tables](#adding-or-removing-tables) section.                                                                                       |
+| Add or remove tables from a publication                                                            | Update the publication, then restart the pipeline or start it if stopped. See [Adding or removing tables](#adding-or-removing-tables).                                                                 |
 | Change row filters, published operations, or partition structure                                   | Stop affected pipelines first. Follow the [Other publication changes](#other-publication-changes) or [Partitioned tables](#partitioned-tables) section.                                                |
 | Change column types, enum values, or shared types, functions, or schemas used by replicated tables | Plan maintenance with affected pipelines stopped. Check destination support and plan to [rebuild affected tables](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) as needed. |
 | Change primary keys or replica identity                                                            | Plan maintenance with affected pipelines stopped. Check the destination's key requirements and whether affected tables need rebuilding.                                                                |

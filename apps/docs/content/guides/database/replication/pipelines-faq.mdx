@@ -93,7 +93,7 @@ Required WAL is gone, so replication cannot continue from that slot. Follow [slo
 
 ## What happens if a table is deleted at the destination?
 
-Deleting or modifying managed objects can stop replication and require a new initial sync. To remove a destination table, first follow the [steps to remove the table from replication](/docs/guides/database/replication/pipelines#removing-tables-from-replication). Delete the destination table after the pipeline starts again and stops tracking it.
+Deleting or modifying managed objects can stop replication and require a new initial sync. To remove a destination table, first follow the [steps to remove the table from replication](/docs/guides/database/replication/pipelines#removing-tables-from-replication). Delete the destination table only after the pipeline has applied the removal.
 
 ## What happens when a project becomes inactive or moves to the Free Plan?
 
