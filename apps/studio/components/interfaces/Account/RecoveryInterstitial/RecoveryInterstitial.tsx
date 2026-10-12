@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useUser } from 'common'
 import { ArrowRight } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -9,21 +9,19 @@ import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
 import { AuthenticatorTask } from './AuthenticatorTask'
-import { recoveryInterstitialKeys } from './keys'
 import { PreviewRecoveryCodesFlow } from './PreviewRecoveryCodesFlow'
 import {
-  evaluateRecoveryGap,
   getMockRecoveryGap,
+  getRecoveryGap,
   getRecoveryReturnTo,
   type RecoveryGap,
 } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
-import { getMfaListFactors } from '@/data/profile/mfa-list-factors-query'
-import { getProfileIdentities } from '@/data/profile/profile-identities-query'
-import { getRecoveryCodesStatus } from '@/data/recovery-codes/recovery-codes-status-query'
+import { profileKeys } from '@/data/profile/keys'
+import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { IS_PLATFORM } from '@/lib/constants'
 
 export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
@@ -49,54 +47,21 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const queryClient = useQueryClient()
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const canReadAccount = IS_PLATFORM && !!user?.id && !!isEnabled && hasSecuritySettings
-  const identities = useQuery({
-    queryKey: recoveryInterstitialKeys.identities(user?.id),
-    queryFn: getProfileIdentities,
-    enabled: canReadAccount,
-    staleTime: 0,
+  const { findings, isPending, isError } = useAccountRecovery({
+    enabled: isEnabled && hasSecuritySettings,
   })
-  const factors = useQuery({
-    queryKey: recoveryInterstitialKeys.factors(user?.id),
-    queryFn: getMfaListFactors,
-    enabled: canReadAccount,
-    staleTime: 0,
-  })
-  const codes = useQuery({
-    queryKey: recoveryInterstitialKeys.codes(user?.id),
-    queryFn: getRecoveryCodesStatus,
-    enabled: canReadAccount,
-    staleTime: 0,
-  })
-  const isReady =
-    identities.isSuccess &&
-    factors.isSuccess &&
-    codes.isSuccess &&
-    (codes.data.status === 'unenrolled' || codes.data.data !== null)
-  const gap = evaluateRecoveryGap({
-    isEnabled: canReadAccount,
-    isReady,
-    isManaged:
-      identities.data?.identities.some((identity) => identity.provider.startsWith('sso')) ?? false,
-    verifiedFactorCount:
-      factors.data?.all.filter(
-        (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
-      ).length ?? 0,
-    remainingCodes: codes.data?.data?.remaining ?? null,
-  })
-
-  const isLoading = canReadAccount && (identities.isPending || factors.isPending || codes.isPending)
+  const gap = isError ? null : getRecoveryGap(findings)
   return (
     <RecoveryReminder
       key={user?.id}
       gap={gap}
       destination={destination}
-      isLoading={isLoading}
+      isLoading={isPending}
       onCodesComplete={() => {
-        queryClient.invalidateQueries({ queryKey: recoveryInterstitialKeys.codes(user?.id) })
+        queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
       }}
       onFactorComplete={() => {
-        queryClient.invalidateQueries({ queryKey: recoveryInterstitialKeys.factors(user?.id) })
+        queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors(user?.id) })
       }}
     />
   )

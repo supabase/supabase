@@ -1,35 +1,46 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  evaluateRecoveryGap,
   getMockRecoveryGap,
+  getRecoveryGap,
   getRecoveryReturnTo,
 } from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial.utils'
 
-const eligible = {
-  isEnabled: true,
-  isReady: true,
-  isManaged: false,
-  verifiedFactorCount: 1,
-  remainingCodes: null,
-}
-
-describe('account recovery eligibility', () => {
-  it('prioritizes missing and exhausted recovery codes', () => {
-    expect(evaluateRecoveryGap(eligible)).toBe('missing')
-    expect(evaluateRecoveryGap({ ...eligible, remainingCodes: 0 })).toBe('exhausted')
+describe('account recovery reminder selection', () => {
+  it('selects missing and exhausted recovery codes', () => {
+    expect(
+      getRecoveryGap([
+        { id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' },
+      ])
+    ).toBe('missing')
+    expect(
+      getRecoveryGap([
+        { id: 'recovery-codes-exhausted', severity: 'critical', action: 'regenerate-codes' },
+      ])
+    ).toBe('exhausted')
   })
-  it.each([1, 2, 10])('does not interrupt with %i usable codes', (remainingCodes) => {
-    expect(evaluateRecoveryGap({ ...eligible, remainingCodes })).toBeNull()
+  it('prioritizes exhausted codes if both findings are present', () => {
+    expect(
+      getRecoveryGap([
+        { id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' },
+        { id: 'recovery-codes-exhausted', severity: 'critical', action: 'regenerate-codes' },
+      ])
+    ).toBe('exhausted')
   })
-  it.each([
-    { isEnabled: false },
-    { isReady: false },
-    { isManaged: true },
-    { verifiedFactorCount: 0 },
-    { verifiedFactorCount: 2 },
-  ])('suppresses ineligible state %j', (state) => {
-    expect(evaluateRecoveryGap({ ...eligible, ...state })).toBeNull()
+  it('does not interrupt for other recovery findings', () => {
+    expect(getRecoveryGap([])).toBeNull()
+    expect(
+      getRecoveryGap([
+        {
+          id: 'recovery-codes-low',
+          severity: 'warning',
+          action: 'regenerate-codes',
+          remainingCodes: 2,
+        },
+        { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
+        { id: 'single-oauth-identity', severity: 'warning', action: 'set-password' },
+      ])
+    ).toBeNull()
   })
 })
 

@@ -1,21 +1,10 @@
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
+
 export type RecoveryGap = 'missing' | 'exhausted'
 
-export function evaluateRecoveryGap({
-  isEnabled,
-  isReady,
-  isManaged,
-  verifiedFactorCount,
-  remainingCodes,
-}: {
-  isEnabled: boolean
-  isReady: boolean
-  isManaged: boolean
-  verifiedFactorCount: number
-  remainingCodes: number | null
-}): RecoveryGap | null {
-  if (!isEnabled || !isReady || isManaged || verifiedFactorCount !== 1) return null
-  if (remainingCodes === null) return 'missing'
-  if (remainingCodes === 0) return 'exhausted'
+export function getRecoveryGap(findings: AccountRecoveryFinding[]): RecoveryGap | null {
+  if (findings.some((finding) => finding.id === 'recovery-codes-exhausted')) return 'exhausted'
+  if (findings.some((finding) => finding.id === 'recovery-codes-missing')) return 'missing'
   return null
 }
 
