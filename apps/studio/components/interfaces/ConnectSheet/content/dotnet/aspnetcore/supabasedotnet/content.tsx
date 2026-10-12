@@ -45,6 +45,7 @@ var app = builder.Build();
 // minimal API endpoint here, or a @inject in a Blazor component.
 app.MapGet("/todos", async (Supabase.Client supabase) =>
 {
+    await supabase.InitializeAsync();
     var response = await supabase.From<Todo>().Get();
     return response.Models;
 });

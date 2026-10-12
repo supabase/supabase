@@ -62,8 +62,7 @@ using UnityEngine;
 
 public class TodoList : MonoBehaviour
 {
-    // Lifecycle hooks can't be awaited, so start the async work from a Task
-    // method rather than an "async void" Start, which would swallow exceptions.
+    // Start() can't be awaited, so kick off the async work from a Task method.
     private void Start()
     {
         _ = LoadTodosAsync();
@@ -103,7 +102,15 @@ public class Todo : BaseModel
     },
   ]
 
-  return <MultipleCodeBlock files={files} />
+    return (
+        <div className="flex flex-col gap-y-4">
+          <p className="text-sm text-foreground-light">
+            Before running the sample, attach <code>SupabaseManager</code> to an active GameObject and
+            attach <code>TodoList</code> to an active GameObject in the scene.
+          </p>
+          <MultipleCodeBlock files={files} />
+        </div>
+    )
 }
 
 // Used as a dynamic import
