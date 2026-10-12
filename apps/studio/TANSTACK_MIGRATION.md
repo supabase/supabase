@@ -630,3 +630,5 @@ for the Vite pipeline:
 - Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
 - Remove the "TanStack Start migration" section from `apps/studio/AGENTS.md` — it only applies while both runtimes coexist.
 - Delete this file.
+
+- [x] `/account-recovery` -> `routes/account-recovery.tsx` (Path A, account recovery interstitial spike)
