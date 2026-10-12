@@ -1,4 +1,4 @@
-import { MoreVerticalIcon } from 'lucide-react'
+import { Lock, MoreVertical, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -16,14 +17,20 @@ import {
 } from 'ui'
 
 import { OAuthAppsMemberGrantsDialogContent } from './OAuthAppsMemberGrantsDialogContent'
+import { OAuthAppsRevokeDialogContent } from './OAuthAppsRevokeDialogContent'
 import type { OAuthApprovalItem, OAuthApprovalTarget } from '@/data/oauth-apps/types'
 
 export interface OAuthAppsAuthorizedRowProps {
   approval: OAuthApprovalItem
   className?: string
+  canRevoke: boolean
 }
 
-export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthorizedRowProps) => {
+export const OAuthAppsAuthorizedRow = ({
+  approval,
+  className,
+  canRevoke,
+}: OAuthAppsAuthorizedRowProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [dialogContent, setDialogContent] = useState<'grants' | 'revoke' | null>(null)
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
@@ -67,35 +74,54 @@ export const OAuthAppsAuthorizedRow = ({ approval, className }: OAuthAppsAuthori
                 <DropdownMenuTrigger asChild>
                   <Button
                     ref={menuTriggerRef}
-                    icon={<MoreVerticalIcon />}
+                    icon={<MoreVertical />}
                     className="px-1"
                     aria-label="Manage app"
                     aria-describedby={undefined}
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent>Manage app</TooltipContent>
+              <TooltipContent side="bottom">Manage app</TooltipContent>
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-40">
               <DialogTrigger asChild>
-                <DropdownMenuItem onClick={() => setDialogContent('grants')}>
+                <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('grants')}>
+                  <Lock size={14} />
                   View grants
                 </DropdownMenuItem>
               </DialogTrigger>
+              <DropdownMenuSeparator />
+              {canRevoke && (
+                <DialogTrigger asChild>
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setDialogContent('revoke')}>
+                    <X size={14} />
+                    Revoke grants
+                  </DropdownMenuItem>
+                </DialogTrigger>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
           {dialogContent === 'grants' && (
             <OAuthAppsMemberGrantsDialogContent
               approval={approval}
-              onCloseAutoFocus={(event) => {
-                event.preventDefault()
-              }}
+              onCloseAutoFocus={preventDefault}
+            />
+          )}
+          {dialogContent === 'revoke' && (
+            <OAuthAppsRevokeDialogContent
+              approval={approval}
+              onClose={() => setDialogContent(null)}
+              onCloseAutoFocus={preventDefault}
             />
           )}
         </Dialog>
       </TableCell>
     </TableRow>
   )
+}
+
+const preventDefault = (event: Event) => {
+  event.preventDefault()
 }
 
 const getGrantTargetLabel = (target: OAuthApprovalTarget) => {
