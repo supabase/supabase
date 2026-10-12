@@ -85,6 +85,42 @@ const VERSIONS = [
   },
 ]
 
+/**
+ * Ferhat's A/B/C case: B was written while suspended so it carries no version id and the
+ * listing drops it, but A stays behind it as a restorable noncurrent version.
+ */
+const NONCURRENT_UNDER_UNVERSIONED_CURRENT = [
+  {
+    id: 'f1',
+    name: 'photo.png',
+    version: null,
+    created_at: '2024-02-01T00:00:00Z',
+    updated_at: '2024-02-01T00:00:00Z',
+    last_accessed_at: null,
+    archived_at: null,
+    is_delete_marker: false,
+    metadata: { size: 12, mimetype: 'image/png' },
+  },
+  {
+    id: 'f1',
+    name: 'photo.png',
+    version: 'v-a',
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
+    last_accessed_at: null,
+    archived_at: '2024-02-01T00:00:00Z',
+    is_delete_marker: false,
+    metadata: { size: 10, mimetype: 'image/png' },
+  },
+]
+
+const mockVersionListing = (objects: unknown[]) =>
+  addAPIMock({
+    method: 'post',
+    path: '/platform/storage/:ref/buckets/:id/objects/list',
+    response: () => Response.json(objects),
+  })
+
 const renderPane = (file: Partial<StorageItem> = {}) => {
   selectedFilePreview.current = { ...FILE, ...file }
   return render(<PreviewPane />)
@@ -95,11 +131,7 @@ describe('PreviewPane', () => {
     versioningEnabled.current = true
     selectedBucket.current = { id: 'my-bucket', name: 'my-bucket', public: false }
 
-    addAPIMock({
-      method: 'post',
-      path: '/platform/storage/:ref/buckets/:id/objects/list',
-      response: () => Response.json(VERSIONS),
-    })
+    mockVersionListing(VERSIONS)
     addAPIMock({
       method: 'post',
       path: '/platform/storage/:ref/buckets/:id/objects/sign',
@@ -131,11 +163,53 @@ describe('PreviewPane', () => {
     expect(screen.queryByRole('button', { name: 'More delete options' })).not.toBeInTheDocument()
   })
 
-  it('keeps the Versions section on a suspended bucket, since it can still hold versions', async () => {
-    selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-    renderPane({ is_versioned: true })
+  describe('version history visibility', () => {
+    it('shows it for a versioned file on a suspended bucket', async () => {
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+      renderPane({ is_versioned: true })
 
-    expect(await screen.findByText('Versions')).toBeInTheDocument()
-    expect(await screen.findByText('Versioning is suspended on this bucket')).toBeInTheDocument()
+      expect(await screen.findByText('Versions')).toBeInTheDocument()
+      expect(
+        await screen.findByText(/retains the current version one last time/)
+      ).toBeInTheDocument()
+    })
+
+    it('hides it for a file written while versioning was suspended', async () => {
+      // The listing drops unversioned rows, so a file with no history comes back empty.
+      mockVersionListing([])
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+      renderPane({ is_versioned: false })
+
+      expect(await screen.findByRole('button', { name: 'Delete file' })).toBeInTheDocument()
+      expect(screen.queryByText('Versions')).not.toBeInTheDocument()
+    })
+
+    it('still shows it when a retained version sits under an unversioned current', async () => {
+      // Hiding here would strand a version the user can still restore.
+      mockVersionListing(NONCURRENT_UNDER_UNVERSIONED_CURRENT)
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+      renderPane({ is_versioned: false })
+
+      expect(await screen.findByText('Versions')).toBeInTheDocument()
+      expect(await screen.findByText(/overwrites it in place/)).toBeInTheDocument()
+    })
+
+    it('hides it on a disabled bucket', async () => {
+      mockVersionListing([])
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'DISABLED' }
+      renderPane({ is_versioned: false })
+
+      expect(await screen.findByRole('button', { name: 'Delete file' })).toBeInTheDocument()
+      expect(screen.queryByText('Versions')).not.toBeInTheDocument()
+    })
+
+    it('shows it for every file on an enabled bucket, even one written before versioning', async () => {
+      mockVersionListing([])
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+      renderPane({ is_versioned: false })
+
+      // The next write will version it, so the history has to be on offer.
+      expect(await screen.findByText('Versions')).toBeInTheDocument()
+    })
   })
 })

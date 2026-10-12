@@ -119,21 +119,45 @@ describe('VersionHistory', () => {
         await screen.findByText(/Overwriting this file will retain a recoverable copy/)
       ).toBeInTheDocument()
     })
+  })
 
-    it('says the file is replaced in place when no write will retain a version', async () => {
-      mockEmptyListing()
-      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: false })
+  describe('suspended notice', () => {
+    it('promises one last retained version for a file that predates the suspension', async () => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json(VERSIONS),
+      })
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: true })
 
-      expect(await screen.findByText(/replaces it in place/)).toBeInTheDocument()
-      expect(screen.queryByText(/retain a recoverable copy/)).not.toBeInTheDocument()
+      expect(
+        await screen.findByText(/retains the current version one last time/)
+      ).toBeInTheDocument()
     })
 
-    it('points at the bucket settings when versioning is off', async () => {
-      mockEmptyListing()
-      renderHistory({ versioningState: 'disabled', willRetainVersionOnWrite: false })
+    it('says the file is overwritten in place once the one-shot retention is spent', async () => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json(VERSIONS),
+      })
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: false })
 
-      expect(await screen.findByText(/Versioning is off for this bucket/)).toBeInTheDocument()
-      expect(screen.queryByText(/replaces it in place/)).not.toBeInTheDocument()
+      // The versions already listed are still restorable, so the notice has to say so.
+      expect(await screen.findByText(/overwrites it in place/)).toBeInTheDocument()
+      expect(screen.getByText(/stay retained/)).toBeInTheDocument()
+    })
+
+    it('stays out of the way on an enabled bucket', async () => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json(VERSIONS),
+      })
+      renderHistory({ versioningState: 'enabled' })
+
+      await screen.findByRole('button', { name: /Actions for version/ })
+      expect(screen.queryByText(/Versioning is suspended/)).not.toBeInTheDocument()
     })
   })
 })

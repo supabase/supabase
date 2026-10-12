@@ -244,38 +244,27 @@ export const VersionHistory = ({
         />
       )}
 
-      {versioningState === 'suspended' && (
+      {versioningState === 'suspended' && willRetainVersionOnWrite && (
         <Admonition
           type="default"
           title="Versioning is suspended on this bucket"
-          description="New noncurrent versions are no longer created. Everything already retained here stays as it is until you delete it or a lifecycle policy expires it."
+          description="Replacing this file retains the current version one last time. Anything uploaded after that overwrites it in place."
         />
       )}
 
-      {isSuccess && versions.length === 0 && versioningState === 'disabled' && (
-        <p className="text-sm text-foreground-light">
-          Versioning is off for this bucket, so previous versions aren&apos;t retained. Turn it on
-          in the bucket settings to start keeping them.
-        </p>
+      {versioningState === 'suspended' && !willRetainVersionOnWrite && (
+        <Admonition
+          type="default"
+          title="Versioning is suspended on this bucket"
+          description="Replacing this file overwrites it in place. The versions below stay retained until you delete them or a lifecycle policy expires them."
+        />
       )}
 
-      {isSuccess &&
-        versions.length === 0 &&
-        versioningState !== 'disabled' &&
-        willRetainVersionOnWrite && (
-          <p className="text-sm text-foreground-light">
-            No previous versions yet. Overwriting this file will retain a recoverable copy here.
-          </p>
-        )}
-
-      {isSuccess &&
-        versions.length === 0 &&
-        versioningState !== 'disabled' &&
-        !willRetainVersionOnWrite && (
-          <p className="text-sm text-foreground-light">
-            No previous versions retained. Overwriting this file replaces it in place.
-          </p>
-        )}
+      {isSuccess && versions.length === 0 && (
+        <p className="text-sm text-foreground-light">
+          No previous versions yet. Overwriting this file will retain a recoverable copy here.
+        </p>
+      )}
 
       {isSuccess && versions.length > 0 && (
         <ol className="flex flex-col gap-y-0.5">

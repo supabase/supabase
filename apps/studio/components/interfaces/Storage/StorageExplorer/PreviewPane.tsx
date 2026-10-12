@@ -317,6 +317,10 @@ export const PreviewPane = () => {
   const willRetainVersion =
     isStorageVersioningEnabled &&
     willRetainVersionOnWrite({ versioningState, isObjectVersioned: file.is_versioned })
+
+  const hasRetainedVersions = (versions?.length ?? 0) > 0
+  const showVersionHistory = hasVersions && (willRetainVersion || hasRetainedVersions)
+
   const isComparing = previewedVersion !== undefined && !previewedVersion.isCurrent
 
   const handleRestore = () => {
@@ -407,7 +411,7 @@ export const PreviewPane = () => {
         <div className="space-y-3 px-4 pt-3">
           <FileDetails createdAt={createdAt} updatedAt={updatedAt} />
 
-          {isStorageVersioningEnabled && (
+          {showVersionHistory && (
             <PreviewSection title="Versions" count={versions?.length} defaultOpen>
               <VersionHistory
                 projectRef={projectRef}
