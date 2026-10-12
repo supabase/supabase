@@ -41,7 +41,7 @@
     "jotai": "^2.8.0",
     "lucide-react": "*",
     "monaco-editor": "catalog:",
-    "motion": "^11.18.2",
+    "motion": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
     "openai": "^5.9.0",

@@ -63,6 +63,9 @@ catalogs:
     cn:
       specifier: ^0.4.0
       version: 0.4.0
+    motion:
+      specifier: ^11.18.2
+      version: 11.18.2
     next:
       specifier: ^16.3.6
       version: 16.3.6
@@ -492,7 +495,7 @@ importers:
         specifier: ^1.0.0
         version: 1.0.1
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: ^15.5.24
@@ -833,7 +836,7 @@ importers:
         specifier: '*'
         version: 0.511.0(react@19.2.6)
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
@@ -1252,7 +1255,7 @@ importers:
         specifier: 0.52.2
         version: 0.52.2
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
@@ -1598,7 +1601,7 @@ importers:
         specifier: 0.52.2
         version: 0.52.2
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
@@ -1935,7 +1938,7 @@ importers:
         specifier: ^1.0.1
         version: 1.0.1
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: ^15.5.24
@@ -2743,7 +2746,7 @@ importers:
         specifier: ^0.436.0
         version: 0.436.0(react@19.2.6)
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       prop-types:
         specifier: ^15.7.2
@@ -2906,7 +2909,7 @@ importers:
         specifier: 0.52.2
         version: 0.52.2
       motion:
-        specifier: ^11.18.2
+        specifier: 'catalog:'
         version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'

@@ -25,7 +25,7 @@
     "input-otp": "^1.4.2",
     "lodash": "catalog:",
     "lucide-react": "^0.436.0",
-    "motion": "^11.18.2",
+    "motion": "catalog:",
     "prop-types": "^15.7.2",
     "radix-ui": "catalog:",
     "react": "catalog:",

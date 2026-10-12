@@ -21,7 +21,7 @@
     "common": "workspace:*",
     "jotai": "^2.8.0",
     "lucide-react": "*",
-    "motion": "^11.18.2",
+    "motion": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
     "react": "catalog:",

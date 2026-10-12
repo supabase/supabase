@@ -130,7 +130,7 @@
     "markdown-table": "^3.0.3",
     "mime-db": "^1.53.0",
     "monaco-editor": "catalog:",
-    "motion": "^11.18.2",
+    "motion": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",
     "nuqs": "2.7.1",
