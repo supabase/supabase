@@ -22,13 +22,19 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 		{description && <meta name="description" content={description} />}
 		<script is:inline>
 			// Set data-theme on <html> before first paint, so the page doesn't flash
-			// the wrong theme while this loads. Defaults to dark (no system-preference
-			// check — the toggle in components/ThemeToggle.tsx is light/dark only).
+			// the wrong theme while this loads. Defaults to dark, and "system" follows the
+			// OS preference, including changes mid-session (choices come from components/ThemeToggle.tsx).
 			;(function () {
-				try {
-					var stored = localStorage.getItem('theme')
-					document.documentElement.setAttribute('data-theme', stored === 'light' ? 'light' : 'dark')
-				} catch (_) {}
+				var systemDark = window.matchMedia('(prefers-color-scheme: dark)')
+				var applyTheme = function () {
+					try {
+						var stored = localStorage.getItem('theme')
+						var theme = stored === 'system' ? (systemDark.matches ? 'dark' : 'light') : stored === 'light' ? 'light' : 'dark'
+						document.documentElement.setAttribute('data-theme', theme)
+					} catch (_) {}
+				}
+				applyTheme()
+				systemDark.addEventListener('change', applyTheme)
 			})()
 		</script>
 		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
