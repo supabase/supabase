@@ -14,12 +14,23 @@ export async function getStaticPaths() {
 
 const { guide } = Astro.props
 const { title, description, topics, github_url, date } = guide.data
-const { Content } = await render(guide)
+const { Content, headings } = await render(guide)
+const toc = headings
+	.filter((heading) => heading.depth === 2 || heading.depth === 3)
+	.map((heading) => ({ title: heading.text, url: `#${heading.slug}`, depth: heading.depth }))
 
 // guide.filePath is relative to the kb app root, e.g. "src/content/guides/foo.mdx"
 const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${guide.filePath}`
 ---
 
-<ArticleLayout title={title} description={description} topics={topics} github_url={github_url} viewGitHubLink={viewGitHubLink} date={date}>
+<ArticleLayout
+	title={title}
+	description={description}
+	topics={topics}
+	github_url={github_url}
+	viewGitHubLink={viewGitHubLink}
+	date={date}
+	toc={toc}
+>
 	<Content components={{ Admonition }} />
 </ArticleLayout>

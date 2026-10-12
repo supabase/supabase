@@ -1,9 +1,11 @@
 ---
 import { ExternalLink } from 'lucide-react'
-import { Badge, GithubIcon } from 'ui'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
+import type { TOCItemType } from 'ui-patterns/Toc/types'
 
+import { GuideSidebar } from '../components/GuideSidebar'
 import Layout from './Layout.astro'
-import { getTopicDescription, type Topic, TOPIC_NAMES, topicToSlug } from '../lib/topics'
+import { getTopicDescription, isKnownTopic, topicToSlug } from '../lib/topics'
 
 interface Props {
 	title: string
@@ -15,61 +17,85 @@ interface Props {
 	github_url?: string
 	viewGitHubLink?: string
 	date?: string
+	toc?: TOCItemType[]
 }
 
-const { title, description, topics = [], github_url, viewGitHubLink, date } = Astro.props
-
-function isKnownTopic(topic: string): topic is Topic {
-	return (TOPIC_NAMES as readonly string[]).includes(topic)
-}
+const { title, description, topics = [], github_url, viewGitHubLink, date, toc = [] } = Astro.props
+const pagePath = Astro.url.pathname.replace(/\/$/, '')
 ---
 
 <Layout title={title} description={description}>
-	<article class="prose max-w-3xl mx-auto px-6 py-16">
-		<h1>{title}</h1>
-		{date && <p class="text-sm pb-4">{date}</p>}
-		{description && <p class="lead">{description}</p>}
-		{
-			topics.length > 0 && (
-				<div class="flex flex-wrap gap-2">
-					{topics.map((topic) =>
-						isKnownTopic(topic) ? (
-							<a
-								href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
-								title={getTopicDescription(topic)}
-							>
-								<Badge>{topic}</Badge>
-							</a>
-						) : (
-							<Badge>{topic}</Badge>
+	<div class="section-container lg:flex lg:gap-12">
+		<article class="prose prose-img:rounded-lg mx-auto max-w-3xl min-w-0 flex-1 py-16 lg:ml-(--nav-inset)">
+			<Breadcrumb className="not-prose mb-6">
+				<BreadcrumbList>
+					<BreadcrumbItem>
+						<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
+					</BreadcrumbItem>
+					{
+						topics.length > 0 && (
+							<>
+								<BreadcrumbSeparator />
+								{/* a guide can sit in several topics, so they share one level instead of nesting */}
+								<BreadcrumbItem>
+									{topics.map((topic, index) => (
+										<span>
+											{isKnownTopic(topic) ? (
+												<BreadcrumbLink
+													href={`${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`}
+													title={getTopicDescription(topic)}
+												>
+													{topic}
+												</BreadcrumbLink>
+											) : (
+												topic
+											)}
+											{index < topics.length - 1 && ','}
+										</span>
+									))}
+								</BreadcrumbItem>
+							</>
 						)
-					)}
-				</div>
-			)
-		}
-		<slot />
-		{
-			github_url && (
-				<p>
-					<a href={github_url} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5">
-						<GithubIcon size={16} /> Go to the GitHub discussion
-					</a>
-				</p>
-			)
-		}
-		{
-			viewGitHubLink && (
-				<footer class="mt-16 not-prose">
-					<a
-						href={viewGitHubLink}
-						target="_blank"
-						rel="noreferrer noopener edit"
-						class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
-					>
-						View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
-					</a>
-				</footer>
-			)
-		}
-	</article>
+					}
+				</BreadcrumbList>
+			</Breadcrumb>
+			<header class="mb-8">
+				<h1 class="mt-0 mb-0 text-balance">{title}</h1>
+				{date && <p class="not-prose mt-3 text-sm text-foreground-lighter">{date}</p>}
+				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
+			</header>
+			<slot />
+			{
+				github_url && (
+					<p>
+						<a href={github_url} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5">
+							<GithubIcon size={16} /> Go to the GitHub discussion
+						</a>
+					</p>
+				)
+			}
+			{
+				viewGitHubLink && (
+					<footer class="mt-16 not-prose">
+						<a
+							href={viewGitHubLink}
+							target="_blank"
+							rel="noreferrer noopener edit"
+							class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
+						>
+							View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+						</a>
+					</footer>
+				)
+			}
+		</article>
+		<aside class="sticky top-(--header-height) hidden max-h-[calc(100vh-var(--header-height))] w-60 shrink-0 self-start overflow-y-auto py-16 xl:block">
+			<GuideSidebar
+				client:load
+				items={toc}
+				pageUrl={new URL(pagePath, Astro.site).href}
+				markdownUrl={`${pagePath}.md`}
+			/>
+		</aside>
+	</div>
 </Layout>
