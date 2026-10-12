@@ -102,15 +102,15 @@ public class Todo : BaseModel
     },
   ]
 
-    return (
-        <div className="flex flex-col gap-y-4">
-          <p className="text-sm text-foreground-light">
-            Before running the sample, attach <code>SupabaseManager</code> to an active GameObject and
-            attach <code>TodoList</code> to an active GameObject in the scene.
-          </p>
-          <MultipleCodeBlock files={files} />
-        </div>
-    )
+  return (
+    <div className="flex flex-col gap-y-4">
+      <p className="text-sm text-foreground-light">
+        Before running the sample, attach <code>SupabaseManager</code> to an active GameObject and
+        attach <code>TodoList</code> to an active GameObject in the scene.
+      </p>
+      <MultipleCodeBlock files={files} />
+    </div>
+  )
 }
 
 // Used as a dynamic import
