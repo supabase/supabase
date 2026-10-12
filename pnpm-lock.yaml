@@ -875,8 +875,8 @@ importers:
         specifier: ^7.1.0
         version: 7.1.0
       rehype-pretty-code:
-        specifier: ^0.9.0
-        version: 0.9.11(shiki@1.6.0)
+        specifier: 'catalog:'
+        version: 0.14.5(shiki@4.5.0)
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
@@ -902,9 +902,6 @@ importers:
         specifier: 'catalog:'
         version: 0.4.0(supports-color@8.1.1)
     devDependencies:
-      '@shikijs/compat':
-        specifier: ^1.1.7
-        version: 1.6.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.14
@@ -921,8 +918,8 @@ importers:
         specifier: ^4.1.5
         version: 4.1.5
       shiki:
-        specifier: ^1.1.7
-        version: 1.6.0
+        specifier: 'catalog:'
+        version: 4.5.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
@@ -1658,8 +1655,8 @@ importers:
         specifier: ^7.1.0
         version: 7.1.0
       rehype-pretty-code:
-        specifier: ^0.9.0
-        version: 0.9.11(shiki@1.6.0)
+        specifier: 'catalog:'
+        version: 0.14.5(shiki@4.5.0)
       rehype-slug:
         specifier: ^6.0.0
         version: 6.0.0
@@ -1709,9 +1706,6 @@ importers:
       '@react-router/fs-routes':
         specifier: ^7.18.4
         version: 7.18.4(@react-router/dev@7.18.4(@react-router/serve@7.18.4(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(supports-color@8.1.1)(typescript@6.0.2))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.7.0)(lightningcss@1.33.0)(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(sass@1.77.4)(supports-color@8.1.1)(terser@5.48.0)(tsx@4.22.4)(typescript@6.0.2)(vite@8.2.1(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(yaml@2.9.0))(typescript@6.0.2)
-      '@shikijs/compat':
-        specifier: ^1.1.7
-        version: 1.6.0
       '@supabase/ssr':
         specifier: 'catalog:'
         version: 0.12.7(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))
@@ -1794,8 +1788,8 @@ importers:
         specifier: ^4.0.0
         version: 4.21.0(babel-plugin-macros@3.1.0)(supports-color@8.1.1)(typescript@6.0.2)
       shiki:
-        specifier: ^1.1.7
-        version: 1.6.0
+        specifier: 'catalog:'
+        version: 4.5.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
@@ -8049,12 +8043,6 @@ packages:
       eslint:
         optional: true
 
-  '@shikijs/compat@1.6.0':
-    resolution: {integrity: sha512-aiyhzBiQnUx2y327pYUneOFznNzGhE74pawWzzxpR8XhtBvia4G6HS72vCqFxfSN1fsKWr+59tMUn8ckbuATbg==}
-
-  '@shikijs/core@1.6.0':
-    resolution: {integrity: sha512-NIEAi5U5R7BLkbW1pG/ZKu3eb1lzc3/+jD0lFsuxMT7zjaf9bbNwdNyMr7zh/Zl8EXQtQ+MYBAt5G+JLu+5DlA==}
-
   '@shikijs/core@3.13.0':
     resolution: {integrity: sha512-3P8rGsg2Eh2qIHekwuQjzWhKI4jV97PhvYjYUzGqjvJfqdQPz+nMlfWahU24GZAyW1FxFI1sYjyhfh5CoLmIUA==}
 
@@ -8093,9 +8081,6 @@ packages:
   '@shikijs/themes@4.5.0':
     resolution: {integrity: sha512-zGb87H3UBbpuI4yoh5UguB1XbU+2BDU3kflM7UfZ+Cy2hWo9lBtqjSVK20gmLY6ukYl040hAypGXMgud9vul8Q==}
     engines: {node: '>=20'}
-
-  '@shikijs/transformers@1.6.0':
-    resolution: {integrity: sha512-qGfHe1ECiqfE2STPWvfogIj/9Q0SK+MCRJdoITkW7AmFuB7DmbFnBT2US84+zklJOB51MzNO8RUXZiauWssJlQ==}
 
   '@shikijs/types@3.13.0':
     resolution: {integrity: sha512-oM9P+NCFri/mmQ8LoFGVfVyemm5Hi27330zuOBp0annwJdKH1kOLndw3zCtAVDehPLg9fKqoEx3Ht/wNZxolfw==}
@@ -12933,10 +12918,6 @@ packages:
   has-unicode@2.0.1:
     resolution: {integrity: sha512-8Rf9Y83NBReMnx0gFzA8JImQACstCYWUplepDa9xprwwtmgEZUF0h/i5xSA625zB/I37EtrswSST6OXxwaaIJQ==}
 
-  hash-obj@4.0.0:
-    resolution: {integrity: sha512-FwO1BUVWkyHasWDW4S8o0ssQXjvyghLV2rfVhnN36b2bbcj45eGiuzdn9XOvOpjV3TKQD7Gm2BWNXdE9V4KKYg==}
-    engines: {node: '>=12'}
-
   hasown@2.0.2:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
@@ -16572,12 +16553,6 @@ packages:
     peerDependencies:
       shiki: ^1.0.0 || ^2.0.0 || ^3.0.0 || ^4.0.0
 
-  rehype-pretty-code@0.9.11:
-    resolution: {integrity: sha512-Eq90eCYXQJISktfRZ8PPtwc5SUyH6fJcxS8XOMnHPUQZBtC6RYo67gGlley9X2nR8vlniPj0/7oCDEYHKQa/oA==}
-    engines: {node: '>=16'}
-    peerDependencies:
-      shiki: '*'
-
   rehype-raw@7.0.0:
     resolution: {integrity: sha512-/aE8hCfKlQeA8LmyeyQvQF3eBiLRGNlfBJEvWH7ivp9sBqs7TNqBL5X3v157rM4IFETqDnIOO+z5M/biZbo9Ww==}
 
@@ -17092,9 +17067,6 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  shiki@1.6.0:
-    resolution: {integrity: sha512-P31ROeXcVgW/k3Z+vUUErcxoTah7ZRaimctOpzGuqAntqnnSmx1HOsvnbAB8Z2qfXPRhw61yptAzCsuKOhTHwQ==}
-
   shiki@3.13.0:
     resolution: {integrity: sha512-aZW4l8Og16CokuCLf8CF8kq+KK2yOygapU5m3+hoGw0Mdosc6fPitjM+ujYarppj5ZIKGyPDPP1vqmQhr+5/0g==}
 
@@ -17220,10 +17192,6 @@ packages:
     peerDependencies:
       react: ^18.0.0
       react-dom: ^18.0.0
-
-  sort-keys@5.0.0:
-    resolution: {integrity: sha512-Pdz01AvCAottHTPQGzndktFNdbRA75BgOfeT1hH+AMnJFv8lynkPi42rfeEhpx1saTEI3YNMWxfqu0sFD1G8pw==}
-    engines: {node: '>=12'}
 
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
@@ -17832,10 +17800,6 @@ packages:
   type-fest@0.7.1:
     resolution: {integrity: sha512-Ne2YiiGN8bmrmJJEuTWTLJR32nh/JdL1+PSicowtNb0WFpn59GK8/lfD61bVtzguz7b3PBt74nxpv/Pw5po5Rg==}
     engines: {node: '>=8'}
-
-  type-fest@1.4.0:
-    resolution: {integrity: sha512-yGSza74xk0UG8k+pLh5oeoYirvIiWo5t0/o3zHHAO2tRDiZcxWP7fywNlXhqb6/r6sWvwi+RsyQMWhVLe4BVuA==}
-    engines: {node: '>=10'}
 
   type-fest@4.30.0:
     resolution: {integrity: sha512-G6zXWS1dLj6eagy6sVhOMQiLtJdxQBHIA9Z6HFUNLOlr6MFOgzV8wvmidtPONfPtEUv0uZsy77XJNzTAfwPDaA==}
@@ -24971,14 +24935,6 @@ snapshots:
       eslint: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
       oxc-parser: 0.148.0
 
-  '@shikijs/compat@1.6.0':
-    dependencies:
-      '@shikijs/core': 1.6.0
-      '@shikijs/transformers': 1.6.0
-      shiki: 1.6.0
-
-  '@shikijs/core@1.6.0': {}
-
   '@shikijs/core@3.13.0':
     dependencies:
       '@shikijs/types': 3.13.0
@@ -25037,10 +24993,6 @@ snapshots:
   '@shikijs/themes@4.5.0':
     dependencies:
       '@shikijs/types': 4.5.0
-
-  '@shikijs/transformers@1.6.0':
-    dependencies:
-      shiki: 1.6.0
 
   '@shikijs/types@3.13.0':
     dependencies:
@@ -30917,12 +30869,6 @@ snapshots:
 
   has-unicode@2.0.1: {}
 
-  hash-obj@4.0.0:
-    dependencies:
-      is-obj: 3.0.0
-      sort-keys: 5.0.0
-      type-fest: 1.4.0
-
   hasown@2.0.2:
     dependencies:
       function-bind: 1.1.2
@@ -35702,13 +35648,6 @@ snapshots:
       unified: 11.0.5
       unist-util-visit: 5.1.0
 
-  rehype-pretty-code@0.9.11(shiki@1.6.0):
-    dependencies:
-      '@types/hast': 2.3.6
-      hash-obj: 4.0.0
-      parse-numeric-range: 1.3.0
-      shiki: 1.6.0
-
   rehype-raw@7.0.0:
     dependencies:
       '@types/hast': 3.0.5
@@ -36515,10 +36454,6 @@ snapshots:
       interpret: 1.4.0
       rechoir: 0.6.2
 
-  shiki@1.6.0:
-    dependencies:
-      '@shikijs/core': 1.6.0
-
   shiki@3.13.0:
     dependencies:
       '@shikijs/core': 3.13.0
@@ -36684,10 +36619,6 @@ snapshots:
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
-
-  sort-keys@5.0.0:
-    dependencies:
-      is-plain-obj: 4.1.0
 
   source-map-js@1.2.2: {}
 
@@ -37301,8 +37232,6 @@ snapshots:
   type-fest@0.21.3: {}
 
   type-fest@0.7.1: {}
-
-  type-fest@1.4.0: {}
 
   type-fest@4.30.0: {}
 
