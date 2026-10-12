@@ -24,9 +24,13 @@ If you do not have VisuaLeaf, you can download the free Community Edition from t
     <StepHikeCompact.Details title="Add your connection details">
       In your Supabase project dashboard, click [**Connect**](/dashboard/project/_?showConnect=true). Select **Session pooler**, choose **URI**, and copy the connection string.
 
-      Replace `[YOUR-PASSWORD]` with the database password you created for your Supabase project. If you forgot it, you can reset it in the [Database Settings](/dashboard/project/_/database/settings).
+      Replace `[YOUR-PASSWORD]` with the database password you created for your Supabase project. If you forgot it, you can reset it in the [Database Settings](/dashboard/project/_/database/settings). If the password contains reserved URI characters such as `@`, `:`, `/`, `?` or `#`, percent-encode them (for example, `@` becomes `%40`) so the connection string is parsed correctly.
 
-      In VisuaLeaf, paste the connection string into **Paste Connection URL**, then click **Auto-Fill**. Click **Test Connection**, and save the connection after the test succeeds.
+      In VisuaLeaf, paste the connection string into **Paste Connection URL**, then click **Auto-Fill**.
+
+      To make sure the connection is always encrypted, expand **Advanced driver properties** and set `sslmode` to `require`. Without it, the PostgreSQL driver uses `prefer`, which can fall back to an unencrypted connection.
+
+      Click **Test Connection**, and save the connection after the test succeeds.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
