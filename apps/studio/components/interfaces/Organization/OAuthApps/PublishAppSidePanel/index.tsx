@@ -271,7 +271,7 @@ export const PublishAppSidePanel = ({
             <Shortcut
               id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
               onTrigger={() => form.handleSubmit(onSubmit)()}
-              options={{ enabled: visible && !isSubmitting }}
+              options={{ enabled: visible && !isSubmitting && !isAuthorizationPendingConfirmation }}
               side="top"
             >
               <Button
