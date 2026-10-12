@@ -1,6 +1,5 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { parseAsString, useQueryState } from 'nuqs'
 import type { PropsWithChildren } from 'react'
 import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { cn } from 'ui'
@@ -8,7 +7,6 @@ import { cn } from 'ui'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
-import { getRecoveryReturnTo } from '@/components/interfaces/Account/RecoveryInterstitial/RecoveryInterstitial.utils'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -23,7 +21,6 @@ export interface AccountLayoutProps {
 
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
-  const [recoveryReturnTo] = useQueryState('recoveryReturnTo', parseAsString)
   const appSnap = useAppStateSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
@@ -35,7 +32,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
 
-  const defaultBackToDashboardURL =
+  const backToDashboardURL =
     appSnap.lastRouteBeforeVisitingAccountPage.length > 0
       ? appSnap.lastRouteBeforeVisitingAccountPage
       : IS_PLATFORM && !!lastVisitedOrganization
@@ -43,10 +40,6 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
         : IS_PLATFORM
           ? '/organizations'
           : '/project/default'
-
-  const backToDashboardURL = recoveryReturnTo
-    ? getRecoveryReturnTo(recoveryReturnTo)
-    : defaultBackToDashboardURL
 
   const pageTitle = buildStudioPageTitle({
     section: title,
