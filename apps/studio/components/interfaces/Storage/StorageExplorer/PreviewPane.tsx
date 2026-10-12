@@ -16,7 +16,12 @@ import {
 import { fromLifecycleRules } from '../FilesBuckets/BucketVersioningFields/BucketVersioningFields.lifecycle'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { getBucketVersioningState } from '../StorageVersioning.constants'
+import {
+  getBucketVersioningState,
+  hasVersioningHistory,
+  isVersioningActive,
+  willRetainVersionOnWrite,
+} from '../StorageVersioning.constants'
 import { FilePreview } from './FilePreview'
 import { pickFile } from './pickFile'
 import { PreviewSection } from './PreviewSection'
@@ -60,15 +65,13 @@ const FileDetails = ({ createdAt, updatedAt }: FileDetailsProps) => (
 
 interface CurrentFilePreviewProps {
   file: StorageItem
-  /** Full path within the bucket, which is what the URL endpoints address. */
   path: string
   mimeType?: string
   size: string | null
   isPublicBucket: boolean
-  isVersionedBucket: boolean
-  /** Sits beside Download. Omitted when replacing a file isn't on offer. */
+  hasVersions: boolean
+  canArchive: boolean
   replacementAction?: ReactNode
-  /** Pins the preview to the current version, so a new one busts the cached URL. */
   currentVersionId?: string
   hasCurrentVersion: boolean
   canUpdateFiles: boolean
@@ -85,7 +88,8 @@ const CurrentFilePreview = ({
   mimeType,
   size,
   isPublicBucket,
-  isVersionedBucket,
+  hasVersions,
+  canArchive,
   replacementAction,
   currentVersionId,
   hasCurrentVersion,
@@ -114,15 +118,15 @@ const CurrentFilePreview = ({
         {/* No `title`: the explorer rows use it as their handle, and a second
             element carrying the same one makes `getByTitle` ambiguous. */}
         <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
           {mimeType}
           {size && <>, {size}</>}
-          {isVersionedBucket && hasCurrentVersion && (
+          {hasVersions && hasCurrentVersion && (
             <Badge variant="success" className="-my-1">
               Current
             </Badge>
           )}
-        </p>
+        </div>
         {file.isCorrupted && (
           <div className="mt-1 flex items-center gap-x-1.5">
             <AlertCircle size={12} className="shrink-0 text-foreground-light" />
@@ -183,7 +187,7 @@ const CurrentFilePreview = ({
         )}
 
         {/* A delete in a versioned bucket is a soft delete/archive, unless specified explicitly */}
-        {canUpdateFiles && isVersionedBucket && (
+        {canUpdateFiles && canArchive && (
           <div className="flex">
             <Button
               variant="outline"
@@ -222,7 +226,7 @@ const CurrentFilePreview = ({
           </div>
         )}
 
-        {canUpdateFiles && !isVersionedBucket && (
+        {canUpdateFiles && !canArchive && (
           <ButtonTooltip
             variant="outline"
             size="tiny"
@@ -307,7 +311,19 @@ export const PreviewPane = () => {
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
   const currentVersion = versions?.find((version) => version.isCurrent)
-  const isVersionedBucket = isStorageVersioningEnabled && versioningState !== 'disabled'
+  const hasVersions = isStorageVersioningEnabled && hasVersioningHistory(selectedBucket)
+  const isActivelyVersioning = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
+  // The label names the action being taken, not the retention behind it: a suspended bucket
+  // reads "Replace file" even for a file that still has one retained version coming.
+  const replaceLabel = isActivelyVersioning ? 'Upload new version' : 'Replace file'
+  // A suspended bucket only retains a copy when this particular file predates the suspension.
+  const willRetainVersion =
+    isStorageVersioningEnabled &&
+    willRetainVersionOnWrite({ versioningState, isObjectVersioned: file.is_versioned })
+
+  const hasRetainedVersions = (versions?.length ?? 0) > 0
+  const showVersionHistory = hasVersions && (willRetainVersion || hasRetainedVersions)
+
   const isComparing = previewedVersion !== undefined && !previewedVersion.isCurrent
 
   const handleRestore = () => {
@@ -325,7 +341,6 @@ export const PreviewPane = () => {
     if (newFile !== undefined) await replaceFile({ file: newFile, item: file })
   }
 
-  // The compare widget replaces the top of the panel, so scroll up to show it.
   const handlePreviewVersion = (version: ObjectVersion) => {
     setPreviewedVersion(version)
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -367,7 +382,8 @@ export const PreviewPane = () => {
             mimeType={mimeType}
             size={size}
             isPublicBucket={!!selectedBucket?.public}
-            isVersionedBucket={isVersionedBucket}
+            hasVersions={hasVersions}
+            canArchive={isActivelyVersioning}
             replacementAction={
               canUpdateFiles && isStorageVersioningEnabled ? (
                 <ButtonTooltip
@@ -375,12 +391,8 @@ export const PreviewPane = () => {
                   className="px-2"
                   icon={<Upload size={14} />}
                   onClick={onReplaceFile}
-                  tooltip={{
-                    content: {
-                      side: 'top',
-                      text: isVersionedBucket ? 'Upload new version' : 'Replace file',
-                    },
-                  }}
+                  aria-label={replaceLabel}
+                  tooltip={{ content: { side: 'top', text: replaceLabel } }}
                 />
               ) : undefined
             }
@@ -398,7 +410,7 @@ export const PreviewPane = () => {
         <div className="space-y-3 px-4 pt-3">
           <FileDetails createdAt={createdAt} updatedAt={updatedAt} />
 
-          {isStorageVersioningEnabled && (
+          {showVersionHistory && (
             <PreviewSection title="Versions" count={versions?.length} defaultOpen>
               <VersionHistory
                 projectRef={projectRef}
@@ -406,6 +418,7 @@ export const PreviewPane = () => {
                 objectName={file.name}
                 path={filePath ?? file.name}
                 versioningState={versioningState}
+                willRetainVersionOnWrite={willRetainVersion}
                 lifecyclePolicy={lifecyclePolicy}
                 expirationMode={storedPolicy.expirationMode}
                 mimeType={mimeType}
