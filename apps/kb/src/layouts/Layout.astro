@@ -37,6 +37,14 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 				systemDark.addEventListener('change', applyTheme)
 			})()
 		</script>
+		<script is:inline>
+			;(function () {
+				var hero = new URLSearchParams(window.location.search).get('hero')
+				if (hero === 'warp') {
+					document.documentElement.setAttribute('data-hero-kind', 'warp')
+				}
+			})()
+		</script>
 		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
 		<link rel="manifest" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${faviconRoute}/manifest.json`} />
 		<meta name="generator" content={Astro.generator} />
