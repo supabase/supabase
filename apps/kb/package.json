@@ -18,7 +18,9 @@
     "@astrojs/markdown-remark": "7.2.4",
     "@astrojs/mdx": "^7.0.7",
     "@astrojs/react": "^6.0.4",
+    "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.2.6",
+    "common": "workspace:*",
     "lucide-react": "*",
     "react": "catalog:",
     "react-dom": "catalog:",
@@ -34,6 +36,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.2.4",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "config": "workspace:*",

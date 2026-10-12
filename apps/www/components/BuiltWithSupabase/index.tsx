@@ -17,7 +17,7 @@ const BuiltWithSupabase = () => {
           </p>
           <div className="flex justify-center gap-2 py-4">
             <Button asChild size="small" className="h-full">
-              <Link href="/docs/guides/examples">View all examples</Link>
+              <a href="/docs/guides/examples">View all examples</a>
             </Button>
             <Button
               asChild

@@ -6,12 +6,14 @@ import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
 } from './ProjectCreation.constants'
+import type { AvailableRegions } from './ProjectCreation.utils'
 import {
   filterHighAvailabilityRegions,
   getAvailableRegions,
+  getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
+  getRegionSelectionType,
   resolveDefaultDbRegion,
-  resolveSelectedRegionOptionType,
 } from './ProjectCreation.utils'
 
 describe('resolveDefaultDbRegion', () => {
@@ -70,55 +72,6 @@ describe('resolveDefaultDbRegion', () => {
   })
 })
 
-describe('resolveSelectedRegionOptionType', () => {
-  const smartGroupRegions = [{ name: 'Americas' }, { name: 'APAC' }]
-  const specificRegions = [{ name: 'ap-southeast-1' }, { name: 'us-east-1' }]
-
-  it('returns general when the "Best available region" shortcut was used', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: true,
-        dbRegion: 'ap-southeast-1',
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBe('general')
-  })
-
-  it('returns general when the region was picked from the smart group list', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: false,
-        dbRegion: 'Americas',
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBe('general')
-  })
-
-  it('returns specific when the region was picked from the specific regions list', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: false,
-        dbRegion: 'ap-southeast-1',
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBe('specific')
-  })
-
-  it('returns undefined when the region matches neither list', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: false,
-        dbRegion: undefined,
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBeUndefined()
-  })
-})
-
 describe('getAvailableRegions', () => {
   it.each(['local', 'staging', 'prod'])('returns all AWS regions for AWS on %s', (environment) => {
     expect(getAvailableRegions('AWS', environment)).toEqual(AWS_REGIONS)
@@ -164,4 +117,84 @@ describe('High Availability project creation constraints', () => {
       expect(filterHighAvailabilityRegions(regions, false, environment)).toEqual(regions)
     }
   )
+})
+
+describe('getFreeTierGeneralRegionExperimentVariant', () => {
+  const base = {
+    isFreePlan: true,
+    smartRegionEnabled: true,
+    enrollmentFlag: true,
+    selectionFlag: true,
+  }
+
+  it('returns test when in the experiment and the selection flag is on', () => {
+    expect(getFreeTierGeneralRegionExperimentVariant(base)).toBe('test')
+  })
+
+  it('returns control when in the experiment and the selection flag is off', () => {
+    expect(getFreeTierGeneralRegionExperimentVariant({ ...base, selectionFlag: false })).toBe(
+      'control'
+    )
+  })
+
+  it('returns undefined for a paid plan', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, isFreePlan: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when smart regions are disabled (AWS_NIMBUS)', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, smartRegionEnabled: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when the enrollment flag is off', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when the enrollment flag is off even if the selection flag is on', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({
+        ...base,
+        enrollmentFlag: false,
+        selectionFlag: true,
+      })
+    ).toBeUndefined()
+  })
+})
+
+describe('getRegionSelectionType', () => {
+  const availableRegions: AvailableRegions = {
+    smartGroup: [{ code: 'americas', name: 'Americas', type: 'smartGroup' }],
+    specific: [
+      { code: 'us-east-1', name: 'East US (North Virginia)', provider: 'AWS', type: 'specific' },
+    ],
+  }
+
+  it('classifies a smart group region as general', () => {
+    expect(getRegionSelectionType({ dbRegion: 'Americas', availableRegions })).toBe('general')
+  })
+
+  it('classifies a specific region as specific', () => {
+    expect(getRegionSelectionType({ dbRegion: 'East US (North Virginia)', availableRegions })).toBe(
+      'specific'
+    )
+  })
+
+  it('returns undefined when the region matches neither list', () => {
+    expect(getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions })).toBeUndefined()
+  })
+
+  it('returns undefined when dbRegion is undefined', () => {
+    expect(getRegionSelectionType({ dbRegion: undefined, availableRegions })).toBeUndefined()
+  })
+
+  it('returns undefined when availableRegions is undefined', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
+    ).toBeUndefined()
+  })
 })

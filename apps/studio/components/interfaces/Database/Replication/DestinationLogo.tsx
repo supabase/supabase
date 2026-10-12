@@ -1,16 +1,16 @@
+import { useTheme } from 'next-themes'
 import { cn, StatusIcon } from 'ui'
 
 import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { BASE_PATH } from '@/lib/constants'
+import { BRAND_ICONS, resolveThemedIconSrc, type ThemedIconSrc } from '@/lib/brand-icons'
+import { resolveThemeOverrideMode } from '@/lib/theme-overrides'
 
-type DestinationBrand = { type: 'mark'; src: string } | { type: 'monogram'; label: string }
-
-const BRAND_BY_TYPE: Partial<Record<DestinationType, DestinationBrand>> = {
-  BigQuery: { type: 'mark', src: `${BASE_PATH}/img/icons/bigquery-icon.svg` },
-  ClickHouse: { type: 'monogram', label: 'CH' },
-  DuckLake: { type: 'mark', src: `${BASE_PATH}/img/icons/ducklake-icon.svg` },
-  Snowflake: { type: 'monogram', label: 'SF' },
+const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, ThemedIconSrc>> = {
+  BigQuery: BRAND_ICONS.bigquery,
+  ClickHouse: BRAND_ICONS.clickhouse,
+  DuckLake: BRAND_ICONS.ducklake,
+  Snowflake: BRAND_ICONS.snowflake,
 }
 
 const SIZE_CLASS_NAME = {
@@ -36,28 +36,19 @@ export const DestinationLogo = ({
   className,
   hasErrors = false,
 }: DestinationLogoProps) => {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolveThemeOverrideMode(resolvedTheme) === 'dark'
   const sizing = SIZE_CLASS_NAME[size]
-  const brand = BRAND_BY_TYPE[type]
+  const brandMark = BRAND_MARK_BY_TYPE[type]
+  const brandMarkSrc = brandMark === undefined ? undefined : resolveThemedIconSrc(brandMark, isDark)
 
   return (
     <span className={cn('relative inline-flex shrink-0', className)}>
       <span className={cn('flex items-center justify-center border bg-surface-100', sizing.frame)}>
-        {brand === undefined && (
+        {brandMarkSrc === undefined ? (
           <DestinationIcon type={type} size={sizing.icon} className="text-foreground-light" />
-        )}
-        {brand?.type === 'mark' && (
-          <img src={brand.src} alt="" aria-hidden className={sizing.mark} />
-        )}
-        {brand?.type === 'monogram' && (
-          <span
-            className={cn(
-              'font-mono font-medium leading-none text-foreground-muted',
-              size === 'small' ? 'text-xs' : 'text-lg'
-            )}
-            aria-hidden
-          >
-            {brand.label}
-          </span>
+        ) : (
+          <img src={brandMarkSrc} alt="" aria-hidden className={sizing.mark} />
         )}
       </span>
       {hasErrors && (

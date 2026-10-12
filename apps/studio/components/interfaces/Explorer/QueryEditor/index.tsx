@@ -478,6 +478,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           options={{
             minimap: { enabled: false },
             padding: { top: 8 },
+            scrollBeyondLastLine: true,
           }}
           onInputChange={(value) => onSqlChange(value ?? '')}
           onMount={(editor, monaco) => {
