@@ -7,7 +7,9 @@ import { StickToBottom, useStickToBottomContext } from 'use-stick-to-bottom'
 type ConversationProps = Omit<ComponentProps<typeof StickToBottom>, 'children'> & {
   children?: ReactNode
 }
-type ConversationContentProps = ComponentProps<typeof StickToBottom.Content>
+type ConversationContentProps = ComponentProps<typeof StickToBottom.Content> & {
+  scrollClassName?: string
+}
 type ConversationScrollButtonProps = ComponentProps<typeof Button>
 
 /**
@@ -20,7 +22,7 @@ const FADE_GUTTER = 'inset-x-7'
 
 export const Conversation = ({ className, children, ...props }: ConversationProps) => (
   <StickToBottom
-    className={cn('relative flex-1 overflow-y-auto', className)}
+    className={cn('relative min-h-0 flex-1 overflow-hidden', className)}
     initial="smooth"
     resize="smooth"
     role="log"
@@ -44,9 +46,25 @@ export const Conversation = ({ className, children, ...props }: ConversationProp
   </StickToBottom>
 )
 
-export const ConversationContent = ({ className, ...props }: ConversationContentProps) => (
-  <StickToBottom.Content className={cn(CONTENT_GUTTER, 'py-4', className)} {...props} />
-)
+export const ConversationContent = ({
+  className,
+  scrollClassName,
+  children,
+  ...props
+}: ConversationContentProps) => {
+  const context = useStickToBottomContext()
+
+  return (
+    <div
+      ref={context.scrollRef}
+      className={cn('h-full w-full overflow-auto overscroll-y-contain', scrollClassName)}
+    >
+      <div {...props} ref={context.contentRef} className={cn(CONTENT_GUTTER, 'py-4', className)}>
+        {typeof children === 'function' ? children(context) : children}
+      </div>
+    </div>
+  )
+}
 
 export const ConversationScrollButton = ({
   className,

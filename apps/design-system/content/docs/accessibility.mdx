@@ -28,6 +28,8 @@ Chromium-based browsers and Firefox handle this automatically via the Tab key. S
 
 Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use one shared focus ring so users recognize this state instantly. Its color follows the theme's brighter primary hue in both themes. See [Primary and brand colors](../docs/color-usage#primary-and-brand-colors).
 
+An editable text field can use its visible insertion caret to show focus. This can be useful for inputs embedded within a compact control, where another ring would obscure nearby elements. Check that the caret clearly identifies the active field. Read-only fields and controls without a caret still need a visible focus indicator.
+
 ### Focus ring recipe
 
 Prefer the shared utilities over inventing local styles:
@@ -75,7 +77,7 @@ transition-property: color, background-color, border-color, ...
 Rules:
 
 - Prefer `:focus-visible` over `:focus` so click/tap does not show a focus indicator
-- Never use `outline-none` / `outline-hidden` without a ring or outline replacement
+- Never use `outline-none` / `outline-hidden` without a visible focus indicator, such as a ring, outline, or insertion caret in an editable text field
 - Always use the shared color (`ring-ring` / `outline-ring`). Variants (primary, danger, warning) do not change focus color. The shared color derives from `--primary` with enough lightness to remain visible in light mode.
 - Do not animate the focus indicator; avoid `transition-all` / `transition` on controls that show one (prefer `transition-colors`)
 - Prefer `focus-ring` / `focus-inset` over copy-pasting the class stack

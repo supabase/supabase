@@ -3,6 +3,8 @@ import { Check } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 const HIGHLIGHTS = [
   {
     title: 'Multi-Factor Authentication',
@@ -65,7 +67,11 @@ export function HighlightsSection() {
               </div>
               <div className="mt-6">
                 <Button size="small" asChild>
-                  <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                  {isCrossZoneHref(highlight.cta.href) ? (
+                    <a href={highlight.cta.href}>{highlight.cta.label}</a>
+                  ) : (
+                    <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                  )}
                 </Button>
               </div>
             </div>

@@ -28,6 +28,7 @@ interface PostgresVersionSelectorProps {
   dbRegion: string
   disabled?: boolean
   organizationSlug?: string
+  highAvailability?: boolean
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
   /**
@@ -65,6 +66,7 @@ export const PostgresVersionSelector = ({
   dbRegion,
   disabled = false,
   organizationSlug,
+  highAvailability,
   field,
   form,
   lastValidSelectionRef,
@@ -85,6 +87,7 @@ export const PostgresVersionSelector = ({
       cloudProvider,
       dbRegion: dbRegionExact,
       organizationSlug,
+      highAvailability,
     },
     { enabled: type === 'create' }
   )

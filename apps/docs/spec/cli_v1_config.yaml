@@ -63,6 +63,8 @@ parameters:
     description: |
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
+      Local projects started with the experimental `supabase stack` commands are identified by their project directory, git branch, and `--stack` name instead. See [Running multiple local projects](https://supabase.com/docs/guides/local-development/running-multiple-local-projects).
+
   - id: 'api.enabled'
     title: 'api.enabled'
     tags: ['api']
@@ -151,6 +153,16 @@ parameters:
     links:
       - name: 'PostgreSQL configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.orioledb_version'
+    title: 'db.orioledb_version'
+    tags: ['database']
+    required: false
+    description: |
+      OrioleDB version of the Postgres image to use for the local database. Leave empty to use the default storage engine. Requires `db.major_version` 15 or 17. `supabase init --use-orioledb` sets this value.
+    links:
+      - name: 'OrioleDB'
+        link: 'https://supabase.com/docs/guides/database/orioledb'
 
   - id: 'db.pooler.enabled'
     title: 'db.pooler.enabled'
@@ -1748,6 +1760,19 @@ parameters:
       - name: Self-hosted Logflare Configuration
         link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started
 
+  - id: 'experimental.stack'
+    title: 'experimental.stack'
+    tags: ['experimental']
+    required: false
+    default: 'false'
+    description: |
+      Turns on the experimental `supabase stack` commands, and makes the top-level `supabase start`, `supabase status`, and `supabase stop` commands run `supabase stack start`, `supabase stack status`, and `supabase stack stop`. The local targets of the `db`, `migration`, `test`, `gen`, `inspect`, `pull`, `storage`, `seed`, and `services` commands, and `functions serve`, also use the stack. With this setting, several local projects can run at the same time on one machine. On supported platforms a local project can also run without Docker.
+      Local projects started this way keep their own data, separate from local projects started with the default `supabase start`. The environment variable `SUPABASE_EXPERIMENTAL_STACK=1` or `0` overrides this value.
+      Note: This is an experimental feature and may change in future releases.
+    links:
+      - name: 'Running multiple local projects'
+        link: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects'
+
   - id: 'experimental.webhooks.enabled'
     title: 'experimental.webhooks.enabled'
     tags: ['experimental']
@@ -1763,8 +1788,7 @@ parameters:
     tags: ['experimental']
     required: false
     description: |
-      Configures Postgres storage engine to use OrioleDB with S3 support.
-      Note: This is an experimental feature and may change in future releases.
+      Deprecated. Use `db.orioledb_version` instead. The CLI still reads this setting and prints a deprecation warning when it is set.
     links: []
 
   - id: 'experimental.s3_host'

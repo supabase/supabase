@@ -14,6 +14,8 @@ date: '2026-07-21'
 toc_depth: 2
 ---
 
+> **Update: October 2, 2026.** BigQuery, ClickHouse, DuckLake, and Snowflake are now available in public alpha. The destination early-access form has been retired. To get started, see the [destination guides](/docs/guides/database/replication#supported-destinations). The original announcement follows.
+
 Today we're moving **Supabase Pipelines** into public alpha. The biggest addition is schema change support: Pipelines can now detect supported schema changes in your source tables and apply them to the destination automatically. This release also brings a faster initial sync and a new destination request form for ClickHouse, Snowflake, and DuckLake.
 
 Supabase Pipelines replicates your Supabase Postgres data to external analytical systems in near real time. It is powered by [Supabase ETL](https://github.com/supabase/etl), our open source change-data-capture pipeline written in Rust. Supabase ETL reads changes from Postgres through logical replication, copies existing table data, streams inserts, updates, deletes, and truncates, and writes them to your destination.

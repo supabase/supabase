@@ -14,7 +14,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: { name: string }
+  wrapper: { id: number; name: string; server_name: string; server_options?: string[] | null }
   wrapperMeta: WrapperMeta
 }
 
@@ -25,7 +25,12 @@ export async function deleteFDW({
   wrapperMeta,
 }: FDWDeleteVariables) {
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['delete-fdw'],
+  })
   return result
 }
 
@@ -57,9 +62,7 @@ export const useFDWDeleteMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(
-          `Failed to disable ${variables.wrapper.name} foreign data wrapper: ${data.message}`
-        )
+        toast.error(`Failed to delete ${variables.wrapper.name} connection: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

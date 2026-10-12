@@ -5,7 +5,7 @@ import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only']
+export const FIXED_ROLE_ORDER = ['Owner', 'Administrator', 'Developer', 'Read-only', 'None']
 export type OrganizationRolesVariables = { slug?: string }
 export type OrganizationRolesResponse = components['schemas']['OrganizationRoleResponse_Output']
 export type OrganizationRole =
@@ -46,10 +46,21 @@ export const useOrganizationRolesV2Query = <TData = OrganizationRolesData>(
     select: (data) => {
       return {
         ...data,
-        org_scoped_roles: [...data.org_scoped_roles].sort((a, b) => {
-          return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
-        }),
+        org_scoped_roles: [...data.org_scoped_roles]
+          .sort((a, b) => {
+            return FIXED_ROLE_ORDER.indexOf(a.name) - FIXED_ROLE_ORDER.indexOf(b.name)
+          })
+          .filter((role) => FIXED_ROLE_ORDER.includes(role.name))
+          .map((role) => ({ ...role, name: getOverrideRoleName(role.name) })),
       } as TData
     },
     ...options,
   })
+
+const OVERRIDE_ROLE_NAMES: Record<string, string> = {
+  None: 'No-access',
+}
+
+export function getOverrideRoleName(rolename: string) {
+  return OVERRIDE_ROLE_NAMES[rolename] ?? rolename
+}

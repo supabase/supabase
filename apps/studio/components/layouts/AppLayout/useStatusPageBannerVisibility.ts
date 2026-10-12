@@ -1,22 +1,19 @@
-import { useQueries, useQuery } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { useCallback, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { useCallback } from 'react'
 
 import { getRelevantIncidentIds, shouldShowBanner } from './StatusPageBanner.utils'
-import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { incidentBannerQueryOptions } from '@/data/platform/incident-banner-query'
-import { projectKeys } from '@/data/projects/keys'
-import {
-  getOrganizationProjects,
-  type OrgProject,
-} from '@/data/projects/org-projects-infinite-query'
+import { useEmergencyIncidentOverride } from '@/hooks/misc/useEmergencyIncidentOverride'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useUserProjectRegions } from '@/hooks/misc/useUserProjectRegions'
 
 export type StatusPageBannerData = { title: string; dismiss?: () => void }
 
+const EMPTY_REGIONS: ReadonlySet<string> = new Set()
+
 export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
-  const showIncidentBannerOverride =
-    useFlag('ongoingIncident') || process.env.NEXT_PUBLIC_ONGOING_INCIDENT === 'true'
+  const showIncidentBannerOverride = useEmergencyIncidentOverride()
 
   const { data: incidentBannerData } = useQuery(incidentBannerQueryOptions())
 
@@ -24,35 +21,15 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
   const incidents = bannerItems.map((i) => ({ id: i.id, cache: i.metadata }))
   const hasActiveIncidents = incidents.length > 0
 
-  const { data: organizations } = useOrganizationsQuery({
+  const userProjectRegions = useUserProjectRegions({
     enabled: !showIncidentBannerOverride && hasActiveIncidents,
   })
 
-  const orgProjectsQueries = useQueries({
-    queries: (organizations ?? []).map((org) => ({
-      queryKey: projectKeys.bannerProjectsByOrg(org.slug),
-      queryFn: () => getOrganizationProjects({ slug: org.slug, limit: 100 }),
-      staleTime: 5 * 60 * 1000,
-      enabled: !showIncidentBannerOverride && hasActiveIncidents,
-    })),
-  })
-
-  const isProjectsFetched =
-    organizations !== undefined &&
-    (organizations.length === 0 || orgProjectsQueries.every((q) => q.isFetched))
-
-  const allProjects = orgProjectsQueries.flatMap((q) => q.data?.projects ?? [])
-  const hasProjects = allProjects.length > 0
-  const userRegions = useMemo(
-    () =>
-      new Set(
-        allProjects.flatMap((project: OrgProject) => project.databases.map((db) => db.region))
-      ),
-    [allProjects]
-  )
-  const hasUnknownRegions = orgProjectsQueries.some(
-    (q) => q.isError || (q.data !== undefined && q.data.pagination.count > q.data.projects.length)
-  )
+  const userContext =
+    userProjectRegions.status === 'resolved' ? userProjectRegions.context : undefined
+  const hasProjects = userContext?.hasProjects ?? false
+  const userRegions = userContext?.regions ?? EMPTY_REGIONS
+  const hasUnknownRegions = userContext !== undefined && !userContext.isComplete
 
   const [dismissedIds, setDismissedIds, { isSuccess: isDismissedLoaded }] = useLocalStorageQuery<
     Array<string>
@@ -73,7 +50,7 @@ export function useStatusPageBannerVisibility(): StatusPageBannerData | null {
 
   if (showIncidentBannerOverride) return { title: 'We are investigating a technical issue' }
 
-  if (!hasActiveIncidents || !isProjectsFetched) return null
+  if (!hasActiveIncidents || userProjectRegions.status === 'loading') return null
 
   const dismissedIdSet = new Set(dismissedIds)
   const undismissedIncidents = incidents.filter((i) => !dismissedIdSet.has(i.id))

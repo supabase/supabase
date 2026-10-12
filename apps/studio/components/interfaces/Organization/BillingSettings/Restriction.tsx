@@ -21,6 +21,9 @@ export const Restriction = () => {
     usage?.usages.find(
       (metric) =>
         metric.metric !== PricingMetric.DISK_SIZE_GB_HOURS_GP3 &&
+        // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+        metric.metric !== PricingMetric.LOG_INGESTION &&
+        metric.metric !== PricingMetric.LOG_QUERYING &&
         !metric.unlimited &&
         metric.capped &&
         metric.usage > (metric?.pricing_free_units ?? 0)

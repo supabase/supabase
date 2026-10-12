@@ -7,7 +7,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationsComboBox } from './PublicationsComboBox'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
-import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
@@ -21,15 +22,45 @@ export const PublicationSelection = ({
   const { ref: projectRef } = useParams()
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
 
-  const sourceId = useReplicationSourceId({ projectRef })
+  const {
+    data: sourcesData,
+    isError: isSourcesError,
+    isSuccess: isSourcesSuccess,
+  } = useReplicationSourcesQuery({ projectRef })
+  const sourceId = sourcesData?.sources.find((source) => source.name === projectRef)?.id
+  const isSourceUnavailable = isSourcesError || (isSourcesSuccess && sourceId === undefined)
 
   const { data: publications, isSuccess: isSuccessPublications } =
     useReplicationPublicationNamesQuery({ projectRef, sourceId })
-
+  const { data: selectedPublication, isError: isPublicationError } = useReplicationPublicationQuery(
+    { projectRef, sourceId, publicationName }
+  )
   const isSelectedPublicationMissing =
     isSuccessPublications &&
     !!publicationName &&
     !(publications ?? []).some((publication) => publication.name === publicationName)
+
+  let partitionHandlingMessage = ''
+  let isPartitionHandlingLoading = false
+
+  if (publicationName && !isSelectedPublicationMissing) {
+    if (selectedPublication?.name === publicationName) {
+      partitionHandlingMessage = selectedPublication.config.publish_via_partition_root
+        ? 'Partitioned tables use the parent table identity.'
+        : 'Each partition is replicated separately.'
+    } else if (isPublicationError || isSourceUnavailable) {
+      partitionHandlingMessage = 'Partition handling could not be loaded.'
+    } else {
+      isPartitionHandlingLoading = true
+    }
+  }
+
+  const publicationDescription = [
+    'Tables in the selected publication will be replicated to this destination.',
+    isPartitionHandlingLoading ? 'Loading partition handling...' : partitionHandlingMessage,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <FormField
@@ -39,8 +70,13 @@ export const PublicationSelection = ({
         <FormItemLayout
           layout="horizontal"
           label="Publication"
-          description="Tables in the selected publication will be replicated to this destination."
+          description={publicationDescription}
         >
+          <span role="status" className="sr-only">
+            {isPartitionHandlingLoading
+              ? 'Loading partition handling...'
+              : partitionHandlingMessage}
+          </span>
           <FormControl>
             <PublicationsComboBox
               field={{

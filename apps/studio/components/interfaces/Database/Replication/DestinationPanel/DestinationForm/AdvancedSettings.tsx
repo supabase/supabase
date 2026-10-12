@@ -19,14 +19,16 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { BigQueryConnectionFields } from './BigQuery/ConnectionFields'
 import { TableOptions } from './BigQuery/TableOptions'
 import {
-  DEFAULT_CONNECTION_POOL_SIZE,
   DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
   DEFAULT_MAX_FILL_MS,
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
 } from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+import { DuckLakeConnectionFields } from './DuckLake/ConnectionFields'
+import { SnowflakeConnectionFields } from './Snowflake/ConnectionFields'
 
 const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
   error: 'Block startup',
@@ -54,11 +56,15 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional settings to control the pipeline in more depth
+                {type === 'DuckLake'
+                  ? 'Adjust catalog connections and replication settings.'
+                  : 'Customize how the pipeline syncs and replicates data.'}
               </span>
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
+            {type === 'DuckLake' && <DuckLakeConnectionFields control={form.control} />}
+
             <FormField
               control={form.control}
               name="maxFillMs"
@@ -66,7 +72,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description="How long the pipeline waits before sending a partially filled batch."
+                  description="Maximum time before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
@@ -77,7 +83,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
+                        placeholder={String(DEFAULT_MAX_FILL_MS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -106,7 +112,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
+                        placeholder={String(DEFAULT_MAX_TABLE_SYNC_WORKERS)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -135,7 +141,7 @@ export const AdvancedSettings = ({
                         step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
+                        placeholder={String(DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE)}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -182,62 +188,7 @@ export const AdvancedSettings = ({
 
             {type === 'BigQuery' && (
               <>
-                <FormField
-                  control={form.control}
-                  name="connectionPoolSize"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Connection pool size"
-                      layout="horizontal"
-                      description="Number of BigQuery connections used for destination writes."
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>connections</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="maxStalenessMins"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Maximum staleness"
-                      layout="horizontal"
-                      description="Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results."
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={0}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>minutes</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                <BigQueryConnectionFields control={form.control} />
 
                 <div className="flex flex-col gap-y-3">
                   <div className="flex flex-col gap-y-1">
@@ -251,6 +202,8 @@ export const AdvancedSettings = ({
                 </div>
               </>
             )}
+
+            {type === 'Snowflake' && <SnowflakeConnectionFields control={form.control} />}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

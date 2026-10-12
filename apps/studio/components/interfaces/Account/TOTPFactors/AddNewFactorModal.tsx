@@ -246,7 +246,7 @@ const SecondStep = ({
         complete the enrolment.
       </p>
 
-      {isLoading && (
+      {!factor && (
         <div className="pb-4 px-4">
           <GenericSkeletonLoader />
         </div>

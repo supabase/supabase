@@ -115,8 +115,8 @@ export const HaPrimaryNode = ({ data }: NodeProps<Node<HaPoolerNodeData>>) => {
           )}
         </div>
         {/* Whether connection metrics are meaningful through the multigateway
-            is unconfirmed, so they're left off for HA projects. */}
-        <ComputeMetricsFooter showConnections={false} />
+            is unconfirmed, so they're marked unavailable for HA projects. */}
+        <ComputeMetricsFooter isConnectionsAvailable={false} />
       </div>
       <Handle type="source" position={Position.Bottom} style={{ background: 'transparent' }} />
     </>

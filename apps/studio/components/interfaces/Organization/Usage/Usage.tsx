@@ -355,18 +355,16 @@ export const Usage = () => {
         isLoadingOrgDailyStats={isLoadingOrgDailyStats}
       />
 
-      {subscription?.plan.id === 'platform' && (
-        <OrgLogUsage
-          orgSlug={slug as string}
-          projectRef={selectedProjectRef}
-          subscription={subscription}
-          startDate={startDate}
-          endDate={endDate}
-          currentBillingCycleSelected={currentBillingCycleSelected}
-          orgDailyStats={orgDailyStats}
-          isLoadingOrgDailyStats={isLoadingOrgDailyStats}
-        />
-      )}
+      <OrgLogUsage
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+        orgDailyStats={orgDailyStats}
+        isLoadingOrgDailyStats={isLoadingOrgDailyStats || isLoadingSubscription}
+      />
 
       <Pipelines
         orgSlug={slug as string}

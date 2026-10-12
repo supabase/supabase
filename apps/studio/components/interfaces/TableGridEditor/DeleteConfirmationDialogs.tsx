@@ -275,7 +275,7 @@ const DeleteConfirmationDialogs = ({
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected column? This action cannot be undone.
           </p>
-          <div className="items-top flex space-x-2">
+          <div className="items-start flex space-x-2">
             <Checkbox
               id="checkbox-cascade"
               checked={isDeleteWithCascade}
@@ -336,7 +336,7 @@ const DeleteConfirmationDialogs = ({
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected table? This action cannot be undone.
           </p>
-          <div className="items-top flex space-x-2">
+          <div className="items-start flex space-x-2">
             <Checkbox
               id="checkbox-cascade"
               checked={isDeleteWithCascade}
@@ -469,7 +469,7 @@ const DropEntityConfirmationModal = ({
         <p className="text-sm text-foreground-light">
           Are you sure you want to delete this {entityLabel}? This action cannot be undone.
         </p>
-        <div className="items-top flex space-x-2">
+        <div className="items-start flex space-x-2">
           <Checkbox
             id={checkboxId}
             checked={isDeleteWithCascade}
