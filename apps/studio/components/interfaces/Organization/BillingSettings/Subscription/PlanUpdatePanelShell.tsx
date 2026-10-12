@@ -87,7 +87,9 @@ export function PlanUpdateFullScreenShell({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: contentDelay, duration: 0.3, ease: 'easeOut' }}
       >
-        <h1 className="text-2xl text-center text-balance max-w-2/3">Change subscription plan for {organizationName}</h1>
+        <h1 className="text-2xl text-center text-balance max-w-2/3">
+          Change subscription plan for {organizationName}
+        </h1>
         {notice}
         {children}
       </motion.div>
