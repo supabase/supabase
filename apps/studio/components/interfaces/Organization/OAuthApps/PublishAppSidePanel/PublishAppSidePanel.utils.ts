@@ -41,7 +41,7 @@ export const formSchemaWithOAuthAppScopedGrants = formSchema
       context.addIssue({
         code: 'custom',
         path: ['project_scoping_confirmed'],
-        message: 'Please confirm you want to use the permissions of the person who connects',
+        message: 'Please confirm you want users to select specific projects',
       })
     }
   })

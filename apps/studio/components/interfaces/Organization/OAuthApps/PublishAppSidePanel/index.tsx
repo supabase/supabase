@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Edit, Upload } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
@@ -56,7 +56,6 @@ import { uploadAttachment } from '@/lib/upload'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface PublishAppSidePanelProps {
-  withOAuthAppScopedGrants: boolean
   visible: boolean
   selectedApp?: OAuthApp
   onClose: () => void
@@ -107,7 +106,6 @@ const getFormDefaultValues = (
 const FORM_ID = 'publish-oauth-app-form'
 
 export const PublishAppSidePanel = ({
-  withOAuthAppScopedGrants,
   visible,
   selectedApp,
   onClose,
@@ -115,6 +113,7 @@ export const PublishAppSidePanel = ({
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
+  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
 
   const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
@@ -207,11 +206,13 @@ export const PublishAppSidePanel = ({
   }
 
   const form = useForm<
-    typeof withOAuthAppScopedGrants extends true ? FormSchemaWithOAuthAppScopedGrants : FormSchema
+    typeof areOAuthAppScopedGrantsEnabled extends true
+      ? FormSchemaWithOAuthAppScopedGrants
+      : FormSchema
   >({
-    defaultValues: getFormDefaultValues(selectedApp, withOAuthAppScopedGrants),
+    defaultValues: getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled),
     resolver: zodResolver(
-      withOAuthAppScopedGrants ? formSchemaWithOAuthAppScopedGrants : formSchema
+      areOAuthAppScopedGrantsEnabled ? formSchemaWithOAuthAppScopedGrants : formSchema
     ),
   })
   const { reset } = form
@@ -219,10 +220,10 @@ export const PublishAppSidePanel = ({
 
   useEffect(() => {
     if (visible) {
-      const defaultValues = getFormDefaultValues(selectedApp)
+      const defaultValues = getFormDefaultValues(selectedApp, areOAuthAppScopedGrantsEnabled)
       reset(defaultValues)
     }
-  }, [visible, selectedApp, reset])
+  }, [visible, selectedApp, reset, areOAuthAppScopedGrantsEnabled])
 
   const name = useWatch({ name: 'name', control: form.control })
   const website = useWatch({ name: 'website', control: form.control })
@@ -434,7 +435,7 @@ export const PublishAppSidePanel = ({
             </>
           )}
 
-          {isFormSchemaWithOAuthAppScopedGrants(form.control, withOAuthAppScopedGrants) && (
+          {isFormSchemaWithOAuthAppScopedGrants(form.control, areOAuthAppScopedGrantsEnabled) && (
             <>
               <SidePanel.Separator />
               <AuthorizationSection control={form.control} />
