@@ -4,15 +4,15 @@ topics:
   - Troubleshooting
   - Database
 errors:
-  - code: "42501"
+  - code: '42501'
     message: must be owner of table spatial_ref_sys
-  - code: "01006"
+  - code: '01006'
     message: no privileges could be revoked for "spatial_ref_sys"
-  - code: "42501"
+  - code: '42501'
     message: must be owner of relation spatial_ref_sys
-  - code: "XX000"
+  - code: 'XX000'
     message: Cannot find SRID (4326) in spatial_ref_sys
-  - code: "0A000"
+  - code: '0A000'
     message: extension "postgis" does not support SET SCHEMA
 ---
 
@@ -25,7 +25,7 @@ When PostGIS is installed in the `public` schema, the [Security Advisor](/dashbo
 | Public Can Execute SECURITY DEFINER Function, Signed-In Users Can Execute SECURITY DEFINER Function | `public.st_estimatedextent`                                                                  |
 | Public Can See Object in GraphQL Schema, Signed-In Users Can See Object in GraphQL Schema           | `spatial_ref_sys`, `geometry_columns`, and `geography_columns`, when `pg_graphql` is enabled |
 
-These objects don't hold your data. The main risk is that anyone with your project's anon key can change the coordinate system definitions in `spatial_ref_sys`, which breaks PostGIS queries. For details, see [What the findings expose](#what-the-findings-expose).
+These objects don't hold your data, unless you added your own coordinate systems to `spatial_ref_sys`. The main risk is that anyone with your project's anon key can change the coordinate system definitions in `spatial_ref_sys`, which breaks PostGIS queries. For details, see [What the findings expose](#what-the-findings-expose).
 
 You can't resolve these findings on the objects themselves. Enabling Row Level Security or creating a policy on `spatial_ref_sys` fails with the following error:
 
@@ -84,7 +84,7 @@ limit 100;
 
 Logs are available only for the retention period of your plan.
 
-If rows were deleted or changed, [dropping and re-creating PostGIS](#drop-and-re-create-postgis-yourself) restores the original table. If you move PostGIS without dropping it, copy the missing rows from a project with the same PostGIS version. To find your version, run `select extversion from pg_extension where extname = 'postgis';`.
+If rows were deleted or changed, [dropping and re-creating PostGIS](#drop-and-re-create-postgis-yourself) restores the original table. If you move PostGIS without dropping it, compare `spatial_ref_sys` with the same table in a project with the same PostGIS version, and copy the missing or changed rows. To find your version, run `select extversion from pg_extension where extname = 'postgis';`.
 
 ## Why this happens
 
@@ -94,7 +94,7 @@ Only a table's owner can enable Row Level Security on it or create policies for 
 
 ### What the findings expose
 
-`spatial_ref_sys` holds the coordinate system definitions that PostGIS ships with, and none of your data. Anyone with your project's anon key can insert, update, and delete its rows through the Data API. If a row that your queries use is changed or deleted, PostGIS functions that use that spatial reference ID (SRID) fail. For example, after the row for SRID 4326 is deleted, geography functions fail:
+`spatial_ref_sys` holds the coordinate system definitions that PostGIS ships with, and any that you added. Anyone with your project's anon key can insert, update, and delete its rows through the Data API. If a row that your queries use is changed or deleted, PostGIS functions that use that spatial reference ID (SRID) fail. For example, after the row for SRID 4326 is deleted, geography functions fail:
 
 ```text
 ERROR:  Cannot find SRID (4326) in spatial_ref_sys
@@ -166,14 +166,20 @@ You can't move PostGIS with `alter extension postgis set schema extensions`. Pos
      );
    ```
 
-4. Drop PostGIS and create it in the `extensions` schema in one transaction. If the `create` fails, the transaction rolls back and PostGIS stays where it was:
+4. Drop PostGIS and create it in the `extensions` schema in one transaction. The transaction copies `spatial_ref_sys` first, and adds back the rows that PostGIS doesn't ship, such as coordinate systems you added. If the `create` fails, the transaction rolls back and PostGIS stays where it was:
 
    ```sql
    begin;
+   create temp table spatial_ref_sys_backup as table public.spatial_ref_sys;
    drop extension postgis cascade;
    create extension postgis with schema extensions;
+   insert into extensions.spatial_ref_sys
+   select * from spatial_ref_sys_backup
+   on conflict (srid) do nothing;
    commit;
    ```
+
+   The insert also adds back rows that someone inserted through the Data API. If you found such rows in [Check whether rows in `spatial_ref_sys` were changed](#check-whether-rows-in-spatial_ref_sys-were-changed), delete them after the move.
 
 5. Re-create each extension from step 3. `postgis_raster` must be in the same schema as PostGIS, and `postgis_topology` creates its own `topology` schema:
 
