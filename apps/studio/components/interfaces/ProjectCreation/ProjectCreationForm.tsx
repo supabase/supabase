@@ -207,8 +207,10 @@ export const ProjectCreationForm = ({
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
-  // The specific-regions link owns the region selector, so the free tier experiment stays inactive
-  const isSpecificRegionsLinkEnabled = useFlag('projectCreationSpecificRegionsLink') === true
+  // Only free-plan orgs get the specific-regions link collapse behavior. When active for an
+  // org, it owns the region selector, so the free tier experiment stays inactive for that org.
+  const isSpecificRegionsLinkEnabled =
+    useFlag('projectCreationSpecificRegionsLink') === true && isFreePlan
   const isResolvingFreeTierGeneralRegionExperiment =
     !isSpecificRegionsLinkEnabled &&
     isFreePlan &&
@@ -832,6 +834,7 @@ export const ProjectCreationForm = ({
                       instanceSize={instanceSize as DesiredInstanceSize}
                       showGeneralRegionsOnly={freeTierGeneralRegionExperimentVariant === 'test'}
                       isLoading={isResolvingFreeTierGeneralRegionExperiment}
+                      isFreePlan={isFreePlan}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}

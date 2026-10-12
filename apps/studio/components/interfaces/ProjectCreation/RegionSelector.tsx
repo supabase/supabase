@@ -55,6 +55,8 @@ interface RegionSelectorProps {
   /** Hides specific regions and shows an upgrade prompt in their place */
   showGeneralRegionsOnly?: boolean
   isLoading?: boolean
+  /** Specific regions collapse behind the "Need a specific region?" link only for free-plan orgs */
+  isFreePlan: boolean
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
@@ -78,6 +80,7 @@ export const RegionSelector = ({
   layout = 'horizontal',
   showGeneralRegionsOnly = false,
   isLoading: isParentLoading = false,
+  isFreePlan,
 }: RegionSelectorProps) => {
   const { slug } = useParams()
   const track = useTrack()
@@ -90,7 +93,8 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
-  const isSpecificRegionsLinkEnabled = useFlag('projectCreationSpecificRegionsLink') === true
+  const isSpecificRegionsLinkEnabled =
+    useFlag('projectCreationSpecificRegionsLink') === true && isFreePlan
 
   const { getRegionRestriction } = useRegionRestriction()
 

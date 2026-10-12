@@ -512,9 +512,10 @@ describe('project creation wizard', () => {
 
     describe('specific regions behind a link', () => {
       const SPECIFIC_REGIONS_LINK_FLAG = { projectCreationSpecificRegionsLink: true }
+      const FREE_PLAN_ORG = [mockOrg({ plan: { id: 'free', name: 'Free' } })]
 
-      test('opens on the general regions alone', async () => {
-        mockWizardEndpoints()
+      test('opens on the general regions alone for a free-plan org', async () => {
+        mockWizardEndpoints({ organizations: FREE_PLAN_ORG })
 
         await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
 
@@ -526,7 +527,7 @@ describe('project creation wizard', () => {
       })
 
       test('the link reopens the dropdown on the full list with the general region still selected', async () => {
-        mockWizardEndpoints()
+        mockWizardEndpoints({ organizations: FREE_PLAN_ORG })
         const onRequest = vi.fn()
         mockCreateProject(onRequest)
 
@@ -548,6 +549,21 @@ describe('project creation wizard', () => {
           screen.queryByRole('button', { name: 'Need a specific region?' })
         ).not.toBeInTheDocument()
         expect(await submitAndReadRegionSelection(onRequest)).toMatchObject({ code: 'us-east-1' })
+      })
+
+      test('has no effect for a paid-plan org: the full region list shows directly with no link', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.getByText('Specific regions')).toBeInTheDocument()
+        expect(
+          screen.queryByRole('button', { name: 'Need a specific region?' })
+        ).not.toBeInTheDocument()
       })
     })
 
