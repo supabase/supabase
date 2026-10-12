@@ -21,7 +21,8 @@ Each project is provisioned with a unique JWT secret used to sign and verify aut
 - If the JWT secret is different in the new project, existing tokens become invalid, and users must sign in again to get new tokens.
 - If you reuse the original JWT secret in the new project, existing tokens remain valid and users don't need to sign in again.
 
-With the [migration to publishable and secret API keys](/docs/guides/getting-started/migrating-to-new-api-keys):
+If your source project uses [JWT signing keys](/docs/guides/auth/signing-keys):
 
-- Reusing a JWT secret isn't possible. A unique `kid` value is required when you manually import a private key in [JWT Keys](/dashboard/project/_/settings/jwt).
-- Projects that still use legacy JWT secrets can configure a custom JWT secret in the new project at [Settings > API > JWT Secret](/dashboard/project/_/settings/api). Updating the JWT secret regenerates the `anon` and `service_role` API keys in the new project.
+- You can't export the current key.
+- If the key is asymmetric (that is, not a shared secret), you can't reuse it in the new project.
+- If the key is a shared secret and you have a copy, import it in [JWT Keys](/dashboard/project/_/settings/jwt), then rotate keys to make it the current key.
