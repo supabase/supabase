@@ -358,12 +358,20 @@ export const InviteMemberButton = () => {
                           const canAssignRole = rolesAddable.includes(role.id)
                           const isOwnerRole = role.name === 'Owner'
                           const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                          const disabled = !canAssignRole || disabledForStripe
+
+                          const isNoAccessRole = role.name === 'No-access'
+                          const isApplyingProjectRole = !applyToOrg
+                          const disabledForProjectRole = isApplyingProjectRole && isNoAccessRole
+
+                          const disabled =
+                            !canAssignRole || disabledForStripe || disabledForProjectRole
                           const disabledReason = disabledForStripe
                             ? 'Cannot be assigned in Stripe Projects organizations'
-                            : !canAssignRole
-                              ? 'Additional permissions required to assign role'
-                              : undefined
+                            : disabledForProjectRole
+                              ? 'Cannot assign No-access role to project-scoped members'
+                              : !canAssignRole
+                                ? 'Additional permissions required to assign role'
+                                : undefined
 
                           return (
                             <FormItem asChild key={role.id}>

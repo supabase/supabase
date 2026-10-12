@@ -22,6 +22,7 @@ const notebookRunPart = {
     id: 'notebook-1',
     name: 'Notebook',
     updated_at: '2026-01-01T00:00:00.000Z',
+    optInLevel: 'schema_and_log_and_data',
     cells: [
       {
         cell_id: 'db',
@@ -266,5 +267,42 @@ describe('messages are sanitized based on opt-in level', () => {
     const sanitized = sanitizeMessagePart(message.parts[0], 'schema') as ToolUIPart
 
     expect(sanitized.output).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+  })
+})
+
+describe('execute_sql rows are shared only up to the level they ran under', () => {
+  const executeSqlPart = (output: unknown) =>
+    ({
+      type: 'tool-execute_sql',
+      state: 'output-available',
+      toolCallId: 'sql-1',
+      input: { sql: 'select email from users' },
+      output,
+    }) as unknown as ToolUIPart
+  const rows = [{ email: 'test@example.com' }]
+
+  test.each([
+    ['schema', 'schema_and_log_and_data', NO_DATA_PERMISSIONS],
+    ['schema_and_log_and_data', 'schema', NO_DATA_PERMISSIONS],
+    ['schema_and_log_and_data', 'schema_and_log_and_data', rows],
+  ] as const)('stamp %s, current %s', (stamp, current, expected) => {
+    const part = executeSqlPart({ rows, optInLevel: stamp })
+    expect((sanitizeMessagePart(part, current) as ToolUIPart).output).toEqual(expected)
+  })
+
+  test('output saved before the stamp existed stays hidden', () => {
+    const part = executeSqlPart(rows)
+    expect((sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output).toBe(
+      NO_DATA_PERMISSIONS
+    )
+  })
+
+  test('notebook run without a stamp hides rows even at data level', () => {
+    const { optInLevel: _, ...unstamped } = notebookRunPart.output as NotebookRunOutput
+    const part = { ...notebookRunPart, output: unstamped } as ToolUIPart
+    const output = (sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart)
+      .output as NotebookRunOutput
+    expect(output.cells[0].rows).toBeUndefined()
+    expect(output.cells[1].rows).toBeUndefined()
   })
 })

@@ -450,35 +450,17 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     dataApiRevokeOnCreateDefaultEnabled?: boolean | string
     /**
-     * Which region option was submitted. Only present for the region-recommendation experiment's
-     * eligible cohort (free plan + `project_creation:show_best_available_region` feature enabled —
-     * see `shouldTrackRegionRecommendation` in ProjectCreationForm.tsx). This is cohort-level
-     * eligibility, not "the option was shown" — it's present for both the PostHog flag's control
-     * and test arms so the two can be compared; omitted entirely outside the cohort (e.g. paid
-     * plans, or providers like AWS_NIMBUS where the feature is disabled).
-     * 'best_available' = the "Best available region" shortcut was used
-     * otherwise = the name of the region that was directly selected (e.g. 'Americas', 'ap-southeast-1')
+     * freeTierGeneralRegionExperiment variant at submission time. Omitted when the org isn't
+     * in the experiment (paid plan, smart regions disabled for the selected cloud provider,
+     * or not enrolled via the freeTierGeneralRegionEnrollment ConfigCat flag).
      */
-    selectedRegionOption?: string
+    freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * Which region list `selectedRegionOption` came from. Only present alongside `selectedRegionOption`.
-     * 'general' = picked from the "General regions" (smart group) list, or the "Best available
-     * region" shortcut was used (it always resolves to a general/smart region)
-     * 'specific' = picked from the "Specific regions" list
+     * Whether the submitted region is a smart region group ('general', e.g. Americas) or an
+     * exact region ('specific', e.g. us-east-1). Only set when smart regions are enabled for
+     * the selected cloud provider.
      */
-    selectedRegionOptionType?: 'general' | 'specific'
-    /**
-     * The region that was recommended/defaulted to on initial render, before any user
-     * interaction. Present under the same cohort gate as `selectedRegionOption`. Frozen the
-     * first time it's known, so a later refetch (e.g. switching cloud provider or instance size)
-     * doesn't overwrite what was actually shown to the user initially.
-     * 'best_available' = the user was in the PostHog flag's test arm, so the form defaulted to
-     * the "Best available region" shortcut
-     * otherwise = the name of the smart-group region recommended by the `available-regions`
-     * endpoint (e.g. 'Americas'), for users in the flag's control arm
-     * undefined = no recommendation had loaded yet at submission time
-     */
-    initialRecommendedRegion?: string
+    regionSelectionType?: 'general' | 'specific'
   }
   groups: TelemetryGroups
 }
@@ -533,6 +515,36 @@ export interface ProjectCreationFormExposedEvent {
      */
     surface?: 'main' | 'vercel'
   }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * Org was targeted for the freeTierGeneralRegionExperiment: a free-plan org with smart
+ * regions enabled for the selected cloud provider, enrolled (control or test arm) via the
+ * freeTierGeneralRegionEnrollment ConfigCat flag.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionExperimentExposedEvent {
+  action: 'free_tier_general_region_experiment_exposed'
+  properties: {
+    /** The experiment variant the user is enrolled in */
+    variant: 'control' | 'test'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Upgrade to Pro" link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionUpgradeClickedEvent {
+  action: 'free_tier_general_region_upgrade_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -1073,6 +1085,68 @@ export interface DocsContentListingClickedEvent {
     groupTitle?: string
     listingId?: string
   }
+}
+
+/**
+ * User opened the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2OpenedEvent {
+  action: 'docs_search_v2_opened'
+  properties: {
+    /**
+     * The trigger that opened the Search V2 dialog.
+     */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User's search term was sent to the Search V2 endpoint.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2SearchSubmittedEvent {
+  action: 'docs_search_v2_search_submitted'
+  properties: {
+    /**
+     * The search term sent to the Search V2 endpoint.
+     */
+    query: string
+  }
+}
+
+/**
+ * User activated a Search V2 result, either by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ResultClickedEvent {
+  action: 'docs_search_v2_result_clicked'
+  properties: {
+    /**
+     * The path of the result that was activated.
+     */
+    resultPath: string
+    /**
+     * The search term whose results were showing when the result was activated.
+     */
+    query: string
+  }
+}
+
+/**
+ * User closed the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2ClosedEvent {
+  action: 'docs_search_v2_closed'
 }
 
 /**
@@ -2075,6 +2149,24 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /** Whether object versioning was turned on at creation time. */
+    hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a bucket that has never had it.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /** Whether a lifecycle policy was configured at the same time. */
+    hasLifecyclePolicy?: boolean
   }
   groups: TelemetryGroups
 }
@@ -4089,6 +4181,8 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationFormExposedEvent
+  | FreeTierGeneralRegionExperimentExposedEvent
+  | FreeTierGeneralRegionUpgradeClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -4120,6 +4214,10 @@ export type TelemetryEvent =
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
+  | DocsSearchV2OpenedEvent
+  | DocsSearchV2SearchSubmittedEvent
+  | DocsSearchV2ResultClickedEvent
+  | DocsSearchV2ClosedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
@@ -4188,6 +4286,7 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent

@@ -1,4 +1,12 @@
+import type { useDocsSearchV2 } from 'common'
 import type { ReactNode } from 'react'
+
+type DocsSearchV2State = ReturnType<typeof useDocsSearchV2>['searchState']
+
+interface GetIsSearchingParams {
+  searchState: DocsSearchV2State
+  query: string
+}
 
 /** Common English prepositions/articles/conjunctions, excluded from highlighting so a query like "the mcp server" doesn't bold "the". */
 const IGNORED_WORDS = new Set([
@@ -65,7 +73,7 @@ function getMatchRanges(text: string, query: string): Array<[number, number]> {
 /**
  * Highlight every case-insensitive, per-word partial match of `query` inside `text`.
  * Returns the plain string when there's no match, otherwise a fragment with matches
- * wrapped in <strong>, preserving the original casing of `text`.
+ * wrapped in <mark>, preserving the original casing of `text`.
  */
 function highlightMatches(text: string, query: string): ReactNode {
   const ranges = getMatchRanges(text, query)
@@ -75,7 +83,11 @@ function highlightMatches(text: string, query: string): ReactNode {
   let cursor = 0
   ranges.forEach(([start, end], i) => {
     if (start > cursor) nodes.push(text.slice(cursor, start))
-    nodes.push(<strong key={i}>{text.slice(start, end)}</strong>)
+    nodes.push(
+      <mark key={i} className="-mx-px rounded-sm bg-primary-bright/15 px-px text-primary">
+        {text.slice(start, end)}
+      </mark>
+    )
     cursor = end
   })
   if (cursor < text.length) nodes.push(text.slice(cursor))
@@ -83,4 +95,16 @@ function highlightMatches(text: string, query: string): ReactNode {
   return <>{nodes}</>
 }
 
-export { formatHeadingPath, highlightMatches }
+// drives the loading beam: on while a request is in flight or about to be sent
+function getIsSearching({ searchState, query }: GetIsSearchingParams): boolean {
+  if (searchState.status === 'loading') return true
+  if (searchState.status === 'error') return false
+
+  const trimmedQuery = query.trim()
+  const settledQuery = 'query' in searchState ? searchState.query : null
+
+  // so a search is on its way and the beam starts on the keystroke, not when the request fires
+  return trimmedQuery !== '' && trimmedQuery !== settledQuery
+}
+
+export { formatHeadingPath, getIsSearching, highlightMatches }

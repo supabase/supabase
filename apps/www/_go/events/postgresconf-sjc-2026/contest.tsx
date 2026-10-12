@@ -119,7 +119,7 @@ const page: GoPageInput = {
             <li>Complete these steps by Monday, September 14, 2026 at 12:00 PM PST</li>
           </ol>
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Create your account</Link>
+            <a href="https://supabase.com/dashboard">Create your account</a>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">
             No purchase necessary. Void where prohibited.{' '}

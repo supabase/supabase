@@ -33,7 +33,12 @@ export async function updateFDW({
   tables,
 }: FDWUpdateVariables) {
   const sql = wrapWithTransaction(getUpdateFDWSql({ wrapper, wrapperMeta, formState, tables }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['update-fdw'],
+  })
   return result
 }
 
@@ -68,7 +73,7 @@ export const useFDWUpdateMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         toast.error(
-          `Failed to update ${variables.wrapper.name} foreign data wrapper: ${data.message}`
+          `Failed to update ${variables.wrapperMeta.label} foreign data wrapper: ${data.message}`
         )
       } else {
         onError(data, variables, context)
