@@ -9,9 +9,9 @@ database_id = "fd711d33-9703-402f-84b2-8e74034e7690"
 
 Each Supabase project is provisioned on hardware in the chosen region, so it is bound to a region at the infrastructure level.
 
-Therefore, the process to change the region of a Supabase Project is to create a new project in the desired region and migrate your existing project using the [migrations guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
+To change the region of a project, create a new project in the desired region and migrate your existing project using the [migrations guide](/docs/guides/platform/migrating-within-supabase/backup-restore).
 
-If you are using third-party auth (Facebook, Google, etc.), you need to manually copy over your client ID/secret pairs in the dashboard. Also, you need to change your API URL and [API keys](/docs/guides/getting-started/api-keys) (publishable, secret, `anon`, or `service_role` keys), which is usually done via environment variables on your web host.
+If you use third-party auth providers such as Facebook or Google, manually copy your client ID and secret pairs to the new project in the Supabase Dashboard. Also update your API URL and [API keys](/docs/guides/getting-started/api-keys) (publishable, secret, `anon`, or `service_role` keys), usually through environment variables on your web host.
 
 ## Project configurations
 
