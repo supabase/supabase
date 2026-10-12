@@ -152,7 +152,9 @@ export const GET = async (event) => {
     locals: { supabase },
   } = event
   const code = url.searchParams.get('code')
-  const next = url.searchParams.get('next') ?? '/'
+  const _next = url.searchParams.get('next') ?? '/'
+  // only same-site paths are allowed: "//host" and "/\host" point to another site
+  const next = /^\/(?![/\\])/.test(_next) ? _next : '/'
 
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
@@ -179,7 +181,9 @@ import { type APIRoute } from 'astro'
 export const GET: APIRoute = async ({ request, cookies, redirect }) => {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') || '/'
+  const _next = requestUrl.searchParams.get('next') ?? '/'
+  // only same-site paths are allowed: "//host" and "/\host" point to another site
+  const next = /^\/(?![/\\])/.test(_next) ? _next : '/'
 
   if (code) {
     const supabase = createServerClient(
@@ -224,7 +228,9 @@ import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@s
 export async function loader({ request }: LoaderFunctionArgs) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') || '/'
+  const _next = requestUrl.searchParams.get('next') ?? '/'
+  // only same-site paths are allowed: "//host" and "/\host" point to another site
+  const next = /^\/(?![/\\])/.test(_next) ? _next : '/'
   const responseHeaders = new Headers()
 
   if (code) {
@@ -267,7 +273,9 @@ Create a new route in your express app and populate with the following:
 ...
 app.get("/auth/callback", async function (req, res) {
   const code = req.query.code
-  const next = req.query.next ?? "/"
+  const _next = req.query.next
+  // only same-site paths are allowed: "//host" and "/\host" point to another site
+  const next = typeof _next === 'string' && /^\/(?![/\\])/.test(_next) ? _next : "/"
 
   if (code) {
     const supabase = createServerClient(
