@@ -132,7 +132,7 @@ const DEFAULT_AVAILABLE_VERSIONS: { available_versions: AvailableVersion[] } = {
     { postgres_engine: '15', release_channel: 'ga', version: 'supabase-postgres-15.6.1.139' },
     {
       postgres_engine: '17-oriole',
-      release_channel: 'alpha',
+      release_channel: 'beta',
       version: 'supabase-postgres-17.9.9.999-orioledb',
     },
   ],
@@ -186,6 +186,15 @@ function mockWizardEndpoints(
     path: '/platform/organizations',
     response: () =>
       HttpResponse.json<OrganizationResponse[]>(overrides.organizations ?? [mockOrg()]),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug',
+    response: {
+      ...(overrides.organizations?.[0] ?? mockOrg()),
+      created_at: '2026-01-01T00:00:00Z',
+      has_oriole_project: false,
+    },
   })
   addAPIMock({
     method: 'get',
@@ -275,13 +284,22 @@ const DEFAULT_FLAGS = {
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
   projectCreationRestrictedRegions: false,
+  freeTierGeneralRegionEnrollment: false,
+  freeTierGeneralRegionSelection: false,
 }
 
-async function renderWizard(options: { flags?: Record<string, boolean | string> } = {}) {
+async function renderWizard(
+  options: { flags?: Record<string, boolean | string>; isConfigCatStale?: boolean } = {}
+) {
   const { default: Wizard } = await import('@/pages/new/[slug]')
   return customRender(
     <FeatureFlagContext.Provider
-      value={{ configcat: { ...DEFAULT_FLAGS, ...options.flags }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: { ...DEFAULT_FLAGS, ...options.flags },
+        posthog: {},
+        hasLoaded: true,
+        isConfigCatStale: options.isConfigCatStale,
+      }}
     >
       <Wizard dehydratedState={undefined} />
     </FeatureFlagContext.Provider>,
@@ -493,6 +511,89 @@ describe('project creation wizard', () => {
       await screen.findByText('Error loading available regions')
     })
 
+    describe('free tier general region experiment', () => {
+      test('keeps the region selector loading while flags are being re-evaluated', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+          isConfigCatStale: true,
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        expect(await screen.findByText('Loading available regions...')).toBeInTheDocument()
+        expect(getSelectTriggerByLabel('Region')).toBeDisabled()
+      })
+
+      test('restricts the picker to general regions with an upgrade footer for a free-plan org in the test arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.queryByRole('option', { name: /North Virginia/ })).not.toBeInTheDocument()
+
+        const upgradeLink = screen.getByRole('link', { name: 'Upgrade to Pro' })
+        expect(upgradeLink).toHaveAttribute(
+          'href',
+          `/org/${ORG_SLUG}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`
+        )
+      })
+
+      test('shows the full region picker with no upgrade footer for a free-plan org in the control arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: false,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: /North Virginia/ })).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
+
+      test('shows the full region picker with no upgrade footer for a paid-plan org even when enrolled', async () => {
+        mockWizardEndpoints()
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
+        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
+      })
+    })
+
     describe('restricted regions', () => {
       const CAPACITY_COPY = {
         title: 'Selected region is at capacity',
@@ -617,7 +718,7 @@ describe('project creation wizard', () => {
       ).not.toBeInTheDocument()
     })
 
-    test('selecting orioledb shows the alpha warning and submits the oriole engine/channel', async () => {
+    test('selecting orioledb shows the beta warning and submits the oriole engine/channel', async () => {
       mockWizardEndpoints()
       const onRequest = vi.fn()
       mockCreateProject(onRequest)
@@ -638,7 +739,7 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       const body = onRequest.mock.calls[0][0]
       expect(body.postgres_engine).toBe('17-oriole')
-      expect(body.release_channel).toBe('alpha')
+      expect(body.release_channel).toBe('beta')
     })
 
     test('hides advanced configuration only while high availability is enabled', async () => {

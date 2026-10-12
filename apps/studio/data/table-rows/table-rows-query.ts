@@ -403,7 +403,7 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 ) => {
   const queryClient = useQueryClient()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   // [Ali] Exclude preflightCheck from query key — it controls how the query
   // executes (whether an EXPLAIN guard runs first), not what data is returned.

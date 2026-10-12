@@ -8,8 +8,8 @@ import { getRowTimestampMs } from '../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../config/serviceFlowFields'
 import { BlockFieldConfig } from '../types'
 import { DetailRow } from './shared/DetailRow'
-import { DetailSectionHeader } from './shared/DetailSection'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
+import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 
 interface PostgresFlowDetailProps {
   data: ColumnSchema

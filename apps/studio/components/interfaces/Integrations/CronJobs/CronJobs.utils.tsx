@@ -122,6 +122,9 @@ select
   );`
 }
 
+// Default of pg_net's `timeout_milliseconds` argument, used when a command omits it
+const PG_NET_DEFAULT_TIMEOUT_MS = 5000
+
 const DEFAULT_CRONJOB_COMMAND = {
   type: 'sql_snippet',
   snippet: '',
@@ -150,7 +153,7 @@ export const parseCronJobCommand = (
     const body = unescapeSqlLiteral(bodyMatch?.[2], Boolean(bodyMatch?.[1]))
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
-    const timeout = timeoutMatch?.[1] || ''
+    const timeoutMs = timeoutMatch ? Number(timeoutMatch[1]) : PG_NET_DEFAULT_TIMEOUT_MS
 
     let headersObjs: { name: string; value: string }[] = []
     if (/headers:=jsonb_build_object\s*\(/i.test(command)) {
@@ -198,7 +201,7 @@ export const parseCronJobCommand = (
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: Number(timeout ?? 1000),
+        timeoutMs,
         snippet: originalCommand,
       }
     }
@@ -210,7 +213,7 @@ export const parseCronJobCommand = (
         endpoint: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: Number(timeout ?? 1000),
+        timeoutMs,
         snippet: originalCommand,
       }
     }

@@ -172,7 +172,7 @@ const AttributeUsage = ({
                           ) : (
                             <p className="text-xs">
                               {attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
-                                ? `${usageMeta.pricing_free_units ?? 0} GB`
+                                ? `${usageMeta.pricing_free_units?.toLocaleString() ?? 0} GB`
                                 : (usageMeta.pricing_free_units ?? 0).toLocaleString()}
                             </p>
                           )}

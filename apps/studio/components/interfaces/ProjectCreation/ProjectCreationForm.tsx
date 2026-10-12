@@ -31,7 +31,9 @@ import {
 import { FormSchema } from './ProjectCreation.schema'
 import {
   getAvailableRegions,
+  getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
+  getRegionSelectionType,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
@@ -74,6 +76,7 @@ import {
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
@@ -121,6 +124,7 @@ export const ProjectCreationForm = ({
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
+  const hasSelectedOrganization = currentOrg !== undefined
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
@@ -135,7 +139,7 @@ export const ProjectCreationForm = ({
     'integrations.github_connections'
   )
 
-  const { hasLoaded: flagsLoaded } = useFeatureFlags()
+  const { hasLoaded: flagsLoaded, isConfigCatStale } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration =
     useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
@@ -202,6 +206,20 @@ export const ProjectCreationForm = ({
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
+  const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
+  const isResolvingFreeTierGeneralRegionExperiment =
+    isFreePlan &&
+    smartRegionEnabled &&
+    (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
+  const freeTierGeneralRegionEnrollment = useFlag('freeTierGeneralRegionEnrollment')
+  const freeTierGeneralRegionSelection = useFlag('freeTierGeneralRegionSelection')
+  const freeTierGeneralRegionExperimentVariant = getFreeTierGeneralRegionExperimentVariant({
+    isFreePlan,
+    smartRegionEnabled,
+    enrollmentFlag: freeTierGeneralRegionEnrollment,
+    selectionFlag: freeTierGeneralRegionSelection,
+  })
+
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
   // would re-fire this effect after each setValue and trigger an infinite loop.
@@ -216,10 +234,8 @@ export const ProjectCreationForm = ({
   // form state carried over from the free plan. To avoid this, we set a
   // default instance size in this case.
   const instanceSize = canChooseInstanceSize ? (watchedInstanceSize ?? sizes[0]) : undefined
-  const { data: membersExceededLimit = [] } = useFreeProjectLimitCheckQuery(
-    { slug },
-    { enabled: isFreePlan }
-  )
+  const { data: membersExceededLimit = [], isLoading: isLoadingFreeProjectLimit } =
+    useFreeProjectLimitCheckQuery({ slug }, { enabled: isFreePlan })
   const hasMembersExceedingFreeTierLimit = membersExceededLimit.length > 0
   const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
 
@@ -265,21 +281,25 @@ export const ProjectCreationForm = ({
     }
   )
 
-  const { data: availableRegionsData, error: availableRegionsError } =
-    useOrganizationAvailableRegionsQuery(
-      {
-        slug: slug,
-        cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
-        desiredInstanceSize: instanceSize as DesiredInstanceSize,
-      },
-      {
-        enabled: flagsLoaded && smartRegionEnabled,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchInterval: false,
-        refetchOnReconnect: false,
-      }
-    )
+  const {
+    data: availableRegionsData,
+    error: availableRegionsError,
+    isFetching: isFetchingAvailableRegions,
+  } = useOrganizationAvailableRegionsQuery(
+    {
+      slug: slug,
+      cloudProvider: PROVIDERS[cloudProvider as CloudProvider].id,
+      desiredInstanceSize: instanceSize as DesiredInstanceSize,
+      highAvailability,
+    },
+    {
+      enabled: flagsLoaded && smartRegionEnabled && hasSelectedOrganization,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchInterval: false,
+      refetchOnReconnect: false,
+    }
+  )
 
   const highAvailabilityRegion =
     highAvailability && highAvailabilityRegionCode !== undefined
@@ -315,6 +335,7 @@ export const ProjectCreationForm = ({
       cloudProvider: cloudProvider as CloudProvider,
       dbRegion: smartRegionEnabled ? dbRegionExact : (dbRegion ?? ''),
       organizationSlug: organization,
+      highAvailability,
     },
     { enabled: currentOrg !== null }
   )
@@ -342,6 +363,12 @@ export const ProjectCreationForm = ({
   } = useProjectCreateMutation({
     onSuccess: (res) => {
       setProjectCreationError(undefined)
+      const regionSelectionType = smartRegionEnabled
+        ? getRegionSelectionType({
+            dbRegion: form.getValues('dbRegion'),
+            availableRegions: availableRegionsData?.all,
+          })
+        : undefined
       track(
         'project_creation_simple_version_submitted',
         {
@@ -354,6 +381,10 @@ export const ProjectCreationForm = ({
           ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
             dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
           }),
+          ...(freeTierGeneralRegionExperimentVariant !== undefined && {
+            freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
+          }),
+          ...(regionSelectionType !== undefined && { regionSelectionType }),
         },
         {
           project: res.ref,
@@ -588,6 +619,26 @@ export const ProjectCreationForm = ({
     track('project_creation_form_exposed', { surface })
   }, [isOrganizationsSuccess, canCreateProject, currentOrg, track, surface])
 
+  const freeTierGeneralRegionExposedSlug = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (!slug || freeTierGeneralRegionExposedSlug.current === slug) return
+    if (isResolvingFreeTierGeneralRegionExperiment) return
+    if (freeTierGeneralRegionExperimentVariant === undefined) return
+    if (!canCreateProject || projectCreationDisabled || isLoadingFreeProjectLimit) return
+    freeTierGeneralRegionExposedSlug.current = slug
+    track('free_tier_general_region_experiment_exposed', {
+      variant: freeTierGeneralRegionExperimentVariant,
+    })
+  }, [
+    slug,
+    isResolvingFreeTierGeneralRegionExperiment,
+    freeTierGeneralRegionExperimentVariant,
+    canCreateProject,
+    projectCreationDisabled,
+    isLoadingFreeProjectLimit,
+    track,
+  ])
+
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
     if (allOrgProjects && allOrgProjects.length > 0 && !allProjects) {
@@ -711,6 +762,7 @@ export const ProjectCreationForm = ({
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
+              isLoadingAvailableRegions={isFetchingAvailableRegions}
               cancelAction={isVercelIntegrationFlow ? 'close' : 'studio'}
             />
           }
@@ -772,7 +824,10 @@ export const ProjectCreationForm = ({
 
                     <RegionSelector
                       form={form}
+                      hasSelectedOrganization={hasSelectedOrganization}
                       instanceSize={instanceSize as DesiredInstanceSize}
+                      showGeneralRegionsOnly={freeTierGeneralRegionExperimentVariant === 'test'}
+                      isLoading={isResolvingFreeTierGeneralRegionExperiment}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}

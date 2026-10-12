@@ -572,14 +572,7 @@ export interface paths {
     /**
      * Gets project's logs
      * @deprecated
-     * @description Executes a SQL query on the project's logs.
-     *
-     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
-     *     If both are not provided, only the last 1 minute of logs will be queried.
-     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
-     *
-     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.
-     *
+     * @description This endpoint has been removed and always responds with `410 Gone`. Use `GET /v1/projects/{ref}/analytics/endpoints/logs` instead. See the [migration guide](https://supabase.com/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint).
      */
     get: operations['v1-get-project-logs-all']
     put?: never
@@ -4041,6 +4034,8 @@ export interface components {
       message: string
     }
     PostgresConfigResponse_Output: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4074,6 +4069,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
@@ -4226,6 +4223,11 @@ export interface components {
       override_enabled: boolean
     }
     RealtimeConfigResponse_Output: {
+      /**
+       * Format: date-time
+       * @description If set, the Realtime service has been suspended by an admin.
+       */
+      admin_suspended_at: string | null
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool: number | null
       /** @description Sets maximum number of bytes per second rate per channel limit */
@@ -4952,6 +4954,8 @@ export interface components {
      *       "statement_timeout": "60000ms"
      *     } */
     UpdatePostgresConfigBody: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4985,6 +4989,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       restart_database?: boolean
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
@@ -7622,12 +7628,7 @@ export interface operations {
   }
   'v1-get-project-logs-all': {
     parameters: {
-      query?: {
-        iso_timestamp_end?: string
-        iso_timestamp_start?: string
-        /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
-        sql?: string
-      }
+      query?: never
       header?: never
       path: {
         /** @description Project ref */
@@ -7637,14 +7638,6 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse_Output']
-        }
-      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -7652,15 +7645,15 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Usage exceeded. Enable additional usage to continue querying */
-      402: {
+      /** @description Forbidden action */
+      403: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
-      /** @description Forbidden action */
-      403: {
+      /** @description This endpoint has been removed */
+      410: {
         headers: {
           [name: string]: unknown
         }

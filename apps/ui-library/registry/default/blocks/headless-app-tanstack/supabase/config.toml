@@ -57,5 +57,5 @@ authorization_url_path = "/oauth/consent"
 allow_dynamic_registration = true
 
 # The MCP server verifies user access tokens itself, so skip the gateway check.
-[functions.mcp-server]
+[functions.mcp]
 verify_jwt = false

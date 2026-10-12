@@ -24,7 +24,11 @@ import InformationBox from '@/components/ui/InformationBox'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsHighAvailability, useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsHighAvailability,
+  useIsOrioleDbInAws,
+  useOrioleDbReleaseStage,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -63,8 +67,9 @@ const ScheduledBackups = () => {
     isSuccess,
   } = useBackupsQuery({ projectRef })
 
-  const isOrioleDbInAws = useIsOrioleDbInAws()
   const isHighAvailability = useIsHighAvailability()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const isPitrEnabled = backups?.pitr_enabled
 
   const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -72,14 +77,14 @@ const ScheduledBackups = () => {
     'back_ups'
   )
 
-  if (isOrioleDbInAws) {
+  if (isOrioleDbInAws && orioleDbReleaseStage === 'alpha') {
     return (
       <Admonition
         type="default"
         title="Database backups are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description={`OrioleDB is currently in public ${orioleDbReleaseStage} and projects created are strictly ephemeral with no database backups`}
       >
-        <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>
     )
   }

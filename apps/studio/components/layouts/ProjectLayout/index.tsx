@@ -311,7 +311,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 maxSize={resizableSidebar ? 512 : 256}
                 defaultSize={256}
                 id="panel-left"
-                disabled={!resizableSidebar}
               >
                 <AnimatePresence initial={false}>
                   <motion.div

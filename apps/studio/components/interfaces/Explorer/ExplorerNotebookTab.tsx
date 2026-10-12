@@ -61,7 +61,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
-import { useCreateChat, useLoadNotebook } from './hooks'
+import { useAnalyzeNotebook, useLoadNotebook } from './hooks'
 import { MarkdownCell } from './MarkdownCell'
 import { QueryCell } from './QueryCell'
 import { type QueryEditorHandle } from './QueryEditor'
@@ -83,6 +83,7 @@ import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-ups
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
@@ -97,7 +98,7 @@ export const ExplorerNotebookTab = () => {
   const tabs = useTabsStateSnapshot()
   const snap = useNotebooksStateSnapshot()
   const queryClient = useQueryClient()
-  const { createChat, isCreating } = useCreateChat()
+  const { analyzeNotebook, isCreating } = useAnalyzeNotebook()
   const { onSelectDelete } = useExplorerDeleteItem()
 
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
@@ -109,6 +110,7 @@ export const ExplorerNotebookTab = () => {
   const { name, content } = currentNotebook?.notebook ?? {}
   const { isNotFound } = useLoadNotebook({ id, projectRef: ref })
   const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
   const cells = content?.cells ?? []
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
@@ -121,12 +123,31 @@ export const ExplorerNotebookTab = () => {
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const [isExportingPdf, setIsExportingPdf] = useState(false)
+
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
+  const confirmedCreatedNotebookIdsRef = useRef(new Set<string>())
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: (data) => {
+  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation<{
+    isCreation: boolean
+  }>({
+    onMutate: (variables) => ({
+      isCreation:
+        (currentNotebook?.status === 'new' ||
+          snap.serverDivergedWhileDirty.get(variables.id) === 'deleted') &&
+        !confirmedCreatedNotebookIdsRef.current.has(variables.id),
+    }),
+    onSuccess: (data, variables, context) => {
+      const { isCreation } = context
+      if (isCreation) confirmedCreatedNotebookIdsRef.current.add(variables.id)
+
+      track(
+        isCreation ? 'explorer_notebook_created' : 'explorer_notebook_updated',
+        { notebookId: variables.id },
+        { project: variables.projectRef }
+      )
+
       if (id && content === savedContentRef.current) {
         snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
@@ -296,12 +317,7 @@ export const ExplorerNotebookTab = () => {
     }
   }
 
-  const handleAnalyze = () => {
-    createChat({
-      name: `Analyze ${name} notebook`,
-      initialMessage: `Run the notebook "${name}" (id: ${id}) and analyze the results. Summarize the key findings per cell, calling out anomalies or trends, and use any markdown cells for context. Skip or flag any cell that would mutate data rather than running it.`,
-    })
-  }
+  const handleAnalyze = () => analyzeNotebook({ id, name })
 
   const handleClickAnalyze = () => {
     if (hasDiscardableChanges(currentNotebook)) {

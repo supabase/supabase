@@ -118,6 +118,15 @@ export const QueryCell = forwardRef<QueryEditorHandle, QueryCellProps>(function 
       <QueryEditor
         ref={ref}
         id={cell._id}
+        location={
+          currentNotebook
+            ? {
+                surface: 'notebook_cell',
+                notebookId: currentNotebook.notebook.id,
+                cellId: cell._id,
+              }
+            : undefined
+        }
         variant="embedded"
         className="min-h-0"
         title={title}

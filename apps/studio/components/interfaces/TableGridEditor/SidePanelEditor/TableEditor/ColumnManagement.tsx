@@ -72,6 +72,18 @@ export const ColumnManagement = ({
   const [columnIdToFocus, setColumnIdToFocus] = useState<string | null>(null)
 
   const hasImportContent = !isEmpty(importContent)
+  const columnGridTemplate = [
+    isNewRecord && '26px',
+    'minmax(0, 30fr)',
+    'minmax(0, 25fr)',
+    `minmax(0, ${isNewRecord ? 25 : 30}fr)`,
+    'minmax(0, 10fr)',
+    hasImportContent && 'minmax(0, 10fr)',
+    '26px',
+    !hasImportContent && '26px',
+  ]
+    .filter(Boolean)
+    .join(' ')
   const [primaryKeyColumns, otherColumns] = partition(
     columns,
     (column: ColumnField) => column.isPrimaryKey
@@ -222,14 +234,24 @@ export const ColumnManagement = ({
 
         <div className="space-y-2">
           {/* Headers */}
-          <div className="flex w-full px-3">
+          <div
+            className={`grid items-center gap-x-1 w-full ${isNewRecord ? 'px-3' : ''}`}
+            style={{ gridTemplateColumns: columnGridTemplate }}
+          >
             {/* Drag handle */}
-            {isNewRecord && <div className="w-[5%]" />}
-            <div className="w-[25%] flex items-center space-x-2">
+            {isNewRecord && <div />}
+            <div className="min-w-0 flex items-center space-x-2">
               <h5 className="text-xs text-foreground-lighter">Name</h5>
               <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="text"
+                    aria-label="Show help for column Name"
+                    className="w-6.5 px-0"
+                    icon={
+                      <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                    }
+                  />
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="w-[300px]">
                   Recommended to use lowercase and use an underscore to separate words e.g.
@@ -237,14 +259,21 @@ export const ColumnManagement = ({
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="w-[25%]">
+            <div className="min-w-0">
               <h5 className="text-xs text-foreground-lighter">Type</h5>
             </div>
-            <div className={`${isNewRecord ? 'w-[25%]' : 'w-[30%]'} flex items-center space-x-2`}>
-              <h5 className="text-xs text-foreground-lighter">Default Value</h5>
+            <div className="min-w-0 flex items-center space-x-2">
+              <h5 className="text-xs text-foreground-lighter">Default value</h5>
               <Tooltip>
-                <TooltipTrigger>
-                  <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="text"
+                    aria-label="Show help for column Default value"
+                    className="w-6.5 px-0"
+                    icon={
+                      <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                    }
+                  />
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="w-[300px]">
                   Can either be a literal or an expression. When using an expression wrap your
@@ -252,15 +281,15 @@ export const ColumnManagement = ({
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="w-[10%]">
+            <div className="min-w-0">
               <h5 className="text-xs text-foreground-lighter">Primary</h5>
             </div>
             {/* Empty space */}
-            <div className={`${hasImportContent ? 'w-[10%]' : 'w-0'}`} />
+            {hasImportContent && <div />}
             {/* More config button */}
-            <div className="w-[5%]" />
+            <div />
             {/* Delete button */}
-            {!hasImportContent && <div className="w-[5%]" />}
+            {!hasImportContent && <div />}
           </div>
 
           {primaryKeyColumns.length > 0 && (
@@ -286,6 +315,7 @@ export const ColumnManagement = ({
                       hasForeignKeys={checkIfHaveForeignKeys(column)}
                       isNewRecord={isNewRecord}
                       hasImportContent={hasImportContent}
+                      gridTemplateColumns={columnGridTemplate}
                       shouldAutoFocusName={column.id === columnIdToFocus}
                       onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                       onRemoveColumn={() => onRemoveColumn(column)}
@@ -318,6 +348,7 @@ export const ColumnManagement = ({
                     isNewRecord={isNewRecord}
                     hasForeignKeys={checkIfHaveForeignKeys(column)}
                     hasImportContent={hasImportContent}
+                    gridTemplateColumns={columnGridTemplate}
                     shouldAutoFocusName={column.id === columnIdToFocus}
                     onUpdateColumn={(changes) => onUpdateColumn(column, changes)}
                     onRemoveColumn={() => onRemoveColumn(column)}

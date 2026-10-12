@@ -140,7 +140,7 @@ export function RotateKeyDialog({
 
             <Label
               htmlFor="understands-standby"
-              className="flex items-top gap-4 text-sm leading-none"
+              className="flex items-start gap-4 text-sm leading-none"
             >
               <Checkbox
                 id="understands-standby"
@@ -175,7 +175,7 @@ export function RotateKeyDialog({
 
             <Label
               htmlFor="understands-previously-used"
-              className="flex items-top gap-4 text-sm leading-none"
+              className="flex items-start gap-4 text-sm leading-none"
             >
               <Checkbox
                 className="mt-0.5"

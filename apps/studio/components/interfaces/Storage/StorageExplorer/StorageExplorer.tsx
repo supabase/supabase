@@ -1,6 +1,4 @@
-import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { useState } from 'react'
 
 import { useSelectedBucket } from '../FilesBuckets/useSelectedBucket'
 import { StorageExplorerContent } from './StorageExplorerContent'
@@ -11,8 +9,8 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const StorageExplorer = () => {
   const { ref, bucketId } = useParams()
-  const { selectedBucket } = useStorageExplorerStateSnapshot()
-
+  const { selectedBucket, debouncedSearchString, itemSearchString, setItemSearchString } =
+    useStorageExplorerStateSnapshot()
   useProjectStorageConfigQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { data: bucket, isLoading: isBucketQueryLoading } = useSelectedBucket()
 
@@ -20,8 +18,6 @@ export const StorageExplorer = () => {
   const isBucketReady = !isBucketQueryLoading && !!bucket && bucketId === selectedBucket.id
 
   // Deliberately not in the URL, so a shared link points at a folder, not someone's filter.
-  const [itemSearchString, setItemSearchString] = useState('')
-  const debouncedSearchString = useDebounce(itemSearchString, 500)
 
   return (
     <div className="bg-studio flex h-full w-full flex-col">

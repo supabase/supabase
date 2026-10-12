@@ -13,8 +13,8 @@ import {
   MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
 } from './components/ServiceBlocks'
-import { DetailSectionHeader } from './components/shared/DetailSection'
 import type { ServiceFlowBlockProps } from './types'
+import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
   data: ColumnSchema
