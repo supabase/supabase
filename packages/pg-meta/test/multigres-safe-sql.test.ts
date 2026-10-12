@@ -16,11 +16,8 @@ const expectAnalyzableExecutes = (sql: string) => {
     (m) => m[1]
   )
   for (const formatString of formatStrings) {
-    const conversions = [...formatString.matchAll(/%(?:\d+\$)?([A-Za-z%])/g)].map((m) => m[1])
-    expect(
-      conversions.every((c) => ['I', 'L', '%'].includes(c)),
-      formatString
-    ).toBe(true)
+    // Strip the allowed conversions; any `%` left over is a `%s` or another unchecked conversion.
+    expect(formatString.replace(/%(?:\d+\$)?[IL]|%%/g, ''), formatString).not.toContain('%')
   }
   return formatStrings.length
 }
@@ -49,6 +46,7 @@ test('publication update SQL has analyzable EXECUTEs', () => {
     { tables: null },
     { tables: [] },
     { tables: ['public.t', 'bare', 'a.b.c'] },
+    { tables: ['My Schema.Odd Table', `it's."q"`] },
     { name: 'renamed', owner: 'postgres', publish_insert: true },
   ]
   for (const params of variants) {

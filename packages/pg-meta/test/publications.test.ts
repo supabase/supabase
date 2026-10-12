@@ -378,3 +378,102 @@ withTestDatabase('update from a table list to all tables and back', async ({ exe
   await executeQuery(pgMeta.publications.update(allTables.id, { tables: ['todos'] }).sql)
   expect(await publicationTableNames(executeQuery, 'pub')).toEqual(['public.todos'])
 })
+
+const createPublication = async (
+  executeQuery: <T = any>(query: string) => Promise<T>,
+  params: Parameters<typeof pgMeta.publications.create>[0]
+) => {
+  await executeQuery(pgMeta.publications.create(params).sql)
+  const { sql, zod } = pgMeta.publications.retrieve({ name: params.name })
+  return zod.parse((await executeQuery(sql))[0])!
+}
+
+withTestDatabase(
+  'update with tables in other schemas, with names that need quoting',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create schema "My Schema";
+      create table "My Schema"."Odd Table"();
+      create schema a;
+      create table a."b.c"();
+    `)
+    const { id } = await createPublication(executeQuery, { name: 'pub', tables: ['users'] })
+
+    // `a.b.c` splits on the first dot only: schema `a`, table `b.c`.
+    await executeQuery(
+      pgMeta.publications.update(id, { tables: ['My Schema.Odd Table', 'a.b.c', 'public.users'] })
+        .sql
+    )
+    expect(await publicationTableNames(executeQuery, 'pub')).toEqual([
+      'My Schema.Odd Table',
+      'a.b.c',
+      'public.users',
+    ])
+
+    // Replacing the list drops the tables in the other schemas again.
+    await executeQuery(pgMeta.publications.update(id, { tables: ['public.todos'] }).sql)
+    expect(await publicationTableNames(executeQuery, 'pub')).toEqual(['public.todos'])
+  }
+)
+
+withTestDatabase(
+  'update the published tables together with the name and events',
+  async ({ executeQuery }) => {
+    const { id } = await createPublication(executeQuery, {
+      name: 'pub',
+      publish_insert: true,
+      publish_update: true,
+      tables: ['users'],
+    })
+
+    await executeQuery(
+      pgMeta.publications.update(id, {
+        name: 'pub_renamed',
+        owner: 'postgres',
+        publish_insert: false,
+        publish_update: false,
+        tables: ['public.todos', 'public.memes'],
+      }).sql
+    )
+
+    const { sql, zod } = pgMeta.publications.retrieve({ name: 'pub_renamed' })
+    const res = zod.parse((await executeQuery(sql))[0])!
+    expect(res.publish_insert).toBe(false)
+    expect(res.publish_update).toBe(false)
+    expect(res.tables?.map((t) => `${t.schema}.${t.name}`).sort()).toEqual([
+      'public.memes',
+      'public.todos',
+    ])
+  }
+)
+
+withTestDatabase('update from all tables to an empty list', async ({ executeQuery }) => {
+  const { id } = await createPublication(executeQuery, { name: 'pub', tables: null })
+
+  // Going from `all tables` recreates the publication, then the add loop runs zero times.
+  await executeQuery(pgMeta.publications.update(id, { tables: [] }).sql)
+
+  const { sql, zod } = pgMeta.publications.retrieve({ name: 'pub' })
+  const res = zod.parse((await executeQuery(sql))[0])!
+  expect(res.tables).toEqual([])
+})
+
+withTestDatabase(
+  'update with a table that does not exist fails and leaves the publication untouched',
+  async ({ executeQuery }) => {
+    const { id } = await createPublication(executeQuery, {
+      name: 'pub',
+      tables: ['users', 'todos'],
+    })
+
+    await expect(
+      executeQuery(pgMeta.publications.update(id, { tables: ['public.todos', 'nope'] }).sql)
+    ).rejects.toThrow(/relation "nope" does not exist/)
+
+    // The whole `do` block rolls back, including the earlier drop of `users`.
+    expect(await publicationTableNames(executeQuery, 'pub')).toEqual([
+      'public.todos',
+      'public.users',
+    ])
+  }
+)
