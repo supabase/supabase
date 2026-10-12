@@ -39,7 +39,7 @@ import type {
   WebhookEndpoint,
   WebhookScope,
 } from './PlatformWebhooks.types'
-import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
+import { generateSigningSecret, generateWebhookEndpointName } from './PlatformWebhooks.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -47,52 +47,64 @@ import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-const endpointFormSchema = z
-  .object({
-    name: z.string().trim().max(64, 'Name cannot exceed 64 characters'),
-    url: httpEndpointUrlSchema({
-      requiredMessage: 'Please provide a URL',
-      invalidMessage: 'Please provide a valid URL',
-      prefixMessage: 'Please prefix your URL with http:// or https://',
-    }),
-    description: z.string().trim().max(512, 'Description cannot exceed 512 characters'),
-    enabled: z.boolean().default(true),
-    subscribeAll: z.boolean().default(false),
-    eventTypes: z.array(z.string()).default([]),
-    customHeaders: z
-      .array(
-        z.object({
-          key: z.string().trim(),
-          value: z.string().trim(),
+const buildEndpointFormSchema = (mode: 'create' | 'edit') =>
+  z
+    .object({
+      name: z.string().trim().max(64, 'Name cannot exceed 64 characters'),
+      url: httpEndpointUrlSchema({
+        requiredMessage: 'Please provide a URL',
+        invalidMessage: 'Please provide a valid URL',
+        prefixMessage: 'Please prefix your URL with http:// or https://',
+      }),
+      description: z.string().trim().max(512, 'Description cannot exceed 512 characters'),
+      enabled: z.boolean().default(true),
+      subscribeAll: z.boolean().default(false),
+      eventTypes: z.array(z.string()).default([]),
+      customHeaders: z
+        .array(
+          z.object({
+            key: z.string().trim(),
+            value: z.string().trim(),
+          })
+        )
+        .default([]),
+      // Only required on create — the API only accepts a new secret on create,
+      // rotating it on an existing endpoint is a separate flow (regenerateSecret).
+      signingSecret: z.string().trim().default(''),
+    })
+    .superRefine((data, ctx) => {
+      if (!data.subscribeAll && data.eventTypes.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Select at least one event type',
+          path: ['eventTypes'],
         })
-      )
-      .default([]),
-  })
-  .superRefine((data, ctx) => {
-    if (!data.subscribeAll && data.eventTypes.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Select at least one event type',
-        path: ['eventTypes'],
-      })
-    }
+      }
 
-    getKeyValueFieldArrayValidationIssues({
-      rows: data.customHeaders,
-      keyFieldName: 'key',
-      valueFieldName: 'value',
-      keyRequiredMessage: 'Header name is required',
-      valueRequiredMessage: 'Header value is required',
-    }).forEach((issue) => {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: issue.message,
-        path: ['customHeaders', ...issue.path],
+      if (mode === 'create' && data.signingSecret.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please provide a signing secret',
+          path: ['signingSecret'],
+        })
+      }
+
+      getKeyValueFieldArrayValidationIssues({
+        rows: data.customHeaders,
+        keyFieldName: 'key',
+        valueFieldName: 'value',
+        keyRequiredMessage: 'Header name is required',
+        valueRequiredMessage: 'Header value is required',
+      }).forEach((issue) => {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: issue.message,
+          path: ['customHeaders', ...issue.path],
+        })
       })
     })
-  })
 
-export type EndpointFormValues = z.infer<typeof endpointFormSchema>
+export type EndpointFormValues = z.infer<ReturnType<typeof buildEndpointFormSchema>>
 
 const toEventTypes = (values: EndpointFormValues) =>
   values.subscribeAll ? ['*'] : values.eventTypes
@@ -108,10 +120,12 @@ const buildEventTypeGroups = (scope: WebhookScope, eventTypes: string[]): EventT
     return [{ id: 'project', label: 'Project events', eventTypes }]
   }
 
-  const organizationEvents = eventTypes.filter((eventType) => eventType.startsWith('organization.'))
-  const projectEvents = eventTypes.filter((eventType) => eventType.startsWith('project.'))
+  const organizationEvents = eventTypes.filter((eventType) =>
+    eventType.startsWith('v1.organization.')
+  )
+  const projectEvents = eventTypes.filter((eventType) => eventType.startsWith('v1.project.'))
   const ungroupedEvents = eventTypes.filter(
-    (eventType) => !eventType.startsWith('organization.') && !eventType.startsWith('project.')
+    (eventType) => !eventType.startsWith('v1.organization.') && !eventType.startsWith('v1.project.')
   )
 
   return [
@@ -149,6 +163,7 @@ export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndp
     keyFieldName: 'key',
     valueFieldName: 'value',
   }),
+  signingSecret: values.signingSecret,
 })
 
 interface EndpointSheetProps {
@@ -175,7 +190,7 @@ export const PlatformWebhooksEndpointSheet = ({
   onSubmit,
 }: EndpointSheetProps) => {
   const form = useForm<EndpointFormValues>({
-    resolver: zodResolver(endpointFormSchema),
+    resolver: zodResolver(buildEndpointFormSchema(mode)),
     defaultValues: {
       name: generateWebhookEndpointName(),
       url: '',
@@ -184,6 +199,7 @@ export const PlatformWebhooksEndpointSheet = ({
       subscribeAll: false,
       eventTypes: [],
       customHeaders: [],
+      signingSecret: mode === 'create' ? generateSigningSecret() : '',
     },
   })
   const isDirty = form.formState.isDirty
@@ -216,6 +232,7 @@ export const PlatformWebhooksEndpointSheet = ({
         subscribeAll: false,
         eventTypes: [],
         customHeaders: [],
+        signingSecret: generateSigningSecret(),
       })
       return
     }
@@ -231,6 +248,7 @@ export const PlatformWebhooksEndpointSheet = ({
         key: header.key,
         value: header.value,
       })),
+      signingSecret: '',
     })
   }, [enabledOverride, endpoint, eventTypes, form, visible])
 
@@ -305,6 +323,33 @@ export const PlatformWebhooksEndpointSheet = ({
                     </FormItemLayout>
                   )}
                 />
+
+                {mode === 'create' && (
+                  <FormField
+                    control={form.control}
+                    name="signingSecret"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Signing secret"
+                        description="Shown only once after creation — used to verify delivery payloads."
+                        layout="vertical"
+                        className="gap-1"
+                      >
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input {...field} placeholder="whsec_..." className="font-mono" />
+                          </FormControl>
+                          <Button
+                            type="button"
+                            onClick={() => field.onChange(generateSigningSecret())}
+                          >
+                            Generate
+                          </Button>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
 
                 <FormField
                   control={form.control}
