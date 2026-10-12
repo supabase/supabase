@@ -82,6 +82,7 @@ dotnet add package Supabase.Extensions.DependencyInjection
 Register the client in `Program.cs`:
 
 ```c#
+using Supabase.Core.Http;
 using Supabase.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -100,6 +101,8 @@ var app = builder.Build();
 `AddSupabase` registers the `Supabase.Client` as a scoped service, so you can inject it wherever you need: a minimal API endpoint, a controller, or your own service.
 
 ```c#
+using Supabase;
+
 public class TodoService(Client supabase)
 {
     public async Task<List<Todo>> GetOpen()
@@ -140,7 +143,8 @@ var supabase = new Client(url, key, options);
 await supabase.InitializeAsync();
 ```
 
-`InitializeAsync` loads any persisted session and, with `AutoConnectRealtime` on, opens the Realtime connection.
+`InitializeAsync` restores a saved session and, with `AutoConnectRealtime` on, opens the Realtime connection.
+The default session handler does not store anything, so to restore a sign-in after a restart, set `SupabaseOptions.SessionHandler` to your own implementation that saves and loads the session.
 Create the client once and reuse it in the app.
 A new client per operation means a new `HttpClient` each time, which is the same problem the DI package solves on the server.
 
@@ -153,7 +157,7 @@ The examples below use a `supabase` variable, which is a `Supabase.Client` insta
 `From<T>()` opens a query on the table mapped by `T`.
 You can then filter using `Where` and then call `Get` to execute the query.
 
-`Get` returns a `ModeledResponse<T>`, and you can find the rows with in `Models`:
+`Get` returns a `ModeledResponse<T>`, and you can find the rows in `Models`:
 
 ```c#
 ModeledResponse<Todo> result = await supabase
@@ -174,9 +178,9 @@ await supabase.From<Todo>().Insert(new Todo { Task = "Write the launch notes", I
 ### Update and delete
 
 There are two ways to update an entity, and both are valid.
-It simply depends on whether you already have th row in hand.
+It simply depends on whether you already have the row in hand.
 
-If you already retrievied a model, change its properties and call `Update` on it.
+If you already retrieved a model, change its properties and call `Update` on it.
 A row returned from `Get` carries its own identity, so it knows which record to write:
 
 ```c#
