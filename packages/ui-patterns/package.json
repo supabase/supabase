@@ -522,6 +522,10 @@
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
     },
+    "./Notch": {
+      "import": "./src/Notch/index.ts",
+      "types": "./src/Notch/index.ts"
+    },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",
       "types": "./src/PageBreadcrumbs/index.tsx"
