@@ -25,7 +25,6 @@
   --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
 }
 
-/* kb's strong ease-out for entrances and menus, used as `ease-out-strong` or var(--ease-out-strong) */
 @theme {
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 }
@@ -37,7 +36,6 @@
   --tracking-label: 0.08em;
 }
 
-/* the raised shadows are dark-only, so light theme falls back to no shadow */
 @theme inline {
   --shadow-raised: var(--raised-shadow, 0 0 #0000);
   --drop-shadow-raised: var(--raised-drop-shadow, 0 0 #0000);
@@ -133,4 +131,10 @@ h6:not(.font-mono),
 
 .prose [role='alert'] {
   margin: 1.25rem 0;
+}
+
+@media (width < 64rem) {
+  html[data-mobile-menu-open] {
+    overflow: hidden;
+  }
 }
