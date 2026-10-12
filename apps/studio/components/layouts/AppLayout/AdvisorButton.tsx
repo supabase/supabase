@@ -35,10 +35,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const hasCriticalIssues =
     hasCriticalNotifications ||
     hasCriticalSignals ||
-    accountRecoveryAdvice?.severity === 'critical' ||
+    accountRecoveryAdvice.some((item) => item.severity === 'critical') ||
     (Array.isArray(lints) && lints.some((lint) => lint.level === 'ERROR'))
   const hasWarningIssues =
-    (hasSignals || accountRecoveryAdvice?.severity === 'warning') && !hasCriticalIssues
+    (hasSignals || accountRecoveryAdvice.some((item) => item.severity === 'warning')) &&
+    !hasCriticalIssues
 
   const isOpen = activeSidebar?.id === SIDEBAR_KEYS.ADVISOR_PANEL
 

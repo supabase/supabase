@@ -1,75 +1,60 @@
 import type { AdvisorAccountItem } from './AdvisorPanel.types'
-import type { MFAFactor } from '@/data/profile/mfa-list-factors-query'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 
-type AccountRecoveryAdviceInput = {
-  factors: Pick<MFAFactor, 'factor_type' | 'status'>[]
-  identities: { provider: string }[]
-  recoveryCodes:
-    | { status: 'unenrolled' }
-    | { status: 'available'; data: { remaining: number } | null }
-}
+const recoveryCodesHref = '/account/security#recovery-codes'
 
-export const createAccountRecoveryAdvice = ({
-  factors,
-  identities,
-  recoveryCodes,
-}: AccountRecoveryAdviceInput): AdvisorAccountItem | undefined => {
-  if (identities.some((identity) => identity.provider.startsWith('sso'))) return undefined
-
-  const verifiedFactorCount = factors.filter(
-    (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
-  ).length
-  if (verifiedFactorCount === 0) return undefined
-
-  const hasInsufficientBackupFactors = verifiedFactorCount < 2
-  const availableCodes =
-    recoveryCodes.status === 'available' ? recoveryCodes.data?.remaining : undefined
-
-  if (recoveryCodes.status === 'unenrolled') {
-    return {
-      id: 'account:recovery-codes-missing',
-      source: 'signal',
-      scope: 'account',
-      type: 'recovery-codes-missing',
-      category: 'security',
-      severity: hasInsufficientBackupFactors ? 'critical' : 'warning',
-      title: 'Generate account recovery codes',
-      summary:
-        'Your account has no recovery codes. Generate codes and store them somewhere safe so you can sign in if you lose access to an authenticator app.',
-      actions: [{ label: 'Generate recovery codes', href: '/account/security#recovery-codes' }],
+export const mapAccountRecoveryFindings = (
+  findings: AccountRecoveryFinding[]
+): AdvisorAccountItem[] =>
+  findings.map((finding) => {
+    const base = {
+      id: `account:${finding.id}`,
+      source: 'signal' as const,
+      scope: 'account' as const,
+      type: finding.id,
+      category: 'security' as const,
+      severity: finding.severity,
     }
-  }
 
-  if (availableCodes === 0) {
-    return {
-      id: 'account:recovery-codes-exhausted',
-      source: 'signal',
-      scope: 'account',
-      type: 'recovery-codes-exhausted',
-      category: 'security',
-      severity: hasInsufficientBackupFactors ? 'critical' : 'warning',
-      title: 'Regenerate account recovery codes',
-      summary:
-        'Your account has no unused recovery codes. Regenerate them and store the new codes somewhere safe.',
-      actions: [{ label: 'Regenerate recovery codes', href: '/account/security#recovery-codes' }],
+    switch (finding.id) {
+      case 'recovery-codes-missing':
+        return {
+          ...base,
+          title: 'Generate account recovery codes',
+          summary:
+            'Your account has no recovery codes. Generate codes and store them somewhere safe so you can sign in if you lose access to an authenticator app.',
+          actions: [{ label: 'Generate recovery codes', href: recoveryCodesHref }],
+        }
+      case 'recovery-codes-exhausted':
+        return {
+          ...base,
+          title: 'Regenerate account recovery codes',
+          summary:
+            'Your account has no unused recovery codes. Regenerate them and store the new codes somewhere safe.',
+          actions: [{ label: 'Regenerate recovery codes', href: recoveryCodesHref }],
+        }
+      case 'recovery-codes-low':
+        return {
+          ...base,
+          title: 'Regenerate account recovery codes',
+          summary: `Your account has ${finding.remainingCodes} unused recovery ${finding.remainingCodes === 1 ? 'code' : 'codes'}. Regenerate codes before you need them.`,
+          actions: [{ label: 'Regenerate recovery codes', href: recoveryCodesHref }],
+        }
+      case 'single-mfa-factor':
+        return {
+          ...base,
+          title: 'Add a backup MFA method',
+          summary:
+            'Your account has one verified MFA method. Add a backup method on another device in case you lose access to the first.',
+          actions: [{ label: 'Review multi-factor authentication', href: '/account/security' }],
+        }
+      case 'single-oauth-identity':
+        return {
+          ...base,
+          title: 'Add a password to your account',
+          summary:
+            'Your account has one external sign-in method. Add a password so you have another way to sign in.',
+          actions: [{ label: 'Add a password', href: '/reset-password?type=change' }],
+        }
     }
-  }
-
-  // One remaining code merits a reminder, but still provides a recovery path.
-  if (availableCodes === 1) {
-    return {
-      id: 'account:recovery-codes-low',
-      source: 'signal',
-      scope: 'account',
-      type: 'recovery-codes-low',
-      category: 'security',
-      severity: 'info',
-      title: 'Review account recovery codes',
-      summary:
-        'Your account has one unused recovery code. Consider regenerating codes before you need them.',
-      actions: [{ label: 'Review recovery codes', href: '/account/security#recovery-codes' }],
-    }
-  }
-
-  return undefined
-}
+  })

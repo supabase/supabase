@@ -1,105 +1,56 @@
 import { describe, expect, it } from 'vitest'
 
-import { createAccountRecoveryAdvice } from './account-recovery-advice'
+import { mapAccountRecoveryFindings } from './account-recovery-advice'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 
-const oneFactor = [{ factor_type: 'totp' as const, status: 'verified' as const }]
-const twoFactors = [...oneFactor, ...oneFactor]
-const identities = [{ provider: 'email' }]
+const findings: AccountRecoveryFinding[] = [
+  { id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' },
+  {
+    id: 'recovery-codes-exhausted',
+    severity: 'critical',
+    action: 'regenerate-codes',
+    remainingCodes: 0,
+  },
+  {
+    id: 'recovery-codes-low',
+    severity: 'warning',
+    action: 'regenerate-codes',
+    remainingCodes: 2,
+  },
+  { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
+  { id: 'single-oauth-identity', severity: 'warning', action: 'set-password' },
+]
 
-describe('createAccountRecoveryAdvice', () => {
-  it('requires a verified factor and excludes SSO managed accounts', () => {
+describe('mapAccountRecoveryFindings', () => {
+  it('maps all shared finding types to account signals with stable IDs', () => {
+    const items = mapAccountRecoveryFindings(findings)
+
     expect(
-      createAccountRecoveryAdvice({
-        factors: [{ factor_type: 'totp', status: 'unverified' }],
-        identities,
-        recoveryCodes: { status: 'unenrolled' },
-      })
-    ).toBeUndefined()
-    expect(
-      createAccountRecoveryAdvice({
-        factors: [{ factor_type: 'recovery_code', status: 'verified' }],
-        identities,
-        recoveryCodes: { status: 'unenrolled' },
-      })
-    ).toBeUndefined()
-    expect(
-      createAccountRecoveryAdvice({
-        factors: oneFactor,
-        identities: [{ provider: 'sso:example' }],
-        recoveryCodes: { status: 'unenrolled' },
-      })
-    ).toBeUndefined()
-  })
-
-  it('makes missing and exhausted codes critical only without a second factor', () => {
-    for (const recoveryCodes of [
-      { status: 'unenrolled' as const },
-      { status: 'available' as const, data: { remaining: 0 } },
-    ]) {
-      expect(
-        createAccountRecoveryAdvice({ factors: oneFactor, identities, recoveryCodes })?.severity
-      ).toBe('critical')
-      expect(
-        createAccountRecoveryAdvice({ factors: twoFactors, identities, recoveryCodes })?.severity
-      ).toBe('warning')
-    }
-  })
-
-  it('uses account-scoped signal types and the matching Security action', () => {
-    const cases = [
-      {
-        recoveryCodes: { status: 'unenrolled' as const },
-        type: 'recovery-codes-missing',
-        label: 'Generate recovery codes',
-      },
-      {
-        recoveryCodes: { status: 'available' as const, data: { remaining: 0 } },
-        type: 'recovery-codes-exhausted',
-        label: 'Regenerate recovery codes',
-      },
-      {
-        recoveryCodes: { status: 'available' as const, data: { remaining: 1 } },
-        type: 'recovery-codes-low',
-        label: 'Review recovery codes',
-      },
-    ]
-
-    for (const item of cases) {
-      const advice = createAccountRecoveryAdvice({
-        factors: oneFactor,
-        identities,
-        recoveryCodes: item.recoveryCodes,
-      })
-      expect(advice).toMatchObject({
+      items.map(({ id, type, source, scope, severity }) => ({ id, type, source, scope, severity }))
+    ).toEqual(
+      findings.map((finding) => ({
+        id: `account:${finding.id}`,
+        type: finding.id,
         source: 'signal',
         scope: 'account',
-        type: item.type,
-        actions: [{ label: item.label, href: '/account/security#recovery-codes' }],
-      })
-    }
+        severity: finding.severity,
+      }))
+    )
+    expect(items.every((item) => !('dismissalKey' in item))).toBe(true)
   })
 
-  it('treats one code as a recommendation and clears advice after replenishment', () => {
-    expect(
-      createAccountRecoveryAdvice({
-        factors: oneFactor,
-        identities,
-        recoveryCodes: { status: 'available', data: { remaining: 1 } },
-      })?.severity
-    ).toBe('info')
-    expect(
-      createAccountRecoveryAdvice({
-        factors: oneFactor,
-        identities,
-        recoveryCodes: { status: 'available', data: { remaining: 2 } },
-      })
-    ).toBeUndefined()
-    expect(
-      createAccountRecoveryAdvice({
-        factors: oneFactor,
-        identities,
-        recoveryCodes: { status: 'available', data: null },
-      })
-    ).toBeUndefined()
+  it('links each finding to an action available for that account state', () => {
+    expect(mapAccountRecoveryFindings(findings).map((item) => item.actions[0])).toEqual([
+      { label: 'Generate recovery codes', href: '/account/security#recovery-codes' },
+      { label: 'Regenerate recovery codes', href: '/account/security#recovery-codes' },
+      { label: 'Regenerate recovery codes', href: '/account/security#recovery-codes' },
+      { label: 'Review multi-factor authentication', href: '/account/security' },
+      { label: 'Add a password', href: '/reset-password?type=change' },
+    ])
+  })
+
+  it('includes the remaining recovery code count in low-code advice', () => {
+    const [item] = mapAccountRecoveryFindings([findings[2]])
+    expect(item.summary).toContain('2 unused recovery codes')
   })
 })

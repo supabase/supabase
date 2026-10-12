@@ -1,12 +1,9 @@
 import type { Lint } from '@/data/lint/lint-query'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 import type { AdvisorCategory, AdvisorItemSource, AdvisorSeverity } from '@/state/advisor-state'
 
-export type AdvisorSignalType =
-  | 'banned-ip'
-  | 'recovery-codes-missing'
-  | 'recovery-codes-exhausted'
-  | 'recovery-codes-low'
+export type AdvisorSignalType = 'banned-ip' | AccountRecoveryFinding['id']
 
 export type AdvisorSignalAction = {
   label: string
@@ -50,7 +47,7 @@ export type AdvisorBannedIPSignalItem = AdvisorBaseSignalItem & {
 
 export type AdvisorAccountItem = AdvisorBaseSignalItem & {
   scope: 'account'
-  type: 'recovery-codes-missing' | 'recovery-codes-exhausted' | 'recovery-codes-low'
+  type: AccountRecoveryFinding['id']
 }
 
 export type AdvisorSignalItem = AdvisorBannedIPSignalItem | AdvisorAccountItem

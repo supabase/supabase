@@ -1,45 +1,62 @@
-import { useFlag, useUser } from 'common'
+import { mapAccountRecoveryFindings } from './account-recovery-advice'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
+import {
+  evaluateAccountRecovery,
+  type AccountRecoveryInput,
+} from '@/lib/account-recovery/evaluate-account-recovery'
 
-import { createAccountRecoveryAdvice } from './account-recovery-advice'
-import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
-import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
-import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
-import { IS_PLATFORM } from '@/lib/constants'
+type Preview = 'exhausted' | 'missing' | 'low' | 'single-identity' | 'single-factor'
+const previewValues: Preview[] = ['exhausted', 'missing', 'low', 'single-identity', 'single-factor']
+
+const previewInputs: Record<Preview, AccountRecoveryInput> = {
+  exhausted: {
+    identities: [{ provider: 'email' }],
+    email: 'preview@example.com',
+    verifiedFactorCount: 1,
+    recoveryCodes: { status: 'available', remaining: 0 },
+    features: { hasSecuritySettings: true, recoveryCodesEnabled: true, passwordEnabled: true },
+  },
+  missing: {
+    identities: [{ provider: 'email' }],
+    email: 'preview@example.com',
+    verifiedFactorCount: 1,
+    recoveryCodes: { status: 'missing' },
+    features: { hasSecuritySettings: true, recoveryCodesEnabled: true, passwordEnabled: true },
+  },
+  low: {
+    identities: [{ provider: 'email' }],
+    email: 'preview@example.com',
+    verifiedFactorCount: 1,
+    recoveryCodes: { status: 'available', remaining: 2 },
+    features: { hasSecuritySettings: true, recoveryCodesEnabled: true, passwordEnabled: true },
+  },
+  'single-identity': {
+    identities: [{ provider: 'github' }],
+    email: 'preview@example.com',
+    verifiedFactorCount: 0,
+    recoveryCodes: { status: 'unknown' },
+    features: { hasSecuritySettings: true, recoveryCodesEnabled: true, passwordEnabled: true },
+  },
+  'single-factor': {
+    identities: [{ provider: 'email' }],
+    email: 'preview@example.com',
+    verifiedFactorCount: 1,
+    recoveryCodes: { status: 'available', remaining: 8 },
+    features: { hasSecuritySettings: true, recoveryCodesEnabled: true, passwordEnabled: true },
+  },
+}
+
+const getPreview = (): Preview | undefined => {
+  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') return undefined
+  const value = new URLSearchParams(window.location.search).get('mockAccountAdvisor')
+  return previewValues.find((preview) => preview === value)
+}
 
 export const useAccountRecoveryAdvice = ({ enabled = true }: { enabled?: boolean } = {}) => {
-  const isRecoveryCodesEnabled = useFlag('enableAuthRecoveryCodes')
-  const shouldMockAdvice =
-    process.env.NODE_ENV === 'development' &&
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('mockAccountAdvisor') === 'exhausted'
-  const userId = useUser()?.id
-  const shouldReadAccount =
-    IS_PLATFORM && isRecoveryCodesEnabled && enabled && !!userId && !shouldMockAdvice
-  const factors = useMfaListFactorsQuery({ enabled: shouldReadAccount, userId })
-  const identities = useProfileIdentitiesQuery({ enabled: shouldReadAccount, userId })
-  const shouldReadCodes =
-    shouldReadAccount &&
-    factors.isSuccess &&
-    factors.data.all.some(
-      (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
-    ) &&
-    identities.isSuccess &&
-    !identities.data.identities.some((identity) => identity.provider.startsWith('sso'))
-  const recoveryCodes = useRecoveryCodesStatusQuery({ enabled: shouldReadCodes, userId })
+  const preview = getPreview()
+  const { findings } = useAccountRecovery({ enabled: enabled && !preview })
 
-  if (shouldMockAdvice && enabled) {
-    return createAccountRecoveryAdvice({
-      factors: [{ factor_type: 'totp', status: 'verified' }],
-      identities: [{ provider: 'email' }],
-      recoveryCodes: { status: 'available', data: { remaining: 0 } },
-    })
-  }
-
-  if (!shouldReadCodes || !recoveryCodes.isSuccess) return undefined
-
-  return createAccountRecoveryAdvice({
-    factors: factors.data.all,
-    identities: identities.data.identities,
-    recoveryCodes: recoveryCodes.data,
-  })
+  if (!enabled) return []
+  const activeFindings = preview ? evaluateAccountRecovery(previewInputs[preview]) : findings
+  return mapAccountRecoveryFindings(activeFindings)
 }

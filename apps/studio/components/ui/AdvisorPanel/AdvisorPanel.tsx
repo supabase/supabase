@@ -160,7 +160,7 @@ export const AdvisorPanel = () => {
       ...lintItems,
       ...signalItems,
       ...notificationItems,
-      ...(accountRecoveryAdvice ? [accountRecoveryAdvice] : []),
+      ...accountRecoveryAdvice,
     ])
   }, [lintItems, signalItems, notificationItems, accountRecoveryAdvice])
 
