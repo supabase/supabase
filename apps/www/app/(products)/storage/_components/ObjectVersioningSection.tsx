@@ -69,7 +69,7 @@ export function ObjectVersioningSection() {
           </p>
           <p className="text-foreground-lighter text-sm">{form.description}</p>
           <Button size="small" iconRight={<ArrowUpRight />} asChild>
-            <Link href="#" target="_blank">
+            <Link href="https://supabase.com/docs/guides/storage/object-versioning" target="_blank">
               Documentation
             </Link>
           </Button>
