@@ -74,7 +74,15 @@ describe('DestinationTypeSelection', () => {
     customRender(<DestinationTypeSelection />)
     expect(await screen.findByRole('radiogroup', { name: 'Destination type' })).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Analytics Bucket/ })).toBeInTheDocument()
+    expect(screen.getByText('DEPRECATED')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: /Analytics Bucket/ }))
+    expect(await screen.findByRole('radio', { name: /Analytics Bucket/ })).toBeChecked()
+    expect(
+      screen.getByText(
+        'Destination type cannot be changed after creation. Analytics Bucket is deprecated.'
+      )
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('radio', { name: /DuckLake/ }))
     expect(await screen.findByRole('radio', { name: /DuckLake/ })).toBeChecked()
   })

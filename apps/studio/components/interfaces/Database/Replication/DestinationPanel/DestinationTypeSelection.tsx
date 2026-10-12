@@ -146,10 +146,8 @@ export const DestinationTypeSelection = () => {
       </span>
     ) : undefined
 
-  if (isCreationPreviewEnabled && !editMode && destinationType !== 'Analytics Bucket') {
-    const availableDestinations = options
-      .map(({ value }) => value)
-      .filter((value) => value !== 'Analytics Bucket')
+  if (isCreationPreviewEnabled && !editMode) {
+    const availableDestinations = options.map(({ value }) => value)
     return (
       <div className="p-5">
         <PipelineDestinationSelection

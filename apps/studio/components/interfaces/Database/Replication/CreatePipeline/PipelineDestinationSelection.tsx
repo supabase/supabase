@@ -1,13 +1,22 @@
 import { useId, type ReactNode } from 'react'
-import { RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import { Badge, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
 
-export type PipelineDestinationType = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
+export type PipelineDestinationType =
+  | 'BigQuery'
+  | 'DuckLake'
+  | 'Snowflake'
+  | 'ClickHouse'
+  | 'Analytics Bucket'
 
 const DESTINATIONS: { type: PipelineDestinationType; description: string }[] = [
   { type: 'BigQuery', description: 'Replicate changes to BigQuery for analytics and BI' },
   { type: 'DuckLake', description: 'Replicate changes to DuckLake for open lakehouse storage' },
   { type: 'Snowflake', description: 'Replicate changes to Snowflake for cloud data warehousing' },
   { type: 'ClickHouse', description: 'Replicate changes to ClickHouse for real-time analytics' },
+  {
+    type: 'Analytics Bucket',
+    description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
+  },
 ]
 
 export const PipelineDestinationSelection = ({
@@ -52,7 +61,10 @@ export const PipelineDestinationSelection = ({
               <span className="flex items-center gap-x-3.5">
                 {renderLogo?.(type)}
                 <span className="flex flex-col">
-                  <span className="font-medium text-foreground">{type}</span>
+                  <span className="flex items-center gap-x-2 font-medium text-foreground">
+                    {type}
+                    {type === 'Analytics Bucket' && <Badge variant="warning">DEPRECATED</Badge>}
+                  </span>
                   <span className="text-sm text-foreground-lighter text-balance">
                     {description}
                   </span>
