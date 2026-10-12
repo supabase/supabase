@@ -1,0 +1,12 @@
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+}
