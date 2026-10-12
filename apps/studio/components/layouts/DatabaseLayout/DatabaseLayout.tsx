@@ -19,7 +19,7 @@ export const DatabaseProductMenu = () => {
   return <ProductMenu page={page} menu={menu} />
 }
 
-const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
+const DatabaseLayoutContent = ({ children, title }: PropsWithChildren<DatabaseLayoutProps>) => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
   const menu = useGenerateDatabaseMenu()
@@ -37,4 +37,4 @@ const DatabaseLayout = ({ children, title }: PropsWithChildren<DatabaseLayoutPro
   )
 }
 
-export default withAuth(DatabaseLayout)
+export const DatabaseLayout = withAuth(DatabaseLayoutContent)

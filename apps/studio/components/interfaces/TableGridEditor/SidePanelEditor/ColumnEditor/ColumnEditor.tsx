@@ -33,7 +33,7 @@ import type {
   CreateColumnPayload,
   UpdateColumnPayload,
 } from '../SidePanelEditor.types'
-import ColumnDefaultValue from './ColumnDefaultValue'
+import { ColumnDefaultValue } from './ColumnDefaultValue'
 import {
   generateColumnField,
   generateColumnFieldFromPGColumn,
@@ -300,7 +300,7 @@ export const ColumnEditor = ({
                 className="lg:col-span-4!"
                 description={
                   <div className="space-y-2">
-                    <Button asChild variant="default" icon={<Plus />}>
+                    <Button asChild icon={<Plus />}>
                       <Link
                         target="_blank"
                         rel="noreferrer"
@@ -309,7 +309,7 @@ export const ColumnEditor = ({
                         Create enum types
                       </Link>
                     </Button>
-                    <Button asChild variant="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLink />}>
                       <Link
                         target="_blank"
                         rel="noreferrer"
@@ -371,7 +371,7 @@ export const ColumnEditor = ({
                       isReactForm={false}
                       layout="flex"
                       id="isArray"
-                      label="Define as Array"
+                      label="Define as array"
                       description="Allow column to be defined as variable-length multidimensional arrays"
                     >
                       <Checkbox
@@ -484,7 +484,7 @@ export const ColumnEditor = ({
                       isReactForm={false}
                       layout="flex"
                       id="isUnique"
-                      label="Is Unique"
+                      label="Is unique"
                       description="Enforce values in the column to be unique across rows"
                     >
                       <Switch

@@ -198,7 +198,7 @@ export const QueueMessagesDataGrid = ({
                 <p className="text-foreground-light">
                   The selected queue doesn't have any messages.
                 </p>
-                <Button className="mt-2" onClick={() => showMessageModal()}>
+                <Button variant="primary" className="mt-2" onClick={() => showMessageModal()}>
                   Add message
                 </Button>
               </div>

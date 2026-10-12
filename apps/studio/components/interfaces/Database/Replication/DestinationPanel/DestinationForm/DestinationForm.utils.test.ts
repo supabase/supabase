@@ -11,25 +11,26 @@ import {
   buildTableSyncCopyConfig,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
+  pruneStaleTableOptions,
 } from './DestinationForm.utils'
 import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
-import type { ReplicationPublication } from '@/data/replication/publications-query'
+import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 
 const baseDucklakeFormData = {
   name: 'DuckLake Destination',
   publicationName: 'pub',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
+  maxFillMs: 500,
+  maxTableSyncWorkers: 1,
+  maxCopyConnectionsPerTable: 1,
   invalidatedSlotBehavior: undefined,
   projectId: undefined,
   datasetId: undefined,
   serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
+  connectionPoolSize: 1,
   maxStalenessMins: undefined,
   warehouseName: undefined,
   namespace: undefined,
@@ -55,14 +56,14 @@ const baseSnowflakeFormData = {
   publicationName: 'pub',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
+  maxFillMs: 500,
+  maxTableSyncWorkers: 1,
+  maxCopyConnectionsPerTable: 1,
   invalidatedSlotBehavior: undefined,
   projectId: undefined,
   datasetId: undefined,
   serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
+  connectionPoolSize: 1,
   maxStalenessMins: undefined,
   warehouseName: undefined,
   namespace: undefined,
@@ -169,33 +170,105 @@ describe('DestinationForm.utils table copy selection', () => {
   })
 
   it('drops selected ids that are no longer in the publication', () => {
-    const publications = [
-      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
-    ] as ReplicationPublication[]
+    const publication: ReplicationPublicationData = {
+      name: 'analytics',
+      config: {
+        type: 'all_tables',
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [
+        {
+          id: 101,
+          schema: 'public',
+          name: 'orders',
+          kind: 'table',
+          partition_parent_id: null,
+        },
+      ],
+    }
 
     expect(
       pruneStaleSelectedTableIds({
         mode: 'include_tables',
         selectedTableIds: ['101', '202'],
-        publications,
+        publication,
         publicationName: 'analytics',
       })
     ).toEqual(['101'])
   })
 
   it('leaves selected ids untouched for non-selective modes', () => {
-    const publications = [
-      { name: 'analytics', tables: [{ id: 101, schema: 'public', name: 'orders' }] },
-    ] as ReplicationPublication[]
+    const publication: ReplicationPublicationData = {
+      name: 'analytics',
+      config: {
+        type: 'all_tables',
+        operations: ['insert'],
+        publish_via_partition_root: false,
+      },
+      tables: [
+        {
+          id: 101,
+          schema: 'public',
+          name: 'orders',
+          kind: 'table',
+          partition_parent_id: null,
+        },
+      ],
+    }
 
     expect(
       pruneStaleSelectedTableIds({
         mode: 'include_all_tables',
         selectedTableIds: ['202'],
-        publications,
+        publication,
         publicationName: 'analytics',
       })
     ).toEqual(['202'])
+  })
+})
+
+describe('pruneStaleTableOptions', () => {
+  const publication: ReplicationPublicationData = {
+    name: 'analytics',
+    config: {
+      type: 'tables',
+      tables: [{ id: 101, schema: 'public', name: 'orders', columns: null, row_filter: null }],
+      operations: ['insert'],
+      publish_via_partition_root: false,
+    },
+    tables: [
+      {
+        id: 101,
+        schema: 'public',
+        name: 'orders',
+        kind: 'table',
+        partition_parent_id: null,
+      },
+    ],
+  }
+
+  it('drops table options whose ids are no longer in the publication', () => {
+    expect(
+      pruneStaleTableOptions({
+        tableOptions: [
+          { tableId: 101, clusterBy: ['region'] },
+          { tableId: 202, clusterBy: ['unused'] },
+        ],
+        publication,
+        publicationName: 'analytics',
+      })
+    ).toEqual([{ tableId: 101, clusterBy: ['region'] }])
+  })
+
+  it('returns undefined when table options were never set', () => {
+    expect(
+      pruneStaleTableOptions({
+        tableOptions: undefined,
+        publication,
+        publicationName: 'analytics',
+      })
+    ).toBeUndefined()
   })
 })
 
@@ -204,14 +277,14 @@ const baseClickHouseFormData = {
   publicationName: 'pub',
   tableSyncCopyMode: 'include_all_tables' as const,
   tableSyncCopyTableIds: [],
-  maxFillMs: undefined,
-  maxTableSyncWorkers: undefined,
-  maxCopyConnectionsPerTable: undefined,
+  maxFillMs: 500,
+  maxTableSyncWorkers: 1,
+  maxCopyConnectionsPerTable: 1,
   invalidatedSlotBehavior: undefined,
   projectId: undefined,
   datasetId: undefined,
   serviceAccountKey: undefined,
-  connectionPoolSize: undefined,
+  connectionPoolSize: 1,
   maxStalenessMins: undefined,
   warehouseName: undefined,
   namespace: undefined,
@@ -238,6 +311,16 @@ const baseClickHouseFormData = {
 }
 
 describe('DestinationForm.utils DuckLake', () => {
+  it('uses the default pool size when the advanced field is cleared', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'DuckLake',
+      data: { ...baseDucklakeFormData, ducklakePoolSize: '' },
+    })
+
+    expect(config).toMatchObject({ ducklake: { poolSize: undefined } })
+  })
+
   it('builds DuckLake validation config with required fields trimmed and blank optionals removed', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
@@ -421,13 +504,11 @@ describe('DestinationForm.utils DuckLake', () => {
 const baseDucklakeSupabaseFormData = {
   ...baseDucklakeFormData,
   ducklakeMode: 'supabase' as const,
-  ducklakeCatalogProjectRef: 'catalog-ref',
-  ducklakeStorageProjectRef: 'storage-ref',
   ducklakeStorageBucket: 'ducklake-data',
 }
 
-describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
-  it('builds DuckLake validation config from project refs in supabase mode', () => {
+describe('DestinationForm.utils DuckLake (managed)', () => {
+  it('uses the current project for the catalog and storage during validation', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
@@ -436,8 +517,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -445,7 +526,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
   })
 
-  it('builds DuckLake submit config from project refs in supabase mode', async () => {
+  it('uses the current project for the catalog and storage during submission', async () => {
     const createS3AccessKey = vi.fn()
     const resolveNamespace = vi.fn()
 
@@ -459,8 +540,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -470,11 +551,9 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
-  it('returns required-field errors for missing supabase selections, ignoring custom fields', () => {
+  it('requires a bucket and ignores connection fields', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeMode: 'supabase',
-      ducklakeCatalogProjectRef: '',
-      ducklakeStorageProjectRef: '',
       ducklakeStorageBucket: '',
       // Custom-mode fields are intentionally blank and must not be validated in supabase mode
       ducklakeCatalogUrl: '',
@@ -486,19 +565,13 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
       ducklakeMetadataSchema: '',
     })
 
-    expect(issues).toEqual([
-      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
-      { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
-    ])
+    expect(issues).toEqual([{ path: 'ducklakeStorageBucket', message: 'Bucket is required.' }])
   })
 
-  it('accepts a complete supabase configuration', () => {
+  it('accepts a complete managed configuration', () => {
     expect(
       getDucklakeValidationIssues({
         ducklakeMode: 'supabase',
-        ducklakeCatalogProjectRef: 'catalog-ref',
-        ducklakeStorageProjectRef: 'storage-ref',
         ducklakeStorageBucket: 'ducklake-data',
         ducklakeCatalogUrl: '',
         ducklakeDataPath: '',

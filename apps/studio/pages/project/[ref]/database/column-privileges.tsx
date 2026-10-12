@@ -19,7 +19,7 @@ import {
 import PrivilegesHead from '@/components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
@@ -335,7 +335,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     privileges here
                   </p>
                   {selectedSchema === 'public' && (
-                    <Button asChild className="mt-4">
+                    <Button variant="primary" asChild className="mt-4">
                       <Link href={`/project/${ref}/editor`}>Create a new table</Link>
                     </Button>
                   )}
@@ -353,7 +353,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription>
               <div className="mt-4">
-                <Button variant="default" onClick={() => toggleFeaturePreviewModal(true)}>
+                <Button onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>

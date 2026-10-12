@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
 import { ResponseError } from '@/types/base'
@@ -21,8 +21,6 @@ function throwAndCatch(error: unknown): ResponseError {
 }
 
 describe('handleError — error classification', () => {
-  beforeEach(() => vi.clearAllMocks())
-
   describe('known patterns', () => {
     it('classifies connection timeout via message field', () => {
       const err = throwAndCatch({ message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT' })

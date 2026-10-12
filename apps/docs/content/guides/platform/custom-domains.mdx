@@ -90,7 +90,6 @@ Use the [`domains reverify`](/docs/reference/cli/supabase-domains-reverify) comm
 supabase domains reverify --project-ref abcdefghijklmnopqrst
 ```
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
 In the background, Supabase will check your DNS records and issue an SSL certificate. Supabase uses multiple Certificate Authorities (including Let's Encrypt, Google Trust Services and SSL.com) to ensure high availability. The specific issuer is chosen based on availability and this process can take up to 30 minutes.
 
 ### Prepare to activate your domain
@@ -103,6 +102,7 @@ Before you activate your domain, prepare your applications and integrations for 
 - Supabase Auth will use the custom domain immediately once activated.
   - OAuth flows will advertise the custom domain as a callback URL.
   - SAML will use the custom domain instead. This means that the `EntityID` of your project has changed, and this may cause SAML with existing identity providers to stop working.
+- MCP servers that use Supabase Auth need `authorizationServer` set explicitly to the project Auth issuer, not the custom domain. See [Use a custom domain](/docs/guides/ai-tools/byo-mcp#use-a-custom-domain) in the BYO-MCP guide.
 
 To prevent issues for your users, follow these steps:
 
@@ -135,6 +135,8 @@ const supabase = createClient('https://api.example.com', 'sb_publishable_...')
 ```
 
 Similarly, your Edge Functions will now be available at `https://api.example.com/functions/v1/your_function_name`, and your Storage objects at `https://api.example.com/storage/v1/object/public/your_file_path.ext`.
+
+Your custom domain supports the same TLS versions and cipher suites as your project's default domain. For details, see [TLS for project APIs](/docs/guides/security/tls).
 
 ### Remove a custom domain
 

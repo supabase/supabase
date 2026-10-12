@@ -11,11 +11,15 @@ const {
   mockUseStorageExplorerStateSnapshot,
   mockUseAsyncCheckPermissions,
   mockUseStoragePreference,
+  mockGoUpOneLevel,
+  mockNavigateToPath,
 } = vi.hoisted(() => ({
   mockTrack: vi.fn(),
   mockUseStorageExplorerStateSnapshot: vi.fn(),
   mockUseAsyncCheckPermissions: vi.fn(),
   mockUseStoragePreference: vi.fn(),
+  mockGoUpOneLevel: vi.fn(),
+  mockNavigateToPath: vi.fn(),
 }))
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
@@ -24,6 +28,13 @@ vi.mock('@/state/storage-explorer', () => ({
 }))
 vi.mock('@/hooks/misc/useCheckPermissions', () => ({
   useAsyncCheckPermissions: () => mockUseAsyncCheckPermissions(),
+}))
+
+vi.mock('./StorageExplorerNavigation', () => ({
+  useStorageExplorerNavigation: () => ({
+    goUpOneLevel: mockGoUpOneLevel,
+    navigateToPath: mockNavigateToPath,
+  }),
 }))
 
 vi.mock('./useStoragePreference', () => ({
@@ -77,6 +88,8 @@ describe('FileExplorerHeader', () => {
     mockUseStorageExplorerStateSnapshot.mockReset()
     mockUseAsyncCheckPermissions.mockReset()
     mockUseStoragePreference.mockReset()
+    mockGoUpOneLevel.mockReset()
+    mockNavigateToPath.mockReset()
 
     mockUseStorageExplorerStateSnapshot.mockReturnValue(createSnapshot())
     mockUseStoragePreference.mockReturnValue(createPreference())
@@ -166,9 +179,7 @@ describe('FileExplorerHeader', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Go up one level' }))
 
-    expect(snapshot.popColumn).toHaveBeenCalled()
-    expect(snapshot.popOpenedFolders).toHaveBeenCalled()
-    expect(snapshot.setSelectedFilePreview).toHaveBeenCalledWith(undefined)
+    expect(mockGoUpOneLevel).toHaveBeenCalled()
   })
 
   it('opens path edit mode from Navigate and tracks the click', async () => {
@@ -189,7 +200,7 @@ describe('FileExplorerHeader', () => {
     expect(screen.getByRole('button', { name: 'Navigate' })).toBeInTheDocument()
   })
 
-  it('submits a path, tracks the submission, and calls the existing path navigation flow', async () => {
+  it('submits a path, tracks the submission, and navigates to it', async () => {
     const snapshot = createSnapshot()
     mockUseStorageExplorerStateSnapshot.mockReturnValue(snapshot)
 
@@ -209,7 +220,7 @@ describe('FileExplorerHeader', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
     await waitFor(() => {
-      expect(snapshot.fetchFoldersByPath).toHaveBeenCalledWith({ paths: ['archive', '2025'] })
+      expect(mockNavigateToPath).toHaveBeenCalledWith(['archive', '2025'])
     })
     await waitFor(() => {
       expect(mockTrack).toHaveBeenCalledWith('storage_explorer_navigate_submitted')
@@ -237,11 +248,9 @@ describe('FileExplorerHeader', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Navigate' }))
 
     await waitFor(() => {
-      expect(snapshot.popColumnAtIndex).toHaveBeenCalledWith(0)
+      expect(mockNavigateToPath).toHaveBeenCalledWith([])
     })
 
-    expect(snapshot.clearOpenedFolders).toHaveBeenCalled()
-    expect(snapshot.setSelectedFilePreview).toHaveBeenCalledWith(undefined)
     expect(mockTrack).toHaveBeenCalledWith('storage_explorer_navigate_clicked')
     expect(mockTrack).not.toHaveBeenCalledWith('storage_explorer_navigate_submitted')
   })

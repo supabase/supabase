@@ -3,13 +3,13 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle } from 'lucide-react'
 
-import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import type { Timezone } from '@/lib/constants/timezones'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -59,6 +59,7 @@ const PITRStatus = ({
               </span>
             </div>
             <ButtonTooltip
+              variant="primary"
               disabled={hasReadReplicas || !canTriggerPhysicalBackup}
               onClick={() => onSetConfiguration()}
               tooltip={{
@@ -81,6 +82,7 @@ const PITRStatus = ({
           <div className="w-[350px]">
             <TimezoneSelection
               selectedTimezone={selectedTimezone}
+              date={dayjs.unix(latestPhysicalBackupDateUnix ?? 0)}
               onSelectTimezone={onUpdateTimezone}
             />
           </div>

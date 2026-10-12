@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildBigQueryApiConfig,
   buildDucklakeApiConfig,
-  buildPipelineApiConfig,
 } from './create-destination-pipeline-mutation'
+import {
+  buildBigQueryUpdateApiConfig,
+  buildDucklakeUpdateApiConfig,
+} from './update-destination-pipeline-mutation'
+import { buildPipelineApiConfig } from './utils'
 
 describe('buildPipelineApiConfig', () => {
   it('maps selective initial-copy configuration to the ETL API shape', () => {
@@ -24,6 +29,151 @@ describe('buildPipelineApiConfig', () => {
       invalidated_slot_behavior: 'recreate',
       table_sync_copy: { type: 'skip_tables', table_ids: [101, 202] },
     })
+  })
+})
+
+describe('buildBigQueryApiConfig', () => {
+  const baseConfig = {
+    projectId: 'my-project',
+    datasetId: 'analytics',
+    serviceAccountKey: '{}',
+  }
+
+  it('omits table_options when none are configured', () => {
+    expect(buildBigQueryApiConfig(baseConfig)).toEqual({
+      big_query: {
+        project_id: 'my-project',
+        dataset_id: 'analytics',
+        service_account_key: '{}',
+        connection_pool_size: undefined,
+        max_staleness_mins: undefined,
+        table_options: undefined,
+      },
+    })
+  })
+
+  it('maps per-table partitioning and clustering to the API shape', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          {
+            tableId: 16_408,
+            partitionBy: { kind: 'time_column', column: 'created_at', granularity: 'day' },
+            clusterBy: ['customer_id', 'region'],
+          },
+          {
+            tableId: 16_409,
+            partitionBy: {
+              kind: 'integer_range',
+              column: 'shard',
+              start: 0,
+              end: 100,
+              interval: 10,
+            },
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_408,
+              partition_by: { kind: 'time_column', column: 'created_at', granularity: 'day' },
+              cluster_by: ['customer_id', 'region'],
+            },
+            {
+              table_id: 16_409,
+              partition_by: {
+                kind: 'integer_range',
+                column: 'shard',
+                start: 0,
+                end: 100,
+                interval: 10,
+              },
+              cluster_by: undefined,
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('omits a time-column partition that has no column selected', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          { tableId: 16_408, partitionBy: { kind: 'time_column', column: '', granularity: 'day' } },
+          {
+            tableId: 16_409,
+            partitionBy: { kind: 'time_column', column: '', granularity: 'day' },
+            clusterBy: ['customer_id'],
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_409,
+              partition_by: undefined,
+              cluster_by: ['customer_id'],
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('omits a table entry that has neither partitioning nor clustering set', () => {
+    expect(
+      buildBigQueryApiConfig({
+        ...baseConfig,
+        tableOptions: [
+          { tableId: 16_408, partitionBy: undefined, clusterBy: [] },
+          {
+            tableId: 16_409,
+            partitionBy: { kind: 'ingestion_time', granularity: 'day' },
+          },
+        ],
+      })
+    ).toMatchObject({
+      big_query: {
+        table_options: {
+          tables: [
+            {
+              table_id: 16_409,
+              partition_by: { kind: 'ingestion_time', granularity: 'day' },
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('sends table_options: null on update when every configured table is removed or blank', () => {
+    expect(
+      buildBigQueryUpdateApiConfig({
+        ...baseConfig,
+        tableOptions: [{ tableId: 16_408, clusterBy: [] }],
+      })
+    ).toMatchObject({ big_query: { table_options: null } })
+  })
+
+  it('sends table_options: null on update when every configured table is removed', () => {
+    expect(buildBigQueryUpdateApiConfig({ ...baseConfig, tableOptions: [] })).toMatchObject({
+      big_query: { table_options: null },
+    })
+  })
+
+  it('omits blank service_account_key on update, but not on create', () => {
+    const config = { ...baseConfig, serviceAccountKey: '' }
+
+    expect(buildBigQueryApiConfig(config).big_query.service_account_key).toBe('')
+    expect(buildBigQueryUpdateApiConfig(config).big_query.service_account_key).toBeUndefined()
   })
 })
 
@@ -106,21 +256,18 @@ describe('buildDucklakeApiConfig', () => {
 
   it('omits blank custom secret fields when requested', () => {
     expect(
-      buildDucklakeApiConfig(
-        {
-          catalogUrl: '  ',
-          dataPath: 's3://bucket/path',
-          poolSize: 4,
-          s3AccessKeyId: '',
-          s3SecretAccessKey: '\n',
-          s3Region: 'eu-west-1',
-          s3Endpoint: 's3.example.com',
-          s3UrlStyle: 'path',
-          s3UseSsl: true,
-          metadataSchema: 'ducklake',
-        },
-        { omitBlankSecrets: true }
-      )
+      buildDucklakeUpdateApiConfig({
+        catalogUrl: '  ',
+        dataPath: 's3://bucket/path',
+        poolSize: 4,
+        s3AccessKeyId: '',
+        s3SecretAccessKey: '\n',
+        s3Region: 'eu-west-1',
+        s3Endpoint: 's3.example.com',
+        s3UrlStyle: 'path',
+        s3UseSsl: true,
+        metadataSchema: 'ducklake',
+      })
     ).toEqual({
       ducklake: {
         catalog_url: undefined,

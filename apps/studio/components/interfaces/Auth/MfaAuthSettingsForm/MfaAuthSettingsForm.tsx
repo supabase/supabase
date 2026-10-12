@@ -47,7 +47,9 @@ import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
 
 function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
   return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
@@ -78,8 +80,7 @@ const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['va
 
 const totpSchema = z.object({
   MFA_TOTP: z.string().min(1, 'Required'),
-  MFA_MAX_ENROLLED_FACTORS: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
+  MFA_MAX_ENROLLED_FACTORS: preprocessEmptyNumberInput(
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
       .min(0, 'Must be a value 0 or larger')
@@ -91,8 +92,7 @@ type TotpFormValues = z.infer<typeof totpSchema>
 
 const phoneSchema = z.object({
   MFA_PHONE: z.string().min(1, 'Required'),
-  MFA_PHONE_OTP_LENGTH: z.preprocess(
-    (val) => (val === '' || val == null ? undefined : val),
+  MFA_PHONE_OTP_LENGTH: preprocessEmptyNumberInput(
     z.coerce
       .number({ required_error: 'Required', invalid_type_error: 'Required' })
       .min(6, 'Must be a value 6 or larger')
@@ -117,6 +117,8 @@ export const MfaAuthSettingsForm = () => {
     isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
+  const { data: project, isPending: isLoadingProject } = useSelectedProjectQuery()
+  const isBranch = project?.parentRef !== project?.ref
 
   // Separate loading states for each form
   const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
@@ -320,7 +322,12 @@ export const MfaAuthSettingsForm = () => {
     )
   }
 
-  if (isLoading || isLoadingEntitlement || isLoadingEntitlementEnhanceSecurity) {
+  if (
+    isLoading ||
+    isLoadingProject ||
+    isLoadingEntitlement ||
+    isLoadingEntitlementEnhanceSecurity
+  ) {
     return (
       <PageSection>
         <PageSectionContent>
@@ -334,8 +341,11 @@ export const MfaAuthSettingsForm = () => {
   const hasUpgradedPhoneMFA =
     authConfig && !authConfig.MFA_PHONE_VERIFY_ENABLED && phoneMFAIsEnabled
 
+  // Auth add-ons aren't charged for on branches, so there's no price increase to confirm
+  const shouldConfirmPhoneMFACharge = hasUpgradedPhoneMFA && !isBranch
+
   const maybeConfirmPhoneMFAOrSubmit = () => {
-    if (hasUpgradedPhoneMFA) {
+    if (shouldConfirmPhoneMFACharge) {
       setIsConfirmationModalVisible(true)
     } else {
       phoneForm.handleSubmit(onSubmitPhoneForm)()
@@ -422,9 +432,7 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {totpForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => totpForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => totpForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"
@@ -569,9 +577,7 @@ export const MfaAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {phoneForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => phoneForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => phoneForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant={promptProPlanUpgrade ? 'default' : 'primary'}
@@ -658,9 +664,7 @@ export const MfaAuthSettingsForm = () => {
                 )}
                 <CardFooter className="justify-end space-x-2">
                   {securityForm.formState.isDirty && (
-                    <Button variant="default" onClick={() => securityForm.reset()}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => securityForm.reset()}>Cancel</Button>
                   )}
                   <Button
                     variant="primary"

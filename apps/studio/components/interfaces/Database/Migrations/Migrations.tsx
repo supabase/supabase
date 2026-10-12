@@ -1,4 +1,3 @@
-import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { Search } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
@@ -16,15 +15,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { AlertError } from '@/components/ui/AlertError'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -78,31 +77,11 @@ export const Migrations = () => {
 
       <div>
         {isError && (
-          <Admonition
-            type="warning"
-            title="Failed to retrieve migration history for database"
-            description={
-              <>
-                <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists for more than a few
-                  minutes, please reach out to us via support.
-                </p>
-                <p className="mb-4">Error: {error?.message ?? 'Unknown'}</p>
-              </>
-            }
-          >
-            <Button key="contact-support" asChild variant="default">
-              <SupportLink
-                queryParams={{
-                  projectRef: project?.ref,
-                  category: SupportCategories.DASHBOARD_BUG,
-                  subject: 'Unable to view database migrations',
-                }}
-              >
-                Contact support
-              </SupportLink>
-            </Button>
-          </Admonition>
+          <AlertError
+            projectRef={project?.ref}
+            subject="Failed to retrieve migration history for database"
+            error={error}
+          />
         )}
         {isSuccess && (
           <div>
@@ -176,10 +155,7 @@ export const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  variant="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
+                                <Button onClick={() => setSelectedMigration(migration)}>
                                   View migration SQL
                                 </Button>
                               </TableCell>
@@ -187,14 +163,7 @@ export const Migrations = () => {
                           )
                         })
                       ) : (
-                        <TableRow>
-                          <TableCell colSpan={3}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{search}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults colSpan={3} search={search} />
                       )}
                     </TableBody>
                   </Table>
@@ -211,10 +180,8 @@ export const Migrations = () => {
         header={`Migration: ${selectedMigration?.version}`}
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
-          <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button variant="default" onClick={() => setSelectedMigration(undefined)}>
-              Close
-            </Button>
+          <div className="flex items-center justify-end p-4 border-t">
+            <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
       >

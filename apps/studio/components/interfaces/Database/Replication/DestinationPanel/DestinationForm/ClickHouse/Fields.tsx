@@ -16,6 +16,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
+import {
+  CLICKHOUSE_DATABASE_FIELD_COPY,
+  CLICKHOUSE_ENGINE_FIELD_COPY,
+  CLICKHOUSE_URL_FIELD_COPY,
+} from '../DestinationFormFieldCopy'
 
 export const ClickHouseFields = ({
   form,
@@ -25,6 +30,7 @@ export const ClickHouseFields = ({
   editMode: boolean
 }) => {
   const [showPassword, setShowPassword] = useState(false)
+  const passwordVisibilityLabel = showPassword ? 'Hide entered password' : 'Show entered password'
 
   return (
     <div className="flex flex-col gap-y-6 p-5">
@@ -37,8 +43,8 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="URL"
-              description="HTTPS endpoint for your ClickHouse server, including port"
+              label={CLICKHOUSE_URL_FIELD_COPY.label}
+              description={CLICKHOUSE_URL_FIELD_COPY.description}
             >
               <FormControl>
                 <Input
@@ -58,10 +64,10 @@ export const ClickHouseFields = ({
             <FormItemLayout
               layout="horizontal"
               label="User"
-              description="ClickHouse user with permission to write to the target database"
+              description="Dedicated database user with access to the destination database."
             >
               <FormControl>
-                <Input {...field} value={field.value ?? ''} placeholder="default" />
+                <Input {...field} value={field.value ?? ''} placeholder="pipelines_user" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -74,29 +80,31 @@ export const ClickHouseFields = ({
             <FormItemLayout
               layout="horizontal"
               label="Password"
+              labelOptional="Optional"
               description={
                 editMode
-                  ? 'Stored password is hidden. Enter a new password to replace it.'
-                  : 'Omit for passwordless access'
+                  ? 'Enter a new password to replace the stored one.'
+                  : 'Leave blank if the ClickHouse user has no password.'
               }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
+                  type={showPassword && !editMode ? 'text' : 'password'}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        variant="default"
-                        className="w-7"
-                        title={showPassword ? 'Hide password' : 'Show password'}
-                        aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        icon={showPassword ? <Eye /> : <EyeOff />}
-                        onClick={() => setShowPassword(!showPassword)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          title={passwordVisibilityLabel}
+                          aria-label={passwordVisibilityLabel}
+                          icon={showPassword ? <Eye /> : <EyeOff />}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>
@@ -110,11 +118,11 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Database"
-              description="The ClickHouse database where replicated tables will be created"
+              label={CLICKHOUSE_DATABASE_FIELD_COPY.label}
+              description={CLICKHOUSE_DATABASE_FIELD_COPY.description}
             >
               <FormControl>
-                <Input {...field} value={field.value ?? ''} placeholder="default" />
+                <Input {...field} value={field.value ?? ''} placeholder="pipelines" />
               </FormControl>
             </FormItemLayout>
           )}
@@ -126,18 +134,28 @@ export const ClickHouseFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Table engine"
-              description="Server defaults to replacing_merge_tree when unset"
+              label={CLICKHOUSE_ENGINE_FIELD_COPY.label}
+              description={CLICKHOUSE_ENGINE_FIELD_COPY.description}
             >
               <FormControl>
                 <Select
                   value={field.value ?? 'replacing_merge_tree'}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger>{field.value ?? 'replacing_merge_tree'}</SelectTrigger>
+                  <SelectTrigger>
+                    {field.value === 'merge_tree' ? 'MergeTree' : 'ReplacingMergeTree'}
+                  </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="replacing_merge_tree">replacing_merge_tree</SelectItem>
-                    <SelectItem value="merge_tree">merge_tree</SelectItem>
+                    <SelectItem value="replacing_merge_tree" className="[&>span]:top-2.5">
+                      <p>ReplacingMergeTree</p>
+                      <p className="text-foreground-lighter">Creates current-state views.</p>
+                    </SelectItem>
+                    <SelectItem value="merge_tree" className="[&>span]:top-2.5">
+                      <p>MergeTree</p>
+                      <p className="text-foreground-lighter">
+                        Keeps an append-only history of changes.
+                      </p>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

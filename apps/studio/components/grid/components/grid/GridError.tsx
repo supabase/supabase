@@ -14,6 +14,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
 import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -134,9 +135,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
         One or more of your filters may have a value or operator that doesn't match the column's
         data type. Try updating or removing the filter.
       </p>
-      <Button variant="default" onClick={removeAllFilters}>
-        Remove filters
-      </Button>
+      <Button onClick={removeAllFilters}>Remove filters</Button>
     </Admonition>
   )
 }
@@ -167,9 +166,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
         Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
-      <Button variant="default" onClick={() => onApplySorts([])}>
-        Remove sorts
-      </Button>
+      <Button onClick={() => onApplySorts([])}>Remove sorts</Button>
     </Admonition>
   )
 }
@@ -200,10 +197,14 @@ const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
 
 const GeneralError = ({ error }: { error: ResponseError }) => {
   const { filters } = useTableFilter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   return (
     <AlertError
       error={error}
+      projectRef={project?.ref}
+      orgSlug={org?.slug}
       className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
     >

@@ -15,6 +15,7 @@ import SupabaseWordmark from './SupabaseWordmark'
 import staticContent from '@/.generated/staticContent/_index.json'
 import ProductModulesData from '@/data/ProductModules'
 import { DEFAULT_EASE } from '@/lib/animations'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface Props {
@@ -63,6 +64,11 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               description={component.description_short}
               icon={component.icon}
               onClick={() => setOpen(false)}
+              badge={
+                component.name === 'Compute'
+                  ? { label: 'Private Alpha', variant: 'default' }
+                  : undefined
+              }
             />
           ))}
           <div>
@@ -190,6 +196,14 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
                 <AccordionTrigger className={className}>{menuItem.title}</AccordionTrigger>
                 <AccordionMenuItem menuItem={menuItem} />
               </AccordionItem>
+            ) : isCrossZoneHref(menuItem.url ?? '/') ? (
+              <a
+                href={menuItem.url ?? '/'}
+                className={cn(className, 'block focus-ring rounded-sm')}
+                onClick={() => setOpen(false)}
+              >
+                {menuItem.title}
+              </a>
             ) : (
               <Link
                 href={menuItem.url ?? '/'}
@@ -255,49 +269,43 @@ export const MobileMenu = ({ open, setOpen, menu }: Props) => {
               {!isUserLoading && (
                 <>
                   {isLoggedIn ? (
-                    <Link href="/dashboard/projects" passHref legacyBehavior>
-                      <Button block asChild>
-                        <a type={undefined} className="h-10 py-4">
-                          Dashboard
-                        </a>
-                      </Button>
-                    </Link>
+                    <Button block asChild>
+                      <a type={undefined} className="h-10 py-4" href="/dashboard/projects">
+                        Dashboard
+                      </a>
+                    </Button>
                   ) : (
                     <>
-                      <Link
-                        href="https://supabase.com/dashboard"
-                        passHref
-                        legacyBehavior
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: 'sign_in_button_clicked',
-                            properties: { buttonLocation: 'Mobile Nav' },
-                          })
-                        }
-                      >
-                        <Button block variant="default" asChild>
-                          <a type={undefined} className="h-10 py-4">
-                            Sign in
-                          </a>
-                        </Button>
-                      </Link>
-                      <Link
-                        href="https://supabase.com/dashboard/sign-up"
-                        passHref
-                        legacyBehavior
-                        onClick={() =>
-                          sendTelemetryEvent({
-                            action: 'start_project_button_clicked',
-                            properties: { buttonLocation: 'Mobile Nav' },
-                          })
-                        }
-                      >
-                        <Button block asChild>
-                          <a type={undefined} className="h-10 py-4">
-                            Start your project
-                          </a>
-                        </Button>
-                      </Link>
+                      <Button block asChild>
+                        <a
+                          type={undefined}
+                          className="h-10 py-4"
+                          href="https://supabase.com/dashboard"
+                          onClick={() =>
+                            sendTelemetryEvent({
+                              action: 'sign_in_button_clicked',
+                              properties: { buttonLocation: 'Mobile Nav' },
+                            })
+                          }
+                        >
+                          Sign in
+                        </a>
+                      </Button>
+                      <Button variant="primary" block asChild>
+                        <a
+                          type={undefined}
+                          className="h-10 py-4"
+                          href="https://supabase.com/dashboard/sign-up"
+                          onClick={() =>
+                            sendTelemetryEvent({
+                              action: 'start_project_button_clicked',
+                              properties: { buttonLocation: 'Mobile Nav' },
+                            })
+                          }
+                        >
+                          Start your project
+                        </a>
+                      </Button>
                     </>
                   )}
                 </>

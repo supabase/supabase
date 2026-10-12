@@ -1,8 +1,9 @@
-import { CheckIcon, ChevronsUpDown, Globe } from 'lucide-react'
+import type { Dayjs } from 'dayjs'
+import { CheckIcon, Globe } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
-  Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -15,41 +16,38 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { ALL_TIMEZONES } from './PITR.constants'
-import type { Timezone } from './PITR.types'
+import { getTimezoneLabel, TIMEZONES_BY_IANA, type Timezone } from '@/lib/constants/timezones'
 
 interface TimezoneSelectionProps {
   selectedTimezone: Timezone
+  date: Dayjs
   onSelectTimezone: (timezone: Timezone) => void
 }
 
 export const TimezoneSelection = ({
   selectedTimezone,
+  date,
   onSelectTimezone,
 }: TimezoneSelectionProps) => {
   const [open, setOpen] = useState(false)
   const listboxId = useId()
 
-  const timezoneOptions = ALL_TIMEZONES.map((option) => option.text)
-
   return (
     <div className="w-full">
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button
-            role="combobox"
+          <ComboboxTrigger
             aria-expanded={open}
             aria-controls={listboxId}
-            className="w-[350px] justify-start"
+            data-state={open ? 'open' : 'closed'}
+            className="w-[350px]"
             size="small"
-            variant="default"
-            icon={<Globe />}
-            iconRight={<ChevronsUpDown size={14} strokeWidth={1.5} className="ml-auto" />}
           >
-            {selectedTimezone
-              ? timezoneOptions.find((option) => option === selectedTimezone.text)
-              : 'Select timezone...'}
-          </Button>
+            <span className="flex min-w-0 items-center gap-2">
+              <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
+              <span className="truncate">{getTimezoneLabel(selectedTimezone, date)}</span>
+            </span>
+          </ComboboxTrigger>
         </PopoverTrigger>
         <PopoverContent id={listboxId} className="w-[350px] p-0">
           <Command>
@@ -58,25 +56,20 @@ export const TimezoneSelection = ({
               <CommandEmpty>No timezones found...</CommandEmpty>
               <CommandGroup>
                 <ScrollArea className="h-72">
-                  {timezoneOptions.map((option) => (
+                  {TIMEZONES_BY_IANA.map((option) => (
                     <CommandItem
-                      key={option}
-                      value={option}
-                      onSelect={(text) => {
-                        const selectedTimezone = ALL_TIMEZONES.find(
-                          (option) => option.text === text
-                        )
-                        if (selectedTimezone) {
-                          onSelectTimezone(selectedTimezone)
-                          setOpen(false)
-                        }
+                      key={option.value}
+                      value={getTimezoneLabel(option, date)}
+                      onSelect={() => {
+                        onSelectTimezone(option)
+                        setOpen(false)
                       }}
                     >
-                      {option}
+                      {getTimezoneLabel(option, date)}
                       <CheckIcon
                         className={cn(
                           'ml-auto h-4 w-4',
-                          selectedTimezone.text === option ? 'opacity-100' : 'opacity-0'
+                          selectedTimezone.value === option.value ? 'opacity-100' : 'opacity-0'
                         )}
                       />
                     </CommandItem>

@@ -143,7 +143,6 @@ const buildUsageResponse = ({
 
 describe('ComputeAndDiskUsageCharts', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseProject.mockReturnValue({ data: { infra_compute_size: 'micro' } })
     mockUseInfraMonitoringAttributesQuery.mockReturnValue({
       data: buildUsageResponse(),

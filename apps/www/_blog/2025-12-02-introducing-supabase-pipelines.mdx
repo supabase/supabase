@@ -11,6 +11,8 @@ date: '2025-12-02T11:00'
 toc_depth: 2
 ---
 
+> **Update: October 2, 2026.** BigQuery, ClickHouse, DuckLake, and Snowflake are now available in public alpha. The destination early-access form has been retired. To get started, see the [destination guides](/docs/guides/database/replication#supported-destinations). The original announcement follows.
+
 Today we're introducing **Supabase Pipelines**: managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.
 
 Pipelines reads changes from your Postgres database and writes them to supported destination systems. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
@@ -65,7 +67,7 @@ for tables in schema public;
 
 ### Step 2: Enable Pipelines
 
-Navigate to `Database` in your Supabase Dashboard. Select the `Replication` tab, click `Add destination`, choose a Pipelines destination, and click `Enable Pipelines`.
+Navigate to `Database` in your Supabase Dashboard. Select the `Pipelines` tab, click `Add destination`, choose a Pipelines destination, and click `Enable Pipelines`.
 
 ### Step 3: Configure the destination
 

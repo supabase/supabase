@@ -57,10 +57,20 @@ Once the restoration is complete, the new project will be available in your dash
 
 New projects are completely independent of their source, and as such can be modified and used as desired.
 
-<Admonition type="note">
+<Admonition type="caution">
 
-As the entire database is copied to the new project, this will include all extensions that were enabled at the source. If the source project included extensions that are configured to carry out external operations—for example pg_net, pg_cron, wrappers—these should be disabled once the copy process has completed to avoid any unwanted actions from taking place.
+Restore to a new project is a binary restore: it copies the entire database, including any enabled extensions that carry out external operations (for example `pg_net`, `pg_cron`, wrappers). These jobs start running as soon as the restore completes. There's no way to exclude or pause them going into the restore.
+
+If you need to inspect or remove cron jobs, webhook triggers, or wrapper definitions before any external extension runs, use a [logical restore with the Supabase CLI](/docs/guides/platform/migrating-within-supabase/backup-restore) instead. This process is manual, and doesn't carry over the encryption root key, so Vault secrets and encrypted columns aren't readable unless you migrate the key separately.
 
 </Admonition>
 
 Restoring to a new project is an excellent way to manage environments more effectively. You can use this feature to create staging environments for testing, experiment with changes without risk to production data, or swiftly recover from unexpected data loss scenarios.
+
+<Admonition type="danger">
+
+Recovering deleted rows by manually inspecting dead tuples (for example with `pageinspect` and `pg_surgery`) isn't supported on Supabase. It bypasses your table's constraint checks and can corrupt your data by restoring rows that violate a `CHECK`, `FOREIGN KEY`, or `UNIQUE` constraint.
+
+</Admonition>
+
+Restoring to a new project is the safe way to get deleted rows back. Restore from a physical backup that predates the deletion, or, if the deletion happened too recently for your last backup to have captured it, enable PITR and restore to the exact point in time before the deletion. Then copy the rows you need into your live project.

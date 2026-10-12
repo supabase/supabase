@@ -30,6 +30,7 @@ import {
   useIsAwsK8sCloudProvider,
   useIsHighAvailability,
   useIsOrioleDb,
+  useOrioleDbReleaseStage,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
@@ -41,6 +42,7 @@ export const RestoreToNewProject = () => {
   const { hasAccess: hasAccessToRestoreToNewProject, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('backup.restore_to_new_project')
   const isOrioleDb = useIsOrioleDb()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isHighAvailability = useIsHighAvailability()
 
@@ -130,7 +132,7 @@ export const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="Restoring to new projects are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description={`OrioleDB is currently in public ${orioleDbReleaseStage} and restoring to a new project is unavailable on OrioleDB projects`}
       />
     )
   }
@@ -278,7 +280,7 @@ export const RestoreToNewProject = () => {
               The new project {(restoringClone?.target_project as any)?.name || ''} is currently
               being created. You'll be able to restore again once the project is ready.
             </p>
-            <Button asChild variant="default" className="mt-2">
+            <Button asChild className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>
                 Go to new project
               </Link>

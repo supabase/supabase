@@ -18,10 +18,8 @@ import {
   getEntryMetadata,
   type NotebookDatabaseContext,
 } from './AssistantNotebookPreview.utils'
-import {
-  ExplorerQueryFooter,
-  ExplorerQueryResults,
-} from '@/components/interfaces/Explorer/ExplorerQuery'
+import { ExplorerQueryResults } from '@/components/interfaces/Explorer/ExplorerQuery'
+import { QueryResultFooter } from '@/components/interfaces/Explorer/QueryEditor/QueryResultFooter'
 import { QueryResultRenderer } from '@/components/interfaces/Explorer/QueryEditor/QueryResultRenderer'
 import type { QueryResult } from '@/components/interfaces/Explorer/types'
 import { DiffEditor } from '@/components/ui/DiffEditor'
@@ -139,17 +137,12 @@ const QueryCellResult = ({
       >
         <QueryResultRenderer view={cell.view ?? 'table'} result={result} chart={cell.chart} />
       </ExplorerQueryResults>
-      <ExplorerQueryFooter className="flex items-center gap-x-2">
-        <p>
-          {rowCount.toLocaleString()} {rowCount === 1 ? 'row' : 'rows'}
-        </p>
-        {rowLimit !== undefined && (
-          <>
-            <p>·</p>
-            <p>{rowLimit < 0 ? 'No row limit' : `Limit ${rowLimit} rows`}</p>
-          </>
-        )}
-      </ExplorerQueryFooter>
+      <QueryResultFooter
+        results={result.rows}
+        count={rowCount}
+        rowLimit={rowLimit}
+        fileName={cell.title}
+      />
     </>
   )
 }

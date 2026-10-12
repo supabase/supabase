@@ -176,7 +176,7 @@ export const EdgeFunctionRecentErrors = ({
         <Check
           size={16}
           strokeWidth={1.5}
-          className="mt-0.5 shrink-0 text-brand"
+          className="mt-0.5 shrink-0 text-primary"
           aria-hidden="true"
         />
       ) : (
@@ -208,7 +208,6 @@ export const EdgeFunctionRecentErrors = ({
               </PageSectionSummary>
               <PageSectionAside>
                 <Button
-                  variant="default"
                   size="tiny"
                   icon={<ExternalLink size={14} />}
                   onClick={() =>

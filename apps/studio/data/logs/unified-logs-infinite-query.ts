@@ -1,12 +1,11 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
+import { useFeatureFlags } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
-import { parseOtelTimestamp } from './otel-inspection.utils'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
-import { extractLogMetadata } from './unified-logs.utils'
+import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import {
@@ -17,7 +16,6 @@ import { handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
-type LogLevel = 'success' | 'warning' | 'error'
 
 export const UNIFIED_LOGS_QUERY_OPTIONS = {
   refetchOnWindowFocus: false,
@@ -30,6 +28,11 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
+
+export const useUnifiedLogsBackend = () => {
+  const { otelUnifiedLogs = true } = useFeatureFlags().configcat
+  return typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+}
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
@@ -122,33 +125,8 @@ export async function getUnifiedLogs(
 
   if (data.error) handleError(new Error(data.error as string))
 
-  const resultData = data?.result ?? []
-
-  const result = resultData.map((row: any) => {
-    const date = parseOtelTimestamp(row.timestamp)
-
-    const { status, method, pathname } = extractLogMetadata(row)
-
-    return {
-      id: row.id,
-      date,
-      method,
-      pathname,
-      status,
-      timestamp: row.timestamp,
-      level: row.level as LogLevel,
-      host: row.host,
-      event_message: row.event_message || row.body || '',
-      headers:
-        typeof row.headers === 'string' ? JSON.parse(row.headers || '{}') : row.headers || {},
-      regions: row.region ? [row.region] : [],
-      log_type: row.log_type || '',
-      latency: row.latency || 0,
-      log_count: row.log_count || null,
-      logs: row.logs || [],
-      auth_user: row.auth_user || null,
-    }
-  })
+  const resultData = parseUnifiedLogsQueryRows(data?.result)
+  const result = resultData.map(mapUnifiedLogRow)
 
   const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null
@@ -179,12 +157,11 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   return useInfiniteQuery({
     queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
-    queryFn: ({ signal, pageParam }) => {
-      return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
-    },
+    queryFn: ({ signal, pageParam }) =>
+      getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     getPreviousPageParam: (firstPage) => {

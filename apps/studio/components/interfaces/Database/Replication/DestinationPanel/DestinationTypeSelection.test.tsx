@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, within } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -8,9 +8,9 @@ import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ReplicationSourcesResponse = components['schemas']['ReplicationSourcesResponse']
-type ReplicationPipelinesResponse = components['schemas']['ReplicationPipelinesResponse']
-type ReplicationDestinationResponse = components['schemas']['ReplicationDestinationResponse']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type ReplicationDestinationResponse = components['schemas']['DestinationResponse_Output']
 
 mockAnimationsApi()
 
@@ -28,14 +28,6 @@ vi.mock('../useIsETLPrivateAlpha', () => ({
   useIsETLDucklakePrivateAlpha: () => mockDucklakeEnabled(),
   useIsETLSnowflakePrivateAlpha: () => mockSnowflakeEnabled(),
   useIsETLClickHousePrivateAlpha: () => mockClickHouseEnabled(),
-}))
-
-const mockInfrastructureReadReplicas = vi.fn(() => true)
-
-vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: () => ({
-    infrastructureReadReplicas: mockInfrastructureReadReplicas(),
-  }),
 }))
 
 // Background queries from useDestinationInformation (sources + pipelines fire
@@ -59,18 +51,16 @@ const addBackgroundMocks = () => {
 
 describe('DestinationTypeSelection', () => {
   beforeEach(() => {
-    mockInfrastructureReadReplicas.mockReturnValue(true)
     window.localStorage.clear()
-  })
-
-  test('shows placeholder when no type is selected', async () => {
     mockBigQueryEnabled.mockReturnValue(false)
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
+  })
 
+  test('shows placeholder when no type is selected', async () => {
     customRender(<DestinationTypeSelection />)
 
     expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
@@ -80,65 +70,53 @@ describe('DestinationTypeSelection', () => {
     mockBigQueryEnabled.mockReturnValue(true)
     mockIcebergEnabled.mockReturnValue(true)
     mockDucklakeEnabled.mockReturnValue(true)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
+    mockSnowflakeEnabled.mockReturnValue(true)
+    mockClickHouseEnabled.mockReturnValue(true)
 
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('Public Alpha')).toBeInTheDocument()
-    expect(screen.getByText('Early Access')).toBeInTheDocument()
+    const publicAlphaGroup = await screen.findByRole('group', { name: 'Public Alpha' })
+    expect(screen.queryByText('Early Access')).not.toBeInTheDocument()
     expect(screen.getByText('Deprecated')).toBeInTheDocument()
-    expect(screen.getByText('BigQuery')).toBeInTheDocument()
-    expect(screen.getByText('DuckLake')).toBeInTheDocument()
+    for (const destination of ['BigQuery', 'ClickHouse', 'DuckLake', 'Snowflake']) {
+      expect(within(publicAlphaGroup).getByText(destination)).toBeInTheDocument()
+    }
     expect(screen.getByText('Analytics Bucket')).toBeInTheDocument()
-    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
   test('hides destinations behind disabled feature flags', async () => {
-    mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
-
     customRender(<DestinationTypeSelection />)
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(screen.queryByText('Read Replica')).not.toBeInTheDocument()
-    expect(screen.queryByText('BigQuery')).not.toBeInTheDocument()
-    expect(screen.queryByText('DuckLake')).not.toBeInTheDocument()
-    expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
-    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
+    expect(screen.queryAllByRole('option')).toHaveLength(0)
   })
 
-  test('shows the public alpha warning for a Pipelines destination', async () => {
-    mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
+  test.each(['BigQuery', 'ClickHouse', 'DuckLake', 'Snowflake'])(
+    'shows the public alpha warning for %s',
+    async (destination) => {
+      mockBigQueryEnabled.mockReturnValue(true)
+      mockDucklakeEnabled.mockReturnValue(true)
+      mockSnowflakeEnabled.mockReturnValue(true)
+      mockClickHouseEnabled.mockReturnValue(true)
 
-    customRender(<DestinationTypeSelection />)
+      customRender(<DestinationTypeSelection />)
 
-    fireEvent.click(await screen.findByRole('combobox'))
-    fireEvent.click(await screen.findByText('BigQuery'))
+      fireEvent.click(await screen.findByRole('combobox'))
+      fireEvent.click(await screen.findByText(destination))
 
-    expect(await screen.findByText(/In public alpha and may change/)).toBeInTheDocument()
-  })
+      expect(
+        await screen.findByText(
+          `Destination type cannot be changed after creation. ${destination} support is in public alpha.`
+        )
+      ).toBeInTheDocument()
+    }
+  )
 
   test('disables the selector in edit mode so the destination type cannot be changed', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
     // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
     addAPIMock({
       method: 'get',
@@ -162,39 +140,5 @@ describe('DestinationTypeSelection', () => {
     customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
 
     expect(await screen.findByRole('combobox')).toBeDisabled()
-    expect(screen.queryByText('Read replicas have moved')).not.toBeInTheDocument()
-  })
-
-  test('shows a callout pointing read replicas to Infrastructure in create mode', async () => {
-    mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    mockInfrastructureReadReplicas.mockReturnValue(true)
-    addBackgroundMocks()
-
-    customRender(<DestinationTypeSelection />)
-
-    expect(await screen.findByText('Read replicas have moved')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Go to Infrastructure' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('/settings/infrastructure')
-    )
-  })
-
-  test('hides the read replicas callout when Infrastructure read replicas are disabled', async () => {
-    mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
-    mockDucklakeEnabled.mockReturnValue(false)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    mockInfrastructureReadReplicas.mockReturnValue(false)
-    addBackgroundMocks()
-
-    customRender(<DestinationTypeSelection />)
-
-    expect(await screen.findByText('Select a destination type')).toBeInTheDocument()
-    expect(screen.queryByText('Read replicas have moved')).not.toBeInTheDocument()
   })
 })

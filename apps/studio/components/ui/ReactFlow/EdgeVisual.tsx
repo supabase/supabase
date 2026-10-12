@@ -51,7 +51,7 @@ export const getEdgeVisual = ({
   if (isReplicating) {
     return {
       Icon: ArrowRight,
-      color: 'hsl(var(--brand-default))',
+      color: 'var(--primary-bright)',
       opacity: 1,
       dashArray: '5',
       strokeWidth: 2,

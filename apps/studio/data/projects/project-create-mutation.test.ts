@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/data/fetchers', () => ({
   post: vi.fn(),
@@ -8,10 +8,6 @@ vi.mock('@/data/fetchers', () => ({
 }))
 
 describe('project-create-mutation', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('createProject', () => {
     it('sends GitHub connection fields when provided', async () => {
       const { post } = await import('@/data/fetchers')

@@ -77,7 +77,7 @@ export const ComputeMetric = ({
                 <Link
                   href={`${DOCS_URL}/guides/platform/manage-your-usage/branching`}
                   target="_blank"
-                  className="transition text-brand hover:text-brand-600 underline"
+                  className="transition text-primary hover:text-primary-hover underline"
                 >
                   Read more
                 </Link>
@@ -90,7 +90,7 @@ export const ComputeMetric = ({
                 <Link
                   href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                   target="_blank"
-                  className="transition text-brand hover:text-brand-600 underline"
+                  className="transition text-primary hover:text-primary-hover underline"
                 >
                   Read more
                 </Link>

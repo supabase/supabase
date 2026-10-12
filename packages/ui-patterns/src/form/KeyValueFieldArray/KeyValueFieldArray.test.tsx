@@ -78,7 +78,9 @@ const KeyValueForm = ({
           addActions={addActions}
           removeLabel="Remove header"
         />
-        <Button type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   )
@@ -110,7 +112,9 @@ const NameValueForm = ({
           addLabel="Add header"
           removeLabel="Remove header"
         />
-        <Button type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   )

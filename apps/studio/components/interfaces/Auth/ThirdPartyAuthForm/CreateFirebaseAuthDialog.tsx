@@ -151,10 +151,16 @@ export const CreateFirebaseAuthIntegrationDialog = ({
             </div>
           )}
 
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
+          <Button
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={isPending}
+            loading={isPending}
+          >
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

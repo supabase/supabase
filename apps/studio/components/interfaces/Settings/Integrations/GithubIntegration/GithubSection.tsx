@@ -203,7 +203,6 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
           {disabled ? (
             <ButtonTooltip
               icon={<Plus />}
-              variant="default"
               size="tiny"
               disabled
               tooltip={{
@@ -216,7 +215,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
               Add connection
             </ButtonTooltip>
           ) : (
-            <Button icon={<Plus />} variant="default" size="tiny" type="button" onClick={onClick}>
+            <Button icon={<Plus />} size="tiny" type="button" onClick={onClick}>
               Add connection
             </Button>
           )}

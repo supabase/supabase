@@ -76,7 +76,6 @@ export const DatabaseDiffPanel = ({
           </Link>
         </CardTitle>
         <Button
-          variant="default"
           size="tiny"
           icon={<Download strokeWidth={1.5} size={14} className="text-foreground-light" />}
           className="mt-0"

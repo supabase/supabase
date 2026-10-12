@@ -163,7 +163,6 @@ export function useQueryInsightsTableColumns({
                   tooltip={{ content: { text: 'Query details' } }}
                   icon={<ArrowRight size={14} />}
                   size="tiny"
-                  variant="default"
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -371,7 +370,6 @@ export function useQueryInsightsTableColumns({
                 tooltip={{ content: { text: 'Query details' } }}
                 icon={<ArrowRight size={14} />}
                 size="tiny"
-                variant="default"
                 onClick={(e: React.MouseEvent) => {
                   e.stopPropagation()
                   setSelectedTriageRow(props.rowIdx)
@@ -496,7 +494,6 @@ export function useQueryInsightsTableColumns({
             <div className="flex items-center gap-2 justify-end w-full h-full">
               {!row.issueType && (
                 <Button
-                  variant="default"
                   size="tiny"
                   onClick={(e: React.MouseEvent) => {
                     e.stopPropagation()

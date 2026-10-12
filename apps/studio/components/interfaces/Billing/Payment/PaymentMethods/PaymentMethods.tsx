@@ -116,7 +116,6 @@ const PaymentMethods = () => {
                           <Button
                             asChild
                             key="stripe-projects-billing-docs"
-                            variant="default"
                             iconRight={<ExternalLink size={14} />}
                           >
                             <a
@@ -128,7 +127,7 @@ const PaymentMethods = () => {
                             </a>
                           </Button>
                         ) : (
-                          <Button asChild key="payment-method-support" variant="default">
+                          <Button asChild key="payment-method-support">
                             <SupportLink
                               queryParams={{
                                 category: SupportCategories.BILLING,
@@ -154,7 +153,6 @@ const PaymentMethods = () => {
                             <div />
                           )}
                           <Button
-                            variant="default"
                             icon={<Plus />}
                             disabled={!canUpdatePaymentMethods}
                             onClick={() => setShowAddPaymentMethodModal(true)}

@@ -1,6 +1,6 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import type { Tables } from 'common/marketplace.types'
-import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import { Clock5, Code2, Layers, Timer, Vault, Warehouse, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -414,6 +414,41 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     },
   },
   {
+    id: 'warehouse',
+    type: 'custom' as const,
+    source: 'Official' as const,
+    status: 'alpha' as const,
+    requiredExtensions: [],
+    name: `Warehouse`,
+    icon: ({ className, ...props } = {}) => (
+      <Warehouse className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description: 'Replicate your database to an analytical endpoint',
+    // No Warehouse guide exists yet. Point this at `${DOCS_URL}/guides/warehouse` once one does.
+    docsUrl: null,
+    author: authorSupabase,
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+    ],
+    navigate: ({ pageId = 'overview' }) => {
+      if (pageId === 'overview') {
+        return dynamic(
+          () =>
+            import('@/components/interfaces/Integrations/Warehouse/OverviewTab').then(
+              (mod) => mod.WarehouseOverviewTab
+            ),
+          {
+            loading: Loading,
+          }
+        )
+      }
+      return null
+    },
+  },
+  {
     id: 'graphiql',
     type: 'postgres_extension' as const,
     source: 'Official' as const,
@@ -651,6 +686,7 @@ const INTEGRATIONS_WITH_CATEGORIES = [
       vault: ['security'],
       webhooks: ['api'],
       data_api: ['api', 'data-platform'],
+      warehouse: ['data-platform'],
       graphiql: ['api', 'devtools'],
     }
     return {

@@ -8,6 +8,7 @@ import { Button, cn } from 'ui'
 
 import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
 import ProductIcon from '../ProductIcon'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 import { resolveDashboardCtaHref } from '@/lib/dashboard-links'
 
 // to do: move types to be global
@@ -53,7 +54,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => {
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
                 <span
-                  className="text-brand-600 dark:text-brand font-mono uppercase"
+                  className="text-brand-600 dark:text-primary font-mono uppercase"
                   key={`product-name-${props.title}`}
                 >
                   {props.title}
@@ -86,7 +87,11 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => {
                   onClick={cta.onClick}
                   asChild
                 >
-                  <Link href={href}>{cta.label ?? 'Start for free'}</Link>
+                  {isCrossZoneHref(href) ? (
+                    <a href={href}>{cta.label ?? 'Start for free'}</a>
+                  ) : (
+                    <Link href={href}>{cta.label ?? 'Start for free'}</Link>
+                  )}
                 </Button>
               )
             })}

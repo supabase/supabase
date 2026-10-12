@@ -12,6 +12,9 @@ import postgresSummit2026Contest from './events/postgres-summit-2026/contest'
 import postgresSummit2026ContestThankYou from './events/postgres-summit-2026/contest-thank-you'
 import postgresconfContest from './events/postgresconf-sjc-2026/contest'
 import postgresconfContestThankYou from './events/postgresconf-sjc-2026/contest-thank-you'
+import selectCisoDinner from './events/select-2026/ciso-dinner'
+import selectCisoDinnerThankYou from './events/select-2026/ciso-dinner-thank-you'
+import selectHackathon2026Schedule from './events/select-2026/hackathon-2026-schedule'
 import selectPartnerDay from './events/select-2026/partner-day'
 import selectPartnerDayThankYou from './events/select-2026/partner-day-thank-you'
 import selectVipDinner from './events/select-2026/vip-dinner'
@@ -26,22 +29,24 @@ import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-schedu
 import stripeParty from './events/stripe-sessions-2026/party'
 import vercelShipSydneyContest from './events/vercel-ship-sydney-2026/contest'
 import vercelShipSydneyContestThankYou from './events/vercel-ship-sydney-2026/contest-thank-you'
+import askSupabaseSelect from './lead-gen/ask-supabase-select'
 import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
-import supabasePipelinesNewDestinations from './pre-release/supabase-pipelines-new-destinations'
-import supabasePipelinesNewDestinationsThankYou from './pre-release/supabase-pipelines-new-destinations-thank-you'
+import multigresEarlyAccess from './pre-release/multigres-early-access'
+import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
+  askSupabaseSelect, // maintain forever
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
   byocEarlyAccess, // maintain until PM says to remove
-  supabasePipelinesNewDestinations, // maintain while Pipelines destination early access is active
-  supabasePipelinesNewDestinationsThankYou, // maintain while Pipelines destination early access is active
+  multigresEarlyAccess, // maintain while the Multigres private alpha is active
+  multigresEarlyAccessThankYou, // maintain while the Multigres private alpha is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever
@@ -64,10 +69,13 @@ const pages: GoPageInput[] = [
   aiEngineerEuropeContestThankYou,
   selectVipDinner, // remove after Select 2026
   selectVipDinnerThankYou, // remove after Select 2026
+  selectCisoDinner, // remove after Select 2026
+  selectCisoDinnerThankYou, // remove after Select 2026
   selectVipExperience, // remove after Select 2026
   selectVipExperienceThankYou, // remove after Select 2026
   selectPartnerDay, // remove after Select 2026
   selectPartnerDayThankYou, // remove after Select 2026
+  selectHackathon2026Schedule, // remove after Select 2026
   startupGrindContest, // remove after May 31, 2026
   vercelShipSydneyContest, // remove after July 31, 2026
   vercelShipSydneyContestThankYou, // remove after July 31, 2026

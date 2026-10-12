@@ -297,15 +297,21 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     .filter((code) => code.startsWith('2'))
     .sort()[0]
 
+  const stabilityLabel = endpointDetails.deprecated
+    ? 'deprecated'
+    : endpointDetails['x-scalar-stability'] === 'experimental'
+      ? 'experimental'
+      : undefined
+
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader
         title={
           <>
             {endpointDetails.summary}
-            {endpointDetails.deprecated && (
+            {stabilityLabel && (
               <Badge variant="warning" className="ml-2">
-                deprecated
+                {stabilityLabel}
               </Badge>
             )}
           </>
@@ -548,7 +554,15 @@ async function FunctionSection({
               </TabsList>
               {examples.map((example) => (
                 <TabsContent key={example.id} value={example.id}>
-                  <MDXRemoteRefs source={example.code} />
+                  <div
+                    className={cn(
+                      'prose wrap-break-word max-w-none',
+                      '[&_.shiki]:!my-0 [&_.shiki:not(:last-child)]:!mb-4',
+                      '[&_p]:!whitespace-normal'
+                    )}
+                  >
+                    <MDXRemoteRefs source={example.code} />
+                  </div>
                   <div className="flex flex-col gap-2 mt-2">
                     {'data' in example && !!example.data?.sql && (
                       <CollapsibleDetails title="Data source" content={example.data.sql} />

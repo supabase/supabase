@@ -115,7 +115,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                   {product !== undefined ? (
                     <>
                       Resume this project to access the{' '}
-                      <span className="text-brand">{product}</span> page.
+                      <span className="text-primary">{product}</span> page.
                     </>
                   ) : !isRestoreDisabled ? (
                     'Resume this project and get back to building!'
@@ -143,7 +143,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
             {isFreePlan ? (
               <UpgradePlanButton source="projectPausedStateRestore" />
             ) : (
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
               </Button>
             )}

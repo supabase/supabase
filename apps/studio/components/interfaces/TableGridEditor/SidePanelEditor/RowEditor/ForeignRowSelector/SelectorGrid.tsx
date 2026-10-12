@@ -23,7 +23,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
       {isPrimaryKey && (
         <Tooltip>
           <TooltipTrigger>
-            <div className="text-brand">
+            <div className="text-primary">
               <Key size={14} strokeWidth={2} />
             </div>
           </TooltipTrigger>

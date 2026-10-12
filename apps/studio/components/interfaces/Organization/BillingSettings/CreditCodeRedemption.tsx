@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Calendar, PartyPopper } from 'lucide-react'
+import { Calendar, Info, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -150,12 +150,27 @@ export const CreditCodeRedemption = ({
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
 
+  function getRedemptionNotice() {
+    const redemptionIsReady = !!codeRedemptionResult
+    if (!redemptionIsReady) {
+      return undefined
+    }
+
+    const alreadyRedeemedCents = codeRedemptionResult.already_redeemed_partner_credits ?? 0
+    if (!alreadyRedeemedCents) {
+      return undefined
+    }
+
+    return `Since you already redeemed $${alreadyRedeemedCents / 100} through other deals, we couldn't grant the full $${((alreadyRedeemedCents + codeRedemptionResult.amount_cents) / 100).toFixed(0)}.`
+  }
+
+  const redemptionNotice = getRedemptionNotice()
+
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
       {!modalVisible && (
         <DialogTrigger asChild>
           <ButtonTooltip
-            variant="default"
             className="pointer-events-auto"
             disabled={codeRedemptionDisabled}
             tooltip={{
@@ -194,6 +209,12 @@ export const CreditCodeRedemption = ({
           }}
         />
 
+        {/* screen reader */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {!!codeRedemptionResult && `$${codeRedemptionResult.amount_cents / 100} credits applied.`}
+          {redemptionNotice && ` ${redemptionNotice}`}
+        </div>
+
         {!!codeRedemptionResult ? (
           <div className="p-8">
             <div className="text-center flex items-center justify-center">
@@ -213,16 +234,24 @@ export const CreditCodeRedemption = ({
             </div>
 
             {codeRedemptionResult.credits_expire_at && (
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
                 <Calendar className="h-4 w-4" />
                 <span>
-                  Expires on{' '}
+                  Your credits expire on{' '}
                   <TimestampInfo
                     className="text-sm"
                     utcTimestamp={codeRedemptionResult.credits_expire_at}
                     labelFormat="MMMM DD, YYYY"
                   />
+                  .
                 </span>
+              </div>
+            )}
+
+            {!!redemptionNotice && (
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
+                <Info className="h-4 w-4 shrink-0" />
+                <span>{redemptionNotice}</span>
               </div>
             )}
 
@@ -237,7 +266,7 @@ export const CreditCodeRedemption = ({
                   )}
 
                   {!router.pathname.includes('/org/') && (
-                    <Button asChild variant="default">
+                    <Button asChild>
                       <Link href={`/org/${org?.slug}`}>Go to organization</Link>
                     </Button>
                   )}

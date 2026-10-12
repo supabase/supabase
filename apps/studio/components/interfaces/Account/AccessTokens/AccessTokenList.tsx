@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   TableCell,
   TableRow,
@@ -150,19 +151,17 @@ export const AccessTokenList = ({
               <div className="flex items-center justify-end gap-x-2">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="default"
-                      aria-label="More options"
-                      className="w-7"
-                      icon={<MoreVertical />}
-                    />
+                    <Button aria-label="More options" className="w-7" icon={<MoreVertical />} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
                     {x.kind === 'scoped' && (
-                      <DropdownMenuItem className="gap-x-2" onClick={() => setTokenToShow(x)}>
-                        <Key size={12} />
-                        <p>View permissions</p>
-                      </DropdownMenuItem>
+                      <>
+                        <DropdownMenuItem className="gap-x-2" onClick={() => setTokenToShow(x)}>
+                          <Key size={12} />
+                          <p>View permissions</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
                     )}
                     <DropdownMenuItem className="gap-x-2" onClick={() => setTokenToDelete(x)}>
                       <Trash size={12} />

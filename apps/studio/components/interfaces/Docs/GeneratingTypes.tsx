@@ -74,7 +74,6 @@ export function GeneratingTypes({ selectedLang }: Props) {
           <div className="flex flex-col items-center justify-center p-10">
             {selectedLang === 'js' && (
               <Button
-                variant="default"
                 disabled={isGeneratingTypes}
                 loading={isGeneratingTypes}
                 icon={<Download strokeWidth={1.5} />}

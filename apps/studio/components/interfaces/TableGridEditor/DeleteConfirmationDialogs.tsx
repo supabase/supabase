@@ -275,7 +275,7 @@ const DeleteConfirmationDialogs = ({
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected column? This action cannot be undone.
           </p>
-          <div className="items-top flex space-x-2">
+          <div className="items-start flex space-x-2">
             <Checkbox
               id="checkbox-cascade"
               checked={isDeleteWithCascade}
@@ -303,7 +303,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertTitle>
               <AlertDescription>
-                <Button asChild size="tiny" variant="default" icon={<ExternalLink />}>
+                <Button asChild size="tiny" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -336,7 +336,7 @@ const DeleteConfirmationDialogs = ({
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected table? This action cannot be undone.
           </p>
-          <div className="items-top flex space-x-2">
+          <div className="items-start flex space-x-2">
             <Checkbox
               id="checkbox-cascade"
               checked={isDeleteWithCascade}
@@ -364,7 +364,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertDescription>
               <AlertDescription className="mt-4">
-                <Button asChild size="tiny" variant="default" icon={<ExternalLink />}>
+                <Button asChild size="tiny" icon={<ExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -469,7 +469,7 @@ const DropEntityConfirmationModal = ({
         <p className="text-sm text-foreground-light">
           Are you sure you want to delete this {entityLabel}? This action cannot be undone.
         </p>
-        <div className="items-top flex space-x-2">
+        <div className="items-start flex space-x-2">
           <Checkbox
             id={checkboxId}
             checked={isDeleteWithCascade}
@@ -497,7 +497,7 @@ const DropEntityConfirmationModal = ({
               recursively.
             </AlertDescription>
             <AlertDescription className="mt-4">
-              <Button asChild size="tiny" variant="default" icon={<ExternalLink />}>
+              <Button asChild size="tiny" icon={<ExternalLink />}>
                 <Link
                   href="https://www.postgresql.org/docs/current/ddl-depend.html"
                   target="_blank"

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { ArrowRight, GitMerge, MessageCircle, MoreVertical, Shield, X } from 'lucide-react'
+import { ArrowRight, GitMerge, MoreVertical, Shield, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { toast } from 'sonner'
@@ -12,6 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -182,7 +184,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                       <div className="rounded-sm border rounded-lg bg-background px-6 py-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-sm text-foreground-light">
-                            <GitMerge strokeWidth={1.5} size={16} className="text-brand" />
+                            <GitMerge strokeWidth={1.5} size={16} className="text-primary" />
                             <span className="text-foreground">{currentBranch.name}</span>
                             last viewed
                           </div>
@@ -250,14 +252,22 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                 // whether the branch is linked to a GitHub PR.
                                 branch.review_requested_at && (
                                   <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button
-                                        variant="text"
-                                        icon={<MoreVertical />}
-                                        className="px-1"
-                                        onClick={(e) => e.stopPropagation()}
-                                      />
-                                    </DropdownMenuTrigger>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                          <Button
+                                            aria-label="Manage merge request"
+                                            variant="text"
+                                            className="px-1"
+                                            icon={<MoreVertical />}
+                                            onClick={(e) => e.stopPropagation()}
+                                          />
+                                        </DropdownMenuTrigger>
+                                      </TooltipTrigger>
+                                      <TooltipContent side="bottom">
+                                        Manage merge request
+                                      </TooltipContent>
+                                    </Tooltip>
                                     <DropdownMenuContent className="w-56" side="bottom" align="end">
                                       <Tooltip>
                                         <DropdownMenuItem
@@ -362,24 +372,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
           isUpdating={isUpdating}
         />
       }
-      secondaryActions={
-        <div className="flex items-center gap-x-2">
-          <Button
-            asChild
-            variant="text"
-            icon={<MessageCircle className="text-muted" strokeWidth={1} />}
-          >
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://github.com/orgs/supabase/discussions/18937"
-            >
-              Branching feedback
-            </a>
-          </Button>
-          <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-        </div>
-      }
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
     >
       {children}
     </PageLayout>

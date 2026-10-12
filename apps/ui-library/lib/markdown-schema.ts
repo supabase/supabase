@@ -1,0 +1,174 @@
+import path from 'node:path'
+
+import { getInstallCommands } from '../lib/install-command'
+import { generateRegistryTree, type RegistryNode } from '../lib/process-registry'
+import { resolveRegistryItem } from '../lib/registry-resolution'
+import { registry } from '../registry'
+import { toAgentHref } from './library-documents'
+
+export type MarkdownOptions = {
+  registryDirectory?: string
+  documentSlugs?: ReadonlySet<string>
+  documentBasePath?: string
+}
+
+type HandlerContext = {
+  props: Record<string, unknown>
+  children: string
+  options: MarkdownOptions
+}
+
+type ComponentHandler = (ctx: HandlerContext) => string
+
+const omit: ComponentHandler = () => ''
+const unwrap: ComponentHandler = ({ children }) => children
+
+function getRegistryItem(name: string) {
+  return registry.items.find((item) => item.name === name)
+}
+
+function requiredName(props: Record<string, unknown>, field: string): string {
+  const name = props[field]
+  if (typeof name !== 'string' || !name) {
+    throw new Error(`Registry component requires a ${field}`)
+  }
+  return name
+}
+
+function BlockItem({ props }: HandlerContext): string {
+  const name = requiredName(props, 'name')
+  resolveRegistryItem(getRegistryItem, name)
+  const framework = props.framework ?? 'react'
+  if (framework !== 'react' && framework !== 'vue') {
+    throw new Error(`Unsupported install framework for ${name}: ${String(framework)}`)
+  }
+  const command = getInstallCommands(name, { framework, production: true }).npm
+  return ['Install this block:', '', '```bash', command, '```'].join('\n')
+}
+
+function RegistryBlock({ props, options }: HandlerContext): string {
+  const itemName = requiredName(props, 'itemName')
+  const definition = resolveRegistryItem(getRegistryItem, itemName)
+  const registryPath = path.join(
+    options.registryDirectory ?? path.join(process.cwd(), 'public', 'r'),
+    `${itemName}.json`
+  )
+  let tree: RegistryNode[]
+  try {
+    tree = generateRegistryTree(registryPath)
+  } catch (error) {
+    throw new Error(`Cannot export registry files for ${itemName}: ${String(error)}`, {
+      cause: error,
+    })
+  }
+
+  const sources = [itemName, ...definition.firstPartyDependencies].map(
+    (name) => `Full source: https://supabase.com/library/r/${name}.json`
+  )
+  const scope = definition.firstPartyDependencies.length
+    ? `Includes first-party dependencies: ${definition.firstPartyDependencies.join(', ')}.`
+    : ''
+  const external = definition.externalRegistryDependencies.length
+    ? `External registry dependencies: ${definition.externalRegistryDependencies.join(', ')}.`
+    : ''
+
+  return [scope, formatTree(tree), external, sources.join('\n')].filter(Boolean).join('\n\n')
+}
+
+function BlockOverview({ props, children, options }: HandlerContext): string {
+  const name = requiredName(props, 'name')
+  const files =
+    props.showFiles === true || props.showFiles === 'true'
+      ? ['## Files', RegistryBlock({ props: { itemName: name }, children: '', options })].join(
+          '\n\n'
+        )
+      : ''
+  return [children, files].filter(Boolean).join('\n\n')
+}
+
+function formatTree(nodes: RegistryNode[], indent = 0): string {
+  return nodes
+    .map((node) => {
+      const prefix = `${'  '.repeat(indent)}- \`${node.name}${node.type === 'directory' ? '/' : ''}\``
+      const children = node.children?.length ? `\n${formatTree(node.children, indent + 1)}` : ''
+      return `${prefix}${children}`
+    })
+    .join('\n')
+}
+
+function Callout({ props, children }: HandlerContext): string {
+  const type = String(props.type ?? 'note')
+  const label = type.charAt(0).toUpperCase() + type.slice(1)
+  return `${label}: ${children}`.trim()
+}
+
+function AccordionTrigger({ children }: HandlerContext): string {
+  const title = children.trim()
+  return title ? `**${title}**` : ''
+}
+
+function LinkedCard({ props, children, options }: HandlerContext): string {
+  const href = toAgentHref(
+    String(props.href ?? ''),
+    options.documentSlugs,
+    options.documentBasePath
+  )
+  const label = children.replace(/\s+/g, ' ').trim()
+  return href ? `- [${label || href}](${href})` : label
+}
+
+function ComponentPreview({ props }: HandlerContext): string {
+  const description = String(props.description ?? '').trim()
+  return description
+}
+
+function TanStackBeta(): string {
+  return 'Note: TanStack Start support is in beta. APIs may change.'
+}
+
+function TanstackDBGenerator(): string {
+  return [
+    'This block is generated from your project schema.',
+    'Open the HTML page to log in and generate an install command:',
+    'https://supabase.com/library/docs/nextjs/tanstack-db',
+  ].join('\n')
+}
+
+function Anchor({ props, children, options }: HandlerContext): string {
+  const href = toAgentHref(
+    String(props.href ?? ''),
+    options.documentSlugs,
+    options.documentBasePath
+  )
+  return href ? `[${children}](${href})` : children
+}
+
+export const markdownSchema: Record<string, ComponentHandler> = {
+  BlockItem,
+  BlockOverview,
+  RegistryBlock,
+  Callout,
+  Accordion: unwrap,
+  AccordionItem: unwrap,
+  AccordionTrigger,
+  AccordionContent: unwrap,
+  Card: unwrap,
+  LinkedCard,
+  FrameworkQuickstart: unwrap,
+  FrameworkQuickstartTab: unwrap,
+  QuickstartStep: unwrap,
+  ComponentPreview,
+  CatalogPreview: omit,
+  BlockPreview: omit,
+  DualRealtimeChat: omit,
+  DualRealtimeFlow: omit,
+  DualRealtimeMonaco: omit,
+  RealtimeMonaco: omit,
+  TanStackBeta,
+  TanstackDBGenerator,
+  CopyButton: omit,
+  svg: omit,
+  path: omit,
+  title: omit,
+  a: Anchor,
+}

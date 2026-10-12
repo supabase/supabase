@@ -120,7 +120,7 @@ function MessageActionsThumbsUp({
           strokeWidth={1.5}
           className={cn(
             isActive
-              ? 'text-brand hover:text-brand-700'
+              ? 'text-primary hover:text-brand-700'
               : 'text-foreground-light hover:text-foreground'
           )}
         />

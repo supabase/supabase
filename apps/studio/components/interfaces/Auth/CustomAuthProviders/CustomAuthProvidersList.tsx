@@ -340,13 +340,7 @@ export const CustomAuthProvidersList = () => {
               onSaveFilters={setFilteredEnabledStatuses}
             />
             {hasActiveFilters && (
-              <Button
-                variant="default"
-                size="tiny"
-                className="px-1"
-                icon={<X />}
-                onClick={handleResetFilters}
-              />
+              <Button size="tiny" className="px-1" icon={<X />} onClick={handleResetFilters} />
             )}
           </div>
           <div className="flex items-center gap-x-2">
@@ -474,11 +468,11 @@ export const CustomAuthProvidersList = () => {
                           {provider.enabled ? 'Enabled' : 'Disabled'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="max-w-20 bg-surface-100 @[944px]:hover:bg-surface-200 px-6">
+                      <TableCell className="max-w-20 relative px-6">
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="default" className="px-1" icon={<MoreVertical />} />
+                              <Button className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem

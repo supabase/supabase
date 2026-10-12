@@ -18,12 +18,12 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
+import { CreateBucketModal } from './CreateBucketModal'
 import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -144,7 +144,7 @@ export const FilesBuckets = () => {
                         </ShortcutTooltip>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="default" icon={<ArrowDownNarrowWide />}>
+                            <Button icon={<ArrowDownNarrowWide />}>
                               Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
                             </Button>
                           </DropdownMenuTrigger>
@@ -167,7 +167,6 @@ export const FilesBuckets = () => {
                           side="bottom"
                         >
                           <Button
-                            variant="default"
                             icon={<RefreshCw />}
                             loading={isFetchingBuckets}
                             onClick={handleRefresh}

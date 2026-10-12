@@ -182,7 +182,7 @@ export const AccountIdentities = () => {
                     </div>
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
-                        <Button asChild variant="default">
+                        <Button asChild>
                           <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
@@ -225,7 +225,6 @@ export const AccountIdentities = () => {
                       </div>
                     </div>
                     <Button
-                      variant="default"
                       loading={linkingProviderId === provider.id}
                       disabled={!!linkingProviderId}
                       onClick={() => onLinkExternalProvider(provider)}

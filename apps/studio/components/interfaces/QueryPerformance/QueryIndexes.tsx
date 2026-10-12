@@ -311,7 +311,7 @@ export const QueryIndexes = ({
                       {isLinterWarning ? (
                         <Alert
                           variant="default"
-                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary my-3"
                         >
                           <Lightbulb />
                           <AlertTitle>
@@ -320,7 +320,7 @@ export const QueryIndexes = ({
                           </AlertTitle>
                           <AlertDescription>
                             You can improve this query's performance by{' '}
-                            <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
+                            <span className="text-primary">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
                             {index_statements.length > 1 ? 'indexes' : 'index'}
                           </AlertDescription>

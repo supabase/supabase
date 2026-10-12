@@ -64,6 +64,14 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     docsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/plugins.html',
   },
   {
+    key: 'omp',
+    label: 'omp',
+    icon: 'omp',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://github.com/can1357/oh-my-pi/blob/main/docs/marketplace.md',
+    docsLinkText: 'View omp plugin docs',
+  },
+  {
     key: 'vscode',
     label: 'VS Code',
     icon: 'vscode',

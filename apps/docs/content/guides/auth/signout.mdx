@@ -89,6 +89,16 @@ Supabase Auth allows you to specify three different scopes for when a user invok
 
 You can invoke these by providing the `scope` option:
 
+<Admonition type="caution">
+
+JavaScript, Swift, Python, and C# default to the `global` scope. Dart and Kotlin default to `local`.
+
+With the `global` scope, calling `signOut()` on one device revokes the refresh tokens for every session that user has, including other devices and browsers. Those other sessions fail with `AuthApiError: Invalid Refresh Token: Refresh Token Not Found` the next time they try to refresh, even though no one signed out on that device.
+
+If your app expects independent sessions per device, pass the `local` scope explicitly, as shown in the examples below.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"

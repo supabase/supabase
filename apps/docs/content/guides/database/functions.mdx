@@ -1,36 +1,43 @@
 ---
 id: 'functions'
-title: 'Database Functions'
+title: 'Database functions'
 description: 'Creating and using Postgres functions.'
 video: 'https://www.youtube.com/v/MJZCCpCYEqk'
 ---
 
 Postgres has built-in support for [SQL functions](https://www.postgresql.org/docs/current/sql-createfunction.html).
-These functions live inside your database, and they can be [used with the API](../../reference/javascript/rpc).
+These functions live inside your database, and you can call them from your app with [`rpc()`](../../reference/javascript/rpc).
+
+- [Database functions vs Edge Functions](#database-functions-vs-edge-functions) compares the two. Start here if you aren't sure which one fits.
+- [Create a database function](#create-a-database-function) has the steps, from a one-line function to one that takes parameters.
+- [Secure a database function](#secure-a-database-function) covers which user the function runs as and who can call it.
+- [Debugging database functions](/docs/guides/database/debugging-functions) covers logging and error handling.
 
 ## Quick demo
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/MJZCCpCYEqk"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="MJZCCpCYEqk" title="Creating and calling Postgres functions" />
 
-## Getting started
+## Database functions vs Edge Functions
 
-Supabase provides several options for creating database functions. You can use the Dashboard or create them directly using SQL.
-We provide a SQL editor within the Dashboard, or you can [connect](../../guides/database/connecting-to-postgres) to your database
-and run the SQL queries yourself.
+For data-intensive operations, use database functions. They run inside your database, and you can call them remotely with the [REST and GraphQL API](../api).
 
-1. Go to the "SQL editor" section.
-2. Click "New Query".
-3. Enter the SQL to create or replace your Database function.
-4. Click "Run" or cmd+enter (ctrl+enter).
+For use cases that need low latency, use [Edge Functions](../../guides/functions). They're globally distributed and you write them in TypeScript.
 
-## Basic functions [#simple-functions]
+## Create a database function
+
+### Getting started
+
+Create a database function from the Dashboard, or write the SQL yourself against a
+[direct connection](../../guides/database/connecting-to-postgres).
+
+To use the Dashboard:
+
+1. Go to the **SQL Editor** section.
+2. Click **New Query**.
+3. Enter the SQL that creates or replaces your database function.
+4. Click **Run**. You can also press `cmd+enter` or `ctrl+enter`.
+
+### Basic functions [#simple-functions]
 
 Create a basic database function that returns the string "hello world".
 
@@ -47,26 +54,24 @@ $$; --6
 <details>
 <summary>Show/Hide Details</summary>
 
-At it's most basic a function has the following parts:
+At its most basic, a function has the following parts:
 
-1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. You can use either `create` when creating a new function or `replace` when replacing an existing function. Or you can use `create or replace` together to handle either.
-2. `returns text`: The type of data that the function returns. If it returns nothing, you can `returns void`.
+1. `create or replace function hello_world()`: The function declaration, where `hello_world` is the name of the function. Use `create` for a new function, `replace` for one that exists, or `create or replace` when the function might not exist yet.
+2. `returns text`: The type of data the function returns. For a function that returns nothing, write `returns void`.
 3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plpython`, etc.
-4. `as $$`: The function wrapper. Anything enclosed inside the `$$` symbols will be part of the function body.
-5. `select 'hello world';`: A basic function body. The final `select` statement inside a function body will be returned if there are no statements following it.
+4. `as $$`: The function wrapper. Anything inside the `$$` symbols is part of the function body.
+5. `select 'hello world';`: A basic function body. The function returns the result of its final query, which can be an `insert`, `update`, or `delete` with a `returning` clause.
 6. `$$;`: The closing symbols of the function wrapper.
 
 </details>
 
-<br />
-
 <Admonition type="caution">
 
-When naming your functions, make the name of the function unique as overloaded functions are not supported.
+Overloaded functions aren't supported. Give every function a unique name.
 
 </Admonition>
 
-After the Function is created, we have several ways of "executing" the function - either directly inside the database using SQL, or with one of the client libraries.
+After you create the function, you can run it inside the database with SQL, or with one of the client libraries.
 
 <Tabs
   scrollable
@@ -149,22 +154,22 @@ Reference: [`Rpc()`](../../reference/csharp/rpc)
 </$Show>
 </Tabs>
 
-## Returning data sets
+### Returning data sets
 
-Database Functions can also return data sets from [Tables](../../guides/database/tables) or Views.
+A database function can also return a data set from a [table](../../guides/database/tables) or a view.
 
-For example, if we had a database with some Star Wars data inside:
+For example, create two tables holding some Star Wars data. The **Data** tab shows the rows they end up with.
 
 <Tabs
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="data"
+  defaultActiveId="sql"
   queryGroup="example-view"
 >
 <TabPanel id="data" label="Data">
 
-### Planets
+#### Planets
 
 ```
 | id  | name     |
@@ -174,7 +179,7 @@ For example, if we had a database with some Star Wars data inside:
 | 3   | Kashyyyk |
 ```
 
-### People
+#### People
 
 ```
 | id  | name             | planet_id |
@@ -195,11 +200,11 @@ create table planets (
 );
 
 insert into planets
-  (id, name)
+  (name)
 values
-  (1, 'Tattoine'),
-  (2, 'Alderaan'),
-  (3, 'Kashyyyk');
+  ('Tatooine'),
+  ('Alderaan'),
+  ('Kashyyyk');
 
 create table people (
   id serial primary key,
@@ -208,18 +213,18 @@ create table people (
 );
 
 insert into people
-  (id, name, planet_id)
+  (name, planet_id)
 values
-  (1, 'Anakin Skywalker', 1),
-  (2, 'Luke Skywalker', 1),
-  (3, 'Princess Leia', 2),
-  (4, 'Chewbacca', 3);
+  ('Anakin Skywalker', 1),
+  ('Luke Skywalker', 1),
+  ('Princess Leia', 2),
+  ('Chewbacca', 3);
 ```
 
 </TabPanel>
 </Tabs>
 
-We could create a function which returns all the planets:
+The following function returns all the planets:
 
 ```sql
 create or replace function get_planets()
@@ -230,7 +235,7 @@ as $$
 $$;
 ```
 
-Because this function returns a table set, we can also apply filters and selectors. For example, if we only wanted the first planet:
+Because this function returns a table set, you can apply filters and selectors to it. To get the first planet only:
 
 <Tabs
   scrollable
@@ -299,9 +304,9 @@ data = supabase.rpc('get_planets').eq('id', 1).execute()
 </$Show>
 </Tabs>
 
-## Passing parameters
+### Passing parameters
 
-Create a function to insert a new planet into the `planets` table and return the new ID. Note that this time we're using the `plpgsql` language.
+Create a function that inserts a new planet into the `planets` table and returns the new ID. This function uses the `plpgsql` language.
 
 ```sql
 create or replace function add_planet(name text)
@@ -320,7 +325,7 @@ end;
 $$;
 ```
 
-Once again, you can execute this function either inside your database using a `select` query, or with the client libraries:
+You can run this function inside your database with a `select` query, or with the client libraries:
 
 <Tabs
   scrollable
@@ -416,21 +421,14 @@ await supabase.Rpc("add_planet", new Dictionary<string, object> { { "name", "Jak
 </$Show>
 </Tabs>
 
-## Suggestions
-
-### Database Functions vs Edge Functions
-
-For data-intensive operations, use Database Functions, which are executed within your database
-and can be called remotely using the [REST and GraphQL API](../api).
-
-For use-cases which require low-latency, use [Edge Functions](../../guides/functions), which are globally-distributed and can be written in Typescript.
+## Secure a database function
 
 ### Security `definer` vs `invoker`
 
-Postgres allows you to specify whether you want the function to be executed as the user _calling_ the function (`invoker`), or as the _creator_ of the function (`definer`). For example:
+Postgres runs a function either as the user _calling_ it (`invoker`) or as its _creator_ (`definer`). For example:
 
 ```sql
-create function hello_world()
+create or replace function hello_world()
 returns text
 language plpgsql
 security definer set search_path = ''
@@ -441,209 +439,52 @@ end;
 $$;
 ```
 
-It is best practice to use `security invoker` (which is also the default). If you ever use `security definer`, you _must_ set the `search_path`.
-If you use an empty search path (`search_path = ''`), you must explicitly state the schema for every relation in the function body (e.g. `from public.table`).
-This limits the potential damage if you allow access to schemas which the user executing the function should not have.
+Prefer `security invoker`, which is also the default. When you use `security definer`, you must set the `search_path`.
+
+With an empty search path, `search_path = ''`, name the schema for every relation in the function body, such as `from public.table`. An empty search path limits the damage when the function can reach a schema you don't want the calling user to reach.
+
+<Admonition type="danger">
+
+A `security definer` function can return rows the caller isn't allowed to read. It runs with its creator's privileges. A function created in the Dashboard or by a migration is owned by `postgres`, which bypasses Row Level Security. Any role can call it by default, including `anon`, the role that serves requests carrying no user session.
+
+Pinning the `search_path` doesn't change who can call the function. When a `security definer` function reads per-user data:
+
+- **Check ownership in the function body.** An execute grant controls which roles can call the function. It doesn't limit the rows a permitted role gets back, so granting to `authenticated` still returns any user's row to every signed-in caller.
+- **Narrow the execute privilege as well.** Revoke it from `public` and from each role holding a direct grant, such as `anon`. Then grant it to the roles that need it. See the [Function privileges](#function-privileges) section of this page.
+
+</Admonition>
 
 ### Function privileges
 
-By default, database functions can be executed by any role. There are two main ways to restrict this:
+By default, any role can run a database function. You can restrict execution in two ways:
 
-1.  On a case-by-case basis. Specifically revoke permissions for functions you want to protect. Execution needs to be revoked for both `public` and the role you're restricting:
+1.  Revoke on a case-by-case basis. Revoke execute for the functions you want to protect, from both `public` and the role you're restricting:
 
     ```sql
     revoke execute on function public.hello_world from public;
     revoke execute on function public.hello_world from anon;
     ```
 
-1.  Restrict function execution by default. Specifically _grant_ access when you want a function to be executable by a specific role.
+1.  Restrict execution by default, then grant access to the roles that need each function.
 
-    To restrict all existing functions, revoke execution permissions from both `public` _and_ the role you want to restrict:
+    To restrict every function that exists, revoke execute from both `public` and the role you want to restrict:
 
     ```sql
     revoke execute on all functions in schema public from public;
     revoke execute on all functions in schema public from anon, authenticated;
     ```
 
-    To restrict all new functions, change the default privileges for both `public` _and_ the role you want to restrict:
+    To restrict every function created later, change the default privileges for both `public` and the role you want to restrict:
 
     ```sql
     alter default privileges in schema public revoke execute on functions from public;
     alter default privileges in schema public revoke execute on functions from anon, authenticated;
     ```
 
-    You can then regrant permissions for a specific function to a specific role:
-
-    ```sql
-    grant execute on function public.hello_world to authenticated;
-    ```
-
-### Debugging functions
-
-You can add logs to help you debug functions. This is especially recommended for complex functions.
-
-Good targets to log include:
-
-- Values of (non-sensitive) variables
-- Returned results from queries
-
-#### General logging
-
-To create custom logs in the [Dashboard's Postgres Logs](/dashboard/project/_/logs/postgres-logs), you can use the `raise` keyword. By default, there are 3 observed severity levels:
-
-- `log`
-- `warning`
-- `exception` (error level)
+You can then regrant permissions for a specific function to a specific role:
 
 ```sql
-create function logging_example(
-  log_message text,
-  warning_message text,
-  error_message text
-)
-returns void
-language plpgsql
-as $$
-begin
-  raise log 'logging message: %', log_message;
-  raise warning 'logging warning: %', warning_message;
-
-  -- immediately ends function and reverts transaction
-  raise exception 'logging error: %', error_message;
-end;
-$$;
-
-select logging_example('LOGGED MESSAGE', 'WARNING MESSAGE', 'ERROR MESSAGE');
-```
-
-#### Error handling
-
-You can create custom errors with the `raise exception` keywords.
-
-A common pattern is to throw an error when a variable doesn't meet a condition:
-
-```sql
-create or replace function error_if_null(some_val text)
-returns text
-language plpgsql
-as $$
-begin
-  -- error if some_val is null
-  if some_val is null then
-    raise exception 'some_val should not be NULL';
-  end if;
-  -- return some_val if it is not null
-  return some_val;
-end;
-$$;
-
-select error_if_null(null);
-```
-
-Value checking is common, so Postgres provides a shorthand: the `assert` keyword. It uses the following format:
-
-```sql
--- throw error when condition is false
-assert <some condition>, 'message';
-```
-
-Below is an example
-
-```sql
-create function assert_example(name text)
-returns uuid
-language plpgsql
-as $$
-declare
-  student_id uuid;
-begin
-  -- save a user's id into the user_id variable
-  select
-    id into student_id
-  from attendance_table
-  where student = name;
-
-  -- throw an error if the student_id is null
-  assert student_id is not null, 'assert_example() ERROR: student not found';
-
-  -- otherwise, return the user's id
-  return student_id;
-end;
-$$;
-
-select assert_example('Harry Potter');
-```
-
-Error messages can also be captured and modified with the `exception` keyword:
-
-```sql
-create function error_example()
-returns void
-language plpgsql
-as $$
-begin
-  -- fails: cannot read from nonexistent table
-  select * from table_that_does_not_exist;
-
-  exception
-      when others then
-          raise exception 'An error occurred in function <function name>: %', sqlerrm;
-end;
-$$;
-```
-
-#### Advanced logging
-
-For more complex functions or complicated debugging, try logging:
-
-- Formatted variables
-- Individual rows
-- Start and end of function calls
-
-```sql
-create or replace function advanced_example(num int default 10)
-returns text
-language plpgsql
-as $$
-declare
-    var1 int := 20;
-    var2 text;
-begin
-    -- Logging start of function
-    raise log 'logging start of function call: (%)', (select now());
-
-    -- Logging a variable from a SELECT query
-    select
-      col_1 into var1
-    from some_table
-    limit 1;
-    raise log 'logging a variable (%)', var1;
-
-    -- It is also possible to avoid using variables, by returning the values of your query to the log
-    raise log 'logging a query with a single return value(%)', (select col_1 from some_table limit 1);
-
-    -- If necessary, you can even log an entire row as JSON
-    raise log 'logging an entire row as JSON (%)', (select to_jsonb(some_table.*) from some_table limit 1);
-
-    -- When using INSERT or UPDATE, the new value(s) can be returned
-    -- into a variable.
-    -- When using DELETE, the deleted value(s) can be returned.
-    -- All three operations use "RETURNING value(s) INTO variable(s)" syntax
-    insert into some_table (col_2)
-    values ('new val')
-    returning col_2 into var2;
-
-    raise log 'logging a value from an INSERT (%)', var2;
-
-    return var1 || ',' || var2;
-exception
-    -- Handle exceptions here if needed
-    when others then
-        raise exception 'An error occurred in function <advanced_example>: %', sqlerrm;
-end;
-$$;
-
-select advanced_example();
+grant execute on function public.hello_world to authenticated;
 ```
 
 ## Resources
@@ -651,39 +492,16 @@ select advanced_example();
 - Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Flutter](../../reference/dart/rpc)
 - Community client libraries: [github.com/supabase-community](https://github.com/supabase-community)
 - Postgres Official Docs: [Chapter 9. Functions and Operators](https://www.postgresql.org/docs/current/functions.html)
-- Postgres Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/9.1/sql-createfunction.html)
+- Postgres Reference: [CREATE FUNCTION](https://www.postgresql.org/docs/current/sql-createfunction.html)
 
-## Deep dive
+### Create a database function in the Dashboard
 
-### Create Database Functions
+<YouTube id="MJZCCpCYEqk" title="Creating a Postgres function in the dashboard" />
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/MJZCCpCYEqk"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+### Call a database function from JavaScript
 
-### Call Database Functions using JavaScript
+<YouTube id="I6nnp9AINJk" title="Calling a Postgres function from JavaScript" />
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/I6nnp9AINJk"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+### Call an external API from a database function
 
-### Using Database Functions to call an external API
-
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/rARgrELRCwY"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+<YouTube id="rARgrELRCwY" title="Calling an external API from a Postgres function" />

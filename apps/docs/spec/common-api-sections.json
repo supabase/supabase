@@ -21,6 +21,12 @@
         "title": "Get security advisors",
         "slug": "v1-get-security-advisors",
         "type": "operation"
+      },
+      {
+        "id": "v2-run-project-advisors",
+        "title": "Run project advisors",
+        "slug": "v2-run-project-advisors",
+        "type": "operation"
       }
     ]
   },
@@ -224,6 +230,42 @@
         "id": "v1-remove-project-addon",
         "title": "Remove project addon",
         "slug": "v1-remove-project-addon",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Compute",
+    "items": [
+      {
+        "id": "v2-create-compute-instance-upload",
+        "title": "Create compute instance upload",
+        "slug": "v2-create-compute-instance-upload",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-a-compute-instance",
+        "title": "Delete a compute instance",
+        "slug": "v2-delete-a-compute-instance",
+        "type": "operation"
+      },
+      {
+        "id": "v2-deploy-a-compute-instance",
+        "title": "Deploy a compute instance",
+        "slug": "v2-deploy-a-compute-instance",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-a-compute-instance",
+        "title": "Get a compute instance",
+        "slug": "v2-get-a-compute-instance",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-all-compute-instances",
+        "title": "List all compute instances",
+        "slug": "v2-list-all-compute-instances",
         "type": "operation"
       }
     ]
@@ -611,6 +653,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-create-a-branch",
+        "title": "Create a branch",
+        "slug": "v2-create-a-branch",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-branch",
         "title": "Delete a branch",
         "slug": "v1-delete-a-branch",
@@ -737,63 +785,63 @@
     "title": "Organization webhooks",
     "items": [
       {
-        "id": "v2-organizations-slug-webhooks-deliveries-id-get",
-        "title": "Organizations slug webhooks deliveries id get",
-        "slug": "v2-organizations-slug-webhooks-deliveries-id-get",
-        "type": "operation"
-      },
-      {
-        "id": "v2-organizations-slug-webhooks-deliveries-id-retry-post",
-        "title": "Organizations slug webhooks deliveries id retry post",
-        "slug": "v2-organizations-slug-webhooks-deliveries-id-retry-post",
+        "id": "v2-organizations-slug-webhooks-endpoints-post",
+        "title": "Create endpoint",
+        "slug": "v2-organizations-slug-webhooks-endpoints-post",
         "type": "operation"
       },
       {
         "id": "v2-organizations-slug-webhooks-endpoints-delete",
-        "title": "Organizations slug webhooks endpoints delete",
+        "title": "Delete all endpoints",
         "slug": "v2-organizations-slug-webhooks-endpoints-delete",
         "type": "operation"
       },
       {
-        "id": "v2-organizations-slug-webhooks-endpoints-get",
-        "title": "Organizations slug webhooks endpoints get",
-        "slug": "v2-organizations-slug-webhooks-endpoints-get",
-        "type": "operation"
-      },
-      {
         "id": "v2-organizations-slug-webhooks-endpoints-id-delete",
-        "title": "Organizations slug webhooks endpoints id delete",
+        "title": "Delete endpoint",
         "slug": "v2-organizations-slug-webhooks-endpoints-id-delete",
         "type": "operation"
       },
       {
-        "id": "v2-organizations-slug-webhooks-endpoints-id-deliveries-get",
-        "title": "Organizations slug webhooks endpoints id deliveries get",
-        "slug": "v2-organizations-slug-webhooks-endpoints-id-deliveries-get",
+        "id": "v2-organizations-slug-webhooks-deliveries-id-get",
+        "title": "Get delivery",
+        "slug": "v2-organizations-slug-webhooks-deliveries-id-get",
         "type": "operation"
       },
       {
         "id": "v2-organizations-slug-webhooks-endpoints-id-get",
-        "title": "Organizations slug webhooks endpoints id get",
+        "title": "Get endpoint",
         "slug": "v2-organizations-slug-webhooks-endpoints-id-get",
         "type": "operation"
       },
       {
-        "id": "v2-organizations-slug-webhooks-endpoints-id-patch",
-        "title": "Organizations slug webhooks endpoints id patch",
-        "slug": "v2-organizations-slug-webhooks-endpoints-id-patch",
+        "id": "v2-organizations-slug-webhooks-endpoints-id-deliveries-get",
+        "title": "List deliveries",
+        "slug": "v2-organizations-slug-webhooks-endpoints-id-deliveries-get",
+        "type": "operation"
+      },
+      {
+        "id": "v2-organizations-slug-webhooks-endpoints-get",
+        "title": "List endpoints",
+        "slug": "v2-organizations-slug-webhooks-endpoints-get",
+        "type": "operation"
+      },
+      {
+        "id": "v2-organizations-slug-webhooks-deliveries-id-retry-post",
+        "title": "Retry delivery",
+        "slug": "v2-organizations-slug-webhooks-deliveries-id-retry-post",
         "type": "operation"
       },
       {
         "id": "v2-organizations-slug-webhooks-endpoints-id-test-post",
-        "title": "Organizations slug webhooks endpoints id test post",
+        "title": "Send test event",
         "slug": "v2-organizations-slug-webhooks-endpoints-id-test-post",
         "type": "operation"
       },
       {
-        "id": "v2-organizations-slug-webhooks-endpoints-post",
-        "title": "Organizations slug webhooks endpoints post",
-        "slug": "v2-organizations-slug-webhooks-endpoints-post",
+        "id": "v2-organizations-slug-webhooks-endpoints-id-patch",
+        "title": "Update endpoint",
+        "slug": "v2-organizations-slug-webhooks-endpoints-id-patch",
         "type": "operation"
       }
     ]
@@ -899,63 +947,63 @@
     "title": "Project webhooks",
     "items": [
       {
-        "id": "v2-projects-ref-webhooks-deliveries-id-get",
-        "title": "Projects ref webhooks deliveries id get",
-        "slug": "v2-projects-ref-webhooks-deliveries-id-get",
-        "type": "operation"
-      },
-      {
-        "id": "v2-projects-ref-webhooks-deliveries-id-retry-post",
-        "title": "Projects ref webhooks deliveries id retry post",
-        "slug": "v2-projects-ref-webhooks-deliveries-id-retry-post",
+        "id": "v2-projects-ref-webhooks-endpoints-post",
+        "title": "Create endpoint",
+        "slug": "v2-projects-ref-webhooks-endpoints-post",
         "type": "operation"
       },
       {
         "id": "v2-projects-ref-webhooks-endpoints-delete",
-        "title": "Projects ref webhooks endpoints delete",
+        "title": "Delete all endpoints",
         "slug": "v2-projects-ref-webhooks-endpoints-delete",
         "type": "operation"
       },
       {
-        "id": "v2-projects-ref-webhooks-endpoints-get",
-        "title": "Projects ref webhooks endpoints get",
-        "slug": "v2-projects-ref-webhooks-endpoints-get",
-        "type": "operation"
-      },
-      {
         "id": "v2-projects-ref-webhooks-endpoints-id-delete",
-        "title": "Projects ref webhooks endpoints id delete",
+        "title": "Delete endpoint",
         "slug": "v2-projects-ref-webhooks-endpoints-id-delete",
         "type": "operation"
       },
       {
-        "id": "v2-projects-ref-webhooks-endpoints-id-deliveries-get",
-        "title": "Projects ref webhooks endpoints id deliveries get",
-        "slug": "v2-projects-ref-webhooks-endpoints-id-deliveries-get",
+        "id": "v2-projects-ref-webhooks-deliveries-id-get",
+        "title": "Get delivery",
+        "slug": "v2-projects-ref-webhooks-deliveries-id-get",
         "type": "operation"
       },
       {
         "id": "v2-projects-ref-webhooks-endpoints-id-get",
-        "title": "Projects ref webhooks endpoints id get",
+        "title": "Get endpoint",
         "slug": "v2-projects-ref-webhooks-endpoints-id-get",
         "type": "operation"
       },
       {
-        "id": "v2-projects-ref-webhooks-endpoints-id-patch",
-        "title": "Projects ref webhooks endpoints id patch",
-        "slug": "v2-projects-ref-webhooks-endpoints-id-patch",
+        "id": "v2-projects-ref-webhooks-endpoints-id-deliveries-get",
+        "title": "List deliveries",
+        "slug": "v2-projects-ref-webhooks-endpoints-id-deliveries-get",
+        "type": "operation"
+      },
+      {
+        "id": "v2-projects-ref-webhooks-endpoints-get",
+        "title": "List endpoints",
+        "slug": "v2-projects-ref-webhooks-endpoints-get",
+        "type": "operation"
+      },
+      {
+        "id": "v2-projects-ref-webhooks-deliveries-id-retry-post",
+        "title": "Retry delivery",
+        "slug": "v2-projects-ref-webhooks-deliveries-id-retry-post",
         "type": "operation"
       },
       {
         "id": "v2-projects-ref-webhooks-endpoints-id-test-post",
-        "title": "Projects ref webhooks endpoints id test post",
+        "title": "Send test event",
         "slug": "v2-projects-ref-webhooks-endpoints-id-test-post",
         "type": "operation"
       },
       {
-        "id": "v2-projects-ref-webhooks-endpoints-post",
-        "title": "Projects ref webhooks endpoints post",
-        "slug": "v2-projects-ref-webhooks-endpoints-post",
+        "id": "v2-projects-ref-webhooks-endpoints-id-patch",
+        "title": "Update endpoint",
+        "slug": "v2-projects-ref-webhooks-endpoints-id-patch",
         "type": "operation"
       }
     ]
@@ -977,6 +1025,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-create-notebook",
+        "title": "Create notebook",
+        "slug": "v2-create-notebook",
+        "type": "operation"
+      },
+      {
         "id": "v2-create-private-link-association",
         "title": "Create private link association",
         "slug": "v2-create-private-link-association",
@@ -992,6 +1046,12 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-notebook",
+        "title": "Delete notebook",
+        "slug": "v2-delete-notebook",
         "type": "operation"
       },
       {
@@ -1034,6 +1094,12 @@
         "id": "v1-get-network-restrictions",
         "title": "Get network restrictions",
         "slug": "v1-get-network-restrictions",
+        "type": "operation"
+      },
+      {
+        "id": "v2-get-notebook",
+        "title": "Get notebook",
+        "slug": "v2-get-notebook",
         "type": "operation"
       },
       {
@@ -1097,6 +1163,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-list-notebooks",
+        "title": "List notebooks",
+        "slug": "v2-list-notebooks",
+        "type": "operation"
+      },
+      {
         "id": "v2-list-private-link-associations",
         "title": "List private link associations",
         "slug": "v2-list-private-link-associations",
@@ -1154,6 +1226,12 @@
         "id": "v1-update-network-restrictions",
         "title": "Update network restrictions",
         "slug": "v1-update-network-restrictions",
+        "type": "operation"
+      },
+      {
+        "id": "v2-update-notebook",
+        "title": "Update notebook",
+        "slug": "v2-update-notebook",
         "type": "operation"
       },
       {
@@ -1304,42 +1382,6 @@
         "id": "v1-update-storage-config",
         "title": "Update storage config",
         "slug": "v1-update-storage-config",
-        "type": "operation"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Workers",
-    "items": [
-      {
-        "id": "v2-create-worker-upload",
-        "title": "Create worker upload",
-        "slug": "v2-create-worker-upload",
-        "type": "operation"
-      },
-      {
-        "id": "v2-delete-a-worker",
-        "title": "Delete a worker",
-        "slug": "v2-delete-a-worker",
-        "type": "operation"
-      },
-      {
-        "id": "v2-deploy-a-worker",
-        "title": "Deploy a worker",
-        "slug": "v2-deploy-a-worker",
-        "type": "operation"
-      },
-      {
-        "id": "v2-get-a-worker",
-        "title": "Get a worker",
-        "slug": "v2-get-a-worker",
-        "type": "operation"
-      },
-      {
-        "id": "v2-list-all-workers",
-        "title": "List all workers",
-        "slug": "v2-list-all-workers",
         "type": "operation"
       }
     ]
