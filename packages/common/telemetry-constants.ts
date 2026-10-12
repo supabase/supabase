@@ -1116,6 +1116,10 @@ export interface DocsSearchV2SearchSubmittedEvent {
      * The search term sent to the Search V2 endpoint.
      */
     query: string
+    /**
+     * Whether the Search V2 endpoint returned at least one result for the query.
+     */
+    hasResults: boolean
   }
 }
 
