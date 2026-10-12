@@ -275,10 +275,26 @@ jwks_has_oct=$(echo "$jwks_content" | jq -r '[.keys[] | .kty] | if any(. == "oct
 check "JWKS contains EC public key" "true" "$jwks_has_ec"
 check "JWKS does NOT contain symmetric key" "false" "$jwks_has_oct"
 
-#echo ""
-#echo "--- OAuth metadata endpoint ---"
-#check "well-known oauth (no auth)" "200" \
-#    "$(http_status "$BASE_URL/.well-known/oauth-authorization-server")"
+echo ""
+echo "--- OAuth and OIDC discovery ---"
+check "OIDC discovery (no auth)" "200" \
+    "$(http_status "$BASE_URL/auth/v1/.well-known/openid-configuration")"
+
+# Auth returns 404 feature_disabled while its OAuth server is off (the default),
+# so either the metadata or that error shows the request reached Auth.
+oauth_metadata_reached() {
+    if curl -s "$BASE_URL$1" | grep -qE '"issuer"|"feature_disabled"'; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+check "OAuth metadata at RFC 8414 path (no auth)" "true" \
+    "$(oauth_metadata_reached /.well-known/oauth-authorization-server/auth/v1)"
+check "OAuth metadata under /auth/v1 (no auth)" "true" \
+    "$(oauth_metadata_reached /auth/v1/.well-known/oauth-authorization-server)"
+check "OAuth metadata at bare root path not routed to Auth" "false" \
+    "$(oauth_metadata_reached /.well-known/oauth-authorization-server)"
 
 echo ""
 echo "--- Realtime WebSocket upgrade ---"
