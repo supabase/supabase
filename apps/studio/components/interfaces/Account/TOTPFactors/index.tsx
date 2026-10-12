@@ -20,6 +20,7 @@ import { AddNewFactorModal } from './AddNewFactorModal'
 import { DeleteFactorModal } from './DeleteFactorModal'
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
+import { shouldShowLockoutWarning } from './TOTPFactors.utils'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
@@ -34,7 +35,6 @@ export const TOTPFactors = () => {
 
   const totpFactors = data?.totp ?? []
   const canAddApp = isSuccess && totpFactors.length < 2
-  const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
   const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
 
   const {
@@ -46,6 +46,14 @@ export const TOTPFactors = () => {
     enabled: shouldVerifyRecoveryCodes,
   })
   const { data: codes, status } = recoveryCodesStatus ?? {}
+  const isLockoutWarningVisible = shouldShowLockoutWarning({
+    isFactorsSuccess: isSuccess,
+    totpFactorsCount: totpFactors.length,
+    isRecoveryCodesEnabled: enableAuthRecoveryCodes,
+    recoveryCodesStatus,
+    isRecoveryCodesPending: recoveryCodesIsPending,
+    isRecoveryCodesError: recoveryCodesIsError,
+  })
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
@@ -59,8 +67,8 @@ export const TOTPFactors = () => {
           <PageSectionSummary>
             <PageSectionTitle>Multi-factor authentication</PageSectionTitle>
             <PageSectionDescription>
-              Use a multi-factor authentication app (like Google Authenticator or 1Password) to protect your
-              account.
+              Use a multi-factor authentication app (like Google Authenticator or 1Password) to
+              protect your account.
             </PageSectionDescription>
           </PageSectionSummary>
           {canAddApp && (
@@ -72,12 +80,16 @@ export const TOTPFactors = () => {
           )}
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
-          {shouldShowLockoutWarning && (
+          {isLockoutWarningVisible && (
             <Admonition
               type="warning"
               layout="responsive"
               title="Avoid being locked out"
-              description="Add a backup authentication method now. Losing access to your only method will permanently lock you out of your account."
+              description={
+                enableAuthRecoveryCodes
+                  ? 'Add a backup authentication method or generate recovery codes. Losing access to your only method could lock you out of your account.'
+                  : 'Add a backup authentication method so you can still sign in if you lose access to this one.'
+              }
               actions={
                 <Button icon={<Plus />} onClick={handleAddNewApp}>
                   Add another method
@@ -138,8 +150,7 @@ export const TOTPFactors = () => {
             <PageSectionSummary>
               <PageSectionTitle>Recovery codes</PageSectionTitle>
               <PageSectionDescription>
-                Recover your account in case you lose access to your MFA
-                methods.
+                Recover your account in case you lose access to your MFA methods.
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>

@@ -12,7 +12,6 @@ import {
 } from './AdvisorPanel.utils'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
-import { useAccountRecoveryAdvisor } from './useAccountRecoveryAdvisor'
 import { useAdvisorSignals } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
@@ -65,9 +64,6 @@ export const AdvisorPanel = () => {
   const shouldLoadHealthLints =
     isHealthAdvisorEnabled && canLoadProjectData && isCategorySelected('health')
   const shouldLoadSignals = canLoadProjectData && isCategorySelected('security')
-  const accountRecoveryItem = useAccountRecoveryAdvisor({
-    enabled: isSidebarOpen && isCategorySelected('security'),
-  })
 
   const {
     data: lintData,
@@ -156,22 +152,13 @@ export const AdvisorPanel = () => {
   }, [notifications])
 
   const combinedItems = useMemo<AdvisorItem[]>(() => {
-    return sortAdvisorItems([
-      ...lintItems,
-      ...signalItems,
-      ...notificationItems,
-      ...(accountRecoveryItem ? [accountRecoveryItem] : []),
-    ])
-  }, [lintItems, signalItems, notificationItems, accountRecoveryItem])
+    return sortAdvisorItems([...lintItems, ...signalItems, ...notificationItems])
+  }, [lintItems, signalItems, notificationItems])
 
   const itemsFilteredByCategory = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
-      if (
-        !hasProjectRef &&
-        item.source !== 'notification' &&
-        !(item.source === 'signal' && item.type === 'account-recovery')
-      )
-        return false
+      // Notifications are the only items that exist without a project
+      if (!hasProjectRef && item.source !== 'notification') return false
 
       return categoryFilters.length === 0 || categoryFilters.includes(item.category)
     })
@@ -314,7 +301,6 @@ export const AdvisorPanel = () => {
               hiddenItemsCount={hiddenItemsCount}
               hasAnyFilters={hasNarrowingFilters}
               hasProjectRef={hasProjectRef}
-              hasAccountAdvice={accountRecoveryItem !== undefined}
               projectNameByRef={projectNameByRef}
             />
           </div>

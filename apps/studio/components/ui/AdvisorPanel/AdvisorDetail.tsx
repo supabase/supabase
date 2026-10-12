@@ -1,6 +1,4 @@
-import { Link } from '@tanstack/react-router'
 import { noop } from 'lodash'
-import { Button } from 'ui'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import { AdvisorSignalDetail } from './AdvisorSignalDetail'
@@ -32,16 +30,6 @@ export const AdvisorDetail = ({
   }
 
   if (item.source === 'signal') {
-    if (item.type === 'account-recovery') {
-      return (
-        <div className="px-6 py-6 space-y-6">
-          <p className="text-sm text-foreground-light">{item.summary}</p>
-          <Button variant="primary" asChild>
-            <Link to={item.action.href}>{item.action.label}</Link>
-          </Button>
-        </div>
-      )
-    }
     return (
       <div className="px-6 py-6">
         <AdvisorSignalDetail item={item} />

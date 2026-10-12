@@ -40,15 +40,4 @@ export type AdvisorSignalItem = AdvisorBaseItem & {
   sourceData: { type: 'banned-ip'; ip: string }
 }
 
-export type AdvisorAccountRecoveryItem = AdvisorBaseItem & {
-  source: 'signal'
-  type: 'account-recovery'
-  summary: string
-  action: AdvisorSignalAction
-}
-
-export type AdvisorItem =
-  | AdvisorLintItem
-  | AdvisorNotificationItem
-  | AdvisorSignalItem
-  | AdvisorAccountRecoveryItem
+export type AdvisorItem = AdvisorLintItem | AdvisorNotificationItem | AdvisorSignalItem
