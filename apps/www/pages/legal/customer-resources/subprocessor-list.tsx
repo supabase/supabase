@@ -3,9 +3,9 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import PageBreadcrumb from '~/components/Sections/PageBreadcrumb'
 import PageHeader from '~/components/Sections/PageHeader'
 import SubprocessorUpdatesForm from '~/components/SubprocessorUpdatesForm'
-import { Download } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import { NextSeo } from 'next-seo'
-import { Button } from 'ui'
+import { Badge } from 'ui'
 
 /**
  * TO ADD A NEW SUBPROCESSOR LIST VERSION:
@@ -49,21 +49,22 @@ export default function SubprocessorListPage() {
         subheader="The third-party sub-processors Supabase engages to help provide its services are indicated in the latest linked Subprocessor List available below. This page is updated with an updated Subprocessor List as our sub-processors change. You can subscribe to receive notifications of updates to this page, below."
       />
       <SectionContainer className="prose">
-        <div className="flex flex-col gap-4">
-          <div className="not-prose flex flex-col items-start gap-4">
-            {SUBPROCESSOR_LIST_VERSIONS.map(({ file, displayDate }) => (
-              <Button key={file} asChild icon={<Download />}>
-                <a
-                  href={`${PDF_BASE_PATH}/${file}`}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Subprocessor List - Updated {displayDate}
-                </a>
-              </Button>
-            ))}
-          </div>
+        <div className="divide-y divide-border">
+          {SUBPROCESSOR_LIST_VERSIONS.map(({ file, displayDate }) => (
+            <div key={file} className="flex items-center gap-3 py-4">
+              <FileText size={15} className="shrink-0 text-foreground-muted" />
+              <a
+                href={`${PDF_BASE_PATH}/${file}`}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-foreground-light transition-colors hover:text-foreground hover:underline"
+              >
+                Subprocessor List
+              </a>
+              <Badge>Updated {displayDate}</Badge>
+            </div>
+          ))}
         </div>
 
         <div className="mt-16 flex flex-col items-start gap-4">
