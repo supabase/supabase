@@ -222,6 +222,12 @@ export const AIAssistantChatSelector = ({
                 <span>Start a new chat</span>
               </CommandItem>
             </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup className="px-2 py-1.5">
+              <p className="text-xs text-foreground-lighter">
+                Chat history is saved to this browser and isn't synced across devices.
+              </p>
+            </CommandGroup>
           </CommandList>
         </Command>
       </PopoverContent>

@@ -8,10 +8,6 @@ import {
   type AffectedComponent,
 } from '@/lib/status-page/status-page.schema'
 
-const INCIDENT_STATUS_ERROR = {
-  incidents: [],
-  error: 'Unable to check incident status at this time.',
-}
 const NO_ACTIVE_INCIDENTS_MESSAGE = 'No active incidents.'
 const DEFAULT_STATUS_PAGE_URL = 'https://status.supabase.com'
 
@@ -74,108 +70,95 @@ export const getIncidentTools = ({
       }
 
       if (useStatusPageWidget) {
-        try {
-          const response = await fetch(`${baseUrl}/api/status-page`, {
-            signal: timeoutSignal(abortSignal),
-          })
-
-          if (!response.ok) {
-            console.warn('Failed to fetch status page:', response.status)
-            return INCIDENT_STATUS_ERROR
-          }
-
-          const json = await response.json()
-          const parseResult = StatusPageResponseSchema.safeParse(json)
-
-          if (!parseResult.success) {
-            console.warn('Failed to parse status page response:', parseResult.error)
-            return INCIDENT_STATUS_ERROR
-          }
-
-          const { data } = parseResult
-
-          const incidents = data.ongoing_incidents
-            .filter((incident) => incident.visible)
-            .map((incident) => ({
-              kind: 'incident' as const,
-              name: incident.name,
-              status: incident.status,
-              impact: incident.current_worst_impact,
-              affected_components: formatAffectedComponents(incident.affected_components),
-              last_update_message: incident.last_update_message ?? null,
-              url: incident.url,
-            }))
-
-          const maintenances = data.in_progress_maintenances
-            .filter((maintenance) => maintenance.visible)
-            .map((maintenance) => ({
-              kind: 'maintenance' as const,
-              name: maintenance.name,
-              status: maintenance.status,
-              affected_components: formatAffectedComponents(maintenance.affected_components),
-              last_update_message: maintenance.last_update_message ?? null,
-              url: maintenance.url,
-              started_at: maintenance.started_at,
-            }))
-
-          const combined = [...incidents, ...maintenances]
-
-          if (combined.length === 0) {
-            return {
-              incidents: [],
-              message: NO_ACTIVE_INCIDENTS_MESSAGE,
-            }
-          }
-
-          const statusPageUrl = data.page_url || DEFAULT_STATUS_PAGE_URL
-
-          return {
-            incidents: combined,
-            message: buildActiveIncidentsMessage(
-              incidents.length,
-              maintenances.length,
-              statusPageUrl
-            ),
-          }
-        } catch (error) {
-          console.warn('Failed to fetch status page:', error)
-          return INCIDENT_STATUS_ERROR
-        }
-      }
-
-      try {
-        const response = await fetch(`${baseUrl}/api/incident-status`, {
+        const response = await fetch(`${baseUrl}/api/status-page`, {
           signal: timeoutSignal(abortSignal),
         })
 
         if (!response.ok) {
-          console.warn('Failed to fetch incident status:', response.status)
-          return INCIDENT_STATUS_ERROR
+          throw new Error(`Failed to fetch status page: ${response.status}`)
         }
 
-        const incidents: IncidentInfo[] = await response.json()
+        const json = await response.json()
+        const parseResult = StatusPageResponseSchema.safeParse(json)
 
-        if (incidents.length === 0) {
+        if (!parseResult.success) {
+          throw new Error(`Failed to parse status page response: ${parseResult.error.message}`)
+        }
+
+        const { data } = parseResult
+
+        const incidents = data.ongoing_incidents
+          .filter((incident) => incident.visible)
+          .map((incident) => ({
+            kind: 'incident' as const,
+            name: incident.name,
+            status: incident.status,
+            impact: incident.current_worst_impact,
+            affected_components: formatAffectedComponents(incident.affected_components),
+            last_update_message: incident.last_update_message ?? null,
+            url: incident.url,
+          }))
+
+        const maintenances = data.in_progress_maintenances
+          .filter((maintenance) => maintenance.visible)
+          .map((maintenance) => ({
+            kind: 'maintenance' as const,
+            name: maintenance.name,
+            status: maintenance.status,
+            affected_components: formatAffectedComponents(maintenance.affected_components),
+            last_update_message: maintenance.last_update_message ?? null,
+            url: maintenance.url,
+            started_at: maintenance.started_at,
+          }))
+
+        const combined = [...incidents, ...maintenances]
+
+        if (combined.length === 0) {
           return {
             incidents: [],
             message: NO_ACTIVE_INCIDENTS_MESSAGE,
           }
         }
 
-        const incidentSummaries = incidents.map((incident) => ({
-          name: incident.name,
-          status: incident.status,
-          impact: incident.impact,
-          active_since: incident.active_since,
-        }))
+        const statusPageUrl = data.page_url || DEFAULT_STATUS_PAGE_URL
 
         return {
-          incidents: incidentSummaries,
-          message: buildActiveIncidentsMessage(incidents.length, 0, DEFAULT_STATUS_PAGE_URL),
+          incidents: combined,
+          message: buildActiveIncidentsMessage(
+            incidents.length,
+            maintenances.length,
+            statusPageUrl
+          ),
         }
-      } catch (error) {
-        console.warn('Failed to fetch incident status:', error)
-        return INCIDENT_STATUS_ERROR
+      }
+
+      const response = await fetch(`${baseUrl}/api/incident-status`, {
+        signal: timeoutSignal(abortSignal),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch incident status: ${response.status}`)
+      }
+
+      const incidents: IncidentInfo[] = await response.json()
+
+      if (incidents.length === 0) {
+        return {
+          incidents: [],
+          message: NO_ACTIVE_INCIDENTS_MESSAGE,
+        }
+      }
+
+      const incidentSummaries = incidents.map((incident) => ({
+        name: incident.name,
+        status: incident.status,
+        impact: incident.impact,
+        active_since: incident.active_since,
+      }))
+
+      return {
+        incidents: incidentSummaries,
+        message: buildActiveIncidentsMessage(incidents.length, 0, DEFAULT_STATUS_PAGE_URL),
       }
     },
   }),

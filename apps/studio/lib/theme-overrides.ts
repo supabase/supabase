@@ -1,7 +1,10 @@
 import * as z from 'zod'
 
-export type ThemeOverrideKey = 'chroma' | 'contrast' | 'surface' | 'elevationStep'
+export type ThemeOverrideKey = 'primaryHue' | 'chroma' | 'contrast' | 'surface' | 'elevationStep'
 export type ThemeOverrideMode = 'dark' | 'light'
+
+/** ConfigCat flag: Spot color control (employee-only via Supabase Team Email segment). */
+export const APPEARANCE_SPOT_COLOR_FLAG = 'appearanceSpotColor'
 
 type ThemeOverrideRange = { min: number; max: number }
 
@@ -15,10 +18,17 @@ export interface ThemeOverrideKnob {
 
 export const THEME_OVERRIDE_KNOBS: readonly ThemeOverrideKnob[] = [
   {
+    key: 'primaryHue',
+    cssVar: '--primary-hue',
+    label: 'Spot color',
+    description: 'Changes the hue of primary controls and the canvas.',
+    ranges: { dark: { min: 0, max: 360 }, light: { min: 0, max: 360 } },
+  },
+  {
     key: 'chroma',
     cssVar: '--chroma',
-    label: 'Color intensity',
-    description: 'Controls how vivid interface colors appear.',
+    label: 'Surface tint',
+    description: 'Controls how much color tints backgrounds, text, and borders.',
     ranges: { dark: { min: 0, max: 0.04 }, light: { min: 0, max: 0.03 } },
   },
   {
@@ -48,8 +58,8 @@ export const THEME_OVERRIDE_DEFAULTS: Record<
   ThemeOverrideMode,
   Record<ThemeOverrideKey, number>
 > = {
-  dark: { chroma: 0.005, contrast: 0.5, surface: 0.19, elevationStep: 0.025 },
-  light: { chroma: 0, contrast: 0.53, surface: 0.995, elevationStep: 0.024 },
+  dark: { primaryHue: 157.5, chroma: 0.005, contrast: 0.5, surface: 0.19, elevationStep: 0.025 },
+  light: { primaryHue: 157.5, chroma: 0, contrast: 0.53, surface: 0.995, elevationStep: 0.024 },
 }
 
 export type ThemeOverrides = Partial<Record<ThemeOverrideKey, number>>
@@ -57,6 +67,7 @@ export type ThemeOverridesByMode = Partial<Record<ThemeOverrideMode, ThemeOverri
 
 const themeOverridesSchema = z
   .object({
+    primaryHue: z.number().finite().optional(),
     chroma: z.number().finite().optional(),
     contrast: z.number().finite().optional(),
     surface: z.number().finite().optional(),
@@ -154,6 +165,16 @@ export function clearThemeOverridesForMode(
 
 export function hasThemeOverrides(overrides: ThemeOverrides): boolean {
   return THEME_OVERRIDE_KNOBS.some((knob) => overrides[knob.key] !== undefined)
+}
+
+/** Drops the Spot color override when the employee-only flag is off. */
+export function resolveThemeOverridesForFlags(
+  overrides: ThemeOverrides,
+  { isSpotColorEnabled }: { isSpotColorEnabled: boolean }
+): ThemeOverrides {
+  if (isSpotColorEnabled || overrides.primaryHue === undefined) return overrides
+  const { primaryHue: _removed, ...rest } = overrides
+  return rest
 }
 
 function sanitizeThemeOverrides(

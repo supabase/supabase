@@ -415,28 +415,28 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/postgres/postgres-intro',
-    destination: '/docs/postgres/server/about',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: false,
     source: '/docs/realtime/about',
-    destination: '/docs/realtime/server/about',
+    destination: '/docs/guides/self-hosting',
   },
-  { permanent: false, source: '/docs/realtime/aws', destination: '/docs/postgres/server/aws' },
+  { permanent: false, source: '/docs/realtime/aws', destination: '/docs/guides/self-hosting' },
   {
     permanent: false,
     source: '/docs/realtime/digitalocean',
-    destination: '/docs/postgres/server/digitalocean',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: false,
     source: '/docs/realtime/docker',
-    destination: '/docs/postgres/server/docker',
+    destination: '/docs/guides/self-hosting/docker',
   },
   {
     permanent: false,
     source: '/docs/realtime/source',
-    destination: '/docs/postgres/server/about',
+    destination: '/docs/guides/self-hosting',
   },
   {
     permanent: false,
@@ -813,12 +813,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/connecting/direct-connections',
-    destination: '/docs/guides/database/connecting-to-postgres',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting/direct-connections',
-    destination: '/docs/guides/database/connection-pooling',
+    destination: '/docs/guides/database/connecting-to-postgres/#direct-connection',
   },
   {
     permanent: true,
@@ -1008,7 +1003,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/03/22/In-The-Loop',
-    destination: '/blog/in-the-loop',
+    destination: '/blog/In-The-Loop',
   },
   {
     permanent: true,
@@ -1420,52 +1415,52 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-list',
-    destination: '/docs/reference/supabase-branches-list',
+    destination: '/docs/reference/cli/supabase-branches-list',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-create',
-    destination: '/docs/reference/supabase-branches-create',
+    destination: '/docs/reference/cli/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-branch-delete',
-    destination: '/docs/reference/supabase-branches-delete',
+    destination: '/docs/reference/cli/supabase-branches-delete',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-switch',
-    destination: '/docs/reference/supabase-branches-create',
+    destination: '/docs/reference/cli/supabase-branches-create',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-changes',
-    destination: '/docs/reference/supabase-db-diff',
+    destination: '/docs/reference/cli/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-commit',
-    destination: '/docs/reference/supabase-db-pull',
+    destination: '/docs/reference/cli/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-set',
-    destination: '/docs/reference/supabase-link',
+    destination: '/docs/reference/cli/supabase-link',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-changes',
-    destination: '/docs/reference/supabase-db-diff',
+    destination: '/docs/reference/cli/supabase-db-diff',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-db-remote-commit',
-    destination: '/docs/reference/supabase-db-pull',
+    destination: '/docs/reference/cli/supabase-db-pull',
   },
   {
     permanent: true,
     source: '/docs/reference/cli/supabase-gen-types-typescript',
-    destination: '/docs/reference/supabase-gen-types',
+    destination: '/docs/reference/cli/supabase-gen-types',
   },
 
   {
@@ -1480,23 +1475,13 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/realtime#broadcast',
-    destination: '/docs/guides/realtime/broadcast',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/realtime#presence',
-    destination: '/docs/guides/realtime/presence',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/realtime/postgres-cdc',
     destination: '/docs/guides/realtime/postgres-changes',
   },
   {
     permanent: true,
     source: '/docs/reference/javascript/next/migration-guide',
-    destination: '/docs/reference/javascript/release-notes',
+    destination: '/docs/reference/javascript/v1/upgrade-guide',
   },
   {
     permanent: true,
@@ -1554,70 +1539,70 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-getuser',
-    destination: '/docs/reference/javascript/v1/auth-api-getuser',
+    destination: '/docs/reference/javascript/auth-getuser',
   },
   // v1: /auth-api-resetpasswordforemail
   // v2: /auth-resetpasswordforemail
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-resetpasswordforemail',
-    destination: '/docs/reference/javascript/v1/auth-api-resetpasswordforemail',
+    destination: '/docs/reference/javascript/auth-resetpasswordforemail',
   },
   // v1: /auth-api-verifyotp
   // v2: /auth-verifyotp
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-verifyotp',
-    destination: '/docs/reference/javascript/v1/auth-api-verifyotp',
+    destination: '/docs/reference/javascript/auth-verifyotp',
   },
   // v1: /auth-api-listusers
   // v2: /auth-admin-listusers
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-listusers',
-    destination: '/docs/reference/javascript/v1/auth-api-listusers',
+    destination: '/docs/reference/javascript/auth-admin-listusers',
   },
   // v1: /auth-api-createuser
   // v2: /auth-admin-createuser
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-createuser',
-    destination: '/docs/reference/javascript/v1/auth-api-createuser',
+    destination: '/docs/reference/javascript/auth-admin-createuser',
   },
   // v1: /auth-api-deleteuser
   // v2: /auth-admin-deleteuser
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-deleteuser',
-    destination: '/docs/reference/javascript/v1/auth-api-deleteuser',
+    destination: '/docs/reference/javascript/auth-admin-deleteuser',
   },
   // v1: /auth-api-generatelink
   // v2: /auth-admin-generatelink
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-generatelink',
-    destination: '/docs/reference/javascript/v1/auth-api-generatelink',
+    destination: '/docs/reference/javascript/auth-admin-generatelink',
   },
   // v1: /auth-api-inviteuserbyemail
   // v2: /auth-admin-inviteuserbyemail
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-inviteuserbyemail',
-    destination: '/docs/reference/javascript/v1/auth-api-inviteuserbyemail',
+    destination: '/docs/reference/javascript/auth-admin-inviteuserbyemail',
   },
   // v1: /auth-api-getuserbyid
   // v2: /auth-admin-getuserbyid
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-getuserbyid',
-    destination: '/docs/reference/javascript/v1/auth-api-getuserbyid',
+    destination: '/docs/reference/javascript/auth-admin-getuserbyid',
   },
   // v1: /auth-api-updateuserbyid
   // v2: /auth-admin-updateuserbyid
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-updateuserbyid',
-    destination: '/docs/reference/javascript/v1/auth-api-updateuserbyid',
+    destination: '/docs/reference/javascript/auth-admin-updateuserbyid',
   },
   // signIn method is now split into signInWithPassword ,signInWithOtp ,signInWithOAuth
   // send traffic to v1 docs instead
@@ -1638,7 +1623,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/auth-api-sendmobileotp',
-    destination: '/docs/reference/javascript/v1/auth-api-sendmobileotp',
+    destination: '/docs/reference/javascript/auth-signinwithotp',
   },
 
   // realtime methods been replaced with new names
@@ -1683,7 +1668,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/auth-signin',
-    destination: '/docs/reference/dart/v0/auth-signin',
+    destination: '/docs/reference/dart/auth-signinwithpassword',
   },
   // v0: /auth-session
   // v1: /auth-currentsession
@@ -1710,12 +1695,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/removesubscription',
-    destination: '/docs/reference/dart/v0/removesubscription',
+    destination: '/docs/reference/dart/removechannel',
   },
   {
     permanent: true,
     source: '/docs/reference/dart/getsubscriptions',
-    destination: '/docs/reference/dart/v0/getsubscriptions',
+    destination: '/docs/reference/dart/getchannels',
   },
   {
     permanent: true,
@@ -1751,16 +1736,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/storage-cdn',
     destination: '/docs/guides/storage/cdn',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/functions/auth#understanding-authorization-headers',
-    destination: '/docs/guides/functions/auth-headers',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
-    destination: '/docs/guides/functions/auth-headers',
   },
   {
     permanent: true,
@@ -1802,75 +1777,6 @@ module.exports = [
     source: '/project/:path+',
     destination: 'https://supabase.com/dashboard/project/:path+',
   },
-  // Reorganizing pooler docs:-----------------------------
-
-  //external libraries
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#integrations',
-    destination: '/docs/guides/database/connecting-to-postgres#quickstart-connection-guides',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-drizzle',
-    destination: '/docs/guides/database/drizzle',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-prisma',
-    destination: '/docs/guides/database/prisma',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-postgresjs',
-    destination: '/docs/guides/database/postgres-js',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-pgadmin',
-    destination: '/docs/guides/database/pgadmin',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connecting-with-psql',
-    destination: '/docs/guides/database/psql',
-  },
-
-  // pooling
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#connection-pooler',
-    destination: '/docs/guides/database/connecting-to-postgres#connection-pooling-in-depth',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#troubleshooting-supavisor',
-    destination: '/docs/guides/database/supavisor',
-  },
-
-  //IPv4/IPv6
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#finding-your-database-hostname',
-    destination: '/docs/guides/platform/ipv4-address#finding-your-databases-ip-address',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#managing-your-ip-address',
-    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#ipv6-address',
-    destination: '/docs/guides/platform/ipv4-address#supabase-and-ipv6-compatibility',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres#ipv4-address',
-    destination: '/docs/guides/platform/ipv4-address',
-  },
-  //--------------------------------------------------------
-
   // START docs 2.0, moving pages in to structure
   {
     permanent: true,
@@ -2431,7 +2337,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/openai/vector-search',
-    destination: '/docs/guides/ai/examples/docs-search',
+    destination: '/docs/guides/ai/examples/nextjs-vector-search',
   },
   {
     permanent: true,
@@ -2499,11 +2405,6 @@ module.exports = [
     destination: '/docs/guides/database/extensions/pg_repack',
   },
   {
-    permanent: false,
-    source: '/docs/guides/database/extensions/pg_partman',
-    destination: '/docs/guides/database/extensions',
-  },
-  {
     permanent: true,
     source: '/docs/guides/ai/structured-unstructured-embeddings',
     destination: '/docs/guides/ai/structured-unstructured',
@@ -2552,6 +2453,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/catalog/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/clickhouse-clickpipes',
+    destination: '/partners/catalog/clickhouse',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations',
     destination: '/partners/catalog',
   },
@@ -2573,7 +2484,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/bracket',
-    destination: '/partners/catalog/bracket',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2583,7 +2494,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/cloudflare-workers',
-    destination: '/partners/catalog/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
   },
   {
     permanent: true,
@@ -2618,7 +2529,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/forestadmin',
-    destination: '/partners/catalog/forestadmin',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2653,7 +2564,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/passage',
-    destination: '/partners/catalog/passage',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2663,7 +2574,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/picket',
-    destination: '/partners/catalog/picket',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2673,7 +2584,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/polyscale',
-    destination: '/partners/catalog/polyscale',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2683,7 +2594,17 @@ module.exports = [
   {
     permanent: true,
     source: '/partners/integrations/atomic_crm',
-    destination: '/partners/catalog/atomic-crm',
+    destination: '/partners/catalog',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/clickhouse-clickpipes',
+    destination: '/partners/catalog/clickhouse',
   },
   {
     permanent: true,
@@ -2713,7 +2634,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/snaplet',
-    destination: '/partners/catalog/snaplet',
+    destination: '/partners',
   },
   {
     permanent: true,
@@ -2823,7 +2744,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/dart/sign-in-with-apple',
-    destination: '/docs/reference/dart/sign-in-with-id-token',
+    destination: '/docs/reference/dart/auth-signinwithidtoken',
   },
   {
     permanent: true,
@@ -3068,17 +2989,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/functions/debugging',
-    destination: '/docs/functions/logging',
+    destination: '/docs/guides/functions/logging',
   },
   {
     permanent: true,
     source: '/docs/guides/functions/log-drains',
-    destination: '/docs/platform/log-drains',
+    destination: '/docs/guides/observability/log-drains',
   },
   {
     permanent: true,
     source: '/docs/guides/functions/functions-headers',
-    destination: '/docs/functions/logging',
+    destination: '/docs/guides/functions/logging',
   },
   {
     permanent: true,
@@ -3319,11 +3240,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
-    destination: '/docs/guides/database/connecting-to-postgres',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
     destination: '/docs/guides/troubleshooting/http-api-issues',
   },
@@ -3373,61 +3289,6 @@ module.exports = [
     destination: '/docs/guides/platform/billing-on-supabase',
   },
   {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#how-billing-is-organized',
-    destination: '/docs/guides/platform/billing-on-supabase#organization-based-billing',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#quotas-and-features',
-    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#usage-items',
-    destination: '/docs/guides/platform/billing-on-supabase#variable-usage-fees-and-quotas',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours',
-    destination: '/docs/guides/platform/manage-your-usage/compute',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#compute-pricing',
-    destination: '/docs/guides/platform/manage-your-usage/compute#pricing',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#compute-credits',
-    destination: '/docs/guides/platform/manage-your-usage/compute#compute-credits',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#read-replicas',
-    destination: '/docs/guides/platform/manage-your-usage/read-replicas',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#project-add-ons',
-    destination: '/docs/guides/platform/manage-your-usage',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#unified-egress',
-    destination: '/docs/guides/platform/manage-your-usage/egress',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#included-egress-quota',
-    destination: '/docs/guides/platform/manage-your-usage/egress#pricing',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#egress-dashboards',
-    destination: '/docs/guides/platform/manage-your-usage/egress#usage-page',
-  },
-  {
     permanent: true,
     source: '/docs/guides/platform/manage-your-usage/log-ingest',
     destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
@@ -3436,31 +3297,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/manage-your-usage/log-query',
     destination: '/docs/guides/platform/manage-your-usage/logs-query',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#disk-size',
-    destination: '/docs/guides/platform/manage-your-usage/disk-size',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#free-plan',
-    destination: '/docs/guides/platform/billing-on-supabase#free-plan',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#billing-examples',
-    destination: '/docs/guides/platform/billing-on-supabase',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-free-plan-organization',
-    destination: '/docs/guides/platform/billing-on-supabase',
-  },
-  {
-    permanent: false,
-    source: '/docs/guides/platform/org-based-billing#multiple-projects-in-a-pro-plan-organization',
-    destination: '/docs/guides/platform/billing-on-supabase',
   },
   {
     permanent: false,
@@ -3566,6 +3402,19 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
+  },
+  { permanent: true, source: '/signup', destination: '/dashboard/sign-up' },
+  { permanent: true, source: '/about', destination: '/company' },
+  { permanent: true, source: '/startups', destination: '/solutions/startups' },
+  {
+    permanent: true,
+    source: '/legal/subprocessors',
+    destination: '/legal/customer-resources/subprocessor-list',
+  },
+  {
+    permanent: true,
+    source: '/downloads/docs/Supabase\\+DPA\\+:version.pdf',
+    destination: '/legal/customer-resources/data-processing-addendum',
   },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/index.md' },

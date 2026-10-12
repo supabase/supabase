@@ -7,6 +7,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { SingleStat } from '@/components/ui/SingleStat'
@@ -157,8 +158,9 @@ export const ActivityStats = () => {
         <ServiceStatus />
 
         <SingleStat
+          href={getInfrastructurePath(ref)}
           icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
-          label={<span>Compute</span>}
+          label={<span>Compute size</span>}
           value={
             <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
               {project?.infra_compute_size ? (

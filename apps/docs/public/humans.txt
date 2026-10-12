@@ -17,6 +17,7 @@ Alex Hall
 Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
+Alexis Aguilar
 Ali Waseem
 Alice Crosbie
 Allan S
@@ -38,10 +39,12 @@ Artyom Borissov
 Aziz Quadri
 Barco Fourie
 Barry Roodt
+Ben Fritsch
 Beng Eu
 Benjamin Coenen
 Beth Long
 Bobbie Soedirgo
+Brad Deam
 Brad Gyger
 Brendan Stephens
 Brent Graveland
@@ -73,9 +76,11 @@ Clayton Kast
 Colin Goodheart-Smithe
 Colin Murray
 Colum Ferry
+Connor Davis
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Chapman
 Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
@@ -85,6 +90,7 @@ David A. Ventimiglia
 David Alvarez
 David Birdsong
 David Camacho Cateura
+David McNeil
 David Weitzman
 David Whittington
 Davide Pellegatta
@@ -163,6 +169,7 @@ Joel Low
 Joey Freeland
 Joey Lei
 John Fitzgerald
+John Jarvis
 Joel Martin
 Johan Bergström
 John Pena
@@ -207,6 +214,7 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
+Lovro Mažgon
 Lukas Bernert
 Lukas Klingsbo
 Łukasz Korbasiewicz
@@ -231,6 +239,7 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
 Mo Khan

@@ -14,7 +14,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: { id: number; name: string; server_name: string }
+  wrapper: { id: number; name: string; server_name: string; server_options?: string[] | null }
   wrapperMeta: WrapperMeta
 }
 
@@ -25,7 +25,12 @@ export async function deleteFDW({
   wrapperMeta,
 }: FDWDeleteVariables) {
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['delete-fdw'],
+  })
   return result
 }
 

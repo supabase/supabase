@@ -92,7 +92,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         )}
       >
         <TableHeader className="sticky top-0 z-1">
-          <TableRow className={cn(TableRowClassName, 'bg-surface-75')}>
+          <TableRow className={cn(TableRowClassName, 'bg-surface-75 hover:bg-surface-75')}>
             {headers.map((header) => {
               const sort = header.column.getIsSorted()
               const canResize = header.column.getCanResize()

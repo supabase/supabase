@@ -12,12 +12,16 @@ const BackgroundPattern = ({ className, variant = 'center' }: BackgroundPatternP
     <div className={cn('absolute inset-x-0 top-0 h-1/2 w-full', className)}>
       <svg
         aria-hidden
+<<<<<<< HEAD
         className={cn(
           'pointer-events-none absolute inset-x-0 top-0 w-full text-foreground/20 dark:text-foreground/30',
           variant === 'center'
             ? 'h-1/2 [-webkit-mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)] [mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)]'
             : 'h-full [-webkit-mask-image:linear-gradient(to_bottom,black_0%,transparent_82%)] [mask-image:linear-gradient(to_bottom,black_0%,transparent_82%)]'
         )}
+=======
+        className="pointer-events-none absolute inset-x-0 top-0 h-1/2 w-full text-foreground/20 dark:text-foreground/30 [-webkit-mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)] [mask-image:radial-gradient(ellipse_70%_90%_at_50%_0%,black,transparent_70%)]"
+>>>>>>> origin/master
       >
         <defs>
           <pattern id={patternId} width="30" height="30" patternUnits="userSpaceOnUse">

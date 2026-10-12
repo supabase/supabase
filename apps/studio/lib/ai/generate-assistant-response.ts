@@ -48,6 +48,7 @@ export async function generateAssistantResponse({
   systemProviderOptions,
   providerOptions,
   requestedModel,
+  effectiveModel,
   abortSignal,
   timeout,
   onSpanCreated,
@@ -71,6 +72,8 @@ export async function generateAssistantResponse({
   includesLogsSnippets?: boolean
   isExplorerEnabled?: boolean
   requestedModel?: string
+  /** The model actually used after entitlement/throttle fallback. */
+  effectiveModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
@@ -196,6 +199,7 @@ export async function generateAssistantResponse({
         planId,
         isHighComplianceProject,
         requestedModel,
+        effectiveModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },

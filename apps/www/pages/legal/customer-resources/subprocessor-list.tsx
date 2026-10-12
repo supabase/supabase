@@ -35,7 +35,7 @@ export default function SubprocessorListPage() {
           <PageBreadcrumb
             items={[
               { label: 'Legal', href: '/legal' },
-              { label: 'Customer Legal Resources', href: '/legal#customer-legal-resources' },
+              { label: 'Privacy Resources', href: '/legal#privacy-resources' },
             ]}
           />
         }
