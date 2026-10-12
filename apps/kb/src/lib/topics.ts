@@ -91,6 +91,15 @@ export type Topic = (typeof TOPICS)[number]['name']
 // can't preserve on its own — this cast is safe because TOPICS is `as const`.
 export const TOPIC_NAMES = TOPICS.map((topic) => topic.name) as [Topic, ...Topic[]]
 
+// these say what kind of guide it is, the rest say what it's about
+export const FORMAT_TOPICS: Topic[] = [
+  'Migration',
+  'Comparison',
+  'Rundowns',
+  'Troubleshooting',
+  'Tutorial',
+]
+
 export function getTopicDescription(topic: Topic): string {
   return TOPICS.find((t) => t.name === topic)!.description
 }
