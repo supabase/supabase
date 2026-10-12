@@ -141,9 +141,9 @@ interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
   objectName: string
-  /** Full path within the bucket, which is what the version endpoints address. */
   path: string
   versioningState: BucketVersioningState
+  willRetainVersionOnWrite: boolean
   lifecyclePolicy: LifecyclePolicy
   expirationMode: ExpirationMode
   mimeType?: string
@@ -159,6 +159,7 @@ export const VersionHistory = ({
   objectName,
   path,
   versioningState,
+  willRetainVersionOnWrite,
   lifecyclePolicy,
   expirationMode,
   mimeType,
@@ -218,10 +219,11 @@ export const VersionHistory = ({
           expiryDays,
           cap,
           mode: expirationMode,
+          willRetainVersionOnWrite,
         }),
       ])
     )
-  }, [versions, expiryDays, cap, expirationMode])
+  }, [versions, expiryDays, cap, expirationMode, willRetainVersionOnWrite])
 
   const handleRestore = (version: ObjectVersion) => {
     if (!projectRef || !bucketId) return
@@ -257,11 +259,23 @@ export const VersionHistory = ({
         </p>
       )}
 
-      {isSuccess && versions.length === 0 && versioningState !== 'disabled' && (
-        <p className="text-sm text-foreground-light">
-          No previous versions yet. Overwriting this file will retain a recoverable copy here.
-        </p>
-      )}
+      {isSuccess &&
+        versions.length === 0 &&
+        versioningState !== 'disabled' &&
+        willRetainVersionOnWrite && (
+          <p className="text-sm text-foreground-light">
+            No previous versions yet. Overwriting this file will retain a recoverable copy here.
+          </p>
+        )}
+
+      {isSuccess &&
+        versions.length === 0 &&
+        versioningState !== 'disabled' &&
+        !willRetainVersionOnWrite && (
+          <p className="text-sm text-foreground-light">
+            No previous versions retained. Overwriting this file replaces it in place.
+          </p>
+        )}
 
       {isSuccess && versions.length > 0 && (
         <ol className="flex flex-col gap-y-0.5">

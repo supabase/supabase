@@ -186,7 +186,6 @@ export const ArchivedFilePreviewPane = () => {
                 className="flex items-center justify-center overflow-hidden rounded-md border border-overlay bg-surface-200"
                 style={{ height: 'clamp(120px, calc((100vh - 144px) * 0.4), 180px)' }}
               >
-                {/* The path's current row is the delete marker, so the version has to be named. */}
                 <FilePreview
                   path={object.path}
                   mimeType={object.currentVersion.mimeType}
@@ -199,12 +198,12 @@ export const ArchivedFilePreviewPane = () => {
                 <p className="truncate text-sm font-medium text-foreground" title={object.path}>
                   {object.path}
                 </p>
-                <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
+                <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
                   {formatBytes(object.currentVersion.size)}
                   <Badge variant="warning" className="-my-1">
                     Archived
                   </Badge>
-                </p>
+                </div>
 
                 <div className="mt-3 flex shrink-0 items-center gap-x-1">
                   <ButtonTooltip

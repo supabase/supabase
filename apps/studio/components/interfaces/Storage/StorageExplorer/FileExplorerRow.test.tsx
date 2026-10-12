@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   STORAGE_ROW_STATUS,
@@ -14,10 +14,25 @@ import type {
 import { FileExplorerRow } from '@/components/interfaces/Storage/StorageExplorer/FileExplorerRow'
 import { customRender as render } from '@/tests/lib/custom-render'
 
+const { versioningEnabled, selectedBucket } = vi.hoisted(() => ({
+  versioningEnabled: { current: false },
+  selectedBucket: {
+    current: { id: 'my-bucket', name: 'my-bucket', public: false } as Record<string, unknown>,
+  },
+}))
+
+vi.mock(
+  '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext',
+  async (importOriginal) => {
+    const actual = await importOriginal<Record<string, unknown>>()
+    return { ...actual, useIsStorageVersioningEnabled: () => versioningEnabled.current }
+  }
+)
+
 vi.mock('@/state/storage-explorer', () => ({
   useStorageExplorerStateSnapshot: () => ({
     projectRef: 'abcdef',
-    selectedBucket: { id: 'my-bucket', name: 'my-bucket', public: false },
+    selectedBucket: selectedBucket.current,
     selectedFilePreview: undefined,
     openedFolders: [],
     setSelectedFileCustomExpiry: vi.fn(),
@@ -28,6 +43,7 @@ vi.mock('@/state/storage-explorer', () => ({
     setSelectedItemsToMove: vi.fn(),
     downloadFolder: vi.fn(),
     selectRangeItems: vi.fn(),
+    setItemToPurge: vi.fn(),
   }),
 }))
 vi.mock('@/components/interfaces/Storage/StorageExplorer/StorageExplorerNavigation', () => ({
@@ -67,6 +83,11 @@ const item = (overrides: Partial<StorageItem>): StorageItem => ({
   last_accessed_at: null,
   path: 'photo.png',
   ...overrides,
+})
+
+beforeEach(() => {
+  versioningEnabled.current = false
+  selectedBucket.current = { id: 'my-bucket', name: 'my-bucket', public: false }
 })
 
 describe('FileExplorerRow', () => {
@@ -154,6 +175,108 @@ describe('FileExplorerRow', () => {
     // The live folder actions have no archived equivalent.
     expect(screen.queryByText('Download')).not.toBeInTheDocument()
     expect(screen.queryByText('Rename')).not.toBeInTheDocument()
+  })
+
+  describe('versioning state', () => {
+    const openFileMenu = async (fileItem: Partial<StorageItem> = {}) => {
+      render(
+        <FileExplorerRow
+          item={item({ id: 'f4', ...fileItem })}
+          index={0}
+          view={STORAGE_VIEWS.COLUMNS}
+          columnIndex={0}
+          selectedItems={[]}
+        />
+      )
+      await userEvent.click(screen.getByRole('button', { name: 'photo.png actions' }))
+      // Waiting on one entry keeps the rest of the assertions off a racing menu.
+      await screen.findByText('Download')
+    }
+
+    it('archives and offers a purge on an enabled bucket', async () => {
+      versioningEnabled.current = true
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+
+      await openFileMenu()
+
+      expect(screen.getByText('Upload new version')).toBeInTheDocument()
+      expect(screen.getByText('Archive')).toBeInTheDocument()
+      expect(screen.getByText('Delete permanently')).toBeInTheDocument()
+    })
+
+    it('deletes rather than archives on a suspended bucket', async () => {
+      versioningEnabled.current = true
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+
+      await openFileMenu({ is_versioned: false })
+
+      // Suspended can't archive, so there is no soft delete and nothing to purge from here.
+      expect(screen.getByText('Delete')).toBeInTheDocument()
+      expect(screen.queryByText('Archive')).not.toBeInTheDocument()
+      expect(screen.queryByText('Delete permanently')).not.toBeInTheDocument()
+      // The write overwrites in place, so it is not a new version.
+      expect(screen.getByText('Replace file')).toBeInTheDocument()
+      expect(screen.queryByText('Upload new version')).not.toBeInTheDocument()
+    })
+
+    it('still retains a version for a file that predates the suspension', async () => {
+      versioningEnabled.current = true
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+
+      await openFileMenu({ is_versioned: true })
+
+      expect(screen.getByText('Upload new version')).toBeInTheDocument()
+      // Retaining a version does not bring the archive action back.
+      expect(screen.getByText('Delete')).toBeInTheDocument()
+      expect(screen.queryByText('Archive')).not.toBeInTheDocument()
+    })
+
+    it('ignores is_versioned on a disabled bucket', async () => {
+      versioningEnabled.current = true
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'DISABLED' }
+
+      await openFileMenu({ is_versioned: true })
+
+      expect(screen.getByText('Replace file')).toBeInTheDocument()
+      expect(screen.getByText('Delete')).toBeInTheDocument()
+      expect(screen.queryByText('Delete permanently')).not.toBeInTheDocument()
+    })
+
+    it('archives a folder on an enabled bucket, and plainly deletes it on a suspended one', async () => {
+      versioningEnabled.current = true
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+
+      const folder = item({ name: 'avatars', type: STORAGE_ROW_TYPES.FOLDER, metadata: null })
+      const { unmount } = render(
+        <FileExplorerRow
+          item={folder}
+          index={0}
+          view={STORAGE_VIEWS.COLUMNS}
+          columnIndex={0}
+          selectedItems={[]}
+        />
+      )
+      await userEvent.click(screen.getByRole('button', { name: 'avatars actions' }))
+      expect(await screen.findByText('Archive')).toBeInTheDocument()
+      expect(screen.getByText('Delete permanently')).toBeInTheDocument()
+      await userEvent.keyboard('{Escape}')
+      unmount()
+
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+      render(
+        <FileExplorerRow
+          item={folder}
+          index={0}
+          view={STORAGE_VIEWS.COLUMNS}
+          columnIndex={0}
+          selectedItems={[]}
+        />
+      )
+      await userEvent.click(screen.getByRole('button', { name: 'avatars actions' }))
+      expect(await screen.findByText('Delete')).toBeInTheDocument()
+      expect(screen.queryByText('Archive')).not.toBeInTheDocument()
+      expect(screen.queryByText('Delete permanently')).not.toBeInTheDocument()
+    })
   })
 
   it('keeps hiding the icon on hover for a live file, which does swap in a checkbox', () => {

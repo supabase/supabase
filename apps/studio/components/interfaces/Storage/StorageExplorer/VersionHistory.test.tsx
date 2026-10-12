@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { VersionHistory } from '@/components/interfaces/Storage/StorageExplorer/VersionHistory'
@@ -48,7 +49,7 @@ const VERSIONS = [
   },
 ]
 
-const renderHistory = () =>
+const renderHistory = (props: Partial<ComponentProps<typeof VersionHistory>> = {}) =>
   render(
     <VersionHistory
       projectRef="abcdef"
@@ -56,10 +57,12 @@ const renderHistory = () =>
       objectName="photo.png"
       path="images/photo.png"
       versioningState="enabled"
+      willRetainVersionOnWrite
       lifecyclePolicy={{ expiryDays: null, maxVersions: null }}
       expirationMode="and"
       clearPreview={vi.fn()}
       onEditBucket={vi.fn()}
+      {...props}
     />
   )
 
@@ -89,5 +92,48 @@ describe('VersionHistory', () => {
     // A restore changes the object's size, type and modified date, and the row
     // showing them lives in the explorer's state rather than a React Query cache.
     await waitFor(() => expect(refetchAllOpenedFolders).toHaveBeenCalled())
+  })
+
+  describe('empty state', () => {
+    const mockEmptyListing = () =>
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json([]),
+      })
+
+    it('promises retention on an enabled bucket', async () => {
+      mockEmptyListing()
+      renderHistory()
+
+      expect(
+        await screen.findByText(/Overwriting this file will retain a recoverable copy/)
+      ).toBeInTheDocument()
+    })
+
+    it('promises retention on a suspended bucket when the file predates the suspension', async () => {
+      mockEmptyListing()
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: true })
+
+      expect(
+        await screen.findByText(/Overwriting this file will retain a recoverable copy/)
+      ).toBeInTheDocument()
+    })
+
+    it('says the file is replaced in place when no write will retain a version', async () => {
+      mockEmptyListing()
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: false })
+
+      expect(await screen.findByText(/replaces it in place/)).toBeInTheDocument()
+      expect(screen.queryByText(/retain a recoverable copy/)).not.toBeInTheDocument()
+    })
+
+    it('points at the bucket settings when versioning is off', async () => {
+      mockEmptyListing()
+      renderHistory({ versioningState: 'disabled', willRetainVersionOnWrite: false })
+
+      expect(await screen.findByText(/Versioning is off for this bucket/)).toBeInTheDocument()
+      expect(screen.queryByText(/replaces it in place/)).not.toBeInTheDocument()
+    })
   })
 })

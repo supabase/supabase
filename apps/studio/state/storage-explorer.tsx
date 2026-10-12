@@ -45,6 +45,10 @@ import {
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import {
+  getBucketVersioningState,
+  willRetainVersionOnWrite,
+} from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
 import { configKeys } from '@/data/config/keys'
@@ -1527,7 +1531,18 @@ export function createStorageExplorerState({
      */
     replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
       const path = getStorageItemPath(state, item)
-      const toastId = toast.loading(`Uploading a new version of ${item.name}...`)
+      // A suspended bucket overwrites "current" version unless this file predates the suspension.
+      const isRetainingVersion = willRetainVersionOnWrite({
+        versioningState: getBucketVersioningState(state.selectedBucket),
+        isObjectVersioned: item.is_versioned,
+      })
+      const copy = isRetainingVersion
+        ? {
+            loading: `Uploading a new version of ${item.name}...`,
+            success: `Uploaded a new version of ${item.name}`,
+          }
+        : { loading: `Replacing ${item.name}...`, success: `Replaced ${item.name}` }
+      const toastId = toast.loading(copy.loading)
 
       state.updateRowStatus({
         name: item.name,
@@ -1563,7 +1578,7 @@ export function createStorageExplorerState({
           upload.start()
         })
 
-        toast.success(`Uploaded a new version of ${item.name}`, { id: toastId })
+        toast.success(copy.success, { id: toastId })
         await state.refetchAllOpenedFolders()
         await Promise.all([
           getQueryClient().invalidateQueries({

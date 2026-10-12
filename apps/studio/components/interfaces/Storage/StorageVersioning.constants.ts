@@ -19,8 +19,25 @@ export const getBucketVersioningState = (bucket?: Bucket): BucketVersioningState
   }
 }
 
-export const isBucketVersioned = (bucket?: Bucket) => getBucketVersioningState(bucket) === 'enabled'
+/** Only an enabled bucket turns a delete into a recoverable archive. */
+export const canArchiveInBucket = (bucket?: Bucket) =>
+  getBucketVersioningState(bucket) === 'enabled'
 
 /** A suspended bucket can still be retaining versions. */
 export const hasVersioningHistory = (bucket?: Bucket) =>
   getBucketVersioningState(bucket) !== 'disabled'
+
+/**
+ * A suspended bucket retains a copy when the object it replaces
+ * was itself written while versioning was enabled.
+ */
+export const willRetainVersionOnWrite = ({
+  versioningState,
+  isObjectVersioned,
+}: {
+  versioningState: BucketVersioningState
+  isObjectVersioned?: boolean | null
+}) => {
+  if (versioningState === 'enabled') return true
+  return versioningState === 'suspended' && !!isObjectVersioned
+}
