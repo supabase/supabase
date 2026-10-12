@@ -65,8 +65,7 @@ export const OrganizationSelector = ({
                   field.onChange(slug)
                   router.push(`/new/${slug}`)
                 }}
-                value={field.value}
-                defaultValue={field.value}
+                value={field.value ?? ''}
                 disabled={disableOrganizationSelection}
               >
                 <FormControl>
