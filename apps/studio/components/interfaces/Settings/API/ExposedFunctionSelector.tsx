@@ -124,7 +124,7 @@ export const ExposedFunctionSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">{functionsSummary}</p>
+                <p className="text-foreground-lighter" aria-live="polite">{functionsSummary}</p>
               </div>
             </Button>
           </PopoverTrigger>

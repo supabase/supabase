@@ -123,7 +123,7 @@ export const ExposedSchemaSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">{schemasSummary}</p>
+                <p className="text-foreground-lighter" aria-live="polite">{schemasSummary}</p>
               </div>
             </Button>
           </PopoverTrigger>

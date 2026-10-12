@@ -118,7 +118,7 @@ export const ExposedTableSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter">{tablesSummary}</p>
+                <p className="text-foreground-lighter" aria-live="polite">{tablesSummary}</p>
               </div>
             </Button>
           </PopoverTrigger>
