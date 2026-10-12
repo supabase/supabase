@@ -16,7 +16,12 @@ Insert-only tables don't require a primary key or replica identity. Updates and 
 
 ## Prepare DuckLake resources [#understand-the-ducklake-components]
 
-DuckLake stores metadata in a Postgres catalog and data in object storage. With **Use this Supabase project**, Pipelines uses this project's Postgres database for the catalog and a Storage bucket in the same project. Pipelines creates the connection credentials. With **Enter connection details**, you provide the catalog URL and storage credentials. You also need a compatible query engine to read the replicated data.
+DuckLake stores metadata in a Postgres catalog and data in object storage. Pipelines offers two ways to set them up:
+
+- **Use this Supabase project**: Pipelines uses this project's Postgres database as the catalog and a Storage bucket in the same project as object storage. It also creates the connection credentials.
+- **Enter connection details**: You provide the catalog URL and the storage credentials.
+
+To read the replicated data, you also need a compatible query engine.
 
 | Component        | Purpose                                                                                                                             |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
