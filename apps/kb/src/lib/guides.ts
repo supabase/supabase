@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content'
 
-import { TOPICS, topicToSlug, type Topic } from './topics'
+import { isKnownTopic, TOPICS, topicToSlug, type Topic } from './topics'
 
 export interface GuideSummary {
   id: string
@@ -42,6 +42,16 @@ export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   description: guide.data.description,
   topics: guide.data.topics,
   href: `${import.meta.env.BASE_URL}/guides/${guide.id}`,
+})
+
+export const toTroubleshootingSummary = (
+  entry: CollectionEntry<'troubleshooting'>
+): GuideSummary => ({
+  id: entry.id,
+  title: entry.data.title,
+  description: entry.data.description ?? '',
+  topics: entry.data.topics.filter(isKnownTopic),
+  href: `${import.meta.env.BASE_URL}/troubleshooting/${entry.id}`,
 })
 
 export const filterGuides = ({ guides, topic }: FilterGuidesParams): GuideSummary[] =>

@@ -1,16 +1,17 @@
 ---
 import { getCollection } from 'astro:content'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from 'ui'
 
+import { FeaturedSection } from '../../components/FeaturedSection'
+import { Hero } from '../../components/Hero'
 import Layout from '../../layouts/Layout.astro'
+import { toSummary, toTroubleshootingSummary, type FeaturedItem } from '../../lib/guides'
 import { TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
 	const troubleshooting = await getCollection('troubleshooting')
-	const entries = [
-		...guides.map((guide) => ({ data: guide.data, href: `/guides/${guide.id}` })),
-		...troubleshooting.map((entry) => ({ data: entry.data, href: `/troubleshooting/${entry.id}` })),
-	]
+	const summaries = [...guides.map(toSummary), ...troubleshooting.map(toTroubleshootingSummary)]
 
 	// One page per topic in TOPICS — not just topics a guide already uses —
 	// so every link on the "Topics" nav resolves instead of 404ing.
@@ -19,30 +20,33 @@ export async function getStaticPaths() {
 		props: {
 			topic: topic.name,
 			description: topic.description,
-			guides: entries.filter((entry) => entry.data.topics?.includes(topic.name)),
+			guides: summaries.filter((summary) => summary.topics.includes(topic.name)),
 		},
 	}))
 }
 
 const { topic, description, guides } = Astro.props
+// guide and troubleshooting slugs can collide, hrefs can't
+const items: FeaturedItem[] = guides.map((summary) => ({ ...summary, slot: summary.href }))
 ---
 
 <Layout title={topic} description={description}>
-	<article class="prose max-w-3xl mx-auto px-6 py-16">
-		<h1>{topic}</h1>
-		<p class="lead">{description}</p>
+	<Hero client:load title={topic} description={description} guides={guides}>
+		<Breadcrumb slot="breadcrumb">
+			<BreadcrumbList>
+				<BreadcrumbItem>
+					<BreadcrumbLink href={import.meta.env.BASE_URL}>Knowledge base</BreadcrumbLink>
+				</BreadcrumbItem>
+			</BreadcrumbList>
+		</Breadcrumb>
+	</Hero>
+	<div class="pb-24 pt-16 sm:pt-20">
 		{
-			guides.length === 0 ? (
-				<p>No guides for this topic</p>
+			items.length === 0 ? (
+				<p class="mx-auto max-w-6xl px-6 text-sm text-foreground-light">No guides for this topic yet.</p>
 			) : (
-				<ul>
-					{guides.map((guide) => (
-						<li>
-							<a href={`${import.meta.env.BASE_URL}${guide.href}`}>{guide.data.title}</a>
-						</li>
-					))}
-				</ul>
+				<FeaturedSection client:load title="Guides" items={items} />
 			)
 		}
-	</article>
+	</div>
 </Layout>
