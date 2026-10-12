@@ -506,16 +506,16 @@ You can send messages directly from your database using the `realtime.send()` fu
 ```sql
 select
   realtime.send(
-    jsonb_build_object('hello', 'world'), -- JSONB Payload
+    jsonb_build_object('hello', 'world'), -- JSONB payload
     'event', -- Event name
     'topic', -- Topic
-    false    -- Private flag - true: Private (default), false: Public
+    false    -- private flag: false sends to a public channel; true sends to a private channel (default)
   );
 ```
 
 <Admonition type="note">
 
-The `realtime.send()` function in the database includes a flag that determines whether the broadcast is private or public, and client channels also have the same configuration. For broadcasts to work correctly, these settings must match. A public broadcast only reaches public channels and a private broadcast only reaches private channels.
+The `realtime.send()` function includes a `private` flag that determines whether the broadcast is sent to a private or public channel. Client channels also have the same configuration. For broadcasts to work correctly, these settings must match: a public broadcast only reaches public channels, and a private broadcast only reaches private channels.
 
 By default, all database broadcasts are private, meaning clients must authenticate to receive them. If the database sends a public message but the client subscribes to a private channel, the message is not delivered because private channels only accept signed, authenticated messages.
 
@@ -530,11 +530,11 @@ select
     '\x012345'::bytea, -- bytea payload
     'event',           -- Event name
     'topic',           -- Topic
-    true               -- Private flag - true: Private (default), false: Public
+    true               -- private flag: true sends to a private channel (default); false sends to a public channel
   );
 ```
 
-The same public/private matching rule applies: a binary broadcast only reaches channels with the same private setting. Binary messages only reach clients on **supabase-js 2.91.0** and **supabase-swift 2.44.0** or later; older clients silently drop them.
+The same public/private matching rule applies: a binary broadcast only reaches channels with the same `private` setting. Binary messages only reach clients on **supabase-js 2.91.0** and **supabase-swift 2.44.0** or later; older clients silently drop them.
 
 You can use the `realtime.broadcast_changes()` helper function to broadcast messages when a record is created, updated, or deleted. For more details, read [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes).
 
