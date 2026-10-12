@@ -3134,7 +3134,7 @@ export interface AdvisorDetailOpenedEvent {
     /**
      * Source of the advisor
      */
-    advisorSource: 'lint' | 'notification' | 'signal' | 'account'
+    advisorSource: 'lint' | 'notification' | 'signal'
     /**
      * Category of the advisor
      */

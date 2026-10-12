@@ -63,7 +63,7 @@ export const getLintCategory = (lint: Lint): LintCategory | undefined =>
  */
 export const getAdvisorItemTelemetryCategory = (item: AdvisorItem): LintCategory | undefined => {
   if (item.source === 'lint') return getLintCategory(item.original)
-  if (item.source === 'signal' || item.source === 'account') return 'SECURITY'
+  if (item.source === 'signal') return 'SECURITY'
   return undefined
 }
 
@@ -161,10 +161,8 @@ export const getAdvisorItemSecondaryText = (
   }
 
   if (item.source === 'signal') {
-    return `Database · ${item.sourceData.ip}`
+    return item.scope === 'account' ? 'Account' : `Database · ${item.sourceData.ip}`
   }
-
-  if (item.source === 'account') return 'Account'
 
   if (item.source === 'notification') {
     if (!item.project_ref) return undefined

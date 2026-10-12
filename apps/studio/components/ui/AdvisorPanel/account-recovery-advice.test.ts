@@ -45,6 +45,40 @@ describe('createAccountRecoveryAdvice', () => {
     }
   })
 
+  it('uses account-scoped signal types and the matching Security action', () => {
+    const cases = [
+      {
+        recoveryCodes: { status: 'unenrolled' as const },
+        type: 'recovery-codes-missing',
+        label: 'Generate recovery codes',
+      },
+      {
+        recoveryCodes: { status: 'available' as const, data: { remaining: 0 } },
+        type: 'recovery-codes-exhausted',
+        label: 'Regenerate recovery codes',
+      },
+      {
+        recoveryCodes: { status: 'available' as const, data: { remaining: 1 } },
+        type: 'recovery-codes-low',
+        label: 'Review recovery codes',
+      },
+    ]
+
+    for (const item of cases) {
+      const advice = createAccountRecoveryAdvice({
+        factors: oneFactor,
+        identities,
+        recoveryCodes: item.recoveryCodes,
+      })
+      expect(advice).toMatchObject({
+        source: 'signal',
+        scope: 'account',
+        type: item.type,
+        actions: [{ label: item.label, href: '/account/security#recovery-codes' }],
+      })
+    }
+  })
+
   it('treats one code as a recommendation and clears advice after replenishment', () => {
     expect(
       createAccountRecoveryAdvice({

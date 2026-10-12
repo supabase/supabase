@@ -28,26 +28,30 @@ export const createAccountRecoveryAdvice = ({
   if (recoveryCodes.status === 'unenrolled') {
     return {
       id: 'account:recovery-codes-missing',
-      source: 'account',
+      source: 'signal',
+      scope: 'account',
       type: 'recovery-codes-missing',
       category: 'security',
       severity: hasInsufficientBackupFactors ? 'critical' : 'warning',
       title: 'Generate account recovery codes',
       summary:
         'Your account has no recovery codes. Generate codes and store them somewhere safe so you can sign in if you lose access to an authenticator app.',
+      actions: [{ label: 'Generate recovery codes', href: '/account/security#recovery-codes' }],
     }
   }
 
   if (availableCodes === 0) {
     return {
       id: 'account:recovery-codes-exhausted',
-      source: 'account',
+      source: 'signal',
+      scope: 'account',
       type: 'recovery-codes-exhausted',
       category: 'security',
       severity: hasInsufficientBackupFactors ? 'critical' : 'warning',
       title: 'Regenerate account recovery codes',
       summary:
         'Your account has no unused recovery codes. Regenerate them and store the new codes somewhere safe.',
+      actions: [{ label: 'Regenerate recovery codes', href: '/account/security#recovery-codes' }],
     }
   }
 
@@ -55,13 +59,15 @@ export const createAccountRecoveryAdvice = ({
   if (availableCodes === 1) {
     return {
       id: 'account:recovery-codes-low',
-      source: 'account',
+      source: 'signal',
+      scope: 'account',
       type: 'recovery-codes-low',
       category: 'security',
       severity: 'info',
       title: 'Review account recovery codes',
       summary:
         'Your account has one unused recovery code. Consider regenerating codes before you need them.',
+      actions: [{ label: 'Review recovery codes', href: '/account/security#recovery-codes' }],
     }
   }
 

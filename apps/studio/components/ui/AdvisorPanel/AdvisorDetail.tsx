@@ -30,7 +30,7 @@ export const AdvisorDetail = ({
     )
   }
 
-  if (item.source === 'signal') {
+  if (item.source === 'signal' && item.scope === 'project') {
     return (
       <div className="px-6 py-6">
         <AdvisorSignalDetail item={item} />
@@ -38,7 +38,7 @@ export const AdvisorDetail = ({
     )
   }
 
-  if (item.source === 'account') {
+  if (item.source === 'signal' && item.scope === 'account') {
     return (
       <div className="px-6 py-6">
         <AdvisorAccountDetail item={item} />

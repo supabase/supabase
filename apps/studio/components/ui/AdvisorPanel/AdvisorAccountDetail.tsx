@@ -11,8 +11,10 @@ export const AdvisorAccountDetail = ({ item }: { item: AdvisorAccountItem }) => 
     <p className="text-sm text-foreground-light mb-6">{item.summary}</p>
 
     <h3 className="text-sm mb-2">Resolve</h3>
-    <Button asChild>
-      <a href="/account/security">Review account security</a>
-    </Button>
+    {item.actions.map((action) => (
+      <Button asChild key={action.href}>
+        <a href={action.href}>{action.label}</a>
+      </Button>
+    ))}
   </div>
 )

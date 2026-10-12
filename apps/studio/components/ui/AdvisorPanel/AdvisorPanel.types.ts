@@ -2,7 +2,11 @@ import type { Lint } from '@/data/lint/lint-query'
 import type { Notification } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorCategory, AdvisorItemSource, AdvisorSeverity } from '@/state/advisor-state'
 
-export type AdvisorSignalType = 'banned-ip'
+export type AdvisorSignalType =
+  | 'banned-ip'
+  | 'recovery-codes-missing'
+  | 'recovery-codes-exhausted'
+  | 'recovery-codes-low'
 
 export type AdvisorSignalAction = {
   label: string
@@ -29,25 +33,26 @@ export type AdvisorNotificationItem = AdvisorBaseItem & {
   project_ref?: string
 }
 
-export type AdvisorSignalItem = AdvisorBaseItem & {
+type AdvisorBaseSignalItem = AdvisorBaseItem & {
   source: 'signal'
-  type: AdvisorSignalType
-  dismissalKey: string
   summary: string
+  actions: AdvisorSignalAction[]
+}
+
+export type AdvisorBannedIPSignalItem = AdvisorBaseSignalItem & {
+  scope: 'project'
+  type: 'banned-ip'
+  dismissalKey: string
   description?: string
   docsUrl?: string
-  actions: AdvisorSignalAction[]
   sourceData: { type: 'banned-ip'; ip: string }
 }
 
-export type AdvisorAccountItem = AdvisorBaseItem & {
-  source: 'account'
+export type AdvisorAccountItem = AdvisorBaseSignalItem & {
+  scope: 'account'
   type: 'recovery-codes-missing' | 'recovery-codes-exhausted' | 'recovery-codes-low'
-  summary: string
 }
 
-export type AdvisorItem =
-  | AdvisorLintItem
-  | AdvisorNotificationItem
-  | AdvisorSignalItem
-  | AdvisorAccountItem
+export type AdvisorSignalItem = AdvisorBannedIPSignalItem | AdvisorAccountItem
+
+export type AdvisorItem = AdvisorLintItem | AdvisorNotificationItem | AdvisorSignalItem

@@ -133,7 +133,7 @@ export const TOTPFactors = () => {
       </PageSection>
 
       {shouldVerifyRecoveryCodes && (
-        <PageSection>
+        <PageSection id="recovery-codes" className="scroll-mt-6">
           <PageSectionMeta>
             <PageSectionSummary>
               <PageSectionTitle>Recovery codes</PageSectionTitle>

@@ -166,8 +166,8 @@ export const AdvisorPanel = () => {
 
   const itemsFilteredByCategory = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
-      if (!hasProjectRef && item.source !== 'notification' && item.source !== 'account')
-        return false
+      const isAccountSignal = item.source === 'signal' && item.scope === 'account'
+      if (!hasProjectRef && item.source !== 'notification' && !isAccountSignal) return false
 
       return categoryFilters.length === 0 || categoryFilters.includes(item.category)
     })
@@ -224,12 +224,9 @@ export const AdvisorPanel = () => {
     }
 
     const advisorCategory = getAdvisorItemTelemetryCategory(item)
-    const advisorType =
-      item.source === 'signal' || item.source === 'account'
-        ? item.type
-        : item.source === 'lint'
-          ? item.original.name
-          : item.title
+    let advisorType = item.title
+    if (item.source === 'signal') advisorType = item.type
+    if (item.source === 'lint') advisorType = item.original.name
     const advisorLevel = item.source === 'lint' ? item.original.level : undefined
 
     track('advisor_detail_opened', {
