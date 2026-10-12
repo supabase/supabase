@@ -121,6 +121,25 @@ order by
     total_size_megabyte desc;
 ```
 
+In a bucket with [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, noncurrent versions count toward your storage size, and these queries include them. To count only current versions, add `archived_at is null` to the `where` clause.
+
+List buckets with their total size, split into current and noncurrent versions:
+
+```sql
+select
+    bucket_id,
+    case when archived_at is null then 'current' else 'noncurrent' end as version_status,
+    (sum((metadata->>'size')::int) / 1048576.0)::numeric(10, 2) as total_size_megabyte
+from
+    storage.objects
+group by
+    bucket_id,
+    version_status
+order by
+    bucket_id,
+    version_status;
+```
+
 ## Optimize usage
 
 - [Limit the upload size](/docs/guides/storage/production/scaling#limit-the-upload-size) for your buckets
