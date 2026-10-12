@@ -188,7 +188,7 @@ export const TextConfirmModal = forwardRef<
                       {enableCopy ? (
                         <>
                           <Button
-                            className="h-auto min-h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre-wrap break-all text-left [&>span]:whitespace-pre-wrap [&>span]:break-all [&>span]:overflow-visible [&>span]:text-clip"
+                            className="h-auto min-h-6 px-1.5 py-0 border-muted text-sm text-left [&>span]:whitespace-pre-wrap [&>span]:break-all [&>span]:overflow-visible"
                             iconRight={
                               showCopied ? (
                                 <Check strokeWidth={2} className="text-primary" />
