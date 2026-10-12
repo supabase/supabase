@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { Check, X } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
@@ -50,6 +50,9 @@ export const PublishableApps = () => {
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
 
+  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
+  const { hasLoaded } = useFeatureFlags()
+
   const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
     'approved_oauth_apps'
@@ -88,6 +91,7 @@ export const PublishableApps = () => {
   const handlePublishedSortChange = (column: PublishedAppsSortColumn) => {
     toggleSort(publishedAppsSort, column, setPublishedAppsSort)
   }
+  if (!hasLoaded) return null
 
   return (
     <PageSection id="published-apps" className="pt-12">
@@ -267,6 +271,7 @@ export const PublishableApps = () => {
           setShowPublishModal(false)
         }}
         onCreateSuccess={setCreatedApp}
+        withOAuthAppScopedGrants={areOAuthAppScopedGrantsEnabled}
       />
       <DeleteAppModal
         selectedApp={selectedAppToDelete}

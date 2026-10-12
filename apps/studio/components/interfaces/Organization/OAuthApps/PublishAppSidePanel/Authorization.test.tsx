@@ -1,112 +1,135 @@
-import { screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { useState } from 'react'
-import { describe, expect, test } from 'vitest'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { Form } from 'ui'
+import { describe, expect, test, vi } from 'vitest'
+import z from 'zod'
 
-import { AuthorizationSection } from './Authorization'
-import { AuthorizationToggleState } from './Authorization.utils'
+import { OneTimeWithConfirmToggle } from './Authorization'
 import { customRender } from '@/tests/lib/custom-render'
 
-const OFF: AuthorizationToggleState = { checked: false, locked: false, confirmed: false }
-const LOCKED_ON: AuthorizationToggleState = { checked: true, locked: true, confirmed: false }
+describe('OneTimeWithConfirmToggle', () => {
+  const schema = z
+    .object({
+      thing_to_enable: z.coerce.boolean(),
+      thing_to_enable_confirmed: z.coerce.boolean().optional(),
+    })
+    .superRefine((values, context) => {
+      if (values.thing_to_enable && !values.thing_to_enable_confirmed) {
+        context.addIssue({
+          code: 'custom',
+          path: ['thing_to_enable_confirmed'],
+          message: 'Please confirm you want to enable the thing',
+        })
+      }
+    })
+  type Schema = z.infer<typeof schema>
 
-const StatefulAuthorizationSection = ({
-  initialMemberBoundGrant = OFF,
-  initialProjectScoping = OFF,
-}: {
-  initialMemberBoundGrant?: AuthorizationToggleState
-  initialProjectScoping?: AuthorizationToggleState
-}) => {
-  const [memberBoundGrantChecked, setMemberBoundGrantChecked] = useState(
-    initialMemberBoundGrant.checked
-  )
-  const [memberBoundGrantConfirmed, setMemberBoundGrantConfirmed] = useState(
-    initialMemberBoundGrant.confirmed
-  )
-  const [projectScopingChecked, setProjectScopingChecked] = useState(initialProjectScoping.checked)
-  const [projectScopingConfirmed, setProjectScopingConfirmed] = useState(
-    initialProjectScoping.confirmed
-  )
+  const TestForm = ({
+    defaultValues,
+    onSubmit,
+  }: {
+    defaultValues: Schema
+    onSubmit: SubmitHandler<Schema>
+  }) => {
+    const form = useForm<Schema>({
+      defaultValues,
+      resolver: zodResolver(schema),
+    })
 
-  return (
-    <AuthorizationSection
-      memberBoundGrant={{
-        checked: memberBoundGrantChecked,
-        locked: initialMemberBoundGrant.locked,
-        confirmed: memberBoundGrantConfirmed,
-      }}
-      onMemberBoundGrantChange={setMemberBoundGrantChecked}
-      onMemberBoundGrantConfirmedChange={setMemberBoundGrantConfirmed}
-      projectScoping={{
-        checked: projectScopingChecked,
-        locked: initialProjectScoping.locked,
-        confirmed: projectScopingConfirmed,
-      }}
-      onProjectScopingChange={setProjectScopingChecked}
-      onProjectScopingConfirmedChange={setProjectScopingConfirmed}
-    />
-  )
-}
+    return (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <OneTimeWithConfirmToggle
+            control={form.control}
+            name="thing_to_enable"
+            confirmedName="thing_to_enable_confirmed"
+            label="Thing to enable"
+            description=""
+            warningBody="Careful"
+          />
+          <button tabIndex={0} type="submit">
+            Save
+          </button>
+        </form>
+      </Form>
+    )
+  }
 
-describe('AuthorizationSection', () => {
-  test('shows the legacy resulting grant when both toggles are off', () => {
-    customRender(<StatefulAuthorizationSection />)
-
-    expect(screen.getByText('Legacy behaviour, unchanged from today.')).toBeInTheDocument()
-    expect(screen.queryByText("This can't be turned off after you save")).not.toBeInTheDocument()
-  })
-
-  test('turning a toggle on shows the permanence warning and checkbox', async () => {
-    const user = userEvent.setup()
-    customRender(<StatefulAuthorizationSection />)
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Use the permissions of the person who connects' })
+  test('It requires the confirmation field to be checked when enabled from initially disabled', async () => {
+    const onSubmit = vi.fn()
+    customRender(
+      <TestForm
+        defaultValues={{
+          thing_to_enable: false,
+          thing_to_enable_confirmed: false,
+        }}
+        onSubmit={onSubmit}
+      />
     )
 
-    expect(screen.getByText("This can't be turned off after you save")).toBeInTheDocument()
+    // Confirmation is hidden initially
     expect(
-      screen.getByText('I understand this is permanent. I can test it on a duplicate app first')
-    ).toBeInTheDocument()
-    expect(screen.getByText('One grant per member, organization-wide.')).toBeInTheDocument()
-  })
-
-  test('turning a toggle off clears its confirmation checkbox and warning', async () => {
-    const user = userEvent.setup()
-    customRender(<StatefulAuthorizationSection />)
-
-    const toggle = screen.getByRole('switch', {
-      name: 'Use the permissions of the person who connects',
-    })
-    await user.click(toggle)
-    await user.click(screen.getByRole('checkbox'))
-    await user.click(toggle)
-
-    expect(screen.queryByText("This can't be turned off after you save")).not.toBeInTheDocument()
-  })
-
-  test('a toggle locked from load renders on and disabled with no callout', () => {
-    customRender(<StatefulAuthorizationSection initialMemberBoundGrant={LOCKED_ON} />)
-
-    const toggle = screen.getByRole('switch', {
-      name: 'Use the permissions of the person who connects',
-    })
-    expect(toggle).toBeChecked()
-    expect(toggle).toBeDisabled()
-    expect(screen.queryByText("This can't be turned off after you save")).not.toBeInTheDocument()
-  })
-
-  test('shows the combined explanation and resulting grant when both toggles are on', async () => {
-    const user = userEvent.setup()
-    customRender(<StatefulAuthorizationSection />)
-
-    await user.click(
-      screen.getByRole('switch', { name: 'Use the permissions of the person who connects' })
+      screen.queryByLabelText(
+        'I understand this is permanent. I can test it on a duplicate app first'
+      )
+    ).toBeNull()
+    fireEvent.click(await screen.findByLabelText('Thing to enable'))
+    // Confirmation is now visible
+    const confirmCheckbox = await screen.findByLabelText(
+      'I understand this is permanent. I can test it on a duplicate app first'
     )
-    await user.click(screen.getByRole('switch', { name: 'Ask for specific projects' }))
+    fireEvent.click(await screen.findByText('Save'))
+    await screen.findByText('Please confirm you want to enable the thing')
+    expect(onSubmit).not.toHaveBeenCalled()
+    fireEvent.click(confirmCheckbox)
+    fireEvent.click(await screen.findByText('Save'))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+  })
 
+  test('It does not requires the confirmation field to be checked when the field is not enabled', async () => {
+    const onSubmit = vi.fn()
+    customRender(
+      <TestForm
+        defaultValues={{
+          thing_to_enable: false,
+          thing_to_enable_confirmed: false,
+        }}
+        onSubmit={onSubmit}
+      />
+    )
+
+    // Confirmation is hidden initially
     expect(
-      screen.getByText('One grant per member, limited to chosen projects.')
-    ).toBeInTheDocument()
+      screen.queryByLabelText(
+        'I understand this is permanent. I can test it on a duplicate app first'
+      )
+    ).toBeNull()
+    fireEvent.click(await screen.findByText('Save'))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
+  })
+
+  test('It does not allow to modify the field nor requires the confirmation field to be checked when the field is initially enabled', async () => {
+    const onSubmit = vi.fn()
+    customRender(
+      <TestForm
+        defaultValues={{
+          thing_to_enable: true,
+          thing_to_enable_confirmed: true,
+        }}
+        onSubmit={onSubmit}
+      />
+    )
+
+    // Confirmation is hidden initially
+    expect(
+      screen.queryByLabelText(
+        'I understand this is permanent. I can test it on a duplicate app first'
+      )
+    ).toBeNull()
+    expect(screen.queryByLabelText('Thing to enable')).toBeDisabled()
+
+    fireEvent.click(await screen.findByText('Save'))
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled())
   })
 })

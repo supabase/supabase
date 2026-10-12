@@ -3,7 +3,7 @@ import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Edit, Upload } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { Control, SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -31,12 +31,16 @@ import {
   SidePanel,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import * as z from 'zod'
 
 import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { AuthorizationSection } from './Authorization'
-import { isAuthorizationConfirmationPending } from './Authorization.utils'
+import {
+  formSchema,
+  FormSchema,
+  FormSchemaWithOAuthAppScopedGrants,
+  formSchemaWithOAuthAppScopedGrants,
+} from './PublishAppSidePanel.utils'
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -47,36 +51,22 @@ import {
 import { useOAuthAppUpdateMutation } from '@/data/oauth/oauth-app-update-mutation'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
 import { DOCS_URL } from '@/lib/constants'
-import { isValidHttpUrl, uuidv4 } from '@/lib/helpers'
+import { uuidv4 } from '@/lib/helpers'
 import { uploadAttachment } from '@/lib/upload'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface PublishAppSidePanelProps {
+  withOAuthAppScopedGrants: boolean
   visible: boolean
   selectedApp?: OAuthApp
   onClose: () => void
   onCreateSuccess: (app: OAuthAppCreateResponse) => void
 }
 
-const formSchema = z.object({
-  name: z.string().min(1, 'Please provide a name for your application'),
-  website: z
-    .string()
-    .min(1, 'Please provide a URL for your site')
-    .url('Please provide a URL for your site')
-    .refine((value) => isValidHttpUrl(value), 'Please provide a valid URL for your site'),
-  redirect_uris: z
-    .array(
-      z.object({
-        id: z.string(),
-        value: z.string().min(1, 'Please provide a URL').url('Please provide a URL'),
-      }),
-      { required_error: 'Please provide at least one callback URL' }
-    )
-    .min(1, 'Please provide at least one callback URL'),
-})
-
-const getFormDefaultValues = (selectedApp: OAuthApp | undefined) => {
+const getFormDefaultValues = (
+  selectedApp: OAuthApp | undefined,
+  withOAuthAppScopedGrants = false
+): FormSchema => {
   if (selectedApp) {
     return {
       name: selectedApp.name,
@@ -85,17 +75,39 @@ const getFormDefaultValues = (selectedApp: OAuthApp | undefined) => {
         selectedApp.redirect_uris?.map((url) => {
           return { id: uuidv4(), value: url }
         }) ?? [],
+      ...(withOAuthAppScopedGrants
+        ? {
+            // TODO: read the next 4 props from the selected app once implemented in backend
+            // Set to true to verify it can't be changed once enabled
+            member_bound_grant: true,
+            member_bound_grant_confirmed: true,
+            // Set to false to verify it can be changed if it wasn't enabled before
+            project_scoping: false,
+            project_scoping_confirmed: false,
+          }
+        : {}),
     }
   }
 
-  return { name: '', website: '', redirect_uris: [{ id: uuidv4(), value: '' }] }
+  return {
+    name: '',
+    website: '',
+    redirect_uris: [{ id: uuidv4(), value: '' }],
+    ...(withOAuthAppScopedGrants
+      ? {
+          member_bound_grant: false,
+          member_bound_grant_confirmed: false,
+          project_scoping: false,
+          project_scoping_confirmed: false,
+        }
+      : {}),
+  }
 }
-
-type FormSchema = z.infer<typeof formSchema>
 
 const FORM_ID = 'publish-oauth-app-form'
 
 export const PublishAppSidePanel = ({
+  withOAuthAppScopedGrants,
   visible,
   selectedApp,
   onClose,
@@ -129,14 +141,6 @@ export const PublishAppSidePanel = ({
   const [iconUrl, setIconUrl] = useState<string>()
   const [scopes, setScopes] = useState<OAuthScope[]>([])
 
-  const [isMemberBoundGrant, setIsMemberBoundGrant] = useState(false)
-  const [isMemberBoundGrantLocked, setIsMemberBoundGrantLocked] = useState(false)
-  const [isMemberBoundGrantConfirmed, setIsMemberBoundGrantConfirmed] = useState(false)
-
-  const [isProjectScopingEnabled, setIsProjectScopingEnabled] = useState(false)
-  const [isProjectScopingLocked, setIsProjectScopingLocked] = useState(false)
-  const [isProjectScopingConfirmed, setIsProjectScopingConfirmed] = useState(false)
-
   useEffect(() => {
     if (visible) {
       setIconFile(undefined)
@@ -148,28 +152,8 @@ export const PublishAppSidePanel = ({
         setScopes([])
         setIconUrl(undefined)
       }
-
-      setIsMemberBoundGrant(false)
-      setIsMemberBoundGrantLocked(false)
-      setIsMemberBoundGrantConfirmed(false)
-      setIsProjectScopingEnabled(false)
-      setIsProjectScopingLocked(false)
-      setIsProjectScopingConfirmed(false)
     }
   }, [visible, selectedApp])
-
-  const isAuthorizationPendingConfirmation = isAuthorizationConfirmationPending(
-    {
-      checked: isMemberBoundGrant,
-      locked: isMemberBoundGrantLocked,
-      confirmed: isMemberBoundGrantConfirmed,
-    },
-    {
-      checked: isProjectScopingEnabled,
-      locked: isProjectScopingLocked,
-      confirmed: isProjectScopingConfirmed,
-    }
-  )
 
   const onFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     event.persist()
@@ -222,9 +206,13 @@ export const PublishAppSidePanel = ({
     }
   }
 
-  const form = useForm<FormSchema>({
-    defaultValues: getFormDefaultValues(selectedApp),
-    resolver: zodResolver(formSchema),
+  const form = useForm<
+    typeof withOAuthAppScopedGrants extends true ? FormSchemaWithOAuthAppScopedGrants : FormSchema
+  >({
+    defaultValues: getFormDefaultValues(selectedApp, withOAuthAppScopedGrants),
+    resolver: zodResolver(
+      withOAuthAppScopedGrants ? formSchemaWithOAuthAppScopedGrants : formSchema
+    ),
   })
   const { reset } = form
   const { errors, isSubmitting } = form.formState
@@ -271,7 +259,7 @@ export const PublishAppSidePanel = ({
             <Shortcut
               id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
               onTrigger={() => form.handleSubmit(onSubmit)()}
-              options={{ enabled: visible && !isSubmitting && !isAuthorizationPendingConfirmation }}
+              options={{ enabled: visible && !isSubmitting }}
               side="top"
             >
               <Button
@@ -279,7 +267,7 @@ export const PublishAppSidePanel = ({
                 type="submit"
                 form={FORM_ID}
                 loading={isSubmitting}
-                disabled={isSubmitting || isAuthorizationPendingConfirmation}
+                disabled={isSubmitting}
               >
                 Confirm
               </Button>
@@ -446,23 +434,12 @@ export const PublishAppSidePanel = ({
             </>
           )}
 
-          <SidePanel.Separator />
-          <AuthorizationSection
-            memberBoundGrant={{
-              checked: isMemberBoundGrant,
-              locked: isMemberBoundGrantLocked,
-              confirmed: isMemberBoundGrantConfirmed,
-            }}
-            onMemberBoundGrantChange={setIsMemberBoundGrant}
-            onMemberBoundGrantConfirmedChange={setIsMemberBoundGrantConfirmed}
-            projectScoping={{
-              checked: isProjectScopingEnabled,
-              locked: isProjectScopingLocked,
-              confirmed: isProjectScopingConfirmed,
-            }}
-            onProjectScopingChange={setIsProjectScopingEnabled}
-            onProjectScopingConfirmedChange={setIsProjectScopingConfirmed}
-          />
+          {isFormSchemaWithOAuthAppScopedGrants(form.control, withOAuthAppScopedGrants) && (
+            <>
+              <SidePanel.Separator />
+              <AuthorizationSection control={form.control} />
+            </>
+          )}
 
           <SidePanel.Separator />
           <div className="p-6 ">
@@ -511,4 +488,11 @@ export const PublishAppSidePanel = ({
       </Form>
     </SidePanel>
   )
+}
+
+const isFormSchemaWithOAuthAppScopedGrants = (
+  _schema: Control<FormSchema> | Control<FormSchemaWithOAuthAppScopedGrants>,
+  withOAuthAppScopedGrants: boolean
+): _schema is Control<FormSchemaWithOAuthAppScopedGrants> => {
+  return withOAuthAppScopedGrants
 }
