@@ -123,7 +123,9 @@ export const ExposedSchemaSelector = ({
               aria-describedby={undefined}
             >
               <div className="w-full flex gap-1">
-                <p className="text-foreground-lighter" aria-live="polite">{schemasSummary}</p>
+                <p className="text-foreground-lighter" aria-live="polite">
+                  {schemasSummary}
+                </p>
               </div>
             </Button>
           </PopoverTrigger>
@@ -132,9 +134,6 @@ export const ExposedSchemaSelector = ({
           Select schemas
         </TooltipContent>
       </Tooltip>
-      <span aria-live="polite" className="sr-only">
-        {schemasSummary}
-      </span>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
