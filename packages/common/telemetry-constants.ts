@@ -549,6 +549,19 @@ export interface FreeTierGeneralRegionUpgradeClickedEvent {
 }
 
 /**
+ * User clicked the "Need a specific region?" link to reveal the specific regions
+ * list in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSpecificRegionLinkClickedEvent {
+  action: 'project_creation_specific_region_link_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * New-organization form was rendered and shown to the user. Passive impression that
  * anchors the organization-creation funnel (exposed -> completed). Fires once per form
  * view, after the user's profile has resolved (i.e. an authenticated session), so it
@@ -4183,6 +4196,7 @@ export type TelemetryEvent =
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
+  | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent

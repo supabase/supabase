@@ -196,6 +196,7 @@ export const RegionSelector = ({
   const showSpecificRegions = !isSpecificRegionsCollapsedBehindLink && !hideSpecificRegions
 
   const handleRevealSpecificRegions = () => {
+    track('project_creation_specific_region_link_clicked')
     setHasRevealedSpecificRegions(true)
     setIsOpen(true)
   }
