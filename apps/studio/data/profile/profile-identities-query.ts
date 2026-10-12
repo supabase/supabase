@@ -28,11 +28,15 @@ type ProfileIdentitiesError = any
 
 export const useProfileIdentitiesQuery = <TData = ProfileIdentitiesData>({
   enabled = true,
+  userId,
   ...options
-}: UseCustomQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> = {}) => {
+}: UseCustomQueryOptions<ProfileIdentitiesData, ProfileIdentitiesError, TData> & {
+  userId?: string
+} = {}) => {
   return useQuery<ProfileIdentitiesData, ProfileIdentitiesError, TData>({
-    queryKey: profileKeys.identities(),
+    queryKey: profileKeys.identities(userId),
     queryFn: () => getProfileIdentities(),
+    enabled,
     ...options,
   })
 }

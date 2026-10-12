@@ -1,3 +1,6 @@
 export const recoveryCodeKeys = {
-  status: () => ['recovery-code-status-query'] as const,
+  status: (userId?: string) =>
+    userId
+      ? (['recovery-code-status-query', userId] as const)
+      : (['recovery-code-status-query'] as const),
 }
