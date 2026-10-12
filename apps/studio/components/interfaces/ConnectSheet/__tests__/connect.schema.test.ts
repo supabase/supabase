@@ -80,7 +80,7 @@ describe('connect.schema:fields', () => {
 
   test('frameworkVariant field should depend on framework', () => {
     const field = connectSchema.fields.frameworkVariant
-    expect(field.dependsOn).toEqual({ framework: ['nextjs', 'react'] })
+    expect(field.dependsOn).toEqual({ framework: ['nextjs', 'react', 'dotnet'] })
   })
 
   test('frameworkUi field should be a switch type', () => {
