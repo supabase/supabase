@@ -1,27 +1,19 @@
 ---
-title = "Security Advisor flags spatial_ref_sys and other PostGIS objects in the public schema"
-topics = [ "database" ]
-keywords = [ "PostGIS", "spatial_ref_sys", "geometry_columns", "geography_columns", "st_estimatedextent", "Security Advisor", "RLS Disabled in Public", "is public, but RLS has not been enabled", "rls_disabled_in_public", "extension_in_public", "anon_security_definer_function_executable", "authenticated_security_definer_function_executable", "pg_graphql_anon_table_exposed", "Row Level Security", "RLS", "revoke", "grant", "supabase_admin", "extensions schema", "anon", "authenticated" ]
-
-[[errors]]
-code = "42501"
-message = "must be owner of table spatial_ref_sys"
-
-[[errors]]
-code = "01006"
-message = "no privileges could be revoked for \"spatial_ref_sys\""
-
-[[errors]]
-code = "42501"
-message = "must be owner of relation spatial_ref_sys"
-
-[[errors]]
-code = "XX000"
-message = "Cannot find SRID (4326) in spatial_ref_sys"
-
-[[errors]]
-code = "0A000"
-message = "extension \"postgis\" does not support SET SCHEMA"
+title: Security Advisor flags spatial_ref_sys and other PostGIS objects in the public schema
+topics:
+  - Troubleshooting
+  - Database
+errors:
+  - code: "42501"
+    message: must be owner of table spatial_ref_sys
+  - code: "01006"
+    message: no privileges could be revoked for "spatial_ref_sys"
+  - code: "42501"
+    message: must be owner of relation spatial_ref_sys
+  - code: "XX000"
+    message: Cannot find SRID (4326) in spatial_ref_sys
+  - code: "0A000"
+    message: extension "postgis" does not support SET SCHEMA
 ---
 
 When PostGIS is installed in the `public` schema, the [Security Advisor](/dashboard/project/_/advisors/security) reports findings on the objects that PostGIS creates there. The following table lists them:
@@ -157,11 +149,8 @@ If a function uses an empty search path and calls PostGIS with the `public.` pre
 
 You can't move PostGIS with `alter extension postgis set schema extensions`. PostGIS doesn't support moving to another schema, so the statement fails with `extension "postgis" does not support SET SCHEMA`. To move it yourself, drop it and create it again in `extensions`.
 
-<Admonition type="danger">
-
-Dropping PostGIS deletes every column that uses a PostGIS type, such as `geometry` or `geography`, and the indexes, views, functions, and extensions that depend on them. Use this method only if your tables have no PostGIS columns, or if you can restore them from a backup.
-
-</Admonition>
+> [!CAUTION]
+> Dropping PostGIS deletes every column that uses a PostGIS type, such as `geometry` or `geography`, and the indexes, views, functions, and extensions that depend on them. Use this method only if your tables have no PostGIS columns, or if you can restore them from a backup.
 
 1. Back up your roles, schema, and data. For the commands, see [Back up database using the CLI](/docs/guides/platform/migrating-within-supabase/backup-restore#back-up-database-using-the-cli).
 2. Prepare your functions.
