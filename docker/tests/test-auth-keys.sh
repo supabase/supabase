@@ -35,7 +35,11 @@ ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
 SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
-FUNCTIONS_VERIFY_JWT=$(grep '^FUNCTIONS_VERIFY_JWT=' .env | cut -d= -f2-)
+
+# Prefer the running container's value: .env can be quoted or edited without
+# recreating the functions service. Fall back to .env without Docker access.
+FUNCTIONS_VERIFY_JWT=$(docker exec supabase-edge-functions printenv VERIFY_JWT 2>/dev/null \
+    || grep '^FUNCTIONS_VERIFY_JWT=' .env | cut -d= -f2-)
 
 pass=0
 fail=0
