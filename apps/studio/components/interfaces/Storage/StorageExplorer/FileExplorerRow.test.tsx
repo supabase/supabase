@@ -43,7 +43,7 @@ vi.mock('@/state/storage-explorer', () => ({
     setSelectedItemsToMove: vi.fn(),
     downloadFolder: vi.fn(),
     selectRangeItems: vi.fn(),
-    setItemToPurge: vi.fn(),
+    setItemsToPurge: vi.fn(),
   }),
 }))
 vi.mock('@/components/interfaces/Storage/StorageExplorer/StorageExplorerNavigation', () => ({

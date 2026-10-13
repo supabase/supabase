@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import type { StorageItemWithColumn } from '../Storage.types'
 import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { getStorageItemPath } from './StorageExplorer.utils'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
@@ -21,8 +22,10 @@ export const ConfirmPurgeModal = () => {
     projectRef,
     selectedBucket,
     openedFolders,
-    itemToPurge,
-    setItemToPurge,
+    itemsToPurge,
+    setItemsToPurge,
+    selectedItems,
+    clearSelectedItems,
     selectedFilePreview,
     refetchAllOpenedFolders,
     getAllItemsAlongFolder,
@@ -35,16 +38,18 @@ export const ConfirmPurgeModal = () => {
   const { mutateAsync: purgeObject } = useObjectPurgeMutation()
   const { mutateAsync: purgeArchivedObject } = useArchivedObjectPurgeMutation()
 
-  const isFolder = itemToPurge?.type === STORAGE_ROW_TYPES.FOLDER
-  const isArchivedFolder = isFolder && itemToPurge.archived !== undefined
+  const [firstItem] = itemsToPurge
+  const hasMultipleItems = itemsToPurge.length > 1
+  const hasFolder = itemsToPurge.some((item) => item.type === STORAGE_ROW_TYPES.FOLDER)
 
   /** A folder is only a prefix, so both halves of what it holds have to go. */
   const purgeFolder = async (
     projectRef: string,
     bucketId: string,
-    folder: NonNullable<typeof itemToPurge>,
+    folder: StorageItemWithColumn,
     path: string
   ) => {
+    const isArchivedFolder = folder.archived !== undefined
     const liveItems = isArchivedFolder ? [] : await getAllItemsAlongFolder(folder)
 
     // Not the overlay's copy: it is empty whenever "Show archived" is off, which would leave
@@ -82,33 +87,55 @@ export const ConfirmPurgeModal = () => {
     return results.filter((result) => result.status === 'rejected').length
   }
 
-  const onConfirm = async () => {
-    if (!projectRef || !selectedBucket?.id || itemToPurge === undefined) return
-
+  const purgeItem = async (projectRef: string, bucketId: string, item: StorageItemWithColumn) => {
     // The endpoints address an object by full path; a row only knows its leaf name.
     // The path captured when the row was targeted beats rebuilding it from folders
     // that may have moved on; synthesized archived folders carry none, so they fall back.
-    const path = itemToPurge.path ?? getStorageItemPath({ openedFolders }, itemToPurge)
+    const path = item.path ?? getStorageItemPath({ openedFolders }, item)
+
+    if (item.type === STORAGE_ROW_TYPES.FOLDER) {
+      return purgeFolder(projectRef, bucketId, item, path)
+    }
+    await purgeObject({ projectRef, bucketId, path })
+    return 0
+  }
+
+  const onConfirm = async () => {
+    if (!projectRef || !selectedBucket?.id || itemsToPurge.length === 0) return
+
+    const bucketId = selectedBucket.id
     setIsPurging(true)
     try {
-      const failureCount = isFolder
-        ? await purgeFolder(projectRef, selectedBucket.id, itemToPurge, path)
-        : await purgeObject({ projectRef, bucketId: selectedBucket.id, path }).then(() => 0)
+      const results = await Promise.allSettled(
+        itemsToPurge.map((item) => purgeItem(projectRef, bucketId, item))
+      )
+
+      results.forEach((result, index) => {
+        const item = itemsToPurge[index]
+        if (result.status !== 'rejected' || result.reason === TRUNCATED_LISTING) return
+        if (item.type !== STORAGE_ROW_TYPES.FOLDER) return
+        toast.error(`Failed to delete ${item.name}: ${(result.reason as Error).message}`)
+      })
+
+      // A rejected item failed whole; a resolved one reports what of its contents stayed.
+      const failureCount = results.reduce(
+        (total, result) => total + (result.status === 'rejected' ? 1 : result.value),
+        0
+      )
 
       if (failureCount > 0) {
         toast.error(`Could not delete ${failureCount} item${failureCount === 1 ? '' : 's'}`)
       } else {
-        toast.success(`Permanently deleted ${itemToPurge.name}`)
-        // Purging from a row menu shouldn't close a preview of something else.
-        if (selectedFilePreview?.id === itemToPurge.id) clearPreviewedFile()
-        setItemToPurge(undefined)
-      }
-    } catch (error) {
-      // The purge mutations settle rather than throw, and report their own failures. What
-      // reaches here is a folder that couldn't be enumerated or whose archived listing
-      // couldn't be fetched — silent until now.
-      if (isFolder && error !== TRUNCATED_LISTING) {
-        toast.error(`Failed to delete ${itemToPurge.name}: ${(error as Error).message}`)
+        toast.success(
+          hasMultipleItems
+            ? `Permanently deleted ${itemsToPurge.length} items`
+            : `Permanently deleted ${firstItem.name}`
+        )
+        const purgedIds = new Set(itemsToPurge.map((item) => item.id))
+        const previewedId = selectedFilePreview?.id
+        if (previewedId !== undefined && purgedIds.has(previewedId)) clearPreviewedFile()
+        if (selectedItems.some((item) => purgedIds.has(item.id))) clearSelectedItems()
+        setItemsToPurge([])
       }
     } finally {
       // Whatever did go through has already changed the listing.
@@ -117,23 +144,37 @@ export const ConfirmPurgeModal = () => {
     }
   }
 
+  const getAlertDescription = () => {
+    if (hasMultipleItems) {
+      return 'Deletes the selected files and every version of them, bypassing versioning. Nothing is left to restore.'
+    }
+    if (hasFolder) {
+      return 'Deletes everything in this folder, archived files included, and every version of them. Nothing is left to restore.'
+    }
+    return 'Deletes the file and every version of it, bypassing versioning. Nothing is left to restore.'
+  }
+
   return (
     <ConfirmationModal
       size="medium"
-      visible={itemToPurge !== undefined}
-      title={<span className="wrap-break-word">Permanently delete {itemToPurge?.name}?</span>}
+      visible={itemsToPurge.length > 0}
+      title={
+        <span className="wrap-break-word">
+          {hasMultipleItems
+            ? `Permanently delete ${itemsToPurge.length} items?`
+            : `Permanently delete ${firstItem?.name}?`}
+        </span>
+      }
       confirmLabel="Delete permanently"
       confirmLabelLoading="Deleting..."
       loading={isPurging}
       variant="destructive"
-      onCancel={() => setItemToPurge(undefined)}
+      onCancel={() => setItemsToPurge([])}
       onConfirm={onConfirm}
       alert={{
         base: { variant: 'destructive' },
         title: 'This cannot be undone',
-        description: isFolder
-          ? 'Deletes everything in this folder, archived files included, and every version of them. Nothing is left to restore.'
-          : 'Deletes the file and every version of it, bypassing versioning. Nothing is left to restore.',
+        description: getAlertDescription(),
       }}
     />
   )
