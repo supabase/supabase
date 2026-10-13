@@ -1,6 +1,14 @@
 import { useFlag, useUser } from 'common'
 import dayjs from 'dayjs'
-import { MoreHorizontal, Plus, RectangleEllipsis, ShieldCheck } from 'lucide-react'
+import {
+  ChevronDown,
+  LockKeyhole,
+  Plus,
+  RectangleEllipsis,
+  RefreshCw,
+  ShieldCheck,
+  Trash,
+} from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -32,6 +40,7 @@ import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
@@ -93,7 +102,7 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
               protect your account.
             </PageSectionDescription>
           </PageSectionSummary>
-          {canAddApp && totpFactors.length > 0 && (
+          {canAddApp && totpFactors.length > 0 && !factorFinding && (
             <PageSectionAside>
               <Button
                 variant={
@@ -135,36 +144,52 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
               </Button>
             </EmptyStatePresentational>
           )}
+          {factorFinding && (
+            <Admonition
+              type="warning"
+              layout="responsive"
+              title="Add a backup authenticator"
+              description="Add an authenticator on another device so you can still sign in if you lose access to this one."
+              actions={
+                <Button
+                  variant={primaryAction === 'add-factor' ? 'primary' : 'default'}
+                  icon={<Plus />}
+                  onClick={handleAddNewApp}
+                >
+                  Add authenticator
+                </Button>
+              }
+            />
+          )}
           {isSuccess && totpFactors.length > 0 && (
             <Card>
               <div className="divide-y">
-                {factorFinding && (
-                  <CardContent>
-                    <p className="text-sm text-foreground-lighter">
-                      Add one on another device as a backup.
-                    </p>
-                  </CardContent>
-                )}
                 {totpFactors.map((factor) => (
                   <CardContent key={factor.id} className="flex justify-between items-center py-4">
-                    <div>
-                      <p className="text-sm">{factor.friendly_name ?? 'No name provided'}</p>
-                      <p className="text-sm text-foreground-lighter">
-                        Added on{' '}
-                        <TimestampInfo
-                          className="text-sm"
-                          utcTimestamp={factor.created_at}
-                          label={dayjs(factor.created_at).format(DATETIME_FORMAT)}
-                        />
-                      </p>
+                    <div className="flex items-center gap-x-4">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+                        <LockKeyhole size={18} className="text-foreground-lighter" />
+                      </div>
+                      <div>
+                        <p className="text-sm">{factor.friendly_name ?? 'No name provided'}</p>
+                        <p className="text-sm text-foreground-lighter">
+                          Added on{' '}
+                          <TimestampInfo
+                            className="text-sm"
+                            utcTimestamp={factor.created_at}
+                            label={dayjs(factor.created_at).format(DATETIME_FORMAT)}
+                          />
+                        </p>
+                      </div>
                     </div>
-                    <Button
+                    <ButtonTooltip
                       size="tiny"
+                      icon={<Trash size={14} />}
+                      aria-label={`Remove ${factor.friendly_name ?? 'unnamed'} authenticator`}
+                      tooltip={{ content: { text: 'Remove authenticator' } }}
                       onClick={() => setFactorToBeDeleted(factor.id)}
                       disabled={disableDeleteFactor}
-                    >
-                      Delete
-                    </Button>
+                    />
                   </CardContent>
                 ))}
               </div>
@@ -197,7 +222,7 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                 description="Enable multi-factor authentication first, then generate codes to recover access if you lose your authenticator."
               >
                 <Button variant="default" icon={<Plus />} onClick={handleAddNewApp}>
-                  Set up MFA
+                  Set up MFA first
                 </Button>
               </EmptyStatePresentational>
             )}
@@ -226,80 +251,80 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                 ) : null
               }
             </GenerateRecoveryCodesModal>
-            <RegenerateRecoveryCodesModal>
-              {({ onClick, isPending }) => {
-                if (
-                  !shouldVerifyRecoveryCodes ||
-                  status !== 'available' ||
-                  !codes ||
-                  recoveryCodesIsError
-                )
-                  return null
-                const action = (
-                  <Button
-                    variant={isCodeActionPrimary ? 'primary' : 'default'}
-                    onClick={onClick}
-                    loading={isPending}
-                  >
-                    Regenerate recovery codes
-                  </Button>
-                )
-                if (codeFinding)
-                  return (
-                    <Admonition
-                      type={codeFinding.severity === 'critical' ? 'destructive' : 'warning'}
-                      layout="responsive"
-                      title={
-                        codeFinding.id === 'recovery-codes-exhausted'
-                          ? 'Recovery codes used up'
-                          : `${codes.remaining} of ${codes.total} recovery codes available`
-                      }
-                      description="Generate a new set before you need them to recover your account."
-                      actions={action}
-                    />
-                  )
-                return (
-                  <Card>
-                    <CardContent className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center gap-x-4">
-                        <RectangleEllipsis size={18} className="text-foreground-lighter" />
-                        <div className="text-sm">
-                          <p>
-                            {codes.remaining} of {codes.total} recovery codes available
-                          </p>
-                          <p className="text-foreground-lighter">
-                            Each code can only be used once. Keep them somewhere safe.
-                          </p>
-                        </div>
-                      </div>
-                      {action}
-                    </CardContent>
-                  </Card>
-                )
-              }}
-            </RegenerateRecoveryCodesModal>
             <UnenrollRecoveryCodesModal>
-              {({ onClick }) =>
-                shouldVerifyRecoveryCodes && status === 'available' && !recoveryCodesIsError ? (
-                  <div className="flex justify-end">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
+              {({ onClick: onRemove }) => (
+                <RegenerateRecoveryCodesModal>
+                  {({ onClick, isPending }) => {
+                    if (
+                      !shouldVerifyRecoveryCodes ||
+                      status !== 'available' ||
+                      !codes ||
+                      recoveryCodesIsError
+                    )
+                      return null
+                    const action = (
+                      <div className={codeFinding ? 'flex w-full @lg:w-auto' : 'flex w-fit'}>
                         <Button
-                          variant="default"
-                          size="tiny"
-                          icon={<MoreHorizontal />}
-                          aria-label="Recovery code options"
+                          variant={isCodeActionPrimary ? 'primary' : 'default'}
+                          className="flex-1 @lg:flex-none rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
+                          icon={<RefreshCw />}
+                          onClick={onClick}
+                          loading={isPending}
+                        >
+                          Regenerate
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant={isCodeActionPrimary ? 'primary' : 'default'}
+                              aria-label="Recovery code options"
+                              className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                              icon={<ChevronDown />}
+                            />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem onSelect={onRemove}>Remove recovery codes</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )
+                    if (codeFinding)
+                      return (
+                        <Admonition
+                          type={codeFinding.severity === 'critical' ? 'destructive' : 'warning'}
+                          layout="responsive"
+                          title={
+                            codeFinding.id === 'recovery-codes-exhausted'
+                              ? 'Recovery codes used up'
+                              : `${codes.remaining} of ${codes.total} recovery codes available`
+                          }
+                          description="Generate a new set before you need them to recover your account."
+                          actions={action}
                         />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={onClick}>
-                          Remove recovery codes
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                ) : null
-              }
+                      )
+                    return (
+                      <Card>
+                        <CardContent className="flex flex-wrap items-center justify-between gap-4">
+                          <div className="flex items-center gap-x-4">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+                              <RectangleEllipsis size={18} className="text-foreground-lighter" />
+                            </div>
+                            <div className="text-sm">
+                              <p>
+                                {codes.remaining} of {codes.total} recovery codes available
+                              </p>
+                              <p className="text-foreground-lighter">
+                                Each code can only be used once. Keep them somewhere safe.
+                              </p>
+                            </div>
+                          </div>
+                          {action}
+                        </CardContent>
+                      </Card>
+                    )
+                  }}
+                </RegenerateRecoveryCodesModal>
+              )}
             </UnenrollRecoveryCodesModal>
           </PageSectionContent>
         </PageSection>

@@ -98,7 +98,7 @@ test('offers optional backup after saving and restarts setup without generating 
   await verifyAndSave()
   await screen.findByText('Add a backup authenticator?')
   expect(onSaved).toHaveBeenCalledOnce()
-  fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Add another' }))
   expect(await screen.findByRole('textbox', { name: 'Authenticator app name' })).toHaveValue('')
   expect(auth.mfa.recoveryCodes.generate).toHaveBeenCalledOnce()
 })

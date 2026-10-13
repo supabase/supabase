@@ -55,7 +55,7 @@ describe('evaluateAccountRecovery', () => {
       ])
     }
     expect(evaluate({ recoveryCodes: { status: 'available', remaining: 4 } })).toEqual([
-      { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
+      { id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' },
     ])
     expect(
       evaluate({ verifiedFactorCount: 2, recoveryCodes: { status: 'available', remaining: 2 } })
@@ -69,7 +69,7 @@ describe('evaluateAccountRecovery', () => {
         recoveryCodes: { status: 'unknown' },
         features: { ...base.features, recoveryCodesEnabled: false },
       })
-    ).toEqual([{ id: 'single-mfa-factor', severity: 'info', action: 'add-factor' }])
+    ).toEqual([{ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' }])
   })
 
   it('gates security findings but independently advises on a single OAuth sign-in', () => {
@@ -81,16 +81,16 @@ describe('evaluateAccountRecovery', () => {
       })
     ).toEqual([{ id: 'single-oauth-identity', severity: 'warning', action: 'set-password' }])
     expect(evaluate({ identities: [...identities, { provider: 'google' }] })).toEqual([
-      { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
+      { id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' },
     ])
     expect(evaluate({ identities: [{ provider: 'phone' }] })).toEqual([
-      { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
+      { id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' },
     ])
     expect(evaluate({ identities, email: undefined })).toEqual([
-      { id: 'single-mfa-factor', severity: 'info', action: 'add-factor' },
+      { id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' },
     ])
     expect(
       evaluate({ identities, features: { ...base.features, passwordEnabled: false } })
-    ).toEqual([{ id: 'single-mfa-factor', severity: 'info', action: 'add-factor' }])
+    ).toEqual([{ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' }])
   })
 })

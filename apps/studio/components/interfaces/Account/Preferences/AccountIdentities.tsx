@@ -210,7 +210,11 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
                     className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex gap-x-4">
-                      <IdentityProviderIcon display={providerDisplay} size={30} />
+                      <div
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
+                      >
+                        <IdentityProviderIcon display={providerDisplay} size={30} />
+                      </div>
                       <div>
                         <div className="flex items-center gap-x-2">
                           <p className="text-sm capitalize">{providerName}</p>
@@ -267,7 +271,11 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
                     className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div className="flex gap-x-4">
-                      <IdentityProviderIcon display={providerDisplay} size={30} />
+                      <div
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
+                      >
+                        <IdentityProviderIcon display={providerDisplay} size={30} />
+                      </div>
                       <div>
                         <p className="text-sm">{provider.displayName}</p>
                         <p className="text-sm text-foreground-lighter">

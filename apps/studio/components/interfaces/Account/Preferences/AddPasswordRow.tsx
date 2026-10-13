@@ -64,7 +64,9 @@ export const AddPasswordRow = ({
   const row = (
     <CardContent className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-x-4">
-        <IdentityProviderIcon display={providerDisplay} size={30} />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+          <IdentityProviderIcon display={providerDisplay} size={30} />
+        </div>
         <div>
           <p className="text-sm">{providerDisplay.displayName}</p>
           <p className="text-sm text-foreground-lighter">{email}</p>

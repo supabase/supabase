@@ -69,7 +69,7 @@ export const evaluateAccountRecovery = ({
 
   const isCodeStatusUnknown = features.recoveryCodesEnabled && recoveryCodes.status === 'unknown'
   if (features.hasSecuritySettings && hasOneFactor && !hasCodeFinding && !isCodeStatusUnknown) {
-    findings.push({ id: 'single-mfa-factor', severity: 'info', action: 'add-factor' })
+    findings.push({ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' })
   }
 
   const hasOneOAuthIdentity =

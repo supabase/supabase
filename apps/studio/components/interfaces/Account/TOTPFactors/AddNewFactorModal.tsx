@@ -146,18 +146,18 @@ export const AddNewFactorModal = ({
             </p>
           </DialogSection>
           <DialogFooter>
+            <Button variant="default" onClick={() => setIsBackupOfferOpen(false)}>
+              Not now
+            </Button>
             <Button
-              variant="default"
+              variant="primary"
               onClick={() => {
                 setIsBackupOfferOpen(false)
                 reset()
                 setIsBackupSetupOpen(true)
               }}
             >
-              Add authenticator
-            </Button>
-            <Button variant="primary" onClick={() => setIsBackupOfferOpen(false)}>
-              Done
+              Add another
             </Button>
           </DialogFooter>
         </DialogContent>

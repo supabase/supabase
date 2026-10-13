@@ -31,7 +31,7 @@ describe('getPrimarySecurityAction', () => {
     expect(
       getPrimarySecurityAction({
         ...base,
-        findings: [{ id: 'single-mfa-factor', severity: 'info', action: 'add-factor' }],
+        findings: [{ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' }],
       })
     ).toBe('add-factor')
     expect(getPrimarySecurityAction(base)).toBeUndefined()

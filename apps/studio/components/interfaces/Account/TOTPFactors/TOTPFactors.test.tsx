@@ -61,7 +61,10 @@ describe('account security MFA and recovery sections', () => {
     })
     renderSection()
     expect(await screen.findByText('Set up multi-factor authentication')).toBeInTheDocument()
-    const setupButtons = screen.getAllByRole('button', { name: 'Set up MFA' })
+    const setupButtons = [
+      screen.getByRole('button', { name: 'Set up MFA' }),
+      screen.getByRole('button', { name: 'Set up MFA first' }),
+    ]
     expect(setupButtons).toHaveLength(2)
     expect(screen.getByText('Set up recovery codes')).toBeInTheDocument()
     await userEvent.click(setupButtons[1])
@@ -91,7 +94,7 @@ describe('account security MFA and recovery sections', () => {
     expect(
       screen.getByText('Generate a new set before you need them to recover your account.')
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Regenerate recovery codes' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Regenerate' })).toBeInTheDocument()
   })
 
   it('shows exhausted codes and keeps removal in the options menu', async () => {
@@ -103,11 +106,9 @@ describe('account security MFA and recovery sections', () => {
       remainingCodes: 0,
     })
     expect(await screen.findByText('Recovery codes used up')).toBeInTheDocument()
-    expect(screen.queryByText('Remove recovery codes')).not.toBeInTheDocument()
+    expect(screen.queryByText('Remove')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Recovery code options' }))
-    expect(
-      await screen.findByRole('menuitem', { name: 'Remove recovery codes' })
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('menuitem', { name: 'Remove' })).toBeInTheDocument()
   })
 
   it('shows available codes without inventing a backup recommendation', async () => {
@@ -115,7 +116,16 @@ describe('account security MFA and recovery sections', () => {
     expect(await screen.findByText('10 of 10 recovery codes available')).toBeInTheDocument()
     expect(screen.getByText('Phone')).toBeInTheDocument()
     expect(screen.queryByText('1 verified authenticator')).not.toBeInTheDocument()
-    expect(screen.queryByText('Add one on another device as a backup.')).not.toBeInTheDocument()
+    expect(screen.queryByText('Add a backup authenticator')).not.toBeInTheDocument()
+  })
+
+  it('shows a backup warning with one authenticator action', async () => {
+    renderSection({ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' })
+    expect(await screen.findByText('Add a backup authenticator')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Add authenticator' })).toHaveLength(1)
+    expect(
+      await screen.findByRole('button', { name: 'Remove Phone authenticator' })
+    ).toBeInTheDocument()
   })
 
   it('does not infer missing codes when the status check fails', async () => {
@@ -126,7 +136,10 @@ describe('account security MFA and recovery sections', () => {
     expect(
       screen.queryByRole('button', { name: 'Generate recovery codes' })
     ).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Remove Phone authenticator' })).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
   })
 
   it('opens the authenticator action destination and consumes it when closed', async () => {
