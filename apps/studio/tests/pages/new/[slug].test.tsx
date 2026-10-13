@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -359,7 +359,6 @@ const submitAndReadRegionSelection = async (onRequest: ReturnType<typeof vi.fn>)
   return onRequest.mock.calls[0][0].region_selection
 }
 
-// Region is selected explicitly because the smart-region auto-fill is unreliable (FE-3884).
 const selectRegion = async (optionName: string | RegExp) => {
   await user.click(getSelectTriggerByLabel('Region'))
   await user.click(await screen.findByRole('option', { name: optionName }))
@@ -482,6 +481,51 @@ describe('project creation wizard', () => {
   })
 
   describe('region selection', () => {
+    test('blocks submission until a region is selected', async () => {
+      mockWizardEndpoints({
+        availableRegions: {
+          ...DEFAULT_AVAILABLE_REGIONS,
+          recommendations: {
+            ...DEFAULT_AVAILABLE_REGIONS.recommendations,
+            smartGroup: { code: 'americas', name: '', type: 'smartGroup' },
+          },
+        },
+      })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Region Required Project')
+      await generateAndWaitForStrongPassword()
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Select a region')
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      expect(await screen.findByText('Please select a region.')).toBeInTheDocument()
+      expect(onRequest).not.toHaveBeenCalled()
+
+      await selectRegion(/Americas/)
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ name: 'Americas' })
+    })
+
+    test('submits the recommended region without manual selection', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Recommended Region Project')
+      await generateAndWaitForStrongPassword()
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ name: 'Americas' })
+    })
+
     test('surfaces the recommended smart region with a "Recommended" badge', async () => {
       mockWizardEndpoints()
 
@@ -568,12 +612,55 @@ describe('project creation wizard', () => {
       })
     })
 
-    test('shows an error state when available regions fail to load', async () => {
+    test('blocks submission when available regions fail to load', async () => {
       mockWizardEndpoints({ availableRegions: 'error' })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
 
       await renderWizard()
 
       await screen.findByText('Error loading available regions')
+      await fillProjectName('Unavailable Regions Project')
+      await generateAndWaitForStrongPassword()
+
+      const submitButton = screen.getByRole('button', { name: 'Create new project' })
+      expect(submitButton).toBeDisabled()
+      const form = submitButton.closest('form')
+      if (!form) throw new Error('Project creation form not found')
+      await act(async () => {
+        fireEvent.submit(form)
+      })
+      expect(onRequest).not.toHaveBeenCalled()
+    })
+
+    test('blocks a previously selected region when regions fail to load for the new compute size', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Changed Compute Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Americas/)
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/available-regions',
+        response: () => HttpResponse.error(),
+      })
+      await user.click(getSelectTriggerByLabel('Compute size'))
+      await user.click(await screen.findByRole('option', { name: /2 GB RAM/ }))
+      await screen.findByText('Error loading available regions')
+
+      const submitButton = screen.getByRole('button', { name: 'Create new project' })
+      expect(submitButton).toBeDisabled()
+      const form = submitButton.closest('form')
+      if (!form) throw new Error('Project creation form not found')
+      await act(async () => {
+        fireEvent.submit(form)
+      })
+      expect(onRequest).not.toHaveBeenCalled()
     })
 
     describe('free tier general region experiment', () => {

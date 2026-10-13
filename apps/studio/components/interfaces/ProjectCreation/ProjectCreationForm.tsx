@@ -177,7 +177,7 @@ export const ProjectCreationForm = ({
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
-      dbRegion: undefined,
+      dbRegion: '',
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',
@@ -337,6 +337,9 @@ export const ProjectCreationForm = ({
   })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
+  const hasAvailableRegions =
+    !smartRegionEnabled || (availableRegionsData !== undefined && !availableRegionsError)
+  const canSubmitProject = canCreateProject && hasAvailableRegions
   const canConfigureGitHubOnCreate =
     canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
@@ -526,6 +529,18 @@ export const ProjectCreationForm = ({
       )
     }
 
+    const isRegionSelectionUnavailable =
+      smartRegionEnabled &&
+      (!selectedRegion || !!availableRegionsError || isFetchingAvailableRegions)
+    if (isRegionSelectionUnavailable) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: 'Please select an available region.' },
+        { shouldFocus: true }
+      )
+      return
+    }
+
     const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
     const selectedStaticRegion = smartRegionEnabled
       ? undefined
@@ -679,10 +694,10 @@ export const ProjectCreationForm = ({
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (regionError && fixedDefaultRegion) {
+    if (!smartRegionEnabled && regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
-  }, [regionError, resetField, fixedDefaultRegion])
+  }, [smartRegionEnabled, regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -768,7 +783,7 @@ export const ProjectCreationForm = ({
           footer={
             <ProjectCreationFooter
               form={form}
-              canCreateProject={canCreateProject}
+              canCreateProject={canSubmitProject}
               instanceSize={instanceSize}
               highAvailability={highAvailability}
               organizationProjects={organizationProjects}

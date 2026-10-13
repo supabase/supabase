@@ -293,7 +293,7 @@ export const RegionSelector = ({
                               : 'Select a region for your project..'
                           }
                         >
-                          {dbRegion !== undefined && (
+                          {!!dbRegion && (
                             <div className="flex items-center gap-x-3">
                               {isLoading && <Loader2 size={14} className="animate-spin" />}
                               {selectedRegion?.code && (
