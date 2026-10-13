@@ -1956,7 +1956,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
+    heroImage: 'https://www.youtube-nocookie.com/embed/EQ5h3NSWMbk',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
     status: {
