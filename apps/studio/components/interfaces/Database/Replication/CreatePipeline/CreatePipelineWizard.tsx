@@ -25,6 +25,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { DestinationLogo } from '../DestinationLogo'
 import { AdvancedSettings } from '../DestinationPanel/DestinationForm/AdvancedSettings'
 import { BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE } from '../DestinationPanel/DestinationForm/BigQuery/BigQuery.utils'
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
@@ -647,6 +648,7 @@ export const CreatePipelineWizard = () => {
                   <PipelineDestinationSelection
                     availableDestinations={availableDestinations}
                     value={selectedType}
+                    renderLogo={(type) => <DestinationLogo type={type} />}
                     onChange={(type) => setUrlDestinationType(type)}
                   />
                 </CardContent>
