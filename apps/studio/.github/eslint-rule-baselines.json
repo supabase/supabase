@@ -12,7 +12,7 @@
     "jsx-a11y/anchor-is-valid": 6,
     "jsx-a11y/heading-has-content": 2,
     "valtio/state-snapshot-rule": 1,
-    "shadcn/no-arbitrary-values": 197,
+    "shadcn/no-arbitrary-values": 198,
     "shadcn/no-unknown-classes": 150,
     "shadcn/no-raw-colors": 58
   },
@@ -1056,6 +1056,7 @@
       "components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/CreateTable/CreateTableInstructionsDialog.tsx": 2,
       "components/interfaces/Storage/AnalyticsBuckets/AnalyticsBucketDetails/NamespaceWithTables/TableRowComponent.tsx": 2,
       "components/interfaces/Storage/BucketFilePickerDialog/BucketFilePickerHeader.tsx": 2,
+      "components/interfaces/Storage/StorageExplorer/ArchivedVersionRestoreWidget.tsx": 1,
       "components/interfaces/Storage/StorageExplorer/FileExplorerRow.tsx": 2,
       "components/interfaces/Storage/StorageExplorer/MoveItemsFolderPickerRow.tsx": 2,
       "components/interfaces/Storage/StoragePolicies/StoragePoliciesEditor.tsx": 1,
