@@ -38,6 +38,7 @@ import {
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
+  getReplaceableFileNames,
   getStorageItemPath,
   getUploadNameConflicts,
   sanitizeNameForDuplicateInColumn,
@@ -49,6 +50,7 @@ import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/us
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import {
+  getBucketVersioningState,
   hasVersioningHistory,
   isVersioningActive,
 } from '@/components/interfaces/Storage/StorageVersioning.constants'
@@ -181,9 +183,9 @@ export function createStorageExplorerState({
     },
 
     // Separate from `selectedItemsToDelete`, which only archives on a versioned bucket.
-    itemToPurge: undefined as StorageItemWithColumn | undefined,
-    setItemToPurge: (item?: StorageItemWithColumn) => {
-      state.itemToPurge = item
+    itemsToPurge: [] as StorageItemWithColumn[],
+    setItemsToPurge: (items: StorageItemWithColumn[]) => {
+      state.itemsToPurge = items
     },
 
     selectedItemsToMove: [] as StorageItemWithColumn[],
@@ -1098,14 +1100,9 @@ export function createStorageExplorerState({
       const bucketIdAtStart = state.selectedBucket.id
       const destinationPath = state.columns?.[derivedColumnIndex]?.path ?? ''
 
-      // Archived objects never reach `state.columns` — the explorer merges them in at render
-      // time — so an upload landing on one would silently restore it. Started here rather
-      // than at the conflict check so it overlaps reading the dropped entries, which is the
-      // slow part of a folder drop. The cost is one unused request on a folder-only drop,
-      // where nothing at the top level can clash.
-      const canPromptArchived =
+      const canPromptOnConflict =
         onConflict !== undefined && hasVersioningHistory(state.selectedBucket)
-      const archivedNamesRequest = canPromptArchived
+      const archivedNamesRequest = canPromptOnConflict
         ? queryClient
             .fetchQuery({
               ...archivedObjectNamesQueryOptions({
@@ -1215,25 +1212,34 @@ export function createStorageExplorerState({
         )
         .map((item) => item.name)
 
+      const versioningState = getBucketVersioningState(state.selectedBucket)
+      const replaceableNames = getReplaceableFileNames({
+        items: state.columns?.[derivedColumnIndex]?.items ?? [],
+        versioningState,
+      })
       const liveNames = getUploadNameConflicts({
         fileNames: topLevelFileNames,
-        existingNames: existingFileNames,
+        existingNames: replaceableNames,
       })
       // A delete marker can outlive the delete it recorded, so anything the archived listing
       // reports that is also live belongs to the live half, where replacing is what it says.
       const takenLiveNames = new Set(existingFileNames.map((name) => name.toLowerCase()))
+      const archivedFolderNames = (await archivedNamesRequest).filter(
+        (name) => !takenLiveNames.has(name.toLowerCase())
+      )
       const archivedNames = getUploadNameConflicts({
         fileNames: topLevelFileNames,
-        existingNames: (await archivedNamesRequest).filter(
-          (name) => !takenLiveNames.has(name.toLowerCase())
-        ),
+        existingNames: archivedFolderNames,
       })
 
-      // Replacing is only offered where it keeps what it replaces. A suspended bucket still
-      // holds archived files, and restoring one loses nothing, so that half stays on.
+      const existingNameByLowercase = new Map(
+        [...replaceableNames, ...archivedFolderNames].map((name) => [name.toLowerCase(), name])
+      )
+
       const conflicts: UploadConflicts = {
-        liveNames: isVersioningActive(state.selectedBucket) ? liveNames : [],
-        archivedNames: canPromptArchived ? archivedNames : [],
+        liveNames: canPromptOnConflict ? liveNames : [],
+        archivedNames: canPromptOnConflict ? archivedNames : [],
+        isVersioningSuspended: versioningState === 'suspended',
       }
 
       let shouldReplaceConflicts = false
@@ -1246,9 +1252,6 @@ export function createStorageExplorerState({
         shouldReplaceConflicts = resolution === 'replace'
       }
 
-      // The user was free to navigate while the listing was read and the prompt was open, and
-      // everything below reads the destination back out of state — the path the files land
-      // on, the bucket they are written to, and the column the rename compares against.
       const destinationColumn = state.columns?.[derivedColumnIndex]
       if (
         destinationColumn === undefined ||
@@ -1294,22 +1297,23 @@ export function createStorageExplorerState({
         const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
         const isWithinFolder = (file?.path ?? '').split('/').length > 1
-        // Kept as-is so the write lands on the existing object instead of beside it.
         const isReplacingExisting =
           shouldReplaceConflicts && !isWithinFolder && conflictingNames.includes(file.name)
         const isReplacingArchived = isReplacingExisting && archivedConflictNames.has(file.name)
-        const fileName =
-          isWithinFolder || isReplacingExisting
-            ? file.name
-            : sanitizeNameForDuplicateInColumn(state, {
-                name: file.name,
-                autofix,
-                // The same column the conflict check read, so "keep both" always renames.
-                columnIndex: derivedColumnIndex,
-                // Archived names are absent from the column, so without these a declined
-                // restore would upload under the original name and restore it anyway.
-                reservedNames: conflicts.archivedNames,
-              })
+
+        const getUploadName = () => {
+          if (isWithinFolder) return file.name
+          if (isReplacingExisting) {
+            return existingNameByLowercase.get(file.name.toLowerCase()) ?? file.name
+          }
+          return sanitizeNameForDuplicateInColumn(state, {
+            name: file.name,
+            autofix,
+            columnIndex: derivedColumnIndex,
+            reservedNames: archivedFolderNames,
+          })
+        }
+        const fileName = getUploadName()
         const unsanitizedFormattedFileName =
           has(file, ['path']) && isWithinFolder ? file.path : fileName
         /**

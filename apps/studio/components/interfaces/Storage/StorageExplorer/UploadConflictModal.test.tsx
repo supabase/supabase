@@ -11,7 +11,12 @@ const renderModal = (conflicts: Partial<UploadConflicts>) => {
   const onConfirm = vi.fn()
   customRender(
     <UploadConflictModal
-      conflicts={{ liveNames: [], archivedNames: [], ...conflicts }}
+      conflicts={{
+        liveNames: [],
+        archivedNames: [],
+        isVersioningSuspended: false,
+        ...conflicts,
+      }}
       onCancel={onCancel}
       onConfirm={onConfirm}
     />
@@ -68,6 +73,13 @@ describe('UploadConflictModal', () => {
 
     expect(onCancel).toHaveBeenCalled()
     expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  it('says the retention only holds once when versioning is suspended', () => {
+    renderModal({ liveNames: ['photo.png'], isVersioningSuspended: true })
+
+    expect(screen.getByText('Replace existing file')).toBeInTheDocument()
+    expect(screen.getByText(/one last time/)).toBeInTheDocument()
   })
 
   describe('archived conflicts', () => {

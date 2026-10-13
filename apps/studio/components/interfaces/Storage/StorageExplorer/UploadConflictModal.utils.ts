@@ -9,6 +9,19 @@ export interface UploadConflictCopy {
   keepBothDescription: string
 }
 
+const getLiveReplaceDescription = (isVersioningSuspended: boolean, isPlural: boolean) => {
+  if (isVersioningSuspended && isPlural) {
+    return 'Each file you replace is kept as a noncurrent version one last time, and anything uploaded after that overwrites it in place'
+  }
+  if (isVersioningSuspended) {
+    return 'The file you replace is kept as a noncurrent version one last time, and anything uploaded after that overwrites it in place'
+  }
+  if (isPlural) {
+    return 'Each file you replace becomes a noncurrent version you can restore from its version history'
+  }
+  return 'The file you replace becomes a noncurrent version you can restore from its version history'
+}
+
 /**
  * What the two choices mean depends on what is sitting at the name. A live file is replaced
  * and kept as a noncurrent version; an archived one has no visible occupant at all, so the
@@ -17,6 +30,7 @@ export interface UploadConflictCopy {
 export const getUploadConflictCopy = ({
   liveNames,
   archivedNames,
+  isVersioningSuspended,
 }: UploadConflicts): UploadConflictCopy => {
   const totalCount = liveNames.length + archivedNames.length
 
@@ -25,8 +39,7 @@ export const getUploadConflictCopy = ({
       title: `${liveNames[0]} already exists here`,
       description: 'Choose what happens to the existing file.',
       replaceLabel: 'Replace existing file',
-      replaceDescription:
-        'The file you replace becomes a noncurrent version you can restore from its version history',
+      replaceDescription: getLiveReplaceDescription(isVersioningSuspended, false),
       keepBothLabel: 'Keep both files',
       keepBothDescription: 'Keeps the existing file and appends an incremental number to the name',
     }
@@ -37,8 +50,7 @@ export const getUploadConflictCopy = ({
       title: `${totalCount} files already exist here`,
       description: 'Choose what happens to the existing files.',
       replaceLabel: 'Replace existing files',
-      replaceDescription:
-        'Each file you replace becomes a noncurrent version you can restore from its version history',
+      replaceDescription: getLiveReplaceDescription(isVersioningSuspended, true),
       keepBothLabel: 'Keep all files',
       keepBothDescription:
         'Keeps the existing files and appends an incremental number to the names',
@@ -75,8 +87,9 @@ export const getUploadConflictCopy = ({
     title: `${totalCount} files already exist here`,
     description: 'Some of them are archived. Choose what happens to all of them.',
     replaceLabel: 'Replace and restore',
-    replaceDescription:
-      'Existing files become noncurrent versions, and archived files are restored with your upload as the current version',
+    replaceDescription: isVersioningSuspended
+      ? 'Existing files are kept as noncurrent versions one last time, and archived files are restored with your upload as the current version'
+      : 'Existing files become noncurrent versions, and archived files are restored with your upload as the current version',
     keepBothLabel: 'Keep all files',
     keepBothDescription:
       'Leaves the existing and archived files as they are, and appends an incremental number to the names you upload',

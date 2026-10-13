@@ -4,6 +4,10 @@ import { copyToClipboard } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../Storage.utils'
+import {
+  willRetainVersionOnWrite,
+  type BucketVersioningState,
+} from '../StorageVersioning.constants'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'
@@ -147,25 +151,14 @@ export function sanitizeNameForDuplicateInColumn(
   return name
 }
 
-/** What the user chose when an upload would land on a name that already exists. */
 export type UploadConflictResolution = 'replace' | 'keep-both' | 'cancel'
 
-/**
- * Names an upload would land on, split by what is actually sitting there. Disjoint: an
- * object whose current version is a delete marker is not in the live listing.
- */
 export type UploadConflicts = {
   liveNames: string[]
-  /** Soft-deleted objects. Uploading onto one restores it rather than sitting beside it. */
   archivedNames: string[]
+  isVersioningSuspended: boolean
 }
 
-/**
- * Names that are already taken in the destination column, matched the same case-insensitive
- * way `sanitizeNameForDuplicateInColumn` matches them. Files landing inside an uploaded folder
- * are the caller's to leave out: a folder upload merges into its destination, so only its top
- * level can clash.
- */
 export function getUploadNameConflicts({
   fileNames,
   existingNames,
@@ -176,6 +169,22 @@ export function getUploadNameConflicts({
   const takenNames = new Set(existingNames.map((name) => name.toLowerCase()))
   return Array.from(new Set(fileNames.filter((name) => takenNames.has(name.toLowerCase()))))
 }
+
+export const getReplaceableFileNames = ({
+  items,
+  versioningState,
+}: {
+  items: readonly StorageItem[]
+  versioningState: BucketVersioningState
+}): string[] =>
+  items
+    .filter(
+      (item) =>
+        item.type === STORAGE_ROW_TYPES.FILE &&
+        item.status !== STORAGE_ROW_STATUS.EDITING &&
+        willRetainVersionOnWrite({ versioningState, isObjectVersioned: item.is_versioned })
+    )
+    .map((item) => item.name)
 
 /** Bucket-relative path to an item */
 export function getStoragePathForItem(

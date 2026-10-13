@@ -22,6 +22,7 @@ export const FileExplorerHeaderSelection = () => {
     clearSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemsToMove,
+    setItemsToPurge,
   } = useStorageExplorerStateSnapshot()
 
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
@@ -74,6 +75,24 @@ export const FileExplorerHeaderSelection = () => {
             {canArchive ? 'Archive' : 'Delete'}
           </ButtonTooltip>
         </ShortcutTooltip>
+        {canArchive && (
+          <ButtonTooltip
+            size="tiny"
+            icon={<Trash2 size={12} className={canUpdateFiles ? 'text-destructive' : undefined} />}
+            disabled={!canUpdateFiles}
+            onClick={() => setItemsToPurge(selectedItems)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to delete files'
+                  : 'Deletes every version, leaving nothing to restore',
+              },
+            }}
+          >
+            Delete permanently
+          </ButtonTooltip>
+        )}
 
         <ShortcutTooltip
           shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_MOVE_SELECTED}

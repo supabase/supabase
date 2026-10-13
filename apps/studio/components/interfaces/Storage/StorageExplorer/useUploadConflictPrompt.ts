@@ -2,7 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import type { UploadConflictResolution, UploadConflicts } from './StorageExplorer.utils'
 
-const NO_CONFLICTS: UploadConflicts = { liveNames: [], archivedNames: [] }
+const NO_CONFLICTS: UploadConflicts = {
+  liveNames: [],
+  archivedNames: [],
+  isVersioningSuspended: false,
+}
 
 /**
  * Turns the upload's name clash into a question the user answers in a modal. The upload is

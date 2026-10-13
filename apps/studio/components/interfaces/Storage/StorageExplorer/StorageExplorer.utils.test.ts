@@ -13,6 +13,7 @@ import {
   describeUploadFailure,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getReplaceableFileNames,
   getStorageExplorerUrlForItem,
   getStorageItemPath,
   getStoragePathForItem,
@@ -578,5 +579,75 @@ describe('getUploadNameConflicts', () => {
         existingNames: ['photo.png'],
       })
     ).toEqual(['photo.png'])
+  })
+})
+
+describe('getReplaceableFileNames', () => {
+  const file = (overrides: Partial<StorageItem>): StorageItem => ({
+    id: 'file-id',
+    name: 'file.txt',
+    type: STORAGE_ROW_TYPES.FILE,
+    status: STORAGE_ROW_STATUS.READY,
+    metadata: null,
+    isCorrupted: false,
+    created_at: null,
+    updated_at: null,
+    last_accessed_at: null,
+    ...overrides,
+  })
+
+  it('offers every file on an enabled bucket, where any replace keeps what it lands on', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt', is_versioned: true }), file({ name: 'b.txt' })],
+        versioningState: 'enabled',
+      })
+    ).toEqual(['a.txt', 'b.txt'])
+  })
+
+  it('offers only a pre-suspension file once the bucket is suspended', () => {
+    // Its replacement is unversioned, so the write after it retains nothing — which is why
+    // `b.txt`, written while suspended, is not worth asking about.
+    expect(
+      getReplaceableFileNames({
+        items: [
+          file({ name: 'a.txt', is_versioned: true }),
+          file({ name: 'b.txt', is_versioned: false }),
+        ],
+        versioningState: 'suspended',
+      })
+    ).toEqual(['a.txt'])
+  })
+
+  it('offers nothing on a suspended bucket when the flag is absent', () => {
+    // Nothing is promised that the write might not deliver; the upload renames instead.
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt' }), file({ name: 'b.txt', is_versioned: null })],
+        versioningState: 'suspended',
+      })
+    ).toEqual([])
+  })
+
+  it('offers nothing on a disabled bucket', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt', is_versioned: true })],
+        versioningState: 'disabled',
+      })
+    ).toEqual([])
+  })
+
+  it('skips folders and rows being renamed', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [
+          file({ name: 'folder', type: STORAGE_ROW_TYPES.FOLDER, id: null }),
+          file({ name: 'editing.txt', status: STORAGE_ROW_STATUS.EDITING }),
+          file({ name: 'a.txt' }),
+        ],
+        versioningState: 'enabled',
+      })
+    ).toEqual(['a.txt'])
   })
 })

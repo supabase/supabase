@@ -249,7 +249,7 @@ export const PreviewPane = () => {
     selectedFilePreview: file,
     openedFolders,
     setSelectedItemsToDelete,
-    setItemToPurge,
+    setItemsToPurge,
     refetchAllOpenedFolders,
     replaceFile,
     setSelectedFileCustomExpiry,
@@ -403,7 +403,7 @@ export const PreviewPane = () => {
             onDownload={() => downloadFile(file)}
             onCustomExpiry={() => setSelectedFileCustomExpiry(file)}
             onDelete={() => setSelectedItemsToDelete([file])}
-            onPurge={() => setItemToPurge(file)}
+            onPurge={() => setItemsToPurge([file])}
           />
         )}
 
