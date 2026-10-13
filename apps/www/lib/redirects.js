@@ -3515,7 +3515,11 @@ module.exports = [
     destination: '/docs/guides/auth/passwords',
   },
   { permanent: true, source: '/docs/mcp', destination: '/docs/guides/ai-tools/mcp' },
-  { permanent: true, source: '/docs/guides/database/pagination', destination: '/docs/reference/javascript/using-modifiers-overridetypes' },
+  {
+    permanent: true,
+    source: '/docs/guides/database/pagination',
+    destination: '/docs/reference/javascript/using-modifiers-overridetypes',
+  },
   {
     permanent: true,
     source: '/docs/guides/platform/audit-logs',
@@ -3607,7 +3611,11 @@ module.exports = [
     source: '/docs/guides/auth/oauth-server/overview',
     destination: '/docs/guides/auth/oauth-server',
   },
-  { permanent: true, source: '/docs/guides/api/rest/pagination', destination: '/docs/reference/javascript/using-modifiers-overridetypes' },
+  {
+    permanent: true,
+    source: '/docs/guides/api/rest/pagination',
+    destination: '/docs/reference/javascript/using-modifiers-overridetypes',
+  },
   {
     permanent: true,
     source: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
@@ -3623,7 +3631,11 @@ module.exports = [
     source: '/docs/guides/getting-started/quickstarts',
     destination: '/docs/guides/getting-started',
   },
-  { permanent: true, source: '/docs/guides/api/pagination', destination: '/docs/reference/javascript/using-modifiers-overridetypes' },
+  {
+    permanent: true,
+    source: '/docs/guides/api/pagination',
+    destination: '/docs/reference/javascript/using-modifiers-overridetypes',
+  },
   {
     permanent: true,
     source: '/docs/guides/platform/projects',
