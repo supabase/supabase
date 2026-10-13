@@ -10,11 +10,11 @@ interface Props {
 	description?: string
 	topics?: Topic[]
 	github_url?: string
-	editLink?: string
+	viewGitHubLink?: string
 	date?: string
 }
 
-const { title, description, topics = [], github_url, editLink, date } = Astro.props
+const { title, description, topics = [], github_url, viewGitHubLink, date } = Astro.props
 
 ---
 
@@ -48,15 +48,15 @@ const { title, description, topics = [], github_url, editLink, date } = Astro.pr
 			)
 		}
 		{
-			editLink && (
+			viewGitHubLink && (
 				<footer class="mt-16 not-prose">
 					<a
-						href={editLink}
+						href={viewGitHubLink}
 						target="_blank"
 						rel="noreferrer noopener edit"
 						class="w-fit inline-flex items-center gap-1 text-sm text-foreground-light hover:text-foreground"
 					>
-						Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
+						View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
 					</a>
 				</footer>
 			)
