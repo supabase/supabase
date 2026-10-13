@@ -296,10 +296,7 @@ describe('getPipelineCreateStepDocsUrl', () => {
 
 describe('getPipelineCreateConnectionStepFieldNames', () => {
   it.each([
-    [
-      'DuckLake',
-      ['ducklakePoolSize', 'ducklakeMode', 'ducklakeCatalogProjectRef', 'ducklakeStorageBucket'],
-    ],
+    ['DuckLake', ['ducklakePoolSize', 'ducklakeMode', 'ducklakeStorageBucket']],
     ['Snowflake', ['snowflakePrivateKeyPassphrase', 'snowflakeRole']],
     ['ClickHouse', ['clickhousePassword', 'clickhouseEngine']],
   ] as const)('includes settings that require retesting %s', (type, fields) => {

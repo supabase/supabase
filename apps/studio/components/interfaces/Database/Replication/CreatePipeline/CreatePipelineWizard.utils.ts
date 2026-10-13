@@ -294,8 +294,6 @@ const PIPELINE_CREATE_CONNECTION_STEP_FIELDS: Record<
     'ducklakeS3UrlStyle',
     'ducklakeS3UseSsl',
     'ducklakeMetadataSchema',
-    'ducklakeCatalogProjectRef',
-    'ducklakeStorageProjectRef',
     'ducklakeStorageBucket',
     'ducklakePoolSize',
   ],

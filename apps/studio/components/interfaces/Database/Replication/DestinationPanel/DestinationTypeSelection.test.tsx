@@ -16,6 +16,11 @@ mockAnimationsApi()
 
 // Feature flags are not API calls — mock at the module level so tests can
 // control per-destination-type visibility without hitting PostHog.
+const mockCreationPreview = vi.fn()
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({ isEnabled: mockCreationPreview() }),
+}))
+
 const mockBigQueryEnabled = vi.fn()
 const mockIcebergEnabled = vi.fn()
 const mockDucklakeEnabled = vi.fn()
@@ -52,12 +57,34 @@ const addBackgroundMocks = () => {
 describe('DestinationTypeSelection', () => {
   beforeEach(() => {
     window.localStorage.clear()
+    mockCreationPreview.mockReturnValue(false)
     mockBigQueryEnabled.mockReturnValue(false)
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
+  })
+
+  test('uses radio cards only when creation preview is enabled', async () => {
+    mockCreationPreview.mockReturnValue(true)
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(true)
+    customRender(<DestinationTypeSelection />)
+    expect(await screen.findByRole('radiogroup', { name: 'Destination type' })).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Analytics Bucket/ })).toBeInTheDocument()
+    expect(screen.getByText('DEPRECATED')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: /Analytics Bucket/ }))
+    expect(await screen.findByRole('radio', { name: /Analytics Bucket/ })).toBeChecked()
+    expect(
+      screen.getByText(
+        'Destination type cannot be changed after creation. Analytics Bucket is deprecated.'
+      )
+    ).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: /DuckLake/ }))
+    expect(await screen.findByRole('radio', { name: /DuckLake/ })).toBeChecked()
   })
 
   test('shows placeholder when no type is selected', async () => {
@@ -115,51 +142,34 @@ describe('DestinationTypeSelection', () => {
     }
   )
 
-  test('disables the selector in edit mode so the destination type cannot be changed', async () => {
-    mockBigQueryEnabled.mockReturnValue(true)
-    // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
-    addAPIMock({
-      method: 'get',
-      path: '/platform/replication/:ref/destinations/:destination_id',
-      response: () =>
-        HttpResponse.json<ReplicationDestinationResponse>({
-          tenant_id: 't',
-          id: 1,
-          name: 'My BigQuery Destination',
-          config: {
-            big_query: {
-              project_id: 'gcp-proj',
-              dataset_id: 'analytics',
-              connection_pool_size: 5,
+  test.each([false, true])(
+    'keeps the edit selector locked (creation preview: %s)',
+    async (isEnabled) => {
+      mockCreationPreview.mockReturnValue(isEnabled)
+      mockBigQueryEnabled.mockReturnValue(true)
+      // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/destinations/:destination_id',
+        response: () =>
+          HttpResponse.json<ReplicationDestinationResponse>({
+            tenant_id: 't',
+            id: 1,
+            name: 'My BigQuery Destination',
+            config: {
+              big_query: {
+                project_id: 'gcp-proj',
+                dataset_id: 'analytics',
+                connection_pool_size: 5,
+              },
             },
-          },
-        }),
-    })
+          }),
+      })
 
-    // ?edit=1 locks the type to the existing destination
-    customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
+      // ?edit=1 locks the type to the existing destination
+      customRender(<DestinationTypeSelection />, { nuqs: { searchParams: { edit: '1' } } })
 
-    expect(await screen.findByRole('combobox')).toBeDisabled()
-  })
-
-  test('radio variant lists public alpha destinations and excludes the deprecated destination', async () => {
-    mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(true)
-    mockDucklakeEnabled.mockReturnValue(true)
-    mockSnowflakeEnabled.mockReturnValue(false)
-    mockClickHouseEnabled.mockReturnValue(false)
-    addBackgroundMocks()
-
-    customRender(<DestinationTypeSelection variant="radio" />)
-
-    expect(await screen.findByRole('group', { name: 'Destination type' })).toBeInTheDocument()
-    expect(screen.getByText('Public Alpha')).toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /BigQuery/ })).toBeInTheDocument()
-    expect(screen.queryByText('Early Access')).not.toBeInTheDocument()
-    expect(screen.getByRole('radio', { name: /DuckLake/ })).toBeInTheDocument()
-    expect(screen.queryByText('Deprecated')).not.toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
-    expect(screen.queryByText('Cannot be changed after creation.')).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'Leave feedback' })).not.toBeInTheDocument()
-  })
+      expect(await screen.findByRole('combobox')).toBeDisabled()
+    }
+  )
 })

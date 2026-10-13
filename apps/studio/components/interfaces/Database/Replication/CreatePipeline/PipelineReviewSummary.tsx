@@ -21,11 +21,8 @@ import {
   CLICKHOUSE_ENGINE_FIELD_COPY,
   CLICKHOUSE_URL_FIELD_COPY,
   DUCKLAKE_BUCKET_FIELD_COPY,
-  DUCKLAKE_CATALOG_PROJECT_FIELD_COPY,
   DUCKLAKE_CATALOG_URL_FIELD_COPY,
   DUCKLAKE_DATA_PATH_FIELD_COPY,
-  DUCKLAKE_STORAGE_PROJECT_FIELD_COPY,
-  getDestinationTypeCreateDescription,
   INITIAL_SYNC_FIELD_COPY,
   INITIAL_SYNC_LABELS,
   PIPELINE_NAME_FIELD_COPY,
@@ -233,7 +230,7 @@ export const PipelineReviewSummary = ({
       rows: [
         {
           label: 'Type',
-          description: getDestinationTypeCreateDescription(type),
+          description: `Destination type cannot be changed after creation. ${type} support is in public alpha.`,
           content: (
             <div className="flex min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 p-2 text-sm">
               <DestinationLogo type={type} />
@@ -391,16 +388,6 @@ const getDestinationRows = (
     }
 
     return [
-      {
-        label: DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.label,
-        value: values.ducklakeCatalogProjectRef || '—',
-        description: DUCKLAKE_CATALOG_PROJECT_FIELD_COPY.description,
-      },
-      {
-        label: DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.label,
-        value: values.ducklakeStorageProjectRef || '—',
-        description: DUCKLAKE_STORAGE_PROJECT_FIELD_COPY.description,
-      },
       {
         label: DUCKLAKE_BUCKET_FIELD_COPY.label,
         value: values.ducklakeStorageBucket || '—',

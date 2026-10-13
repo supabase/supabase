@@ -1,349 +1,80 @@
-import type { ChangeEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  cn,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { BigQueryConnectionFields } from './BigQuery/ConnectionFields'
 import { TableOptions } from './BigQuery/TableOptions'
-import {
-  DEFAULT_CONNECTION_POOL_SIZE,
-  DEFAULT_DUCKLAKE_POOL_SIZE,
-  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
-  DEFAULT_MAX_FILL_MS,
-  DEFAULT_MAX_TABLE_SYNC_WORKERS,
-} from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
-
-export type AdvancedSettingsGroup = 'all' | 'connection' | 'data'
-
-const DATA_DESCRIPTION = 'Adjust initial sync and replication slot behavior.'
-const ALL_DESCRIPTION = 'Customize how the pipeline syncs and replicates data.'
-
-const getConnectionDescription = (type: DestinationType) => `Adjust how data is written to ${type}.`
-
-const INVALIDATED_SLOT_BEHAVIOR_LABELS = {
-  error: 'Block startup',
-  recreate: 'Recreate slot',
-} as const
+import { DuckLakeConnectionFields } from './DuckLake/ConnectionFields'
+import { ReplicationFields } from './ReplicationFields'
+import { SnowflakeConnectionFields } from './Snowflake/ConnectionFields'
 
 export const AdvancedSettings = ({
   type,
   form,
   group = 'all',
   flush = false,
-  className,
 }: {
+  group?: 'all' | 'connection' | 'data'
+  flush?: boolean
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
-  group?: AdvancedSettingsGroup
-  flush?: boolean
-  className?: string
 }) => {
-  const showConnection = group === 'all' || group === 'connection'
-  const showData = group === 'all' || group === 'data'
-  const description =
-    group === 'connection'
-      ? getConnectionDescription(type)
-      : group === 'data'
-        ? DATA_DESCRIPTION
-        : ALL_DESCRIPTION
+  const shouldShowConnection = group !== 'data'
+  const shouldShowData = group !== 'connection'
+  if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
+    return null
 
-  const handleNumberChange =
-    (field: { onChange: (value: number | '') => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const parsed = e.target.valueAsNumber
-      field.onChange(e.target.value === '' || Number.isNaN(parsed) ? '' : parsed)
-    }
+  let description = 'Customize how the pipeline syncs and replicates data.'
+  if (type === 'DuckLake' && group === 'all')
+    description = 'Adjust catalog connections and replication settings.'
+  if (group === 'connection') description = `Adjust how data is written to ${type}.`
+  if (group === 'data') description = 'Adjust initial sync and replication slot behavior.'
 
   return (
-    <div className={cn(flush ? 'border-b last:border-none' : 'px-5', className)}>
+    <div
+      className={cn(
+        'w-full',
+        group !== 'all' && 'border-t border-default',
+        flush && '[&_[data-slot=accordion-trigger]]:px-6'
+      )}
+    >
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger
-            className={cn(
-              'font-normal gap-2 justify-between text-sm py-3 hover:no-underline',
-              flush && 'rounded-none px-(--card-padding-x) py-4'
-            )}
-          >
+          <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">{description}</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent
-            className={cn(
-              'pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4',
-              flush && 'px-(--card-padding-x)'
-            )}
-          >
-            {showConnection && type === 'DuckLake' && (
-              <FormField
-                control={form.control}
-                name="ducklakePoolSize"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Pool size"
-                    description="Maximum concurrent connections this pipeline opens to the catalog. Choose 1 to 6."
-                  >
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        min={1}
-                        max={6}
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder={String(DEFAULT_DUCKLAKE_POOL_SIZE)}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
+            {shouldShowConnection && type === 'DuckLake' && (
+              <DuckLakeConnectionFields control={form.control} />
             )}
 
-            {showConnection && (
-              <FormField
-                control={form.control}
-                name="maxFillMs"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Batch wait time"
-                    description="Maximum time before sending a partially filled batch."
-                  >
-                    <FormControl>
-                      <InputGroup>
-                        <FormInputGroupInput
-                          {...field}
-                          type="number"
-                          min={0}
-                          step={1}
-                          value={field.value ?? ''}
-                          onChange={handleNumberChange(field)}
-                          placeholder={String(DEFAULT_MAX_FILL_MS)}
-                        />
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupText>milliseconds</InputGroupText>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            )}
+            {shouldShowData && <ReplicationFields control={form.control} />}
 
-            {showData && (
+            {type === 'BigQuery' && (
               <>
-                <FormField
-                  control={form.control}
-                  name="maxTableSyncWorkers"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Table sync workers"
-                      layout="horizontal"
-                      description="Maximum number of tables synced at the same time."
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder={String(DEFAULT_MAX_TABLE_SYNC_WORKERS)}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>workers</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                {shouldShowConnection && <BigQueryConnectionFields control={form.control} />}
 
-                <FormField
-                  control={form.control}
-                  name="maxCopyConnectionsPerTable"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Initial sync connections per table"
-                      layout="horizontal"
-                      description="Maximum number of source connections used to sync existing rows for each table."
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder={String(DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE)}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>connections</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="invalidatedSlotBehavior"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Invalidated slot behavior"
-                      layout="horizontal"
-                      description="What the pipeline does when its replication slot becomes invalid."
-                    >
-                      <FormControl>
-                        <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            {INVALIDATED_SLOT_BEHAVIOR_LABELS[field.value ?? 'error']}
-                          </SelectTrigger>
-                          <SelectContent side="bottom" collisionPadding={16}>
-                            <SelectItem value="error" className="[&>span]:top-2.5">
-                              <p>Block startup</p>
-                              <p className="text-foreground-lighter">
-                                Blocks startup for manual recovery.
-                              </p>
-                            </SelectItem>
-                            <SelectItem value="recreate" className="[&>span]:top-2.5">
-                              <p>Recreate slot</p>
-                              <p className="text-foreground-lighter">
-                                Replaces destination tables and runs a new, billable initial sync.
-                              </p>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                {shouldShowData && (
+                  <div className="flex flex-col gap-y-3">
+                    <div className="flex flex-col gap-y-1">
+                      <span className="text-sm text-foreground">Table layout</span>
+                      <p className="text-sm text-foreground-lighter">
+                        Partitioning and clustering for each BigQuery table. Applied when a
+                        destination table is first created or reset.
+                      </p>
+                    </div>
+                    <TableOptions control={form.control} />
+                  </div>
+                )}
               </>
             )}
 
-            {showConnection && type === 'BigQuery' && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="connectionPoolSize"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Connection pool size"
-                      layout="horizontal"
-                      description={
-                        group === 'all'
-                          ? 'BigQuery only. Number of BigQuery connections used for destination writes.'
-                          : 'Number of BigQuery connections used for destination writes.'
-                      }
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={1}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>connections</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="maxStalenessMins"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Maximum staleness"
-                      layout="horizontal"
-                      description={
-                        group === 'all'
-                          ? 'BigQuery only. Maximum age of BigQuery query results for newly created or recreated tables. Leave blank for the freshest results.'
-                          : 'Maximum age of BigQuery query results for newly created or recreated tables. Leave blank for the freshest results.'
-                      }
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            min={0}
-                            step={1}
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>minutes</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              </>
-            )}
-
-            {showConnection && type === 'Snowflake' && (
-              <FormField
-                control={form.control}
-                name="snowflakeRole"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Role"
-                    labelOptional="Optional"
-                    layout="horizontal"
-                    description="Role for SQL requests. Leave blank to use the service user’s default role."
-                  >
-                    <FormControl>
-                      <Input {...field} placeholder="PIPELINES_ROLE" value={field.value ?? ''} />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            )}
-
-            {showData && type === 'BigQuery' && (
-              <div className="flex flex-col gap-y-3">
-                <div className="flex flex-col gap-y-1">
-                  <span className="text-sm text-foreground">Table layout</span>
-                  <p className="text-sm text-foreground-lighter">
-                    Partitioning and clustering for each BigQuery table. Applied when a destination
-                    table is first created or reset.
-                  </p>
-                </div>
-                <TableOptions control={form.control} />
-              </div>
+            {shouldShowConnection && type === 'Snowflake' && (
+              <SnowflakeConnectionFields control={form.control} />
             )}
           </AccordionContent>
         </AccordionItem>

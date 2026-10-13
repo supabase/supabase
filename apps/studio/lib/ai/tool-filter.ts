@@ -32,6 +32,7 @@ export const toolSetValidationSchema = z.record(
     'execute_sql',
     'deploy_edge_function',
     'rename_chat',
+    'update_opt_in_level',
     'escalate_to_human',
     'resolve_support_conversation',
     'list_policies',
@@ -57,6 +58,38 @@ export const toolSetValidationSchema = z.record(
 )
 export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
 
+/** Ordered from least to most data shared with the model. */
+export const OPT_IN_LEVELS = [
+  'disabled',
+  'schema',
+  'schema_and_log',
+  'schema_and_log_and_data',
+] as const
+
+export const optInLevelSchema = z.enum(OPT_IN_LEVELS)
+
+export const updateOptInLevelInputSchema = z.object({
+  requiredLevel: z
+    .enum(['schema', 'schema_and_log', 'schema_and_log_and_data'])
+    .optional()
+    .describe(
+      'The lowest opt-in level that unlocks what you need: `schema` for table and column metadata, `schema_and_log` for logs, `schema_and_log_and_data` for query results. Omit it when the user just wants to review or change the setting, for example to lower it.'
+    ),
+})
+
+/** Input as stored on the message. `levelWhenAsked` is the org's level when the call was made. */
+export const storedUpdateOptInLevelInputSchema = updateOptInLevelInputSchema.extend({
+  levelWhenAsked: optInLevelSchema.optional(),
+})
+
+export function isOptInLevelAtLeast(level: AiOptInLevel, minimum: AiOptInLevel): boolean {
+  return OPT_IN_LEVELS.indexOf(level) >= OPT_IN_LEVELS.indexOf(minimum)
+}
+
+export function lowerOptInLevel(a: AiOptInLevel, b: AiOptInLevel): AiOptInLevel {
+  return isOptInLevelAtLeast(a, b) ? b : a
+}
+
 /**
  * Tool categories based on the data they access
  */
@@ -81,6 +114,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   execute_sql: TOOL_CATEGORIES.UI,
   deploy_edge_function: TOOL_CATEGORIES.UI,
   rename_chat: TOOL_CATEGORIES.UI,
+  update_opt_in_level: TOOL_CATEGORIES.UI,
   escalate_to_human: TOOL_CATEGORIES.UI,
   resolve_support_conversation: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
@@ -147,18 +181,7 @@ function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
     return true
   }
 
-  // Check if current opt-in level meets the minimum requirement
-  const optInHierarchy: AiOptInLevel[] = [
-    'disabled',
-    'schema',
-    'schema_and_log',
-    'schema_and_log_and_data',
-  ]
-
-  const currentLevelIndex = optInHierarchy.indexOf(aiOptInLevel)
-  const minimumLevelIndex = optInHierarchy.indexOf(minimumLevel)
-
-  return currentLevelIndex >= minimumLevelIndex
+  return isOptInLevelAtLeast(aiOptInLevel, minimumLevel)
 }
 
 /**
@@ -169,9 +192,9 @@ function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
  */
 export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
   const privacyMessage =
-    "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to third-party AI providers solely to generate responses."
+    'This tool needs a higher opt-in level than your organization has set. The opt-in level is an organization-wide setting. Call `update_opt_in_level` with the lowest level that unlocks this tool so the user can review it. By default, no data is shared. A higher level allows Supabase to send information (like schema, logs, or data) to third-party AI providers solely to generate responses.'
   const condensedPrivacyMessage =
-    'Requires opting in to sharing data with third-party AI providers. You can opt in via organization settings.'
+    'Requires opting in to a higher level of sharing data with third-party AI providers. Call `update_opt_in_level` to ask the user to update it.'
   const toolDescription = toolInstance.description
   const description =
     typeof toolDescription === 'function'

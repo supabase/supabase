@@ -44,12 +44,9 @@ import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fie
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { NoDestinationsAvailable } from '../DestinationPanel/DestinationForm/NoDestinationsAvailable'
 import { PipelineRegionField } from '../DestinationPanel/DestinationForm/PipelineRegionField'
-import { PublicationSelection } from '../DestinationPanel/DestinationForm/PublicationSelection'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
-import { TableCopySelection } from '../DestinationPanel/DestinationForm/TableCopySelection'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
-import { DestinationTypeSelection } from '../DestinationPanel/DestinationTypeSelection'
 import { LocalReplicationUnavailableAdmonition } from '../LocalReplicationUnavailableAdmonition'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -79,6 +76,8 @@ import {
   type PipelineDestinationType,
 } from './CreatePipelineWizard.utils'
 import { PipelineCreateStepDescription } from './PipelineCreateStepDescription'
+import { PipelineDataSection } from './PipelineDataSection'
+import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewSummary } from './PipelineReviewSummary'
 import {
   CONNECTION_VALIDATION_HINT,
@@ -144,7 +143,7 @@ export const CreatePipelineWizard = () => {
 
   useRedirectLegacyReadReplicaDestination()
 
-  const [urlDestinationType] = useQueryState(
+  const [urlDestinationType, setUrlDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
@@ -215,10 +214,9 @@ export const CreatePipelineWizard = () => {
       generateDefaultValues({
         catalogToken: '',
         region: projectSettings?.region,
-        projectRef,
         editMode: false,
       }),
-    [projectSettings, projectRef]
+    [projectSettings]
   )
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -646,7 +644,11 @@ export const CreatePipelineWizard = () => {
                   <LocalReplicationUnavailableAdmonition className="mt-2" />
                 </SteppedFlowHeader>
                 <CardContent>
-                  <DestinationTypeSelection variant="radio" />
+                  <PipelineDestinationSelection
+                    availableDestinations={availableDestinations}
+                    value={selectedType}
+                    onChange={(type) => setUrlDestinationType(type)}
+                  />
                 </CardContent>
               </>
             )}
@@ -707,16 +709,11 @@ export const CreatePipelineWizard = () => {
                   description={<PipelineCreateStepDescription step={step} />}
                   actions={pipelineCreateDocsButton}
                 />
-                <CardContent>
-                  <PublicationSelection
-                    form={form}
-                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                  />
-                </CardContent>
-                <CardContent>
-                  <TableCopySelection form={form} editMode={false} />
-                </CardContent>
-                <AdvancedSettings type={selectedType} form={form} group="data" flush />
+                <PipelineDataSection
+                  type={selectedType}
+                  form={form}
+                  onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                />
                 {hasRunValidation && !isValidating && (
                   <PipelineValidationAdmonition
                     failures={pipelineValidationFailures}

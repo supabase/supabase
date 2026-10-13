@@ -1,49 +1,7 @@
-import type { DestinationType } from '../DestinationPanel.types'
-
 export const PIPELINE_NAME_FIELD_COPY = {
   label: 'Pipeline name',
   description: 'Used to identify this pipeline in Supabase.',
 } as const
-
-export const DESTINATION_TYPE_FIELD_COPY = {
-  label: 'Type',
-  cannotChangeAfterCreation: 'Destination type cannot be changed after creation.',
-} as const
-
-export const DESTINATION_TYPE_STAGE_DESCRIPTIONS = {
-  'Public Alpha': (type: DestinationType) => `${type} support is in public alpha.`,
-  'Early Access': (type: DestinationType) => `${type} support is in early access.`,
-  Deprecated: (type: DestinationType) => `${type} is deprecated.`,
-} as const
-
-const DESTINATION_TYPE_STAGES: Record<
-  DestinationType,
-  keyof typeof DESTINATION_TYPE_STAGE_DESCRIPTIONS | null
-> = {
-  BigQuery: 'Public Alpha',
-  DuckLake: 'Public Alpha',
-  Snowflake: 'Public Alpha',
-  ClickHouse: 'Public Alpha',
-  'Analytics Bucket': 'Deprecated',
-}
-
-export const getDestinationTypeCreateDescription = (type: DestinationType) => {
-  const stage = DESTINATION_TYPE_STAGES[type]
-
-  if (stage === 'Public Alpha') {
-    return `Destination type cannot be changed after creation. ${type} support is in public alpha.`
-  }
-
-  if (stage === 'Early Access') {
-    return `Destination type cannot be changed after creation. ${type} support is in early access.`
-  }
-
-  if (stage === 'Deprecated') {
-    return `Destination type cannot be changed after creation. ${type} is deprecated.`
-  }
-
-  return 'Destination type cannot be changed after creation.'
-}
 
 export const BIGQUERY_PROJECT_ID_FIELD_COPY = {
   label: 'Project ID',
@@ -63,16 +21,6 @@ export const ANALYTICS_BUCKET_BUCKET_FIELD_COPY = {
 export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
   label: 'Namespace',
   description: 'The namespace within the bucket where tables will be organized.',
-} as const
-
-export const DUCKLAKE_CATALOG_PROJECT_FIELD_COPY = {
-  label: 'Catalog project',
-  description: 'Postgres project that stores this DuckLake’s metadata.',
-} as const
-
-export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
-  label: 'Storage project',
-  description: 'Supabase project that stores the DuckLake data files.',
 } as const
 
 export const DUCKLAKE_BUCKET_FIELD_COPY = {
@@ -122,26 +70,23 @@ export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   description: 'Controls how ClickHouse stores and queries replicated changes.',
 } as const
 
-export const PUBLICATION_FIELD_COPY = {
-  label: 'Publication',
-  description: 'Tables in the selected publication will be replicated to this destination.',
-} as const
-
-export const INITIAL_SYNC_FIELD_COPY = {
-  label: 'Initial sync',
-  description:
-    'Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
-} as const
-
 export const INITIAL_SYNC_LABELS = {
   include_all_tables: 'All tables',
   skip_all_tables: 'No tables',
   include_tables: 'Selected tables only',
   skip_tables: 'All except selected tables',
-} as const satisfies Record<
-  'include_all_tables' | 'skip_all_tables' | 'include_tables' | 'skip_tables',
-  string
->
+}
+
+export const INITIAL_SYNC_FIELD_COPY = {
+  label: 'Initial sync',
+  description:
+    'Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
+}
+
+export const PUBLICATION_FIELD_COPY = {
+  label: 'Publication',
+  description: 'Tables in the selected publication will be replicated to this destination.',
+}
 
 export const getTableSyncSelectionDescription = ({
   mode,
