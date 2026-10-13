@@ -4,31 +4,6 @@ export interface AuthorizationToggleState {
   confirmed: boolean
 }
 
-export const AUTHORIZATION_COPY = {
-  sectionTitle: 'Authorization',
-  sectionDescription: 'How your app is granted access when someone connects it',
-  memberBoundGrant: {
-    label: 'Use the permissions of the person who connects',
-    description:
-      'Each member who connects gets their own grant, limited to what they can already do. When off, an owner approves one organization-wide grant.',
-    warningBody:
-      'Existing connections keep working. Only new connections will use per-member grants.',
-  },
-  projectScoping: {
-    label: 'Ask for specific projects',
-    description:
-      'Users pick which projects your app can reach. Requests to other projects return 403. When off, your app reaches every project in the organization.',
-    warningBody:
-      'Make sure your app reads the returned scopes and handles denied requests before you turn this on.',
-  },
-  warningTitle: "This can't be turned off after you save",
-  confirmationLabel: 'I understand this is permanent. I can test it on a duplicate app first',
-  previewTitle: 'What your app users will see when they connect',
-  previewIntro:
-    'An organization owner approves your app once. It can then reach every project in their organization.',
-  resultingGrantLabel: 'Resulting grant:',
-} as const
-
 export function getAuthorizationPreviewExplanation(
   isMemberBoundGrant: boolean,
   isProjectScopingEnabled: boolean
