@@ -63,8 +63,8 @@ describe('PipelineDestinationReview', () => {
     { type: 'Analytics Bucket', details: ['bucket', 'namespace'] },
   ])('shows $type details without credentials', ({ type, details }) => {
     const { container } = customRender(<TestReview type={type} />)
-    expect(screen.getByText('Analytics')).toBeInTheDocument()
-    for (const detail of details) expect(screen.getByText(detail)).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Analytics')).toHaveAttribute('readonly')
+    for (const detail of details) expect(screen.getByDisplayValue(detail)).toBeInTheDocument()
     for (const secret of [
       'private-service-account',
       'private-s3-key',
@@ -81,7 +81,7 @@ describe('PipelineDestinationReview', () => {
   it('reveals and hides the entire catalog URL and remasks a changed URL', () => {
     const { container } = customRender(<TestReview type="DuckLake" />)
     fireEvent.click(screen.getByRole('button', { name: 'Show catalog URL' }))
-    expect(screen.getByText(catalogUrl)).toBeInTheDocument()
+    expect(screen.getByDisplayValue(catalogUrl)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Hide catalog URL' }))
     expect(container.innerHTML).not.toContain(catalogUrl)
     fireEvent.click(screen.getByRole('button', { name: 'Show catalog URL' }))
@@ -92,10 +92,10 @@ describe('PipelineDestinationReview', () => {
 
   it('shows Supabase DuckLake bucket details and updates live form values', () => {
     customRender(<TestReview type="DuckLake" values={{ ...defaults, ducklakeMode: 'supabase' }} />)
-    expect(screen.getByText('lake-bucket')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('lake-bucket')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Show catalog URL' })).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Change name' }))
-    expect(screen.getByText('Updated name')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Updated name')).toBeInTheDocument()
   })
 
   it('masks a ClickHouse URL containing credentials until explicitly revealed', () => {
@@ -103,14 +103,14 @@ describe('PipelineDestinationReview', () => {
     const button = screen.getByRole('button', { name: 'Show HTTPS endpoint' })
     expect(button).toHaveAttribute('type', 'button')
     fireEvent.click(button)
-    expect(screen.getByText(defaults.clickhouseUrl)).toBeInTheDocument()
+    expect(screen.getByDisplayValue(defaults.clickhouseUrl)).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Hide HTTPS endpoint' }))
     expect(container.innerHTML).not.toContain(defaults.clickhouseUrl)
   })
 
   it('shows missing values without exposing inactive destination details', () => {
     customRender(<TestReview type="BigQuery" values={{ name: 'Analytics' }} />)
-    expect(screen.getAllByText('Not set')).toHaveLength(2)
+    expect(screen.getAllByDisplayValue('Not set')).toHaveLength(2)
     expect(screen.queryByText('Catalog URL')).not.toBeInTheDocument()
   })
 })

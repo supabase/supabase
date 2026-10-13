@@ -1,8 +1,10 @@
 import { Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
-import { Button } from 'ui'
+import { Button, Input, Separator } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { DestinationLogo } from '../DestinationLogo'
 import { CREATE_NEW_NAMESPACE } from '../DestinationPanel/DestinationForm/DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import {
@@ -21,15 +23,18 @@ import {
   SNOWFLAKE_DATABASE_FIELD_COPY,
   SNOWFLAKE_SCHEMA_FIELD_COPY,
 } from '../DestinationPanel/DestinationForm/DestinationFormFieldCopy'
-import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/PipelineRegionField'
+import {
+  getPipelineRegionDescription,
+  PipelineRegionReadonly,
+} from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
   const [isVisible, setIsVisible] = useState(false)
-  if (!value) return <>Not set</>
+  if (!value) return <Input readOnly value="Not set" aria-label={label} />
   return (
     <div className="flex min-w-0 items-center gap-2">
-      <span className="min-w-0 break-all">{isVisible ? value : '••••••••'}</span>
+      <Input readOnly aria-label={label} value={isVisible ? value : '••••••••'} />
       <Button
         type="button"
         variant="text"
@@ -88,78 +93,99 @@ export const PipelineDestinationReview = ({
       'newNamespaceName',
     ],
   })
-  const rows: { label: string; value?: string; isMasked?: boolean }[] = []
+  const rows: { label: string; value?: string; description?: string; isMasked?: boolean }[] = []
   switch (type) {
     case 'BigQuery':
       rows.push(
-        { label: BIGQUERY_PROJECT_ID_FIELD_COPY.label, value: projectId },
-        { label: BIGQUERY_DATASET_ID_FIELD_COPY.label, value: datasetId }
+        { ...BIGQUERY_PROJECT_ID_FIELD_COPY, value: projectId },
+        { ...BIGQUERY_DATASET_ID_FIELD_COPY, value: datasetId }
       )
       break
     case 'DuckLake':
       if (mode === 'custom') {
         rows.push(
-          { label: DUCKLAKE_CATALOG_URL_FIELD_COPY.label, value: catalogUrl, isMasked: true },
-          { label: DUCKLAKE_DATA_PATH_FIELD_COPY.label, value: dataPath }
+          {
+            ...DUCKLAKE_CATALOG_URL_FIELD_COPY,
+            description: DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription,
+            value: catalogUrl,
+            isMasked: true,
+          },
+          { ...DUCKLAKE_DATA_PATH_FIELD_COPY, value: dataPath }
         )
       } else {
-        rows.push({ label: DUCKLAKE_BUCKET_FIELD_COPY.label, value: bucket })
+        rows.push({ ...DUCKLAKE_BUCKET_FIELD_COPY, value: bucket })
       }
       break
     case 'Snowflake':
       rows.push(
-        { label: SNOWFLAKE_ACCOUNT_ID_FIELD_COPY.label, value: account },
-        { label: SNOWFLAKE_DATABASE_FIELD_COPY.label, value: database },
-        { label: SNOWFLAKE_SCHEMA_FIELD_COPY.label, value: schema }
+        { ...SNOWFLAKE_ACCOUNT_ID_FIELD_COPY, value: account },
+        { ...SNOWFLAKE_DATABASE_FIELD_COPY, value: database },
+        { ...SNOWFLAKE_SCHEMA_FIELD_COPY, value: schema }
       )
       break
     case 'ClickHouse':
       rows.push(
-        { label: CLICKHOUSE_URL_FIELD_COPY.label, value: url, isMasked: true },
-        { label: CLICKHOUSE_DATABASE_FIELD_COPY.label, value: clickhouseDatabase },
+        { ...CLICKHOUSE_URL_FIELD_COPY, value: url, isMasked: true },
+        { ...CLICKHOUSE_DATABASE_FIELD_COPY, value: clickhouseDatabase },
         {
-          label: CLICKHOUSE_ENGINE_FIELD_COPY.label,
+          ...CLICKHOUSE_ENGINE_FIELD_COPY,
           value: engine === 'merge_tree' ? 'MergeTree' : 'ReplacingMergeTree',
         }
       )
       break
     case 'Analytics Bucket':
       rows.push(
-        { label: ANALYTICS_BUCKET_BUCKET_FIELD_COPY.label, value: warehouse },
+        { ...ANALYTICS_BUCKET_BUCKET_FIELD_COPY, value: warehouse },
         {
-          label: ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY.label,
+          ...ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY,
           value: namespace === CREATE_NEW_NAMESPACE ? newNamespace : namespace,
         }
       )
       break
   }
   return (
-    <section aria-label="Destination review" className="space-y-4 p-5">
-      <h3 className="text-sm font-medium text-foreground">Destination review</h3>
-      <dl className="space-y-4 text-sm">
-        {[
-          { label: PIPELINE_NAME_FIELD_COPY.label, value: name },
-          { label: 'Destination type', value: type },
-          ...rows,
-        ].map((row) => (
-          <div key={row.label} className="grid gap-1 sm:grid-cols-2 sm:gap-4">
-            <dt className="text-foreground-light">{row.label}</dt>
-            <dd className="min-w-0 break-words text-foreground">
-              {row.isMasked ? (
-                <MaskedUrl key={`${type}-${row.value}`} value={row.value ?? ''} label={row.label} />
-              ) : (
-                row.value || 'Not set'
-              )}
-            </dd>
+    <section aria-label="Destination review">
+      <div className="space-y-6 p-5">
+        <h3 className="text-sm font-medium text-foreground">Destination</h3>
+        <FormItemLayout
+          isReactForm={false}
+          layout="horizontal"
+          label="Type"
+          description={`Destination type cannot be changed after creation. ${type === 'Analytics Bucket' ? 'Analytics Bucket is deprecated.' : `${type} support is in public alpha.`}`}
+        >
+          <div className="flex items-center gap-3 rounded-md border bg-surface-200 p-3">
+            <DestinationLogo type={type} />
+            <span className="text-sm text-foreground">{type}</span>
           </div>
+        </FormItemLayout>
+      </div>
+      <Separator />
+      <div className="space-y-6 p-5">
+        <h3 className="text-sm font-medium text-foreground">Connection</h3>
+        {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
+          <FormItemLayout
+            key={row.label}
+            isReactForm={false}
+            layout="horizontal"
+            label={row.label}
+            description={row.description}
+          >
+            {row.isMasked ? (
+              <MaskedUrl key={`${type}-${row.value}`} value={row.value ?? ''} label={row.label} />
+            ) : (
+              <Input readOnly aria-label={row.label} value={row.value || 'Not set'} />
+            )}
+          </FormItemLayout>
         ))}
-        <div className="grid gap-1 sm:grid-cols-2 sm:gap-4">
-          <dt className="text-foreground-light">Pipeline region</dt>
-          <dd>
-            <PipelineRegionReadonly />
-          </dd>
-        </div>
-      </dl>
+        <FormItemLayout
+          isReactForm={false}
+          layout="horizontal"
+          label="Pipeline region"
+          description={getPipelineRegionDescription(type)}
+        >
+          <PipelineRegionReadonly />
+        </FormItemLayout>
+      </div>
     </section>
   )
 }
