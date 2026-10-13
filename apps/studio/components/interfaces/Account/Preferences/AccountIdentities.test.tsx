@@ -118,7 +118,7 @@ describe('AccountIdentities', () => {
     renderAccountIdentities()
 
     expect(await screen.findByRole('button', { name: 'Add password' })).toBeInTheDocument()
-    expect(screen.getByText('Email')).toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Change password' })).not.toBeInTheDocument()
   })
 

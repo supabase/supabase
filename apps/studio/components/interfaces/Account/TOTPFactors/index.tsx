@@ -133,7 +133,7 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
               protect your account.
             </PageSectionDescription>
           </PageSectionSummary>
-          {canAddApp && totpFactors.length > 0 && !factorFinding && (
+          {canAddApp && totpFactors.length > 0 && (
             <PageSectionAside>
               <Button
                 variant={
@@ -181,15 +181,6 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
               layout="responsive"
               title="Add a backup authenticator"
               description="Add an authenticator on another device so you can still sign in if you lose access to this one."
-              actions={
-                <Button
-                  variant={primaryAction === 'add-factor' ? 'primary' : 'default'}
-                  icon={<Plus />}
-                  onClick={handleAddNewApp}
-                >
-                  Add authenticator
-                </Button>
-              }
             />
           )}
           {isSuccess && totpFactors.length > 0 && (
@@ -264,12 +255,19 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
             <GenerateRecoveryCodesModal>
               {({ onClick, isPending }) =>
                 shouldVerifyRecoveryCodes && status === 'unenrolled' && !recoveryCodesIsError ? (
-                  <Admonition
-                    type={codeFinding ? 'warning' : 'default'}
-                    layout="responsive"
-                    title="No recovery codes"
-                    description="Save recovery codes so you can sign in if you lose access to your authenticator."
-                    actions={
+                  <>
+                    {codeFinding && (
+                      <Admonition
+                        type="warning"
+                        title="No recovery codes"
+                        description="Save recovery codes so you can sign in if you lose access to your authenticator."
+                      />
+                    )}
+                    <EmptyStatePresentational
+                      icon={RectangleEllipsis}
+                      title="Set up recovery codes"
+                      description="Save a backup way to sign in if you lose your authenticator."
+                    >
                       <Button
                         variant={isCodeActionPrimary ? 'primary' : 'default'}
                         onClick={onClick}
@@ -277,8 +275,8 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
                       >
                         Generate recovery codes
                       </Button>
-                    }
-                  />
+                    </EmptyStatePresentational>
+                  </>
                 ) : null
               }
             </GenerateRecoveryCodesModal>
@@ -294,7 +292,7 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
                     )
                       return null
                     const action = (
-                      <div className={codeFinding ? 'flex w-full @lg:w-auto' : 'flex w-fit'}>
+                      <div className="flex w-fit">
                         <Button
                           variant={isCodeActionPrimary ? 'primary' : 'default'}
                           className="flex-1 @lg:flex-none rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
@@ -319,39 +317,42 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
                         </DropdownMenu>
                       </div>
                     )
-                    if (codeFinding)
-                      return (
-                        <Admonition
-                          type={codeFinding.severity === 'critical' ? 'destructive' : 'warning'}
-                          layout="responsive"
-                          title={
-                            codeFinding.id === 'recovery-codes-exhausted'
-                              ? 'Recovery codes used up'
-                              : `${codes.remaining} of ${codes.total} recovery codes available`
-                          }
-                          description="Generate a new set before you need them to recover your account."
-                          actions={action}
-                        />
-                      )
                     return (
-                      <Card>
-                        <CardContent className="flex flex-wrap items-center justify-between gap-4">
-                          <div className="flex items-center gap-x-4">
-                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
-                              <RectangleEllipsis size={18} className="text-foreground-lighter" />
+                      <>
+                        {codeFinding && (
+                          <Admonition
+                            type={codeFinding.severity === 'critical' ? 'destructive' : 'warning'}
+                            title={
+                              codeFinding.id === 'recovery-codes-exhausted'
+                                ? 'Recovery codes used up'
+                                : `${codes.remaining} recovery ${codes.remaining === 1 ? 'code' : 'codes'} remaining`
+                            }
+                            description={
+                              codeFinding.id === 'recovery-codes-exhausted'
+                                ? 'Generate a new set so you have a backup way to sign in.'
+                                : 'Generate a new set before you need them to recover your account.'
+                            }
+                          />
+                        )}
+                        <Card>
+                          <CardContent className="flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex items-center gap-x-4">
+                              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+                                <RectangleEllipsis size={18} className="text-foreground-lighter" />
+                              </div>
+                              <div className="text-sm">
+                                <p>
+                                  {codes.remaining} of {codes.total} recovery codes available
+                                </p>
+                                <p className="text-foreground-lighter">
+                                  Each code can only be used once. Keep them somewhere safe.
+                                </p>
+                              </div>
                             </div>
-                            <div className="text-sm">
-                              <p>
-                                {codes.remaining} of {codes.total} recovery codes available
-                              </p>
-                              <p className="text-foreground-lighter">
-                                Each code can only be used once. Keep them somewhere safe.
-                              </p>
-                            </div>
-                          </div>
-                          {action}
-                        </CardContent>
-                      </Card>
+                            {action}
+                          </CardContent>
+                        </Card>
+                      </>
                     )
                   }}
                 </RegenerateFlow>

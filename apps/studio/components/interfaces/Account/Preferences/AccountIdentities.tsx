@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { Edit, Mail, Unlink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -147,7 +147,7 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
     if (message) toast.success(message)
   }, [message])
 
-  const renderMethods = (passwordRow?: ReactNode) => (
+  const renderMethods = () => (
     <Card>
       {isLoading && (
         <CardContent>
@@ -156,7 +156,6 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
       )}
       {isSuccess && (
         <div className="divide-y">
-          {passwordRow}
           {identities.map((identity) => {
             const { identity_id, provider } = identity
             const username = identity.identity_data?.user_name
@@ -280,16 +279,19 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
         {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
         {!!data?.email && (
           <AddPasswordRow email={data.email} isPrimary={primaryAction === 'set-password'}>
-            {({ onOpen, row }) => {
+            {({ onOpen }) => {
               if (!isSuccess || !showAddPasswordRow) return renderMethods()
-              if (!hasPasswordFinding) return renderMethods(row)
               return (
                 <>
                   <Admonition
-                    type="warning"
+                    type={hasPasswordFinding ? 'warning' : 'default'}
                     layout="responsive"
                     title="Add a password for email sign-in"
-                    description={`Use ${data.email} and a password as another way to sign in if you lose access to ${getProviderDisplay(identities[0]?.provider ?? '').displayName}.`}
+                    description={
+                      hasPasswordFinding
+                        ? `Use ${data.email} and a password as another way to sign in if you lose access to ${getProviderDisplay(identities[0]?.provider ?? '').displayName}.`
+                        : `Add a password to sign in with ${data.email}.`
+                    }
                     actions={
                       <Button
                         variant={primaryAction === 'set-password' ? 'primary' : 'default'}

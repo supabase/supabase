@@ -76,7 +76,8 @@ describe('account security MFA and recovery sections', () => {
     mock.getStatus.mockResolvedValue({ data: null, error: { code: 'mfa_factor_not_found' } })
     renderSection({ id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' })
     expect(await screen.findByText('No recovery codes')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Generate recovery codes' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Generate recovery codes' })).toHaveLength(1)
+    expect(screen.getByText('Set up recovery codes')).toBeInTheDocument()
     expect(screen.queryByText('Avoid being locked out')).not.toBeInTheDocument()
   })
 
@@ -94,7 +95,10 @@ describe('account security MFA and recovery sections', () => {
     expect(
       screen.getByText('Generate a new set before you need them to recover your account.')
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Regenerate' })).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Regenerate' })).toHaveLength(1)
+    expect(
+      screen.getByText('Each code can only be used once. Keep them somewhere safe.')
+    ).toBeInTheDocument()
   })
 
   it('shows exhausted codes and keeps removal in the options menu', async () => {
@@ -106,6 +110,11 @@ describe('account security MFA and recovery sections', () => {
       remainingCodes: 0,
     })
     expect(await screen.findByText('Recovery codes used up')).toBeInTheDocument()
+    expect(screen.getByText('0 of 10 recovery codes available')).toBeInTheDocument()
+    expect(
+      screen.getByText('Generate a new set so you have a backup way to sign in.')
+    ).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Regenerate' })).toHaveLength(1)
     expect(screen.queryByText('Remove')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Recovery code options' }))
     expect(await screen.findByRole('menuitem', { name: 'Remove codes' })).toBeInTheDocument()
@@ -122,7 +131,7 @@ describe('account security MFA and recovery sections', () => {
   it('shows a backup warning with one authenticator action', async () => {
     renderSection({ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' })
     expect(await screen.findByText('Add a backup authenticator')).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: 'Add authenticator' })).toHaveLength(1)
+    expect(await screen.findAllByRole('button', { name: 'Add authenticator' })).toHaveLength(1)
     expect(
       await screen.findByRole('button', { name: 'Remove Phone authenticator' })
     ).toBeInTheDocument()

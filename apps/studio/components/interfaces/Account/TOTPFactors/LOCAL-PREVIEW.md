@@ -14,3 +14,11 @@ Remove the query parameter to return to live MFA and recovery state.
 ## Cleanup
 
 When this preview is no longer needed, remove `RecoveryCodesPreview.utils.ts`, its tests, the preview-only flow, and the preview branches in `pages/account/security.tsx` and `TOTPFactors/index.tsx`. Remove this marker last.
+
+## Account Security layout decision
+
+Keep configured sign-in methods, authenticators and recovery-code counts in stable rows. Supplement those rows with contextual admonitions above them; do not move management controls into the warnings. Keep one action entry point rather than repeat the same button in the warning and row.
+
+An account email without a password is not a configured sign-in method. Offer password setup in an admonition outside the methods list. Keep the email icon and row styling for configured email sign-in.
+
+For exhausted codes, use: "Generate a new set so you have a backup way to sign in." The warning must not imply the user still has codes left.
