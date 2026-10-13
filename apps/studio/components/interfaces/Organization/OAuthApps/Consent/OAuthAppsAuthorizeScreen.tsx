@@ -93,7 +93,12 @@ export const OAuthAppsAuthorizeScreen = ({
     }
   )
 
-  const { data: appDetails, isPending: isPendingAppDetails } = useOAuthOrgAppDetailsQuery(
+  const {
+    data: appDetails,
+    isPending: isPendingAppDetails,
+    isError: isErrorAppDetails,
+    error: errorAppDetails,
+  } = useOAuthOrgAppDetailsQuery(
     {
       slug: memberOrg || '',
       appId: request.app_id,
@@ -185,6 +190,20 @@ export const OAuthAppsAuthorizeScreen = ({
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError subject="An error occurred while loading your data" error={identityError} />
+        </div>
+      </InterstitialLayout>
+    )
+  }
+
+  if (isErrorAppDetails) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
+      >
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError subject="An error occurred while loading your data" error={errorAppDetails} />
         </div>
       </InterstitialLayout>
     )
