@@ -1,23 +1,25 @@
 ---
 title: Current User Avatar
 description: Supabase Auth-aware avatar
+preview: |-
+  <BlockOverview name="current-user-avatar-nuxtjs" showFiles>
+    <ComponentPreview name="current-user-avatar-demo" showCode={false} />
+  </BlockOverview>
 ---
-
-<ComponentPreview name="current-user-avatar-demo" showCode={false} />
 
 ## Installation
 
-<BlockItem
-  name="current-user-avatar-nuxtjs"
-  description="Renders the avatar of the current user."
-  framework="vue"
-/>
+### Set up the Supabase client
 
-## Folder structure
+This block requires a Supabase client for Nuxt.js. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
 
-This block assumes that you have already installed a Supabase client for Vue from the previous step.
+<BlockItem name="supabase-client-nuxtjs" framework="vue" showOpenInV0={false} />
 
-<RegistryBlock itemName="current-user-avatar-nuxtjs" />
+Configure the environment variables described in the [Nuxt.js client guide](/library/docs/nuxtjs/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="current-user-avatar-nuxtjs" framework="vue" />
 
 ## Introduction
 

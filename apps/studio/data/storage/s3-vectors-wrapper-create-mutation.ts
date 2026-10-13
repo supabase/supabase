@@ -6,7 +6,6 @@ import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import { getVectorURI } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
 import {
-  getVectorBucketFDWName,
   getVectorBucketFDWServerName,
   getVectorBucketS3KeyName,
 } from '@/components/interfaces/Storage/VectorBuckets/VectorBuckets.utils'
@@ -74,7 +73,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
       )
     }
 
-    const wrapperName = getVectorBucketFDWName(bucketName)
     const serverName = getVectorBucketFDWServerName(bucketName)
 
     const params: FDWCreateVariables = {
@@ -82,7 +80,6 @@ export const useS3VectorsWrapperCreateMutation = () => {
       connectionString: project?.connectionString,
       wrapperMeta: wrapperMeta!,
       formState: {
-        wrapper_name: wrapperName,
         server_name: serverName,
         vault_access_key_id: accessKey,
         vault_secret_access_key: secretKey,

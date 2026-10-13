@@ -3,8 +3,12 @@ import { Table, TableBody } from 'ui'
 
 import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
 import type { BucketsTablePaginationProps } from './BucketsTable.types'
-import { BucketTableHeader, BucketTableRow } from './BucketTable'
-import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import {
+  BucketTableEmptyState,
+  BucketTableHeader,
+  BucketTableRow,
+  useVersioningColumnSpan,
+} from './BucketTable'
 import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
 import { Bucket } from '@/data/storage/buckets-query'
 
@@ -41,6 +45,7 @@ const BucketsTableUnvirtualized = ({
   pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+  const versioningColumnSpan = useVersioningColumnSpan()
 
   return (
     <Table
@@ -52,11 +57,7 @@ const BucketsTableUnvirtualized = ({
       <BucketTableHeader mode="standard" hasBuckets={buckets.length > 0} />
       <TableBody>
         {showSearchEmptyState ? (
-          <TableRowNoResults
-            className="[&>td]:hover:bg-inherit"
-            colSpan={5}
-            search={filterString}
-          />
+          <BucketTableEmptyState mode="standard" filterString={filterString} />
         ) : (
           buckets.map((bucket) => (
             <BucketTableRow
@@ -70,7 +71,7 @@ const BucketsTableUnvirtualized = ({
         )}
         <LoadMoreRow
           mode="standard"
-          colSpan={6}
+          colSpan={6 + versioningColumnSpan}
           hasMore={hasMore}
           isLoadingMore={isLoadingMore}
           onLoadMore={onLoadMore}
@@ -88,6 +89,7 @@ const BucketsTableVirtualized = ({
   pagination: { hasMore = false, isLoadingMore = false, onLoadMore },
 }: BucketsTableProps) => {
   const showSearchEmptyState = buckets.length === 0 && filterString.length > 0
+  const versioningColumnSpan = useVersioningColumnSpan()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   return (
@@ -99,20 +101,16 @@ const BucketsTableVirtualized = ({
     >
       <BucketTableHeader mode="virtualized" hasBuckets={buckets.length > 0} />
       <VirtualizedTableBody<Bucket>
-        paddingColSpan={5}
+        paddingColSpan={5 + versioningColumnSpan}
         emptyContent={
           showSearchEmptyState ? (
-            <TableRowNoResults
-              className="[&>td]:hover:bg-inherit"
-              colSpan={5}
-              search={filterString}
-            />
+            <BucketTableEmptyState mode="virtualized" filterString={filterString} />
           ) : undefined
         }
         trailingContent={
           <LoadMoreRow
             mode="virtualized"
-            colSpan={6}
+            colSpan={6 + versioningColumnSpan}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             onLoadMore={onLoadMore}

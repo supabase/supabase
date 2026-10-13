@@ -147,7 +147,7 @@ describe('filterToolsByOptInLevel', () => {
 
     return (
       parsedResult.success &&
-      parsedResult.data.status.includes("You don't have permission to use this tool")
+      parsedResult.data.status.includes('This tool needs a higher opt-in level')
     )
   }
 
@@ -233,7 +233,7 @@ describe('createPrivacyMessageTool', () => {
     expect(privacyTool.toModelOutput).toBeUndefined()
 
     const result = await privacyTool.execute({}, {})
-    expect(result.status).toContain("You don't have permission to use this tool")
+    expect(result.status).toContain('This tool needs a higher opt-in level')
     expect(result.status).toContain('third-party AI providers')
   })
 })

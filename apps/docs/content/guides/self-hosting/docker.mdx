@@ -326,10 +326,11 @@ To change the database password, read [Changing database password](#changing-dat
 
 ## Accessing Edge Functions
 
-Edge Functions live in `volumes/functions`. The default setup includes a `hello` function you can invoke with `curl`:
+Edge Functions live in `volumes/functions`. The default setup includes a `hello` function you can invoke with `curl`. It requires your publishable or secret key in the `apikey` header:
 
 ```sh
-curl http://<your-domain>:8000/functions/v1/hello
+curl http://<your-domain>:8000/functions/v1/hello \
+  --header 'apikey: <SUPABASE_PUBLISHABLE_KEY>'
 ```
 
 Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart the service to pick them up:

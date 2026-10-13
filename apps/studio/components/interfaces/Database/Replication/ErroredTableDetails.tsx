@@ -30,7 +30,7 @@ export const ErroredTableDetails = ({ table }: ErroredTableDetailsProps) => {
           Needs{' '}
           <InlineLink
             className="text-foreground-lighter hover:text-foreground"
-            href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&error=${encodeURIComponent(state.reason ?? '')}`}
+            href={`/support?projectRef=${projectRef}&category=dashboard_bug&subject=Database%20replication%20error&errorMessage=${encodeURIComponent(state.reason ?? '')}`}
           >
             support
           </InlineLink>

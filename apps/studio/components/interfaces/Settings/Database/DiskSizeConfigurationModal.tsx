@@ -180,16 +180,16 @@ const DiskSizeConfigurationModal = ({
                 <DialogSection className="w-full space-y-4">
                   <Alert variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
                     <Info size={16} />
-                    <AlertTitle>
-                      Disk modifications are limited to 4 per rolling 24-hour window
-                    </AlertTitle>
+                    <AlertTitle>This operation is only possible every 4 hours</AlertTitle>
                     <AlertDescription>
                       <div className="mb-4">
                         {isAbleToResizeDatabase
-                          ? `You can modify disk attributes up to 4 times within a rolling 24-hour window. A new modification can be started as soon as the previous one completes.`
+                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
+                              'DD MMM YYYY, HH:mm (ZZ)'
+                            )}`
                           : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
                               'DD MMM YYYY, HH:mm (ZZ)'
-                            )}. You've reached the disk modification limit for now — you can resize again in approximately ${formattedTimeTillNextAvailableResize}.`}
+                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
                       </div>
                       <Button asChild iconRight={<ExternalLink size={14} />}>
                         <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>

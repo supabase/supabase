@@ -5,6 +5,7 @@ import {
   type LanguageModel,
   type ModelMessage,
   type SystemModelMessage,
+  type TimeoutConfiguration,
   type ToolSet,
   type UIMessage,
 } from 'ai'
@@ -47,7 +48,9 @@ export async function generateAssistantResponse({
   systemProviderOptions,
   providerOptions,
   requestedModel,
+  effectiveModel,
   abortSignal,
+  timeout,
   onSpanCreated,
 }: {
   messages: UIMessage[]
@@ -69,9 +72,12 @@ export async function generateAssistantResponse({
   includesLogsSnippets?: boolean
   isExplorerEnabled?: boolean
   requestedModel?: string
+  /** The model actually used after entitlement/throttle fallback. */
+  effectiveModel?: string
   systemProviderOptions?: Record<string, any>
   providerOptions?: Record<string, any>
   abortSignal?: AbortSignal
+  timeout?: TimeoutConfiguration<ToolSet>
   onSpanCreated?: (spanId: string) => void
 }) {
   const shouldTrace = allowTracing ?? IS_TRACING_ENABLED
@@ -126,14 +132,24 @@ export async function generateAssistantResponse({
 
     const streamTextFn = shouldTrace ? tracedStreamText : ai.streamText
 
+    // onEnd still fires after an abort once a step has finished, so end the span only once.
+    let isSpanEnded = false
+    const endSpan = (metadata: Record<string, unknown>) => {
+      if (!span || isSpanEnded) return
+      isSpanEnded = true
+      span.log({ metadata })
+      span.end()
+    }
+
     return streamTextFn({
       model,
       instructions: systemMessage,
-      stopWhen: isStepCount(10),
+      stopWhen: isStepCount(20),
       messages: coreMessages,
       ...(providerOptions && { providerOptions }),
       tools,
       ...(abortSignal && { abortSignal }),
+      ...(timeout && { timeout }),
       ...(span && {
         onEnd: ({ steps, finishReason }) => {
           const metadata: Record<string, unknown> = {
@@ -147,8 +163,12 @@ export async function generateAssistantResponse({
               }
             }
           }
-          span.log({ metadata })
-          span.end()
+          endSpan(metadata)
+        },
+        // The call aborts on either the request signal or `timeout`, so an unaborted
+        // request signal means the deadline stopped it.
+        onAbort: () => {
+          endSpan({ isAborted: true, isTimedOut: !abortSignal?.aborted })
         },
       }),
     } satisfies Parameters<typeof ai.streamText>[0])
@@ -179,6 +199,7 @@ export async function generateAssistantResponse({
         planId,
         isHighComplianceProject,
         requestedModel,
+        effectiveModel,
         gitBranch: process.env.VERCEL_GIT_COMMIT_REF,
         environment: process.env.NEXT_PUBLIC_ENVIRONMENT,
       },

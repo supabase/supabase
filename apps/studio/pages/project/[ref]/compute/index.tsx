@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { RefreshCw } from 'lucide-react'
+import { ExternalLink, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -79,8 +79,20 @@ const ComputePage: NextPageWithLayout = () => {
             {isNotEnrolled && (
               <Admonition
                 type="default"
-                title={`${PRODUCT_NAME} is not enabled for this project`}
-                description={`${PRODUCT_NAME} is in Private Alpha. Contact support to have this project added to the alpha.`}
+                layout="horizontal"
+                title={`You don't have access to ${PRODUCT_NAME} yet`}
+                description="Join the waitlist to get early access."
+                actions={
+                  <Button asChild icon={<ExternalLink />}>
+                    <a
+                      href="https://supabase.com/compute"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Join waitlist
+                    </a>
+                  </Button>
+                }
               />
             )}
             {isMissingPermission && (

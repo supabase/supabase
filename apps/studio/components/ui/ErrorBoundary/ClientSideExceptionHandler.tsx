@@ -86,7 +86,7 @@ export const ClientSideExceptionHandler = ({
               category: SupportCategories.DASHBOARD_BUG,
               subject: 'Client side exception occurred on dashboard',
               sid: sentryIssueId,
-              error: urlMessage,
+              errorMessage: urlMessage,
             }}
           >
             Contact support

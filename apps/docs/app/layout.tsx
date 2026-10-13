@@ -19,13 +19,16 @@ const { metadataApplicationName, metadataTitle } = getCustomContent([
   'metadata:title',
 ])
 
+const FAVICON_ROUTE = process.env.NODE_ENV === 'development' ? '/favicon/local' : '/favicon'
+
 const metadata: Metadata = {
   applicationName: metadataApplicationName,
   title: metadataTitle,
   description:
     'Supabase is the Postgres development platform providing all the backend features you need to build a product.',
   metadataBase: new URL('https://supabase.com'),
-  icons: genFaviconData(BASE_PATH),
+  icons: genFaviconData(BASE_PATH, FAVICON_ROUTE),
+  manifest: `${BASE_PATH}${FAVICON_ROUTE}/manifest.json`,
   robots: {
     index: IS_PRODUCTION,
     follow: IS_PRODUCTION,

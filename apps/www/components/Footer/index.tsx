@@ -24,6 +24,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 interface Props {
   className?: string
@@ -231,7 +232,7 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              link.url.startsWith('https') || isCrossZoneHref(link.url) ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
                                 <Link href={link.url}>{children}</Link>

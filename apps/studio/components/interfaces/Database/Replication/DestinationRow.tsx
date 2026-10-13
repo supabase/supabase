@@ -3,7 +3,7 @@ import { ChevronRight, Minus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { TableCell, TableRow } from 'ui'
+import { cn, TableCell, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
@@ -50,9 +50,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     error: pipelineError,
     isPending: isPipelineLoading,
     isError: isPipelineError,
-    isSuccess: isPipelineSuccess,
   } = pipelineFetcher
-  const destinationName = destination?.name ?? ''
+  const destinationName = destination?.name ?? pipeline?.destination_name ?? ''
 
   const {
     error: pipelineStatusError,
@@ -134,8 +133,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     }
   }
 
-  // Five distinct states, so early returns rather than a ternary chain. The row only renders once
-  // a pipeline exists, so there is no "no pipeline" case to handle here.
+  // Five distinct states, so early returns rather than a ternary chain.
   const renderLag = () => {
     if (isReplicationStatusLoading) return <ShimmeringLoader />
     if (isInitialSyncRunning)
@@ -161,39 +159,41 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
           </TableCell>
         </TableRow>
       )}
-      {isPipelineSuccess && pipeline && (
+      {(isPipelineLoading || pipeline) && (
         <TableRow
-          className="relative cursor-pointer focus-inset"
+          className={cn('relative', pipeline && 'cursor-pointer focus-inset')}
           onClick={handleNavigation}
           onAuxClick={handleNavigation}
           onKeyDown={handleNavigation}
-          tabIndex={0}
+          tabIndex={pipeline ? 0 : undefined}
         >
           <TableCell className="!pr-1">
             {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
           </TableCell>
 
           <TableCell className="max-w-[180px]">
-            {isPipelineLoading ? (
+            {isPipelineLoading && !destinationName ? (
               <ShimmeringLoader />
             ) : (
               <div className="flex flex-col gap-y-0.5">
                 <p className="text-sm font-medium text-foreground truncate">
                   {destinationName || type}
                 </p>
-                <DetailSubtext className="flex items-center gap-x-1.5">
-                  <span>#{pipeline?.id}</span>
-                  <span aria-hidden>&middot;</span>
-                  <span>{type}</span>
-                  {hasTableErrors && (
-                    <>
-                      <span aria-hidden>&middot;</span>
-                      <span className="text-destructive">
-                        {errorCount} table error{errorCount === 1 ? '' : 's'}
-                      </span>
-                    </>
-                  )}
-                </DetailSubtext>
+                {pipeline && (
+                  <DetailSubtext className="flex items-center gap-x-1.5">
+                    <span>#{pipeline.id}</span>
+                    <span aria-hidden>&middot;</span>
+                    <span>{type}</span>
+                    {hasTableErrors && (
+                      <>
+                        <span aria-hidden>&middot;</span>
+                        <span className="text-destructive">
+                          {errorCount} table error{errorCount === 1 ? '' : 's'}
+                        </span>
+                      </>
+                    )}
+                  </DetailSubtext>
+                )}
               </div>
             )}
           </TableCell>
@@ -232,32 +232,38 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
 
           <TableCell>
             <div className="flex items-center justify-end gap-x-2">
-              <div
-                onClick={(event) => event.stopPropagation()}
-                onAuxClick={(event) => event.stopPropagation()}
-                onKeyDown={(event) => event.stopPropagation()}
-              >
-                <RowMenu
-                  destinationId={destinationId}
-                  pipeline={pipeline}
-                  pipelineStatus={pipelineStatus?.status}
-                  error={pipelineStatusError}
-                  isLoading={isPipelineStatusLoading}
-                  isError={isPipelineStatusError}
-                  onDeleteClick={() => setShowDeleteDestinationForm(true)}
-                  hasUpdate={hasUpdate}
-                  onUpdateClick={() => setShowUpdateVersionModal(true)}
-                />
-              </div>
-              <ChevronRight
-                size={16}
-                strokeWidth={1.5}
-                className="text-foreground-lighter"
-                aria-hidden
-              />
-              <button tabIndex={-1} className="sr-only">
-                Go to pipeline details
-              </button>
+              {pipeline ? (
+                <>
+                  <div
+                    onClick={(event) => event.stopPropagation()}
+                    onAuxClick={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => event.stopPropagation()}
+                  >
+                    <RowMenu
+                      destinationId={destinationId}
+                      pipeline={pipeline}
+                      pipelineStatus={pipelineStatus?.status}
+                      error={pipelineStatusError}
+                      isLoading={isPipelineStatusLoading}
+                      isError={isPipelineStatusError}
+                      onDeleteClick={() => setShowDeleteDestinationForm(true)}
+                      hasUpdate={hasUpdate}
+                      onUpdateClick={() => setShowUpdateVersionModal(true)}
+                    />
+                  </div>
+                  <ChevronRight
+                    size={16}
+                    strokeWidth={1.5}
+                    className="text-foreground-lighter"
+                    aria-hidden
+                  />
+                  <button tabIndex={-1} className="sr-only">
+                    Go to pipeline details
+                  </button>
+                </>
+              ) : (
+                <ShimmeringLoader className="h-6 w-6 py-0" />
+              )}
             </div>
           </TableCell>
         </TableRow>

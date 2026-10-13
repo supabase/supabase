@@ -6,6 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { useDestinationForm } from './useDestinationForm'
+import { useDestinationValidation } from './useDestinationValidation'
 import { replicationKeys } from '@/data/replication/keys'
 import {
   PipelineRequestStatusProvider,
@@ -18,6 +19,8 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 type ValidationResponse = components['schemas']['ValidatePipelineResponse_Output']
 const updateRequests: unknown[] = []
 const validationRequests: unknown[] = []
+const destinationRequests: unknown[] = []
+let destinationResponse: ValidationResponse
 const startRequests = vi.fn()
 const createRequests = vi.fn()
 let validationResponse: ValidationResponse
@@ -71,6 +74,8 @@ describe('useDestinationForm', () => {
     })
     updateRequests.length = 0
     validationRequests.length = 0
+    destinationRequests.length = 0
+    destinationResponse = { validation_failures: [] }
     startRequests.mockClear()
     createRequests.mockClear()
     validationResponse = { validation_failures: [] }
@@ -105,10 +110,12 @@ describe('useDestinationForm', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/replication/:ref/destinations/validate',
-      response: () =>
-        HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
-          validation_failures: [],
-        }),
+      response: async ({ request }) => {
+        destinationRequests.push(await request.json())
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>(
+          destinationResponse
+        )
+      },
     })
     addAPIMock({
       method: 'post',
@@ -178,6 +185,151 @@ describe('useDestinationForm', () => {
         }),
       }),
     ])
+  })
+
+  it('sends the same pipeline settings to both validation endpoints', async () => {
+    const expectedPipelineConfig = {
+      publication_name: 'analytics',
+      table_sync_copy: { type: 'include_tables', table_ids: [101] },
+      batch: { max_fill_ms: 500 },
+      max_table_sync_workers: 4,
+      max_copy_connections_per_table: 1,
+    }
+    const { result } = await renderDestinationForm()
+    await act(async () => {
+      await result.current.validateConfiguration({
+        data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+        onValidationFail: vi.fn(),
+      })
+    })
+    expect(destinationRequests).toEqual([
+      {
+        config: {
+          big_query: {
+            project_id: 'example-project',
+            dataset_id: 'analytics',
+            service_account_key: '{"type":"service_account"}',
+            connection_pool_size: 5,
+            max_staleness_mins: 0,
+          },
+        },
+        source_id: 42,
+        pipeline_config: expectedPipelineConfig,
+      },
+    ])
+    expect(validationRequests).toEqual([{ source_id: 42, config: expectedPipelineConfig }])
+  })
+
+  it.each<{ failure_type: 'critical' | 'warning' }>([
+    { failure_type: 'critical' },
+    { failure_type: 'warning' },
+  ])('preserves destination $failure_type handling', async ({ failure_type }) => {
+    const failure = { failure_type, name: 'Connection issue', reason: 'Check credentials.' }
+    destinationResponse = { validation_failures: [failure] }
+    const onValidationFail = vi.fn()
+    const { result } = await renderDestinationForm()
+    await act(async () => {
+      expect(
+        await result.current.validateConfiguration({
+          data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+          onValidationFail,
+        })
+      ).toEqual({
+        canContinue: failure_type === 'warning',
+        warnings: failure_type === 'warning' ? [failure] : [],
+      })
+    })
+    expect(result.current.destinationValidationFailures).toEqual([failure])
+    expect(onValidationFail).toHaveBeenCalledOnce()
+    act(() => result.current.resetValidation())
+    expect(result.current.hasRunValidation).toBe(false)
+    expect(result.current.destinationValidationFailures).toEqual([])
+  })
+
+  it('recovers after a destination validation request fails', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 503 }),
+    })
+    const { result } = await renderDestinationForm()
+    const onValidationFail = vi.fn()
+    const options = {
+      data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+      onValidationFail,
+    }
+    await act(async () => {
+      expect(await result.current.validateConfiguration(options)).toEqual({
+        canContinue: false,
+        warnings: [],
+      })
+    })
+    expect(result.current.hasRunValidation).toBe(false)
+    expect(onValidationFail).not.toHaveBeenCalled()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: () => HttpResponse.json<ValidationResponse>({ validation_failures: [] }),
+    })
+    await act(async () => {
+      expect(await result.current.validateConfiguration(options)).toEqual({
+        canContinue: true,
+        warnings: [],
+      })
+    })
+    expect(result.current.hasRunValidation).toBe(true)
+    expect(result.current.destinationValidationFailures).toEqual([])
+  })
+
+  it('reports destination validation as pending until the request completes', async () => {
+    const response = Promise.withResolvers<void>()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async () => {
+        await response.promise
+        return HttpResponse.json<ValidationResponse>({ validation_failures: [] })
+      },
+    })
+    const { result } = customRenderHook(() =>
+      useDestinationValidation({ projectRef: 'default', selectedType: 'BigQuery' })
+    )
+    let request: Promise<ValidationResponse>
+    act(() => {
+      request = result.current.validateDestination({
+        data: { ...formData, serviceAccountKey: '{}' },
+      })
+    })
+    await waitFor(() => expect(result.current.isValidatingDestination).toBe(true))
+    await act(async () => {
+      response.resolve()
+      await request
+    })
+    await waitFor(() => expect(result.current.isValidatingDestination).toBe(false))
+  })
+
+  it('validates a connection without source or pipeline settings', async () => {
+    const { result } = customRenderHook(() =>
+      useDestinationValidation({ projectRef: 'default', selectedType: 'BigQuery' })
+    )
+    await act(async () => {
+      expect(
+        await result.current.validateDestination({
+          data: { ...formData, serviceAccountKey: '{"type":"service_account"}' },
+        })
+      ).toEqual({ validation_failures: [] })
+    })
+    expect(destinationRequests).toEqual([
+      {
+        config: expect.objectContaining({
+          big_query: expect.objectContaining({
+            project_id: 'example-project',
+            dataset_id: 'analytics',
+          }),
+        }),
+      },
+    ])
+    expect(validationRequests).toEqual([])
   })
 
   it('blocks creation when pipeline validation returns a critical failure', async () => {

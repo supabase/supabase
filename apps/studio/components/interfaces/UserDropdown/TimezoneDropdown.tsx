@@ -15,7 +15,11 @@ import {
   ScrollArea,
 } from 'ui'
 
-import { findTimezoneByIana, TIMEZONES_BY_IANA } from '@/lib/constants/timezones'
+import {
+  getTimezoneLabel,
+  getTimezoneLabelByIana,
+  TIMEZONES_BY_IANA,
+} from '@/lib/constants/timezones'
 import { useTimezone } from '@/lib/datetime'
 import { guessLocalTimezone } from '@/lib/dayjs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -33,7 +37,7 @@ export const TimezoneDropdown = () => {
   const browserTimezone = useMemo(() => guessLocalTimezone(), [])
 
   const triggerLabel = useMemo(() => {
-    return findTimezoneByIana(timezone)?.text ?? timezone
+    return getTimezoneLabelByIana(timezone)
   }, [timezone])
 
   const handleSelect = (nextStored: string) => {
@@ -87,7 +91,7 @@ export const TimezoneDropdown = () => {
                     value="UTC Coordinated Universal Time"
                     onSelect={() => handleSelect('UTC')}
                   >
-                    {'(UTC) Coordinated Universal Time'}
+                    {'(UTC+00:00) Coordinated Universal Time'}
                     <CheckIcon
                       className={cn(
                         'ml-auto h-4 w-4',
@@ -103,10 +107,10 @@ export const TimezoneDropdown = () => {
                         key={ianaName}
                         // CommandItem matches against the `value` prop for the input filter — include
                         // both the human label and the IANA name so search works for either.
-                        value={`${entry.text} ${ianaName}`}
+                        value={`${getTimezoneLabel(entry)} ${ianaName}`}
                         onSelect={() => handleSelect(ianaName)}
                       >
-                        {entry.text}
+                        {getTimezoneLabel(entry)}
                         <CheckIcon
                           className={cn(
                             'ml-auto h-4 w-4',

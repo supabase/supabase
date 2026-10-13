@@ -19,12 +19,12 @@ import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
-import StepHikeCompact from '~/components/StepHikeCompact'
+import { StepHikeCompact } from '~/components/StepHikeCompact'
 import Table from '~/components/Table'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
 import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
-import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
@@ -87,6 +87,7 @@ const components = {
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  CodeTabs,
   ComputeDiskLimitsTable,
   CustomContent,
   ContentListings,

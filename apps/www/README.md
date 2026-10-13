@@ -6,6 +6,25 @@ Refer to the [Development Guide](../../DEVELOPERS.md) to learn how to run this s
 
 To get started copy the example env file using `cp .env.local.example .env.local`.
 
+## Production builds
+
+Run `pnpm build` from `apps/www`, or `pnpm build --filter=www` from the repository
+root. Vercel uses the app's `build` script by default.
+
+`prebuild` refreshes remote content before Turbo hashes it. Turbo caches
+`build:next` (Next.js, sitemaps, and the customer RSS feed), then `postbuild`
+uploads assets even on cache hits. The outer `build` task stays uncached so
+neither preparation nor upload can be skipped. Uploads run after caching because
+the upload script removes `.next/static`.
+
+Production cache reuse requires the same commit and inputs: CDN URLs include
+`VERCEL_GIT_COMMIT_SHA`. Set `FORCE_ASSET_CDN=-1` to disable local uploads.
+Running `build:next` directly skips content preparation and uploads.
+
+Run `pnpm exec vitest run turbo-build.test.ts` to check cache invalidation and
+asset restoration using real pnpm, Turbo, and the upload script with fixture
+generators, a stub compiler, and a fake AWS CLI.
+
 ## Best practices
 
 ### Images

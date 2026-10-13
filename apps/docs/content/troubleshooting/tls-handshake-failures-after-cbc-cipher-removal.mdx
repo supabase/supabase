@@ -1,0 +1,56 @@
+---
+title = "TLS handshake failures after removal of CBC-mode ciphers"
+topics = [ "platform" ]
+keywords = [ "tls", "ssl", "cipher", "cbc", "handshake", "https", "custom domain", "deprecation" ]
+
+[[errors]]
+message = "sslv3 alert handshake failure"
+
+[[errors]]
+message = "ERR_SSL_VERSION_OR_CIPHER_MISMATCH"
+
+[[errors]]
+message = "The request was aborted: Could not create SSL/TLS secure channel."
+
+[[errors]]
+message = "javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure"
+
+[[errors]]
+message = "An SSL error has occurred and a secure connection to the server cannot be made."
+---
+
+Supabase will remove four cipher block chaining (CBC) mode cipher suites from TLS 1.2 on project APIs, on November 10, 2026 at the earliest. After the removal, clients that support only these ciphers can't connect to Auth, the Data API, Storage, Realtime, or Edge Functions. The removal applies to `<project_ref>.supabase.co` and to custom domains.
+
+Direct Postgres connections, connections through the pooler, and the Management API aren't affected.
+
+## Symptoms
+
+The client fails during the TLS handshake, before it sends any HTTP request, so the request doesn't appear in your project's API logs. Clients on up-to-date devices keep working.
+
+The error message depends on the client:
+
+| Client                                               | Error message                                                                     |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| OpenSSL-based clients, such as curl, Node.js, or PHP | `sslv3 alert handshake failure`                                                   |
+| Browsers                                             | `ERR_SSL_VERSION_OR_CIPHER_MISMATCH`                                              |
+| Windows PowerShell and .NET Framework                | `The request was aborted: Could not create SSL/TLS secure channel.`               |
+| Java                                                 | `javax.net.ssl.SSLHandshakeException: Received fatal alert: handshake_failure`    |
+| Apple platforms                                      | `An SSL error has occurred and a secure connection to the server cannot be made.` |
+
+## Cause
+
+The client can't use TLS 1.3, and the only TLS 1.2 cipher suites it shares with project APIs are the removed CBC-mode ones. This error usually means the client runs end-of-life software, such as an unsupported operating system or an embedded device that no longer receives updates. For the full list of removed and supported cipher suites, see [TLS for project APIs](/docs/guides/security/tls).
+
+If you see these errors before the removal date, the CBC-mode removal isn't the cause. For example, project APIs don't support TLS 1.0 or TLS 1.1, so clients limited to those versions can't connect at all.
+
+## Diagnose the client
+
+Check the TLS configuration your application actually uses: its operating system, runtime, and TLS library versions, and any TLS version or cipher suite settings in your code or configuration. A client that connects with TLS 1.3 isn't affected by the removal, whatever TLS 1.2 cipher suites it supports.
+
+## Fix the client
+
+Update the client's operating system, runtime, or TLS library to a version that supports TLS 1.3 or a supported TLS 1.2 cipher suite.
+
+If you can't update a client, route its traffic through a proxy that you control. The proxy accepts the client's ciphers and forwards requests to Supabase over a supported TLS connection.
+
+If you can't update the client or add a proxy, [open a support ticket](/dashboard/support/new).

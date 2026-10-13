@@ -9,7 +9,10 @@ export const getResourcesExceededLimitsOrg = (usageMetrics: OrgMetricsUsage[]): 
         !usageMetric.capped ||
         !usageMetric.available_in_plan ||
         usageMetric.unlimited ||
-        usageMetric.metric === 'DISK_IOPS_GP3'
+        usageMetric.metric === 'DISK_IOPS_GP3' ||
+        // Log metrics should not trigger the exceeded limits alert for now (soft rollout)
+        usageMetric.metric === 'LOG_INGESTION' ||
+        usageMetric.metric === 'LOG_QUERYING'
       ) {
         return false
       }

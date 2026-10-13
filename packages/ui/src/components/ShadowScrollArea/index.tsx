@@ -57,10 +57,15 @@ const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>
             'w-full overflow-auto',
             stickyLastColumn && [
               '[&_tr>*:last-child]:sticky [&_tr>*:last-child]:z-38 [&_tr>*:last-child]:right-0',
-              '[&_tr:hover>*:last-child]:bg-transparent',
-              '[&_th>*:last-child]:bg-surface-100',
+              // Sticky cells need an opaque base. `bg-surface-200` / `--muted` is alpha-based,
+              // so using it alone lets scrolled row content show through on hover. Keep the
+              // opaque surface-100 base and composite muted via background-image so hover
+              // matches TableRow without becoming transparent.
+              '[&_td:last-child]:bg-surface-100',
+              '[&_tr:hover>td:last-child]:!bg-surface-100',
+              '[&_tr:hover>td:last-child]:![background-image:linear-gradient(var(--background-surface-200),var(--background-surface-200))]',
+              '[&_th:last-child]:bg-200',
               stickyColumnShadow,
-              hasHorizontalScroll && '[&_tr:hover>td:last-child]:!bg-surface-200',
             ],
             canScrollRight &&
               '[&_td]:before:opacity-100 [&_tr>*:last-child]:before:opacity-100 [&_th:last-child]:before:opacity-100',

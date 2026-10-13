@@ -1,5 +1,5 @@
 import { InfiniteData, keepPreviousData, useInfiniteQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
+import { useFeatureFlags } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -28,6 +28,11 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 export type UnifiedLogsData = any
 export type UnifiedLogsError = ResponseError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
+
+export const useUnifiedLogsBackend = () => {
+  const { otelUnifiedLogs = true } = useFeatureFlags().configcat
+  return typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+}
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
@@ -152,12 +157,11 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     PageParam | null
   > = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   return useInfiniteQuery({
     queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
-    queryFn: ({ signal, pageParam }) => {
-      return getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal)
-    },
+    queryFn: ({ signal, pageParam }) =>
+      getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     getPreviousPageParam: (firstPage) => {

@@ -46,7 +46,7 @@ const page: GoPageInput = {
           </ol>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <Button asChild size="medium">
-              <Link href="https://supabase.com/dashboard">Create your Supabase account</Link>
+              <a href="https://supabase.com/dashboard">Create your Supabase account</a>
             </Button>
             <Button asChild variant="outline" size="medium">
               <Link href="https://dreambase.ai">Sign up for Dreambase</Link>

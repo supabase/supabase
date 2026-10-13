@@ -58,7 +58,7 @@ export const scopedIntrospectionReady = (): Promise<void> => {
  */
 export const useSyncScopedIntrospection = () => {
   const { hasLoaded } = useFeatureFlags()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   useEffect(() => {
     setScopedIntrospection(scoped)

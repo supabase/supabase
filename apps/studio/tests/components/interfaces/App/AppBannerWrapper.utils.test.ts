@@ -35,10 +35,16 @@ describe('isOrganizationLandingPath', () => {
     expect(isOrganizationLandingPath(pathname)).toBe(true)
   })
 
-  test.each([undefined, null, '', '/project/abc', '/org/my-org/general', '/organizations/new'])(
-    'does not match %s',
-    (pathname) => {
-      expect(isOrganizationLandingPath(pathname)).toBe(false)
-    }
-  )
+  test.each([
+    undefined,
+    null,
+    '',
+    '/',
+    '/sign-in',
+    '/project/abc',
+    '/org/abc/general',
+    '/organizations/new',
+  ])('does not match %s', (pathname) => {
+    expect(isOrganizationLandingPath(pathname)).toBe(false)
+  })
 })

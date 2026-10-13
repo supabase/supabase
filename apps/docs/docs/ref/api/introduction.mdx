@@ -22,9 +22,9 @@ hideTitle: true
       There are two ways to generate an access token:
 
       1. **Personal access token (PAT):**
-      PATs are tokens with a custom expiry that you manually generate to access the Management API. They are useful for automating workflows or developing against the Management API. PATs carry the same privileges as your user account, so be sure to keep it secret.
+      PATs are tokens with a custom expiry that you manually generate to access the Management API. They are useful for automating workflows or developing against the Management API. A scoped PAT can only reach the organizations, projects, and permissions you choose when creating it. A classic PAT, shown as Legacy in the dashboard, carries the same privileges as your user account. Prefer scoped PATs, and keep every token secret.
 
-          To generate or manage your personal access tokens, visit your [account](/dashboard/account/tokens) page.
+          To generate or manage your personal access tokens, visit your [account](/dashboard/account/tokens) page. See [Personal access tokens](/docs/guides/platform/personal-access-tokens) for the permission each endpoint requires.
 
       2. **OAuth2:**
       OAuth2 allows your application to generate tokens on behalf of a Supabase user, providing secure and limited access to their account without requiring their credentials. Use this if you're building a third-party app that needs to create or manage Supabase projects on behalf of your users. Tokens generated via OAuth2 are short-lived and tied to specific scopes to ensure your app can only perform actions that are explicitly approved by the user.

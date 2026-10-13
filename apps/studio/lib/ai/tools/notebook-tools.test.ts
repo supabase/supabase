@@ -362,6 +362,7 @@ describe('ai/tools/notebook-tools', () => {
         id: 'notebook-1',
         name: 'Signup funnel',
         updated_at: '2026-01-01T00:00:00.000Z',
+        optInLevel: 'schema_and_log_and_data',
         cells: [
           {
             cell_id: 'primary-cell',
@@ -408,6 +409,7 @@ describe('ai/tools/notebook-tools', () => {
         id: 'notebook-1',
         name: 'Signup funnel',
         updated_at: '2026-01-01T00:00:00.000Z',
+        optInLevel: 'schema_and_log_and_data',
         cells: [
           {
             cell_id: 'database-cell',

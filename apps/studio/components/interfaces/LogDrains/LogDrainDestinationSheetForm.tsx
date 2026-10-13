@@ -111,18 +111,6 @@ const lokiSubmitSchema = z.object({
   headers: headerRecordSchema,
 })
 
-const postgresSchema = z.object({
-  type: z.literal('postgres'),
-})
-
-const bigquerySchema = z.object({
-  type: z.literal('bigquery'),
-})
-
-const clickhouseSchema = z.object({
-  type: z.literal('clickhouse'),
-})
-
 const s3Schema = z.object({
   type: z.literal('s3'),
   s3_bucket: z.string().min(1, { message: 'Bucket name is required' }),
@@ -197,9 +185,6 @@ const formUnion = z.discriminatedUnion('type', [
   webhookFormSchema,
   datadogSchema,
   lokiFormSchema,
-  postgresSchema,
-  bigquerySchema,
-  clickhouseSchema,
   s3Schema,
   sentrySchema,
   axiomSchema,
@@ -212,9 +197,6 @@ const submitUnion = z.discriminatedUnion('type', [
   webhookSubmitSchema,
   datadogSchema,
   lokiSubmitSchema,
-  postgresSchema,
-  bigquerySchema,
-  clickhouseSchema,
   s3Schema,
   sentrySchema,
   axiomSchema,
@@ -314,7 +296,7 @@ function LogDrainFormItem({
   )
 }
 
-type DefaultValues = { type: LogDrainType } & Partial<LogDrainData>
+type DefaultValues = Partial<LogDrainData>
 
 export function LogDrainDestinationSheetForm({
   open,
@@ -339,14 +321,14 @@ export function LogDrainDestinationSheetForm({
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
-  const defaultType = defaultValues?.type || 'webhook'
+  const defaultType =
+    LOG_DRAIN_TYPES.find(({ value }) => value === defaultValues?.type)?.value || 'webhook'
   const defaultHeaderEntries = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
-    const type = defaultValues?.type || 'webhook'
     return headerRecordToRows(
-      mode === 'create' ? getDefaultHeadersByType(type) : config?.headers || {}
+      mode === 'create' ? getDefaultHeadersByType(defaultType) : config?.headers || {}
     )
-  }, [defaultValues, mode])
+  }, [defaultValues, mode, defaultType])
 
   const enabledLogDrainTypes = useEnabledLogDrainTypes()
 
@@ -354,11 +336,10 @@ export function LogDrainDestinationSheetForm({
 
   const formValues = useMemo(() => {
     const config = (defaultValues?.config || {}) as any
-    const type = defaultValues?.type || 'webhook'
     return {
       name: defaultValues?.name || '',
       description: defaultValues?.description || '',
-      type,
+      type: defaultType,
       http: config?.http || 'http2',
       gzip: mode === 'create' ? true : config?.gzip || false,
       headerEntries: defaultHeaderEntries,
@@ -386,7 +367,7 @@ export function LogDrainDestinationSheetForm({
       client_cert: config?.client_cert || '',
       client_key: config?.client_key || '',
     }
-  }, [defaultValues, mode, defaultHeaderEntries])
+  }, [defaultValues, mode, defaultHeaderEntries, defaultType])
 
   const form = useForm<LogDrainDestinationFormValues>({
     resolver: zodResolver(formSchema),
@@ -458,8 +439,10 @@ export function LogDrainDestinationSheetForm({
                   >
                     <Select
                       defaultValue={defaultType}
-                      value={form.getValues('type')}
-                      onValueChange={(v: LogDrainType) => form.setValue('type', v)}
+                      value={type}
+                      onValueChange={(v: LogDrainDestinationFormValues['type']) =>
+                        form.setValue('type', v)
+                      }
                     >
                       <SelectTrigger>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}

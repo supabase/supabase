@@ -62,3 +62,7 @@ If you add a new content collection or top-level route, add a matching redirect 
 (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`), and check whether `generate-markdown.mjs`
 needs updating too — the content export falls out of its generic `src/content/**` walk automatically, but
 per-topic-style listing pages don't.
+
+## Topic-specific guidance
+
+Articles tagged with the `Comparison` topic are primarily oriented towards LLM crawlers (and not human readers). Because of this, these articles are hidden from the main site navigation.

@@ -1,8 +1,8 @@
 ---
 id: 'automate-with-agents-performance'
-title: 'Performance monitor'
+title: 'Performance'
 subtitle: 'A read-only agent that inspects query performance, blocking sessions, and Performance Advisor findings once per hour.'
-description: 'Hourly monitoring for query regressions, blocking sessions, and performance findings'
+description: 'Hourly checks for query regressions, blocking sessions, and performance findings'
 ---
 
 ```mermaid
@@ -29,7 +29,7 @@ It uses `get_advisors` and read-only `execute_sql` on project-scoped [Supabase M
 
 ## What it will output
 
-Performance monitor reports new or changed findings with the affected query, session, or object, plus an investigation and verification step. It does not infer a regression without comparable measurements or recommend cancellation based only on query age. See [what triggers a performance report](/docs/guides/observability/detecting#performance).
+This prompt reports new or changed findings with the affected query, session, or object, plus an investigation and verification step. It does not infer a regression without comparable measurements or recommend cancellation based only on query age. See [what triggers a performance report](/docs/guides/observability/detecting#performance).
 
 If a check cannot run, the agent tells you what is missing. Clear checks and unchanged findings stay quiet.
 

@@ -47,7 +47,7 @@ export const useTableDefinitionQuery = <TData = TableDefinitionData>(
     ...options
   }: UseCustomQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
 ) => {
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useQuery<TableDefinitionData, TableDefinitionError, TData>({
     queryKey: [...databaseKeys.tableDefinition(projectRef, id), { scoped }],

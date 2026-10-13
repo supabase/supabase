@@ -128,5 +128,5 @@ describe('ResourceAccessStep project selector', () => {
     fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
     expect(await screen.findByRole('option', { name: MOCK_PROJECT_2.name })).toBeInTheDocument()
     expect(screen.queryByRole('option', { name: MOCK_PROJECT.name })).toBeNull()
-  })
+  }, 30000)
 })

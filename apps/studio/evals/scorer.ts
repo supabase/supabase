@@ -6,13 +6,21 @@ import { z } from 'zod'
 
 import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
 import type { Transcript } from './transcript'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
 import { extractUrls } from '@/lib/helpers'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
 
+/** How the simulated user answers an `update_opt_in_level` card. Needs `aiOptInLevel`. */
+export type OptInDecision = 'accept' | 'skip' | { chooses: AiOptInLevel }
+
 export type AssistantEvalInput = {
   prompt: string
+  /** Opt-in level the mock tools are filtered by. Omitted means no filtering, same as the highest level. */
+  aiOptInLevel?: AiOptInLevel
+  /** Resumes the chat after the Assistant asks for a level. Omit to stop at the request. */
+  optInDecision?: OptInDecision
   mockTables?: Record<
     string,
     Array<{
@@ -27,6 +35,8 @@ export type AssistantEvalInput = {
 export type AssistantEvalOutput = {
   finishReason: FinishReason
   transcript: Transcript
+  /** Calls the user denied. They never execute, so they leave no tool span for Tool Usage. */
+  deniedToolCalls?: Array<{ toolName: string; input: unknown }>
 }
 
 type ToolInputExactValue = string | number | boolean | null | string[]
@@ -113,30 +123,33 @@ const matchesExpectedToolInput = (
   })
 }
 
-const matchesRequiredTool = (
-  toolSpans: Awaited<ReturnType<typeof getToolSpans>>,
-  requiredTool: RequiredTool
-) => {
+type CalledTool = { name: string | undefined; input: unknown }
+
+const matchesRequiredTool = (calledTools: CalledTool[], requiredTool: RequiredTool) => {
   if (typeof requiredTool === 'string') {
-    return toolSpans.some((span) => span.span.span_attributes?.name === requiredTool)
+    return calledTools.some((call) => call.name === requiredTool)
   }
 
-  return toolSpans.some((span) => {
-    if (span.span.span_attributes?.name !== requiredTool.name) return false
+  return calledTools.some((call) => {
+    if (call.name !== requiredTool.name) return false
     if (!requiredTool.input) return true
-    return matchesExpectedToolInput(span.input, requiredTool.input)
+    return matchesExpectedToolInput(call.input, requiredTool.input)
   })
 }
 
-export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace }) => {
+export const toolUsageScorer: AssistantEvalScorer = async ({ expected, trace, output }) => {
   const requiredTools = expected.requiredTools ?? []
   const forbiddenTools = expected.forbiddenTools ?? []
   if ((requiredTools.length === 0 && forbiddenTools.length === 0) || !trace) return null
 
   const toolSpans = await getToolSpans(trace)
+  const calledTools: CalledTool[] = [
+    ...toolSpans.map((span) => ({ name: span.span.span_attributes?.name, input: span.input })),
+    ...(output?.deniedToolCalls ?? []).map((call) => ({ name: call.toolName, input: call.input })),
+  ]
 
-  const presentCount = requiredTools.filter((tool) => matchesRequiredTool(toolSpans, tool)).length
-  const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(toolSpans, tool))
+  const presentCount = requiredTools.filter((tool) => matchesRequiredTool(calledTools, tool)).length
+  const violatedTools = forbiddenTools.filter((tool) => matchesRequiredTool(calledTools, tool))
 
   const totalCount = requiredTools.length + forbiddenTools.length
   const passedCount = presentCount + (forbiddenTools.length - violatedTools.length)
@@ -327,6 +340,7 @@ const correctnessEvaluator = LLMClassifierFromTemplate<{ input: string; expected
     {{output}}
 
     The assistant response may include tool call markers like [called execute_sql] followed by the inputs passed to those tools. Treat those tool inputs as part of what the assistant did.
+    A call to update_opt_in_level asks the user through an approval card, even without a prose question.
 
     Is the assistant's response correct? The response can contain additional information beyond the expected answer, but it must:
     - Include the expected answer or perform equivalent actions through tool calls

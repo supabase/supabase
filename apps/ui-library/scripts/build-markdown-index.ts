@@ -86,7 +86,7 @@ Building blocks for your next backend. Every block is shadcn compatible and inte
 
 Every docs page is also available as markdown for agents (append .md to the URL). Blocks that support several frameworks share one guide per framework at ${LIBRARY_BASE_URL}/docs/<framework>/<block>.md.
 
-Start here: ${markdownLink('Quick Start', `${LIBRARY_BASE_URL}/docs/getting-started/quickstart.md`)}, ${markdownLink('Introduction', `${LIBRARY_BASE_URL}/docs/getting-started/introduction.md`)}, ${markdownLink('FAQ', `${LIBRARY_BASE_URL}/docs/getting-started/faq.md`)}.
+Start here: ${markdownLink('Quickstart', `${LIBRARY_BASE_URL}/docs/getting-started/quickstart.md`)}, ${markdownLink('Introduction', `${LIBRARY_BASE_URL}/docs/getting-started/introduction.md`)}, ${markdownLink('FAQ', `${LIBRARY_BASE_URL}/docs/getting-started/faq.md`)}.
 Full page index: ${LIBRARY_BASE_URL}/llms.txt
 
 ${sections.join('\n\n')}

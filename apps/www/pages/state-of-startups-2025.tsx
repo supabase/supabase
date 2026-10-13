@@ -310,7 +310,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
       </div>
       <div className="flex items-center justify-center gap-2 mt-4">
         <Button variant="primary" asChild size="medium">
-          <Link
+          <a
             href="https://supabase.com/dashboard"
             onClick={() =>
               sendTelemetryEvent({
@@ -320,7 +320,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
             }
           >
             Start your project
-          </Link>
+          </a>
         </Button>
         <Button asChild size="medium">
           <Link

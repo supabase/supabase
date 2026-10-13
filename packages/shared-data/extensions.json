@@ -376,7 +376,7 @@
     "link": "/guides/database/extensions/pgsodium",
     "github_url": "https://github.com/michelp/pgsodium",
     "product": "Supabase Vault",
-    "product_url": "/project/{ref}/settings/vault/secrets"
+    "product_url": "/project/{ref}/integrations/vault/secrets"
   },
   {
     "name": "pgstattuple",

@@ -509,6 +509,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
               actions={{ runQuery: { enabled: true, callback: handleRun } }}
+              options={{ scrollBeyondLastLine: true }}
             />
             {rewriteProposal && (
               <div className="absolute inset-0 z-10 flex flex-col bg-studio">

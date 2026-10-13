@@ -47,7 +47,7 @@
 
 /* Pair with `code` elements for semantic consistency, e.g. <code className="text-code-inline"> */
 @utility text-code-inline {
-  @apply break-all text-xs tracking-tight bg-surface-200 border border-muted rounded-md px-1 py-0.5 text-foreground font-medium;
+  @apply break-all text-xs tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
 }
 
 @layer base {

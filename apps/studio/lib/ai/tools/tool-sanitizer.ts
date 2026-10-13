@@ -1,6 +1,7 @@
 import type { ToolUIPart, UIMessage } from 'ai'
+import { z } from 'zod'
 
-import type { ToolName } from '../tool-filter'
+import { lowerOptInLevel, optInLevelSchema, type ToolName } from '../tool-filter'
 import { sanitizeNotebookRunOutput } from './notebook-run-output'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -10,26 +11,35 @@ interface ToolSanitizer {
 }
 
 export const NO_DATA_PERMISSIONS =
-  'The query was executed and the user has viewed the results but decided not to share in the conversation due to permission levels. Continue with your plan unless instructed to interpret the result.'
+  'The query was executed and the user has viewed the results but decided not to share in the conversation due to permission levels. Continue with your plan unless instructed to interpret the result. If you need the rows to answer and `update_opt_in_level` is available, call it with `schema_and_log_and_data`, unless the user already skipped that request in this chat.'
+
+/**
+ * `optInLevel` is the level the query ran under. Rows are shared only at the lower of that
+ * and the current level, so rows from `schema` stay hidden after an upgrade to data.
+ * Output saved before the stamp existed is a bare array and stays hidden.
+ */
+export const executeSqlOutputSchema = z.object({
+  rows: z.array(z.unknown()),
+  optInLevel: optInLevelSchema,
+})
 
 const executeSqlSanitizer: ToolSanitizer = {
   toolName: 'execute_sql',
   sanitize: (tool, optInLevel) => {
     const output = tool.output
-    let sanitizedOutput: unknown
+    const parsed = executeSqlOutputSchema.safeParse(output)
 
-    if (optInLevel !== 'schema_and_log_and_data') {
-      if (Array.isArray(output)) {
-        sanitizedOutput = NO_DATA_PERMISSIONS
+    if (parsed.success) {
+      const level = lowerOptInLevel(parsed.data.optInLevel, optInLevel)
+      return {
+        ...tool,
+        output: level === 'schema_and_log_and_data' ? parsed.data.rows : NO_DATA_PERMISSIONS,
       }
-    } else {
-      sanitizedOutput = output
     }
 
-    return {
-      ...tool,
-      output: sanitizedOutput,
-    }
+    if (Array.isArray(output)) return { ...tool, output: NO_DATA_PERMISSIONS }
+
+    return { ...tool, output: optInLevel === 'schema_and_log_and_data' ? output : undefined }
   },
 }
 

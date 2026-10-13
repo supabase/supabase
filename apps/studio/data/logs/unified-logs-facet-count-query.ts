@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
+import { z } from 'zod'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -9,13 +9,18 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
+import {
+  logsFiltersToUrlParams,
+  parseLogsFilterUrlParams,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getFacetCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import {
+  getEffectiveLogTypes,
   getFacetCountCTE,
   getUnifiedLogsCTE,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
@@ -23,6 +28,15 @@ type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
   facetSearch?: string
   useOtel?: boolean
 }
+
+const facetRowsSchema = z.array(
+  z.object({
+    value: z.union([z.string(), z.number()]).transform(String),
+    count: z
+      .union([z.number(), z.string().regex(/^\d+$/).transform(Number)])
+      .refine((count) => Number.isSafeInteger(count) && count >= 0),
+  })
+)
 
 export async function getUnifiedLogsFacetCount(
   { projectRef, search, facet, facetSearch, useOtel = false }: UnifiedLogsFacetCountVariables,
@@ -38,7 +52,7 @@ export async function getUnifiedLogsFacetCount(
   const sql = useOtel
     ? getFacetCountQuery({ search, facet, facetSearch })
     : safeSql`
-${getUnifiedLogsCTE()},
+${getUnifiedLogsCTE(getEffectiveLogTypes(search))},
 ${getFacetCountCTE({ search, facet, facetSearch, cteName })}
 SELECT dimension, value, count from ${cteName};
 `
@@ -52,11 +66,21 @@ SELECT dimension, value, count from ${cteName};
     iso_timestamp_end: isoTimestampEnd,
     signal,
   })
-  return (data.result ?? []) as Option[]
+  if (data.error !== undefined) {
+    throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
+  }
+  return facetRowsSchema
+    .parse(data.result)
+    .sort((a, b) => b.count - a.count)
+    .map((row) => ({
+      label: row.value,
+      value: row.value,
+      count: row.count,
+    }))
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
-export type UnifiedLogsFacetCountError = ResponseError
+export type UnifiedLogsFacetCountError = ResponseError | z.ZodError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
@@ -65,14 +89,41 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
+  const scopedSearch =
+    facet === 'pathname'
+      ? {
+          ...search,
+          filter: logsFiltersToUrlParams(
+            parseLogsFilterUrlParams(search.filter).filter(({ column }) => column !== facet)
+          ),
+        }
+      : search
+  const facetScope = {
+    ...scopedSearch,
+    latency: null,
+    'timing.dns': null,
+    'timing.connection': null,
+    'timing.tls': null,
+    'timing.ttfb': null,
+    'timing.transfer': null,
+    sort: null,
+    size: 40,
+    start: 0,
+    direction: 'next' as const,
+    cursor: new Date(0),
+    id: null,
+  }
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [
-      ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, search),
+      ...logsKeys.unifiedLogsFacetCount(projectRef, facet, facetSearch, facetScope),
       { otel: useOtel },
     ],
     queryFn: ({ signal }) =>
-      getUnifiedLogsFacetCount({ projectRef, search, facet, facetSearch, useOtel }, signal),
+      getUnifiedLogsFacetCount(
+        { projectRef, search: facetScope, facet, facetSearch, useOtel },
+        signal
+      ),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,

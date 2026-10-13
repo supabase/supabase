@@ -467,6 +467,8 @@ services:
     command:
       [
         "start",
+        "--user-worker-request-idle-timeout",
+        "150000",
         "--main-service",
         "/home/deno/functions/main"
       ]

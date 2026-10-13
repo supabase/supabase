@@ -44,7 +44,7 @@ export function createAssistantMessageWithExecuteSqlTool(
         state: 'output-available',
         toolCallId: 'call-123',
         input: { sql: query },
-        output: results,
+        output: { rows: results, optInLevel: 'schema_and_log_and_data' },
       } satisfies ToolUIPart,
     ],
   }

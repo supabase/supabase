@@ -1,20 +1,25 @@
 import { AuthError, AuthMFARecoveryCodesGenerateResponseData } from '@supabase/auth-js'
-import { MutationStatus, UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { ComponentProps, useState } from 'react'
+import { UseMutationResult, useQueryClient } from '@tanstack/react-query'
+import { Check, Copy, Download } from 'lucide-react'
+import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Checkbox,
+  cn,
   copyToClipboard,
   Dialog,
   DialogClose,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 
 interface RecoveryCodesModalProps<T>
@@ -33,6 +38,40 @@ export const RecoveryCodesModal = <T = unknown,>({
   const [copied, setCopied] = useState(false)
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
+  const { data, status, error, isError, isPending, isSuccess } = mutation
+  const codes = data?.codes ?? []
+
+  const title = useMemo(() => {
+    switch (status) {
+      case 'pending':
+        return 'Generating your recovery codes...'
+      case 'error':
+        return 'An error occurred while generating your recovery code'
+      default:
+        return 'Save your recovery codes'
+    }
+  }, [status])
+
+  const downloadCodes = () => {
+    const blob = new Blob([codes.map((code) => formatRecoveryCode(code)).join('\n')], {
+      type: 'text/plain;charset=utf-8;',
+    })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.setAttribute('download', 'supabase-recovery-codes.txt')
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    window.URL.revokeObjectURL(url)
+  }
+
+  useEffect(() => {
+    if (copiedToClipboard) {
+      setTimeout(() => setCopiedToClipboard(false), 4000)
+    }
+  }, [copiedToClipboard])
+
   return (
     <Dialog
       {...props}
@@ -44,7 +83,6 @@ export const RecoveryCodesModal = <T = unknown,>({
 
         onOpenChange(open)
         if (!open) {
-          // Reset state
           setCopied(false)
           setCopiedToClipboard(false)
           mutation.reset()
@@ -52,117 +90,104 @@ export const RecoveryCodesModal = <T = unknown,>({
         }
       }}
     >
-      <DialogContent>
+      <DialogContent hideClose aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle aria-busy={mutation.isPending} aria-live="polite" role="status">
-            <GenerateRecoveryCodesModalTitle status={mutation.status} />
+            {title}
           </DialogTitle>
-          <DialogDescription asChild>
-            <div className="py-4">
-              <GenerateRecoveryCodesModalContent
-                status={mutation.status}
-                codes={mutation.data?.codes}
-                copied={copied}
-                onCodesCopied={(copied) => setCopied(copied)}
-              />
-            </div>
-          </DialogDescription>
         </DialogHeader>
-        {!mutation.isPending ? (
-          <DialogFooter className="items-center">
-            <span role="status" className="text-sm text-lighter">
-              {copiedToClipboard ? 'Codes copied to your clipboard.' : null}
-            </span>
-            {copied || mutation.isError ? (
-              <DialogClose asChild>
-                <Button>Close</Button>
-              </DialogClose>
-            ) : null}
 
-            {mutation.isSuccess ? (
-              <Button
-                variant="primary"
-                onClick={() =>
-                  copyToClipboard(
-                    mutation.data?.codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
-                    () => {
-                      setCopiedToClipboard(true)
-                      setCopied(true)
+        <DialogSectionSeparator />
+
+        <DialogSection className={cn(isError && 'p-0 md:px-0')}>
+          {isError && (
+            <AlertError
+              layout="vertical"
+              className="rounded-none border-0"
+              subject="Unable to generate recovery codes"
+              error={error}
+            />
+          )}
+
+          {isSuccess && (
+            <div className="text-sm flex flex-col gap-4">
+              <p>
+                Recovery codes allow you to recover your account in case you lost access to your MFA
+                apps. Save them somewhere safe.
+              </p>
+
+              <div className="flex flex-col gap-y-2">
+                <ul className="bg-muted rounded-md p-4 border grid grid-cols-2 gap-2">
+                  {codes?.map((code, idx) => (
+                    <li key={code} className="font-mono text-sm flex gap-x-3">
+                      <span className="text-foreground-lighter w-4 inline-block text-right select-none">
+                        {idx + 1}
+                      </span>
+                      <span>{formatRecoveryCode(code)}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    icon={copiedToClipboard ? <Check className="text-brand-default" /> : <Copy />}
+                    className="ml-auto w-min"
+                    onClick={() =>
+                      copyToClipboard(
+                        codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
+                        () => setCopiedToClipboard(true)
+                      )
                     }
-                  )
-                }
+                  >
+                    {copiedToClipboard ? 'Copied' : 'Copy'}
+                  </Button>
+                  <Button icon={<Download />} onClick={downloadCodes}>
+                    Download
+                  </Button>
+                </div>
+              </div>
+
+              <span className="sr-only" aria-live="polite">
+                {copiedToClipboard && 'Codes copied to clipboard'}
+              </span>
+
+              <Admonition
+                type="warning"
+                title="You won't see these codes again"
+                description="Save them somewhere safe. If you lose them, you'll need to regenerate new codes."
               >
-                Copy to clipboard
+                <div className="flex items-center space-x-2 mt-2">
+                  <Checkbox
+                    id="codeCopied"
+                    checked={copied}
+                    onCheckedChange={(checked) => setCopied(checked === true)}
+                  />
+                  <label
+                    htmlFor="codeCopied"
+                    className="text-sm text-warning leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    I have saved my recovery codes somewhere safe
+                  </label>
+                </div>
+              </Admonition>
+            </div>
+          )}
+        </DialogSection>
+
+        {!isPending && (
+          <DialogFooter className="items-center">
+            <DialogClose
+              asChild
+              disabled={!copied && !isError}
+              className={copied || isError ? 'opacity-100' : ''}
+            >
+              <Button variant={isSuccess ? 'primary' : 'default'}>
+                {isSuccess ? 'Done' : 'Close'}
               </Button>
-            ) : null}
+            </DialogClose>
           </DialogFooter>
-        ) : null}
+        )}
       </DialogContent>
     </Dialog>
   )
-}
-
-const GenerateRecoveryCodesModalTitle = ({ status }: { status: MutationStatus }) => {
-  if (status === 'pending') {
-    return 'Generating your recovery codes...'
-  }
-  if (status === 'error') {
-    return 'An error occurred while generating your recovery code'
-  }
-
-  return 'Save your recovery codes'
-}
-
-const GenerateRecoveryCodesModalContent = ({
-  codes,
-  copied,
-  status,
-  onCodesCopied,
-}: {
-  codes: AuthMFARecoveryCodesGenerateResponseData['codes'] | undefined
-  copied?: boolean
-  status: MutationStatus
-  onCodesCopied: (copied: boolean) => void
-}) => {
-  if (status === 'error') {
-    return (
-      <p className="text-destructive">
-        We couldn't generate your recovery code. Please try again later or contact support if the
-        problem persists.
-      </p>
-    )
-  }
-
-  if (status === 'success') {
-    return (
-      <div className="flex flex-col gap-4">
-        <p>
-          Recovery codes allow you to recover your account in case you lost access to your MFA apps.
-          Save them somewhere safe.
-        </p>
-        <pre className="relative bg-muted rounded-md py-2 px-4">
-          <code className="flex gap-2 flex-wrap justify-between">
-            {codes?.map((code) => (
-              <span key={code}>{formatRecoveryCode(code)}</span>
-            ))}
-          </code>
-        </pre>
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="codeCopied"
-            checked={copied}
-            onCheckedChange={(checked) => onCodesCopied(checked === true)}
-          />
-          <label
-            htmlFor="codeCopied"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            I have copied the codes
-          </label>
-        </div>
-      </div>
-    )
-  }
-
-  return null
 }

@@ -76,7 +76,7 @@ export function usePrefetchEditorTablePage() {
   const { data: project } = useSelectedProjectQuery()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useCallback(
     ({ id: _id, filters, sorts }: { id?: string; filters?: Filter[]; sorts?: Sort[] }) => {

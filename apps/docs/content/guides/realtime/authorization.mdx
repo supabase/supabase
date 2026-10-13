@@ -25,9 +25,17 @@ By creating RLS policies on the `realtime.messages` table you can control the ac
 
 <Admonition type="caution">
 
-Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed.
+Realtime locks down the `realtime` schema to protect it against unexpected changes to guarantee the healthy operation of the Realtime service and avoid conflicts that could be caused by future migrations. Creating a table or function in `realtime` is expected to fail with `permission denied for schema realtime`, whether you run the SQL yourself or through the dashboard. Managing RLS policies on `realtime.messages` is allowed: [`supautils`](https://github.com/supabase/supautils) lets the `postgres` role run policy statements on that table without owning it.
 
-Row level security (RLS) is enabled by default on table `realtime.messages`, you don't need to execute `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY`.
+Row Level Security is already enabled on `realtime.messages`, so don't add `ALTER TABLE realtime.messages ENABLE ROW LEVEL SECURITY` to a migration. Postgres checks table ownership before it checks whether the setting would change, so the statement fails with `42501 must be owner of table messages`. That aborts the transaction, and every statement after it is skipped, including any `create policy` statements that follow.
+
+Remove the `ALTER TABLE` line and the rest of the migration passes. If a migration needs to check that RLS is on, read the catalog:
+
+```sql
+select relrowsecurity from pg_class where oid = 'realtime.messages'::regclass;
+```
+
+If you hit that error, see [must be owner of table messages](/docs/guides/troubleshooting/realtime-must-be-owner-of-table-messages).
 
 </Admonition>
 
@@ -401,6 +409,8 @@ Realtime updates the access policy cache for a client based on your RLS policies
 
 - A client connects to Realtime and subscribes to a Channel
 - A new JWT is sent to Realtime from a client via the [`access_token` message](/docs/guides/realtime/protocol#access-token)
+
+This means that if you revoke a user's access (for example, by removing a row an RLS policy uses to grant it) while they're still connected, they'll keep receiving messages until their JWT expires or a new one is sent.
 
 If a new JWT is never received on the Channel, the client will be disconnected when the JWT expires.
 

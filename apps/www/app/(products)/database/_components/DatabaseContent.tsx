@@ -1,6 +1,7 @@
 import { FeaturesSection } from './FeaturesSection'
 import { Hero } from './Hero'
 import { HighlightsSection } from './HighlightsSection'
+import { MultigresAlphaSection } from './MultigresAlphaSection'
 import { QuoteSection } from './QuoteSection'
 import { SqlEditorSection } from './SqlEditorSection'
 import { TableEditorSection } from './TableEditorSection'
@@ -39,6 +40,13 @@ export function DatabaseContent({ apiSlot }: { apiSlot: React.ReactNode }) {
         aria-label="Built with Supabase"
       >
         <BuiltWithSupabaseSection />
+      </section>
+      <section
+        id="multigres"
+        className="border-t border-border"
+        aria-label="Multigres private alpha"
+      >
+        <MultigresAlphaSection />
       </section>
       <section id="get-started" className="border-t border-border" aria-label="Get started">
         <CTASection />

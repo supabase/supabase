@@ -78,10 +78,7 @@ export const ResourceAccessStep = ({
     data: projectsData,
     hasNextPage,
     fetchNextPage,
-  } = useOrgProjectsInfiniteQuery({
-    slug: selectedOrgSlug,
-    limit: 100,
-  })
+  } = useOrgProjectsInfiniteQuery({ slug: selectedOrgSlug })
 
   const projectsForOrg = useMemo(
     () => projectsData?.pages.flatMap((page) => page.projects) ?? [],

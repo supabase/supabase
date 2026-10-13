@@ -26,7 +26,7 @@ function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NuqsAdapter>
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <DevToolbarProvider apiUrl={API_URL}>
             <ThemeProvider>
               <TooltipProvider delayDuration={0}>

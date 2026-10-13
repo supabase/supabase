@@ -2,6 +2,7 @@ import { UIEvent } from 'react'
 import { v4 as _uuidV4 } from 'uuid'
 
 import type { TablesData } from '../data/tables/tables-query'
+import { BASE_PATH } from './constants'
 
 export const uuidv4 = () => {
   return _uuidV4()
@@ -71,6 +72,16 @@ export const getURL = () => {
         ? process.env.NEXT_PUBLIC_VERCEL_BRANCH_URL
         : 'https://supabase.com/dashboard'
   return url.includes('http') ? url : `https://${url}`
+}
+
+/**
+ * Adds the base path to `getURL()` when it's missing.
+ * `https://supabase.com` → `https://supabase.com/dashboard`
+ * `https://supabase.com/dashboard` → unchanged
+ */
+export const getBasePathURL = (basePath = BASE_PATH) => {
+  const url = getURL().replace(/\/$/, '')
+  return url.endsWith(basePath) ? url : `${url}${basePath}`
 }
 
 /**

@@ -27,7 +27,7 @@ function GithubExamples() {
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
             <Button asChild size="small" icon={<BookOpen size={12} />}>
-              <Link href="/docs/guides/resources/examples">View guides</Link>
+              <a href="/docs/guides/resources/examples">View guides</a>
             </Button>
             <Button asChild size="small" icon={<Github size={12} />}>
               <Link

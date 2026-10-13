@@ -1,20 +1,29 @@
+import { Trash } from 'lucide-react'
 import { useState } from 'react'
-import { Button } from 'ui'
+import { toast } from 'sonner'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useRecoveryCodesUnenrollMutation } from '@/data/recovery-codes/recovery-codes-unenroll'
 
 export const UnenrollRecoveryCodesModal = () => {
   const [showConfirm, setShowConfirm] = useState(false)
-  const recoveryCodesGenerateMutation = useRecoveryCodesUnenrollMutation({
+  const { mutate: unenrollCodes, isPending } = useRecoveryCodesUnenrollMutation({
     onSuccess: () => {
+      toast.success('Successfully removed recovery codes')
       setShowConfirm(false)
     },
   })
 
   return (
     <>
-      <Button onClick={() => setShowConfirm(true)}>Delete my recovery codes</Button>
+      <ButtonTooltip
+        icon={<Trash />}
+        aria-label="Delete recovery codes"
+        onClick={() => setShowConfirm(true)}
+        tooltip={{ content: { side: 'bottom', text: 'Delete recovery codes' } }}
+      />
+
       <TextConfirmModal
         visible={showConfirm}
         size="small"
@@ -23,8 +32,8 @@ export const UnenrollRecoveryCodesModal = () => {
         confirmPlaceholder="DELETE"
         confirmString="DELETE"
         confirmLabel="Delete"
-        loading={recoveryCodesGenerateMutation.isPending}
-        onConfirm={() => recoveryCodesGenerateMutation.mutate()}
+        loading={isPending}
+        onConfirm={() => unenrollCodes()}
         onCancel={() => setShowConfirm(false)}
       >
         <p className="text-sm">

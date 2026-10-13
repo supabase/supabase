@@ -376,6 +376,7 @@
   --breakpoint-xs: 480px;
   --width-listbox: 320px;
   --radius-panel: 6px;
+  --radius-item: calc(var(--radius-md) - 2px);
   --spacing-content: 21px;
   --spacing-card: var(--card-padding-x);
   --transform-origin-dropdown: var(--radix-dropdown-menu-content-transform-origin);

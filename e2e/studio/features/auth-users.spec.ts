@@ -119,3 +119,50 @@ test('should show web3 users as enabled when the matching web3 provider is enabl
   await expect(providerRow).toContainText('Enabled')
   await expect(providerRow).not.toContainText('Disabled')
 })
+
+test('should close the user panel from its close button', async ({ page, ref }) => {
+  const userId = '22222222-2222-4222-8222-222222222222'
+
+  await page.route('**/platform/pg-meta/*/query**', async (route) => {
+    const key = new URL(route.request().url()).searchParams.get('key')
+    if (key !== `user-${userId}`) return route.continue()
+
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          id: userId,
+          email: 'close-panel@example.com',
+          phone: null,
+          role: 'authenticated',
+          aud: 'authenticated',
+          created_at: '2025-10-15T10:00:00.000Z',
+          updated_at: '2025-10-15T10:05:00.000Z',
+          confirmed_at: '2025-10-15T10:01:00.000Z',
+          invited_at: null,
+          confirmation_sent_at: null,
+          last_sign_in_at: '2025-10-15T10:06:00.000Z',
+          banned_until: null,
+          is_sso_user: false,
+          is_anonymous: false,
+          providers: ['email'],
+          raw_app_meta_data: { provider: 'email', providers: ['email'] },
+          raw_user_meta_data: {},
+          user_metadata: {},
+        },
+      ]),
+    })
+  })
+
+  await page.goto(toUrl(`/project/${ref}/auth/users?show=${userId}`))
+
+  await expect(page.getByRole('tab', { name: 'Overview' })).toBeVisible()
+
+  // The tab list is a positioned sibling that spans the panel's full width, so it
+  // will intercept this click unless the button is stacked above it.
+  await page.getByRole('button', { name: 'Close panel' }).click()
+
+  await expect(page.getByRole('tab', { name: 'Overview' })).toBeHidden()
+  await expect.poll(() => new URL(page.url()).searchParams.get('show')).toBeNull()
+})

@@ -43,10 +43,23 @@ export async function GET(request: Request) {
         url,
       }
     })
-    section = flattenedSections.find(
-      (section) =>
-        (section.type === 'markdown' || section.type === 'function') && section.slug === slug
+    const contentSections = flattenedSections.filter(
+      (section) => section.type === 'markdown' || section.type === 'function'
     )
+    section = contentSections.find((section) => section.slug === slug)
+    if (!section) {
+      const legacySlug = slug?.toLowerCase()
+      const replacement = legacyReferenceSlug(lib, version, legacySlug)
+
+      if (replacement) {
+        section = contentSections.find((section) => section.slug?.toLowerCase() === replacement)
+      } else if (legacySlug && version === 'v2' && (lib === 'javascript' || lib === 'dart')) {
+        const matches = contentSections.filter((section) =>
+          section.slug?.toLowerCase().endsWith(`-${legacySlug}`)
+        )
+        if (matches.length === 1) section = matches[0]
+      }
+    }
   } catch {}
 
   if (!section) {
@@ -56,7 +69,7 @@ export async function GET(request: Request) {
   const html = htmlShell(
     lib,
     isVersion ? version : null,
-    slug,
+    section.slug ?? slug,
     section,
     libraryNav(sectionsWithUrl) + (await sectionDetails(lib, isVersion ? version : null, section))
   )
@@ -64,6 +77,17 @@ export async function GET(request: Request) {
   response.headers.set('Content-Type', 'text/html; charset=utf-8')
 
   return response
+}
+
+function legacyReferenceSlug(lib: string, version: string, slug?: string) {
+  if (!slug || slug === 'start') return 'introduction'
+  if (lib === 'swift' && version === 'v2' && slug === 'get-user') return 'auth-getuser'
+  if (version !== 'v2' || (lib !== 'javascript' && lib !== 'dart')) return undefined
+  if (slug === 'admin-api') return 'auth-admin'
+  if (slug === 'get-user') return lib === 'dart' ? 'auth-currentuser' : 'auth-getuser'
+  if (slug.startsWith('storage-from-')) return `file-buckets-${slug.slice('storage-from-'.length)}`
+  if (slug.startsWith('storage-')) return `file-buckets-${slug.slice('storage-'.length)}`
+  return undefined
 }
 
 function htmlShell(
@@ -74,6 +98,7 @@ function htmlShell(
   body: string
 ) {
   const libraryName = REFERENCES[lib].name
+  const versionPath = version && version !== REFERENCES[lib].versions[0] ? '/' + version : ''
   let title = libraryName + ': ' + (section.title ?? '')
 
   return (
@@ -84,6 +109,7 @@ function htmlShell(
     `<meta name="og:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<meta name="twitter:image" content="https://supabase.com/docs/img/supabase-og-image.png">` +
     `<link rel="canonical" href="https://supabase.com/docs/reference/${lib}` +
+    versionPath +
     (slug ? '/' + slug : '') +
     `">` +
     '</head>' +

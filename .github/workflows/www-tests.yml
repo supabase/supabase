@@ -4,7 +4,11 @@ on:
   pull_request:
     branches: ['master']
     paths:
+      - '.github/workflows/www-tests.yml'
       - 'apps/www/**/*.ts*'
+      - 'apps/www/package.json'
+      - 'apps/www/turbo.jsonc'
+      - 'scripts/upload-static-assets.sh'
       - 'packages/common/sentry.ts'
       - 'packages/common/sentry.test.ts'
       - 'apps/www/next.config.mjs'
@@ -45,6 +49,7 @@ jobs:
             apps/www
             apps/docs/content/guides
             packages
+            scripts
             supabase
             patches
 

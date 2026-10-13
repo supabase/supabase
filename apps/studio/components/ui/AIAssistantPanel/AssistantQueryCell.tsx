@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 
 import { identifyQueryType } from './AIAssistant.utils'
 import {
@@ -106,15 +106,18 @@ export const AssistantQueryCell = ({
   }
 
   const result = resultOverride === undefined ? initialResult : (resultOverride ?? undefined)
-  const display =
-    localDisplay ??
-    getAssistantQueryDisplay({
-      view,
-      xAxis,
-      yAxis,
-      sql: query.uncheckedSql,
-      rows: result?.rows,
-    })
+  const inferredDisplay = useMemo(
+    () =>
+      getAssistantQueryDisplay({
+        view,
+        xAxis,
+        yAxis,
+        sql: query.uncheckedSql,
+        rows: result?.rows,
+      }),
+    [view, xAxis, yAxis, query.uncheckedSql, result?.rows]
+  )
+  const display = localDisplay ?? inferredDisplay
 
   const handleTitleChange = (value: string) => {
     const nextTitle = value.trim()
@@ -165,11 +168,12 @@ export const AssistantQueryCell = ({
       onCancel={onDeny}
       onConfirm={onApprove}
     >
+      {/* Keep editor state mounted; the fixed height preserves scroll geometry when skipped. */}
       <QueryEditor
         isReadOnly
         id={id}
         variant="viewport"
-        className="h-96"
+        className="h-96 [content-visibility:auto] [contain-intrinsic-block-size:auto_24rem]"
         title={title}
         query={query}
         result={result}

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
+import { EllipsisVertical, Pencil, RotateCw, Send, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -26,14 +26,14 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { PLATFORM_WEBHOOKS_MOCK_DATA } from './PlatformWebhooks.mock'
+import { PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
+import type { WebhookScope } from './PlatformWebhooks.types'
 import {
   filterWebhookDeliveries,
   filterWebhookEndpoints,
-  usePlatformWebhooksMockStore,
-} from './PlatformWebhooks.store'
-import type { WebhookScope } from './PlatformWebhooks.types'
-import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
+  generateSigningSecret,
+  getWebhookEndpointDisplayName,
+} from './PlatformWebhooks.utils'
 import { PlatformWebhooksDeliveryDetailsSheet } from './PlatformWebhooksDeliveryDetailsSheet'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
 import { PlatformWebhooksEndpointList } from './PlatformWebhooksEndpointList'
@@ -48,10 +48,24 @@ import {
   getPendingSigningSecretReveal,
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
+  shouldRedirectFromWebhooks,
 } from './PlatformWebhooksPage.utils'
-import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useFeaturePreviewContext,
+  useIsPlatformWebhooksEnabled,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { useWebhookDeliveriesQuery } from '@/data/platform-webhooks/platform-webhook-deliveries-query'
+import { useWebhookDeliveryQuery } from '@/data/platform-webhooks/platform-webhook-delivery-query'
+import { useWebhookDeliveryRetryMutation } from '@/data/platform-webhooks/platform-webhook-delivery-retry-mutation'
+import { useWebhookEndpointCreateMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-create-mutation'
+import { useWebhookEndpointDeleteMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-delete-mutation'
+import { useWebhookEndpointRegenerateSecretMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-regenerate-secret-mutation'
+import { useWebhookEndpointTestMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-test-mutation'
+import { useWebhookEndpointUpdateMutation } from '@/data/platform-webhooks/platform-webhook-endpoint-update-mutation'
+import { useWebhookEndpointsQuery } from '@/data/platform-webhooks/platform-webhook-endpoints-query'
+import type { WebhookScopeParams } from '@/data/platform-webhooks/platform-webhooks-fetchers'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -70,15 +84,26 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     enabled: scope === 'project',
   })
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
-  const {
-    endpoints,
-    deliveries,
-    createEndpoint,
-    updateEndpoint,
-    deleteEndpoint,
-    regenerateSecret,
-    retryDelivery,
-  } = usePlatformWebhooksMockStore(scope)
+  const { isInitialized: isFeaturePreviewInitialized } = useFeaturePreviewContext()
+
+  const isScopeReady = scope === 'organization' ? !!slug : !!ref
+  const apiScope: WebhookScopeParams =
+    scope === 'organization'
+      ? { scope: 'organization', orgSlug: slug ?? '' }
+      : { scope: 'project', projectRef: ref ?? '' }
+  const queryEnabled = platformWebhooksEnabled && isScopeReady
+
+  const { data: endpoints = [], isSuccess: isEndpointsLoaded } = useWebhookEndpointsQuery(
+    { scope: apiScope },
+    { enabled: queryEnabled }
+  )
+  const createEndpointMutation = useWebhookEndpointCreateMutation()
+  const updateEndpointMutation = useWebhookEndpointUpdateMutation()
+  const deleteEndpointMutation = useWebhookEndpointDeleteMutation()
+  const regenerateSecretMutation = useWebhookEndpointRegenerateSecretMutation()
+  const testEndpointMutation = useWebhookEndpointTestMutation()
+  const retryDeliveryMutation = useWebhookDeliveryRetryMutation()
+
   const [deliveryId, setDeliveryId] = useQueryState('deliveryId', parseAsString)
   const [panel, setPanel] = useQueryState('panel', parseAsStringLiteral(PANEL_VALUES))
   const [search, setSearch] = useQueryState(
@@ -107,7 +132,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const fallbackHref =
     scope === 'organization' ? `/org/${slug}/general` : `/project/${ref}/settings/general`
 
-  const eventTypeOptions = PLATFORM_WEBHOOKS_MOCK_DATA[scope].eventTypes
+  // A project-scoped endpoint only ever receives project events — subscribing it to an
+  // organization event would be a dead option, since the backend never delivers one there.
+  const eventTypeOptions =
+    scope === 'project'
+      ? PLATFORM_WEBHOOK_EVENT_TYPES.filter((eventType) => eventType.startsWith('v1.project.'))
+      : [...PLATFORM_WEBHOOK_EVENT_TYPES]
   const webhooksHref =
     scope === 'organization' ? `/org/${slug}/webhooks` : `/project/${ref}/settings/webhooks`
 
@@ -115,6 +145,19 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointId) ?? null,
     [endpoints, endpointId]
   )
+  const { data: deliveries = [] } = useWebhookDeliveriesQuery(
+    { scope: apiScope, endpointId: selectedEndpoint?.id ?? '' },
+    { enabled: queryEnabled && !!selectedEndpoint }
+  )
+  const {
+    data: selectedDelivery = null,
+    isSuccess: isSelectedDeliveryLoaded,
+    isError: isSelectedDeliveryError,
+  } = useWebhookDeliveryQuery(
+    { scope: apiScope, endpointId: selectedEndpoint?.id ?? '', id: deliveryId ?? '' },
+    { enabled: queryEnabled && !!selectedEndpoint && !!deliveryId }
+  )
+
   const isEndpointView = !!selectedEndpoint
   const selectedEndpointHasName = selectedEndpoint ? selectedEndpoint.name.trim().length > 0 : false
   const selectedEndpointDisplayName = selectedEndpoint
@@ -144,13 +187,21 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
   }
 
-  useEffect(() => {
-    if (!platformWebhooksEnabled) {
-      router.replace(fallbackHref)
-    }
-  }, [fallbackHref, platformWebhooksEnabled, router])
+  const shouldRedirect = shouldRedirectFromWebhooks({
+    areFlagsReady: isFeaturePreviewInitialized,
+    isScopeReady,
+    isEnabled: !!platformWebhooksEnabled,
+  })
 
   useEffect(() => {
+    if (shouldRedirect) {
+      router.replace(fallbackHref)
+    }
+  }, [fallbackHref, shouldRedirect, router])
+
+  useEffect(() => {
+    if (!isEndpointsLoaded) return
+
     if (
       shouldHandleEndpointNotFound({
         endpointId,
@@ -161,7 +212,14 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       toast('Endpoint not found')
       router.replace(webhooksHref)
     }
-  }, [endpointId, pendingCreatedEndpointId, selectedEndpoint, router, webhooksHref])
+  }, [
+    endpointId,
+    isEndpointsLoaded,
+    pendingCreatedEndpointId,
+    selectedEndpoint,
+    router,
+    webhooksHref,
+  ])
 
   useEffect(() => {
     if (!pendingCreatedEndpointId) return
@@ -186,60 +244,49 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const filteredDeliveries = useMemo(() => {
     if (!selectedEndpoint) return []
-    return filterWebhookDeliveries(deliveries, selectedEndpoint.id, deliverySearch)
+    return filterWebhookDeliveries(deliveries, deliverySearch)
   }, [deliveries, deliverySearch, selectedEndpoint])
 
-  const selectedDelivery = useMemo(() => {
-    if (!selectedEndpoint || !deliveryId) return null
-    return (
-      deliveries.find(
-        (delivery) => delivery.id === deliveryId && delivery.endpointId === selectedEndpoint.id
-      ) ?? null
-    )
-  }, [deliveries, deliveryId, selectedEndpoint])
-
   const deliveryAttempt = useMemo(() => {
-    if (!selectedEndpoint || !selectedDelivery) return null
-    const endpointDeliveries = deliveries
-      .filter((delivery) => delivery.endpointId === selectedEndpoint.id)
-      .sort((a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime())
-    const index = endpointDeliveries.findIndex((delivery) => delivery.id === selectedDelivery.id)
+    if (!selectedDelivery) return null
+    const sortedDeliveries = [...deliveries].sort(
+      (a, b) => new Date(b.attemptAt).getTime() - new Date(a.attemptAt).getTime()
+    )
+    const index = sortedDeliveries.findIndex((delivery) => delivery.id === selectedDelivery.id)
     return index >= 0 ? index + 1 : null
-  }, [deliveries, selectedDelivery, selectedEndpoint])
+  }, [deliveries, selectedDelivery])
 
   const deliveryEventPayload = useMemo(() => {
-    if (!selectedEndpoint || !selectedDelivery) return ''
+    if (!selectedDelivery) return ''
     return JSON.stringify(
       {
-        endpoint_id: selectedEndpoint.id,
-        endpoint_url: selectedEndpoint.url,
-        event_type: selectedDelivery.eventType,
-        event_id: selectedDelivery.id,
-        attempted_at: selectedDelivery.attemptAt,
-        scope,
+        id: selectedDelivery.eventId,
+        type: selectedDelivery.eventType,
+        timestamp: selectedDelivery.attemptAt,
+        payload: selectedDelivery.eventPayload,
       },
       null,
       2
     )
-  }, [scope, selectedDelivery, selectedEndpoint])
+  }, [selectedDelivery])
 
   const deliveryResponsePayload = useMemo(() => {
-    if (!selectedEndpoint || !selectedDelivery) return ''
+    if (!selectedDelivery) return ''
     return JSON.stringify(
       {
-        endpoint_id: selectedEndpoint.id,
-        delivery_id: selectedDelivery.id,
         status: selectedDelivery.status,
-        response_code: selectedDelivery.responseCode ?? null,
+        response_code: selectedDelivery.responseCode,
+        response_headers: selectedDelivery.responseHeaders,
+        response_body: selectedDelivery.responseBody,
       },
       null,
       2
     )
-  }, [selectedDelivery, selectedEndpoint])
+  }, [selectedDelivery])
 
-  const handleDeleteEndpoint = () => {
+  const handleDeleteEndpoint = async () => {
     if (!endpointPendingDelete) return
-    deleteEndpoint(endpointPendingDelete.id)
+    await deleteEndpointMutation.mutateAsync({ scope: apiScope, id: endpointPendingDelete.id })
     if (endpointPendingDelete.id === endpointId) {
       router.push(webhooksHref)
       setDeliverySearch('')
@@ -248,18 +295,19 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     toast.success('Endpoint deleted')
   }
 
-  const handleUpsertEndpoint = (values: EndpointFormValues) => {
+  const handleUpsertEndpoint = async (values: EndpointFormValues) => {
     if (panel === 'create') {
-      const { endpointId: createdEndpointId, signingSecret } = createEndpoint(
-        toEndpointPayload(values)
-      )
-      setPendingCreatedEndpointId(createdEndpointId)
+      const input = toEndpointPayload(values)
+      const created = await createEndpointMutation.mutateAsync({ scope: apiScope, input })
+      // The server never echoes the secret back — we already know it, since the
+      // user (or the "Generate" button) chose it client-side before submitting.
+      setPendingCreatedEndpointId(created.id)
       setPendingSigningSecretReveal(scope, {
-        endpointId: createdEndpointId,
-        signingSecret,
+        endpointId: created.id,
+        signingSecret: input.signingSecret,
       })
-      router.push(`${webhooksHref}/${encodeURIComponent(createdEndpointId)}`)
-      setSigningSecretReveal({ signingSecret })
+      router.push(`${webhooksHref}/${encodeURIComponent(created.id)}`)
+      setSigningSecretReveal({ signingSecret: input.signingSecret })
       setPanel(null)
       setEditEnabledOverride(null)
       toast.success('Endpoint created')
@@ -267,27 +315,46 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     }
 
     if (panel === 'edit' && selectedEndpoint) {
-      updateEndpoint(selectedEndpoint.id, toEndpointPayload(values))
+      await updateEndpointMutation.mutateAsync({
+        scope: apiScope,
+        id: selectedEndpoint.id,
+        input: toEndpointPayload(values),
+      })
       setPanel(null)
       setEditEnabledOverride(null)
       toast.success('Endpoint updated')
     }
   }
 
-  const handleRegenerateSecret = () => {
+  const handleRegenerateSecret = async () => {
     if (!selectedEndpoint) return
-    const nextSecret = regenerateSecret(selectedEndpoint.id)
-    if (!nextSecret) return
+    const nextSecret = generateSigningSecret()
+    await regenerateSecretMutation.mutateAsync({
+      scope: apiScope,
+      id: selectedEndpoint.id,
+      signingSecret: nextSecret,
+    })
     setSigningSecretReveal({ signingSecret: nextSecret })
     setShowRegenerateSecretConfirm(false)
     toast.success('Signing secret regenerated')
   }
 
-  const handleRetryDelivery = (deliveryId: string) => {
+  const handleSendTestEvent = async () => {
+    if (!selectedEndpoint) return
+    await testEndpointMutation.mutateAsync({ scope: apiScope, id: selectedEndpoint.id })
+    toast.success('Test event sent — check deliveries shortly')
+  }
+
+  const handleRetryDelivery = async (deliveryId: string) => {
+    if (!selectedEndpoint) return
     const delivery = deliveries.find((item) => item.id === deliveryId)
     if (!delivery || delivery.status === 'success') return
 
-    retryDelivery(deliveryId)
+    await retryDeliveryMutation.mutateAsync({
+      scope: apiScope,
+      endpointId: selectedEndpoint.id,
+      id: deliveryId,
+    })
     toast.success('Delivery queued for retry')
   }
 
@@ -311,10 +378,18 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   }, [deliveryId, selectedEndpoint, setDeliveryId])
 
   useEffect(() => {
-    if (!!deliveryId && !selectedDelivery) {
+    const deliveryUnavailable =
+      (isSelectedDeliveryLoaded && !selectedDelivery) || isSelectedDeliveryError
+    if (!!deliveryId && deliveryUnavailable) {
       setDeliveryId(null)
     }
-  }, [deliveryId, selectedDelivery, setDeliveryId])
+  }, [
+    deliveryId,
+    isSelectedDeliveryError,
+    isSelectedDeliveryLoaded,
+    selectedDelivery,
+    setDeliveryId,
+  ])
 
   if (!platformWebhooksEnabled) {
     return null
@@ -356,6 +431,10 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   <Button icon={<EllipsisVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="bottom" className="w-48">
+                  <DropdownMenuItem className="gap-x-2" onClick={handleSendTestEvent}>
+                    <Send size={14} className="text-foreground-lighter" />
+                    <span>Send test event</span>
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setShowRegenerateSecretConfirm(true)}

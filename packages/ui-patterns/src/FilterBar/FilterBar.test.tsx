@@ -171,6 +171,84 @@ describe('FilterBar', () => {
     expect(input).toBeInTheDocument()
   })
 
+  it('lets keyboard users reenter and edit a selected filter', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
+        }}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    await user.tab()
+    expect(screen.getByLabelText('Change property from Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText('Operator for Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByLabelText('Value for Name')).toHaveFocus()
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
+    await user.tab({ shift: true })
+    expect(screen.getByLabelText('Value for Name')).toHaveFocus()
+  })
+
+  it('clears the chip highlight when focus moves to its remove button', async () => {
+    const user = userEvent.setup()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
+        }}
+        onFilterChange={mockOnFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    await user.click(screen.getByTestId('filter-bar-freeform-input'))
+    await user.keyboard('{ArrowLeft}')
+    const condition = screen.getByTestId('filter-condition-name')
+    expect(condition).toHaveAttribute('data-highlighted', 'true')
+
+    await user.tab({ shift: true })
+    expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
+    expect(condition).toHaveAttribute('data-highlighted', 'false')
+  })
+
+  it('lets keyboard users remove a selected filter', async () => {
+    const user = userEvent.setup()
+    const onFilterChange = vi.fn()
+    render(
+      <FilterBar
+        filterProperties={mockFilterProperties}
+        filters={{
+          logicalOperator: 'AND',
+          conditions: [{ propertyName: 'name', operator: '=', value: 'test' }],
+        }}
+        onFilterChange={onFilterChange}
+        freeformText=""
+        onFreeformTextChange={mockOnFreeformTextChange}
+      />
+    )
+
+    await user.tab()
+    await user.tab()
+    await user.tab()
+    await user.tab()
+    expect(screen.getByRole('button', { name: 'Remove Name filter' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(onFilterChange).toHaveBeenCalledWith(initialFilters)
+    await waitFor(() => expect(screen.getByTestId('filter-bar-freeform-input')).toHaveFocus())
+  })
+
   it('opens group popover and allows selecting a property', async () => {
     const user = userEvent.setup()
     let currentFilters = initialFilters

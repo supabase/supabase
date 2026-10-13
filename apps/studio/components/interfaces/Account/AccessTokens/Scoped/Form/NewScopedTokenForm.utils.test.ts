@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
 import { describe, expect, test } from 'vitest'
 
-import { TokenFormSchema } from './NewScopedTokenForm.utils'
+import { getExpiryDate, TokenFormSchema } from './NewScopedTokenForm.utils'
 
 const BASE_VALUES = {
   tokenName: 'test',
@@ -33,5 +33,21 @@ describe('TokenFormSchema custom expiry', () => {
     expect(result.error?.issues.map((issue) => issue.message)).toContain(
       'Expiry date must be within one year from today'
     )
+  })
+})
+
+describe('TokenFormSchema never expiry', () => {
+  test('accepts the never preset without a date', () => {
+    const result = TokenFormSchema.safeParse({ ...BASE_VALUES, expiresAt: 'never' })
+    expect(result.success).toBe(true)
+  })
+})
+
+describe('getExpiryDate', () => {
+  test('returns no date for the never preset', () => {
+    expect(getExpiryDate('never')).toBeUndefined()
+  })
+  test('returns no date for the custom preset', () => {
+    expect(getExpiryDate('custom')).toBeUndefined()
   })
 })

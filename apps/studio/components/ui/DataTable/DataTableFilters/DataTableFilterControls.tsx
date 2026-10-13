@@ -1,4 +1,4 @@
-import { Fragment, type ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
 
 import { DateRangeDisabled } from '../DataTable.types'
@@ -27,13 +27,13 @@ export function DataTableFilterControls({
   itemsAfter,
 }: DataTableFilterControls) {
   const { filterFields, isLoadingCounts } = useDataTable()
+  const [openFilters, setOpenFilters] = useState<string[]>(
+    () =>
+      filterFields?.filter(({ defaultOpen }) => defaultOpen)?.map(({ value }) => value as string) ??
+      []
+  )
   return (
-    <Accordion
-      type="multiple"
-      defaultValue={filterFields
-        ?.filter(({ defaultOpen }) => defaultOpen)
-        ?.map(({ value }) => value as string)}
-    >
+    <Accordion type="multiple" value={openFilters} onValueChange={setOpenFilters}>
       {filterFields
         ?.filter((field) => !field.hidden)
         .map((field) => {
@@ -50,18 +50,16 @@ export function DataTableFilterControls({
                   <DataTableFilterResetButton {...field} />
                 </div>
                 <AccordionContent>
-                  {/* REMINDER: avoid the focus state to be cut due to overflow-hidden */}
-                  {/* REMINDER: need to move within here because of accordion height animation */}
                   <div className="p-1">
                     {(() => {
                       switch (field.type) {
                         case 'checkbox': {
-                          // [Joshen] Loader here so that CheckboxAsync can retrieve the data
-                          // immediately to be set in its react query state
-                          if (field.hasDynamicOptions && isLoadingCounts) {
+                          if (field.hasDynamicOptions && !field.hasAsyncSearch && isLoadingCounts) {
                             return <DataTableFilterCheckboxLoader />
                           } else if (field.hasAsyncSearch) {
-                            return <DataTableFilterCheckboxAsync {...field} />
+                            return openFilters.includes(value) ? (
+                              <DataTableFilterCheckboxAsync {...field} />
+                            ) : null
                           } else {
                             return <DataTableFilterCheckbox {...field} />
                           }

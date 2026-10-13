@@ -27,6 +27,7 @@ export interface ChartIntervals {
 
 export interface VaultSecret {
   id: string
+  key_id: string | null
   name: string
   description: string
   secret: string

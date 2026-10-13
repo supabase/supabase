@@ -42,18 +42,22 @@ export const PipelineRegionField = ({
       label="Pipeline region"
       description={getPipelineRegionDescription(destinationType)}
     >
-      <div
-        className={cn(
-          'flex h-9 min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 px-3 text-sm',
-          className
-        )}
-      >
-        <RegionFlag className="w-5 shrink-0" region={PIPELINE_REGION.code} />
-        <span className="min-w-0 truncate text-foreground">{PIPELINE_REGION.displayName}</span>
-        <span className="shrink-0 font-mono text-xs text-foreground-lighter">
-          {PIPELINE_REGION.code}
-        </span>
-      </div>
+      <PipelineRegionReadonly className={className} />
     </FormItemLayout>
   )
 }
+
+export const PipelineRegionReadonly = ({ className }: { className?: string }) => (
+  <div
+    className={cn(
+      'flex h-9 min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 px-3 text-sm',
+      className
+    )}
+  >
+    <RegionFlag className="w-5 shrink-0" region={PIPELINE_REGION.code} />
+    <span className="min-w-0 truncate text-foreground">{PIPELINE_REGION.displayName}</span>
+    <span className="shrink-0 font-mono text-xs text-foreground-lighter">
+      {PIPELINE_REGION.code}
+    </span>
+  </div>
+)

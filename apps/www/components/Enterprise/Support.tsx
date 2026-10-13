@@ -1,19 +1,12 @@
+import { FeatureItem, type Feature } from '~/components/FeatureItem'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import type { LucideIcon } from 'lucide-react'
-import React, { type FC, type ReactNode } from 'react'
-import { cn } from 'ui'
+import type { FC, ReactNode } from 'react'
 
 interface Props {
   id: string
   label?: ReactNode
   heading: ReactNode
   features: Feature[]
-}
-
-type Feature = {
-  icon: LucideIcon | any
-  heading: string
-  subheading: string
 }
 
 const Support: FC<Props> = (props) => {
@@ -29,29 +22,6 @@ const Support: FC<Props> = (props) => {
         ))}
       </ul>
     </SectionContainer>
-  )
-}
-
-interface FeatureItemProps {
-  feature: Feature
-}
-
-const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
-  const Icon: LucideIcon = feature.icon
-  const iconSize = 7
-  const iconWidth = `w-${iconSize}`
-  const iconHeight = `h-${iconSize}`
-
-  return (
-    <li className="flex flex-col gap-2 text-sm">
-      <Icon className={cn('stroke-1 mb-2 text-foreground-lighter', iconWidth, iconHeight)} />
-      <div className="w-full h-px overflow-hidden flex items-start bg-border-muted">
-        <span className={cn('h-full bg-foreground-lighter', iconWidth)} />
-      </div>
-      <h4 className="text-foreground text-lg lg:text-xl mt-1">{feature.heading}</h4>
-      <p className="text-foreground-lighter text-sm">{feature.subheading}</p>
-      {/* <TextLink hasChevron label="Read story" url={feature.url} className="mt-4" /> */}
-    </li>
   )
 }
 

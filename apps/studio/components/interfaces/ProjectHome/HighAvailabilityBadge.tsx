@@ -26,7 +26,12 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
           <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
         </div>
       </HoverCardTrigger>
-      <HoverCardContent side="bottom" align="start" className="w-72 overflow-hidden p-0">
+      <HoverCardContent
+        side="bottom"
+        align="start"
+        className="w-72 overflow-hidden p-0"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="h-24 bg-surface-75">
           <ServerLightGrid />
         </div>
@@ -37,7 +42,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             globally distributed deployments.
           </p>
           <Link
-            href={`${DOCS_URL}/guides/deployment/high-availability`}
+            href={`${DOCS_URL}/guides/database/multigres`}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-1 inline-flex items-center gap-1 text-xs text-foreground-lighter transition-colors hover:text-foreground"

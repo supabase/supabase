@@ -47,6 +47,7 @@ jobs:
           permission-pull-requests: write
 
       - name: Decrease ESLint ratchet baselines and open PR
+        id: decrease-baselines
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -69,6 +70,7 @@ jobs:
 
           if git diff --quiet; then
             echo "No baseline updates detected."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -81,11 +83,45 @@ jobs:
 
           pr_url=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // ""' 2>/dev/null || echo "")
           if [ -z "$pr_url" ]; then
-            gh pr create \
+            pr_url=$(gh pr create \
               --title "[bot] Decrease ESLint ratchet baselines" \
               --body "Automated weekly decrease of ESLint ratchet baselines." \
               --base "$DEFAULT_BRANCH" \
-              --head "$BRANCH"
+              --head "$BRANCH")
           else
             gh pr comment "$pr_url" --body "Updated ESLint ratchet baselines with the latest weekly decreases."
+          fi
+
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+
+      - name: 'Notify #team-frontend about rules that hit a zero baseline'
+        if: steps.decrease-baselines.outputs.changed == 'true'
+        env:
+          PR_URL: ${{ steps.decrease-baselines.outputs.pr_url }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_DASHBOARD_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+
+          zero_rules=$(jq -r '.rules | to_entries | map(select(.value == 0 and (.key | startswith("shadcn/") | not)) | .key) | join(", ")' apps/studio/.github/eslint-rule-baselines.json)
+
+          if [ -z "$zero_rules" ]; then
+            echo "No rules dropped to a baseline of 0; nothing to notify."
+            exit 0
+          fi
+
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "::warning::SLACK_DASHBOARD_WEBHOOK_URL secret is not set; skipping Slack notification for zero-baseline rules: $zero_rules"
+            exit 0
+          fi
+
+          pr_number="${PR_URL##*/}"
+          text="<@U0A1BRW39PC> the weekly ratchet-baseline job just dropped these rules to 0 in <${PR_URL}|#${pr_number}>: ${zero_rules}. Can you remove them from ratchet tracking and bump their ESLint severity to \"error\"?"
+
+          payload=$(jq -n --arg text "$text" '{text: $text}')
+
+          if ! curl --fail --silent --show-error -X POST "$SLACK_WEBHOOK_URL" \
+            -H 'Content-Type: application/json' \
+            -d "$payload"; then
+            echo "::warning::Failed to post Slack notification for zero-baseline rules: $zero_rules"
           fi

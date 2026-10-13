@@ -6,6 +6,7 @@ import {
   resetPendingSigningSecretRevealForTests,
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
+  shouldRedirectFromWebhooks,
 } from './PlatformWebhooksPage.utils'
 
 describe('PlatformWebhooksPage.utils', () => {
@@ -55,6 +56,32 @@ describe('PlatformWebhooksPage.utils', () => {
         pendingCreatedEndpointId: null,
       })
     ).toBe(true)
+  })
+
+  describe('shouldRedirectFromWebhooks', () => {
+    it('does not redirect while flags are still loading', () => {
+      expect(
+        shouldRedirectFromWebhooks({ areFlagsReady: false, isScopeReady: true, isEnabled: false })
+      ).toBe(false)
+    })
+
+    it('does not redirect before route params are populated', () => {
+      expect(
+        shouldRedirectFromWebhooks({ areFlagsReady: true, isScopeReady: false, isEnabled: false })
+      ).toBe(false)
+    })
+
+    it('does not redirect when webhooks are enabled', () => {
+      expect(
+        shouldRedirectFromWebhooks({ areFlagsReady: true, isScopeReady: true, isEnabled: true })
+      ).toBe(false)
+    })
+
+    it('redirects once ready and webhooks are disabled', () => {
+      expect(
+        shouldRedirectFromWebhooks({ areFlagsReady: true, isScopeReady: true, isEnabled: false })
+      ).toBe(true)
+    })
   })
 
   it('stores and reads pending signing secret reveal for matching endpoint route', () => {

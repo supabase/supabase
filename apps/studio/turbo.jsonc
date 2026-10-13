@@ -33,6 +33,9 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        // Vite embeds this ID in server-function request pins.
+        // A different deployment ID requires fresh build output.
+        "VERCEL_DEPLOYMENT_ID",
         // Project-level Vercel settings Nitro's vercel preset reads at build
         // time; they change the emitted routes and asset paths.
         "VERCEL_SKEW_PROTECTION_ENABLED",
@@ -105,6 +108,8 @@
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
+        "INCIDENT_IO_WIDGET_URL",
+        "INCIDENT_IO_STATUS_PAGE_ID",
         "LIVE_SUPABASE_SECRET_KEY",
         // Selects the build mode for the studio's `build`/`start` scripts
         // (e.g. e2e sets `MODE=test`). Listed so turbo invalidates the
@@ -123,12 +128,6 @@
         "SSR",
       ],
       "passThroughEnv": [
-        // Vite bakes this into TanStack's server-function request header. Passed
-        // through rather than hashed so Next's same-commit redeploys keep
-        // hitting the turbo cache as before; a TanStack cache hit reuses the
-        // earlier deployment's id, which is the same code and falls back to
-        // latest if that deployment is gone.
-        "VERCEL_DEPLOYMENT_ID",
         "CURRENT_CLI_VERSION",
         "VERCEL_GIT_COMMIT_REF",
         "VERCEL_GIT_COMMIT_SHA",

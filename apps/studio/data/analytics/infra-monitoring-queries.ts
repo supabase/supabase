@@ -66,14 +66,18 @@ export function useInfraMonitoringQueries(
     return []
   }
 
-  return attributes.map<InfraQueryResult>((attribute) => ({
-    data: seriesByAttribute?.[attribute],
-    error: query.error,
-    isError: query.isError,
-    isFetching: query.isFetching,
-    isLoading: query.isLoading,
-    status: query.status,
-  }))
+  return attributes.map<InfraQueryResult>((attribute) => {
+    const metricError =
+      query.data && 'errors' in query.data ? query.data.errors?.[attribute] : undefined
+    return {
+      data: seriesByAttribute?.[attribute],
+      error: query.error ?? metricError ?? null,
+      isError: query.isError || !!metricError,
+      isFetching: query.isFetching,
+      isLoading: query.isLoading,
+      status: metricError ? 'error' : query.status,
+    }
+  })
 }
 
 type AggregatedBucket = {

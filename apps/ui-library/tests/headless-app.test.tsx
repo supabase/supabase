@@ -14,7 +14,7 @@ vi.mock('@/registry/default/clients/tanstack/lib/supabase/client', () => ({
   createClient: () => ({ auth: { oauth: { listGrants, revokeGrant } } }),
 }))
 
-const serverUrl = 'https://example.supabase.co/functions/v1/mcp-server'
+const serverUrl = 'https://example.supabase.co/functions/v1/mcp'
 const grant: OAuthGrant = {
   client: { id: 'test-agent', name: 'Test agent', uri: '', logo_uri: '' },
   granted_at: '2026-09-01T00:00:00Z',

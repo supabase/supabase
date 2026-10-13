@@ -10,11 +10,13 @@ The generated API contract has three specs: API v1, API v2, and Platform. Their 
 ## Update types
 
 1. Make the API/schema change and ensure it is deployed to production before relying on a type PR. Production is the merge-gate source of truth.
-2. Run `pnpm api:codegen` against a running local API environment. It fetches all three local OpenAPI specs and updates the committed files.
+2. Update the committed types, either:
+   - Run `pnpm api:codegen` against a running local API environment. It fetches all three local OpenAPI specs and updates the committed files.
+   - Or, if you don't have a local API environment running, run `pnpm api:codegen:prod`. It fetches the three production OpenAPI specs directly and overwrites the committed files with them (no diffing — it always writes).
 3. Inspect and commit only the intended generated type changes.
 4. Run `pnpm api:verify-types`. It fetches the three production OpenAPI specs, regenerates types with the repository tooling, and compares them with the committed files.
 
-Complete the update only when `pnpm api:verify-types` passes after the production deployment is available.
+Complete the update only when `pnpm api:verify-types` passes after the production deployment is available. If you used `api:codegen:prod`, this should already pass since the committed files came straight from production.
 
 ## Interpret verification
 

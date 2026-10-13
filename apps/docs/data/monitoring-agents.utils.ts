@@ -26,6 +26,8 @@ export type MonitoringAgentHarnessSetup = {
 const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 const DAY_LABELS = ['12am', '6am', '12pm', '6pm'] as const
 
+export const AGENT_PROMPT_ANCHOR = 'agent-prompt'
+
 const MCP_STEP =
   'Connect the [Supabase MCP server](/docs/guides/ai-tools/mcp) with `project_ref` and `read_only=true`.'
 
@@ -96,14 +98,14 @@ export function getMonitoringAgentHarnesses(agent: MonitoringAgent): MonitoringA
         ? 'https://code.claude.com/docs/en/desktop-scheduled-tasks'
         : 'https://code.claude.com/docs/en/routines',
       intro: isSubHourly
-        ? `Create a Claude Desktop scheduled task that runs ${agent.name} ${cadence}.`
-        : `Create a Claude routine that runs ${agent.name} ${cadence}.`,
+        ? `Create a Claude Desktop scheduled task that runs the ${agent.name} prompt ${cadence}.`
+        : `Create a Claude routine that runs the ${agent.name} prompt ${cadence}.`,
       steps: [
         MCP_STEP,
         isSubHourly
           ? 'In the Claude Code Desktop app, open **Routines**, click **New routine**, and choose **Local**.'
           : 'Open [Claude routines](https://claude.ai/code/routines) or run `/schedule` in Claude Code.',
-        `Name it ${agent.name}. Paste the prompt. Set the schedule to ${cadence}.`,
+        `Name it ${agent.name} checks. Paste the [prompt](#${AGENT_PROMPT_ANCHOR}). Set the schedule to ${cadence}.`,
       ],
       note: isSubHourly
         ? 'Cloud routines have a 1-hour minimum. Use a [Desktop scheduled task](https://code.claude.com/docs/en/desktop-scheduled-tasks) for this cadence.'
@@ -115,11 +117,11 @@ export function getMonitoringAgentHarnesses(agent: MonitoringAgent): MonitoringA
       icon: 'openai',
       hasDistinctDarkIcon: true,
       docsUrl: 'https://developers.openai.com/codex/app/automations',
-      intro: `Create a Codex scheduled task that runs ${agent.name} ${cadence}.`,
+      intro: `Create a Codex scheduled task that runs the ${agent.name} prompt ${cadence}.`,
       steps: [
         MCP_STEP,
         'Open **Scheduled** in the ChatGPT desktop app, or ask Codex to create a standalone scheduled task.',
-        `Name it ${agent.name}. Paste the prompt. Set the schedule to ${cadence}. Each run should start a new chat.`,
+        `Name it ${agent.name} checks. Paste the [prompt](#${AGENT_PROMPT_ANCHOR}). Set the schedule to ${cadence}. Each run should start a new chat.`,
       ],
     },
     {
@@ -128,11 +130,11 @@ export function getMonitoringAgentHarnesses(agent: MonitoringAgent): MonitoringA
       icon: 'cursor',
       hasDistinctDarkIcon: true,
       docsUrl: 'https://cursor.com/docs/cloud-agent/automations',
-      intro: `Create a Cursor automation that runs ${agent.name} ${cadence}.`,
+      intro: `Create a Cursor automation that runs the ${agent.name} prompt ${cadence}.`,
       steps: [
         MCP_STEP,
         'Create an automation in the Agents Window, at [cursor.com/automations](https://cursor.com/automations), or with the `/automate` skill.',
-        `Name it ${agent.name}. Use a scheduled trigger (${cadence}, cron \`${cron}\`). Paste the prompt. Keep the agent read-only, with no repository.`,
+        `Name it ${agent.name} checks. Use a scheduled trigger (${cadence}, cron \`${cron}\`). Paste the [prompt](#${AGENT_PROMPT_ANCHOR}). Keep the agent read-only, with no repository.`,
       ],
     },
   ]

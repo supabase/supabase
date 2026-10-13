@@ -10,6 +10,7 @@ import {
   formatBytes,
   formatCurrency,
   formatRestoreWindow,
+  getBasePathURL,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
   getSemanticVersion,
@@ -104,6 +105,33 @@ describe('getURL', () => {
     const result = getURL()
 
     expect(result).toEqual('https://supabase.com/dashboard')
+  })
+})
+
+describe('getBasePathURL', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('appends the base path to the site URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('does not double the base path on the fallback URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', '')
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_BRANCH_URL', '')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('strips a trailing slash before appending the base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com/')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('returns the site URL when there is no base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:8082')
+    expect(getBasePathURL('')).toEqual('http://localhost:8082')
   })
 })
 
@@ -224,16 +252,36 @@ describe('copyToClipboard', () => {
     expect(writeTextMock).toHaveBeenCalledWith('hello')
   })
 
-  it('resolves and reports when clipboard.write is denied', async () => {
+  it('falls back to writeText when clipboard.write is denied', async () => {
     writeMock.mockRejectedValue(
       new DOMException("Failed to execute 'write' on 'Clipboard': Write permission denied.")
     )
     const callback = vi.fn()
 
-    const promise = copyToClipboard('hello', callback)
-    vi.runAllTimers()
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeTextMock).toHaveBeenCalledWith('hello')
+    expect(callback).toHaveBeenCalled()
+    expect(toast.error).not.toHaveBeenCalled()
+  })
 
-    await expect(promise).resolves.toBeUndefined()
+  it('does not retry after a successful rich write when the callback throws', async () => {
+    const callback = vi.fn(() => {
+      throw new Error('Callback failed')
+    })
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
+    expect(writeMock).toHaveBeenCalledOnce()
+    expect(writeTextMock).not.toHaveBeenCalled()
+    expect(callback).toHaveBeenCalledOnce()
+    expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
+  })
+
+  it('reports when both clipboard methods are denied', async () => {
+    writeMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    writeTextMock.mockRejectedValue(new DOMException('Write permission denied.'))
+    const callback = vi.fn()
+
+    await expect(copyToClipboard('hello', callback)).resolves.toBeUndefined()
     expect(callback).not.toHaveBeenCalled()
     expect(toast.error).toHaveBeenCalledWith('Unable to copy to clipboard')
   })

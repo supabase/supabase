@@ -1,12 +1,9 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -17,6 +14,11 @@ import {
   WarningIcon,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import {
+  DialogDisclosure,
+  DialogDisclosureContent,
+  DialogDisclosureTrigger,
+} from 'ui-patterns/DialogDisclosure'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -129,21 +131,18 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
 
         <DialogSectionSeparator />
 
-        <Collapsible>
-          <CollapsibleTrigger className="py-4 px-5 w-full flex items-center justify-between text-sm">
-            <p>
-              1. Create a custom <code className="text-code-inline">api</code> schema and expose it
-            </p>
-            {hasAPISchema && isAPISchemaExposed ? (
-              <Check size={16} className="text-primary" />
-            ) : (
-              <ChevronDown
-                size={16}
-                className="transition data-open-parent:rotate-180 data-closed-parent:rotate-0"
-              />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="text-sm text-foreground-light flex flex-col gap-y-4">
+        <DialogDisclosure>
+          <DialogDisclosureTrigger
+            className="py-4 px-5"
+            icon={
+              hasAPISchema && isAPISchemaExposed ? (
+                <Check size={16} className="text-primary" />
+              ) : undefined
+            }
+          >
+            1. Create a custom <code className="text-code-inline">api</code> schema and expose it
+          </DialogDisclosureTrigger>
+          <DialogDisclosureContent className="text-sm text-foreground-light flex flex-col gap-y-4">
             <p className="mx-5">
               Click the button below to create a new schema named{' '}
               <code className="text-code-inline">api</code> and grant the{' '}
@@ -207,27 +206,20 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 {`grant select on table api.<your_table> to anon;\ngrant select, insert, update, delete on table api.<your_table> to authenticated;`}
               </CodeBlock>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+          </DialogDisclosureContent>
+        </DialogDisclosure>
 
         <DialogSectionSeparator />
 
-        <Collapsible>
-          <CollapsibleTrigger className="py-4 px-5 w-full flex items-center justify-between text-sm">
-            <p>
-              2. Remove the <code className="text-code-inline">public</code> schema from the exposed
-              schemas
-            </p>
-            {!isPublicSchemaExposed ? (
-              <Check size={16} className="text-primary" />
-            ) : (
-              <ChevronDown
-                size={16}
-                className="transition data-open-parent:rotate-180 data-closed-parent:rotate-0"
-              />
-            )}
-          </CollapsibleTrigger>
-          <CollapsibleContent className="text-sm text-foreground-light">
+        <DialogDisclosure>
+          <DialogDisclosureTrigger
+            className="py-4 px-5"
+            icon={!isPublicSchemaExposed ? <Check size={16} className="text-primary" /> : undefined}
+          >
+            2. Remove the <code className="text-code-inline">public</code> schema from the exposed
+            schemas
+          </DialogDisclosureTrigger>
+          <DialogDisclosureContent className="text-sm text-foreground-light">
             <div className="px-5 pb-4 flex flex-col gap-y-4">
               <Alert variant="warning">
                 <WarningIcon />
@@ -262,8 +254,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 Remove public schema from exposed schemas
               </ButtonTooltip>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+          </DialogDisclosureContent>
+        </DialogDisclosure>
       </DialogContent>
     </Dialog>
   )

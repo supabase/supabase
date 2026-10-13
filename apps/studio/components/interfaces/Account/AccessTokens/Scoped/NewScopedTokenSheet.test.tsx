@@ -255,6 +255,49 @@ describe('NewScopedTokenSheet', () => {
     )
   }, 10_000)
 
+  test('creates a token without an expiry when the Never preset is selected', async () => {
+    let createBody: Record<string, unknown> | undefined
+    addAPIMock({
+      method: 'post',
+      path: '/platform/profile/scoped-access-tokens',
+      response: async ({ request }) => {
+        createBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json<CreateTokenResponse>({
+          created_at: '',
+          expires_at: null,
+          id: 'plop',
+          last_used_at: null,
+          name: 'test',
+          token: 'a_token_value',
+          token_alias: '',
+          permissions: [],
+        })
+      },
+    })
+    renderSheet()
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))
+    await screen.findByRole('dialog')
+    await user.type(await screen.findByLabelText('Name'), 'test')
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Expires in' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Never' }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Organization' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Acme Production' }))
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Projects' }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Project 1' }))
+    await expandPermissionCategory('Project')
+    fireEvent.click(await screen.findByLabelText('Project Settings', { exact: false }))
+    fireEvent.click(await screen.findByRole('option', { name: 'Read' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Review access' }))
+    await screen.findByText('Never')
+    fireEvent.click(await screen.findByRole('button', { name: 'Create token' }))
+    await waitFor(() => expect(createBody).toBeDefined())
+    expect(createBody?.expires_at).toBeUndefined()
+    expect(mockTrack).toHaveBeenCalledWith(
+      'access_token_created',
+      expect.objectContaining({ expiryPreset: 'never' })
+    )
+  }, 10_000)
+
   test('tracks dismissal with the in-progress resourceAccess and touched state on Cancel', async () => {
     renderSheet()
     fireEvent.click(await screen.findByRole('button', { name: 'Generate new token' }))

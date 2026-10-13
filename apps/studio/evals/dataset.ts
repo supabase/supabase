@@ -1151,4 +1151,90 @@ export const dataset: AssistantEvalCase[] = [
         'A multi-part investigation explicitly meant to be referenced again later should route to create_notebook without naming it',
     },
   },
+  {
+    input: {
+      prompt: 'I want to change my AI opt-in level.',
+      aiOptInLevel: 'schema_and_log_and_data',
+      optInDecision: { chooses: 'schema' },
+    },
+    expected: { requiredTools: ['update_opt_in_level'] },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Opt-in: asked to change the setting, the Assistant calls update_opt_in_level instead of sending the user to an admin',
+    },
+  },
+  {
+    input: {
+      prompt: 'What tables do I have in my database?',
+      aiOptInLevel: 'schema_and_log_and_data',
+    },
+    expected: {
+      requiredTools: ['list_tables'],
+      forbiddenTools: ['update_opt_in_level'],
+    },
+    metadata: {
+      category: ['general_help'],
+      description: 'Opt-in: no request when the level already allows the tool',
+    },
+  },
+  {
+    input: {
+      prompt: 'What tables do I have in my database?',
+      aiOptInLevel: 'disabled',
+      optInDecision: 'accept',
+    },
+    expected: {
+      requiredTools: [
+        { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
+        'list_tables',
+      ],
+      correctAnswer:
+        'Answers with the tables list_tables returned instead of saying it lacks access.',
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Opt-in: the Assistant asks for the Schema level when blocked, and after the user accepts it continues with the tool it was blocked from',
+    },
+  },
+  {
+    input: {
+      prompt: 'What tables do I have in my database?',
+      aiOptInLevel: 'disabled',
+      optInDecision: 'skip',
+    },
+    expected: {
+      // The skipped `update_opt_in_level` never executes, so it leaves no tool span to require.
+      requiredTools: [
+        { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
+      ],
+      forbiddenTools: ['list_tables'],
+      correctAnswer:
+        "Says it can't see the tables because schema access wasn't enabled, and offers at least one alternative (enabling it later, the Table Editor, or pasting table names). It does not ask for the opt-in level again and does not invent tables.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Opt-in: after the user skips the request, the Assistant answers without the data and does not ask again',
+    },
+  },
+  {
+    input: {
+      prompt: 'What tables do I have in my database?',
+      aiOptInLevel: 'disabled',
+      optInDecision: { chooses: 'disabled' },
+    },
+    expected: {
+      requiredTools: ['update_opt_in_level'],
+      forbiddenTools: ['list_tables'],
+      correctAnswer:
+        "Does not list tables or claim to have seen them. Either asks for the opt-in level once more or explains that schema access is still not enabled. It never presents tables that weren't returned.",
+    },
+    metadata: {
+      category: ['general_help'],
+      description:
+        'Opt-in: the user saves without raising the level, so the Assistant does not use the blocked tool or claim to have data',
+    },
+  },
 ]

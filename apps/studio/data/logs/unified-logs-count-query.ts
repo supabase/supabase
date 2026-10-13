@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -8,6 +7,7 @@ import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
@@ -90,7 +90,7 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
     queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),

@@ -5,7 +5,7 @@ description: 'How the Authorization and apikey request headers and the verify_jw
 subtitle: 'How the Authorization and apikey headers and the verify_jwt platform check work'
 ---
 
-Every request to an Edge Function passes through two layers of auth. First, a platform-level check (`verify_jwt`) runs before your code executes. Then, once the request reaches your handler, you decide what to do with the credentials the caller sent. This page is the reference for both layers. For the practical patterns built on top of them, see [Securing Edge Functions](/guides/functions/auth).
+Every request to an Edge Function passes through two layers of auth. First, a platform-level check (`verify_jwt`) runs before your code executes. Then, once the request reaches your handler, you decide what to do with the credentials the caller sent. This page is the reference for both layers. For the practical patterns built on top of them, see [Securing Edge Functions](/docs/guides/functions/auth).
 
 ## Understanding authorization headers
 
@@ -41,7 +41,7 @@ For migration compatibility, `verify_jwt` accepts publishable and secret keys on
 Use the `verify_jwt` flag to match how the function is called:
 
 - **Leave `verify_jwt` on** for functions that are only called with a user JWT, such as functions invoked from the client through `supabase.functions.invoke`. The platform rejects unauthenticated requests before they reach your code, and your handler can trust that a valid JWT is present.
-- **Turn `verify_jwt` off** for functions that are called without an `Authorization` header, such as webhooks from external providers, or service-to-service calls that authenticate with an API key. These patterns are covered in [Securing Edge Functions](/guides/functions/auth).
+- **Turn `verify_jwt` off** for functions that are called without an `Authorization` header, such as webhooks from external providers, or service-to-service calls that authenticate with an API key. These patterns are covered in [Securing Edge Functions](/docs/guides/functions/auth).
 
 Set the flag per function in `supabase/config.toml`:
 

@@ -1,4 +1,5 @@
 import { SupportedAssistantEntities } from './AIAssistant.types'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 export const ASSISTANT_ERRORS = {
   'context-exceeded': {
@@ -44,3 +45,10 @@ export const SAFE_FUNCTIONS = [
   'now(',
   'left(',
 ]
+
+export const AI_OPT_IN_LEVEL_LABELS: Record<AiOptInLevel, string> = {
+  disabled: 'Disabled',
+  schema: 'Schema Only',
+  schema_and_log: 'Schema & Logs',
+  schema_and_log_and_data: 'Schema, Logs & Database Data',
+}

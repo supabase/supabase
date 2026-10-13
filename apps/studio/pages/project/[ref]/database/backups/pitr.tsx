@@ -28,7 +28,11 @@ import { useBackupsQuery } from '@/data/database/backups-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
-import { useIsOrioleDbInAws, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsOrioleDbInAws,
+  useOrioleDbReleaseStage,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -71,6 +75,7 @@ const PITR = () => {
   const { hasAccess: hasAccessToPitr, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('pitr.available_variants')
   const isOrioleDbInAws = useIsOrioleDbInAws()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const {
     data: backups,
     error,
@@ -96,8 +101,8 @@ const PITR = () => {
     return (
       <Admonition
         type="default"
-        title="Database backups are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        title="Point-in-Time Recovery is not available for OrioleDB"
+        description={`OrioleDB is currently in public ${orioleDbReleaseStage} and Point-in-Time Recovery is unavailable on OrioleDB projects`}
       >
         <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>

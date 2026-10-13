@@ -8,7 +8,7 @@ import { OAuthConsentCard } from '@/registry/default/blocks/oauth-consent/compon
 import { LoginForm } from '@/registry/default/blocks/password-based-auth-nextjs/components/login-form'
 
 const PRODUCT_NAME = 'Acme'
-const MCP_SERVER_URL = 'https://your-project.supabase.co/functions/v1/mcp-server'
+const MCP_SERVER_URL = 'https://your-project.supabase.co/functions/v1/mcp'
 
 const grants: OAuthGrant[] = [
   {

@@ -1,7 +1,10 @@
+import { useFeatureFlags, useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
 import { AuthorizedApps } from './AuthorizedApps'
+import { OAuthAppsAuthorizedList } from './OAuthAppsAuthorizedList'
 import { PublishableApps } from './PublishableApps'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -9,12 +12,20 @@ import { PublishableApps } from './PublishableApps'
 // check in again after we wrap up Vercel integration
 
 export const OAuthApps = () => {
+  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
+  const { hasLoaded } = useFeatureFlags()
+  const shouldShowNewOAuthApps = areOAuthAppScopedGrantsEnabled && USE_MOCKS
   return (
     <>
       <PageContainer size="default" className="pb-16">
         <PublishableApps />
-        {/* Here we'll display the OAuth App Scoped Grants depending on the feature flag in future PRs */}
-        <AuthorizedApps />
+        {hasLoaded ? (
+          shouldShowNewOAuthApps ? (
+            <OAuthAppsAuthorizedList />
+          ) : (
+            <AuthorizedApps />
+          )
+        ) : null}
       </PageContainer>
     </>
   )

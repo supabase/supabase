@@ -39,4 +39,6 @@ export type CustomContentTypes = {
   infraAwsNimbusLabel: string
 
   sslCertificateUrl: string
+
+  statusPageVisibilityFieldIds: Array<string>
 }

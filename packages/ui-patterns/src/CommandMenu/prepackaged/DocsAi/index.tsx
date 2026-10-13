@@ -30,7 +30,7 @@ const useDocsAiCommands = ({
         action: () => {
           setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME, true)
         },
-        icon: () => <AiIconAnimation />,
+        icon: () => <AiIconAnimation size={20} />,
       },
     ].map(modify),
     options

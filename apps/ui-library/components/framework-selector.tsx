@@ -63,8 +63,11 @@ export function FrameworkSelector() {
 
   return (
     <Select value={selectedFramework} onValueChange={onSelect}>
-      <SelectTrigger className="w-[180px] mt-4 lg:mt-0">
-        <SelectValue />
+      <SelectTrigger
+        aria-label="Framework"
+        className="h-7 w-auto min-w-28 gap-2 rounded-md bg-surface-75 px-2 text-xs"
+      >
+        <SelectValue>{frameworkTitles[selectedFramework]}</SelectValue>
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

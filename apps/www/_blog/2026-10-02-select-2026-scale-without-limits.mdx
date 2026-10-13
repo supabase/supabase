@@ -1,0 +1,140 @@
+---
+title: 'Scale without limits: Multigres, OrioleDB, and dbarena'
+description: 'The app your agent built in minutes stays on the same Postgres from prototype to petabyte.'
+author: joe_sciarrino, alexander_korotkov, daniel_mitterdorfer, aditya_maruvada
+date: '2026-10-02T10:35:00'
+categories:
+  - product
+tags:
+  - postgres
+  - database
+  - scaling
+imgSocial: 'select-2026-scale-without-limits/og.png'
+imgThumb: 'select-2026-scale-without-limits/thumb.png'
+toc_depth: 2
+---
+
+Today at Supabase Select, we announced Multigres for high availability and scalable connection pooling, and OrioleDB for high performance storage. We launched dbarena, an open benchmarks site for comparing managed Postgres providers’ performance results and costs.
+
+Every Supabase project starts with a single Postgres database. As your project grows, vertically upgrading the database’s available RAM & CPU resources can help, but it isn’t a solution to every challenge.
+
+Scaling Postgres isn’t a singular problem — users encounter new challenges at different stages of scale and under different workloads. Our users often report needing help scaling concurrent client connections, reducing the overhead of bloat and frequent VACUUM operations, increasing read and write throughput, avoiding transaction ID wraparound, and guaranteeing uptime with high availability.
+
+Our focus is to remove every scaling limitation from our users’ journey. That means tackling bottlenecks at every layer of Postgres, building in public, and making the improvements fully open source and available to the broader builder community.
+
+<svg
+  className="-mb-8 mt-12 not-sr-only"
+  aria-hidden="true"
+  width="101"
+  height="40"
+  viewBox="0 0 101 40"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g clip-path="url(#clip0_2218_147314)">
+    <path
+      d="M31.3735 4.16153V3.17301H37.4313V4.16153H31.3735ZM33.9081 6.69618V0.638357H34.8967V6.69618H33.9081ZM53.3111 3.90806V2.91955H59.0648V3.90806H53.3111ZM39.6747 3.90806V2.91955H45.4157V3.90806H39.6747ZM46.4929 3.90806V2.91955H52.2339V3.90806H46.4929ZM61.4685 4.16153V3.17301H67.5264V4.16153H61.4685ZM64.0032 6.69618V0.638357H64.9917V6.69618H64.0032ZM16.326 20.1615V19.173H22.3838V20.1615H16.326ZM18.8606 22.6962V16.6384H19.8491V22.6962H18.8606ZM38.2636 19.9081V18.9195H44.0173V19.9081H38.2636ZM24.6272 19.9081V18.9195H30.3681V19.9081H24.6272ZM31.4454 19.9081V18.9195H37.1864V19.9081H31.4454ZM46.421 20.1615V19.173H52.4788V20.1615H46.421ZM48.9557 22.6962V16.6384H49.9442V22.6962H48.9557ZM68.3587 19.9081V18.9195H74.1123V19.9081H68.3587ZM54.7222 19.9081V18.9195H60.4632V19.9081H54.7222ZM61.5404 19.9081V18.9195H67.2814V19.9081H61.5404ZM76.5161 20.1615V19.173H82.5739V20.1615H76.5161ZM79.0507 22.6962V16.6384H80.0393V22.6962H79.0507ZM1.27844 36.1615V35.173H7.33626V36.1615H1.27844ZM3.81309 38.6962V32.6384H4.80161V38.6962H3.81309ZM23.2161 35.9081V34.9195H28.9697V35.9081H23.2161ZM9.57963 35.9081V34.9195H15.3206V35.9081H9.57963ZM16.3978 35.9081V34.9195H22.1388V35.9081H16.3978ZM31.3735 36.1615V35.173H37.4313V36.1615H31.3735ZM33.9081 38.6962V32.6384H34.8967V38.6962H33.9081ZM53.3111 35.9081V34.9195H59.0648V35.9081H53.3111ZM39.6747 35.9081V34.9195H45.4157V35.9081H39.6747ZM46.4929 35.9081V34.9195H52.2339V35.9081H46.4929ZM61.4685 36.1615V35.173H67.5264V36.1615H61.4685ZM64.0032 38.6962V32.6384H64.9917V38.6962H64.0032ZM83.4062 35.9081V34.9195H89.1598V35.9081H83.4062ZM69.7697 35.9081V34.9195H75.5107V35.9081H69.7697ZM76.588 35.9081V34.9195H82.329V35.9081H76.588ZM91.5636 36.1615V35.173H97.6214V36.1615H91.5636ZM94.0983 38.6962V32.6384H95.0868V38.6962H94.0983Z"
+      fill="#797B72"
+    />
+  </g>
+  <defs>
+    <clipPath id="clip0_2218_147314">
+      <rect width="100.99" height="40" fill="white" />
+    </clipPath>
+  </defs>
+</svg>
+
+## Multigres
+
+<video className="wide rounded-md border m-0 w-full" autoPlay loop muted playsInline controls>
+  <source src="/images/blog/select-2026-scale-without-limits/failover.mp4" type="video/mp4" />
+</video>
+
+Multigres is an open source operating system for Postgres, built by the team behind Vitess. It adds scalable connection pooling and automated multi-node failover to Postgres out-of-the-box. With Multigres, there's no separate pooler to run, and your app can connect far more clients than one Postgres instance can hold.
+
+Many developers are familiar with basic Primary / Standby HA architecture and its known issues. Traditionally, if the primary database fails before data has been replicated to the standby, those rows may be lost. In contrast, Multigres uses a generalized consensus protocol built on top of postgres synchronous replication. If a Multigres node fails, the cluster agrees on exactly which writes were committed before accepting new ones, then promotes a replica in seconds. You keep every committed write through the failover.
+
+Multigres runs three Postgres nodes across availability zones in one region, so losing one zone doesn't take your database down. You don't need to change your application code to move to Multigres.
+
+You can also add read replicas and gateways for more read throughput and client connections. During the alpha, our team adds them for you.
+
+Multigres is in private alpha, by invite. It works with Supabase Auth, Storage, and Edge Functions, and it's built for testing during the alpha, not production workloads. [Request access](https://supabase.com/go/multigres-early-access).
+
+<svg
+  className="-mb-8 mt-12 not-sr-only"
+  aria-hidden="true"
+  width="109"
+  height="40"
+  viewBox="0 0 109 40"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <g clip-path="url(#clip0_2218_147312)">
+    <path
+      d="M1.35291 6.98767V5.89776L6.34617 3.66727V3.81935L1.35291 1.58885V0.498951L7.13192 3.07163V4.41499L1.35291 6.98767ZM31.448 6.98767V5.89776L36.4412 3.66727V3.81935L31.448 1.58885V0.498951L37.227 3.07163V4.41499L31.448 6.98767ZM38.9717 6.98767V5.89776L43.965 3.66727V3.81935L38.9717 1.58885V0.498951L44.7507 3.07163V4.41499L38.9717 6.98767ZM69.0668 6.98767V5.89776L74.06 3.66727V3.81935L69.0668 1.58885V0.498951L74.8458 3.07163V4.41499L69.0668 6.98767ZM76.5905 6.98767V5.89776L81.5838 3.66727V3.81935L76.5905 1.58885V0.498951L82.3696 3.07163V4.41499L76.5905 6.98767ZM84.1143 6.98767V5.89776L89.1076 3.66727V3.81935L84.1143 1.58885V0.498951L89.8933 3.07163V4.41499L84.1143 6.98767ZM1.35291 22.9877V21.8978L6.34617 19.6673V19.8193L1.35291 17.5889V16.499L7.13192 19.0716V20.415L1.35291 22.9877ZM31.448 22.9877V21.8978L36.4412 19.6673V19.8193L31.448 17.5889V16.499L37.227 19.0716V20.415L31.448 22.9877ZM38.9717 22.9877V21.8978L43.965 19.6673V19.8193L38.9717 17.5889V16.499L44.7507 19.0716V20.415L38.9717 22.9877ZM69.0668 22.9877V21.8978L74.06 19.6673V19.8193L69.0668 17.5889V16.499L74.8458 19.0716V20.415L69.0668 22.9877ZM76.5905 22.9877V21.8978L81.5838 19.6673V19.8193L76.5905 17.5889V16.499L82.3696 19.0716V20.415L76.5905 22.9877ZM84.1143 22.9877V21.8978L89.1076 19.6673V19.8193L84.1143 17.5889V16.499L89.8933 19.0716V20.415L84.1143 22.9877ZM1.35291 38.9877V37.8978L6.34617 35.6673V35.8193L1.35291 33.5889V32.499L7.13192 35.0716V36.415L1.35291 38.9877ZM31.448 38.9877V37.8978L36.4412 35.6673V35.8193L31.448 33.5889V32.499L37.227 35.0716V36.415L31.448 38.9877ZM38.9717 38.9877V37.8978L43.965 35.6673V35.8193L38.9717 33.5889V32.499L44.7507 35.0716V36.415L38.9717 38.9877ZM69.0668 38.9877V37.8978L74.06 35.6673V35.8193L69.0668 33.5889V32.499L74.8458 35.0716V36.415L69.0668 38.9877ZM76.5905 38.9877V37.8978L81.5838 35.6673V35.8193L76.5905 33.5889V32.499L82.3696 35.0716V36.415L76.5905 38.9877ZM84.1143 38.9877V37.8978L89.1076 35.6673V35.8193L84.1143 33.5889V32.499L89.8933 35.0716V36.415L84.1143 38.9877Z"
+      fill="#797B72"
+    />
+  </g>
+  <defs>
+    <clipPath id="clip0_2218_147312">
+      <rect width="108.515" height="40" fill="white" />
+    </clipPath>
+  </defs>
+</svg>
+
+## OrioleDB
+
+<video
+  alt="Postgres heap leaves dead row versions in the table and needs VACUUM, while OrioleDB moves old versions to an undo log and reclaims space automatically"
+  className="wide rounded-md border m-0 w-full"
+  poster="/images/blog/select-2026-scale-without-limits/orioledb.png"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls
+>
+  <source src="/images/blog/select-2026-scale-without-limits/orioledb.mp4" type="video/mp4" />
+</video>
+
+OrioleDB is an open source, scalable storage engine for Postgres. It replaces Postgres traditional heap storage and eliminates its fundamental limitations, such as table bloat, VACUUM overhead, and txid wraparound inherent to the limited range of 32-bit transaction IDs.
+
+With heap storage, Postgres never updates a row in place: every update writes a new row version and leaves the old one behind as a dead tuple. On hot tables with frequent updates and deletes, this creates significant bloat over time, and cleaning it up requires constant VACUUM activity. VACUUM is one of the most common causes of Postgres performance degradation and outages under load. Teams typically mitigate it with careful tuning, scheduled `pg_repack` runs, and over-provisioned compute.
+
+OrioleDB's undo log removes this problem at the source. Instead of leaving dead tuples behind, updates and deletes write page-level undo records, which the system reclaims automatically. This eliminates bloat entirely and VACUUM is no longer needed.
+
+Allowing lock-free page reads also makes OrioleDB more efficient under high concurrency, especially in IOPS use. OrioleDB delivers up to 1.8x higher throughput than Postgres heap in our public, TPC-C-derived benchmarks, published on [dbarena.com](https://dbarena.com/).
+
+<Admonition type="note">
+
+During the public beta, you can choose OrioleDB under advanced configuration when you create a project. You can also use OrioleDB and heap storage per table in one project, with `USING orioledb` or `USING heap`.
+
+</Admonition>
+
+OrioleDB uses 64-bit transaction IDs (XIDs) by default, so it avoids Postgres's wraparound problem. With 32-bit XIDs, wraparound hits after roughly 4 billion transactions and forces the database to aggressively freeze old rows. With heap storage, XIDs are directly stored in every tuple, so expanding them from 32 to 64 bits would add 8 bytes to every row version. That simple 8-byte change cascades across billions of row versions with dead tuples, resulting in more pages, more I/O, greater cache pressure, and larger indexes.
+
+Because OrioleDB replaces heap's vacuum-based MVCC with an undo log, it sidesteps this constraint entirely: transaction metadata can use 64-bit XIDs without inheriting heap's legacy tuple format.
+
+OrioleDB has been under active development by the Supabase team and open source contributors since 2021. Supabase employs the engine's creators, including major Postgres contributor Alexander Korotkov, who have shipped eighteen beta releases.
+
+## dbarena
+
+<Img
+  alt="A dbarena comparison of two XLarge configurations, showing throughput per dollar, monthly cost, throughput, p95 latency, and throughput over time"
+  src="/images/blog/select-2026-scale-without-limits/dbarena.png"
+  wide
+/>
+
+[dbarena.com](https://dbarena.com) publishes open, reproducible database benchmarks across providers: the benchmark code, published methodology, downloadable raw data per result, and shareable comparison links. It compares Supabase, Amazon RDS, and Google Cloud SQL at launch. For each run, dbarena reports transactions per dollar, monthly total cost, transactions per minute, p95, and machine specs, and it plots throughput over time.
+
+Developers evaluating hosted Postgres have few trustworthy sources for comparing providers. Vendor benchmarks often run under favorable conditions, community benchmarks are one-off snapshots, and a rigorous in-house evaluation costs weeks to produce.
+
+dbarena follows three rules: every published result can be checked independently, comparisons are normalized for cost, and the methodology is public.
+
+Subscribe to the [dbarena newsletter](https://dbarena.com/?subscribe) to keep up with the latest comparisons and performance tracking over time.
+
+## Get started
+
+- Multigres: private alpha. [Request access](https://supabase.com/go/multigres-early-access).
+- OrioleDB: create a new project and choose OrioleDB at project creation. Public beta. [Docs](https://supabase.com/docs/guides/database/orioledb).
+- dbarena: public, at [dbarena.com](https://dbarena.com).

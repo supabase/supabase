@@ -1,3 +1,5 @@
+import { ident } from '@supabase/pg-meta'
+
 import { SupaTable } from '@/components/grid/types'
 import { Lint } from '@/data/lint/lint-query'
 
@@ -34,25 +36,33 @@ export const getTablePoliciesUrl = (
   )}&schema=${encodeURIComponent(schema ?? '')}`
 }
 
+export const formatTableRowsToJSON = (table: SupaTable, rows: Record<string, unknown>[]) => {
+  const objects = rows.map((row) => {
+    const entries = table.columns.map(
+      ({ name }) =>
+        `${JSON.stringify(name)}:${JSON.stringify((Object.hasOwn(row, name) ? row[name] : null) ?? null)}`
+    )
+    return `{${entries.join(',')}}`
+  })
+  return `[${objects.join(',')}]`
+}
+
 export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 
-  const columns = table.columns.map((col) => `"${col.name}"`).join(', ')
+  const columns = table.columns.map((col) => ident(col.name)).join(', ')
 
   const valuesSets = rows
     .map((row) => {
-      const filteredRow = { ...row }
-      if ('idx' in filteredRow) delete filteredRow.idx
-
-      const values = Object.entries(filteredRow).map(([key, val]) => {
-        const { dataType, format } = table.columns.find((col) => col.name === key) ?? {}
+      const values = table.columns.map(({ name, dataType, format }) => {
+        const val = Object.hasOwn(row, name) ? row[name] : undefined
 
         // We only check for NULL, array and JSON types, everything else we stringify
         // given that Postgres can implicitly cast the right type based on the column type
         // For string types, we need to deal with escaping single quotes
         const stringFormats = ['text', 'varchar']
 
-        if (val === null) {
+        if (val === null || val === undefined) {
           return 'null'
         } else if (dataType === 'ARRAY') {
           const array = Array.isArray(val) ? val : JSON.parse(val as string)
@@ -78,7 +88,7 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
     })
     .join(', ')
 
-  return `INSERT INTO "${table.schema}"."${table.name}" (${columns}) VALUES ${valuesSets};`
+  return `INSERT INTO ${ident(table.schema)}.${ident(table.name)} (${columns}) VALUES ${valuesSets};`
 }
 
 /**

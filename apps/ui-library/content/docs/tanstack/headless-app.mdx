@@ -1,14 +1,16 @@
 ---
 title: Headless App
 description: A backend with an agent as the primary interface
+preview: |-
+  <BlockOverview name="headless-app-tanstack" showFiles>
+    <BlockPreview name="headless-app" />
+  </BlockOverview>
 ---
 
 A headless app uses an AI agent as its primary interface. Users sign in and
 approve access in the browser, then work through their agent using MCP tools.
 This starter includes task tools and a database with Row Level Security (RLS)
 that limits each user to their own data.
-
-<BlockPreview name="headless-app" />
 
 ## Installation
 
@@ -30,7 +32,7 @@ Merge `supabase/config.toml` if you already have project settings. Add
 
 - Set `VITE_PRODUCT_NAME` in `.env.local` and edit the generated pages and components.
 - Define your tables, grants, and RLS policies in `supabase/schemas/`.
-- Replace `supabase/functions/mcp-server/tools/tasks.ts` with your app's operations
+- Replace `supabase/functions/mcp/tools/tasks.ts` with your app's operations
   and register them in `tools/index.ts`. Use the supplied user-scoped `supabase` client.
 - Set `MCP_SERVER_NAME` and `MCP_SERVER_DESCRIPTION` with `supabase secrets set`.
 
@@ -75,7 +77,7 @@ Review the migration, including grants and RLS policies, then deploy:
 supabase link --project-ref <project-ref>
 supabase db push
 supabase config push
-supabase functions deploy mcp-server
+supabase functions deploy mcp
 ```
 
 Open `/agents` on your deployed app, sign in, and copy the server URL into an

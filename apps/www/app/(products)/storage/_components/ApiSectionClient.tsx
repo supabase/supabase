@@ -3,7 +3,6 @@
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { ArrowRightLeft, ChevronDown, Download, List, Upload } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -189,7 +188,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
               />
             </motion.div>
           </AnimatePresence>
-          <Link
+          <a
             href="/docs/guides/storage"
             className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
           >
@@ -210,7 +209,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
                 strokeLinejoin="round"
               />
             </svg>
-          </Link>
+          </a>
         </motion.div>
       </div>
     </SectionContainerWithCn>

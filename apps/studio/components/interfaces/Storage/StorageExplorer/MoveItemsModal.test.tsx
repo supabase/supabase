@@ -31,6 +31,16 @@ const createFile = (name: string): StorageObject => ({
   metadata: { size: 1024, mimetype: 'image/png' },
 })
 
+/** list-v2's `objects` entries require the timestamp fields non-null, unlike the v1 fixture type */
+const toV2Object = (file: StorageObject) => ({
+  id: file.id!,
+  name: file.name,
+  created_at: file.created_at!,
+  updated_at: file.updated_at!,
+  last_accessed_at: file.last_accessed_at!,
+  metadata: file.metadata,
+})
+
 /** Contents of the fake bucket the picker browses, keyed by folder path */
 const BUCKET_CONTENTS: Record<string, StorageObject[]> = {
   '': [
@@ -45,7 +55,35 @@ const BUCKET_CONTENTS: Record<string, StorageObject[]> = {
   invoices: [],
 }
 
-const mockObjectsList = () =>
+const mockObjectsList = () => {
+  // Used by the migrated infinite-query hook (folder contents in the picker's main listing)
+  addAPIMock({
+    method: 'post',
+    path: '/platform/storage/:ref/buckets/:id/objects/list-v2',
+    response: async ({ request }) => {
+      const body = (await request.json()) as { prefix: string }
+      // The real API expects a trailing slash to browse a folder's contents; strip it to match
+      // the BUCKET_CONTENTS keys, which mirror path segments without one.
+      const path = body.prefix.replace(/\/$/, '')
+      const contents = BUCKET_CONTENTS[path] ?? []
+      // The real API returns `name` as the full path from the bucket root, with a trailing
+      // slash for folders — not the bare name relative to the requested prefix.
+      const fullPath = (name: string) => (path ? `${path}/${name}` : name)
+      return HttpResponse.json({
+        folders: contents
+          .filter((object) => object.id === null)
+          .map((object) => ({
+            name: `${fullPath(object.name)}/`,
+          })),
+        objects: contents
+          .filter((object) => object.id !== null)
+          .map((object) => toV2Object({ ...object, name: fullPath(object.name) })),
+        hasNext: false,
+      })
+    },
+  })
+
+  // Still v1: used by bucket-folders-query.ts's crawl, which powers the search results list
   addAPIMock({
     method: 'post',
     path: '/platform/storage/:ref/buckets/:id/objects/list',
@@ -54,6 +92,7 @@ const mockObjectsList = () =>
       return HttpResponse.json(BUCKET_CONTENTS[body.path] ?? [])
     },
   })
+}
 
 const selectedFile: StorageItemWithColumn = {
   id: 'id-avatar.png',
@@ -146,11 +185,15 @@ describe('MoveItemsModal', () => {
     const files = Array.from({ length: 200 }, (_, index) => createFile(`file-${index}.png`))
     addAPIMock({
       method: 'post',
-      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      path: '/platform/storage/:ref/buckets/:id/objects/list-v2',
       response: async ({ request }) => {
-        const body = (await request.json()) as { options?: { offset?: number } }
-        const isFirstPage = (body.options?.offset ?? 0) === 0
-        return HttpResponse.json(isFirstPage ? files : [createFolder('buried')])
+        const body = (await request.json()) as { cursor?: string }
+        const isFirstPage = !body.cursor
+        return HttpResponse.json(
+          isFirstPage
+            ? { folders: [], objects: files.map(toV2Object), hasNext: true, nextCursor: 'page-2' }
+            : { folders: [{ name: 'buried/' }], objects: [], hasNext: false }
+        )
       },
     })
 

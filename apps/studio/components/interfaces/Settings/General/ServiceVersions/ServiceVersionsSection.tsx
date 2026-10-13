@@ -34,11 +34,16 @@ import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 
 export const ServiceVersionsSection = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
     useIsFeatureEnabled([
@@ -197,7 +202,7 @@ export const ServiceVersionsSection = () => {
                       </>
                     )}
 
-                    {showDatabaseUpgrades && data && data.eligible ? (
+                    {showDatabaseUpgrades && data && data.eligible && !isAwsK8s ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (

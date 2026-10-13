@@ -84,6 +84,12 @@ Transaction mode does not support [prepared statements](https://postgresql.org/d
 
 </Admonition>
 
+<Admonition type="caution">
+
+Transaction mode does not support [query pipelining](https://www.postgresql.org/docs/current/libpq-pipeline-mode.html). See [Transaction mode limitations](#transaction-mode-limitations) for mode details.
+
+</Admonition>
+
 ```txt
 postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[POOLER-HOST]:6543/postgres
 ```
@@ -168,7 +174,7 @@ For more on sizing an application-side pool, see the [Supavisor FAQ](/docs/guide
 
 ### Transaction mode limitations
 
-[Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Three things are affected.
+[Transaction mode](#pooler-transaction-mode) returns your connection to the pool after each transaction, so anything that depends on session state doesn't survive between transactions. Four things are affected.
 
 **Prepared statements** aren't supported, so turn them off. Each driver does this differently:
 
@@ -185,7 +191,15 @@ For node-postgres, Psycopg, and Rust drivers, see [Disabling prepared statements
 
 **Session-level state** is lost between transactions. This covers `set` and `reset`, session-level advisory locks, `listen` and `notify`, and temporary tables. Run them inside the transaction that needs them, or use session mode or a direct connection instead.
 
-Direct connections and session mode support all three, so none of this applies to either.
+**Query pipelining** isn't supported: transaction mode returns a connection to the pool as soon as it sees one reply finish, even if the client already queued more queries on it.
+
+Direct connections and session mode support all four, so none of this applies to either.
+
+<Admonition type='caution'>
+
+`postgres.js` pipelines queries by default, so this combination can hang queries or return mismatched rows — see the [Postgres.js guide](/docs/guides/database/postgres-js) for how to avoid it.
+
+</Admonition>
 
 ### SSL [#connecting-with-ssl]
 

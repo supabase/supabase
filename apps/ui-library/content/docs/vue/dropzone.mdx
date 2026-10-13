@@ -1,27 +1,29 @@
 ---
 title: Dropzone (File Upload)
 description: Displays a control for easier uploading of files directly to Supabase Storage
+preview: |-
+  <BlockOverview name="dropzone-vue" showFiles>
+    <ComponentPreview
+      name="dropzone-demo"
+      description="A file upload dropzone component that allows users to drag-and-drop files or select them manually. It supports multiple files, displays upload progress, previews images, and shows validation errors."
+      showCode={false}
+    />
+  </BlockOverview>
 ---
-
-<ComponentPreview
-  name="dropzone-demo"
-  description="A file upload dropzone component that allows users to drag-and-drop files or select them manually. It supports multiple files, displays upload progress, previews images, and shows validation errors."
-  showCode={false}
-/>
 
 ## Installation
 
-<BlockItem
-  name="dropzone-vue"
-  description="Displays a control for easier uploading of files directly to Supabase Storage"
-  framework="vue"
-/>
+### Set up the Supabase client
 
-## Folder structure
+This block requires a Supabase client for Vue. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
 
-This block assumes that you have already installed a Supabase client for Vue from the previous step.
+<BlockItem name="supabase-client-vue" framework="vue" showOpenInV0={false} />
 
-<RegistryBlock itemName="dropzone-vue" />
+Configure the environment variables described in the [Vue client guide](/library/docs/vue/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="dropzone-vue" framework="vue" />
 
 ## Introduction
 

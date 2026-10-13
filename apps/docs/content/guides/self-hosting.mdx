@@ -13,15 +13,15 @@ Self-hosting is a good fit if you need full control over your data, have complia
 
 ## How self-hosted Supabase differs
 
-Self-hosted Supabase runs as a single project which means that Studio doesn't support multiple organizations or projects. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
+Self-hosted Supabase runs as a single project, which means that Studio doesn't support multiple organizations or projects. Most settings are configured through [environment variables](https://github.com/supabase/supabase/blob/master/docker/.env.example).
 
-Unlike the managed platform, which is fully hosted and operated by Supabase, branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the platform management API are **unavailable**.
+Some features of the managed platform aren't available when self-hosting: branching, advanced metrics beyond logs, managed backups and PITR, analytics and vector buckets, ETL, and the Management API. To collect logs and metrics yourself, see the community-maintained [observability project](https://github.com/supabase-community/supabase-observability).
 
 ### Not the same as local development
 
 [Supabase CLI](/docs/guides/local-development/cli/getting-started) runs a local stack for development and testing. That stack is not a self-hosted deployment: it is not hardened for production and must not be exposed to external traffic.
 
-To self-host, use [Docker](/docs/guides/self-hosting/docker) or one of the community deployment options.
+To self-host, use [Docker](/docs/guides/self-hosting/docker) or the community-maintained [Kubernetes project](https://github.com/supabase-community/supabase-kubernetes).
 
 ## Your responsibilities when self-hosting
 
@@ -35,9 +35,11 @@ When you self-host, **you are responsible for**:
 - Backups and disaster recovery
 - Monitoring and uptime
 
+<ContentListings id="self-hosting-third-party-guides" />
+
 ## Telemetry
 
-Self-hosted Supabase (run via Docker Compose) **does not phone home or collect any telemetry**.
+Self-hosted Supabase **does not phone home or collect any telemetry**.
 
 The **Supabase CLI**, a separate tool also used for [local development](/docs/guides/local-development/cli/getting-started), collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
 

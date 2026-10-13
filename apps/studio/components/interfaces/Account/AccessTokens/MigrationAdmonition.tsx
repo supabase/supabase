@@ -17,13 +17,16 @@ export const MigrationAdmonition = () => {
   return (
     <Admonition
       type="default"
-      title="We're moving to scoped access tokens"
+      title="Access tokens can now be scoped"
       className="relative mb-5"
       actions={
         <>
-          {/* Awaiting correct documentation link */}
           <Button asChild size="tiny">
-            <Link href={`${DOCS_URL}/guides/api`} target="_blank" rel="noreferrer">
+            <Link
+              href={`${DOCS_URL}/guides/platform/personal-access-tokens`}
+              target="_blank"
+              rel="noreferrer"
+            >
               Learn more
             </Link>
           </Button>
@@ -35,11 +38,12 @@ export const MigrationAdmonition = () => {
     >
       <div className="flex flex-col gap-y-1.5">
         <p className="text-sm text-foreground-light">
-          We recommend granting each new token the minimum access its integration needs.
+          Choose which organizations and projects each new token can reach, and what it can do
+          there. Grant only what its integration needs.
         </p>
         <span className="text-sm text-foreground-light">
-          Pre-existing tokens are marked with a <Badge>Legacy</Badge> badge and will continue to
-          work until expiry or deletion.
+          Tokens with full account access show a <Badge>Legacy</Badge> badge and keep working until
+          they expire or you delete them.
         </span>
       </div>
     </Admonition>

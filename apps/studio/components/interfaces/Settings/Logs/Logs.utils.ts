@@ -859,7 +859,11 @@ export function role(metadata: any) {
   return payload.role
 }
 
-export function formatLogsAsJson(rows: LogData[]): string {
+type LogExportData = Pick<LogData, 'id' | 'event_message'> & {
+  timestamp: string | number
+} & Record<string, unknown>
+
+export function formatLogsAsJson(rows: LogExportData[]): string {
   return JSON.stringify(rows, null, 2)
 }
 
@@ -867,7 +871,7 @@ export function formatLogsAsCsv(rows: LogData[]): string {
   return convertResultsToCSV(rows as unknown as Record<string, unknown>[]) ?? ''
 }
 
-export function formatLogsAsMarkdown(rows: LogData[]): string {
+export function formatLogsAsMarkdown(rows: LogExportData[]): string {
   return rows
     .map((row, i) => {
       const lines: string[] = [`## Log ${i + 1}`]
@@ -887,7 +891,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
       if (row.event_message) {
         lines.push(`**Message:** ${row.event_message}`)
       }
-      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row as any
+      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row
       if (Object.keys(rest).length > 0) {
         lines.push('', '**Details:**', '```json', JSON.stringify(rest, null, 2), '```')
       }
@@ -947,7 +951,11 @@ function extractServiceLabelFromSql(sql: string): string | null {
   return tableName && isLogsTableName(tableName) ? LOG_TABLE_TO_SERVICE_LABEL[tableName] : null
 }
 
-export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {
+export function buildLogsPrompt(
+  rows: LogExportData[],
+  queryType?: string,
+  sqlQuery?: string
+): string {
   const serviceLabel =
     (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
     (sqlQuery ? extractServiceLabelFromSql(sqlQuery) : null)
@@ -961,53 +969,4 @@ export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: 
     sqlContext +
     '\n\nWhat do these logs indicate? What steps can I take to resolve it? Keep your answer very concise and actionable. Max 2 or 3 bullet points.'
   )
-}
-
-/**
- * Computes the next multi-select set after a shift-click on `targetKey`, extending
- * the selection from `anchorKey` (the last row the user clicked). Every key between
- * anchor and target (inclusive, in `orderedKeys` order) is added. If the whole range is
- * already selected, the range is removed instead. Falls back to a plain toggle of
- * `targetKey` when there is no usable anchor (null, or no longer in `orderedKeys`).
- */
-export function getShiftClickSelection({
-  orderedKeys,
-  selectedKeys,
-  anchorKey,
-  targetKey,
-}: {
-  orderedKeys: string[]
-  selectedKeys: Set<string>
-  anchorKey: string | null
-  targetKey: string
-}): Set<string> {
-  const next = new Set(selectedKeys)
-
-  const anchorIndex = anchorKey === null ? -1 : orderedKeys.indexOf(anchorKey)
-  const targetIndex = orderedKeys.indexOf(targetKey)
-  const hasUsableAnchor = anchorIndex !== -1 && targetIndex !== -1
-
-  if (!hasUsableAnchor) {
-    if (next.has(targetKey)) {
-      next.delete(targetKey)
-    } else {
-      next.add(targetKey)
-    }
-    return next
-  }
-
-  const startIndex = Math.min(anchorIndex, targetIndex)
-  const endIndex = Math.max(anchorIndex, targetIndex)
-  const rangeKeys = orderedKeys.slice(startIndex, endIndex + 1)
-  const isRangeFullySelected = rangeKeys.every((key) => selectedKeys.has(key))
-
-  rangeKeys.forEach((key) => {
-    if (isRangeFullySelected) {
-      next.delete(key)
-    } else {
-      next.add(key)
-    }
-  })
-
-  return next
 }

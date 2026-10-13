@@ -53,4 +53,16 @@
   );
   --border-button-default: var(--border);
   --border-button-hover: var(--border-stronger);
+
+  /* Sidebar aliases — full colours for bg-sidebar / text-sidebar-* utilities.
+   * Classic shadcn stores these as HSL channel lists and wraps them in hsl().
+   * In this monorepo they alias the semantic system (same as Studio). */
+  --sidebar-background: var(--background-dash-sidebar);
+  --sidebar-foreground: var(--foreground-default);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: var(--ring);
 }
