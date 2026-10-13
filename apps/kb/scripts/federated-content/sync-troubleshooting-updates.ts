@@ -57,7 +57,7 @@ async function updateDiscussion(discussionId: string, title: string, body: strin
 async function syncDiscussionUpdates() {
   const guides = await readLocalGuides()
   const db = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL as string,
+    process.env.SUPABASE_URL as string,
     process.env.SUPABASE_SERVICE_ROLE_KEY as string
   )
 
