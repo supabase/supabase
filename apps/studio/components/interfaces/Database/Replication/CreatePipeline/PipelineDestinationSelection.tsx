@@ -54,7 +54,7 @@ export const PipelineDestinationSelection = ({
         {options.map(({ type, description }) => (
           <RadioGroupStackedItem
             key={type}
-            id={`${id}-${type}`}
+            id={`${id}-${type.replace(/\s+/g, '-')}`}
             value={type}
             className="[&>div]:items-center [&>div]:py-3.5"
             label={
