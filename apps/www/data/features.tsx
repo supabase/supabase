@@ -3014,10 +3014,12 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     description: `
 Declarative schemas help you manage complex Postgres databases more easily by defining your database structure in SQL files that represent the final, desired state. These schema files can be stored and versioned alongside your codebase, enabling better collaboration and simplified reviews.
 
+Declarative schemas now runs on \`pg-delta\`, a rebuilt diff engine. It loads your schema files into a scratch Postgres and diffs the catalog Postgres builds from them, so migrations cover RLS policy changes, grants, views, partitions, and domains. It is in alpha. New projects get it from \`supabase init\`, and existing projects turn it on with \`[experimental.pgdelta]\` and \`enabled = true\` in \`config.toml\`. \`pg-delta\` also runs on its own against any Postgres 14 through 18.
+
 With declarative schemas, you can:
 
 - Maintain a single source of truth for your database schema, reducing duplication and errors.
-- Generate migration files automatically by diffing your declarative schema against the current database state.
+- Generate migration files automatically by diffing your schema files against your migration history.
 - Review changes easily through concise, readable diffs instead of long, complex migration scripts.
 
 ## Key benefits
@@ -3025,7 +3027,7 @@ With declarative schemas, you can:
 2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
 3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
 4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
-5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, and more through declarative SQL files.
+5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, grants, partitions, publications, and domains through declarative SQL files. Objects that pgmq, pg_cron, and pg_partman create are recognized as extension-managed.
 
 Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
 
@@ -3043,7 +3045,7 @@ Declarative schemas are valuable for a wide range of teams and scenarios:
 Declarative schemas integrate directly with the Supabase CLI, allowing you to:
 
 - Define your schema in SQL files within the \`supabase/schemas\` directory.
-- Use \`supabase db diff\` to generate migration files based on schema changes.
+- With \`pg-delta\` on, run \`supabase db schema declarative sync\` to generate a migration from your schema files.
 - Apply and deploy migrations using the Supabase CLI, ensuring consistency across local and remote environments.
 - Combine with the Postgres Language Server for enhanced IDE support when working with declarative schemas.
 
@@ -3059,7 +3061,7 @@ Migrations are a record of incremental changes to your database schema. Declarat
 
 ### Do I need to write my own migration files?
 
-No. Supabase provides a schema diff tool (\`supabase db diff\`) that automatically generates migration files from your declarative schema files.
+No. The CLI generates them from your declarative schema files: \`supabase db schema declarative sync\` with \`pg-delta\` on, \`supabase db diff\` on the legacy engine.
 
 ### Can I use declarative schemas with my existing projects?
 
