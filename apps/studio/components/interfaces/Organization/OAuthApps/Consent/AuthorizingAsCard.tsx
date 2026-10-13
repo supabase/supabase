@@ -1,5 +1,4 @@
 import { LogOut } from 'lucide-react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
