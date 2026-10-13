@@ -358,7 +358,6 @@ const submitAndReadRegionSelection = async (onRequest: ReturnType<typeof vi.fn>)
   return onRequest.mock.calls[0][0].region_selection
 }
 
-// Region is selected explicitly because the smart-region auto-fill is unreliable (FE-3884).
 const selectRegion = async (optionName: string | RegExp) => {
   await user.click(getSelectTriggerByLabel('Region'))
   await user.click(await screen.findByRole('option', { name: optionName }))
@@ -481,6 +480,51 @@ describe('project creation wizard', () => {
   })
 
   describe('region selection', () => {
+    test('blocks submission until a region is selected', async () => {
+      mockWizardEndpoints({
+        availableRegions: {
+          ...DEFAULT_AVAILABLE_REGIONS,
+          recommendations: {
+            ...DEFAULT_AVAILABLE_REGIONS.recommendations,
+            smartGroup: { code: 'americas', name: '', type: 'smartGroup' },
+          },
+        },
+      })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Region Required Project')
+      await generateAndWaitForStrongPassword()
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Select a region')
+
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      expect(await screen.findByText('Please select a region.')).toBeInTheDocument()
+      expect(onRequest).not.toHaveBeenCalled()
+
+      await selectRegion(/Americas/)
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ name: 'Americas' })
+    })
+
+    test('submits the recommended region without manual selection', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Recommended Region Project')
+      await generateAndWaitForStrongPassword()
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas')
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ name: 'Americas' })
+    })
+
     test('surfaces the recommended smart region with a "Recommended" badge', async () => {
       mockWizardEndpoints()
 

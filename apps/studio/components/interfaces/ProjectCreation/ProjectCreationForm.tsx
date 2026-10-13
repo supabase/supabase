@@ -177,7 +177,7 @@ export const ProjectCreationForm = ({
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
-      dbRegion: undefined,
+      dbRegion: '',
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',
