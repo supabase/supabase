@@ -39,6 +39,28 @@ const NO_MODULE_SCOPE_CREATE_CLIENT = {
     'Do not construct a Supabase client at module scope in API route files — the TanStack server evaluates every route module at boot, so a missing env var (e.g. SUPABASE_URL on platform) crashes every route. Construct it lazily inside the handler (see lib/api/self-hosted-admin.ts).',
 }
 
+const BASE_RESTRICTED_IMPORT_PATHS = [
+  {
+    name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
+    message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
+  },
+]
+
+const APPROVAL_GATE_MESSAGE =
+  'Promote untrusted SQL through the `gate` that approvalGatedToolFromContract passes to execute.'
+const TOOL_MODULE_RESTRICTED_IMPORT_PATHS = [
+  {
+    name: '@supabase/pg-meta',
+    importNames: ['acceptUntrustedSql'],
+    message: APPROVAL_GATE_MESSAGE,
+  },
+  {
+    name: '@/data/logs/safe-analytics-sql',
+    importNames: ['acceptUntrustedLogsSql'],
+    message: APPROVAL_GATE_MESSAGE,
+  },
+]
+
 module.exports = defineConfig([
   { files: ['**/*.ts', '**/*.tsx'] },
   supabaseConfig,
@@ -62,12 +84,7 @@ module.exports = defineConfig([
       'no-restricted-imports': [
         'error',
         {
-          paths: [
-            {
-              name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
-              message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
-            },
-          ],
+          paths: BASE_RESTRICTED_IMPORT_PATHS,
         },
       ],
       'barrel-files/avoid-re-export-all': 'error',
@@ -109,6 +126,15 @@ module.exports = defineConfig([
     ignores: ['data/logs/execute-analytics-sql.ts'],
     rules: {
       'no-restricted-syntax': ['error', ...ANALYTICS_SQL_RESTRICTED_SYNTAX],
+    },
+  },
+  {
+    files: ['lib/ai/tools/*.server.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        { paths: [...BASE_RESTRICTED_IMPORT_PATHS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATHS] },
+      ],
     },
   },
   // API route modules are eagerly imported by the TanStack server at boot, so

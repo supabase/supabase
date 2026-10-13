@@ -13,8 +13,6 @@ import {
   createNotebookInputSchema,
   deleteNotebookInputSchema,
   notebookToolOutputSchema,
-  updateNotebookInputSchema,
-  updateNotebookToolOutputSchema,
 } from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
@@ -25,6 +23,7 @@ import {
 } from '@/data/content/notebooks/notebook-operations'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
+import { contract as updateNotebookContract } from '@/lib/ai/tools/update-notebook'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
 export type NotebookProposalMode = 'create' | 'update' | 'delete'
@@ -386,7 +385,7 @@ function UpdateNotebookProposal({
 }: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
   const notebooksSnap = useNotebooksStateSnapshot()
-  const parsedInput = updateNotebookInputSchema.safeParse(input)
+  const parsedInput = updateNotebookContract.inputSchema.safeParse(input)
   const isCompleted = state === 'output-available'
   const hasUnsavedLocalChanges =
     confirmState === 'approval-requested' &&
@@ -415,7 +414,7 @@ function UpdateNotebookProposal({
   }
 
   if (isCompleted) {
-    const parsedOutput = updateNotebookToolOutputSchema.safeParse(output)
+    const parsedOutput = updateNotebookContract.outputSchema.safeParse(output)
     const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
     const isOutputForRequestedNotebook =
       parsedOutput.success && parsedOutput.data.id === parsedInput.data.id
