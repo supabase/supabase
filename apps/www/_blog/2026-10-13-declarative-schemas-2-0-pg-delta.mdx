@@ -13,11 +13,11 @@ imgThumb: 'select-rewind-2026-declarative-schemas-2-blog/thumb.png'
 toc_depth: 2
 ---
 
-In [April 2025](https://supabase.com/blog/declarative-schemas) we launched declarative schemas. You keep your database schema in SQL files under `supabase/schemas/`, edit those files when you want a change, and let the Supabase CLI write the migration for you. When you change a view or a function, the pull request shows the lines you edited rather than a whole new definition in a migration file.
+On October 2 at Supabase Select we shipped Declarative Schemas 2.0. The Supabase CLI now generates migrations with `pg-delta`, a Postgres diff tool we wrote and open sourced, in place of `migra`, the technology behind our original implementation. Generated migrations now include RLS policy changes, grants, view settings, partitions, domains, and objects that extensions manage.
 
-That launch ran on `migra`, a third-party, open source diff tool. `migra` skipped the objects a Supabase project touches most: RLS policy changes, `security_invoker` on views, and anything an extension manages.
+Declarative schemas [first launched in April 2025](https://supabase.com/blog/declarative-schemas). You keep your schema in SQL files under `supabase/schemas/`, edit them, and the CLI writes the migration. In 2.0 that workflow is the same: edit a file, generate the migration, review it, and apply it. New CLI projects get 2.0 by default. Existing projects opt in with one config block.
 
-At Supabase Select on October 2 we shipped Declarative Schemas 2.0. It runs on `pg-delta`, a Postgres diff engine we wrote and open sourced. The edit, generate, review, and apply loop stays the same. What changed is the engine underneath and the commands you run. The new engine covers the objects `migra` skipped and orders dependencies automatically. The CLI can also export an existing database into schema files. New CLI projects get it by default and existing projects opt in.
+In this post we cover why we built `pg-delta`, how to turn it on, a working example, and what it does not do yet.
 
 ## Why we built `pg-delta`
 
@@ -46,21 +46,19 @@ We felt these gaps ourselves. We use `migra` on our own middleware database, and
 | Export an existing database to schema files                | Not available                                   | `db schema declarative generate`     |
 | Local stack while generating                               | Had to be stopped                               | Can stay running                     |
 
-## The diff covers more of the catalog and leaves out what Supabase manages
+## How `pg-delta` builds a migration
 
-Under the hood, the CLI spins up two throwaway Postgres databases. It loads your schema files into one and replays your migration history into the other. Then `pg-delta` compares what Postgres built in each by reading the system catalog.
+The CLI starts two throwaway Postgres databases. It loads your schema files into one and replays your migration history into the other. `pg-delta` then compares the two by reading the system catalog, and orders the output using a dependency graph built from that catalog. You no longer hand-order files in `schema_paths`.
 
-The engine understands most of what a Postgres database can hold. Everything `migra`'s docs listed as unsupported is now in the diff. So are partitions, publications, subscriptions, and foreign tables.
+Everything `migra`'s docs listed as unsupported is now in the diff. It also covers partitions, publications, subscriptions, and foreign tables.
 
-The engine treats objects an extension owns as the extension's rather than as part of your schema. It never emits raw `create table` or `drop table` for `pg_partman` partitions or `pgmq` queue tables. Changes to them come out as calls to the extension's own API like `select pgmq.drop_queue('q');`. The CLI flags those statements as destructive so you see them in review.
+Objects that an extension owns are changed through the extension's own API. `pg-delta` never emits `create table` or `drop table` for `pg_partman` partitions or `pgmq` queue tables. It emits calls like `select pgmq.drop_queue('q');`, and the CLI flags them as destructive.
 
-Anything the engine doesn't support yet shows up as a warning instead of vanishing from the diff. Pass `--strict-coverage` to turn those warnings into errors so a CI run that hits one fails instead of passing with a gap.
+Unsupported objects produce a warning. Pass `--strict-coverage` to turn those warnings into errors so CI fails.
 
-The CLI handles dependency ordering. The generated migration follows a dependency graph the engine builds from the catalog. You no longer hand-order files in `schema_paths`.
+The output is a plain SQL file in `supabase/migrations/`. Hand-written migrations keep working. Once `pg-delta` is on, `db diff` and `db pull` use it too.
 
-The output is still a plain SQL migration file in `supabase/migrations/`. Hand-written migrations keep working. Once `pg-delta` is on, `db diff` and `db pull` use the same engine.
-
-## Turning it on
+## Turning `pg-delta` on
 
 You need Supabase CLI 2.119 or later. `pg-delta` ships under the `[experimental.pgdelta]` section of `config.toml`. New projects get it from `supabase init`. Existing projects add the block themselves:
 
