@@ -112,21 +112,25 @@ type GetFreeTierGeneralRegionExperimentVariantArgs = {
   smartRegionEnabled: boolean
   enrollmentFlag: boolean
   selectionFlag: boolean
+  /** When true, another feature owns the region selector and the experiment is inactive */
+  isOverridden?: boolean
 }
 
 /**
  * Org's arm in the freeTierGeneralRegionExperiment. The test arm only sees general regions.
- * Returns undefined when the org isn't enrolled.
+ * Returns undefined when the org isn't enrolled, or when the experiment is overridden.
  */
 export function getFreeTierGeneralRegionExperimentVariant({
   isFreePlan,
   smartRegionEnabled,
   enrollmentFlag,
   selectionFlag,
+  isOverridden = false,
 }: GetFreeTierGeneralRegionExperimentVariantArgs):
   | FreeTierGeneralRegionExperimentVariant
   | undefined {
-  const isInExperiment = isFreePlan && smartRegionEnabled && enrollmentFlag === true
+  const isInExperiment =
+    !isOverridden && isFreePlan && smartRegionEnabled && enrollmentFlag === true
   if (!isInExperiment) return undefined
   return selectionFlag === true ? 'test' : 'control'
 }
@@ -136,18 +140,47 @@ export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['al
 type GetRegionSelectionTypeArgs = {
   dbRegion: string | undefined
   availableRegions: AvailableRegions | undefined
+  /** Whether the user ever touched the region field. Defaults to true for untracked callers. */
+  isDbRegionDirty?: boolean
 }
 
 /**
- * Whether the selected region is a general region (e.g. Americas) or a specific one
- * (e.g. us-east-1). Returns undefined if it matches neither list.
+ * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
+ * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
+ * by the user (e.g. us-east-1, 'specific'). Returns undefined if dbRegion matches neither list,
+ * regardless of whether the field was touched.
  */
 export function getRegionSelectionType({
   dbRegion,
   availableRegions,
-}: GetRegionSelectionTypeArgs): 'general' | 'specific' | undefined {
+  isDbRegionDirty = true,
+}: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
   if (!dbRegion || !availableRegions) return undefined
-  if (availableRegions.smartGroup.some((region) => region.name === dbRegion)) return 'general'
-  if (availableRegions.specific.some((region) => region.name === dbRegion)) return 'specific'
-  return undefined
+  const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
+  const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
+  if (!isGeneral && !isSpecific) return undefined
+  if (!isDbRegionDirty) return 'auto'
+  return isGeneral ? 'general' : 'specific'
+}
+
+export type SpecificRegionsLinkVariant = 'test' | 'control'
+
+type GetSpecificRegionsLinkVariantArgs = {
+  isFreePlan: boolean
+  smartRegionEnabled: boolean
+  linkFlag: boolean
+}
+
+/**
+ * Org's arm in the projectCreationSpecificRegionsLink experiment. Returns undefined when the
+ * org isn't in the eligible population (paid plan, or smart regions disabled for the selected
+ * cloud provider) — the link can never show for them regardless of the flag.
+ */
+export function getSpecificRegionsLinkVariant({
+  isFreePlan,
+  smartRegionEnabled,
+  linkFlag,
+}: GetSpecificRegionsLinkVariantArgs): SpecificRegionsLinkVariant | undefined {
+  if (!isFreePlan || !smartRegionEnabled) return undefined
+  return linkFlag === true ? 'test' : 'control'
 }

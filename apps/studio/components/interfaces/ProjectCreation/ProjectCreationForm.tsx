@@ -34,6 +34,7 @@ import {
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
+  getSpecificRegionsLinkVariant,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
@@ -207,7 +208,17 @@ export const ProjectCreationForm = ({
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
+  // Only free-plan orgs get the specific-regions link collapse behavior. When active for an
+  // org, it owns the region selector, so the free tier experiment stays inactive for that org.
+  const specificRegionsLinkFlag = useFlag('projectCreationSpecificRegionsLink') === true
+  const isSpecificRegionsLinkEnabled = specificRegionsLinkFlag && isFreePlan
+  const specificRegionsLinkVariant = getSpecificRegionsLinkVariant({
+    isFreePlan,
+    smartRegionEnabled,
+    linkFlag: specificRegionsLinkFlag,
+  })
   const isResolvingFreeTierGeneralRegionExperiment =
+    !isSpecificRegionsLinkEnabled &&
     isFreePlan &&
     smartRegionEnabled &&
     (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
@@ -218,6 +229,7 @@ export const ProjectCreationForm = ({
     smartRegionEnabled,
     enrollmentFlag: freeTierGeneralRegionEnrollment,
     selectionFlag: freeTierGeneralRegionSelection,
+    isOverridden: isSpecificRegionsLinkEnabled,
   })
 
   // Read dirty state during render rather than depending on form.formState in the
@@ -367,6 +379,7 @@ export const ProjectCreationForm = ({
         ? getRegionSelectionType({
             dbRegion: form.getValues('dbRegion'),
             availableRegions: availableRegionsData?.all,
+            isDbRegionDirty,
           })
         : undefined
       track(
@@ -384,7 +397,11 @@ export const ProjectCreationForm = ({
           ...(freeTierGeneralRegionExperimentVariant !== undefined && {
             freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
           }),
+          ...(specificRegionsLinkVariant !== undefined && {
+            specificRegionsLinkExperiment: specificRegionsLinkVariant,
+          }),
           ...(regionSelectionType !== undefined && { regionSelectionType }),
+          regionCode: res.region,
         },
         {
           project: res.ref,
@@ -828,6 +845,7 @@ export const ProjectCreationForm = ({
                       instanceSize={instanceSize as DesiredInstanceSize}
                       showGeneralRegionsOnly={freeTierGeneralRegionExperimentVariant === 'test'}
                       isLoading={isResolvingFreeTierGeneralRegionExperiment}
+                      isFreePlan={isFreePlan}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
