@@ -401,6 +401,7 @@ export const ProjectCreationForm = ({
             specificRegionsLinkExperiment: specificRegionsLinkVariant,
           }),
           ...(regionSelectionType !== undefined && { regionSelectionType }),
+          regionCode: res.region,
         },
         {
           project: res.ref,

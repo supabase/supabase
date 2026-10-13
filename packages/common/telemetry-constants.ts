@@ -469,6 +469,12 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      * smart regions are enabled for the selected cloud provider.
      */
     regionSelectionType?: 'general' | 'auto' | 'specific'
+    /**
+     * The exact region code the project was provisioned in (e.g. sa-east-1), as returned by
+     * the create-project API. This is the resolved region — for a smart group selection (e.g.
+     * Americas) it's the specific region the backend picked, not the group name.
+     */
+    regionCode?: string
   }
   groups: TelemetryGroups
 }
