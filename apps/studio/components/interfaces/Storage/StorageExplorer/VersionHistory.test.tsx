@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { VersionHistory } from '@/components/interfaces/Storage/StorageExplorer/VersionHistory'
@@ -48,7 +49,7 @@ const VERSIONS = [
   },
 ]
 
-const renderHistory = () =>
+const renderHistory = (props: Partial<ComponentProps<typeof VersionHistory>> = {}) =>
   render(
     <VersionHistory
       projectRef="abcdef"
@@ -56,10 +57,12 @@ const renderHistory = () =>
       objectName="photo.png"
       path="images/photo.png"
       versioningState="enabled"
+      willRetainVersionOnWrite
       lifecyclePolicy={{ expiryDays: null, maxVersions: null }}
       expirationMode="and"
       clearPreview={vi.fn()}
       onEditBucket={vi.fn()}
+      {...props}
     />
   )
 
@@ -89,5 +92,72 @@ describe('VersionHistory', () => {
     // A restore changes the object's size, type and modified date, and the row
     // showing them lives in the explorer's state rather than a React Query cache.
     await waitFor(() => expect(refetchAllOpenedFolders).toHaveBeenCalled())
+  })
+
+  describe('empty state', () => {
+    const mockEmptyListing = () =>
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json([]),
+      })
+
+    it('promises retention on an enabled bucket', async () => {
+      mockEmptyListing()
+      renderHistory()
+
+      expect(
+        await screen.findByText(/Overwriting this file will retain a recoverable copy/)
+      ).toBeInTheDocument()
+    })
+
+    it('promises retention on a suspended bucket when the file predates the suspension', async () => {
+      mockEmptyListing()
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: true })
+
+      expect(
+        await screen.findByText(/Overwriting this file will retain a recoverable copy/)
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('suspended notice', () => {
+    it('promises one last retained version for a file that predates the suspension', async () => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json(VERSIONS),
+      })
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: true })
+
+      expect(
+        await screen.findByText(/retains the current version one last time/)
+      ).toBeInTheDocument()
+    })
+
+    it('says the file is overwritten in place once the one-shot retention is spent', async () => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json(VERSIONS),
+      })
+      renderHistory({ versioningState: 'suspended', willRetainVersionOnWrite: false })
+
+      // The versions already listed are still restorable, so the notice has to say so.
+      expect(await screen.findByText(/overwrites it in place/)).toBeInTheDocument()
+      expect(screen.getByText(/stay retained/)).toBeInTheDocument()
+    })
+
+    it('stays out of the way on an enabled bucket', async () => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/storage/:ref/buckets/:id/objects/list',
+        response: () => Response.json(VERSIONS),
+      })
+      renderHistory({ versioningState: 'enabled' })
+
+      await screen.findByRole('button', { name: /Actions for version/ })
+      expect(screen.queryByText(/Versioning is suspended/)).not.toBeInTheDocument()
+    })
   })
 })
