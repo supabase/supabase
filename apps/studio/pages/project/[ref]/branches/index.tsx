@@ -70,7 +70,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
-  const showEmptyState = isSuccessConnections && isSuccessBranches && previewBranches.length === 0
+  const showEmptyState = false //  isSuccessConnections && isSuccessBranches && previewBranches.length === 0
 
   const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
@@ -108,21 +108,17 @@ const BranchesPage: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isError && showEmptyState ? (
-                    <BranchingEmptyState isGithubConnected={isGithubConnected} />
-                  ) : (
-                    <Overview
-                      isGithubConnected={isGithubConnected}
-                      isLoading={isLoading}
-                      isSuccess={isSuccess}
-                      repo={repo}
-                      mainBranch={mainBranch}
-                      previewBranches={previewBranches}
-                      onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
-                      onSelectDeleteBranch={setSelectedBranchToDelete}
-                      generateCreatePullRequestURL={generateCreatePullRequestURL}
-                    />
-                  )}
+                  <Overview
+                    isGithubConnected={isGithubConnected}
+                    isLoading={isLoading}
+                    isSuccess={isSuccess}
+                    repo={repo}
+                    mainBranch={mainBranch}
+                    previewBranches={previewBranches}
+                    onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  />
                 </>
               )}
             </div>
