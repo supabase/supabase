@@ -2,15 +2,16 @@ import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
+import type { UploadConflicts } from './StorageExplorer.utils'
 import { UploadConflictModal } from './UploadConflictModal'
 import { customRender } from '@/tests/lib/custom-render'
 
-const renderModal = (conflictingNames: string[]) => {
+const renderModal = (conflicts: Partial<UploadConflicts>) => {
   const onCancel = vi.fn()
   const onConfirm = vi.fn()
   customRender(
     <UploadConflictModal
-      conflictingNames={conflictingNames}
+      conflicts={{ liveNames: [], archivedNames: [], ...conflicts }}
       onCancel={onCancel}
       onConfirm={onConfirm}
     />
@@ -20,13 +21,13 @@ const renderModal = (conflictingNames: string[]) => {
 
 describe('UploadConflictModal', () => {
   it('stays closed when nothing clashes', () => {
-    renderModal([])
+    renderModal({})
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
   it('names the file that is already there', () => {
-    renderModal(['photo.png'])
+    renderModal({ liveNames: ['photo.png'] })
 
     expect(screen.getByText('photo.png already exists here')).toBeInTheDocument()
     expect(screen.getByText('Replace existing file')).toBeInTheDocument()
@@ -34,7 +35,7 @@ describe('UploadConflictModal', () => {
   })
 
   it('counts and lists the files when several clash', () => {
-    renderModal(['photo.png', 'notes.txt'])
+    renderModal({ liveNames: ['photo.png', 'notes.txt'] })
 
     expect(screen.getByText('2 files already exist here')).toBeInTheDocument()
     expect(screen.getByText('Replace existing files')).toBeInTheDocument()
@@ -44,7 +45,7 @@ describe('UploadConflictModal', () => {
   })
 
   it('replaces by default, since that is what versioning retains', async () => {
-    const { onConfirm } = renderModal(['photo.png'])
+    const { onConfirm } = renderModal({ liveNames: ['photo.png'] })
 
     await userEvent.click(screen.getByRole('button', { name: 'Upload' }))
 
@@ -52,7 +53,7 @@ describe('UploadConflictModal', () => {
   })
 
   it('keeps both files when the user picks that instead', async () => {
-    const { onConfirm } = renderModal(['photo.png'])
+    const { onConfirm } = renderModal({ liveNames: ['photo.png'] })
 
     await userEvent.click(screen.getByRole('radio', { name: /Keep both files/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Upload' }))
@@ -61,11 +62,42 @@ describe('UploadConflictModal', () => {
   })
 
   it('cancels the upload rather than guessing', async () => {
-    const { onCancel, onConfirm } = renderModal(['photo.png'])
+    const { onCancel, onConfirm } = renderModal({ liveNames: ['photo.png'] })
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
 
     expect(onCancel).toHaveBeenCalled()
     expect(onConfirm).not.toHaveBeenCalled()
+  })
+
+  describe('archived conflicts', () => {
+    it('offers a restore rather than a replace', () => {
+      renderModal({ archivedNames: ['icon-1.svg'] })
+
+      expect(screen.getByText('icon-1.svg already exists and is archived')).toBeInTheDocument()
+      expect(screen.getByText('Restore and add a new version')).toBeInTheDocument()
+      expect(screen.queryByText('Replace existing file')).not.toBeInTheDocument()
+    })
+
+    it('still reports the choice as a replace, which is what the upload does', async () => {
+      const { onConfirm } = renderModal({ archivedNames: ['icon-1.svg'] })
+
+      await userEvent.click(screen.getByRole('button', { name: 'Upload' }))
+
+      expect(onConfirm).toHaveBeenCalledWith('replace')
+    })
+
+    it('marks which of the listed names are archived', () => {
+      renderModal({ liveNames: ['photo.png'], archivedNames: ['icon-1.svg'] })
+
+      expect(screen.getByText('2 files already exist here')).toBeInTheDocument()
+      expect(screen.getByText('Replace and restore')).toBeInTheDocument()
+
+      const archivedRow = screen.getByText('icon-1.svg').closest('li')
+      expect(within(archivedRow!).getByText('Archived')).toBeInTheDocument()
+      expect(
+        within(screen.getByText('photo.png').closest('li')!).queryByText('Archived')
+      ).toBeNull()
+    })
   })
 })

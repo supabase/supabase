@@ -18,7 +18,6 @@ import { UploadConflictModal } from './UploadConflictModal'
 import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
 import { useUploadConflictPrompt } from './useUploadConflictPrompt'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { isVersioningActive } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface StorageExplorerContentProps {
@@ -49,11 +48,7 @@ export const StorageExplorerContent = ({
   const { truncateToColumn } = useStorageExplorerNavigation()
   const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } = useArchivedFilesContext()
   const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
-  const { conflictingNames, promptForConflicts, resolveConflicts } = useUploadConflictPrompt()
-
-  // Replacing only keeps what it replaces while the bucket versions its writes. Everywhere
-  // else the upload renames itself, as it always has, rather than offering to overwrite.
-  const canPromptOnConflict = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
+  const { conflicts, promptForConflicts, resolveConflicts } = useUploadConflictPrompt()
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
@@ -100,7 +95,9 @@ export const StorageExplorerContent = ({
       files: items,
       columnIndex,
       isDrop,
-      onConflict: canPromptOnConflict ? promptForConflicts : undefined,
+      // Whether a clash is worth asking about depends on the bucket's versioning state,
+      // which `uploadFiles` reads for itself. The preview gate is the part only a hook knows.
+      onConflict: isStorageVersioningEnabled ? promptForConflicts : undefined,
     })
     event.target.value = ''
   }
@@ -145,7 +142,7 @@ export const StorageExplorerContent = ({
       </div>
 
       <UploadConflictModal
-        conflictingNames={conflictingNames}
+        conflicts={conflicts}
         onCancel={() => resolveConflicts('cancel')}
         onConfirm={(choice) => resolveConflicts(choice)}
       />

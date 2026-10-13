@@ -215,6 +215,31 @@ describe('sanitizeNameForDuplicateInColumn', () => {
     expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt' })).toBe('file.txt')
   })
 
+  describe('reservedNames', () => {
+    it('treats a reserved name as taken even though no column holds it', () => {
+      const state = makeState([[{ name: 'other.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, {
+          name: 'file.txt',
+          autofix: true,
+          reservedNames: ['file.txt'],
+        })
+      ).toBe('file (1).txt')
+    })
+
+    it('matches a reserved name case-insensitively, like a column name', () => {
+      const state = makeState([[{ name: 'other.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', reservedNames: ['FILE.TXT'] })
+      ).toBeNull()
+    })
+
+    it('leaves callers that pass none exactly as they were', () => {
+      const state = makeState([[{ name: 'file.txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'other.txt' })).toBe('other.txt')
+    })
+  })
+
   describe('columnIndex', () => {
     // Two-column state: col 0 has 'file.txt', col 1 has 'other.txt'
     const state = makeState([[{ name: 'file.txt' }], [{ name: 'other.txt' }]])
@@ -274,6 +299,19 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
         'file (2).txt'
       )
+    })
+
+    it('counts a reserved duplicate, so the suffix skips a name an archived file holds', () => {
+      // Without this the upload lands on `file (1).txt` and restores the archived file,
+      // which is exactly what picking "keep both" declined.
+      const state = makeState([[{ name: 'file.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, {
+          name: 'file.txt',
+          autofix: true,
+          reservedNames: ['file (1).txt'],
+        })
+      ).toBe('file (2).txt')
     })
 
     it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {

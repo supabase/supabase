@@ -2,28 +2,35 @@ import { useState } from 'react'
 import { RadioGroupStacked, RadioGroupStackedItem, ScrollArea } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import type { UploadConflictResolution } from './StorageExplorer.utils'
+import type { UploadConflictResolution, UploadConflicts } from './StorageExplorer.utils'
+import { getUploadConflictCopy } from './UploadConflictModal.utils'
 
+/** Cancelling is reported through `onCancel` instead, so the radio never carries it. */
 export type UploadConflictChoice = Exclude<UploadConflictResolution, 'cancel'>
 
 interface UploadConflictModalProps {
-  conflictingNames: string[]
+  /** Names the upload would land on. Empty keeps the modal closed. */
+  conflicts: UploadConflicts
   onCancel: () => void
   onConfirm: (choice: UploadConflictChoice) => void
 }
 
+/**
+ * Asked before an upload overwrites something, including something only the archived view
+ * can see. Mounted for a bucket that retains versions — elsewhere the explorer renames
+ * instead of offering a choice that would lose the existing file.
+ */
 export const UploadConflictModal = ({
-  conflictingNames,
+  conflicts,
   onCancel,
   onConfirm,
 }: UploadConflictModalProps) => {
   const [choice, setChoice] = useState<UploadConflictChoice>('replace')
 
-  const hasMultipleConflicts = conflictingNames.length > 1
-
-  const title = hasMultipleConflicts
-    ? `${conflictingNames.length} files already exist here`
-    : `${conflictingNames[0]} already exists here`
+  const { liveNames, archivedNames } = conflicts
+  const conflictCount = liveNames.length + archivedNames.length
+  const hasMultipleConflicts = conflictCount > 1
+  const copy = getUploadConflictCopy(conflicts)
 
   const handleCancel = () => {
     setChoice('replace')
@@ -38,14 +45,10 @@ export const UploadConflictModal = ({
   return (
     <ConfirmationModal
       size="medium"
-      visible={conflictingNames.length > 0}
+      visible={conflictCount > 0}
       loading={false}
-      title={<span className="wrap-break-word">{title}</span>}
-      description={
-        hasMultipleConflicts
-          ? 'Choose what happens to the existing files.'
-          : 'Choose what happens to the existing file.'
-      }
+      title={<span className="wrap-break-word">{copy.title}</span>}
+      description={copy.description}
       confirmLabel="Upload"
       onCancel={handleCancel}
       onConfirm={handleConfirm}
@@ -56,32 +59,33 @@ export const UploadConflictModal = ({
       >
         <RadioGroupStackedItem
           value="replace"
-          label={hasMultipleConflicts ? 'Replace existing files' : 'Replace existing file'}
+          label={copy.replaceLabel}
           className="[&_p]:text-pretty!"
-          description={
-            hasMultipleConflicts
-              ? 'Each file you replace becomes a noncurrent version you can restore from its version history'
-              : 'The file you replace becomes a noncurrent version you can restore from its version history'
-          }
+          description={copy.replaceDescription}
         />
         <RadioGroupStackedItem
           value="keep-both"
-          label={hasMultipleConflicts ? 'Keep all files' : 'Keep both files'}
+          label={copy.keepBothLabel}
           className="[&_p]:text-pretty!"
-          description={
-            hasMultipleConflicts
-              ? 'Keeps the existing files and appends an incremental number to the names'
-              : 'Keeps the existing file and appends an incremental number to the name'
-          }
+          description={copy.keepBothDescription}
         />
       </RadioGroupStacked>
 
       {hasMultipleConflicts && (
         <ScrollArea className="mt-3 rounded-md border">
           <ul className="px-4 py-2 max-h-32 overflow-y-auto bg-surface-200 dark:bg-surface-100/50 text-xs text-foreground-light divide-y divide-border">
-            {conflictingNames.map((name, i) => (
+            {liveNames.map((name) => (
               <li key={name} className="text-sm py-1 wrap-break-word">
                 {name}
+              </li>
+            ))}
+            {archivedNames.map((name) => (
+              <li
+                key={name}
+                className="text-sm py-1 flex items-center justify-between gap-x-2 wrap-break-word"
+              >
+                {name}
+                <span className="text-xs text-foreground-lighter shrink-0">Archived</span>
               </li>
             ))}
           </ul>

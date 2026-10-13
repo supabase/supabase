@@ -98,10 +98,16 @@ export function sanitizeNameForDuplicateInColumn(
     name,
     columnIndex,
     autofix = false,
+    reservedNames = [],
   }: {
     name: string
     columnIndex?: number
     autofix?: boolean
+    /**
+     * Names that are taken in the destination but absent from `state.columns` — archived
+     * objects, which only exist in the rendered overlay.
+     */
+    reservedNames?: string[]
   }
 ): string | null {
   const columnIndex_ = columnIndex !== undefined ? columnIndex : state.columns.length - 1
@@ -109,12 +115,15 @@ export function sanitizeNameForDuplicateInColumn(
   const currentColumnItems = currentColumn.items.filter(
     (item) => item.status !== STORAGE_ROW_STATUS.EDITING
   )
+  // One list, so the suffix counter sees everything the clash check does. Counting only
+  // column items would hand back a ` (1)` that an archived object already holds.
+  const takenNames = currentColumnItems.map((item) => item.name).concat(reservedNames)
   // [Joshen] JFYI storage does support folders of the same name with different casing
   // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
   // for folders of the same name with different casing
   // We should remove this check once all projects are on the List V2 endpoint
   const hasSameNameInColumn =
-    currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length > 0
+    takenNames.filter((takenName) => takenName.toLowerCase() === name.toLowerCase()).length > 0
 
   if (hasSameNameInColumn) {
     if (autofix) {
@@ -123,11 +132,9 @@ export function sanitizeNameForDuplicateInColumn(
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
       const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
-      const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
-        item.name.match(dupeNameRegex)
-      )
+      const namesWithSuffix = takenNames.filter((takenName) => takenName.match(dupeNameRegex))
 
-      const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
+      const updatedFileName = fileName + ` (${namesWithSuffix.length + 1})`
       return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
     } else {
       toast.error(
@@ -142,6 +149,16 @@ export function sanitizeNameForDuplicateInColumn(
 
 /** What the user chose when an upload would land on a name that already exists. */
 export type UploadConflictResolution = 'replace' | 'keep-both' | 'cancel'
+
+/**
+ * Names an upload would land on, split by what is actually sitting there. Disjoint: an
+ * object whose current version is a delete marker is not in the live listing.
+ */
+export type UploadConflicts = {
+  liveNames: string[]
+  /** Soft-deleted objects. Uploading onto one restores it rather than sitting beside it. */
+  archivedNames: string[]
+}
 
 /**
  * Names that are already taken in the destination column, matched the same case-insensitive
