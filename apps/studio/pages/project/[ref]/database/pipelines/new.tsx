@@ -1,8 +1,8 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { useRouter } from '@/compat/next/router'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreatePipelineWizard } from '@/components/interfaces/Database/Replication/CreatePipeline/CreatePipelineWizard'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
