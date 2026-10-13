@@ -43,7 +43,7 @@ export const useWebhookEndpointTestMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         if (isWebhookRateLimitError(data)) {
-          toast.error('Too many test events — wait a minute and try again (limit: 10 per minute).')
+          toast.error('Too many requests. Wait a minute and try again (limit: 10 per minute).')
         } else {
           toast.error(`Failed to send test event: ${data.message}`)
         }
