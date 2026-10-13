@@ -320,6 +320,13 @@ describe('DestinationForm edit submission', () => {
       expect(screen.queryByRole('region', { name: 'Destination connection' }) !== null).toBe(
         shouldShowSection
       )
+      if (shouldShowSection) {
+        const section = screen.getByRole('region', { name: 'Destination connection' })
+        expect(
+          section.compareDocumentPosition(screen.getByText('Data')) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy()
+      }
     }
   )
 
