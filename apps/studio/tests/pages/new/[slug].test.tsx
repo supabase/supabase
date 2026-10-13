@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -611,12 +611,55 @@ describe('project creation wizard', () => {
       })
     })
 
-    test('shows an error state when available regions fail to load', async () => {
+    test('blocks submission when available regions fail to load', async () => {
       mockWizardEndpoints({ availableRegions: 'error' })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
 
       await renderWizard()
 
       await screen.findByText('Error loading available regions')
+      await fillProjectName('Unavailable Regions Project')
+      await generateAndWaitForStrongPassword()
+
+      const submitButton = screen.getByRole('button', { name: 'Create new project' })
+      expect(submitButton).toBeDisabled()
+      const form = submitButton.closest('form')
+      if (!form) throw new Error('Project creation form not found')
+      await act(async () => {
+        fireEvent.submit(form)
+      })
+      expect(onRequest).not.toHaveBeenCalled()
+    })
+
+    test('blocks a previously selected region when regions fail to load for the new compute size', async () => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Changed Compute Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Americas/)
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/available-regions',
+        response: () => HttpResponse.error(),
+      })
+      await user.click(getSelectTriggerByLabel('Compute size'))
+      await user.click(await screen.findByRole('option', { name: /2 GB RAM/ }))
+      await screen.findByText('Error loading available regions')
+
+      const submitButton = screen.getByRole('button', { name: 'Create new project' })
+      expect(submitButton).toBeDisabled()
+      const form = submitButton.closest('form')
+      if (!form) throw new Error('Project creation form not found')
+      await act(async () => {
+        fireEvent.submit(form)
+      })
+      expect(onRequest).not.toHaveBeenCalled()
     })
 
     describe('free tier general region experiment', () => {
