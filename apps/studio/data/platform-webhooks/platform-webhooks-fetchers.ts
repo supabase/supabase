@@ -7,7 +7,7 @@ import { del, get, patch, post, handleError as sharedHandleError } from '@/data/
 // top-level `message`/`msg`. Flatten the nested fields up so it finds one.
 const handleError = (error: unknown): never => {
   if (error && typeof error === 'object' && 'error' in error) {
-    const { error: nested, ...rest } = error as { error: unknown } & Record<string, unknown>
+    const { error: nested, ...rest } = error
     if (nested && typeof nested === 'object') {
       return sharedHandleError({ ...rest, ...nested })
     }
