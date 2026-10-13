@@ -11,6 +11,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
 import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
+import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -497,48 +498,44 @@ export const DestinationForm = ({
                     <DialogSectionSeparator />
                   </>
                 )}
-                <div className="p-5 flex flex-col gap-y-6">
-                  {isErrorExistingConfig && (
-                    <Admonition type="warning">
-                      <p className="leading-normal!">
-                        The existing destination or pipeline settings could not be loaded. Refresh
-                        before applying changes.
-                      </p>
-                    </Admonition>
-                  )}
-                  <p className="text-sm font-medium text-foreground">
-                    {shouldShowConnectionSection ? 'Data' : 'Destination details'}
-                  </p>
-
-                  <div className="flex flex-col gap-y-4">
-                    {!shouldShowConnectionSection && (
-                      <DestinationNameInput form={form} destinationType={selectedType} />
-                    )}
-                    <PublicationSelection
-                      form={form}
-                      onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                    />
-                    <TableCopySelection form={form} editMode={editMode} />
-                    {!shouldShowConnectionSection && (
-                      <PipelineRegionField destinationType={selectedType} />
-                    )}
-                  </div>
-                </div>
-
-                {!shouldShowConnectionSection && (
+                {shouldShowConnectionSection ? (
+                  <PipelineDataSection
+                    type={selectedType}
+                    form={form}
+                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                  />
+                ) : (
                   <>
+                    <div className="p-5 flex flex-col gap-y-6">
+                      {isErrorExistingConfig && (
+                        <Admonition type="warning">
+                          <p className="leading-normal!">
+                            The existing destination or pipeline settings could not be loaded.
+                            Refresh before applying changes.
+                          </p>
+                        </Admonition>
+                      )}
+                      <p className="text-sm font-medium text-foreground">Destination details</p>
+
+                      <div className="flex flex-col gap-y-4">
+                        <DestinationNameInput form={form} destinationType={selectedType} />
+                        <PublicationSelection
+                          form={form}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
+                        <TableCopySelection form={form} editMode={editMode} />
+                        <PipelineRegionField destinationType={selectedType} />
+                      </div>
+                    </div>
+
                     <DialogSectionSeparator />
                     {destinationFields}
+
+                    <DialogSectionSeparator />
+
+                    <AdvancedSettings type={selectedType} form={form} group="all" />
                   </>
                 )}
-
-                {!shouldShowConnectionSection && <DialogSectionSeparator />}
-
-                <AdvancedSettings
-                  type={selectedType}
-                  form={form}
-                  group={shouldShowConnectionSection ? 'data' : 'all'}
-                />
 
                 {!editMode && hasRunValidation && !isValidating && (
                   <>
