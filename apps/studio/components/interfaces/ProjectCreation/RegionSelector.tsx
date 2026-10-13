@@ -45,6 +45,7 @@ import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
+import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
 interface RegionSelectorProps {
@@ -404,7 +405,11 @@ export const RegionSelector = ({
                             >
                               Upgrade to Pro
                             </InlineLink>{' '}
-                            to choose a specific region.
+                            to choose a{' '}
+                            <InlineLink href={`${DOCS_URL}/guides/platform/regions`}>
+                              specific region
+                            </InlineLink>
+                            .
                           </div>
                         )}
                       </SelectContent>
