@@ -35,6 +35,13 @@ const createRow = (id: string) => ({
 
 afterEach(() => vi.useRealTimers())
 
+const getLogSequence = () =>
+  screen.getAllByRole('row').flatMap((row) => {
+    if (row.hasAttribute('aria-selected')) return [row.id]
+    if (row.textContent?.endsWith('Refresh')) return ['refresh']
+    return []
+  })
+
 describe('UnifiedLogs Live counts and arrival batches', () => {
   it.each([false, true])(
     'refreshes totals and facets without counting overlap twice and pauses with otel=%s',
@@ -170,6 +177,16 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         expect(screen.getByText('first-arrival')).toBeInTheDocument()
         expect(screen.getByText(/No more data to load/)).toHaveTextContent('3 of 3 rows')
       })
+      expect(getLogSequence()).toEqual(['first-arrival', 'late-arrival', 'refresh', 'initial-log'])
+      const separator = screen.getByText('Refresh', { exact: true })
+      expect(separator.closest('tr')).toHaveTextContent(
+        /\d{2} \w{3} \d{2} \d{2}:\d{2}:\d{2}Refresh/
+      )
+      expect(separator.closest('tr')).not.toHaveAttribute('tabindex')
+      fireEvent.click(separator)
+      expect(
+        screen.getAllByRole('row').filter((row) => row.getAttribute('aria-selected') === 'true')
+      ).toHaveLength(0)
       await act(async () => {})
 
       rows.push(createRow('second-arrival'))
@@ -179,12 +196,21 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         expect(screen.getByText('second-arrival')).toBeInTheDocument()
         expect(screen.getByText(/No more data to load/)).toHaveTextContent('4 of 4 rows')
       })
+      expect(getLogSequence()).toEqual([
+        'second-arrival',
+        'refresh',
+        'first-arrival',
+        'late-arrival',
+        'refresh',
+        'initial-log',
+      ])
       expect(screen.getAllByText('initial-log')).toHaveLength(1)
       expect(screen.getAllByText('first-arrival')).toHaveLength(1)
       expect(requests).toHaveLength(10)
 
       await act(async () => vi.advanceTimersByTimeAsync(10_000))
       await waitForLiveUpdate(() => expect(requests).toHaveLength(12))
+      expect(screen.getAllByText('Refresh', { exact: true })).toHaveLength(2)
 
       fireEvent.click(screen.getByRole('button', { name: 'Live' }))
       const requestsAfterPause = requests.length
@@ -193,6 +219,7 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
       expect(requests).toHaveLength(requestsAfterPause)
       expect(screen.queryByText('paused-arrival')).not.toBeInTheDocument()
       expect(screen.getByRole('checkbox', { name: /^Postgres/ })).toHaveAccessibleName(/\b4\b/)
+      expect(screen.getAllByText('Refresh', { exact: true })).toHaveLength(2)
       unmount()
     },
     20_000

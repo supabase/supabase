@@ -29,6 +29,7 @@ import {
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
+import { LogRefreshMarker } from './components/LogRefreshMarker'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
@@ -232,7 +233,11 @@ export const UnifiedLogs = () => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
   const uniqueRows = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
-  const { rows: flatData, fetchLiveLogs } = useLiveLogBatches({
+  const {
+    rows: flatData,
+    batches,
+    fetchLiveLogs,
+  } = useLiveLogBatches({
     scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
     rows: uniqueRows,
     firstPage: unifiedLogsData?.pages[0],
@@ -307,6 +312,24 @@ export const UnifiedLogs = () => {
   })
 
   const selectedRows = table.getSelectedRowModel().rows
+  const visibleRowIds = new Set(table.getRowModel().rows.map((row) => row.id))
+  const visibleColumnIds = table.getVisibleLeafColumns().map((column) => column.id)
+  const rowDecorations = new Map(
+    batches.flatMap((batch) => {
+      const lastVisibleId = batch.ids.findLast((id) => visibleRowIds.has(id))
+      if (lastVisibleId === undefined) return []
+      return [
+        [
+          lastVisibleId,
+          <LogRefreshMarker
+            key={lastVisibleId}
+            refreshedAt={batch.refreshedAt}
+            columnIds={visibleColumnIds}
+          />,
+        ] as const,
+      ]
+    })
+  )
   const selectedRow =
     selectedRows.find((row) => row.id === selection.activeId) ?? selectedRows.at(-1)
   const openRowId = selectedRow?.id
@@ -524,6 +547,7 @@ export const UnifiedLogs = () => {
                   )}
                 >
                   <DataTableInfinite
+                    rowDecorations={rowDecorations}
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}
                     filterRows={filterDBRowCount}
