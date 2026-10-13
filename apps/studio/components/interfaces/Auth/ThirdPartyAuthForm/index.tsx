@@ -21,6 +21,7 @@ import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
+import { CreateCustomOidcIntegrationDialog } from './CreateCustomOidcDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { CreateWorkOSIntegrationDialog } from './CreateWorkOSDialog'
 import { IntegrationCard } from './IntegrationCard'
@@ -169,6 +170,11 @@ export const ThirdPartyAuthForm = () => {
         <CreateWorkOSIntegrationDialog
           visible={selectedIntegration === 'workos'}
           onDelete={() => {}}
+          onClose={() => setSelectedIntegration(undefined)}
+        />
+
+        <CreateCustomOidcIntegrationDialog
+          visible={selectedIntegration === 'custom'}
           onClose={() => setSelectedIntegration(undefined)}
         />
 

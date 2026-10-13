@@ -53,7 +53,7 @@ export const getIntegrationTypeLabel = (type: INTEGRATION_TYPES) => {
       return 'WorkOS'
     case 'custom':
     default:
-      return 'Custom'
+      return 'Custom OIDC'
   }
 }
 
@@ -69,9 +69,19 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/clerk-icon.svg`
     case 'workos':
       return `${BASE_PATH}/img/icons/workos-icon.svg`
-
     case 'custom':
     default:
-      return `${BASE_PATH}/img/icons/cognito-icon.svg`
+      return `${BASE_PATH}/img/icons/user-round-key-icon.svg`
+  }
+}
+
+export const isValidOidcIssuerUrl = (value: string) => {
+  if (value.includes('?') || value.includes('#')) return false
+
+  try {
+    const url = new URL(value)
+    return url.protocol === 'https:' && url.hostname.length > 0 && !url.username && !url.password
+  } catch {
+    return false
   }
 }

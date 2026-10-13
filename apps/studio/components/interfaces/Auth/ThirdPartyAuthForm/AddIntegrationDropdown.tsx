@@ -70,6 +70,7 @@ export const AddIntegrationDropdown = ({
         <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="custom" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
     </DropdownMenu>
   )
