@@ -173,18 +173,12 @@ export const useIsExplorerEnabled = () => {
   return isExplorerEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]
 }
 
-/** Three gates: the ConfigCat kill switch, the project's capability, and the user's opt-in. */
 export const useIsStorageVersioningEnabled = () => {
   const { ref } = useParams()
   const { flags } = useFeaturePreviewContext()
-  const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
   const { data } = useProjectStorageConfigQuery({ projectRef: ref })
   const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
-  return (
-    isStorageVersioningEnabled &&
-    isObjectVersioningAvailable &&
-    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
-  )
+  return isObjectVersioningAvailable && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]
 }
 
 export const useFeaturePreviewModal = () => {
