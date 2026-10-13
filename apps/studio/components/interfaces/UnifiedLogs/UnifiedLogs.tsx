@@ -236,6 +236,9 @@ export const UnifiedLogs = () => {
   const {
     rows: flatData,
     batches,
+    unreadCount,
+    sessionKey,
+    acknowledgeLiveLogs,
     fetchLiveLogs,
   } = useLiveLogBatches({
     scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
@@ -547,6 +550,14 @@ export const UnifiedLogs = () => {
                   )}
                 >
                   <DataTableInfinite
+                    scrollPreservation={{
+                      key: sessionKey,
+                      onScrollToTop: acknowledgeLiveLogs,
+                      scrollToTopLabel:
+                        unreadCount > 0
+                          ? `${unreadCount} new ${unreadCount === 1 ? 'log' : 'logs'}`
+                          : undefined,
+                    }}
                     rowDecorations={rowDecorations}
                     columns={UNIFIED_LOGS_COLUMNS}
                     totalRows={totalDBRowCount}

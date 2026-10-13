@@ -34,11 +34,14 @@ describe('useLiveLogBatches', () => {
     await act(async () => result.current.fetchLiveLogs())
     expect(result.current.batches).toEqual([])
 
+    expect(result.current.unreadCount).toBe(0)
+
     rerender(props)
     await act(async () => result.current.fetchLiveLogs())
     rerender({ ...props, rows: arrivalPage.data, firstPage: arrivalPage })
     expect(result.current.batches).toEqual([{ ids: ['arrival'], refreshedAt: expect.any(Number) }])
     expect(result.current.rows.map((row) => row.id)).toEqual(['arrival', 'initial'])
+    expect(result.current.unreadCount).toBe(1)
   })
 
   it('marks the first arrival after an empty loaded baseline', async () => {
@@ -48,6 +51,7 @@ describe('useLiveLogBatches', () => {
     expect(result.current.batches).toEqual([
       { ids: ['arrival', 'initial'], refreshedAt: expect.any(Number) },
     ])
+    expect(result.current.unreadCount).toBe(2)
   })
 
   it('keeps the polling callback stable while arrivals and older pages update', async () => {
@@ -76,6 +80,7 @@ describe('useLiveLogBatches', () => {
     })
     expect(result.current.batches).toEqual([])
     expect(refetchCounts).not.toHaveBeenCalled()
+    expect(result.current.unreadCount).toBe(0)
   })
 
   it('ignores placeholder data and failed polls', async () => {
@@ -88,6 +93,7 @@ describe('useLiveLogBatches', () => {
     await act(async () => result.current.fetchLiveLogs())
     expect(result.current.batches).toEqual([])
     expect(refetchCounts).not.toHaveBeenCalled()
+    expect(result.current.unreadCount).toBe(0)
   })
 
   it('does not count zero-result polls or older pagination', async () => {
@@ -98,6 +104,7 @@ describe('useLiveLogBatches', () => {
     })
     await act(async () => result.current.fetchLiveLogs())
     rerender({ ...props, rows: [...initialPage.data, { id: 'older' }] })
+    expect(result.current.unreadCount).toBe(0)
     expect(result.current.batches).toEqual([])
   })
 
@@ -107,5 +114,28 @@ describe('useLiveLogBatches', () => {
       await Promise.all([result.current.fetchLiveLogs(), result.current.fetchLiveLogs()])
     })
     expect(result.current.batches).toHaveLength(1)
+  })
+
+  it('accumulates unique arrivals until acknowledged without removing refresh markers', async () => {
+    const { result, rerender, props, fetchPreviousPage } = setup()
+    const sessionKey = result.current.sessionKey
+    await act(async () => result.current.fetchLiveLogs())
+    rerender({ ...props, rows: arrivalPage.data, firstPage: arrivalPage })
+    const nextPage = { data: [{ id: 'second' }, { id: 'second' }, ...arrivalPage.data] }
+    fetchPreviousPage.mockResolvedValue({
+      isError: false,
+      data: { pages: [nextPage, arrivalPage] },
+    })
+    await act(async () => result.current.fetchLiveLogs())
+    expect(result.current.unreadCount).toBe(2)
+
+    act(() => result.current.acknowledgeLiveLogs())
+    expect(result.current.unreadCount).toBe(0)
+    expect(result.current.batches).toHaveLength(2)
+    expect(result.current.sessionKey).toBe(sessionKey)
+
+    await act(async () => result.current.fetchLiveLogs())
+    expect(result.current.unreadCount).toBe(0)
+    expect(result.current.batches).toHaveLength(2)
   })
 })
