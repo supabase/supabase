@@ -706,6 +706,11 @@ describe('project creation wizard', () => {
           'href',
           `/org/${ORG_SLUG}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`
         )
+
+        expect(screen.getByRole('link', { name: 'specific region' })).toHaveAttribute(
+          'href',
+          expect.stringMatching(/\/guides\/platform\/regions$/)
+        )
       })
 
       test('shows the full region picker with no upgrade footer for a free-plan org in the control arm', async () => {
