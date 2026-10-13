@@ -2947,7 +2947,7 @@ commands:
           Reset local database to match migrations first? (local data will be lost) [y/N] y
           Resetting database...
           ...
-          Declarative schema written to supabase/database
+          Declarative schema written to supabase/schemas
           Finished supabase db schema declarative generate.
     tags: []
     links: []
@@ -2984,7 +2984,6 @@ commands:
       - id: experimental
         name: --experimental
         description: enable experimental features
-        required: true
         default_value: 'false'
       - id: no-cache
         name: --no-cache
@@ -3048,7 +3047,6 @@ commands:
       - id: experimental
         name: --experimental
         description: enable experimental features
-        required: true
         default_value: 'false'
       - id: no-cache
         name: --no-cache

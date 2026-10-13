@@ -91,7 +91,7 @@ supabase migration up
 
 With declarative schemas, the files in `supabase/schemas/` are the source of truth. `supabase db schema declarative sync` compares those files against your migrations. It does not read the live database. Changes you make directly (Studio, the SQL editor, `psql`) are invisible to the diff, which reports "No schema changes found" and silently drops the change. Always edit the schema files, then run `sync`.
 
-Don't use `supabase db diff` here, because it diffs a live database against your migrations and never uses `supabase/schemas/` as its baseline.
+Don't use `supabase db diff` here, because it diffs a live database against your migrations and never uses `supabase/schemas/` as its baseline. If you run `supabase db diff -f` while schema files exist, the CLI prints a note that it ignored them. When your migrations are empty or outdated, the migration it writes can include objects your schema files already declare.
 
 </Admonition>
 
@@ -281,7 +281,7 @@ To set up declarative schemas on an existing project, export your production sch
 supabase db schema declarative generate --linked
 ```
 
-This writes per-object SQL files under `supabase/schemas/` (or the directory set by `experimental.pgdelta.declarative_schema_path`), organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
+This writes per-object SQL files under `supabase/schemas/` (or the directory set by `experimental.pgdelta.declarative_schema_path`), organized by database schema. CLI versions before 2.115.0 wrote the tree to `supabase/database`. Later versions read nothing from that directory. They warn when `supabase/database` still holds schema files while `supabase/schemas` is empty and `declarative_schema_path` is unset. To keep that tree, set `declarative_schema_path = "./database"` under `[experimental.pgdelta]`. Otherwise move it to `supabase/schemas`. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
 
 `generate` writes schema files only. Because `sync` diffs your schema files against your migration history, that history must describe the same database before your first `sync`. If your project has no migrations yet, run `supabase db pull` first to create a baseline migration. Without a baseline, the first `sync` regenerates the entire schema as one migration. That migration can apply cleanly to an empty local database and still fail on `db push`, because the remote database already has those objects.
 
@@ -348,7 +348,7 @@ Projects that haven't enabled `pg-delta` can still use declarative schemas. The 
 
 <Admonition type="caution">
 
-On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `[experimental.pgdelta]` setting, but the tree it writes is only readable by the `db schema declarative` commands. `db diff` on the legacy engine tries to load that tree as its baseline, in lexicographic order, and fails on the first file. If you've already run it, delete the generated tree under `supabase/schemas/` or [switch to `pg-delta`](#switching-to-pg-delta).
+On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `[experimental.pgdelta]` setting. Only the `db schema declarative` commands can read the per-object tree it writes. On the legacy engine it also points `[db.migrations].schema_paths` in `config.toml` at that directory. The next `db diff` then fails because it applies the tree in lexicographic order without resolving dependencies between files. If you've already run it, delete the generated tree under `supabase/schemas/` and remove the `schema_paths` entry it added, or [switch to `pg-delta`](#switching-to-pg-delta).
 
 </Admonition>
 
