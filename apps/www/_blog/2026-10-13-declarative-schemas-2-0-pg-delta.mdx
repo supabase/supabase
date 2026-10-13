@@ -126,7 +126,7 @@ GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON
 
 The grant at the end reflects the default privileges Supabase applies to new tables in `public`. The CLI emits it as one statement per role. It is condensed to one line here. The privileges in the grant depend on your Postgres version, and `MAINTAIN` appears on Postgres 17 and later. If you haven't customized permissions, it is safe to leave in or remove.
 
-The schema files are the source of truth, so sync never reads the live database. A change made in the dashboard or the SQL editor won't appear in the migration until it is in the files. Pull it in with `supabase db pull --declarative` (this updates the files, not your migration history) or edit the files directly then sync again. Review the generated migration before you push.
+The schema files are the source of truth, so sync never reads the live database. A change made in the dashboard or the SQL editor won't appear in the migration until it is in the files. Pull it in with `supabase db pull --declarative` or edit the files directly. Then sync again. `db pull --declarative` refreshes the files only. If the change is already live on your linked project, run `supabase db pull` first so your migration history records it. Otherwise the next sync generates it again. `db push` then fails because the object already exists on the project.
 
 **3. Review and apply**
 
@@ -221,7 +221,7 @@ npx @supabase/pg-delta@alpha render --plan plan.json --out migration.sql
 
 `pg-delta` generates schema changes rather than data changes. It creates tables, policies, and functions. It never writes an `insert`, `update`, or `delete` for the rows in your tables.
 
-There is one exception. Some extensions store their configuration as rows. A `pg_cron` job, for example, is a row in `cron.job`. `pg-delta` treats those rows as part of your schema. It changes them through the extension's own functions like `cron.schedule`. `pgmq` works the same way. A queue is a pair of tables that `pgmq.create` builds for you, plus a row in `pgmq.meta`. `pg-delta` never emits `create table` or `drop table` for those tables. It emits `pgmq.create` and `pgmq.drop_queue` instead and the CLI flags the drop as destructive.
+There is one exception. Some extensions store their configuration as rows. A `pg_cron` job, for example, is a row in `cron.job`. `pg-delta` treats those rows as part of your schema. It changes them through the extension's own functions. A new job comes out as `cron.schedule_in_database` and a removed job as `cron.unschedule`. A changed job comes out as `cron.unschedule` followed by `cron.schedule_in_database`. `pgmq` works the same way. A queue is a pair of tables that `pgmq.create` builds for you, plus a row in `pgmq.meta`. `pg-delta` never emits `create table` or `drop table` for those tables. It emits `pgmq.create` and `pgmq.drop_queue` instead and the CLI flags the drop as destructive.
 
 Storage buckets are not included today. A bucket is a row in `storage.buckets`. `pg-delta` does not diff its rows. A bucket you create in the dashboard will not show up in your schema files. Until that changes, create buckets in a seed file or a hand-written migration instead. The RLS policies on `storage.objects` are a different story. They are schema and are diffed.
 
