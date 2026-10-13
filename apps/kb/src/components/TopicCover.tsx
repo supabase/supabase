@@ -18,6 +18,7 @@ export interface TopicCoverProps {
   title: string
   description: string
   topics: Topic[]
+  date?: string
   className?: string
 }
 
@@ -31,7 +32,7 @@ const getCoverLattice = (size: CanvasSize): Lattice => {
   return { xs: splitEdges({ edges: grid.xs, target: GLYPH_PITCH }), ys: grid.ys }
 }
 
-export const TopicCover = ({ title, description, topics, className }: TopicCoverProps) => {
+export const TopicCover = ({ title, description, topics, date, className }: TopicCoverProps) => {
   const textRef = useRef<HTMLDivElement>(null)
   const getField = (params: FieldParams) => coverField({ ...params, topic: pickCoverTopic(topics) })
 
@@ -58,6 +59,9 @@ export const TopicCover = ({ title, description, topics, className }: TopicCover
           <p className="m-0 line-clamp-2 min-h-[2lh] max-w-100 pr-8 text-sm leading-5.5 text-foreground-light">
             {description}
           </p>
+          {date !== undefined ? (
+            <p className="m-0 min-h-5 text-xs leading-5 text-foreground-lighter">{date}</p>
+          ) : null}
         </div>
       </div>
     </article>
