@@ -57,7 +57,11 @@ Pipelines creates current-state BigQuery tables using destination-compatible nam
 
 ## Query replicated data
 
-Query the generated view for each source table. Its name combines the source schema and table with an underscore, doubling any existing underscores: `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`. Pipelines manages versioned physical tables behind the view and updates its target after a truncate. Queries tied directly to a physical table version can become stale or fail when that version is removed.
+Query the generated view for each source table. Its name combines the source schema and table with an underscore, doubling any existing underscores: `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`.
+
+Pipelines manages versioned physical tables behind the view. Their names append an underscore and a version suffix, such as `public_orders_<version>`. Newly created tables use a random UUID encoded as 25 lowercase base-36 characters: `0`–`9` and `a`–`z`. Treat this suffix as an opaque identifier. Existing tables with numeric suffixes, such as `public_orders_1`, remain supported.
+
+When a source truncate or table restart replaces the physical table, Pipelines assigns a fresh suffix and updates the view to point to the replacement. The view name stays the same. Queries tied directly to a physical table version can become stale or fail when that version is removed.
 
 ## Destination settings
 
