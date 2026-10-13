@@ -237,3 +237,30 @@ withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery
   const finalRoles = finalListZod.parse(await executeQuery(finalListSql))
   expect(finalRoles.find((role) => role.name === 'config_role')).toBeUndefined()
 })
+
+withTestDatabase('update and remove a role whose name needs quoting', async ({ executeQuery }) => {
+  const { sql: createSql } = pgMeta.roles.create({ name: 'quoting_r1' })
+  await executeQuery(createSql)
+  const { sql: listSql, zod: listZod } = pgMeta.roles.list()
+  const findRole = async (name: string) =>
+    listZod.parse(await executeQuery(listSql)).find((role) => role.name === name)
+  const { id } = (await findRole('quoting_r1'))!
+
+  // The rename and `valid until %L` are separate statements in one `do` block.
+  await executeQuery(
+    pgMeta.roles.update(
+      { id },
+      { name: `it's a "role"`, canLogin: true, validUntil: '2030-01-01T00:00:00.000Z' }
+    ).sql
+  )
+
+  const renamed = (await findRole(`it's a "role"`))!
+  expect(await findRole('quoting_r1')).toBeUndefined()
+  expect(renamed.id).toBe(id)
+  expect(renamed.canLogin).toBe(true)
+  // The server's time zone decides how the value is printed, so compare instants.
+  expect(new Date(renamed.validUntil!).toISOString()).toBe('2030-01-01T00:00:00.000Z')
+
+  await executeQuery(pgMeta.roles.remove({ id }).sql)
+  expect(await findRole(`it's a "role"`)).toBeUndefined()
+})
