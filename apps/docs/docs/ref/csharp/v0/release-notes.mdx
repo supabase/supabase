@@ -13,7 +13,7 @@ title: Release Notes
 ## 0.16.1 - 2024-03-15
 
 - Update dependency: `postgrest-csharp@3.5.1`
-  - Re: [#147](https://github.com/supabase-community/supabase-csharp/issues/147) - Supports `Rpc` specifying a generic
+  - Re: [#147](https://github.com/supabase/supabase-csharp/issues/147) - Supports `Rpc` specifying a generic
     type for its return.
 
 ## 0.16.0 - 2024-03-12
@@ -77,9 +77,9 @@ title: Release Notes
 ## 0.13.5 - 2023-10-09
 
 - Update Dependency: `postgrest-csharp@3.2.9`
-  - Re: [supabase-csharp#115](https://github.com/supabase-community/supabase-csharp/discussions/115) Additional
+  - Re: [supabase-csharp#115](https://github.com/supabase/supabase-csharp/discussions/115) Additional
     support for a model referencing another model with multiple foreign keys.
-  - Re: [supabase-csharp#115](https://github.com/supabase-community/supabase-csharp/discussions/115) Adds support for
+  - Re: [supabase-csharp#115](https://github.com/supabase/supabase-csharp/discussions/115) Adds support for
     multiple references attached to the same model (foreign keys) on a single C# Model.
 
 ## 0.13.4 - 2023-10-08
@@ -90,7 +90,7 @@ title: Release Notes
 
 ## 0.13.3 - 2023-09-15
 
-- Re: [#107](https://github.com/supabase-community/supabase-csharp/issues/107) - removes Realtime socket being
+- Re: [#107](https://github.com/supabase/supabase-csharp/issues/107) - removes Realtime socket being
   disconnected on a User sign-out - only the subscriptions should be removed.
 
 ## 0.13.2 - 2023-09-15
@@ -98,7 +98,7 @@ title: Release Notes
 - Update dependency: `postgrest-csharp@3.2.7`
   - Implements a `TableWithCache` for `Get` requests that can pull reactive Models from cache before making a remote
     request.
-  - Re: [supabase-csharp#85](https://github.com/supabase-community/supabase-csharp/issues/85) Includes sourcelink
+  - Re: [supabase-csharp#85](https://github.com/supabase/supabase-csharp/issues/85) Includes sourcelink
     support.
   - Re: [#75](https://github.com/supabase-community/postgrest-csharp/pull/75) Fix issue with marshalling of stored
     procedure arguments. Big thank you to [@corrideat](https://github.com/corrideat)!
@@ -131,7 +131,7 @@ title: Release Notes
     disconnect from channels after a few hours and fail to reconnect by removing the case where the `IsSubscribe` flag
     is flipped when encountering a channel error.
 - Update dependency: `postgrest-csharp@3.2.5`
-  - Re: [supabase-community/supabase-csharp#81](https://github.com/supabase-community/supabase-csharp/discussions/81):
+  - Re: [supabase/supabase-csharp#81](https://github.com/supabase/supabase-csharp/discussions/81):
     Clarifies `ReferenceAttribute` by changing `shouldFilterTopLevel` to `useInnerJoin` and adds an additional
     constructor for `ReferenceAttribute` with a shortcut for specifying the `JoinType`
 
@@ -318,7 +318,7 @@ Thanks [@wiverson](https://github.com/wiverson) for the work in this release!
 
 - Update dependency: supabase-storage-csharp@1.2.5
   - Provides fix
-    for [supabase-community/supabase-csharp#54](https://github.com/supabase-community/supabase-csharp/issues/54) -
+    for [supabase/supabase-csharp#54](https://github.com/supabase/supabase-csharp/issues/54) -
     Dynamic headers were always being overwritten by initialized token headers, so the storage client would not
     receive user's access token as expected.
   - Provides fix for upload progress not reporting
@@ -376,7 +376,7 @@ Thanks [@wiverson](https://github.com/wiverson) for the work in this release!
 ## 0.7.1 - 2023-01-17
 
 - Update dependency: postgrest-csharp@3.1.1
-  - Fix issue from supabase-community/supabase-csharp#48 where boolean model properties would not be evaluated in
+  - Fix issue from supabase/supabase-csharp#48 where boolean model properties would not be evaluated in
     predicate expressions
 
 ## 0.7.0 - 2023-01-16
@@ -392,7 +392,7 @@ Thanks [@wiverson](https://github.com/wiverson) for the work in this release!
 - Update dependency: postgrest-csharp@3.0.4
   - `GetHeaders` is now passed to `ModeledResponse` and `BaseModel` so that the default `Update` and `Delete` methods
     use the latest credentials
-  - `GetHeaders` is used in `Rpc` calls (re: [#39](https://github.com/supabase-community/supabase-csharp/issues/39))
+  - `GetHeaders` is used in `Rpc` calls (re: [#39](https://github.com/supabase/supabase-csharp/issues/39))
 
 ## 0.6.1 - 2022-11-12
 
@@ -427,7 +427,7 @@ Other Changes:
 
 Big thank you to [@veleek](https://github.com/veleek) for his insight into these changes.
 
-Re: [#35](https://github.com/supabase-community/supabase-csharp/issues/35), [#34](https://github.com/supabase-community/supabase-csharp/issues/34), [#23](https://github.com/supabase-community/supabase-csharp/issues/23), [#36](https://github.com/supabase-community/supabase-csharp/pull/36)
+Re: [#35](https://github.com/supabase/supabase-csharp/issues/35), [#34](https://github.com/supabase/supabase-csharp/issues/34), [#23](https://github.com/supabase/supabase-csharp/issues/23), [#36](https://github.com/supabase/supabase-csharp/pull/36)
 
 ## 0.5.3 - 2022-10-11
 
@@ -534,10 +534,10 @@ Re: [#35](https://github.com/supabase-community/supabase-csharp/issues/35), [#34
 ## 0.2.11 - 2021-12-24
 
 - Update dependency: gotrue-csharp@2.3.2 (changes CreateUser parameters to conform to `AdminUserAttributes`)
-  - See [#15](https://github.com/supabase-community/supabase-csharp/issues/15)
-  - See [#16](https://github.com/supabase-community/supabase-csharp/issues/16)
+  - See [#15](https://github.com/supabase/supabase-csharp/issues/15)
+  - See [#16](https://github.com/supabase/supabase-csharp/issues/16)
 - Update dependency: realtime-csharp@2.0.7
-  - See [#13](https://github.com/supabase-community/supabase-csharp/issues/13)
+  - See [#13](https://github.com/supabase/supabase-csharp/issues/13)
 
 ## 0.2.10 - 2021-12-23
 
@@ -560,7 +560,7 @@ Re: [#35](https://github.com/supabase-community/supabase-csharp/issues/35), [#34
 
 ## 0.2.6 - 2021-11-29
 
-- Support for [#12](https://github.com/supabase-community/supabase-csharp/issues/12)
+- Support for [#12](https://github.com/supabase/supabase-csharp/issues/12)
 - Update realtime-csharp to 2.0.6
 - Update gotrue-csharp to 2.2.2
-- Add `StatelessClient` re:[#7](https://github.com/supabase-community/supabase-csharp/issues/7)
+- Add `StatelessClient` re:[#7](https://github.com/supabase/supabase-csharp/issues/7)

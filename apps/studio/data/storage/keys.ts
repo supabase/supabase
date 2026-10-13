@@ -97,6 +97,8 @@ export const storageKeys = {
       path,
       ...(versionId === undefined ? [] : [versionId]),
     ] as const,
+  archivedObjects: (projectRef: string | undefined, bucketId: string | undefined) =>
+    ['projects', projectRef, 'buckets', bucketId, 'archived-objects'] as const,
   icebergNamespaces: ({ projectRef, warehouse }: { projectRef?: string; warehouse?: string }) =>
     [projectRef, 'warehouse', warehouse, 'namespaces'] as const,
   icebergNamespace: ({
