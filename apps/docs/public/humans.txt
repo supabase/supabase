@@ -80,6 +80,7 @@ Connor Davis
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Chapman
 Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
@@ -103,6 +104,7 @@ Divit D
 Divya Sharma
 Donna Alexandra
 Douglas Hunley
+Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
@@ -229,6 +231,7 @@ Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
+Matt McGill
 Matt Robinson
 Matt Rossman
 Matt Smiley
@@ -238,6 +241,7 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
 Mo Khan

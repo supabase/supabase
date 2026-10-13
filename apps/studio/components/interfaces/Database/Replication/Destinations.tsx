@@ -381,9 +381,11 @@ export const Destinations = () => {
 
         {isSourcesError && (
           <AlertError
+            layout="responsive"
             projectRef={projectRef}
             error={sourcesError}
             subject={sourceErrorTitle}
+            hideContactSupport={checkLocalETLNotSetUp(sourcesError)}
             description={
               checkLocalETLNotSetUp(sourcesError)
                 ? 'Configure the replication API to manage pipelines in local development.'
