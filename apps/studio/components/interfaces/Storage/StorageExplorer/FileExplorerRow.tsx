@@ -169,7 +169,7 @@ export const FileExplorerRow = ({
     setSelectedFileCustomExpiry,
     setSelectedItems,
     setSelectedItemsToDelete,
-    setItemToPurge,
+    setItemsToPurge,
     refetchAllOpenedFolders,
     replaceFile,
     downloadFile,
@@ -292,7 +292,7 @@ export const FileExplorerRow = ({
                       {
                         name: 'Delete permanently',
                         icon: <Trash2 size={12} className="text-destructive" />,
-                        onClick: () => setItemToPurge(itemWithColumnIndex),
+                        onClick: () => setItemsToPurge([itemWithColumnIndex]),
                       },
                     ]
                   : []),
@@ -384,7 +384,7 @@ export const FileExplorerRow = ({
                       {
                         name: 'Delete permanently',
                         icon: <Trash2 size={12} className="text-destructive" />,
-                        onClick: () => setItemToPurge(itemWithColumnIndex),
+                        onClick: () => setItemsToPurge([itemWithColumnIndex]),
                       },
                     ]
                   : []),
@@ -448,7 +448,7 @@ export const FileExplorerRow = ({
         {
           name: 'Delete permanently',
           icon: <Trash2 size={12} className="text-destructive" />,
-          onClick: () => setItemToPurge(itemWithColumnIndex),
+          onClick: () => setItemsToPurge([itemWithColumnIndex]),
         },
       ]
 

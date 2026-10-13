@@ -33,7 +33,7 @@ vi.mock('@/state/storage-explorer', () => ({
     selectedFilePreview: selectedFilePreview.current,
     openedFolders: [],
     setSelectedItemsToDelete: vi.fn(),
-    setItemToPurge: vi.fn(),
+    setItemsToPurge: vi.fn(),
     refetchAllOpenedFolders: vi.fn().mockResolvedValue(undefined),
     replaceFile: vi.fn(),
     setSelectedFileCustomExpiry: vi.fn(),
