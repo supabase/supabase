@@ -5,11 +5,14 @@ import { del, get, patch, post, handleError as sharedHandleError } from '@/data/
 // The real webhooks API nests error details under an `error` key
 // (`{ error: { code, message } }`), but the shared `handleError` only reads a
 // top-level `message`/`msg`. Flatten the nested fields up so it finds one.
+// Rate limiting is expected and already has dedicated UI handling, so it's the
+// only case excluded from Sentry capture.
 const handleError = (error: unknown): never => {
   if (error && typeof error === 'object' && 'error' in error) {
     const { error: nested, ...rest } = error
     if (nested && typeof nested === 'object') {
-      return sharedHandleError({ ...rest, ...nested })
+      const isRateLimit = 'code' in nested && nested.code === 'rate_limit_exceeded'
+      return sharedHandleError({ ...rest, ...nested }, { alwaysCapture: !isRateLimit })
     }
   }
   return sharedHandleError(error)

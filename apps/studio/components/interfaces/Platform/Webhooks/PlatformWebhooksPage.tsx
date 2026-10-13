@@ -288,7 +288,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     if (!endpointPendingDelete) return
     try {
       await deleteEndpointMutation.mutateAsync({ scope: apiScope, id: endpointPendingDelete.id })
-    } catch {
+    } catch (error) {
+      console.error('Failed to delete webhook endpoint', error)
       return
     }
     if (endpointPendingDelete.id === endpointId) {
@@ -305,7 +306,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       let created: WebhookEndpoint
       try {
         created = await createEndpointMutation.mutateAsync({ scope: apiScope, input })
-      } catch {
+      } catch (error) {
+        console.error('Failed to create webhook endpoint', error)
         return
       }
       // The server never echoes the secret back — we already know it, since the
@@ -330,7 +332,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
           id: selectedEndpoint.id,
           input: toEndpointPayload(values),
         })
-      } catch {
+      } catch (error) {
+        console.error('Failed to update webhook endpoint', error)
         return
       }
       setPanel(null)
@@ -348,7 +351,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         id: selectedEndpoint.id,
         signingSecret: nextSecret,
       })
-    } catch {
+    } catch (error) {
+      console.error('Failed to regenerate webhook signing secret', error)
       return
     }
     setSigningSecretReveal({ signingSecret: nextSecret })
@@ -360,7 +364,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     if (!selectedEndpoint) return
     try {
       await testEndpointMutation.mutateAsync({ scope: apiScope, id: selectedEndpoint.id })
-    } catch {
+    } catch (error) {
+      console.error('Failed to send webhook test event', error)
       return
     }
     toast.success('Test event sent — check deliveries shortly')
@@ -377,7 +382,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         endpointId: selectedEndpoint.id,
         id: deliveryId,
       })
-    } catch {
+    } catch (error) {
+      console.error('Failed to retry webhook delivery', error)
       return
     }
     toast.success('Delivery queued for retry')
