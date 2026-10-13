@@ -3,7 +3,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { TableScrollPreservation, useTableScrollAnchor } from './useTableScrollAnchor'
 
-function setup({ scrollTop = 0, rowCount = 20 } = {}) {
+const reducedMotionQuery: MediaQueryList = vi.mocked(window.matchMedia).mock.results[
+  vi
+    .mocked(window.matchMedia)
+    .mock.calls.findIndex(([query]) => query === '(prefers-reduced-motion: reduce)')
+].value
+
+function setup({ scrollTop = 0, rowCount = 20, prefersReducedMotion = false } = {}) {
+  Object.defineProperty(reducedMotionQuery, 'matches', {
+    configurable: true,
+    value: prefersReducedMotion,
+  })
   const container = document.createElement('div')
   const table = document.createElement('table')
   container.append(table)
@@ -111,9 +121,46 @@ describe('useTableScrollAnchor', () => {
     expect(container.scrollTop).toBe(30)
   })
 
-  it('jumps immediately to the newest rows and restores anchoring', () => {
+  it('scrolls smoothly to the newest rows and preserves horizontal scroll through arrivals', () => {
     const { container, rowIds, updateRows, rerender, result, onScrollToTop, scrollTo } = setup({
       scrollTop: 150,
+    })
+    act(() => result.current.scrollToTop())
+    expect(scrollTo).toHaveBeenCalledWith({ top: 0, left: 70, behavior: 'smooth' })
+    expect(container.scrollTop).toBe(150)
+    expect(container.scrollLeft).toBe(70)
+    expect(onScrollToTop).toHaveBeenCalledOnce()
+
+    updateRows(['new', ...rowIds])
+    rerender()
+    expect(container.scrollTop).toBe(150)
+    container.scrollTop = 80
+    act(() => {
+      container.dispatchEvent(new Event('scroll'))
+      result.current.handleScroll()
+    })
+    updateRows(['newer', 'new', ...rowIds], 24)
+    rerender()
+    expect(container.scrollTop).toBe(80)
+    rerender()
+    expect(container.scrollTop).toBe(80)
+
+    container.scrollTop = 0
+    act(() => {
+      container.dispatchEvent(new Event('scroll'))
+      result.current.handleScroll()
+    })
+    expect(onScrollToTop).toHaveBeenCalledTimes(2)
+    updateRows(['newest', 'newer', 'new', ...rowIds], 24)
+    rerender()
+    expect(container.scrollTop).toBe(30)
+    expect(container.scrollLeft).toBe(70)
+  })
+
+  it('jumps immediately when reduced motion is preferred and restores anchoring', () => {
+    const { container, rowIds, updateRows, rerender, result, onScrollToTop, scrollTo } = setup({
+      scrollTop: 150,
+      prefersReducedMotion: true,
     })
     act(() => result.current.scrollToTop())
     expect(scrollTo).toHaveBeenCalledWith({ top: 0, left: 70, behavior: 'instant' })
@@ -122,6 +169,81 @@ describe('useTableScrollAnchor', () => {
     updateRows(['new', ...rowIds])
     rerender()
     expect(container.scrollTop).toBe(30)
+  })
+
+  it('acknowledges rows arriving during smooth scrolling when the newest rows become visible', () => {
+    const { container, rowIds, updateRows, rerender, result, onScrollToTop } = setup({
+      scrollTop: 150,
+    })
+    let unseenRows = 1
+    onScrollToTop.mockImplementation(() => {
+      unseenRows = 0
+    })
+    act(() => result.current.scrollToTop())
+    expect(unseenRows).toBe(0)
+
+    unseenRows += 1
+    updateRows(['new', ...rowIds])
+    rerender()
+    expect(unseenRows).toBe(1)
+
+    container.scrollTop = 0
+    act(() => {
+      container.dispatchEvent(new Event('scroll'))
+      result.current.handleScroll()
+      container.dispatchEvent(new Event('scrollend'))
+    })
+    expect(unseenRows).toBe(0)
+    expect(onScrollToTop).toHaveBeenCalledTimes(2)
+  })
+
+  it.each(['scrollend', 'idle'])(
+    'restores anchoring after an interrupted smooth scroll via %s',
+    (end) => {
+      vi.useFakeTimers()
+      const { container, rowIds, updateRows, rerender, result, onScrollToTop } = setup({
+        scrollTop: 150,
+      })
+      act(() => result.current.scrollToTop())
+      container.scrollTop = 100
+      act(() => {
+        container.dispatchEvent(new Event('scroll'))
+        result.current.handleScroll()
+      })
+      act(() => {
+        if (end === 'scrollend') container.dispatchEvent(new Event('scrollend'))
+        else vi.advanceTimersByTime(150)
+      })
+      updateRows(['new', ...rowIds])
+      rerender()
+      expect(container.scrollTop).toBe(130)
+      expect(onScrollToTop).toHaveBeenCalledOnce()
+      expect(vi.getTimerCount()).toBe(0)
+    }
+  )
+
+  it('cleans up pending smooth scrolling when the preservation session changes or unmounts', () => {
+    vi.useFakeTimers()
+    const { container, rowIds, updateRows, rerender, result, onScrollToTop, scrollTo, unmount } =
+      setup({
+        scrollTop: 150,
+      })
+    act(() => result.current.scrollToTop())
+    const nextProps = { scrollPreservation: { key: Symbol(), onScrollToTop } }
+    rerender(nextProps)
+    expect(scrollTo).toHaveBeenLastCalledWith({ top: 150, left: 70, behavior: 'instant' })
+    expect(onScrollToTop).toHaveBeenCalledOnce()
+    expect(vi.getTimerCount()).toBe(0)
+    updateRows(['new', ...rowIds])
+    rerender(nextProps)
+    expect(container.scrollTop).toBe(180)
+    act(() => result.current.scrollToTop())
+    unmount()
+    expect(scrollTo).toHaveBeenLastCalledWith({ top: 180, left: 70, behavior: 'instant' })
+    expect(onScrollToTop).toHaveBeenCalledTimes(2)
+    expect(vi.getTimerCount()).toBe(0)
+    container.dispatchEvent(new Event('scroll'))
+    expect(vi.getTimerCount()).toBe(0)
   })
 
   it('does not undo explicit selection navigation before a scroll event is delivered', () => {
