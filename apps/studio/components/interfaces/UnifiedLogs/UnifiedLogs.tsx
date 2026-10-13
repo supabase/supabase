@@ -222,8 +222,7 @@ export const UnifiedLogs = () => {
   })
 
   const refetchAllData = () => {
-    refetchLogs()
-    refetchCounts()
+    refreshLogs()
     refetchCharts()
   }
 
@@ -240,12 +239,14 @@ export const UnifiedLogs = () => {
     sessionKey,
     acknowledgeLiveLogs,
     fetchLiveLogs,
+    refreshLogs,
   } = useLiveLogBatches({
     scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
     rows: uniqueRows,
     firstPage: unifiedLogsData?.pages[0],
     isPlaceholderData,
     fetchPreviousPage,
+    refetchLogs,
     refetchCounts,
   })
   const liveMode = useLiveMode(flatData)
