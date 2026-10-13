@@ -10,6 +10,7 @@ import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
+import { ImageZoom } from 'ui-patterns/ImageZoom/ImageZoom'
 import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { inter, manrope } from '@/fonts'
@@ -59,6 +60,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body>
         <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
         <TelemetryTagManager />
+        <ImageZoom />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>
         </GlobalProviders>

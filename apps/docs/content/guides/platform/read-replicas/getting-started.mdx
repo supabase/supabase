@@ -91,7 +91,6 @@ The Read Replica then reads the WAL files and applies those changes. There is hi
   caption="Map view of Primary and Read Replica databases"
   src="/docs/img/guides/platform/read-replicas/streaming-replication-dark.png?v=1"
   containerClassName="max-w-[700px] mx-auto"
-  zoomable
 />
 
 We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to off-site, durable cloud storage, such as S3.
