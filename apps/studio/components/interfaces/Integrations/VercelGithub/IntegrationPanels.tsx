@@ -140,13 +140,23 @@ export interface IntegrationConnectionProps extends HTMLAttributes<HTMLLIElement
   connection: IntegrationProjectConnection
   type: Integration['integration']['name']
   actions?: ReactNode
+  leadingAction?: ReactNode
   showNode?: boolean
   orientation?: 'horizontal' | 'vertical'
 }
 
 export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
-    { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
+    {
+      connection,
+      type,
+      actions,
+      leadingAction,
+      showNode = true,
+      orientation = 'horizontal',
+      className,
+      ...props
+    },
     ref
   ) => {
     const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
@@ -222,7 +232,10 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
             </div>
           </div>
 
-          <div className="shrink-0">{actions}</div>
+          <div className="shrink-0 flex items-center gap-x-2">
+            {leadingAction}
+            {actions}
+          </div>
         </div>
       </li>
     )
