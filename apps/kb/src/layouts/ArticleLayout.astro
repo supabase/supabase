@@ -3,7 +3,9 @@ import { ExternalLink } from 'lucide-react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
+import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
+import type { RelatedGuides } from '../lib/guides'
 import Layout from './Layout.astro'
 import { getTopicDescription, isKnownTopic, topicToSlug } from '../lib/topics'
 
@@ -19,9 +21,20 @@ interface Props {
 	date?: string
 	toc?: TOCItemType[]
 	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
+	related?: RelatedGuides | null
 }
 
-const { title, description, topics = [], github_url, viewGitHubLink, date, toc = [], jsonLd } = Astro.props
+const {
+	title,
+	description,
+	topics = [],
+	github_url,
+	viewGitHubLink,
+	date,
+	toc = [],
+	jsonLd,
+	related,
+} = Astro.props
 const pagePath = Astro.url.pathname.replace(/\/$/, '')
 // the `<page>.md` redirect only exists on vercel (vercel.json), so fetch the generated file directly
 const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta.env.BASE_URL}/markdown`)}.md`
@@ -110,4 +123,14 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 			/>
 		</aside>
 	</div>
+	{
+		related && (
+			<FeaturedSection
+				client:load
+				title={`More ${related.topic} guides`}
+				items={related.guides.map((guide) => ({ ...guide, slot: guide.id }))}
+				className="pb-24 pt-16"
+			/>
+		)
+	}
 </Layout>

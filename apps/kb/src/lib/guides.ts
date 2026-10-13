@@ -1,6 +1,6 @@
 import type { CollectionEntry } from 'astro:content'
 
-import { isKnownTopic, TOPICS, topicToSlug, type Topic } from './topics'
+import { FORMAT_TOPICS, isKnownTopic, TOPICS, topicToSlug, type Topic } from './topics'
 
 export interface GuideSummary {
   id: string
@@ -34,7 +34,18 @@ export interface EmptyState {
   action: string
 }
 
+interface RelatedGuidesParams {
+  guide: GuideSummary
+  guides: GuideSummary[]
+}
+
+export interface RelatedGuides {
+  topic: Topic
+  guides: GuideSummary[]
+}
+
 const FEATURED_COUNT = 3
+const RELATED_COUNT = 3
 
 export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   id: guide.id,
@@ -94,4 +105,22 @@ export const emptyStateFor = ({ topic }: EmptyStateParams): EmptyState => {
     message: `There are no ${topicLabel}guides yet.`,
     action: 'Show all guides',
   }
+}
+
+export const relatedGuides = ({ guide, guides }: RelatedGuidesParams): RelatedGuides | null => {
+  const sharedTopics = (other: GuideSummary) =>
+    other.topics.filter((topic) => guide.topics.includes(topic)).length
+  // readers want more on the same subject, not more of the same kind of guide
+  const subjectFirst = guide.topics.toSorted(
+    (a, b) => Number(FORMAT_TOPICS.includes(a)) - Number(FORMAT_TOPICS.includes(b))
+  )
+  for (const topic of subjectFirst) {
+    // hidden topics target crawlers, not readers, so they never name the section
+    if (!TOPICS.find(({ name }) => name === topic)?.visible) continue
+    const others = guides.filter((other) => other.id !== guide.id && other.topics.includes(topic))
+    if (others.length === 0) continue
+    const ranked = others.toSorted((a, b) => sharedTopics(b) - sharedTopics(a))
+    return { topic, guides: ranked.slice(0, RELATED_COUNT) }
+  }
+  return null
 }
