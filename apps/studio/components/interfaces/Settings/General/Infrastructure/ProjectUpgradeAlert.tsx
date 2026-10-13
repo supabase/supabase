@@ -36,7 +36,7 @@ import { z } from 'zod'
 
 import { PLAN_DETAILS } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
-import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import {
