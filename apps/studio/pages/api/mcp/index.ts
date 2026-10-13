@@ -26,7 +26,7 @@ const ENABLE_MCP_OAUTH = process.env.ENABLE_MCP_AUTH === 'true'
 
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
 
-const RESOURCE_METADATA_URL =
+const MCP_RESOURCE_URL =
   (process.env.API_EXTERNAL_URL || process.env.SUPABASE_PUBLIC_URL)?.replace('/auth/v1', '') +
   '/.well-known/oauth-protected-resource/mcp'
 
@@ -72,7 +72,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     if (!token || !(await isTokenValid(token))) {
       res.setHeader(
         'WWW-Authenticate',
-        `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${RESOURCE_METADATA_URL}"`
+        `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${MCP_RESOURCE_URL}"`
       )
 
       return res.status(401).json({ error: 'Unauthorized' })
