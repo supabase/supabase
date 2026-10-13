@@ -8,6 +8,7 @@ export interface GuideSummary {
   description: string
   topics: Topic[]
   href: string
+  date?: string
 }
 
 export interface FeaturedItem extends GuideSummary {
@@ -53,6 +54,7 @@ export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   description: guide.data.description,
   topics: guide.data.topics,
   href: `${import.meta.env.BASE_URL}/guides/${guide.id}`,
+  date: guide.data.date,
 })
 
 export const toTroubleshootingSummary = (

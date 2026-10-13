@@ -77,7 +77,6 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 			</Breadcrumb>
 			<header class="mb-8">
 				<h1 class="mt-0 mb-0 text-balance">{title}</h1>
-				{date && <p class="not-prose mt-3 text-sm text-foreground-lighter">{date}</p>}
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
 			<slot />
@@ -101,7 +100,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 			}
 			{
 				viewGitHubLink && (
-					<footer class="mt-16 not-prose">
+					<footer class="mt-16 not-prose flex items-center justify-between gap-4">
 						<a
 							href={viewGitHubLink}
 							target="_blank"
@@ -110,6 +109,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 						>
 							View this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
 						</a>
+						{date && <p class="m-0 text-sm text-foreground-lighter">{date}</p>}
 					</footer>
 				)
 			}

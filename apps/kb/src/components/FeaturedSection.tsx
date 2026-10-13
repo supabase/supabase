@@ -16,6 +16,7 @@ export interface FeaturedSectionProps {
 
 interface FeaturedCoverProps {
   item: FeaturedItem
+  hasDates: boolean
 }
 
 type NotchStyle = CSSProperties & { '--notch-width': string; '--notch-mask': string }
@@ -29,6 +30,7 @@ const NOTCH_STYLE: NotchStyle = {
 
 export const FeaturedSection = ({ title, items, className }: FeaturedSectionProps) => {
   const headingId = useId()
+  const hasDates = items.some((item) => item.date)
   if (items.length === 0) return null
 
   return (
@@ -57,7 +59,7 @@ export const FeaturedSection = ({ title, items, className }: FeaturedSectionProp
       >
         {items.map((item, index) => (
           <li key={item.slot} style={revealStyle(index + 1)} className={REVEAL_ITEM_CLASS}>
-            <FeaturedCover item={item} />
+            <FeaturedCover item={item} hasDates={hasDates} />
           </li>
         ))}
       </ul>
@@ -65,7 +67,7 @@ export const FeaturedSection = ({ title, items, className }: FeaturedSectionProp
   )
 }
 
-const FeaturedCover = ({ item }: FeaturedCoverProps) => (
+const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
   <a
     href={item.href}
     style={NOTCH_STYLE}
@@ -76,8 +78,10 @@ const FeaturedCover = ({ item }: FeaturedCoverProps) => (
         title={item.title}
         description={item.description}
         topics={item.topics}
+        date={hasDates ? (item.date ?? '') : undefined}
         className={cn(
-          'cover-notch h-107.5',
+          'cover-notch',
+          hasDates ? 'h-115.5' : 'h-107.5',
           // tint layer instead of a bg swap: the canvas paints the card bg into its cutouts
           "before:pointer-events-none before:absolute before:inset-0 before:z-10 before:content-['']",
           'before:rounded-lg before:bg-surface-200 before:opacity-0',

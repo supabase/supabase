@@ -18,6 +18,7 @@ export interface TopicCoverProps {
   title: string
   description: string
   topics: Topic[]
+  date?: string
   className?: string
 }
 
@@ -31,7 +32,7 @@ const getCoverLattice = (size: CanvasSize): Lattice => {
   return { xs: splitEdges({ edges: grid.xs, target: GLYPH_PITCH }), ys: grid.ys }
 }
 
-export const TopicCover = ({ title, description, topics, className }: TopicCoverProps) => {
+export const TopicCover = ({ title, description, topics, date, className }: TopicCoverProps) => {
   const textRef = useRef<HTMLDivElement>(null)
   const getField = (params: FieldParams) => coverField({ ...params, topic: pickCoverTopic(topics) })
 
@@ -50,15 +51,19 @@ export const TopicCover = ({ title, description, topics, className }: TopicCover
         keepOutRefs={[textRef]}
         isInteractive={false}
       />
-      <div className="absolute inset-x-0 bottom-0 flex flex-col">
-        <div ref={textRef} className="flex flex-col gap-3 bg-surface-75 px-6 pb-6">
-          <h3 className="m-0 grid min-h-[2lh] content-end font-sans! text-3xl font-medium! leading-8 tracking-tight text-foreground">
-            <span className="line-clamp-2">{title}</span>
-          </h3>
-          <p className="m-0 line-clamp-2 min-h-[2lh] max-w-100 pr-8 text-sm leading-5.5 text-foreground-light">
-            {description}
-          </p>
-        </div>
+      <div
+        ref={textRef}
+        className="absolute inset-x-0 bottom-0 flex flex-col gap-3 bg-surface-75 px-6 pb-6"
+      >
+        <h3 className="m-0 grid min-h-[2lh] content-end font-sans! text-3xl font-medium! leading-8 tracking-tight text-foreground">
+          <span className="line-clamp-2">{title}</span>
+        </h3>
+        <p className="m-0 line-clamp-2 min-h-[2lh] max-w-100 pr-8 text-sm leading-5.5 text-foreground-light">
+          {description}
+        </p>
+        {date !== undefined ? (
+          <p className="m-0 min-h-5 text-xs leading-5 text-foreground-lighter">{date}</p>
+        ) : null}
       </div>
     </article>
   )
