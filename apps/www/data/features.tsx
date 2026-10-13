@@ -3010,66 +3010,68 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
   },
   {
     title: 'Declarative Schemas',
-    subtitle: 'Simplify database management with declarative schema files.',
+    subtitle: 'Keep your schema in SQL files and let the CLI write the migrations.',
     description: `
-Declarative schemas help you manage complex Postgres databases more easily by defining your database structure in SQL files that represent the final, desired state. These schema files can be stored and versioned alongside your codebase, enabling better collaboration and simplified reviews.
+Declarative schemas define your desired database structure in SQL files alongside your application code. Edit the files, generate a migration, review it, and apply it.
 
-With declarative schemas, you can:
+Declarative Schemas 2.0 runs on Supabase's open source diff engine, \`pg-delta\`. It covers gaps in the legacy \`migra\` engine, including column privileges, \`security_invoker\` on views, and publication membership.
 
-- Maintain a single source of truth for your database schema, reducing duplication and errors.
-- Generate migration files automatically by diffing your declarative schema against the current database state.
-- Review changes easily through concise, readable diffs instead of long, complex migration scripts.
+The CLI loads your schema files into one temporary Postgres database and replays your migration history into another. \`pg-delta\` compares their system catalogs to generate a migration. This comparison never reads your live database.
+
+\`pg-delta\` is still in alpha. New CLI projects get it from \`supabase init\`. Existing projects turn it on with \`[experimental.pgdelta]\` and \`enabled = true\` in \`config.toml\`.
 
 ## Key benefits
-1. Single source of truth: Define your entire database schema in a single, centralized location for better visibility and control.
-2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
-3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
-4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
-5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, and more through declarative SQL files.
 
-Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
+1. Version-controlled schema: Keep your schema in \`supabase/schemas/\` and review changes alongside your application code.
+2. Smaller schema diffs: A one-line change to a view appears as one changed line in the schema file. Review the generated migration too before applying it.
+3. Fewer merge conflicts: Separate files for tables, views, and functions help developers work on different objects independently.
+4. Broader coverage: Generate changes for RLS policies, grants, views, partitions, publications, domains, and comments. If your schema includes something the engine cannot track, such as a custom operator or text search configuration, it reports a warning.
+5. Automatic dependency ordering: The engine orders statements for you. You no longer hand-order files in \`schema_paths\`.
+6. Supabase-aware diffs: Supabase-managed objects stay out. Your customizations, including profile triggers on \`auth.users\`, stay in.
 
-## Use Cases for Declarative Schemas
+## Use cases
 
-Declarative schemas are valuable for a wide range of teams and scenarios:
+Declarative schemas help teams maintain databases with many views, functions, and policies. Developers can edit definitions in place and generate migrations in CI. Existing projects can export their database into schema files to adopt the same workflow.
 
-- Teams managing complex databases. Simplify schema management when working with multiple tables, views, policies, and functions.
-- Collaborative teams. Reduce merge conflicts and improve review processes when multiple developers are making schema changes.
-- CI/CD pipelines. Use declarative schemas to automate schema updates in your deployment workflows.
-- Teams adopting best practices. Adopt a more robust, maintainable approach to schema management with declarative patterns.
+## Supabase CLI workflow
 
-## Integration capabilities with Supabase
+Declarative schemas are part of the Supabase CLI:
 
-Declarative schemas integrate directly with the Supabase CLI, allowing you to:
+- Define your schema in SQL files under \`supabase/schemas/\`. One file per table works well but the layout is up to you.
+- Run \`supabase db schema declarative sync --no-apply\` to generate a migration for review.
+- Review the generated SQL, including any statements the CLI flags as destructive.
+- Apply the migration locally with \`supabase migration up\` and push it with \`supabase db push\`.
+- Schema files are plain SQL. Editor tooling such as the Postgres Language Server works on them.
 
-- Define your schema in SQL files within the \`supabase/schemas\` directory.
-- Use \`supabase db diff\` to generate migration files based on schema changes.
-- Apply and deploy migrations using the Supabase CLI, ensuring consistency across local and remote environments.
-- Combine with the Postgres Language Server for enhanced IDE support when working with declarative schemas.
-
-These tools help you maintain control over your database while moving faster and reducing the risk of errors.
-
-## FAQs about Declarative Schemas
-
-Below are answers to common questions about declarative schemas.
+## Frequently asked questions
 
 ### How do declarative schemas differ from migrations?
 
-Migrations are a record of incremental changes to your database schema. Declarative schemas define the final desired state of your schema, and the necessary migration files are generated by comparing the current database state with your schema files.
+Migrations record incremental changes. Declarative schemas describe the state you want. The CLI compares your schema files with your migration history and writes plain SQL migrations in \`supabase/migrations/\`. Hand-written migrations keep working alongside them.
 
 ### Do I need to write my own migration files?
 
-No. Supabase provides a schema diff tool (\`supabase db diff\`) that automatically generates migration files from your declarative schema files.
+The CLI generates schema migrations, but some changes need manual edits. A renamed column, for example, comes out as a drop followed by an add. Review and adjust the migration to preserve your data. Data changes still need seed files or hand-written migrations.
 
 ### Can I use declarative schemas with my existing projects?
 
-Yes. You can pull your production schema into declarative files by running \`supabase db dump > supabase/schemas/prod.sql\`. From there, you can split the schema into smaller files and adopt a declarative workflow.
+Yes. Turn on \`pg-delta\` first. If the project has no migration history, run \`supabase db pull\` to create a baseline. Run \`supabase db schema declarative generate --linked\` to export your database into SQL files under \`supabase/schemas/\`. Then edit, generate, review, and apply as usual. See the docs for [adopting declarative schemas on the legacy engine](https://supabase.com/docs/guides/local-development/declarative-database-schemas#starting-from-an-existing-database-on-the-legacy-engine).
+
+### What changes if I already use declarative schemas on migra?
+
+Turn on \`pg-delta\` in \`config.toml\` and remove \`schema_paths\`. Run \`supabase db pull\` to capture any objects missing from your migration history. Then switch your scripts from \`supabase db diff\` to \`supabase db schema declarative sync\`. Follow the [diff engines guide](https://supabase.com/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta) for the full procedure. Projects that don't opt in keep using \`migra\`.
 
 ### Are there any limitations to declarative schemas?
 
-The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
+\`pg-delta\` does not diff application data or Storage buckets. Buckets are rows in \`storage.buckets\`. RLS policies on \`storage.objects\` are schema objects and are included in diffs.
 
-For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
+The engine does not orchestrate zero-downtime rollouts. See [known caveats](https://supabase.com/docs/guides/local-development/declarative-database-schemas#known-caveats) for unsupported objects and extension-specific behavior.
+
+### Does pg-delta work outside Supabase?
+
+Yes. \`pg-delta\` is open source under the PostgreSQL License and ships on npm as \`@supabase/pg-delta\`. Point it at any two Postgres databases from version 14 through 18. It writes the migration between them. The engine is at [supabase/pg-delta](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta).
+
+Get started with the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
