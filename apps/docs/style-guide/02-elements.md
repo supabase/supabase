@@ -213,9 +213,7 @@ rather than adding `Locate the **Save** button` as a separate step.
 #### Put the location before the action
 
 Write UI instructions in the order the reader acts: where to look first, then which
-control to use. The reader finds the place before they can act on it. This applies to
-numbered steps, list items, and instructions inside a sentence. It's the UI counterpart of
-[putting the condition before the instruction](./01-voice-and-tone.md#put-the-condition-before-the-instruction).
+control to use. The reader finds the place before they can act on it. 
 
 - **Recommended**: `Next to Supabase, click **Manage**, then click **Open in Supabase**.`
 - **Not recommended**: `Click **Manage** next to Supabase, then click **Open in Supabase**.`
