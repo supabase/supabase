@@ -1,6 +1,22 @@
 import type { operations } from 'api-types'
 
-import { del, get, handleError, patch, post } from '@/data/fetchers'
+import { del, get, patch, post, handleError as sharedHandleError } from '@/data/fetchers'
+
+// The real webhooks API nests error details under an `error` key
+// (`{ error: { code, message } }`), but the shared `handleError` only reads a
+// top-level `message`/`msg`. Flatten the nested fields up so it finds one.
+// Rate limiting is expected and already has dedicated UI handling, so it's the
+// only case excluded from Sentry capture.
+const handleError = (error: unknown): never => {
+  if (error && typeof error === 'object' && 'error' in error) {
+    const { error: nested, ...rest } = error
+    if (nested && typeof nested === 'object') {
+      const isRateLimit = 'code' in nested && nested.code === 'too_many_requests'
+      return sharedHandleError({ ...rest, ...nested }, { alwaysCapture: !isRateLimit })
+    }
+  }
+  return sharedHandleError(error)
+}
 
 export type WebhookScopeParams =
   | { scope: 'organization'; orgSlug: string }
@@ -195,9 +211,14 @@ export async function sendTestWebhookEvent(scope: WebhookScopeParams, id: string
   return data
 }
 
-// Retry and test-event are rate-limited to 10 requests/60s.
+// Retry and test-event are rate-limited to 10 requests/60s. The documented
+// message (api_v2_openapi.json) is "Too Many Requests", but the locally
+// running API currently sends "Rate limit exceeded" instead. Accept both
+// until that's reconciled.
+const RATE_LIMIT_MESSAGES = ['Too Many Requests', 'Rate limit exceeded']
+
 export const isWebhookRateLimitError = (error: { message?: string }) =>
-  error.message === 'Rate limit exceeded'
+  !!error.message && RATE_LIMIT_MESSAGES.includes(error.message)
 
 export async function retryWebhookDelivery(scope: WebhookScopeParams, id: string) {
   const { data, error } =
