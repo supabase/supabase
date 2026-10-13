@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, RefreshCw, Trash } from 'lucide-react'
+import { Loader2, MoreVertical, RefreshCw, SettingsIcon, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
@@ -79,16 +79,16 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
             disabled ? (
               <ButtonTooltip
                 disabled
-                iconRight={<ChevronDown size={14} />}
+                icon={<MoreVertical />}
+                className="px-1.5"
+                aria-label="Manage connection"
                 tooltip={{
                   content: {
                     side: 'bottom',
                     text: 'You need additional permissions to manage this connection',
                   },
                 }}
-              >
-                Manage
-              </ButtonTooltip>
+              />
             ) : (
               <DropdownMenu
                 open={dropdownVisible}
@@ -96,19 +96,22 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<ChevronDown size={14} />}>
-                    <span>Manage</span>
-                  </Button>
+                  <Button
+                    aria-label="Manage connection"
+                    className="px-1.5"
+                    icon={<MoreVertical />}
+                  />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
+                <DropdownMenuContent side="bottom" align="end" className="w-56">
                   {router.pathname !== projectIntegrationUrl && (
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild className="gap-x-2">
                       <Link
-                        href={projectIntegrationUrl.replace(
-                          '[ref]',
-                          connection.supabase_project_ref
-                        )}
+                        href={
+                          projectIntegrationUrl.replace('[ref]', connection.supabase_project_ref) +
+                          `#${type.toLowerCase()}`
+                        }
                       >
+                        <SettingsIcon size={14} />
                         Configure connection
                       </Link>
                     </DropdownMenuItem>

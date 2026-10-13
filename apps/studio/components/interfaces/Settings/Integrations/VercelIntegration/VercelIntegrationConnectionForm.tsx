@@ -182,6 +182,7 @@ const VercelIntegrationConnectionForm = ({
                       >
                         <FormControl>
                           <Switch
+                            aria-label="Toggle sync to Vercel production env"
                             disabled={disabled}
                             checked={field.value}
                             onCheckedChange={field.onChange}
@@ -205,6 +206,7 @@ const VercelIntegrationConnectionForm = ({
                       >
                         <FormControl>
                           <Switch
+                            aria-label="Toggle sync to Vercel preview env"
                             disabled={disabled}
                             checked={field.value}
                             onCheckedChange={field.onChange}
@@ -228,6 +230,7 @@ const VercelIntegrationConnectionForm = ({
                       >
                         <FormControl>
                           <Switch
+                            aria-label="Toggle sync to Vercel development env"
                             disabled={disabled}
                             checked={field.value}
                             onCheckedChange={field.onChange}

@@ -58,7 +58,7 @@ const toIntegrationProjectConnection = (
   } as IntegrationProjectConnection['metadata'],
 })
 
-export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: boolean }) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: org } = useSelectedOrganizationQuery()
@@ -121,7 +121,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   )
 
   return (
-    <PageSection>
+    <PageSection id="github">
       <PageSectionMeta>
         <div className="flex flex-1 items-start gap-5">
           <IntegrationSectionIcon title="github" />
