@@ -9,8 +9,8 @@ import { createClient } from '@supabase/supabase-js'
 export async function getGithubUrlsBySlug(slugs: string[]): Promise<Map<string, string>> {
   try {
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
+      process.env.SUPABASE_URL as string,
+      process.env.SUPABASE_SERVICE_ROLE_KEY as string
     )
     const { data: rows, error } = await supabase
       .from('troubleshooting_entries')
