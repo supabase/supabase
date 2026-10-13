@@ -489,6 +489,14 @@ export const DestinationForm = ({
           <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <fieldset disabled={!isExistingConfigReady} className="contents">
+                {shouldShowConnectionSection && (
+                  <>
+                    <PipelineConnectionSection type={selectedType} form={form}>
+                      {destinationFields}
+                    </PipelineConnectionSection>
+                    <DialogSectionSeparator />
+                  </>
+                )}
                 <div className="p-5 flex flex-col gap-y-6">
                   {isErrorExistingConfig && (
                     <Admonition type="warning">
@@ -498,7 +506,9 @@ export const DestinationForm = ({
                       </p>
                     </Admonition>
                   )}
-                  <p className="text-sm font-medium text-foreground">Destination details</p>
+                  <p className="text-sm font-medium text-foreground">
+                    {shouldShowConnectionSection ? 'Data' : 'Destination details'}
+                  </p>
 
                   <div className="flex flex-col gap-y-4">
                     {!shouldShowConnectionSection && (
@@ -515,14 +525,11 @@ export const DestinationForm = ({
                   </div>
                 </div>
 
-                <DialogSectionSeparator />
-
-                {shouldShowConnectionSection ? (
-                  <PipelineConnectionSection type={selectedType} form={form}>
+                {!shouldShowConnectionSection && (
+                  <>
+                    <DialogSectionSeparator />
                     {destinationFields}
-                  </PipelineConnectionSection>
-                ) : (
-                  destinationFields
+                  </>
                 )}
 
                 <DialogSectionSeparator />
