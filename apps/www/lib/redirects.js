@@ -3515,7 +3515,7 @@ module.exports = [
     destination: '/docs/guides/auth/passwords',
   },
   { permanent: true, source: '/docs/mcp', destination: '/docs/guides/ai-tools/mcp' },
-  { permanent: true, source: '/docs/guides/database/pagination', destination: '/docs/guides/api' },
+  { permanent: true, source: '/docs/guides/database/pagination', destination: '/docs/reference/javascript/using-modifiers-overridetypes' },
   {
     permanent: true,
     source: '/docs/guides/platform/audit-logs',
@@ -3580,7 +3580,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/api/api-keys/models',
-    destination: '/docs/guides/api/securing-your-api',
+    destination: '/docs/guides/getting-started/api-keys',
   },
   {
     permanent: true,
@@ -3607,7 +3607,7 @@ module.exports = [
     source: '/docs/guides/auth/oauth-server/overview',
     destination: '/docs/guides/auth/oauth-server',
   },
-  { permanent: true, source: '/docs/guides/api/rest/pagination', destination: '/docs/guides/api' },
+  { permanent: true, source: '/docs/guides/api/rest/pagination', destination: '/docs/reference/javascript/using-modifiers-overridetypes' },
   {
     permanent: true,
     source: '/docs/guides/integrations/build-a-supabase-integration/oauth-scopes',
@@ -3623,7 +3623,7 @@ module.exports = [
     source: '/docs/guides/getting-started/quickstarts',
     destination: '/docs/guides/getting-started',
   },
-  { permanent: true, source: '/docs/guides/api/pagination', destination: '/docs/guides/api' },
+  { permanent: true, source: '/docs/guides/api/pagination', destination: '/docs/reference/javascript/using-modifiers-overridetypes' },
   {
     permanent: true,
     source: '/docs/guides/platform/projects',
@@ -3659,7 +3659,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/management-api',
-    destination: '/docs/guides/platform',
+    destination: '/docs/reference/api/introduction',
   },
   {
     permanent: true,
@@ -3689,7 +3689,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/high-availability',
-    destination: '/docs/guides/platform',
+    destination: '/docs/guides/platform/read-replicas',
   },
   {
     permanent: true,
@@ -3724,7 +3724,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/api/migrating-to-new-api-keys',
-    destination: '/docs/guides/api/securing-your-api',
+    destination: '/docs/guides/getting-started/migrating-to-new-api-keys',
   },
   { permanent: true, source: '/docs/guides/deployment/ci', destination: '/docs/guides/deployment' },
   {
@@ -3770,7 +3770,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/overview/advanced/self-hosting/configuration/storage',
-    destination: '/docs/guides/self-hosting',
+    destination: '/docs/guides/self-hosting/storage/config',
   },
   {
     permanent: true,
@@ -3782,11 +3782,11 @@ module.exports = [
     source: '/docs/guides/local-development/cli/github-action/generating-types',
     destination: '/docs/guides/deployment/ci/generating-types',
   },
-  { permanent: true, source: '/docs/guides/platform/sla', destination: '/docs/guides/platform' },
+  { permanent: true, source: '/docs/guides/platform/sla', destination: '/sla' },
   {
     permanent: true,
     source: '/docs/guides/self-hosting/storage',
-    destination: '/docs/guides/self-hosting',
+    destination: '/docs/guides/self-hosting/storage/config',
   },
   {
     permanent: true,
