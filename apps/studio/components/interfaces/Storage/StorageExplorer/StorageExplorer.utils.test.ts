@@ -16,6 +16,7 @@ import {
   getStorageExplorerUrlForItem,
   getStorageItemPath,
   getStoragePathForItem,
+  getUploadNameConflicts,
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
   serializeStoragePath,
@@ -506,5 +507,38 @@ describe('describeUploadFailure', () => {
   it('falls back to the raw message for anything else', () => {
     expect(describeUploadFailure({ status: 500, fallback: 'network down' })).toBe('network down')
     expect(describeUploadFailure({ fallback: 'network down' })).toBe('network down')
+  })
+})
+
+describe('getUploadNameConflicts', () => {
+  it('returns the names already taken in the destination', () => {
+    expect(
+      getUploadNameConflicts({
+        fileNames: ['photo.png', 'notes.txt'],
+        existingNames: ['photo.png', 'archive.zip'],
+      })
+    ).toEqual(['photo.png'])
+  })
+
+  it('matches case-insensitively, the way the rename fallback does', () => {
+    expect(
+      getUploadNameConflicts({ fileNames: ['Photo.PNG'], existingNames: ['photo.png'] })
+    ).toEqual(['Photo.PNG'])
+  })
+
+  it('returns nothing when every name is free', () => {
+    expect(
+      getUploadNameConflicts({ fileNames: ['photo.png'], existingNames: ['notes.txt'] })
+    ).toEqual([])
+    expect(getUploadNameConflicts({ fileNames: [], existingNames: ['photo.png'] })).toEqual([])
+  })
+
+  it('reports a name once even when it is uploaded twice', () => {
+    expect(
+      getUploadNameConflicts({
+        fileNames: ['photo.png', 'photo.png'],
+        existingNames: ['photo.png'],
+      })
+    ).toEqual(['photo.png'])
   })
 })

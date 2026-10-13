@@ -14,7 +14,11 @@ import { FileExplorerHeaderSelection } from './FileExplorerHeaderSelection'
 import { MoveItemsModal } from './MoveItemsModal'
 import { PreviewPane } from './PreviewPane'
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
+import { UploadConflictModal } from './UploadConflictModal'
 import { useStorageExplorerShortcuts } from './useStorageExplorerShortcuts'
+import { useUploadConflictPrompt } from './useUploadConflictPrompt'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { isVersioningActive } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface StorageExplorerContentProps {
@@ -44,6 +48,12 @@ export const StorageExplorerContent = ({
   } = useStorageExplorerStateSnapshot()
   const { truncateToColumn } = useStorageExplorerNavigation()
   const { isOverlayEnabled, isListingTruncated, selectedArchivedObject } = useArchivedFilesContext()
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const { conflictingNames, promptForConflicts, resolveConflicts } = useUploadConflictPrompt()
+
+  // Replacing only keeps what it replaces while the bucket versions its writes. Everywhere
+  // else the upload renames itself, as it always has, rather than offering to overwrite.
+  const canPromptOnConflict = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
 
   const handleClearSearch = useCallback(() => {
     setIsSearching(false)
@@ -86,7 +96,12 @@ export const StorageExplorerContent = ({
     event.persist()
     const items = event.target.files || event.dataTransfer.items
     const isDrop = !isEmpty(get(event, ['dataTransfer', 'items'], []))
-    await uploadFiles({ files: items, columnIndex, isDrop })
+    await uploadFiles({
+      files: items,
+      columnIndex,
+      isDrop,
+      onConflict: canPromptOnConflict ? promptForConflicts : undefined,
+    })
     event.target.value = ''
   }
 
@@ -128,6 +143,12 @@ export const StorageExplorerContent = ({
         />
         {selectedArchivedObject !== undefined ? <ArchivedFilePreviewPane /> : <PreviewPane />}
       </div>
+
+      <UploadConflictModal
+        conflictingNames={conflictingNames}
+        onCancel={() => resolveConflicts('cancel')}
+        onConfirm={(choice) => resolveConflicts(choice)}
+      />
 
       <ConfirmDeleteModal />
 

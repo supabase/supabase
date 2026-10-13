@@ -140,6 +140,26 @@ export function sanitizeNameForDuplicateInColumn(
   return name
 }
 
+/** What the user chose when an upload would land on a name that already exists. */
+export type UploadConflictResolution = 'replace' | 'keep-both' | 'cancel'
+
+/**
+ * Names that are already taken in the destination column, matched the same case-insensitive
+ * way `sanitizeNameForDuplicateInColumn` matches them. Files landing inside an uploaded folder
+ * are the caller's to leave out: a folder upload merges into its destination, so only its top
+ * level can clash.
+ */
+export function getUploadNameConflicts({
+  fileNames,
+  existingNames,
+}: {
+  fileNames: string[]
+  existingNames: string[]
+}): string[] {
+  const takenNames = new Set(existingNames.map((name) => name.toLowerCase()))
+  return Array.from(new Set(fileNames.filter((name) => takenNames.has(name.toLowerCase()))))
+}
+
 /** Bucket-relative path to an item */
 export function getStoragePathForItem(
   openedFolders: readonly StorageItem[],

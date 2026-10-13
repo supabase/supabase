@@ -39,8 +39,10 @@ import {
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
   getStorageItemPath,
+  getUploadNameConflicts,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
+  type UploadConflictResolution,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
@@ -1062,10 +1064,16 @@ export function createStorageExplorerState({
       files,
       columnIndex,
       isDrop = false,
+      onConflict,
     }: {
       files: FileList | DataTransferItemList
       columnIndex: number
       isDrop?: boolean
+      /**
+       * Asked once when the upload would land on names that already exist. Without it the
+       * upload falls back to renaming, which is what every caller did before the prompt.
+       */
+      onConflict?: (conflictingNames: string[]) => Promise<UploadConflictResolution>
     }) => {
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
@@ -1159,6 +1167,34 @@ export function createStorageExplorerState({
           return file
         })
 
+      // Asked before anything is written, because the answer changes where the bytes land: a
+      // replace overwrites the object in place, which on a versioned bucket turns the file it
+      // lands on into a previous version. Only the top level of a drop can clash — a folder
+      // upload merges into its destination — and only against files, since a name that belongs
+      // to a folder has nothing to overwrite.
+      const existingFileNames = (state.columns?.[derivedColumnIndex]?.items ?? [])
+        .filter(
+          (item) =>
+            item.type === STORAGE_ROW_TYPES.FILE && item.status !== STORAGE_ROW_STATUS.EDITING
+        )
+        .map((item) => item.name)
+      const conflictingNames = getUploadNameConflicts({
+        fileNames: formattedFilesToUpload
+          .filter((file) => (file.path ?? '').split('/').length <= 1)
+          .map((file) => file.name),
+        existingNames: existingFileNames,
+      })
+
+      let shouldReplaceConflicts = false
+      if (onConflict !== undefined && conflictingNames.length > 0) {
+        const resolution = await onConflict(conflictingNames)
+        if (resolution === 'cancel') return
+        shouldReplaceConflicts = resolution === 'replace'
+      }
+
+      /** Overwritten paths, whose cached preview bytes and version list go stale. */
+      const replacedPaths: string[] = []
+
       state.uploadProgresses = new Array(formattedFilesToUpload.length).fill({
         percentage: 0,
         elapsed: 0,
@@ -1188,9 +1224,18 @@ export function createStorageExplorerState({
         const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
         const isWithinFolder = (file?.path ?? '').split('/').length > 1
-        const fileName = !isWithinFolder
-          ? sanitizeNameForDuplicateInColumn(state, { name: file.name, autofix })
-          : file.name
+        // Kept as-is so the write lands on the existing object instead of beside it.
+        const isReplacingExisting =
+          shouldReplaceConflicts && !isWithinFolder && conflictingNames.includes(file.name)
+        const fileName =
+          isWithinFolder || isReplacingExisting
+            ? file.name
+            : sanitizeNameForDuplicateInColumn(state, {
+                name: file.name,
+                autofix,
+                // The same column the conflict check read, so "keep both" always renames.
+                columnIndex: derivedColumnIndex,
+              })
         const unsanitizedFormattedFileName =
           has(file, ['path']) && isWithinFolder ? file.path : fileName
         /**
@@ -1220,6 +1265,14 @@ export function createStorageExplorerState({
             })
             uploadedTopLevelFolders.push(topLevelFolder)
           }
+        } else if (isReplacingExisting) {
+          replacedPaths.push(formattedPathToFile)
+          // The row is already in the column, so a temp row would duplicate it until the refetch.
+          state.updateRowStatus({
+            name: fileName!,
+            status: STORAGE_ROW_STATUS.LOADING,
+            columnIndex: derivedColumnIndex,
+          })
         } else {
           state.addTempRow({
             type: STORAGE_ROW_TYPES.FILE,
@@ -1261,9 +1314,10 @@ export function createStorageExplorerState({
             const upload = new tus.Upload(file, {
               endpoint: state.resumableUploadUrl,
               retryDelays: [0, 200, 500, 1500, 3000, 5000],
-              headers: {
-                'x-source': 'supabase-dashboard',
-              },
+              // Without upsert the write is rejected as a conflict, since the path exists.
+              headers: isReplacingExisting
+                ? { 'x-source': 'supabase-dashboard', 'x-upsert': 'true' }
+                : { 'x-source': 'supabase-dashboard' },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
               metadata: {
@@ -1420,6 +1474,24 @@ export function createStorageExplorerState({
         }
 
         await state.refetchAllOpenedFolders()
+
+        // The preview URL is cached against the path for a week, so without this the panel
+        // keeps rendering the bytes from before the replace, and the version list stays short.
+        await Promise.all(
+          replacedPaths.flatMap((path) => [
+            queryClient.invalidateQueries({
+              queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: storageKeys.fileUrl({
+                projectRef: state.projectRef,
+                isBucketPublic: state.selectedBucket.public,
+                bucketId: state.selectedBucket.id,
+                path,
+              }),
+            }),
+          ])
+        )
 
         if (
           numberOfFilesToUpload === 0 ||
