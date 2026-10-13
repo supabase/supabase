@@ -3876,25 +3876,6 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
- * User was exposed to the plan-change panel presentation experiment.
- * Fires once per session per enrolled user in any variant (including control), so the
- * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
- * GROWTH experiment: `pricingPanelPlanPresentation`.
- *
- * @group Events
- * @page /org/[slug]/billing (plan-change side panel)
- * @source studio
- */
-export interface PricingPanelPlanPresentationExperimentExposedEvent {
-  action: 'pricing_panel_plan_presentation_experiment_exposed'
-  properties: {
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -4386,7 +4367,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent

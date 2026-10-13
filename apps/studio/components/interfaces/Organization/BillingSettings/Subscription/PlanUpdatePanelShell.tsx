@@ -1,44 +1,16 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Button, SidePanel } from 'ui'
+import { Button } from 'ui'
 
-export interface PlanUpdatePanelShellProps {
+interface PlanUpdateFullScreenShellProps {
   organizationName: string | undefined
   /** Rendered above the plan cards, outside the scrollable card grid. */
   notice: ReactNode
+  skipOverlayFade: boolean
+  contentDelay: number
   onClose: () => void
   children: ReactNode
-}
-
-export function PlanUpdateSheetShell({
-  visible,
-  organizationName,
-  notice,
-  onClose,
-  children,
-}: PlanUpdatePanelShellProps & { visible: boolean }) {
-  return (
-    <SidePanel
-      hideFooter
-      size="xxlarge"
-      visible={visible}
-      onCancel={onClose}
-      header={
-        <div className="flex items-center justify-between w-full">
-          <h4>Change subscription plan for {organizationName}</h4>
-          <Button asChild icon={<ExternalLink />}>
-            <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
-              Pricing
-            </a>
-          </Button>
-        </div>
-      }
-    >
-      {notice}
-      <SidePanel.Content>{children}</SidePanel.Content>
-    </SidePanel>
-  )
 }
 
 export function PlanUpdateFullScreenShell({
@@ -48,7 +20,7 @@ export function PlanUpdateFullScreenShell({
   contentDelay,
   onClose,
   children,
-}: PlanUpdatePanelShellProps & { skipOverlayFade: boolean; contentDelay: number }) {
+}: PlanUpdateFullScreenShellProps) {
   return (
     <motion.div
       className="fixed inset-0 z-50 overflow-y-auto overscroll-contain bg-studio"
