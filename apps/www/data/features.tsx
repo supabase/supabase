@@ -2146,7 +2146,7 @@ By leveraging the Supabase CLI, you can significantly improve your development w
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_2N6ApZ0MmI',
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
     slug: 'cli',
