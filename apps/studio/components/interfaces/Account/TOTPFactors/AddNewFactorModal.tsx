@@ -1,10 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag } from 'common'
+import { useFlag, useUser } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+} from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -16,6 +28,7 @@ import InformationBox from '@/components/ui/InformationBox'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
+import { getMfaListFactors } from '@/data/profile/mfa-list-factors-query'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
 import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
@@ -26,40 +39,71 @@ type TOTP = { qr_code: string; secret: string; uri: string }
 interface AddNewFactorModalProps {
   visible: boolean
   onClose: () => void
+  onComplete?: () => void
+  onRecoveryCodesSaved?: () => void
 }
 
-export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({
+  visible,
+  onClose,
+  onComplete,
+  onRecoveryCodesSaved,
+}: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
+  const userId = useUser()?.id
   const { isPending: isRecoveryCodesStatusPending, refetch: refetchRecoveryCodesStatus } =
     useRecoveryCodesStatusQuery({
       enabled: enableAuthRecoveryCodes,
+      userId,
     })
 
   const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation({
     onSettled: () => {
-      onClose()
+      handleClose()
       setIsRecoveryCodesModalOpen(true)
     },
   })
 
   const [isRecoveryCodesModalOpen, setIsRecoveryCodesModalOpen] = useState<boolean>(false)
 
+  const [isBackupOfferOpen, setIsBackupOfferOpen] = useState(false)
+  const [isBackupSetupOpen, setIsBackupSetupOpen] = useState(false)
+  const isSetupVisible = visible || isBackupSetupOpen
+
+  const handleClose = () => {
+    setIsBackupSetupOpen(false)
+    onClose()
+  }
+
+  const handleRecoveryCodesSaved = async () => {
+    onRecoveryCodesSaved?.()
+    try {
+      const factors = await getMfaListFactors()
+      const verifiedAuthenticators = factors.all.filter(
+        (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
+      )
+      if (verifiedAuthenticators.length === 1) setIsBackupOfferOpen(true)
+    } catch {
+      // The optional offer must not interrupt completed enrollment if this check fails.
+    }
+  }
+
   useEffect(() => {
-    if (!visible) reset()
-  }, [reset, visible])
+    if (!isSetupVisible) reset()
+  }, [reset, isSetupVisible])
 
   return (
     <>
       <FirstStep
-        visible={visible && !Boolean(data)}
+        visible={isSetupVisible && !Boolean(data)}
         isEnrolling={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
         enroll={enroll}
         reset={reset}
-        onClose={onClose}
+        onClose={handleClose}
       />
       <SecondStep
-        visible={visible && Boolean(data)}
+        visible={isSetupVisible && Boolean(data)}
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
         isLoading={
@@ -67,7 +111,9 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
           (enableAuthRecoveryCodes &&
             (isRecoveryCodesStatusPending || recoveryCodesGenerateMutation.isPending))
         }
-        onClose={async () => {
+        onClose={handleClose}
+        onComplete={async () => {
+          onComplete?.()
           if (enableAuthRecoveryCodes) {
             const { data: currentRecoveryCodesStatus } = await refetchRecoveryCodesStatus()
             const shouldGenerateRecoveryCodes = currentRecoveryCodesStatus?.status === 'unenrolled'
@@ -77,14 +123,45 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
               return
             }
           }
-          onClose()
+          handleClose()
         }}
       />
       <RecoveryCodesModal
         open={isRecoveryCodesModalOpen}
-        onOpenChange={(open) => setIsRecoveryCodesModalOpen(open)}
+        onOpenChange={(open) => {
+          setIsRecoveryCodesModalOpen(open)
+          if (!open && recoveryCodesGenerateMutation.isSuccess) void handleRecoveryCodesSaved()
+        }}
         mutation={recoveryCodesGenerateMutation}
       />
+      <Dialog open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
+        <DialogContent size="small" aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>Add a backup authenticator?</DialogTitle>
+          </DialogHeader>
+          <DialogSection>
+            <p className="text-sm text-foreground-light">
+              Your recovery codes are saved. Add an authenticator on another device as a backup if
+              you lose access to your main device.
+            </p>
+          </DialogSection>
+          <DialogFooter>
+            <Button
+              variant="default"
+              onClick={() => {
+                setIsBackupOfferOpen(false)
+                reset()
+                setIsBackupSetupOpen(true)
+              }}
+            >
+              Add authenticator
+            </Button>
+            <Button variant="primary" onClick={() => setIsBackupOfferOpen(false)}>
+              Done
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
@@ -170,6 +247,7 @@ interface SecondStepProps {
   }
   isLoading: boolean
   onClose: () => void
+  onComplete: () => void
 }
 
 const SecondStep = ({
@@ -178,6 +256,7 @@ const SecondStep = ({
   factor: outerFactor,
   isLoading,
   onClose,
+  onComplete,
 }: SecondStepProps) => {
   const queryClient = useQueryClient()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
@@ -205,7 +284,7 @@ const SecondStep = ({
         })
       }
       toast.success(`Successfully added a second factor authentication`)
-      onClose()
+      onComplete()
     },
   })
 
@@ -222,7 +301,7 @@ const SecondStep = ({
       setFactor(outerFactor)
       form.reset({ code: '' })
     }
-  }, [outerFactor])
+  }, [outerFactor, factor?.id, form])
 
   return (
     <ConfirmationModal

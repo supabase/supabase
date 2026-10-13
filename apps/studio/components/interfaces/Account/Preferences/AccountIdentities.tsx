@@ -1,5 +1,5 @@
 import type { Provider } from '@supabase/auth-js'
-import { useFlag } from 'common'
+import { useFlag, useUser } from 'common'
 import dayjs from 'dayjs'
 import { Edit, Unlink } from 'lucide-react'
 import Link from 'next/link'
@@ -19,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
@@ -37,11 +38,13 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 import { captureCriticalError } from '@/lib/error-reporting'
 import {
   buildProviderAuthRedirect,
@@ -51,10 +54,21 @@ import {
 import { getErrorMessage } from '@/lib/get-error-message'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
 
-export const AccountIdentities = () => {
+type AccountIdentitiesProps = {
+  findings?: AccountRecoveryFinding[]
+  primaryAction?: AccountRecoveryFinding['action'] | 'enable-mfa'
+}
+
+export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdentitiesProps) => {
   const router = useRouter()
 
-  const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useProfileIdentitiesQuery({ userId: useUser()?.id })
 
   const enabledProviders = useEnabledIdentityProviders()
   const connectableExternalProviders = useMemo(
@@ -65,6 +79,8 @@ export const AccountIdentities = () => {
   const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
 
   const identities = data?.identities ?? []
+  const isManagedAccount = identities.some((identity) => identity.provider.startsWith('sso'))
+  const hasPasswordFinding = findings.some((finding) => finding.id === 'single-oauth-identity')
   const showAddPasswordRow =
     isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
   const isChangeExpired = data?.email_change_sent_at
@@ -132,7 +148,7 @@ export const AccountIdentities = () => {
   }, [message])
 
   return (
-    <PageSection>
+    <PageSection id="sign-in-methods" className="scroll-mt-6">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Sign-in methods</PageSectionTitle>
@@ -141,7 +157,37 @@ export const AccountIdentities = () => {
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
-      <PageSectionContent>
+      <PageSectionContent className="flex flex-col gap-4">
+        {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
+        {!!data?.email && (
+          <AddPasswordRow email={data.email} isPrimary={primaryAction === 'set-password'}>
+            {({ onOpen, row }) => {
+              if (!isSuccess || !showAddPasswordRow) return null
+              if (!hasPasswordFinding) return <Card>{row}</Card>
+              return (
+                <Admonition
+                  type="warning"
+                  layout="responsive"
+                  title="One sign-in method"
+                  description="Add a password so you can still sign in if you lose access to your connected account."
+                  actions={
+                    <Button
+                      variant={primaryAction === 'set-password' ? 'primary' : 'default'}
+                      onClick={onOpen}
+                    >
+                      Add password
+                    </Button>
+                  }
+                />
+              )
+            }}
+          </AddPasswordRow>
+        )}
+        {isSuccess && isManagedAccount && (
+          <p className="text-sm text-foreground-light">
+            Your organization manages how you sign in.
+          </p>
+        )}
         <Card>
           {isLoading && (
             <CardContent>
@@ -150,8 +196,6 @@ export const AccountIdentities = () => {
           )}
           {isSuccess && (
             <div className="divide-y">
-              {showAddPasswordRow && !!data.email && <AddPasswordRow email={data.email} />}
-
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
                 const username = identity.identity_data?.user_name
@@ -161,7 +205,10 @@ export const AccountIdentities = () => {
                 const canUpdateEmail = !configuredProvider
 
                 return (
-                  <CardContent key={identity_id} className="flex justify-between items-center py-4">
+                  <CardContent
+                    key={identity_id}
+                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
                     <div className="flex gap-x-4">
                       <IdentityProviderIcon display={providerDisplay} size={30} />
                       <div>
@@ -184,7 +231,7 @@ export const AccountIdentities = () => {
                     </div>
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
-                        <Button asChild>
+                        <Button variant="default" asChild>
                           <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
@@ -215,7 +262,10 @@ export const AccountIdentities = () => {
                 const providerDisplay = getProviderDisplay(provider.authProvider)
 
                 return (
-                  <CardContent key={provider.id} className="flex justify-between items-center py-4">
+                  <CardContent
+                    key={provider.id}
+                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
                     <div className="flex gap-x-4">
                       <IdentityProviderIcon display={providerDisplay} size={30} />
                       <div>
@@ -227,6 +277,7 @@ export const AccountIdentities = () => {
                       </div>
                     </div>
                     <Button
+                      variant="default"
                       loading={linkingProviderId === provider.id}
                       disabled={!!linkingProviderId}
                       onClick={() => onLinkExternalProvider(provider)}
