@@ -89,8 +89,8 @@ const DiffScopeGroupItem = ({
               <span className="text-foreground-lighter">
                 (<DiffDescription level={level} previousLevel={permission.previousLevel} />)
               </span>
-              {index < permissions.length - 1 && ','}
-            </span>{' '}
+            </span>
+            {index < permissions.length - 1 && <span className="text-foreground-lighter">, </span>}
           </Fragment>
         ))}
       </p>
