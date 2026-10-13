@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { lowerOptInLevel, optInLevelSchema, type ToolName } from '../tool-filter'
 import { sanitizeNotebookRunOutput } from './notebook-run-output'
 import { sanitizeContractPart } from './registry'
+import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 interface ToolSanitizer {
@@ -14,6 +15,16 @@ interface ToolSanitizer {
 export const NO_DATA_PERMISSIONS =
   'The query was executed and the user has viewed the results but decided not to share in the conversation due to permission levels. Continue with your plan unless instructed to interpret the result. If you need the rows to answer and `update_opt_in_level` is available, call it with `schema_and_log_and_data`, unless the user already skipped that request in this chat.'
 
+// the rows.length default covers chats saved before execute_sql sliced its rows
+export const toModelRows = <T>(rows: T[], totalRows = rows.length) => {
+  if (totalRows <= DEFAULT_CELL_ROW_LIMIT) return rows
+
+  return {
+    rows: rows.slice(0, DEFAULT_CELL_ROW_LIMIT),
+    note: `Only the first ${DEFAULT_CELL_ROW_LIMIT} of ${totalRows} rows are included.`,
+  }
+}
+
 /**
  * `optInLevel` is the level the query ran under. Rows are shared only at the lower of that
  * and the current level, so rows from `schema` stay hidden after an upgrade to data.
@@ -21,6 +32,7 @@ export const NO_DATA_PERMISSIONS =
  */
 export const executeSqlOutputSchema = z.object({
   rows: z.array(z.unknown()),
+  totalRows: z.number().optional(),
   optInLevel: optInLevelSchema,
 })
 
@@ -34,7 +46,10 @@ const executeSqlSanitizer: ToolSanitizer = {
       const level = lowerOptInLevel(parsed.data.optInLevel, optInLevel)
       return {
         ...tool,
-        output: level === 'schema_and_log_and_data' ? parsed.data.rows : NO_DATA_PERMISSIONS,
+        output:
+          level === 'schema_and_log_and_data'
+            ? toModelRows(parsed.data.rows, parsed.data.totalRows)
+            : NO_DATA_PERMISSIONS,
       }
     }
 

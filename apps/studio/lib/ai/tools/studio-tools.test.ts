@@ -238,7 +238,7 @@ describe('ai/tools/studio-tools', () => {
       })
     })
 
-    it('should cap execute_sql rows', async () => {
+    it('should cap execute_sql rows and tell the model the result is partial', async () => {
       const rows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
       const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
@@ -256,10 +256,24 @@ describe('ai/tools/studio-tools', () => {
         context: {},
       })
 
-      expect(result).toEqual({
+      const truncatedOutput = {
         rows: rows.slice(0, 100),
         totalRows: 101,
-        optInLevel: 'schema_and_log_and_data',
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(truncatedOutput)
+      expect(
+        await tools.execute_sql.toModelOutput?.({
+          toolCallId: 'test',
+          input,
+          output: truncatedOutput,
+        })
+      ).toEqual({
+        type: 'json',
+        value: {
+          rows: rows.slice(0, 100),
+          note: 'Only the first 100 of 101 rows are included.',
+        },
       })
     })
 
