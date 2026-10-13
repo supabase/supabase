@@ -1,8 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download, Move, Trash2, X } from 'lucide-react'
+import { Archive, Download, Move, Trash2, X } from 'lucide-react'
 import { Button } from 'ui'
 
+import { isVersioningActive } from '../StorageVersioning.constants'
 import { bulkActionBarClassName } from './storageExplorerChrome'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -13,13 +15,18 @@ export const FileExplorerHeaderSelection = () => {
   const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   const {
+    selectedBucket,
     selectedItems,
     downloadFile,
     downloadSelectedFiles,
     clearSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemsToMove,
+    setItemsToPurge,
   } = useStorageExplorerStateSnapshot()
+
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  const canArchive = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
 
   const count = selectedItems.length
 
@@ -53,7 +60,7 @@ export const FileExplorerHeaderSelection = () => {
         >
           <ButtonTooltip
             size="tiny"
-            icon={<Trash2 size={12} />}
+            icon={canArchive ? <Archive size={12} /> : <Trash2 size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToDelete(selectedItems)}
             tooltip={{
@@ -65,9 +72,27 @@ export const FileExplorerHeaderSelection = () => {
               },
             }}
           >
-            Delete
+            {canArchive ? 'Archive' : 'Delete'}
           </ButtonTooltip>
         </ShortcutTooltip>
+        {canArchive && (
+          <ButtonTooltip
+            size="tiny"
+            icon={<Trash2 size={12} className={canUpdateFiles ? 'text-destructive' : undefined} />}
+            disabled={!canUpdateFiles}
+            onClick={() => setItemsToPurge(selectedItems)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canUpdateFiles
+                  ? 'You need additional permissions to delete files'
+                  : 'Deletes every version, leaving nothing to restore',
+              },
+            }}
+          >
+            Delete permanently
+          </ButtonTooltip>
+        )}
 
         <ShortcutTooltip
           shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_MOVE_SELECTED}

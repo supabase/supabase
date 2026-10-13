@@ -22,7 +22,6 @@ import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
 import { HighAvailabilityInput } from './HighAvailabilityInput'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
 import { OrganizationSelector } from './OrganizationSelector'
-import { extractPostgresVersionDetails } from './PostgresVersionSelector'
 import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
@@ -34,9 +33,11 @@ import {
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
+  getSpecificRegionsLinkVariant,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
+  resolvePostgresVersion,
   smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import { ProjectCreationFooter } from './ProjectCreationFooter'
@@ -176,7 +177,7 @@ export const ProjectCreationForm = ({
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
-      dbRegion: undefined,
+      dbRegion: '',
       githubRepositoryId: '',
       githubInstallationId: undefined,
       githubRepositoryName: '',
@@ -207,7 +208,17 @@ export const ProjectCreationForm = ({
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
+  // Only free-plan orgs get the specific-regions link collapse behavior. When active for an
+  // org, it owns the region selector, so the free tier experiment stays inactive for that org.
+  const specificRegionsLinkFlag = useFlag('projectCreationSpecificRegionsLink') === true
+  const isSpecificRegionsLinkEnabled = specificRegionsLinkFlag && isFreePlan
+  const specificRegionsLinkVariant = getSpecificRegionsLinkVariant({
+    isFreePlan,
+    smartRegionEnabled,
+    linkFlag: specificRegionsLinkFlag,
+  })
   const isResolvingFreeTierGeneralRegionExperiment =
+    !isSpecificRegionsLinkEnabled &&
     isFreePlan &&
     smartRegionEnabled &&
     (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
@@ -218,6 +229,7 @@ export const ProjectCreationForm = ({
     smartRegionEnabled,
     enrollmentFlag: freeTierGeneralRegionEnrollment,
     selectionFlag: freeTierGeneralRegionSelection,
+    isOverridden: isSpecificRegionsLinkEnabled,
   })
 
   // Read dirty state during render rather than depending on form.formState in the
@@ -325,6 +337,9 @@ export const ProjectCreationForm = ({
   })
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
+  const hasAvailableRegions =
+    !smartRegionEnabled || (availableRegionsData !== undefined && !availableRegionsError)
+  const canSubmitProject = canCreateProject && hasAvailableRegions
   const canConfigureGitHubOnCreate =
     canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
@@ -367,6 +382,7 @@ export const ProjectCreationForm = ({
         ? getRegionSelectionType({
             dbRegion: form.getValues('dbRegion'),
             availableRegions: availableRegionsData?.all,
+            isDbRegionDirty,
           })
         : undefined
       track(
@@ -384,7 +400,11 @@ export const ProjectCreationForm = ({
           ...(freeTierGeneralRegionExperimentVariant !== undefined && {
             freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
           }),
+          ...(specificRegionsLinkVariant !== undefined && {
+            specificRegionsLinkExperiment: specificRegionsLinkVariant,
+          }),
           ...(regionSelectionType !== undefined && { regionSelectionType }),
+          regionCode: res.region,
         },
         {
           project: res.ref,
@@ -492,8 +512,11 @@ export const ProjectCreationForm = ({
       return
     }
 
-    const { postgresEngine, releaseChannel } =
-      extractPostgresVersionDetails(postgresVersionSelection)
+    const { postgresEngine, releaseChannel } = resolvePostgresVersion({
+      postgresVersionSelection,
+      useOrioleDb,
+      availableOrioleVersion,
+    })
 
     const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
     const selectedRegion = smartRegionEnabled
@@ -504,6 +527,18 @@ export const ProjectCreationForm = ({
       return toast.error(
         `High Availability projects are not available in the required region (${highAvailabilityRegionCode})`
       )
+    }
+
+    const isRegionSelectionUnavailable =
+      smartRegionEnabled &&
+      (!selectedRegion || !!availableRegionsError || isFetchingAvailableRegions)
+    if (isRegionSelectionUnavailable) {
+      setError(
+        'dbRegion',
+        { type: 'manual', message: 'Please select an available region.' },
+        { shouldFocus: true }
+      )
+      return
     }
 
     const selectedSpecificRegion = specific.find((x) => x.name === dbRegion)
@@ -572,16 +607,8 @@ export const ProjectCreationForm = ({
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
       dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
-      postgresEngine: highAvailability
-        ? HIGH_AVAILABILITY_POSTGRES_ENGINE
-        : useOrioleDb
-          ? availableOrioleVersion?.postgres_engine
-          : postgresEngine,
-      releaseChannel: highAvailability
-        ? HIGH_AVAILABILITY_RELEASE_CHANNEL
-        : useOrioleDb
-          ? availableOrioleVersion?.release_channel
-          : releaseChannel,
+      postgresEngine: highAvailability ? HIGH_AVAILABILITY_POSTGRES_ENGINE : postgresEngine,
+      releaseChannel: highAvailability ? HIGH_AVAILABILITY_RELEASE_CHANNEL : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
       ...(shouldIncludeGitHubFields
         ? {
@@ -667,10 +694,10 @@ export const ProjectCreationForm = ({
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (regionError && fixedDefaultRegion) {
+    if (!smartRegionEnabled && regionError && fixedDefaultRegion) {
       resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
-  }, [regionError, resetField, fixedDefaultRegion])
+  }, [smartRegionEnabled, regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (watchedInstanceSize !== instanceSize) {
@@ -756,7 +783,7 @@ export const ProjectCreationForm = ({
           footer={
             <ProjectCreationFooter
               form={form}
-              canCreateProject={canCreateProject}
+              canCreateProject={canSubmitProject}
               instanceSize={instanceSize}
               highAvailability={highAvailability}
               organizationProjects={organizationProjects}
@@ -828,17 +855,18 @@ export const ProjectCreationForm = ({
                       instanceSize={instanceSize as DesiredInstanceSize}
                       showGeneralRegionsOnly={freeTierGeneralRegionExperimentVariant === 'test'}
                       isLoading={isResolvingFreeTierGeneralRegionExperiment}
+                      isFreePlan={isFreePlan}
                     />
 
                     {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
 
                     <SecurityOptions form={form} surface={surface} />
 
-                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
-
                     {showAdvancedConfig &&
                       !!availableOrioleVersion &&
                       highAvailability !== true && <AdvancedConfiguration form={form} />}
+
+                    {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
                     {shouldShowFreeProjectInfo ? (
                       <Admonition
