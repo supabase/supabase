@@ -41,6 +41,9 @@ jobs:
             learn:
               - *shared
               - 'apps/learn/**'
+            kb:
+              - *shared
+              - 'apps/kb/**'
 
   ratchet:
     needs: changes
