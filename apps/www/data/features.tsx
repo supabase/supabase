@@ -3027,7 +3027,7 @@ With declarative schemas, you can:
 2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
 3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
 4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
-5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, grants, partitions, publications, and domains through declarative SQL files. Objects that pgmq and pg_partman create are recognized as extension-managed.
+5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, grants, partitions, publications, and domains through declarative SQL files. Objects that pgmq, pg_cron, and pg_partman create are recognized as extension-managed.
 
 Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
 
