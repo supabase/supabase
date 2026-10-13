@@ -146,6 +146,15 @@ Use an ordered list for steps taken in sequence, and an unordered list when orde
 doesn't matter. Use Arabic numerals (`1`, `2`, `3`) for ordered lists and dashes (`-`)
 for unordered lists.
 
+#### Introduce a list in the sentence before it
+
+Use _the following_ in the lead-in sentence, and end the sentence with a colon. _These_
+can read as pointing back at something earlier on the page. _The following_ tells the
+reader that a list comes next.
+
+- **Recommended**: `Start from either of the following tabs:`
+- **Not recommended**: `Start from either of these tabs:`
+
 #### Prefer a paragraph to a single-item list
 
 A list of one signals content that was meant to grow and didn't. Exceptions: layout
@@ -200,6 +209,15 @@ action:
 The first step establishes the operating context for both readers and agents. Don't add
 a redundant orientation step to a genuinely atomic instruction. Write `Click **Save**.`
 rather than adding `Locate the **Save** button` as a separate step.
+
+#### Put the location before the action
+
+Write UI instructions in the order the reader acts: where to look first, then which
+control to use. The reader finds the place before they can act on it. This applies to
+numbered steps, list items, and instructions inside a sentence.
+
+- **Recommended**: `Next to Supabase, click **Manage**, then click **Open in Supabase**.`
+- **Not recommended**: `Click **Manage** next to Supabase, then click **Open in Supabase**.`
 
 ### Code blocks
 
