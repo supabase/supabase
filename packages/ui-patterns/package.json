@@ -410,6 +410,10 @@
       "import": "./src/Image/index.tsx",
       "types": "./src/Image/index.tsx"
     },
+    "./ImageZoom/ImageZoom": {
+      "import": "./src/ImageZoom/ImageZoom.tsx",
+      "types": "./src/ImageZoom/ImageZoom.tsx"
+    },
     "./InnerSideMenu": {
       "import": "./src/InnerSideMenu/index.tsx",
       "types": "./src/InnerSideMenu/index.tsx"
