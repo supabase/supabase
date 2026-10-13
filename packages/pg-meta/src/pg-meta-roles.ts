@@ -188,7 +188,7 @@ begin
     raise exception 'Cannot find role with id %', id;
   end if;
 
-  execute(format('alter role %I
+  execute format('alter role %I
     ${isSuperuser === undefined ? safeSql`` : isSuperuser ? safeSql`superuser` : safeSql`nosuperuser`}
     ${canCreateDb === undefined ? safeSql`` : canCreateDb ? safeSql`createdb` : safeSql`nocreatedb`}
     ${canCreateRole === undefined ? safeSql`` : canCreateRole ? safeSql`createrole` : safeSql`nocreaterole`}
@@ -199,7 +199,7 @@ begin
     ${connectionLimit === undefined ? safeSql`` : safeSql`connection limit ${literal(connectionLimit)}`}
     ${password === undefined ? safeSql`` : safeSql`password ${literal(password)}`}
     ${validUntil === undefined ? safeSql`` : safeSql`valid until %L`}
-  ', old.name${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`}));
+  ', old.name${validUntil === undefined ? safeSql`` : safeSql`, ${literal(validUntil)}`});
 
   ${
     newName === undefined
@@ -207,7 +207,7 @@ begin
       : safeSql`
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if ${literal(newName)} != old.name then
-    execute(format('alter role %I rename to %I;', old.name, ${literal(newName)}));
+    execute format('alter role %I rename to %I;', old.name, ${literal(newName)});
   end if;
   `
   }
@@ -235,7 +235,7 @@ begin
     raise exception 'Cannot find role with id %', id;
   end if;
 
-  execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
+  execute format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name);
 end
 $$;
 `
