@@ -317,6 +317,7 @@ describe('DestinationForm edit submission', () => {
           onClose={vi.fn()}
         />
       )
+      expect(screen.queryByRole('region', { name: 'Data' }) !== null).toBe(shouldShowSection)
       expect(screen.queryByRole('region', { name: 'Destination connection' }) !== null).toBe(
         shouldShowSection
       )
