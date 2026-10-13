@@ -162,7 +162,7 @@ Supabase provides an open source toolkit for developing AI applications using Po
 `,
     icon: ChartScatter,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
+    heroImage: 'https://www.youtube-nocookie.com/embed/6xchFWcHkaI',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
     status: {
@@ -787,7 +787,7 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
     status: {
@@ -828,7 +828,7 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
 `,
     icon: MessageCircle,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
     status: {
@@ -868,7 +868,7 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
     status: {
@@ -2280,7 +2280,7 @@ Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flex
 By leveraging Role-Based Access Control, you can create a secure, scalable, and easily manageable access control system for your application. This feature allows you to implement complex permission structures with ease, ensuring that users only have access to the resources and functionalities appropriate for their role within the system.
 `,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/kwoKmi6inAw',
+    heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
