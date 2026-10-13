@@ -64,11 +64,11 @@ export const ProjectCard = ({
         <CardButton
           tabIndex={0}
           linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
-          className="h-44 px-0! group pt-5 pb-0 overflow-hidden relative"
+          className="h-44 px-0! group pt-5 pb-3 overflow-hidden relative"
           hideChevron
           title={
-            <div className="w-full flex flex-col gap-y-4 justify-between px-5">
-              <div className="flex flex-col gap-y-0.5 relative">
+            <div className="w-full h-full flex flex-col gap-y-4 justify-between px-5">
+              <div className="flex flex-col flex-1 gap-y-0.5 relative">
                 <div className="flex items-center justify-between">
                   <h2 className="text-sm shrink truncate pr-5">{name}</h2>
                   <div onClick={(e) => e.preventDefault()}>
