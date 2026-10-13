@@ -10,6 +10,7 @@ import {
   Pencil,
   Redo,
   RefreshCw,
+  RefreshCwIcon,
   Shield,
   Trash2,
 } from 'lucide-react'
@@ -31,6 +32,7 @@ import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } fro
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 import { SwitchToPreviewModal } from './SwitchToPreviewModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
@@ -606,15 +608,21 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="text" icon={<MoreVertical />} className="px-1" />
+          <ButtonTooltip
+            variant="text"
+            icon={<MoreVertical />}
+            className="px-1"
+            tooltip={{ content: { side: 'bottom', text: 'More options' } }}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
           {repo ? (
-            <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-              <DropdownMenuItem asChild className="gap-x-2">
-                <a>Change production branch</a>
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem asChild className="gap-x-2">
+              <Link href={`/project/${projectRef}/settings/integrations`}>
+                <Pencil size={14} />
+                Change production branch
+              </Link>
+            </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
               className="gap-x-2"
@@ -646,7 +654,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
                 },
               }}
             >
-              <Redo size={14} /> Resync branch
+              <RefreshCwIcon size={14} /> Resync branch
             </DropdownMenuItemTooltip>
           ) : null}
         </DropdownMenuContent>
