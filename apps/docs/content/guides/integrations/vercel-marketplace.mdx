@@ -6,9 +6,9 @@ description: 'Manage your Supabase projects directly through Vercel'
 
 ## Overview
 
-The Vercel Marketplace lets you create and manage third-party resources, such as Supabase, from the Vercel platform. When you use Supabase through the Marketplace, Vercel bills you for your Supabase usage, you sign in to Supabase with your Vercel account, and your Vercel team roles carry over to your Supabase organization.
+The Vercel Marketplace lets you create and manage third-party resources, such as Supabase, from the Vercel platform. Through the Marketplace, Vercel bills you for your Supabase usage, and you sign in to Supabase with your Vercel account. Your Vercel team roles also carry over to your Supabase organization.
 
-When you create an organization and projects through Vercel Marketplace, they function like those created directly within Supabase. However, the billing is handled through your Vercel account, and you can manage your resources directly from the Vercel dashboard or CLI. The integration also syncs environment variables to your connected Vercel projects.
+When you create an organization and projects through the Vercel Marketplace, they function like those created directly within Supabase. However, the billing is handled through your Vercel account, and you can manage your resources directly from the Vercel dashboard or CLI. The integration also syncs environment variables to your connected Vercel projects.
 
 For more information, see the [Introducing the Vercel Marketplace](https://vercel.com/blog/introducing-the-vercel-marketplace) blog post.
 
@@ -38,7 +38,7 @@ Your app uses these variables to connect to your database and Supabase APIs.
 
 <div className="bg-surface-100 py-4 px-5 border rounded-md not-prose">
   <h4 className="text-foreground">Deploy a Next.js app with Supabase</h4>
-  <p className="text-foreground-light mb-3">Uses the Next.js Supabase Starter Template</p>
+  <p className="text-foreground-light mb-3">Uses the Next.js Supabase starter template</p>
   <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22supabase%22%2C%22productSlug%22%3A%22supabase%22%7D%5D">
     <img src="https://vercel.com/button" alt="Deploy with Vercel" />
   </a>
@@ -46,26 +46,26 @@ Your app uses these variables to connect to your database and Supabase APIs.
 
 ### Via Vercel Marketplace
 
-In the Vercel Marketplace, go to the [Supabase page](https://vercel.com/marketplace/supabase).
+In the Vercel Marketplace, go to the [Supabase page](https://vercel.com/marketplace/supabase) and click **Install**.
 
 ## Studio support
 
 To open Supabase Studio from the Vercel dashboard, start from either of the following tabs. Each one opens a different page in Supabase:
 
-- **Integrations** tab: Next to Supabase, click **Manage**, then click **Open in Supabase**. The Supabase dashboard homepage opens.
-- **Storage** tab: Select your Supabase project, then click **Open in Supabase**. That project opens in the Supabase dashboard.
+- **Integrations** tab: Next to Supabase, click **Manage**, then click **Open in Supabase**. The Supabase Dashboard homepage opens.
+- **Storage** tab: Select your Supabase project, then click **Open in Supabase**. That project opens in the Supabase Dashboard.
 
 Supabase Studio provides tools such as:
 
-- **SQL Editor:** Run SQL queries against your database.
-- **Table Editor:** Create, edit, and delete tables and columns.
-- **Log Explorer:** Inspect real-time logs for your database.
-- **Postgres Upgrades:** Upgrade your Postgres instance to the latest version.
-- **Compute Upgrades:** Scale the compute resources allocated to your database.
+- **SQL Editor**: Run SQL queries against your database.
+- **Table Editor**: Create, edit, and delete tables and columns.
+- **Log Explorer**: Inspect real-time logs for your database.
+- **Postgres Upgrades**: Upgrade the Postgres version of your database.
+- **Compute Upgrades**: Scale the compute resources allocated to your database.
 
 ## Permissions
 
-There is a direct one-to-one relationship between a Supabase organization and a Vercel team. Installing the integration or launching your first Supabase project through Vercel triggers the creation of a corresponding Supabase organization if one doesn’t already exist.
+There is a direct one-to-one relationship between a Supabase organization and a Vercel team. Installing the integration or launching your first Supabase project through Vercel triggers the creation of a corresponding Supabase organization if one doesn't already exist.
 
 When Vercel users interact with Supabase, they are automatically assigned Supabase accounts. New users get a Supabase account linked to their primary email, while existing users have their Vercel and Supabase accounts linked.
 
@@ -82,7 +82,7 @@ Permissions for users who aren't on your Vercel team don't sync with Vercel. You
 
 ## Pricing
 
-Pricing for databases created through Vercel Marketplace is identical to those created directly within Supabase. Detailed pricing information is available on the [Supabase pricing page](/pricing).
+Pricing for databases created through the Vercel Marketplace is identical to pricing for databases created directly in Supabase. For more information, see [Supabase pricing](/pricing).
 
 The [usage page](/dashboard/org/_/usage) tracks the usage of your Vercel databases, with this information sent to Vercel for billing, which appears on your Vercel invoice.
 
@@ -94,10 +94,10 @@ Changing your plan resets your Supabase billing cycle to start on the day of the
 
 ## Limitations
 
-When using Vercel Marketplace, the following limitations apply:
+When you use the Vercel Marketplace, the following limitations apply:
 
 - Projects can only be created via the Vercel dashboard.
-- To remove an organization, first delete all associated projects, then uninstall the Vercel Marketplace integration. Organizations cannot be removed manually.
-- Owners cannot be added manually within the Supabase dashboard.
-- Invoices and payments must be managed through the Vercel dashboard, not the Supabase dashboard.
+- Organizations are removed only when you uninstall the Vercel Marketplace integration, after you delete all their projects.
+- Owners cannot be added manually within the Supabase Dashboard.
+- Invoices and payments must be managed through the Vercel dashboard, not the Supabase Dashboard.
 - [Custom Domains](/docs/guides/platform/custom-domains) are not supported, and we always use the base `SUPABASE_URL` for the Vercel environment variables.
