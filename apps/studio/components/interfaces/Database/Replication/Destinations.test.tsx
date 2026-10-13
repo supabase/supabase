@@ -34,7 +34,7 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: options.hasAccess, isLoading: options.isLoading }),
 }))
 const router = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }))
-vi.mock('@/compat/next/router', () => ({ useRouter: () => router }))
+vi.mock('next/router', () => ({ useRouter: () => router }))
 vi.mock('./DestinationPanel/DestinationPanel', () => ({
   DestinationPanel: () => {
     const [type] = useQueryState('destinationType')
