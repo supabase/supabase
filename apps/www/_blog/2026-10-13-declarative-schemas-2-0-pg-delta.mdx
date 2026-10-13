@@ -126,7 +126,7 @@ GRANT DELETE, INSERT, MAINTAIN, REFERENCES, SELECT, TRIGGER, TRUNCATE, UPDATE ON
 
 The grant at the end reflects the default privileges Supabase applies to new tables in `public`. The CLI emits it as one statement per role. It is condensed to one line here. The privileges in the grant depend on your Postgres version, and `MAINTAIN` appears on Postgres 17 and later. If you haven't customized permissions, it is safe to leave in or remove.
 
-The schema files are the source of truth, so sync never reads the live database. A change made in the dashboard or the SQL editor won't appear in the migration until it is in the files. Pull it in with `supabase db pull --declarative` or edit the files directly then sync again. Then review the generated migration, since it will repeat the change the remote already has.
+The schema files are the source of truth, so sync never reads the live database. A change made in the dashboard or the SQL editor won't appear in the migration until it is in the files. Pull it in with `supabase db pull --declarative` (this updates the files, not your migration history) or edit the files directly then sync again. Review the generated migration before you push.
 
 **3. Review and apply**
 
