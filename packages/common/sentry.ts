@@ -3,6 +3,7 @@ type SentryEventTags = {
     globalErrorBoundary?: string | number | boolean | null
     third_party_code?: string | number | boolean | null
     codeSampleRate?: string | number | boolean | null
+    empty_body_diagnostic?: string | number | boolean | null
   }
 }
 
@@ -22,12 +23,18 @@ export function filterSentryEvent<T extends SentryEventTags>(
   const isThirdPartyOnly =
     event.tags?.third_party_code === true || event.tags?.third_party_code === 'true'
 
+  // Studio's once-per-session empty-body diagnostic is too rare to sample
+  const isUnsampled =
+    isErrorBoundaryCrash ||
+    event.tags?.empty_body_diagnostic === true ||
+    event.tags?.empty_body_diagnostic === 'true'
+
   if (isThirdPartyOnly && !isErrorBoundaryCrash) return null
-  if (!isErrorBoundaryCrash && Math.random() >= NON_CRASH_ERROR_SAMPLE_RATE) return null
+  if (!isUnsampled && Math.random() >= NON_CRASH_ERROR_SAMPLE_RATE) return null
 
   event.tags = {
     ...event.tags,
-    codeSampleRate: isErrorBoundaryCrash ? '1' : NON_CRASH_ERROR_SAMPLE_RATE.toString(),
+    codeSampleRate: isUnsampled ? '1' : NON_CRASH_ERROR_SAMPLE_RATE.toString(),
   }
 
   return event

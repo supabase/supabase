@@ -1,7 +1,9 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { useState } from 'react'
+import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { MobileMenuContent } from './MobileMenuContent'
@@ -10,6 +12,8 @@ import { ExplorerNavHeader } from '@/components/layouts/ExplorerLayout/ExplorerN
 import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+
+mockAnimationsApi()
 
 const createNotebook = vi.fn()
 const createChat = vi.fn()
@@ -37,18 +41,25 @@ vi.mock('./mobileProductMenuRegistry', () => ({
 const ExplorerMobileMenu = ({ initialSection }: { initialSection: ExplorerResourceType }) => {
   const [section, setSection] = useState<ExplorerResourceType | undefined>(initialSection)
   return (
-    <MobileMenuContent
-      currentProduct="Explorer"
-      currentSectionKey="explorer"
-      currentProductMenu={<span>{section ?? 'Home'} content</span>}
-      currentProductMenuHeader={
-        <ExplorerNavHeader
-          section={section}
-          onBack={() => setSection(undefined)}
-          rootAction={<span>Explorer preferences</span>}
-        />
-      }
-    />
+    <MobileSheetNav
+      open
+      onOpenChange={() => {}}
+      shouldCloseOnRouteChange={false}
+      shouldCloseOnViewportResize={false}
+    >
+      <MobileMenuContent
+        currentProduct="Explorer"
+        currentSectionKey="explorer"
+        currentProductMenu={<span>{section ?? 'Home'} content</span>}
+        currentProductMenuHeader={
+          <ExplorerNavHeader
+            section={section}
+            onBack={() => setSection(undefined)}
+            rootAction={<span>Explorer preferences</span>}
+          />
+        }
+      />
+    </MobileSheetNav>
   )
 }
 
@@ -111,5 +122,22 @@ describe('Mobile product header', () => {
     await user.click(screen.getByRole('button', { name: 'Database' }))
     expect(screen.getByText('Database menu')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'New notebook' })).not.toBeInTheDocument()
+  })
+
+  it('names the project menu dialog across top-level and section navigation', async () => {
+    const user = userEvent.setup()
+    customRender(<ExplorerMobileMenu initialSection="notebook" />)
+
+    expect(screen.getByRole('dialog', { name: 'Project menu' })).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: 'Project menu' })).toHaveLength(1)
+
+    await user.click(screen.getByRole('button', { name: 'Back to menu' }))
+    expect(screen.getByRole('navigation', { name: 'Project menu' })).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Project menu' })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Database' }))
+    expect(screen.getByText('Database menu')).toBeInTheDocument()
+    expect(screen.getByRole('dialog', { name: 'Project menu' })).toBeInTheDocument()
+    expect(screen.getAllByRole('heading', { name: 'Project menu' })).toHaveLength(1)
   })
 })

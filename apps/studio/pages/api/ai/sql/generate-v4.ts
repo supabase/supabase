@@ -161,7 +161,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
   let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-  if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
+  if (!isAssistantBaseModelId(effectiveModel) && (!hasAccessToAdvanceModel || envThrottled)) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
 
@@ -242,6 +242,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
       requestedModel,
+      effectiveModel,
       systemProviderOptions,
       abortSignal: abortController.signal,
       timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },

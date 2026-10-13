@@ -80,6 +80,7 @@
     "@tanstack/react-start": "catalog:",
     "@types/common-tags": "^1.8.4",
     "@types/lodash": "^4.17.16",
+    "@types/node": "catalog:",
     "@types/mdast": "^3.0.15",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
