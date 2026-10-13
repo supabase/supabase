@@ -1,24 +1,24 @@
 ---
 title: 'Ship changes to your Supabase backend with Grok Bot'
 description: 'Supabase joins the SpaceXAI Partner Network: request a change in chat with Grok Bot, and Cursor builds and runs it on your Supabase backend.'
-author: shaziya_bandukia
-date: '2026-10-08'
+author: nick_littman, elsa_heffernan, shaziya_bandukia
+date: '2026-10-13'
 categories:
   - product
 tags:
   - ai
   - integrations
   - mcp
-imgSocial: '2026-10-08-ship-changes-to-your-supabase-backend-with-grok-bot/og.png'
-imgThumb: '2026-10-08-ship-changes-to-your-supabase-backend-with-grok-bot/thumb.png'
+imgSocial: '2026-10-13-ship-changes-to-your-supabase-backend-with-grok-bot/og.png'
+imgThumb: '2026-10-13-ship-changes-to-your-supabase-backend-with-grok-bot/thumb.png'
 toc_depth: 2
 ---
 
 Supabase is joining the SpaceXAI Partner Network. With Grok Bot connected to Cursor, anyone on your team can request a change in chat, and Cursor builds and runs it against your Supabase backend through the [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp).
 
-## From a chat message to a shipped change
+Grok Bot takes a request from the person who needs it, in the place they already work, and hands it to Cursor as scoped engineering work. Cursor writes and runs the code, and through the Supabase MCP server, it can query the database, inspect the schema, read logs, and deploy Supabase Edge Functions, all inside the one Supabase project where the data already lives.
 
-Grok Bot takes a request from the person who needs it, in the place they already work, and hands it to Cursor as scoped engineering work. Cursor writes and runs the code, and through the Supabase MCP server it can query the database, inspect the schema, read logs, and deploy Supabase Edge Functions, all inside the one Supabase project where the data already lives.
+{/* TODO: add video embed */}
 
 ## Agents work the way developers do
 
@@ -28,7 +28,7 @@ Mistakes don't break the loop. When a query fails, the next call is another `exe
 
 ## Requests can come from anyone
 
-The person asking doesn't need to know which project holds the answer or which table to look in. Cursor already knows which Supabase project it's working in 53% of the time and lists projects to find the right one when it doesn't, then reads the schema with `list_tables` before it queries. When the person who made the request isn't watching the code, that's what keeps the work moving.
+The person asking doesn't need to know which project holds the answer or which table to look in. Cursor already knows which Supabase project it's working in most of the time and lists projects to find the right one when it doesn't, then reads the schema with `list_tables` before it queries. When the person who made the request isn't watching the code, that's what keeps the work moving.
 
 ## Add a security check to the loop
 
@@ -51,8 +51,6 @@ With that rule in place, a request to add a comments feature ships with RLS enab
 ## Built in partnership with SpaceXAI
 
 Developers found the Supabase integration on their own, and it consistently ranks among the top community plugins for SpaceXAI's tools. Joining the Partner Network lets us support that demand directly and keep the integration a first-class experience as those tools evolve.
-
-{/* TODO: add quote from SpaceXAI */}
 
 ## Get started
 
