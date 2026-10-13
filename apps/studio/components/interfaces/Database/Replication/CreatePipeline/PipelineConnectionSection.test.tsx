@@ -41,7 +41,11 @@ describe('PipelineConnectionSection', () => {
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toBeInTheDocument()
     expect(screen.getByText('Pipeline region')).toBeInTheDocument()
     expect(screen.getByText('Credentials')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Connection advanced settings/ }))
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    expect(screen.getByText(`Adjust how data is written to ${type}.`)).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: /Advanced settings/ }).closest('.border-t')
+    ).toHaveClass('border-t', 'border-default')
     expect(screen.getByLabelText(label)).toBeInTheDocument()
     expect(screen.queryByText('Batch wait time')).not.toBeInTheDocument()
     expect(screen.queryByText('Table layout')).not.toBeInTheDocument()
@@ -51,9 +55,7 @@ describe('PipelineConnectionSection', () => {
     'does not show an empty connection accordion for %s',
     (type) => {
       customRender(<TestSection type={type} />)
-      expect(
-        screen.queryByRole('button', { name: /Connection advanced settings/ })
-      ).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /Advanced settings/ })).not.toBeInTheDocument()
     }
   )
 })

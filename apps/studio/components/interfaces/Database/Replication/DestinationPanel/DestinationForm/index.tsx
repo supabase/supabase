@@ -532,7 +532,7 @@ export const DestinationForm = ({
                   </>
                 )}
 
-                <DialogSectionSeparator />
+                {!shouldShowConnectionSection && <DialogSectionSeparator />}
 
                 <AdvancedSettings
                   type={selectedType}

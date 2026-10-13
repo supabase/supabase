@@ -1,5 +1,5 @@
 import type { UseFormReturn } from 'react-hook-form'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { DestinationType } from '../DestinationPanel.types'
 import { BigQueryConnectionFields } from './BigQuery/ConnectionFields'
@@ -26,19 +26,16 @@ export const AdvancedSettings = ({
   let description = 'Customize how the pipeline syncs and replicates data.'
   if (type === 'DuckLake' && group === 'all')
     description = 'Adjust catalog connections and replication settings.'
-  if (group === 'connection') description = 'Customize destination connection settings.'
-
-  let title = 'Advanced settings'
-  if (group === 'connection') title = 'Connection advanced settings'
-  if (group === 'data') title = 'Replication advanced settings'
+  if (group === 'connection') description = `Adjust how data is written to ${type}.`
+  if (group === 'data') description = 'Adjust initial sync and replication slot behavior.'
 
   return (
-    <div className="w-full">
+    <div className={cn('w-full', group !== 'all' && 'border-t border-default')}>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
           <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
-              <span className="text-sm font-medium">{title}</span>
+              <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">{description}</span>
             </div>
           </AccordionTrigger>
