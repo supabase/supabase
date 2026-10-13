@@ -19,6 +19,8 @@ resources:
               merge_slashes: true
               path_with_escaped_slashes_action: REJECT_REQUEST
               use_remote_address: true
+              # Limit inactivity, matching Kong's default read_timeout.
+              stream_idle_timeout: 60s
               common_http_protocol_options:
                 headers_with_underscores_action: REJECT_REQUEST
               upgrade_configs:
@@ -61,7 +63,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /verify
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -90,7 +92,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /callback
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -119,7 +121,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /authorize
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -148,7 +150,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /.well-known/jwks.json
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -177,7 +179,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /.well-known/oauth-authorization-server
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -206,7 +208,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /.well-known/openid-configuration
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -235,7 +237,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /.well-known/oauth-authorization-server
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -264,7 +266,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /sso/saml/acs
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -293,7 +295,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /sso/saml/metadata
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -355,7 +357,7 @@ resources:
                         route:
                           cluster: storage
                           prefix_rewrite: /
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -385,7 +387,7 @@ resources:
                         route:
                           cluster: auth
                           prefix_rewrite: /
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -403,7 +405,7 @@ resources:
                         route:
                           cluster: rest
                           prefix_rewrite: /
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -438,7 +440,7 @@ resources:
                         route:
                           cluster: rest
                           prefix_rewrite: /
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -456,7 +458,7 @@ resources:
                         route:
                           cluster: rest
                           prefix_rewrite: /rpc/graphql
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -477,7 +479,7 @@ resources:
                           prefix: /realtime/v1/api/openapi
                         route:
                           cluster: realtime
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -506,7 +508,7 @@ resources:
                           prefix: /realtime/v1/api/tenants
                         route:
                           cluster: realtime
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -536,7 +538,7 @@ resources:
                         route:
                           cluster: realtime
                           prefix_rewrite: /api
-                          timeout: 30s
+                          timeout: 0s
                           host_rewrite_literal: realtime-dev.supabase-realtime
                         request_headers_to_add:
                           - header:
@@ -555,7 +557,7 @@ resources:
                         route:
                           cluster: realtime
                           prefix_rewrite: /socket/
-                          timeout: 30s
+                          timeout: 0s
                           host_rewrite_literal: realtime-dev.supabase-realtime
                         request_headers_to_add:
                           - header:
@@ -574,7 +576,7 @@ resources:
                         route:
                           cluster: meta
                           prefix_rewrite: /
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -601,7 +603,7 @@ resources:
                           prefix: /api/mcp
                         route:
                           cluster: studio
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -630,7 +632,7 @@ resources:
                         route:
                           cluster: studio
                           prefix_rewrite: /api/mcp
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
@@ -677,7 +679,7 @@ resources:
                           prefix: /
                         route:
                           cluster: studio
-                          timeout: 30s
+                          timeout: 0s
                         request_headers_to_remove:
                           - authorization
                         request_headers_to_add:
