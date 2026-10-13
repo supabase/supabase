@@ -39,9 +39,11 @@ import { DeleteFactorModal } from './DeleteFactorModal'
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import {
   PreviewAuthenticatorDialog,
+  PreviewGenerateRecoveryCodesFlow,
   PreviewRecoveryCodesFlow,
   PreviewRemoveRecoveryCodesModal,
 } from './PreviewRecoveryCodesFlow'
+import type { RecoveryCodesPreview } from './RecoveryCodesPreview.utils'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
@@ -52,7 +54,7 @@ import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-acc
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 type TOTPFactorsProps = {
-  previewRemaining?: 1 | 2
+  previewRemaining?: RecoveryCodesPreview
   findings: AccountRecoveryFinding[]
   primaryAction: AccountRecoveryFinding['action'] | 'enable-mfa' | undefined
 }
@@ -70,16 +72,23 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
     isSuccess: queryIsSuccess,
     error,
   } = useMfaListFactorsQuery({ userId: isPreview ? 'local-preview' : userId, enabled: !isPreview })
+  const previewFactorCount = previewRemaining === 'backup' ? 2 : 1
+  const previewHasCodes = previewRemaining !== 'missing' && previewRemaining !== 'mfa-off'
+  const previewCodeCount = typeof previewRemaining === 'number' ? previewRemaining : 10
+  const previewCodesStatus = previewHasCodes
+    ? { status: 'available' as const, data: { remaining: previewCodeCount, total: 10 } }
+    : { status: 'unenrolled' as const, data: undefined }
   const data = isPreview
     ? {
-        totp: [
-          {
-            id: 'preview-factor',
-            friendly_name: 'Preview authenticator',
-            status: 'verified',
-            created_at: '2026-10-01T00:00:00Z',
-          },
-        ],
+        totp:
+          previewRemaining === 'mfa-off'
+            ? []
+            : Array.from({ length: previewFactorCount }, (_, index) => ({
+                id: `preview-factor-${index}`,
+                friendly_name: index === 0 ? 'Preview authenticator' : 'Backup authenticator',
+                status: 'verified',
+                created_at: '2026-10-01T00:00:00Z',
+              })),
       }
     : queriedData
   const isLoading = !isPreview && queryIsLoading
@@ -101,9 +110,7 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
     enabled: shouldVerifyRecoveryCodes && !isPreview,
     userId: isPreview ? 'local-preview' : userId,
   })
-  const recoveryCodesStatus = isPreview
-    ? { status: 'available' as const, data: { remaining: previewRemaining, total: 10 } }
-    : queriedCodesStatus
+  const recoveryCodesStatus = isPreview ? previewCodesStatus : queriedCodesStatus
   const recoveryCodesIsError = !isPreview && queriedCodesIsError
   const recoveryCodesIsPending = !isPreview && queriedCodesIsPending
   const { data: codes, status } = recoveryCodesStatus ?? {}
@@ -114,6 +121,7 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
   const isCodeActionPrimary =
     primaryAction === 'generate-codes' || primaryAction === 'regenerate-codes'
 
+  const GenerateFlow = isPreview ? PreviewGenerateRecoveryCodesFlow : GenerateRecoveryCodesModal
   const RegenerateFlow = isPreview ? PreviewRecoveryCodesFlow : RegenerateRecoveryCodesModal
   const RemoveCodesFlow = isPreview ? PreviewRemoveRecoveryCodesModal : UnenrollRecoveryCodesModal
 
@@ -252,7 +260,7 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
               <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
             )}
             {shouldVerifyRecoveryCodes && recoveryCodesIsPending && <GenericSkeletonLoader />}
-            <GenerateRecoveryCodesModal>
+            <GenerateFlow>
               {({ onClick, isPending }) =>
                 shouldVerifyRecoveryCodes && status === 'unenrolled' && !recoveryCodesIsError ? (
                   <>
@@ -279,7 +287,7 @@ export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPF
                   </>
                 ) : null
               }
-            </GenerateRecoveryCodesModal>
+            </GenerateFlow>
             <RemoveCodesFlow>
               {({ onClick: onRemove }) => (
                 <RegenerateFlow>

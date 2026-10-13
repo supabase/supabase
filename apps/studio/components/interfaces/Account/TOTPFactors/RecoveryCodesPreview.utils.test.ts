@@ -9,8 +9,16 @@ describe('getRecoveryCodesPreview', () => {
       expect(getRecoveryCodesPreview({ value: '1', environment: 'development', hostname })).toBe(1)
       expect(getRecoveryCodesPreview({ value: '2', environment: 'development', hostname })).toBe(2)
       expect(
-        getRecoveryCodesPreview({ value: '0', environment: 'development', hostname })
+        getRecoveryCodesPreview({ value: 'invalid', environment: 'development', hostname })
       ).toBeUndefined()
+    }
+  )
+  it.each(['0', '1', '2', '3', 'missing', 'healthy', 'backup', 'mfa-off'])(
+    'accepts demo state %s',
+    (value) => {
+      expect(
+        getRecoveryCodesPreview({ value, environment: 'development', hostname: 'localhost' })
+      ).toBe(Number.isNaN(Number(value)) ? value : Number(value))
     }
   )
   it.each(['production', 'test', undefined])(

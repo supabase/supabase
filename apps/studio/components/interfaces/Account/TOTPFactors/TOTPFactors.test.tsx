@@ -177,6 +177,20 @@ describe('account security MFA and recovery sections', () => {
     }
   )
 
+  it('opens sample generation for the missing-code preview', async () => {
+    customRender(
+      <TOTPFactors
+        previewRemaining="missing"
+        findings={[{ id: 'recovery-codes-missing', severity: 'warning', action: 'generate-codes' }]}
+        primaryAction="generate-codes"
+      />
+    )
+    expect(screen.getByText('No recovery codes')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Generate recovery codes' }))
+    expect(await screen.findByText('Save your recovery codes')).toBeInTheDocument()
+    expect(mock.getStatus).not.toHaveBeenCalled()
+  })
+
   it('opens the authenticator action destination and consumes it when closed', async () => {
     renderSection(undefined, '?securityAction=add-factor')
     expect(await screen.findByRole('dialog', { name: 'Add authenticator' })).toBeInTheDocument()

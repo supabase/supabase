@@ -18,8 +18,10 @@ type Trigger = { onClick: () => void; isPending: boolean }
 
 export const PreviewRecoveryCodesFlow = ({
   children,
+  action = 'regenerate',
 }: {
   children?: (trigger: Trigger) => ReactNode
+  action?: 'generate' | 'regenerate'
 }) => {
   const mutation = useMutation<AuthMFARecoveryCodesGenerateResponseData, AuthError, void>({
     mutationFn: async () => ({
@@ -33,7 +35,7 @@ export const PreviewRecoveryCodesFlow = ({
     }),
   })
   return (
-    <RecoveryCodesFlow action="regenerate" mutation={mutation} onGenerate={() => mutation.mutate()}>
+    <RecoveryCodesFlow action={action} mutation={mutation} onGenerate={() => mutation.mutate()}>
       {children ?? (() => null)}
     </RecoveryCodesFlow>
   )
@@ -97,3 +99,9 @@ export const PreviewAuthenticatorDialog = ({
     </DialogContent>
   </Dialog>
 )
+
+export const PreviewGenerateRecoveryCodesFlow = ({
+  children,
+}: {
+  children?: (trigger: Trigger) => ReactNode
+}) => <PreviewRecoveryCodesFlow action="generate">{children}</PreviewRecoveryCodesFlow>

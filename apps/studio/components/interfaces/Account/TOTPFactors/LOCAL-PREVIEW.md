@@ -2,10 +2,27 @@
 
 Temporary preview entry points for Account / Security:
 
+| Query value   | Preview                                                             |
+| ------------- | ------------------------------------------------------------------- |
+| `0`           | Exhausted codes, one authenticator. Critical warning.               |
+| `1`, `2`, `3` | Low codes, one authenticator. Warning.                              |
+| `missing`     | No codes generated, one authenticator. Warning and generation flow. |
+| `healthy`     | Ten codes, one authenticator. Backup-authenticator warning.         |
+| `backup`      | Ten codes, two authenticators. No recovery warning.                 |
+| `mfa-off`     | No authenticators. MFA and recovery-code prerequisite empty states. |
+
+Open `http://localhost:8082/account/security?mockRecoveryCodes=VALUE`, replacing `VALUE` with any value above. For example:
+
+- http://localhost:8082/account/security?mockRecoveryCodes=0
 - http://localhost:8082/account/security?mockRecoveryCodes=1
 - http://localhost:8082/account/security?mockRecoveryCodes=2
+- http://localhost:8082/account/security?mockRecoveryCodes=3
+- http://localhost:8082/account/security?mockRecoveryCodes=missing
+- http://localhost:8082/account/security?mockRecoveryCodes=healthy
+- http://localhost:8082/account/security?mockRecoveryCodes=backup
+- http://localhost:8082/account/security?mockRecoveryCodes=mfa-off
 
-Both show one verified authenticator and the selected number of remaining recovery codes. The query parameter works only in development on localhost or 127.0.0.1. Invalid values, production builds and remote hosts use live account state.
+The query parameter works only in development on localhost or 127.0.0.1. Invalid values, production builds and remote hosts use live account state. Preview findings use the shared evaluator.
 
 The MFA and recovery sections use local sample data, not the account query cache. Their preview actions must never call Auth mutations. Sign-in methods still show live account data and keep their normal actions.
 

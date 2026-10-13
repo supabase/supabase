@@ -30,6 +30,11 @@ const Security: NextPageWithLayout = () => {
     environment: process.env.NODE_ENV,
     hostname: typeof window === 'undefined' ? '' : window.location.hostname,
   })
+  let previewFactorCount = 1
+  if (previewRemaining === 'mfa-off') previewFactorCount = 0
+  if (previewRemaining === 'backup') previewFactorCount = 2
+  const previewHasCodes = previewRemaining !== 'missing' && previewRemaining !== 'mfa-off'
+  const previewCodeCount = typeof previewRemaining === 'number' ? previewRemaining : 10
   const recovery = useAccountRecovery({
     enabled: showSecuritySettings && previewRemaining === undefined,
   })
@@ -39,8 +44,10 @@ const Security: NextPageWithLayout = () => {
       : evaluateAccountRecovery({
           identities: [{ provider: 'email' }],
           email: 'preview@example.com',
-          verifiedFactorCount: 1,
-          recoveryCodes: { status: 'available', remaining: previewRemaining },
+          verifiedFactorCount: previewFactorCount,
+          recoveryCodes: previewHasCodes
+            ? { status: 'available', remaining: previewCodeCount }
+            : { status: 'missing' },
           features: {
             hasSecuritySettings: true,
             recoveryCodesEnabled: true,
@@ -48,9 +55,13 @@ const Security: NextPageWithLayout = () => {
           },
         })
   const primaryAction = getPrimarySecurityAction({
-    ...recovery,
     findings,
-    canEnableMfa: recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0,
+    isPending: previewRemaining === undefined && recovery.isPending,
+    isError: previewRemaining === undefined && recovery.isError,
+    canEnableMfa:
+      previewRemaining === undefined
+        ? recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0
+        : previewFactorCount === 0,
   })
 
   if (!showSecuritySettings) {
@@ -73,7 +84,7 @@ const Security: NextPageWithLayout = () => {
         <AccountIdentities findings={findings} primaryAction={primaryAction} />
         <TOTPFactors
           findings={findings}
-          primaryAction={previewRemaining === undefined ? primaryAction : 'regenerate-codes'}
+          primaryAction={primaryAction}
           previewRemaining={previewRemaining}
         />
       </PageContainer>
