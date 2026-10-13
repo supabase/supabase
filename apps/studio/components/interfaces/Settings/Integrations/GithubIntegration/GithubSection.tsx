@@ -150,6 +150,7 @@ export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                         disabled={!canUpdateGitHubConnection}
                         connection={toIntegrationProjectConnection(connection)}
                         type="GitHub"
+                        isProjectScoped={isProjectScoped}
                         onDeleteConnection={onDeleteGitHubConnection}
                       />
                     ))}

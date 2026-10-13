@@ -186,6 +186,7 @@ export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                         <IntegrationConnectionItem
                           connection={connection}
                           disabled={isBranch || !canUpdateVercelConnection}
+                          isProjectScoped={isProjectScoped}
                           type={'Vercel' as IntegrationName}
                           onDeleteConnection={onDeleteVercelConnection}
                           leadingAction={

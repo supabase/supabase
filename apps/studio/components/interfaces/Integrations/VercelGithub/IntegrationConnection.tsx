@@ -1,6 +1,5 @@
-import { Loader2, MoreVertical, RefreshCw, SettingsIcon, Trash } from 'lucide-react'
+import { ChevronDown, Loader2, MoreVertical, RefreshCw, SettingsIcon, Trash } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -25,12 +24,12 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
+  isProjectScoped?: boolean
   onDeleteConnection: (connection: IntegrationProjectConnection) => void | Promise<void>
 }
 
 export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
-  ({ disabled, onDeleteConnection, ...props }, _ref) => {
-    const router = useRouter()
+  ({ disabled, isProjectScoped = false, onDeleteConnection, ...props }, _ref) => {
     const { data: org } = useSelectedOrganizationQuery()
 
     const { type, connection } = props
@@ -71,6 +70,13 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
 
     const projectIntegrationUrl = `/project/[ref]/settings/integrations`
 
+    // Project-scoped Vercel rows have their own "Edit" toggle, so "Manage" collapses to an icon
+    const isManageCompact = isProjectScoped && type === 'Vercel'
+    const triggerLabel = isManageCompact ? null : 'Manage'
+    const triggerProps = isManageCompact
+      ? { icon: <MoreVertical />, className: 'px-1.5', 'aria-label': 'Manage connection' }
+      : { iconRight: <ChevronDown size={14} /> }
+
     return (
       <>
         <IntegrationConnection
@@ -79,16 +85,16 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
             disabled ? (
               <ButtonTooltip
                 disabled
-                icon={<MoreVertical />}
-                className="px-1.5"
-                aria-label="Manage connection"
+                {...triggerProps}
                 tooltip={{
                   content: {
                     side: 'bottom',
                     text: 'You need additional permissions to manage this connection',
                   },
                 }}
-              />
+              >
+                {triggerLabel}
+              </ButtonTooltip>
             ) : (
               <DropdownMenu
                 open={dropdownVisible}
@@ -96,14 +102,10 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                 modal={false}
               >
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    aria-label="Manage connection"
-                    className="px-1.5"
-                    icon={<MoreVertical />}
-                  />
+                  <Button {...triggerProps}>{triggerLabel}</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="end" className="w-56">
-                  {router.pathname !== projectIntegrationUrl && (
+                  {!isProjectScoped && (
                     <DropdownMenuItem asChild className="gap-x-2">
                       <Link
                         href={
@@ -134,7 +136,7 @@ export const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationCo
                     </DropdownMenuItem>
                   )}
                   {((type === 'Vercel' && org?.managed_by !== 'vercel-marketplace') ||
-                    router.pathname !== projectIntegrationUrl) && <DropdownMenuSeparator />}
+                    !isProjectScoped) && <DropdownMenuSeparator />}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
                     <Trash size={14} />
                     <p>Delete connection</p>
