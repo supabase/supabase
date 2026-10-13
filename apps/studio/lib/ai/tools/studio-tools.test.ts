@@ -194,7 +194,7 @@ describe('ai/tools/studio-tools', () => {
         undefined,
         undefined
       )
-      expect(result).toEqual({ rows, optInLevel: 'schema' })
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'text',
         value: NO_DATA_PERMISSIONS,
@@ -231,10 +231,35 @@ describe('ai/tools/studio-tools', () => {
         undefined,
         undefined
       )
-      expect(result).toEqual({ rows, optInLevel: 'schema_and_log_and_data' })
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema_and_log_and_data' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'json',
         value: rows,
+      })
+    })
+
+    it('should cap execute_sql rows', async () => {
+      const rows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      expect(result).toEqual({
+        rows: rows.slice(0, 100),
+        totalRows: 101,
+        optInLevel: 'schema_and_log_and_data',
       })
     })
 
