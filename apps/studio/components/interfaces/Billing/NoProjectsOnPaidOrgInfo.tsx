@@ -14,7 +14,7 @@ export const NoProjectsOnPaidOrgInfo = () => {
     { slug: organization?.slug },
     { enabled: isEligible }
   )
-  const projectCount = data?.pages[0].pagination.count ?? 0
+  const projectCount = data?.pages[0].pagination?.count ?? 0
 
   if (!isEligible || projectCount > 0) return null
 

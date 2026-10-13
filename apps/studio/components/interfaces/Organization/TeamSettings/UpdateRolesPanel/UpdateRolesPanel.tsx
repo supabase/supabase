@@ -65,7 +65,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
+  const totalNumOrgProjects = projectsData?.pages[0].pagination?.count ?? 0
   const orgProjects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 

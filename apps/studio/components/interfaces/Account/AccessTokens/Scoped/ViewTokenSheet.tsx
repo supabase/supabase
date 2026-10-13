@@ -78,7 +78,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
     if (projectsData.pages.length === 0) {
       return false
     }
-    return projectsData.pages[0].pagination.count > 100
+    return (projectsData.pages[0].pagination?.count ?? 0) > 100
   }, [projectsData])
 
   const resourceAccess = token ? SCOPE_TO_RESOURCE_ACCESS[token.scope] : 'project'

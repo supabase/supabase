@@ -28,7 +28,7 @@ function combineOrgProjects(
 
   const anyErrored = results.some((r) => r.isError)
   const anyTruncated = results.some(
-    (r) => r.data !== undefined && r.data.pagination.count > r.data.projects.length
+    (r) => r.data !== undefined && (r.data.pagination?.count ?? 0) > r.data.projects.length
   )
 
   const projects = results.flatMap((r) => r.data?.projects ?? [])

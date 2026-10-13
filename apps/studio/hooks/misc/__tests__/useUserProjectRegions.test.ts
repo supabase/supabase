@@ -88,6 +88,40 @@ describe('useUserProjectRegions', () => {
     )
   })
 
+  it('treats a response without pagination as complete instead of throwing', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations',
+      response: () =>
+        HttpResponse.json<OrganizationResponse[]>([
+          createMockOrganizationResponse({ slug: 'org-a' }),
+        ]),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/projects',
+      response: () =>
+        HttpResponse.json<OrganizationProjectsResponse>({
+          projects: [mockProject('project-a', [{ region: 'us-east-1', type: 'PRIMARY' }])],
+        } as OrganizationProjectsResponse),
+    })
+
+    const { result } = customRenderHook(() => useUserProjectRegions({ enabled: true }), {
+      profileContext: createMockProfileContext(),
+    })
+
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        status: 'resolved',
+        context: {
+          hasProjects: true,
+          regions: new Set(['us-east-1']),
+          isComplete: true,
+        },
+      })
+    )
+  })
+
   it('marks the context incomplete when an org has more projects than the page returned', async () => {
     addAPIMock({
       method: 'get',

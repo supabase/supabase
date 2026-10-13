@@ -47,7 +47,7 @@ export const ProjectLinker = ({
   const { data: orgProjects, isPending: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
     slug,
   })
-  const numProjects = orgProjects?.pages[0].pagination.count ?? 0
+  const numProjects = orgProjects?.pages[0].pagination?.count ?? 0
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))

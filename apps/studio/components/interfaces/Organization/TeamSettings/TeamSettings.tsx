@@ -51,7 +51,7 @@ export const TeamSettings = () => {
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
   const { data } = useOrgProjectsInfiniteQuery({ slug })
-  const totalCount = data?.pages[0].pagination.count ?? 0
+  const totalCount = data?.pages[0].pagination?.count ?? 0
   const threshold = 1000
 
   return (

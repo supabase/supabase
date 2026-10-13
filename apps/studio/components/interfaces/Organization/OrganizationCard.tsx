@@ -31,7 +31,7 @@ export const OrganizationCard = ({
     { slug: organization.slug },
     { enabled: !isPlatformOrg && shouldRenderDefaultDescription }
   )
-  const numProjects = data?.pages[0].pagination.count ?? 0
+  const numProjects = data?.pages[0].pagination?.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa
 
   const card = (
