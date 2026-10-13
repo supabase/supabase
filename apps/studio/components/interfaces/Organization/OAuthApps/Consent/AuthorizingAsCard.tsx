@@ -1,6 +1,7 @@
 import { LogOut } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { OAuthAppsAuthorizeRequest } from '@/data/oauth-apps/types'
 
 export interface AuthorizingAsCardProps {
@@ -23,21 +24,16 @@ export const AuthorizingAsCard = ({
           <span className="shrink-0 text-foreground-light">Authorizing as</span>
           <span className="flex min-w-0 items-center gap-2">
             <span className="min-w-0 truncate text-right text-foreground">{email}</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="text"
-                  size="tiny"
-                  icon={<LogOut size={14} />}
-                  className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
-                  aria-label="Sign out"
-                  aria-describedby={undefined}
-                  // Tooltip repeats the label; screen readers would read it twice
-                  onClick={onSignOut}
-                />
-              </TooltipTrigger>
-              <TooltipContent side="top">Sign out</TooltipContent>
-            </Tooltip>
+            <ButtonTooltip
+              variant="text"
+              size="tiny"
+              icon={<LogOut size={14} />}
+              className="shrink-0 size-6 px-0 text-foreground-light hover:text-foreground"
+              aria-label="Sign out"
+              aria-describedby={undefined}
+              onClick={onSignOut}
+              tooltip={{ content: { side: 'bottom', text: 'Sign out' } }}
+            />
           </span>
         </div>
         <div className="flex items-center justify-between gap-4 py-2.5 text-xs">

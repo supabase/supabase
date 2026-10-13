@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
 import { formatPermissionName } from './OAuthAppsAuthorizeScreen.utils'
 
@@ -12,9 +12,7 @@ export const ScopeGroupCardItem = ({
   if (permissions.length === 0) return null
   return (
     <div className="flex flex-col gap-2 py-3">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-foreground-light">
-        {label}
-      </p>
+      <p className="font-mono text-xs uppercase text-foreground-light">{label}</p>
       <p className="text-xs font-medium text-foreground">
         {permissions.map((permission) => formatPermissionName(permission)).join(', ')}
       </p>

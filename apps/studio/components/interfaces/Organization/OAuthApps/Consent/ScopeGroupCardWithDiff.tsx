@@ -1,6 +1,6 @@
 import { capitalize } from 'lodash'
 import { ChevronsUpDownIcon } from 'lucide-react'
-import { ReactNode, useMemo } from 'react'
+import { Fragment, useMemo, type ReactNode } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import {
@@ -80,26 +80,18 @@ const DiffScopeGroupItem = ({
   if (permissions.length === 0) return null
   return (
     <div className="flex flex-col gap-2 py-3">
-      <p className="font-mono text-[11px] uppercase tracking-wider text-foreground-light">
-        {label}
-      </p>
+      <p className="font-mono text-xs uppercase text-foreground-light">{label}</p>
       <p className="text-xs font-medium text-foreground">
         {permissions.map((permission, index) => (
-          <>
-            <span>
+          <Fragment key={permission.permission}>
+            <span className="inline-block">
               {formatPermissionName(permission.permission)}{' '}
               <span className="text-foreground-lighter">
-                (
-                <DiffDescription
-                  key={permission.permission}
-                  level={level}
-                  previousLevel={permission.previousLevel}
-                />
-                )
+                (<DiffDescription level={level} previousLevel={permission.previousLevel} />)
               </span>
-            </span>
-            {index < permissions.length - 1 ? ', ' : ''}
-          </>
+              {index < permissions.length - 1 && ','}
+            </span>{' '}
+          </Fragment>
         ))}
       </p>
     </div>
