@@ -3,16 +3,18 @@ import { getCollection, render } from 'astro:content'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
+import { relatedGuides, toSummary } from '../../lib/guides'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
+	const summaries = guides.map(toSummary)
 	return guides.map((guide) => ({
 		params: { slug: guide.id },
-		props: { guide },
+		props: { guide, related: relatedGuides({ guide: toSummary(guide), guides: summaries }) },
 	}))
 }
 
-const { guide } = Astro.props
+const { guide, related } = Astro.props
 const { title, description, topics, github_url, date } = guide.data
 const { Content, headings } = await render(guide)
 const toc = headings
@@ -31,6 +33,7 @@ const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb
 	viewGitHubLink={viewGitHubLink}
 	date={date}
 	toc={toc}
+	related={related}
 >
 	<Content components={{ Admonition }} />
 </ArticleLayout>

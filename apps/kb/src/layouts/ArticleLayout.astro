@@ -3,7 +3,9 @@ import { ExternalLink } from 'lucide-react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
+import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
+import type { RelatedGuides } from '../lib/guides'
 import Layout from './Layout.astro'
 import { getTopicDescription, isKnownTopic, topicToSlug } from '../lib/topics'
 
@@ -18,9 +20,10 @@ interface Props {
 	viewGitHubLink?: string
 	date?: string
 	toc?: TOCItemType[]
+	related?: RelatedGuides | null
 }
 
-const { title, description, topics = [], github_url, viewGitHubLink, date, toc = [] } = Astro.props
+const { title, description, topics = [], github_url, viewGitHubLink, date, toc = [], related } = Astro.props
 const pagePath = Astro.url.pathname.replace(/\/$/, '')
 ---
 
@@ -98,4 +101,14 @@ const pagePath = Astro.url.pathname.replace(/\/$/, '')
 			/>
 		</aside>
 	</div>
+	{
+		related && (
+			<FeaturedSection
+				client:load
+				title={`More ${related.topic} guides`}
+				items={related.guides.map((guide) => ({ ...guide, slot: guide.id }))}
+				className="pb-24 pt-16"
+			/>
+		)
+	}
 </Layout>

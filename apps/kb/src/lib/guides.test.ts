@@ -5,6 +5,7 @@ import {
   filterGuides,
   padFeatured,
   parseTopicParam,
+  relatedGuides,
   withTopicParam,
   type GuideSummary,
 } from './guides'
@@ -106,5 +107,39 @@ describe('emptyStateFor', () => {
 
   it('handles no guides at all', () => {
     expect(emptyStateFor({ topic: null }).message).toBe('There are no guides yet.')
+  })
+})
+
+describe('relatedGuides', () => {
+  const firebaseAuth = guide('firebase-auth', 'Migrate from Firebase Auth to Supabase', [
+    'Migration',
+    'Auth',
+  ])
+
+  it('prefers the subject topic over the format topic', () => {
+    const related = relatedGuides({ guide: firebaseAuth, guides: GUIDES })
+    expect(related?.topic).toBe('Auth')
+    expect(related?.guides.map((guide) => guide.id)).toEqual(['auth0'])
+  })
+
+  it('ranks guides sharing more topics first', () => {
+    const rds = guide('rds', 'Migrate from Amazon RDS to Supabase', ['Migration', 'Database'])
+    expect(relatedGuides({ guide: rds, guides: GUIDES })?.guides.map((guide) => guide.id)).toEqual([
+      'firestore',
+      'heroku',
+      'mysql',
+    ])
+  })
+
+  it('falls back to the format topic when no other guide shares the subject', () => {
+    const storage = guide('firebase-storage', 'Migrate from Firebase Storage to Supabase', [
+      'Migration',
+      'Storage',
+    ])
+    expect(relatedGuides({ guide: storage, guides: GUIDES })?.topic).toBe('Migration')
+  })
+
+  it('returns null when no other guide shares a topic', () => {
+    expect(relatedGuides({ guide: firebaseAuth, guides: [firebaseAuth] })).toBeNull()
   })
 })
