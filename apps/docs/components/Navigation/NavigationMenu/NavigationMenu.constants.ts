@@ -342,6 +342,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/troubleshooting' as `/${string}`,
             level: 'troubleshooting',
           },
+          {
+            label: 'Knowledge base',
+            icon: 'resources',
+            href: 'https://supabase.com/kb',
+          },
         ],
       ],
     },
