@@ -61,8 +61,11 @@ describe('account security MFA and recovery sections', () => {
     })
     renderSection()
     expect(await screen.findByText('Set up multi-factor authentication')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Set up MFA' })).toBeInTheDocument()
-    expect(screen.getByText('Set up MFA to use recovery codes.')).toBeInTheDocument()
+    const setupButtons = screen.getAllByRole('button', { name: 'Set up MFA' })
+    expect(setupButtons).toHaveLength(2)
+    expect(screen.getByText('Set up recovery codes')).toBeInTheDocument()
+    await userEvent.click(setupButtons[1])
+    expect(await screen.findByRole('dialog', { name: 'Add authenticator' })).toBeInTheDocument()
     expect(mock.getStatus).not.toHaveBeenCalled()
   })
 

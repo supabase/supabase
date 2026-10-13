@@ -191,7 +191,15 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
               </p>
             )}
             {isSuccess && totpFactors.length === 0 && (
-              <p className="text-sm text-foreground-lighter">Set up MFA to use recovery codes.</p>
+              <EmptyStatePresentational
+                icon={RectangleEllipsis}
+                title="Set up recovery codes"
+                description="Enable multi-factor authentication first, then generate codes to recover access if you lose your authenticator."
+              >
+                <Button variant="default" icon={<Plus />} onClick={handleAddNewApp}>
+                  Set up MFA
+                </Button>
+              </EmptyStatePresentational>
             )}
             {recoveryCodesIsError && (
               <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />

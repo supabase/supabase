@@ -168,8 +168,8 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
                 <Admonition
                   type="warning"
                   layout="responsive"
-                  title="One sign-in method"
-                  description="Add a password so you can still sign in if you lose access to your connected account."
+                  title="Add a password for email sign-in"
+                  description={`Use ${data.email} and a password as another way to sign in if you lose access to ${getProviderDisplay(identities[0]?.provider ?? '').displayName}.`}
                   actions={
                     <Button
                       variant={primaryAction === 'set-password' ? 'primary' : 'default'}

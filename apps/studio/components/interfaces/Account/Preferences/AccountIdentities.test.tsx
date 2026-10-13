@@ -225,9 +225,10 @@ describe('AccountIdentities', () => {
         primaryAction="set-password"
       />
     )
+    expect(await screen.findByText('Add a password for email sign-in')).toBeInTheDocument()
     expect(
       await screen.findByText(
-        'Add a password so you can still sign in if you lose access to your connected account.'
+        `Use ${EMAIL} and a password as another way to sign in if you lose access to GitHub.`
       )
     ).toBeInTheDocument()
     expect(screen.getByText('Choose how you sign in to your Supabase account.')).toBeInTheDocument()

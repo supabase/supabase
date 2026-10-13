@@ -23,7 +23,7 @@ export const getPrimarySecurityAction = ({
 }): SecurityAction | undefined => {
   if (isPending || isError) return undefined
   const finding = findingOrder.map((id) => findings.find((item) => item.id === id)).find(Boolean)
-  if (finding && finding.severity !== 'info') return finding.action
   if (canEnableMfa) return 'enable-mfa'
+  if (finding && finding.severity !== 'info') return finding.action
   return finding?.action
 }

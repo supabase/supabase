@@ -22,9 +22,9 @@ describe('getPrimarySecurityAction', () => {
   it('offers MFA setup without inventing a recovery finding', () => {
     expect(getPrimarySecurityAction({ ...base, canEnableMfa: true })).toBe('enable-mfa')
   })
-  it('prioritizes a password gap before MFA setup', () => {
+  it('prioritizes MFA setup before a password fallback', () => {
     expect(getPrimarySecurityAction({ ...base, canEnableMfa: true, findings: [findings[0]] })).toBe(
-      'set-password'
+      'enable-mfa'
     )
   })
   it('uses a backup authenticator recommendation after higher risks are resolved', () => {
