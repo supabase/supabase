@@ -44,6 +44,7 @@ Beng Eu
 Benjamin Coenen
 Beth Long
 Bobbie Soedirgo
+Brad Deam
 Brad Gyger
 Brendan Stephens
 Brent Graveland
@@ -79,6 +80,7 @@ Connor Davis
 Craig Cannon
 Cuong Do
 Dane Harrigan
+Daniel Chapman
 Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
@@ -102,6 +104,7 @@ Divit D
 Divya Sharma
 Donna Alexandra
 Douglas Hunley
+Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
@@ -237,6 +240,7 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
 Mo Khan

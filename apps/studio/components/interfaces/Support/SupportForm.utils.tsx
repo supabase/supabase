@@ -149,7 +149,8 @@ const supportFormUrlState = {
   category: parseAsCategoryOption,
   subject: parseAsString.withDefault(''),
   message: parseAsString.withDefault(''),
-  error: parseAsString,
+  // Not `error`: auth-js treats `?error=` in any URL as a failed auth redirect
+  errorMessage: parseAsString,
   /** Sentry event ID */
   sid: parseAsString,
 } satisfies UseQueryStatesKeysMap
