@@ -185,6 +185,16 @@ export const buildTableSyncCopyConfig = ({
   }
 }
 
+export const buildTableSyncCopyConfigPreview = (
+  options: Parameters<typeof buildTableSyncCopyConfig>[0]
+): TableSyncCopyConfig | undefined => {
+  try {
+    return buildTableSyncCopyConfig(options)
+  } catch {
+    return undefined
+  }
+}
+
 export const buildBatchConfig = ({
   maxFillMs,
   existingBatch,

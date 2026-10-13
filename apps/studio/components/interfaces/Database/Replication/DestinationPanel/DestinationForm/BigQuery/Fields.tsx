@@ -15,9 +15,11 @@ import { MAX_SERVICE_ACCOUNT_KEY_LENGTH, readServiceAccountFile } from './BigQue
 export const BigQueryFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const serviceAccountFileInputRef = useRef<HTMLInputElement>(null)
   const fileReadRequestIdRef = useRef(0)
@@ -55,7 +57,7 @@ export const BigQueryFields = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       <p className="text-sm font-medium text-foreground">BigQuery settings</p>
       <div className="flex flex-col gap-y-4">
         <FormField

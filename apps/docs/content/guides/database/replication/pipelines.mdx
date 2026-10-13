@@ -48,17 +48,17 @@ Pipelines installs an `etl` schema and a database event trigger to track replica
 </Admonition>
 
 1. Navigate to the [**Database > Pipelines**](/dashboard/project/_/database/pipelines) section of the Dashboard
-2. Click **Add pipeline** to show the replication side panel
+2. Click **Add pipeline** to open the create pipeline flow
 3. Select a destination available to your organization
 4. If Pipelines is not yet enabled, click **Enable Pipelines**, review the dialog, and confirm **Enable Pipelines**.
 
 ### Step 3: Configure a destination
 
-1. Enter a **Name** and select a **Publication**. Use an existing publication, or click **New publication**, name it, and select at least one table. For schema-wide replication or advanced options, [create the publication with SQL](#creating-a-publication-with-sql).
-2. Under **Initial sync**, keep **All tables** to copy existing rows, or [choose which tables to copy](#choosing-which-tables-to-copy) if you only need future changes for some tables.
-3. Enter the credentials and destination-specific settings prepared in Step 1.
-4. Optionally expand **Advanced settings** to change [batching, initial sync concurrency, or slot recovery](#advanced-settings).
-5. Click **Create and start pipeline**. Fix any **Required** issues. For **Warnings**, review the risk, click **Create and start pipeline anyway**, and confirm that you want to continue.
+1. Select a destination and click **Continue**.
+2. Enter a **Name**, the credentials, and the destination-specific settings prepared in Step 1. Optionally expand **Advanced settings**, then test the connection.
+3. Select a **Publication**. Use an existing publication, or click **New publication**, name it, and select at least one table. For schema-wide replication or advanced options, [create the publication with SQL](#creating-a-publication-with-sql).
+4. Under **Initial sync**, keep **All tables** to copy existing rows, or [choose which tables to copy](#choosing-which-tables-to-copy) if you only need future changes for some tables. Optionally expand **Advanced settings** to change [batching, initial sync concurrency, or slot recovery](#advanced-settings).
+5. Review the pipeline and click **Create and start pipeline**. Fix any **Required** issues. For **Warnings**, review the risk, click **Create and start pipeline anyway**, and confirm that you want to continue.
 6. Review the estimated initial sync cost and ongoing charges, then confirm creation.
 
 The pipeline copies the selected tables' existing rows and begins ongoing replication for every published table.

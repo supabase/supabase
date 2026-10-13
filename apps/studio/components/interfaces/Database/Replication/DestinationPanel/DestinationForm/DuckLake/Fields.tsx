@@ -516,9 +516,11 @@ const DuckLakeCustomFields = ({
 export const DuckLakeFields = ({
   form,
   editMode,
+  className,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
+  className?: string
 }) => {
   const ducklakeMode = (useWatch({ control: form.control, name: 'ducklakeMode' }) ??
     DUCKLAKE_MODE_SUPABASE) as DucklakeMode
@@ -528,7 +530,7 @@ export const DuckLakeFields = ({
   const effectiveMode = editMode ? DUCKLAKE_MODE_CUSTOM : ducklakeMode
 
   return (
-    <div className="flex flex-col gap-y-6 p-5">
+    <div className={cn('flex flex-col gap-y-6 p-5', className)}>
       {editMode ? (
         <p className="text-sm font-medium text-foreground">DuckLake settings</p>
       ) : (

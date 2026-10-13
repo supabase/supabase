@@ -9,6 +9,7 @@ import {
   buildDestinationConfig,
   buildDestinationConfigForValidation,
   buildTableSyncCopyConfig,
+  buildTableSyncCopyConfigPreview,
   generateDefaultValues,
   pruneStaleSelectedTableIds,
   pruneStaleTableOptions,
@@ -137,6 +138,24 @@ describe('DestinationForm.utils table copy selection', () => {
         selectedTableIds: ['not-an-id'],
       })
     ).toThrow('The selected table IDs are invalid')
+  })
+
+  it('does not build a preview while a table selection is incomplete', () => {
+    expect(
+      buildTableSyncCopyConfigPreview({
+        mode: 'include_tables',
+        selectedTableIds: [],
+      })
+    ).toBeUndefined()
+  })
+
+  it('builds a preview once the table selection is complete', () => {
+    expect(
+      buildTableSyncCopyConfigPreview({
+        mode: 'include_tables',
+        selectedTableIds: ['101'],
+      })
+    ).toEqual({ type: 'include_tables', table_ids: [101] })
   })
 
   it('hydrates configured pipeline table ids as selected table ids in edit mode', () => {

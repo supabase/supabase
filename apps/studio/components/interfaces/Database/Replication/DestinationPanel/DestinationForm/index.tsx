@@ -10,6 +10,8 @@ import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 
 import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
+import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
+import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -28,6 +30,7 @@ import {
 import { BigQueryFields } from './BigQuery/Fields'
 import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { ClickHouseFields } from './ClickHouse/Fields'
+import { START_PIPELINE_ANYWAY_LABEL, START_PIPELINE_LABEL } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
   areValidationFailuresEqual,
@@ -53,6 +56,7 @@ import { TableCopySelection } from './TableCopySelection'
 import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -104,6 +108,8 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
+  const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
+  const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
@@ -201,7 +207,7 @@ export const DestinationForm = ({
             data.tableSyncCopyMode === 'skip_tables') &&
           data.tableSyncCopyTableIds.length === 0
         ) {
-          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table')
+          addRequiredFieldError('tableSyncCopyTableIds', 'Select at least one table.')
         }
 
         if (selectedType === 'BigQuery') {
@@ -286,10 +292,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Start pipeline anyway'
+        return START_PIPELINE_ANYWAY_LABEL
       }
 
-      return 'Start pipeline'
+      return START_PIPELINE_LABEL
     }
   }
 
@@ -334,7 +340,7 @@ export const DestinationForm = ({
       (data.tableSyncCopyMode === 'include_tables' || data.tableSyncCopyMode === 'skip_tables') &&
       data.tableSyncCopyTableIds.length === 0
     ) {
-      form.setError('tableSyncCopyTableIds', { message: 'Select at least one table' })
+      form.setError('tableSyncCopyTableIds', { message: 'Select at least one table.' })
       return
     }
 
@@ -451,6 +457,30 @@ export const DestinationForm = ({
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
 
+  const destinationFields = (
+    <>
+      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+        <BigQueryFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
+        <AnalyticsBucketFields
+          form={form}
+          editMode={editMode}
+          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+        />
+      )}
+      {selectedType === 'DuckLake' && etlEnableDucklake && (
+        <DuckLakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+        <SnowflakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+        <ClickHouseFields form={form} editMode={editMode} />
+      )}
+    </>
+  )
+
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
@@ -461,53 +491,52 @@ export const DestinationForm = ({
           <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <fieldset disabled={!isExistingConfigReady} className="contents">
-                <div className="p-5 flex flex-col gap-y-6">
-                  {isErrorExistingConfig && (
-                    <Admonition type="warning">
-                      <p className="leading-normal!">
-                        The existing destination or pipeline settings could not be loaded. Refresh
-                        before applying changes.
-                      </p>
-                    </Admonition>
-                  )}
-                  <p className="text-sm font-medium text-foreground">Destination details</p>
-
-                  <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} destinationType={selectedType} />
-                    <PublicationSelection
-                      form={form}
-                      onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                    />
-                    <TableCopySelection form={form} editMode={editMode} />
-                    <PipelineRegionField destinationType={selectedType} />
-                  </div>
-                </div>
-
-                <DialogSectionSeparator />
-
-                {selectedType === 'BigQuery' && etlEnableBigQuery && (
-                  <BigQueryFields form={form} editMode={editMode} />
+                {shouldShowConnectionSection && (
+                  <>
+                    <PipelineConnectionSection type={selectedType} form={form}>
+                      {destinationFields}
+                    </PipelineConnectionSection>
+                    <DialogSectionSeparator />
+                  </>
                 )}
-                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-                  <AnalyticsBucketFields
+                {shouldShowConnectionSection ? (
+                  <PipelineDataSection
+                    type={selectedType}
                     form={form}
-                    editMode={editMode}
-                    onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
                   />
-                )}
-                {selectedType === 'DuckLake' && etlEnableDucklake && (
-                  <DuckLakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'Snowflake' && etlEnableSnowflake && (
-                  <SnowflakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
-                  <ClickHouseFields form={form} editMode={editMode} />
-                )}
+                ) : (
+                  <>
+                    <div className="p-5 flex flex-col gap-y-6">
+                      {isErrorExistingConfig && (
+                        <Admonition type="warning">
+                          <p className="leading-normal!">
+                            The existing destination or pipeline settings could not be loaded.
+                            Refresh before applying changes.
+                          </p>
+                        </Admonition>
+                      )}
+                      <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                <DialogSectionSeparator />
+                      <div className="flex flex-col gap-y-4">
+                        <DestinationNameInput form={form} destinationType={selectedType} />
+                        <PublicationSelection
+                          form={form}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
+                        <TableCopySelection form={form} editMode={editMode} />
+                        <PipelineRegionField destinationType={selectedType} />
+                      </div>
+                    </div>
 
-                <AdvancedSettings type={selectedType} form={form} />
+                    <DialogSectionSeparator />
+                    {destinationFields}
+
+                    <DialogSectionSeparator />
+
+                    <AdvancedSettings type={selectedType} form={form} group="all" />
+                  </>
+                )}
 
                 {!editMode && hasRunValidation && !isValidating && (
                   <>

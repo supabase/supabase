@@ -2,6 +2,7 @@ import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -24,6 +25,10 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
+import {
+  getCreatePipelineHref,
+  isPipelineDestinationType,
+} from './CreatePipeline/CreatePipelineWizard.utils'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
@@ -32,6 +37,7 @@ import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -88,6 +94,8 @@ const compareStatusNames = (
 }
 
 export const Destinations = () => {
+  const router = useRouter()
+  const { isEnabled: isSteppedCreationEnabled } = usePipelineCreationPreview()
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
@@ -101,7 +109,7 @@ export const Destinations = () => {
   const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
-  const [, setDestinationType] = useQueryState(
+  const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
@@ -226,7 +234,11 @@ export const Destinations = () => {
       setShowEnablePipelinesDialog(true)
       return
     }
-    setDestinationType('BigQuery')
+    if (isSteppedCreationEnabled && projectRef) {
+      router.push(getCreatePipelineHref(projectRef, 'BigQuery'))
+    } else {
+      setDestinationType('BigQuery')
+    }
   }
 
   const handleEnableDialogOpenChange = (open: boolean) => {
@@ -238,12 +250,22 @@ export const Destinations = () => {
     const type = pendingCreationTypeRef.current
     pendingCreationTypeRef.current = null
     if (
-      type &&
+      isPipelineDestinationType(type) &&
       queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
     ) {
-      setDestinationType(type)
+      if (isSteppedCreationEnabled && projectRef) {
+        router.push(getCreatePipelineHref(projectRef, type))
+      } else {
+        setDestinationType(type)
+      }
     }
   }
+
+  useEffect(() => {
+    if (!isSteppedCreationEnabled || !projectRef || !isPipelineDestinationType(urlDestinationType))
+      return
+    router.replace(getCreatePipelineHref(projectRef, urlDestinationType))
+  }, [isSteppedCreationEnabled, projectRef, router, urlDestinationType])
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
