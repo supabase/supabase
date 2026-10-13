@@ -1,3 +1,4 @@
+import { parseAsString, useQueryState } from 'nuqs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -10,20 +11,45 @@ import {
 import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
 import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { TOTPFactors } from '@/components/interfaces/Account/TOTPFactors'
+import { getRecoveryCodesPreview } from '@/components/interfaces/Account/TOTPFactors/RecoveryCodesPreview.utils'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
 import { AppLayout } from '@/components/layouts/AppLayout/AppLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { evaluateAccountRecovery } from '@/lib/account-recovery/evaluate-account-recovery'
 import type { NextPageWithLayout } from '@/types'
 
 const Security: NextPageWithLayout = () => {
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
 
-  const recovery = useAccountRecovery({ enabled: showSecuritySettings })
+  const [mockRecoveryCodes] = useQueryState('mockRecoveryCodes', parseAsString)
+  const previewRemaining = getRecoveryCodesPreview({
+    value: mockRecoveryCodes,
+    environment: process.env.NODE_ENV,
+    hostname: typeof window === 'undefined' ? '' : window.location.hostname,
+  })
+  const recovery = useAccountRecovery({
+    enabled: showSecuritySettings && previewRemaining === undefined,
+  })
+  const findings =
+    previewRemaining === undefined
+      ? recovery.findings
+      : evaluateAccountRecovery({
+          identities: [{ provider: 'email' }],
+          email: 'preview@example.com',
+          verifiedFactorCount: 1,
+          recoveryCodes: { status: 'available', remaining: previewRemaining },
+          features: {
+            hasSecuritySettings: true,
+            recoveryCodesEnabled: true,
+            passwordEnabled: false,
+          },
+        })
   const primaryAction = getPrimarySecurityAction({
     ...recovery,
+    findings,
     canEnableMfa: recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0,
   })
 
@@ -44,8 +70,12 @@ const Security: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
-        <AccountIdentities findings={recovery.findings} primaryAction={primaryAction} />
-        <TOTPFactors findings={recovery.findings} primaryAction={primaryAction} />
+        <AccountIdentities findings={findings} primaryAction={primaryAction} />
+        <TOTPFactors
+          findings={findings}
+          primaryAction={previewRemaining === undefined ? primaryAction : 'regenerate-codes'}
+          previewRemaining={previewRemaining}
+        />
       </PageContainer>
     </>
   )

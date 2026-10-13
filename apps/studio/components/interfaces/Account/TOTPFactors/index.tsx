@@ -37,6 +37,11 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { AddNewFactorModal } from './AddNewFactorModal'
 import { DeleteFactorModal } from './DeleteFactorModal'
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
+import {
+  PreviewAuthenticatorDialog,
+  PreviewRecoveryCodesFlow,
+  PreviewRemoveRecoveryCodesModal,
+} from './PreviewRecoveryCodesFlow'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
@@ -47,37 +52,60 @@ import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-acc
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 type TOTPFactorsProps = {
+  previewRemaining?: 1 | 2
   findings: AccountRecoveryFinding[]
   primaryAction: AccountRecoveryFinding['action'] | 'enable-mfa' | undefined
 }
 
-export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
+export const TOTPFactors = ({ findings, primaryAction, previewRemaining }: TOTPFactorsProps) => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const userId = useUser()?.id
+  const isPreview = previewRemaining !== undefined
   const {
-    data,
-    isPending: isLoading,
-    isError,
-    isSuccess,
+    data: queriedData,
+    isPending: queryIsLoading,
+    isError: queryIsError,
+    isSuccess: queryIsSuccess,
     error,
-  } = useMfaListFactorsQuery({ userId })
-  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
+  } = useMfaListFactorsQuery({ userId: isPreview ? 'local-preview' : userId, enabled: !isPreview })
+  const data = isPreview
+    ? {
+        totp: [
+          {
+            id: 'preview-factor',
+            friendly_name: 'Preview authenticator',
+            status: 'verified',
+            created_at: '2026-10-01T00:00:00Z',
+          },
+        ],
+      }
+    : queriedData
+  const isLoading = !isPreview && queryIsLoading
+  const isError = !isPreview && queryIsError
+  const isSuccess = isPreview || queryIsSuccess
+  const isRecoveryCodesFlagEnabled = useFlag('enableAuthRecoveryCodes')
+  const enableAuthRecoveryCodes = isPreview || isRecoveryCodesFlagEnabled
 
   const totpFactors = (data?.totp ?? []).filter((factor) => factor.status === 'verified')
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
 
   const {
-    data: recoveryCodesStatus,
+    data: queriedCodesStatus,
     error: recoveryCodesError,
-    isError: recoveryCodesIsError,
-    isPending: recoveryCodesIsPending,
+    isError: queriedCodesIsError,
+    isPending: queriedCodesIsPending,
   } = useRecoveryCodesStatusQuery({
-    enabled: shouldVerifyRecoveryCodes,
-    userId,
+    enabled: shouldVerifyRecoveryCodes && !isPreview,
+    userId: isPreview ? 'local-preview' : userId,
   })
+  const recoveryCodesStatus = isPreview
+    ? { status: 'available' as const, data: { remaining: previewRemaining, total: 10 } }
+    : queriedCodesStatus
+  const recoveryCodesIsError = !isPreview && queriedCodesIsError
+  const recoveryCodesIsPending = !isPreview && queriedCodesIsPending
   const { data: codes, status } = recoveryCodesStatus ?? {}
   const factorFinding = findings.find((finding) => finding.id === 'single-mfa-factor')
   const codeFinding = findings.find(
@@ -85,6 +113,9 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
   )
   const isCodeActionPrimary =
     primaryAction === 'generate-codes' || primaryAction === 'regenerate-codes'
+
+  const RegenerateFlow = isPreview ? PreviewRecoveryCodesFlow : RegenerateRecoveryCodesModal
+  const RemoveCodesFlow = isPreview ? PreviewRemoveRecoveryCodesModal : UnenrollRecoveryCodesModal
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
@@ -186,7 +217,7 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                       size="tiny"
                       icon={<Trash size={14} />}
                       aria-label={`Remove ${factor.friendly_name ?? 'unnamed'} authenticator`}
-                      tooltip={{ content: { text: 'Remove authenticator' } }}
+                      tooltip={{ content: { side: 'top', text: 'Remove authenticator' } }}
                       onClick={() => setFactorToBeDeleted(factor.id)}
                       disabled={disableDeleteFactor}
                     />
@@ -251,9 +282,9 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                 ) : null
               }
             </GenerateRecoveryCodesModal>
-            <UnenrollRecoveryCodesModal>
+            <RemoveCodesFlow>
               {({ onClick: onRemove }) => (
-                <RegenerateRecoveryCodesModal>
+                <RegenerateFlow>
                   {({ onClick, isPending }) => {
                     if (
                       !shouldVerifyRecoveryCodes ||
@@ -283,7 +314,7 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                             />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-44">
-                            <DropdownMenuItem onSelect={onRemove}>Remove recovery codes</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={onRemove}>Remove codes</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -323,31 +354,48 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                       </Card>
                     )
                   }}
-                </RegenerateRecoveryCodesModal>
+                </RegenerateFlow>
               )}
-            </UnenrollRecoveryCodesModal>
+            </RemoveCodesFlow>
           </PageSectionContent>
         </PageSection>
       )}
 
-      <AddNewFactorModal
-        visible={isAddNewFactorOpen || (securityAction === 'add-factor' && canAddApp)}
-        onClose={() => {
-          setIsAddNewFactorOpen(false)
-          if (securityAction === 'add-factor') void setSecurityAction(null)
-        }}
-      />
+      {isPreview && (
+        <>
+          <PreviewAuthenticatorDialog
+            visible={isAddNewFactorOpen}
+            onClose={() => setIsAddNewFactorOpen(false)}
+          />
+          <PreviewAuthenticatorDialog
+            visible={factorToBeDeleted !== null}
+            isRemoval
+            onClose={() => setFactorToBeDeleted(null)}
+          />
+        </>
+      )}
+      {!isPreview && (
+        <AddNewFactorModal
+          visible={isAddNewFactorOpen || (securityAction === 'add-factor' && canAddApp)}
+          onClose={() => {
+            setIsAddNewFactorOpen(false)
+            if (securityAction === 'add-factor') void setSecurityAction(null)
+          }}
+        />
+      )}
 
-      <DeleteFactorModal
-        visible={factorToBeDeleted !== null}
-        factorId={factorToBeDeleted}
-        lastFactorToBeDeleted={totpFactors.length === 1}
-        onClose={() => setFactorToBeDeleted(null)}
-        hasRecoveryCodes={status === 'available'}
-        canUseRecoveryCodes={
-          enableAuthRecoveryCodes && status === 'available' && !!codes && codes.remaining > 0
-        }
-      />
+      {!isPreview && (
+        <DeleteFactorModal
+          visible={factorToBeDeleted !== null}
+          factorId={factorToBeDeleted}
+          lastFactorToBeDeleted={totpFactors.length === 1}
+          onClose={() => setFactorToBeDeleted(null)}
+          hasRecoveryCodes={status === 'available'}
+          canUseRecoveryCodes={
+            enableAuthRecoveryCodes && status === 'available' && !!codes && codes.remaining > 0
+          }
+        />
+      )}
     </>
   )
 }

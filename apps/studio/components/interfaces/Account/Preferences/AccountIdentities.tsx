@@ -1,10 +1,10 @@
 import type { Provider } from '@supabase/auth-js'
 import { useFlag, useUser } from 'common'
 import dayjs from 'dayjs'
-import { Edit, Unlink } from 'lucide-react'
+import { Edit, Mail, Unlink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -147,6 +147,125 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
     if (message) toast.success(message)
   }, [message])
 
+  const renderMethods = (passwordRow?: ReactNode) => (
+    <Card>
+      {isLoading && (
+        <CardContent>
+          <ShimmeringLoader />
+        </CardContent>
+      )}
+      {isSuccess && (
+        <div className="divide-y">
+          {passwordRow}
+          {identities.map((identity) => {
+            const { identity_id, provider } = identity
+            const username = identity.identity_data?.user_name
+            const providerDisplay = getProviderDisplay(provider)
+            const providerName = providerDisplay.displayName
+            const configuredProvider = getConfiguredExternalProvider(provider)
+            const canUpdateEmail = !configuredProvider
+
+            return (
+              <CardContent
+                key={identity_id}
+                className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex gap-x-4">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
+                  >
+                    {provider === 'email' ? (
+                      <Mail size={18} strokeWidth={2.5} />
+                    ) : (
+                      <IdentityProviderIcon display={providerDisplay} size={30} />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-sm capitalize">{providerName}</p>
+                      {provider === 'email' && data.new_email && !isChangeExpired && (
+                        <Tooltip>
+                          <TooltipTrigger className="flex items-center">
+                            <Badge variant="default">Pending change</Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>Changing to {data.new_email}</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <p className="text-sm text-foreground-lighter">
+                      {!!username ? <span>{username} · </span> : null}
+                      {identity.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-x-1">
+                  {provider === 'email' && (
+                    <Button variant="default" asChild>
+                      <Link href="/reset-password?type=change">Change password</Link>
+                    </Button>
+                  )}
+                  {canUpdateEmail && (
+                    <ButtonTooltip
+                      variant="default"
+                      size="tiny"
+                      icon={<Edit size={14} />}
+                      aria-label="Update email address"
+                      onClick={() => setSelectedProviderUpdateEmail(provider)}
+                      tooltip={{ content: { side: 'top', text: 'Update email address' } }}
+                    />
+                  )}
+                  {identities.length > 1 && (
+                    <ButtonTooltip
+                      variant="text"
+                      icon={<Unlink />}
+                      className="w-7"
+                      onClick={() => setSelectedProviderUnlink(provider)}
+                      tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            )
+          })}
+
+          {unlinkedExternalProviders.map((provider) => {
+            const providerDisplay = getProviderDisplay(provider.authProvider)
+
+            return (
+              <CardContent
+                key={provider.id}
+                className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex gap-x-4">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
+                  >
+                    <IdentityProviderIcon display={providerDisplay} size={30} />
+                  </div>
+                  <div>
+                    <p className="text-sm">{provider.displayName}</p>
+                    <p className="text-sm text-foreground-lighter">
+                      Link your {provider.displayName} account to sign in with{' '}
+                      {provider.displayName}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="default"
+                  loading={linkingProviderId === provider.id}
+                  disabled={!!linkingProviderId}
+                  onClick={() => onLinkExternalProvider(provider)}
+                >
+                  Connect
+                </Button>
+              </CardContent>
+            )
+          })}
+        </div>
+      )}
+    </Card>
+  )
+
   return (
     <PageSection id="sign-in-methods" className="scroll-mt-6">
       <PageSectionMeta>
@@ -162,23 +281,26 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
         {!!data?.email && (
           <AddPasswordRow email={data.email} isPrimary={primaryAction === 'set-password'}>
             {({ onOpen, row }) => {
-              if (!isSuccess || !showAddPasswordRow) return null
-              if (!hasPasswordFinding) return <Card>{row}</Card>
+              if (!isSuccess || !showAddPasswordRow) return renderMethods()
+              if (!hasPasswordFinding) return renderMethods(row)
               return (
-                <Admonition
-                  type="warning"
-                  layout="responsive"
-                  title="Add a password for email sign-in"
-                  description={`Use ${data.email} and a password as another way to sign in if you lose access to ${getProviderDisplay(identities[0]?.provider ?? '').displayName}.`}
-                  actions={
-                    <Button
-                      variant={primaryAction === 'set-password' ? 'primary' : 'default'}
-                      onClick={onOpen}
-                    >
-                      Add password
-                    </Button>
-                  }
-                />
+                <>
+                  <Admonition
+                    type="warning"
+                    layout="responsive"
+                    title="Add a password for email sign-in"
+                    description={`Use ${data.email} and a password as another way to sign in if you lose access to ${getProviderDisplay(identities[0]?.provider ?? '').displayName}.`}
+                    actions={
+                      <Button
+                        variant={primaryAction === 'set-password' ? 'primary' : 'default'}
+                        onClick={onOpen}
+                      >
+                        Add password
+                      </Button>
+                    }
+                  />
+                  {renderMethods()}
+                </>
               )
             }}
           </AddPasswordRow>
@@ -188,116 +310,7 @@ export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdent
             Your organization manages how you sign in.
           </p>
         )}
-        <Card>
-          {isLoading && (
-            <CardContent>
-              <ShimmeringLoader />
-            </CardContent>
-          )}
-          {isSuccess && (
-            <div className="divide-y">
-              {identities.map((identity) => {
-                const { identity_id, provider } = identity
-                const username = identity.identity_data?.user_name
-                const providerDisplay = getProviderDisplay(provider)
-                const providerName = providerDisplay.displayName
-                const configuredProvider = getConfiguredExternalProvider(provider)
-                const canUpdateEmail = !configuredProvider
-
-                return (
-                  <CardContent
-                    key={identity_id}
-                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="flex gap-x-4">
-                      <div
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
-                      >
-                        <IdentityProviderIcon display={providerDisplay} size={30} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-x-2">
-                          <p className="text-sm capitalize">{providerName}</p>
-                          {provider === 'email' && data.new_email && !isChangeExpired && (
-                            <Tooltip>
-                              <TooltipTrigger className="flex items-center">
-                                <Badge variant="default">Pending change</Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>Changing to {data.new_email}</TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                        <p className="text-sm text-foreground-lighter">
-                          {!!username ? <span>{username} · </span> : null}
-                          {identity.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-x-1">
-                      {provider === 'email' && (
-                        <Button variant="default" asChild>
-                          <Link href="/reset-password?type=change">Change password</Link>
-                        </Button>
-                      )}
-                      {canUpdateEmail && (
-                        <ButtonTooltip
-                          variant="text"
-                          icon={<Edit />}
-                          className="w-7"
-                          onClick={() => setSelectedProviderUpdateEmail(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
-                        />
-                      )}
-                      {identities.length > 1 && (
-                        <ButtonTooltip
-                          variant="text"
-                          icon={<Unlink />}
-                          className="w-7"
-                          onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
-                        />
-                      )}
-                    </div>
-                  </CardContent>
-                )
-              })}
-
-              {unlinkedExternalProviders.map((provider) => {
-                const providerDisplay = getProviderDisplay(provider.authProvider)
-
-                return (
-                  <CardContent
-                    key={provider.id}
-                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="flex gap-x-4">
-                      <div
-                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
-                      >
-                        <IdentityProviderIcon display={providerDisplay} size={30} />
-                      </div>
-                      <div>
-                        <p className="text-sm">{provider.displayName}</p>
-                        <p className="text-sm text-foreground-lighter">
-                          Link your {provider.displayName} account to sign in with{' '}
-                          {provider.displayName}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="default"
-                      loading={linkingProviderId === provider.id}
-                      disabled={!!linkingProviderId}
-                      onClick={() => onLinkExternalProvider(provider)}
-                    >
-                      Connect
-                    </Button>
-                  </CardContent>
-                )
-              })}
-            </div>
-          )}
-        </Card>
+        {!data?.email && renderMethods()}
 
         <Dialog
           open={!!selectedProviderUpdateEmail}

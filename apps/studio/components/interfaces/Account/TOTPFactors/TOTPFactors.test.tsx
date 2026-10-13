@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -108,7 +108,7 @@ describe('account security MFA and recovery sections', () => {
     expect(await screen.findByText('Recovery codes used up')).toBeInTheDocument()
     expect(screen.queryByText('Remove')).not.toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Recovery code options' }))
-    expect(await screen.findByRole('menuitem', { name: 'Remove' })).toBeInTheDocument()
+    expect(await screen.findByRole('menuitem', { name: 'Remove codes' })).toBeInTheDocument()
   })
 
   it('shows available codes without inventing a backup recommendation', async () => {
@@ -141,6 +141,32 @@ describe('account security MFA and recovery sections', () => {
       'true'
     )
   })
+
+  it.each([1, 2] as const)(
+    'renders local preview count %s with interactive sample regeneration and no account reads',
+    async (remaining) => {
+      customRender(
+        <TOTPFactors
+          previewRemaining={remaining}
+          findings={[{ id: 'recovery-codes-low', severity: 'warning', action: 'regenerate-codes' }]}
+          primaryAction="regenerate-codes"
+        />
+      )
+      expect(screen.getByText(`${remaining} of 10 recovery codes available`)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Regenerate' })).toBeEnabled()
+      await userEvent.click(screen.getByRole('button', { name: 'Regenerate' }))
+      expect(await screen.findByText('Regenerate my recovery codes')).toBeInTheDocument()
+      await userEvent.type(screen.getByPlaceholderText('REGENERATE'), 'REGENERATE')
+      const confirm = within(screen.getByRole('dialog')).getByRole('button', { name: 'Regenerate' })
+      await waitFor(() => expect(confirm).toBeEnabled())
+      const form = confirm.closest('form')
+      if (!form) throw new Error('Missing confirmation form')
+      fireEvent.submit(form)
+      expect(await screen.findByText('Save your recovery codes')).toBeInTheDocument()
+      expect(mock.listFactors).not.toHaveBeenCalled()
+      expect(mock.getStatus).not.toHaveBeenCalled()
+    }
+  )
 
   it('opens the authenticator action destination and consumes it when closed', async () => {
     renderSection(undefined, '?securityAction=add-factor')

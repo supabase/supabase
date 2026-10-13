@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Mail } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -23,7 +23,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import PasswordConditionsHelper from '@/components/interfaces/SignIn/PasswordConditionsHelper'
-import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useSetPasswordMutation } from '@/data/profile/profile-set-password-mutation'
 import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { passwordValidation } from '@/lib/password-validation'
@@ -65,7 +64,7 @@ export const AddPasswordRow = ({
     <CardContent className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex gap-x-4">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
-          <IdentityProviderIcon display={providerDisplay} size={30} />
+          <Mail size={18} strokeWidth={2.5} />
         </div>
         <div>
           <p className="text-sm">{providerDisplay.displayName}</p>
