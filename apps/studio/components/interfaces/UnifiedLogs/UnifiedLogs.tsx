@@ -33,7 +33,7 @@ import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
@@ -68,6 +68,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
@@ -226,12 +227,7 @@ export const UnifiedLogs = () => {
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
-  // [Joshen] Refer to unified-logs-infinite-query on why the need to deupe
-  const flatData = useMemo(() => {
-    return rawFlatData.filter((value, idx) => {
-      return idx === rawFlatData.findIndex((x) => x.id === value.id)
-    })
-  }, [rawFlatData])
+  const flatData = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -253,11 +249,11 @@ export const UnifiedLogs = () => {
   }, [search.filter])
 
   const getRowClassName = <
-    TData extends { date: Date; level: (typeof LEVELS)[number] | null; timestamp: number },
+    TData extends { date: Date; level: (typeof LEVELS)[number] | null; timestamp: number | string },
   >(
     row: Row<TData>
   ) => {
-    const rowTimestamp = row.original.timestamp
+    const rowTimestamp = Number(row.original.timestamp)
     const isPast = rowTimestamp <= (liveMode.timestamp || -1)
     const levelClassName = getLevelRowClassName(row.original.level)
     return cn(levelClassName, isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
@@ -381,7 +377,8 @@ export const UnifiedLogs = () => {
       setOpenRowId(undefined)
     } else if (openRowId && selectedRow) {
       setSearch({ id: openRowId })
-      track('unified_logs_row_clicked', { logType: selectedRow.original.log_type })
+      const logType = LOG_TYPES.find((type) => type === selectedRow.original.log_type)
+      if (logType) track('unified_logs_row_clicked', { logType })
     } else if (!openRowId && search.id) {
       // Clear the URL parameter when no row is open
       setSearch({ id: null })
