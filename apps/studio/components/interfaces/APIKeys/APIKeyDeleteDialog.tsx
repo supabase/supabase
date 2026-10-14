@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Trash2 } from 'lucide-react'
+import { Trash2Icon } from 'lucide-react'
 
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
@@ -34,7 +34,7 @@ export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialo
         },
       }}
     >
-      <Trash2 size={14} /> Delete API key
+      <Trash2Icon size={14} /> Delete API key
     </DropdownMenuItemTooltip>
   )
 }

@@ -1,4 +1,4 @@
-import { Check, Copy, X } from 'lucide-react'
+import { CheckIcon, CopyIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -42,7 +42,7 @@ export const AuditLogDetailsPanel = ({ selectedLog, onClose }: AuditLogDetailsPa
             <Button
               variant="text"
               className="px-1"
-              icon={<X />}
+              icon={<XIcon />}
               onClick={onClose}
               aria-label="Close"
             />
@@ -61,7 +61,7 @@ export const AuditLogDetailsPanel = ({ selectedLog, onClose }: AuditLogDetailsPa
                 <Button
                   size="tiny"
                   className="px-1.5"
-                  icon={copied ? <Check size={12} /> : <Copy size={12} />}
+                  icon={copied ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
                   onClick={() => {
                     copyToClipboard(json, () => {
                       setCopied(true)

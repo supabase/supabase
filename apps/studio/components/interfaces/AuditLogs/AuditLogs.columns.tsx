@@ -1,6 +1,6 @@
 import type { CellContext, ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { Box, Boxes } from 'lucide-react'
+import { BoxesIcon, BoxIcon } from 'lucide-react'
 import type { RefObject } from 'react'
 import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -142,9 +142,9 @@ export function getAuditLogColumns({
             <Tooltip>
               <TooltipTrigger className="flex items-center">
                 {log.project_ref ? (
-                  <Box size={12} className="text-foreground-light" />
+                  <BoxIcon size={12} className="text-foreground-light" />
                 ) : (
-                  <Boxes size={12} className="text-foreground-light" />
+                  <BoxesIcon size={12} className="text-foreground-light" />
                 )}
               </TooltipTrigger>
               <TooltipContent side="bottom">

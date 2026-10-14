@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { LoaderCircle, Search } from 'lucide-react'
+import { LoaderCircleIcon, SearchIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
@@ -163,9 +163,9 @@ export const LogsFilterBar = () => {
       isLoading={isFetching}
       icon={
         isFetching ? (
-          <LoaderCircle className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
+          <LoaderCircleIcon className="h-4 w-4 animate-spin text-foreground-muted opacity-50" />
         ) : (
-          <Search className="text-foreground-muted w-4 h-4 sticky" />
+          <SearchIcon className="text-foreground-muted w-4 h-4 sticky" />
         )
       }
     />
