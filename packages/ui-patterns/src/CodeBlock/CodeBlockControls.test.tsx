@@ -45,16 +45,19 @@ describe('CodeBlockControls', () => {
     expect(screen.queryByText('Code copied')).toBeNull()
   })
 
-  it('toggles wrapping on the enclosing frame and announces each change', () => {
+  it('sets the wrap flag on a direct child of the frame and announces each change', () => {
     const { container } = renderControls()
     const frame = container.querySelector('.shiki')
+    // code-block.css matches the frame with :has(> [data-wrapped='true'])
+    const wrapFlag = () => frame?.querySelector(":scope > [data-wrapped='true']")
 
     fireEvent.click(screen.getByRole('button', { name: 'Enable word wrap' }))
-    expect(frame).toHaveAttribute('data-wrapped', 'true')
+    expect(wrapFlag()).not.toBeNull()
+    expect(frame).not.toHaveAttribute('data-wrapped')
     expect(screen.getByText('Word wrap enabled')).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: 'Disable word wrap' }))
-    expect(frame).not.toHaveAttribute('data-wrapped')
+    expect(wrapFlag()).toBeNull()
     expect(screen.getByText('Word wrap disabled')).toBeInTheDocument()
   })
 })

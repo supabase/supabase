@@ -1,8 +1,7 @@
 import { type ReactNode } from 'react'
-// deep import: kb renders this inside astro's config, where the `ui` barrel can't load
 import { cn } from 'ui/src/lib/utils/cn'
 
-import { getCodeBlockLabel } from './CodeBlock.utils'
+import { getCodeBlockLabel } from './CodeBlock.tokens'
 import { AnnotatedSpan, type CodeAnnotation } from './CodeBlockAnnotation'
 
 export type CodeToken = [

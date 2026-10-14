@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 function CrossfadeIcon({
@@ -98,26 +98,17 @@ export function CodeBlockControls({ content }: { content: string }) {
   const [isWrapped, setIsWrapped] = useState(false)
   // Empty until the first toggle, so nothing is announced on mount
   const [wrapStatus, setWrapStatus] = useState('')
-  const wrapperRef = useRef<HTMLDivElement>(null)
 
-  const toggleWrap = useCallback(() => {
+  const handleWrapToggle = () => {
     const newValue = !isWrapped
     setIsWrapped(newValue)
     setWrapStatus(newValue ? 'Word wrap enabled' : 'Word wrap disabled')
-
-    const codeBlock = wrapperRef.current?.closest('.shiki')
-    if (codeBlock) {
-      if (newValue) {
-        codeBlock.setAttribute('data-wrapped', 'true')
-      } else {
-        codeBlock.removeAttribute('data-wrapped')
-      }
-    }
-  }, [isWrapped])
+  }
 
   return (
+    // code-block.css finds the frame from this flag, so the controls do not change the frame
     <div
-      ref={wrapperRef}
+      data-wrapped={isWrapped ? 'true' : undefined}
       className={cn(
         'opacity-0 flex group-hover:opacity-100 group-focus-within:opacity-100 absolute top-[9.5px] right-[9.5px] gap-1',
         '[--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]'
@@ -131,7 +122,7 @@ export function CodeBlockControls({ content }: { content: string }) {
           <Button
             variant="outline"
             tabIndex={0}
-            onClick={toggleWrap}
+            onClick={handleWrapToggle}
             className={cn(
               'group/btn size-6 p-1 cursor-pointer bg-200 hover:border-strong',
               'hover:bg-[var(--btn-active)]'

@@ -1,6 +1,6 @@
 @import 'config/tailwind.config.css';
 @import 'config/inline-code.css';
-@import '../../../packages/ui-patterns/src/CodeBlock/code-block.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
 @import './code-block.css';
 @import './reference.css';
 @import './loading-beam.css';

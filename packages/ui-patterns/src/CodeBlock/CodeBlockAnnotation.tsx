@@ -1,11 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useState, type MouseEvent } from 'react'
-// deep imports: kb renders the frame inside astro's config, where the `ui` barrel can't load
+import { useRef, useState, type MouseEvent, type PointerEvent } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui/src/components/shadcn/ui/tooltip'
 import { cn } from 'ui/src/lib/utils/cn'
 
-// structural copy of twoslash's hover fields, so renderers don't depend on twoslash
+// this type copies the twoslash hover fields, so the renderers do not depend on twoslash
 export interface CodeAnnotation {
   text: string
   docs?: string
@@ -21,40 +20,33 @@ interface AnnotatedSpanProps {
 export const AnnotatedSpan = ({ content, className, annotations }: AnnotatedSpanProps) => {
   const [open, setOpen] = useState(false)
 
-  const [isTouchDevice, setIsTouchDevice] = useState(false)
-  useEffect(() => {
-    const touchDevice = !window.matchMedia('(pointer: fine)').matches
-    setIsTouchDevice(touchDevice)
-  }, [])
+  // a tap gives no hover. null means the last press was not a touch
+  const touchTapWasOpen = useRef<boolean | null>(null)
 
-  const handleClick = useCallback(
-    (evt: MouseEvent) => {
-      if (isTouchDevice) {
-        evt.preventDefault()
-        evt.stopPropagation()
-        setOpen((open) => !open)
-      }
-    },
-    [isTouchDevice]
-  )
-  const onOpenChange = useCallback(
-    (open: boolean) => {
-      if (!isTouchDevice || !open) {
-        setOpen(open)
-      }
-    },
-    [isTouchDevice]
-  )
+  const handlePointerDown = (evt: PointerEvent) => {
+    touchTapWasOpen.current = evt.pointerType === 'touch' ? open : null
+  }
+
+  const handleClick = (evt: MouseEvent) => {
+    const wasOpen = touchTapWasOpen.current
+    touchTapWasOpen.current = null
+    if (wasOpen === null) return
+    // radix closes the tooltip on pointerdown and on click. preventDefault stops the close on click
+    evt.preventDefault()
+    evt.stopPropagation()
+    setOpen(!wasOpen)
+  }
 
   return (
-    <Tooltip open={open} onOpenChange={onOpenChange}>
-      <TooltipTrigger asChild onClick={handleClick}>
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger asChild onPointerDown={handlePointerDown} onClick={handleClick}>
         <button
           tabIndex={0}
           className={cn(
             className,
-            isTouchDevice &&
-              'underline underline-offset-4 decoration-dashed decoration-[rgba(from_currentColor_r_g_b/0.5)]'
+            'any-pointer-coarse:underline any-pointer-coarse:underline-offset-4',
+            'any-pointer-coarse:decoration-dashed',
+            'any-pointer-coarse:decoration-[rgba(from_currentColor_r_g_b/0.5)]'
           )}
         >
           {content}
