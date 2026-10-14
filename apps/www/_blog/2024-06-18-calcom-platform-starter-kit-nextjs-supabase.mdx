@@ -80,7 +80,7 @@ model Account {
 
 [Supabase Storage](/storage) is an S3 compatible cloud-based object store that allows you to store files securely. It is conveniently integrated with [Supabase Auth](https://supabase.com/auth) allowing you to easily limit access for uploads and downloads.
 
-Cal.com's Platforms Starter Kit runs their authentication on Next.js' [Auth.js](https://authjs.dev/). Luckily though, [Supabase Storage](/docs/guides/storage) is supa flexible, allowing you to easily create signed upload URLs server-side to then upload assets from the client-side -- no matter which tech you choose to use for handling authentication for your app.
+Cal.com's Platforms Starter Kit runs their authentication on Next.js' [Auth.js](https://authjs.dev/). Luckily though, [Supabase Storage](/storage) is supa flexible, allowing you to easily create signed upload URLs server-side to then upload assets from the client-side -- no matter which tech you choose to use for handling authentication for your app.
 
 To facilitate this, we can create an API route in Next.js to generate these signed URLs:
 
