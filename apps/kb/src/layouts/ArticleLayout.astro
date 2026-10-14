@@ -2,7 +2,7 @@
 import { ExternalLink, Github } from 'lucide-react'
 import { Badge } from 'ui'
 
-import { CodeBlockEnhancements } from '../components/CodeBlockEnhancements'
+import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
 import Layout from './Layout.astro'
 import { getTopicDescription, type Topic, TOPIC_NAMES, topicToSlug } from '../lib/topics'
 
@@ -49,7 +49,7 @@ function isKnownTopic(topic: string): topic is Topic {
 			)
 		}
 		<slot />
-		<CodeBlockEnhancements client:only="react" />
+		<CodeBlockControlsIsland client:only="react" />
 		{
 			github_url && (
 				<p>

@@ -56,7 +56,7 @@
   --code-highlight-color: #1c1c1c;
 }
 
-/* Token classes emitted by CodeBlock.utils.ts */
+/* Token classes emitted by CodeBlock.tokens.ts */
 .shiki .s-f {
   color: var(--code-foreground);
 }
@@ -101,11 +101,11 @@
 }
 
 /* Word wrap styles for code blocks */
-.shiki[data-wrapped='true'] .code-scroll {
+.shiki:has(> [data-wrapped='true']) .code-scroll {
   overflow-x: hidden !important;
 }
 
-.shiki[data-wrapped='true'] .code-content {
+.shiki:has(> [data-wrapped='true']) .code-content {
   white-space: pre-wrap !important;
   overflow-wrap: anywhere !important;
 }

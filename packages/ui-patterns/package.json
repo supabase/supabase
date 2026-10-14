@@ -90,6 +90,10 @@
       "import": "./src/CodeBlock/CodeBlock.theme.ts",
       "types": "./src/CodeBlock/CodeBlock.theme.ts"
     },
+    "./CodeBlock/CodeBlock.tokens": {
+      "import": "./src/CodeBlock/CodeBlock.tokens.ts",
+      "types": "./src/CodeBlock/CodeBlock.tokens.ts"
+    },
     "./CodeBlock/CodeBlock": {
       "import": "./src/CodeBlock/CodeBlock.tsx",
       "types": "./src/CodeBlock/CodeBlock.tsx"
@@ -111,6 +115,7 @@
       "types": "./src/CodeBlock/CodeBlockFrame.tsx"
     },
     "./CodeBlock/code-block.css": {
+      "style": "./src/CodeBlock/code-block.css",
       "import": "./src/CodeBlock/code-block.css",
       "types": "./src/CodeBlock/code-block.css"
     },
@@ -587,6 +592,7 @@
       "types": "./src/PromoToast/index.ts"
     },
     "./PromoToast/styles.css": {
+      "style": "./src/PromoToast/styles.css",
       "import": "./src/PromoToast/styles.css",
       "types": "./src/PromoToast/styles.css"
     },
@@ -607,6 +613,7 @@
       "types": "./src/SelectionListState/index.ts"
     },
     "./ShimmeringLoader/index.css": {
+      "style": "./src/ShimmeringLoader/index.css",
       "import": "./src/ShimmeringLoader/index.css",
       "types": "./src/ShimmeringLoader/index.css"
     },
@@ -773,6 +780,11 @@
     "./multi-select/multi-select": {
       "import": "./src/multi-select/multi-select.tsx",
       "types": "./src/multi-select/multi-select.tsx"
+    },
+    "./styles.css": {
+      "style": "./src/styles.css",
+      "import": "./src/styles.css",
+      "types": "./src/styles.css"
     },
     "./types/assets.d": {
       "import": "./src/types/assets.d.ts",

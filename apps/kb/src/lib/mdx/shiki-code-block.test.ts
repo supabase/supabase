@@ -15,13 +15,13 @@ const SOURCE = `const html = "<b>it's" + '&amp;'\n\n// "done"`
 const MARKDOWN = `Intro\n\n\`\`\`js\n${SOURCE}\n\`\`\`\n\n\`\`\`\nplain <text>\n\`\`\`\n`
 const SHIKI_CONFIG = { theme: codeBlockTheme, transformers: [sharedCodeBlock] }
 
-// .md renders through sätteri, .mdx through the unified pipeline
+// sätteri renders .md files and the unified pipeline renders .mdx files
 const PROCESSORS = {
   satteri: () => createSatteriMarkdownProcessor({ shikiConfig: SHIKI_CONFIG }),
   unified: () => createMarkdownProcessor({ shikiConfig: SHIKI_CONFIG }),
 }
 
-// queried as hast because sätteri's native binding can't run under jsdom
+// the test queries hast because the sätteri native binding does not run under jsdom
 const findAll = (node: HastNode, test: (element: HastElement) => boolean) => {
   const found: Array<HastElement> = []
   visit(node, 'element', (element: HastElement) => {
