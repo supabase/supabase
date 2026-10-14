@@ -67,3 +67,11 @@ export const matchesMfaFilter = (
   if (member.invited_id) return false
   return filter === 'enabled' ? member.mfa_enabled : !member.mfa_enabled
 }
+
+export const matchesOrgRole = (
+  member: Pick<OrganizationMember, 'role_ids'>,
+  role: number | undefined
+) => {
+  if (role == null) return true
+  return member.role_ids.includes(role)
+}

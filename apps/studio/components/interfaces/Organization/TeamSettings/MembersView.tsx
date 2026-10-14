@@ -8,7 +8,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'
 import { MEMBERS_GRID_CLASS, type MfaFilter } from './MembersList.constants'
-import { getMemberRowHeight, matchesMfaFilter } from './TeamSettings.utils'
+import { getMemberRowHeight, matchesMfaFilter, matchesOrgRole } from './TeamSettings.utils'
 import { TeamSettingsDataProvider } from './TeamSettingsDataContext'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 import { AlertError } from '@/components/ui/AlertError'
@@ -37,9 +37,10 @@ const getMemberKey = (member: OrganizationMember) =>
 export interface MembersViewProps {
   searchString: string
   mfaFilter: MfaFilter
+  roleId: number | undefined
 }
 
-export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
+export const MembersView = ({ searchString, mfaFilter, roleId }: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
 
@@ -88,8 +89,10 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
           return false
         })
 
-    return searchedMembers.filter((member) => matchesMfaFilter(member, mfaFilter))
-  }, [members, searchString, mfaFilter])
+    return searchedMembers.filter(
+      (member) => matchesMfaFilter(member, mfaFilter) && matchesOrgRole(member, roleId)
+    )
+  }, [members, searchString, mfaFilter, roleId])
 
   const handleManageAccess = useCallback((member: OrganizationMember) => {
     setMemberForRoleUpdate(member)
@@ -131,7 +134,7 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
     [listedMembers]
   )
 
-  const isFiltering = searchString.length > 0 || mfaFilter !== 'all'
+  const isFiltering = searchString.length > 0 || mfaFilter !== 'all' || roleId != null
   const hasLimitedVisibility = isSuccessRoles && isSuccessMembers && !isOrgScopedRole
 
   return (

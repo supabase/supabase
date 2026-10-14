@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getMemberRowHeight, matchesMfaFilter } from './TeamSettings.utils'
+import { getMemberRowHeight, matchesMfaFilter, matchesOrgRole } from './TeamSettings.utils'
 
 describe('getMemberRowHeight', () => {
   it('uses the minimum height for members with one role', () => {
@@ -43,5 +43,23 @@ describe('matchesMfaFilter', () => {
   it('leaves pending invites out of the "enabled" and "disabled" filters', () => {
     expect(matchesMfaFilter(invite, 'enabled')).toBe(false)
     expect(matchesMfaFilter(invite, 'disabled')).toBe(false)
+  })
+})
+
+describe('matchesOrgRole', () => {
+  const noRole = { role_ids: [] }
+  const singleRole = { role_ids: [2] }
+  const multipleRoles = { role_ids: [1, 2, 3] }
+
+  it('keeps everyone when role is not defined', () => {
+    expect(matchesOrgRole(noRole, undefined)).toBe(true)
+    expect(matchesOrgRole(singleRole, undefined)).toBe(true)
+    expect(matchesOrgRole(multipleRoles, undefined)).toBe(true)
+  })
+
+  it('keeps only members who have the provided role', () => {
+    expect(matchesOrgRole(noRole, 2)).toBe(false)
+    expect(matchesOrgRole(singleRole, 2)).toBe(true)
+    expect(matchesOrgRole(multipleRoles, 2)).toBe(true)
   })
 })

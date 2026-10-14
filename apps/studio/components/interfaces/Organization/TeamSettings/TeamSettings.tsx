@@ -1,9 +1,27 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Search } from 'lucide-react'
+import { Check, Search } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import {
+  cn,
+  ComboboxTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -33,6 +51,8 @@ import { DOCS_URL } from '@/lib/constants'
 export const TeamSettings = () => {
   const { slug } = useParams()
   const [searchString, setSearchString] = useState('')
+  const [roleId, setRoleId] = useState<number | undefined>(undefined)
+  const [isRolesComboboxOpen, setIsRolesComboboxOpen] = useState(false)
   const [mfaFilter, setMfaFilter] = useQueryState(
     'mfa',
     parseAsStringEnum<MfaFilter>(MFA_FILTER_OPTIONS.map((option) => option.value)).withDefault(
@@ -49,6 +69,7 @@ export const TeamSettings = () => {
 
   const { data: roles } = useOrganizationRolesV2Query({ slug })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
+  const organizationRoles = roles?.org_scoped_roles ?? []
 
   const { data } = useOrgProjectsInfiniteQuery({ slug })
   const totalCount = data?.pages[0].pagination.count ?? 0
@@ -101,6 +122,52 @@ export const TeamSettings = () => {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+                <Popover open={isRolesComboboxOpen} onOpenChange={setIsRolesComboboxOpen}>
+                  <PopoverTrigger asChild>
+                    <ComboboxTrigger
+                      aria-expanded={isRolesComboboxOpen}
+                      data-state={isRolesComboboxOpen ? 'open' : 'closed'}
+                      className={cn(
+                        'w-[200px] bg-transparent!',
+                        !roleId && 'text-foreground-lighter'
+                      )}
+                      size="tiny"
+                    >
+                      {roleId
+                        ? organizationRoles.find((role) => role.id === roleId)?.name
+                        : 'Select a role...'}
+                    </ComboboxTrigger>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search a role..." />
+                      <CommandList>
+                        <CommandEmpty>No organization role found.</CommandEmpty>
+                        <CommandGroup>
+                          {organizationRoles.map((role) => (
+                            <CommandItem
+                              key={role.id}
+                              value={role.id.toString()}
+                              onSelect={(currentValue) => {
+                                const newRoleId = parseInt(currentValue)
+                                setRoleId(newRoleId === roleId ? undefined : newRoleId)
+                                setIsRolesComboboxOpen(false)
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  'mr-2 h-4 w-4',
+                                  roleId === role.id ? 'opacity-100' : 'opacity-0'
+                                )}
+                              />
+                              {role.name}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
               <ScaffoldActionsGroup className="w-full md:w-auto">
                 <DocsButton href={`${DOCS_URL}/guides/platform/access-control`} />
@@ -120,6 +187,7 @@ export const TeamSettings = () => {
               <MembersView
                 searchString={searchString.length === 0 ? searchString : debouncedSearch}
                 mfaFilter={mfaFilter}
+                roleId={roleId}
               />
             </ScaffoldSectionContent>
           </ScaffoldFilterAndContent>
