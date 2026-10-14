@@ -1,6 +1,5 @@
 import { components } from 'api-types'
 import dayjs from 'dayjs'
-import { motion } from 'framer-motion'
 import {
   CircleArrowDown,
   CircleArrowUp,
@@ -12,6 +11,7 @@ import {
   Timer,
   Trash2,
 } from 'lucide-react'
+import { motion } from 'motion/react'
 import {
   Badge,
   Button,

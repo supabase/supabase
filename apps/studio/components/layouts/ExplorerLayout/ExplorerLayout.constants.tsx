@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
 import { MessageSquare, NotebookText } from 'lucide-react'
+import { motion } from 'motion/react'
 import { type ComponentType, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'

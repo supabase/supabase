@@ -40,7 +40,7 @@ export function OrgSelector() {
   const isPlatformOrg = selectedOrganization?.plan?.id === 'platform'
   const selectedOrgInitial = selectedOrganization?.name?.trim().charAt(0).toUpperCase() || 'O'
   const { data: projects } = useOrgProjectsInfiniteQuery(
-    { slug, limit: 1 },
+    { slug },
     { enabled: Boolean(slug) && !isPlatformOrg }
   )
 

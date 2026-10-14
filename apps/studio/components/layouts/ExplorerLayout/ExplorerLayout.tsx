@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
   cn,

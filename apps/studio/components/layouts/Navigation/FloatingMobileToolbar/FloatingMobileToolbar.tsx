@@ -1,6 +1,6 @@
 import { useParams, useViewport } from 'common'
-import { AnimatePresence } from 'framer-motion'
 import { Menu, Search, X } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useRef } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 

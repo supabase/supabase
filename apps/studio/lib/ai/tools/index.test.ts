@@ -7,12 +7,18 @@ import { getSchemaTools } from './schema-tools'
 vi.mock('common', () => ({ IS_PLATFORM: true }))
 
 vi.mock('./mcp-tools', () => ({ getMcpTools: vi.fn() }))
-vi.mock('./studio-tools', () => ({ getStudioTools: vi.fn(() => ({ studio_tool: {} })) }))
+vi.mock('./studio-tools', () => ({
+  getStudioTools: vi.fn(() => ({ studio_tool: {} })),
+  getOptInTools: vi.fn(() => ({ opt_in_tool: {} })),
+}))
 vi.mock('./schema-tools', () => ({ getSchemaTools: vi.fn(() => ({ schema_tool: {} })) }))
 vi.mock('./incident-tools', () => ({ getIncidentTools: vi.fn(() => ({ incident_tool: {} })) }))
 vi.mock('./fallback-tools', () => ({ getFallbackTools: vi.fn(() => ({ fallback_tool: {} })) }))
 // Identity filter so assertions can check the raw merged tool set
-vi.mock('../tool-filter', () => ({ filterToolsByOptInLevel: vi.fn((tools) => tools) }))
+vi.mock('../tool-filter', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../tool-filter')>()),
+  filterToolsByOptInLevel: vi.fn((tools) => tools),
+}))
 
 const BASE_PARAMS = {
   projectRef: 'abcdefghijklmnopqrst',
@@ -43,6 +49,7 @@ describe('ai/tools getTools', () => {
       signal: BASE_PARAMS.signal,
     })
     expect(tools).toHaveProperty('studio_tool')
+    expect(tools).toHaveProperty('opt_in_tool')
     expect(tools).toHaveProperty('list_tables')
     expect(tools).toHaveProperty('schema_tool')
     expect(tools).toHaveProperty('incident_tool')
@@ -90,6 +97,7 @@ describe('ai/tools getTools', () => {
 
     expect(getMcpTools).not.toHaveBeenCalled()
     expect(tools).toHaveProperty('studio_tool')
+    expect(tools).not.toHaveProperty('opt_in_tool')
     expect(tools).toHaveProperty('fallback_tool')
     expect(tools).not.toHaveProperty('list_tables')
   })

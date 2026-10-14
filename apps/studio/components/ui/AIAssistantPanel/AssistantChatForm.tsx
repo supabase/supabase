@@ -1,6 +1,6 @@
 import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowUp, Loader2, Square } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
 import { Button, cn, ExpandingTextArea } from 'ui'
 
@@ -56,7 +56,7 @@ export interface FormProps {
   submitLabel?: string
   /**
    * An additional action shown beside the main submit button, transitioned in/out with
-   * framer-motion. Pass undefined to hide it (e.g. when the input doesn't match its condition).
+   * Motion. Pass undefined to hide it (e.g. when the input doesn't match its condition).
    */
   secondaryAction?: {
     label: string

@@ -1,6 +1,6 @@
 import { useParams } from 'common/hooks'
-import { HTMLMotionProps, motion } from 'framer-motion'
 import { X } from 'lucide-react'
+import { HTMLMotionProps, motion } from 'motion/react'
 import { ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
