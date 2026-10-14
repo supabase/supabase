@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Container, Package } from 'lucide-react'
+import { ContainerIcon, PackageIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -107,7 +107,7 @@ export const ComputeInstanceDetail = () => {
         <PageHeaderMeta className="px-0 xl:px-0">
           <PageHeaderIcon>
             <Card className="flex h-14 w-14 shrink-0 items-center justify-center">
-              <Container className="h-5 w-5" />
+              <ContainerIcon className="h-5 w-5" />
             </Card>
           </PageHeaderIcon>
           <PageHeaderSummary>
@@ -117,7 +117,7 @@ export const ComputeInstanceDetail = () => {
               <RuntimeBadge runtime={instance.runtime} />
               {instance.imageVersion !== undefined && (
                 <span className="flex items-center gap-2 text-foreground-light">
-                  <Package size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <PackageIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Version {instance.imageVersion}
                 </span>
               )}

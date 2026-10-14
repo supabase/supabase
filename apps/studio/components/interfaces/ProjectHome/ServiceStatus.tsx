@@ -1,6 +1,12 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertTriangle, CheckCircle2, ChevronRight, Loader2, MinusCircle } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  ChevronRightIcon,
+  Loader2Icon,
+  MinusCircleIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
@@ -14,7 +20,7 @@ import {
   useProjectServiceStatusQuery,
   type ServiceHealthResponse,
 } from '@/data/service-status/service-status-query'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsRealtimeUnavailable } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -28,10 +34,10 @@ const iconProps = {
   size: 18,
   strokeWidth: 1.5,
 }
-const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
-const AlertIcon = () => <AlertTriangle {...iconProps} />
-const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-primary" />
-const DisabledIcon = () => <MinusCircle {...iconProps} className="text-foreground-lighter" />
+const LoaderIcon = () => <Loader2Icon {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangleIcon {...iconProps} />
+const CheckIcon = () => <CheckCircle2Icon {...iconProps} className="text-primary" />
+const DisabledIcon = () => <MinusCircleIcon {...iconProps} className="text-foreground-lighter" />
 
 export const StatusIcon = ({
   isLoading,
@@ -104,7 +110,7 @@ const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { isHighAvailability } = useHighAvailability()
+  const { isRealtimeUnavailable } = useIsRealtimeUnavailable()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
@@ -140,7 +146,7 @@ export const ServiceStatus = () => {
       refetchInterval: (query) => {
         const data = query.state.data
         const isServiceUnhealthy = data?.some((service) => {
-          if (isHighAvailability && service.name === 'realtime') {
+          if (isRealtimeUnavailable && service.name === 'realtime') {
             return false
           }
           // if the postgrest service has an empty schema, postgrest has been disabled
@@ -220,7 +226,7 @@ export const ServiceStatus = () => {
             error: realtimeStatus?.error,
             docsUrl: undefined,
             isLoading,
-            status: resolveRealtimeServiceStatus(isHighAvailability, realtimeStatus?.status),
+            status: resolveRealtimeServiceStatus(isRealtimeUnavailable, realtimeStatus?.status),
             logsUrl: isUnifiedLogsEnabled
               ? '/logs?filter=log_type:eq:realtime'
               : '/logs/realtime-logs',
@@ -319,7 +325,7 @@ export const ServiceStatus = () => {
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
             isProjectComingUp ? (
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2Icon className="animate-spin" size={18} />
             ) : (
               <div className="grid grid-cols-3 gap-1">
                 {services.map((service, index) => (
@@ -388,7 +394,7 @@ export const ServiceStatus = () => {
               {serviceInfo}
               <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
                 <span className="text-xs text-foreground">View logs</span>
-                <ChevronRight size={14} className="text-foreground" />
+                <ChevronRightIcon size={14} className="text-foreground" />
               </div>
             </Link>
           )

@@ -1,8 +1,7 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { z, type SafeParseReturnType } from 'zod'
 
-import { notebookOperationsSchema } from '@/data/content/notebooks/notebook-operations'
-import { agentNotebookSchema, notebookSchema } from '@/data/content/notebooks/notebook-schema'
+import { agentNotebookSchema } from '@/data/content/notebooks/notebook-schema'
 
 // Splits markdown into alternating [plain, code, plain, code, ...] segments.
 // Odd-indexed segments are already inside code spans/fences and should be left alone.
@@ -135,12 +134,6 @@ export const createNotebookInputSchema = z.object({
   content: agentNotebookSchema,
 })
 
-export const updateNotebookInputSchema = z.object({
-  id: z.string(),
-  expected_updated_at: z.string(),
-  operations: notebookOperationsSchema,
-})
-
 export const deleteNotebookInputSchema = z.object({
   id: z.string(),
 })
@@ -151,10 +144,6 @@ export const runNotebookInputSchema = z.object({
 })
 
 export const notebookToolOutputSchema = z.object({ id: z.string(), name: z.string() })
-
-export const updateNotebookToolOutputSchema = notebookToolOutputSchema.extend({
-  previous_content: notebookSchema.optional(),
-})
 
 export const rateMessageResponseSchema = z.object({
   category: z.enum([

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { template } from 'lodash'
-import { Download, Loader2 } from 'lucide-react'
+import { DownloadIcon, Loader2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -153,7 +153,7 @@ export const SSLConfiguration = () => {
             >
               <div className="flex items-center justify-end mt-2.5 space-x-2">
                 {(isLoading || isSubmitting) && (
-                  <Loader2
+                  <Loader2Icon
                     aria-hidden="true"
                     className="animate-spin motion-reduce:animate-none"
                     strokeWidth={1.5}
@@ -222,7 +222,7 @@ export const SSLConfiguration = () => {
                 {!hasSSLCertificate ? (
                   <ButtonTooltip
                     disabled
-                    icon={<Download />}
+                    icon={<DownloadIcon />}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -233,7 +233,7 @@ export const SSLConfiguration = () => {
                     Download certificate
                   </ButtonTooltip>
                 ) : (
-                  <Button icon={<Download />}>
+                  <Button icon={<DownloadIcon />}>
                     <a href={sslCertificateUrl}>Download certificate</a>
                   </Button>
                 )}

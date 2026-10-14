@@ -1,5 +1,5 @@
-import { motion, type Variants } from 'framer-motion'
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
+import { motion, type Variants } from 'motion/react'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 
@@ -72,7 +72,7 @@ export const EnterpriseCard = ({ plan, isCurrentPlan, variants }: EnterpriseCard
               key={typeof feature === 'string' ? feature : feature[0]}
               className="flex items-center py-2 first:mt-0"
             >
-              <Check className="text-primary h-4 w-4" aria-hidden="true" strokeWidth={3} />
+              <CheckIcon className="text-primary h-4 w-4" aria-hidden="true" strokeWidth={3} />
               <span className="text-foreground mb-0 ml-3 ">
                 {typeof feature === 'string' ? feature : feature[0]}
               </span>

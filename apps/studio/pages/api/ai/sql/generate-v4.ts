@@ -27,7 +27,7 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
-import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getBasePathURL } from '@/lib/helpers'

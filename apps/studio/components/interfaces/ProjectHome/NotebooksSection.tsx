@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { NotebookText, Plus } from 'lucide-react'
+import { NotebookTextIcon, PlusIcon } from 'lucide-react'
 import { AiIconAnimation, Badge, Button } from 'ui'
 import { Row } from 'ui-patterns/Row'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -44,7 +44,7 @@ export const NotebooksSection = () => {
       {!isPending && (
         <div className="flex justify-between items-center mb-6">
           <h2>Notebooks</h2>
-          <Button icon={<Plus />} onClick={() => createNotebook()}>
+          <Button icon={<PlusIcon />} onClick={() => createNotebook()}>
             New notebook
           </Button>
         </div>
@@ -94,7 +94,7 @@ function NotebookCard({
   return (
     <HomeCard
       href={`/project/${projectRef}/explorer/notebook/${notebook.id}`}
-      icon={<NotebookText size={16} strokeWidth={1.5} className="text-foreground-light" />}
+      icon={<NotebookTextIcon size={16} strokeWidth={1.5} className="text-foreground-light" />}
       label="NOTEBOOK"
       title={notebook.name}
       description={notebook.description?.trim()}
@@ -132,7 +132,7 @@ function EmptyState({ onCreateNotebook }: { onCreateNotebook: () => void }) {
       <p className="text-sm text-foreground-light mb-4">
         Save queries and notes together to revisit and share
       </p>
-      <Button iconRight={<Plus size={14} />} onClick={onCreateNotebook}>
+      <Button iconRight={<PlusIcon size={14} />} onClick={onCreateNotebook}>
         Create your first notebook
       </Button>
     </div>

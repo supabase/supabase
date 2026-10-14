@@ -128,11 +128,6 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Collapsible Alert',
-          href: '/docs/fragments/collapsible-alert',
-          items: [],
-        },
-        {
           title: 'Collapsible Card Section',
           href: '/docs/fragments/collapsible-card-section',
           items: [],

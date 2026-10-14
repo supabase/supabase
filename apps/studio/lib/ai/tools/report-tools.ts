@@ -1,18 +1,15 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import type { ToolContext } from './types'
 import { getContentById } from '@/data/content/content-id-query'
 import { getContent } from '@/data/content/content-query'
 import type { Dashboards, SqlSnippets } from '@/types'
 
-export type ReportToolsContext = {
-  projectRef?: string
-  authorization?: string
-}
-
-export const getReportTools = (ctx: ReportToolsContext = {}) => {
+export const getReportTools = (ctx: ToolContext = {}) => {
   const { projectRef, authorization } = ctx
-  const authHeaders = authorization ? { Authorization: authorization } : undefined
+  const authHeaders = getAuthHeaders(authorization)
 
   return {
     list_reports: tool({

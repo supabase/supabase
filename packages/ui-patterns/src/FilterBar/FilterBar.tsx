@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
+import { motion } from 'motion/react'
 import React, { forwardRef } from 'react'
 import { cn } from 'ui'
 

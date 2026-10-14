@@ -3,7 +3,7 @@ import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Clock, Download, FileArchive, Send } from 'lucide-react'
+import { ClockIcon, DownloadIcon, FileArchiveIcon, SendIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
@@ -286,7 +286,7 @@ const EdgeFunctionDetailsLayout = ({
                       open={isDownloadOpen ? false : undefined}
                     >
                       <PopoverTrigger asChild>
-                        <Button icon={<Download />}>Download</Button>
+                        <Button icon={<DownloadIcon />}>Download</Button>
                       </PopoverTrigger>
                     </ShortcutTooltip>
                     <PopoverContent align="end" className="p-0">
@@ -310,7 +310,7 @@ const EdgeFunctionDetailsLayout = ({
                         <Button
                           variant="text"
                           className="w-min hover:bg-transparent"
-                          icon={<FileArchive />}
+                          icon={<FileArchiveIcon />}
                           onClick={downloadFunction}
                         >
                           Download as ZIP
@@ -323,7 +323,7 @@ const EdgeFunctionDetailsLayout = ({
                       shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
                       side="bottom"
                     >
-                      <Button icon={<Send />} onClick={openTestSheet}>
+                      <Button icon={<SendIcon />} onClick={openTestSheet}>
                         Test
                       </Button>
                     </ShortcutTooltip>
@@ -373,7 +373,11 @@ const EdgeFunctionDetailsLayout = ({
                   >
                     <HoverCardTrigger asChild>
                       <button type="button" tabIndex={0} className="flex items-center gap-2 group">
-                        <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                        <ClockIcon
+                          size={16}
+                          strokeWidth={1.5}
+                          className="text-foreground-lighter"
+                        />
                         <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
                           {updatedRelative ?? 'Deploy status unavailable'}
                         </span>

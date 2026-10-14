@@ -1,4 +1,4 @@
-import { Ruler } from 'lucide-react'
+import { RulerIcon } from 'lucide-react'
 import { isValidElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
@@ -76,7 +76,7 @@ describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
     expect(info, 'expected pitr_archiving_stale in lintInfoMap').toBeDefined()
 
     expect(info!.title).toBe('PITR archiving may be broken')
-    expect(isValidElement(info!.icon) && info!.icon.type).toBe(Ruler)
+    expect(isValidElement(info!.icon) && info!.icon.type).toBe(RulerIcon)
     expect(info!.category).toBe('security')
     expect(info!.linkText).toBe('View settings')
     // metadata is unused by this entry's link(), and every field on Lint['metadata'] is optional, so {} needs no cast

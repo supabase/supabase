@@ -36,6 +36,7 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabaseflutter: 'flutter pub add supabase_flutter',
   supabaseswift: 'swift package add-dependency https://github.com/supabase/supabase-swift',
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
+  supabasedotnet: 'dotnet add package Supabase',
 }
 
 /**
@@ -75,6 +76,22 @@ const frameworkConfigureStep: StepDefinition = {
   title: 'Add files',
   description: 'Copy the following code into your project.',
   content: '{{framework}}/{{frameworkVariant}}/{{library}}',
+}
+
+const dotnetUnityInstallStep: StepDefinition = {
+  id: 'install',
+  title: 'Install package',
+  description: 'Add the Supabase SDK to your Unity project.',
+  content: 'dotnet/unity/install',
+}
+
+// ASP.NET Core also needs the dependency injection extension package, so it
+// gets its own install step instead of the shared single-package one.
+const dotnetAspnetInstallStep: StepDefinition = {
+  id: 'install',
+  title: 'Install packages',
+  description: 'Run these commands to install the required dependencies.',
+  content: 'dotnet/aspnetcore/install',
 }
 
 const frameworkNextJsFilesStep: StepDefinition = {
@@ -319,7 +336,7 @@ export const connectSchema: ConnectSchema = {
       label: 'Variant',
       options: { source: 'frameworkVariants' },
       defaultValue: 'app',
-      dependsOn: { framework: ['nextjs', 'react'] }, // Only show for frameworks with multiple variants
+      dependsOn: { framework: ['nextjs', 'react', 'dotnet'] }, // Only show for frameworks with multiple variants
     },
     library: {
       id: 'library',
@@ -460,6 +477,13 @@ export const connectSchema: ConnectSchema = {
             },
           },
           remix: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
+          dotnet: {
+            frameworkVariant: {
+              aspnetcore: [dotnetAspnetInstallStep, frameworkConfigureStep, skillsInstallStep],
+              unity: [dotnetUnityInstallStep, frameworkConfigureStep, skillsInstallStep],
+              DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
+            },
+          },
           DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
         },
       },
