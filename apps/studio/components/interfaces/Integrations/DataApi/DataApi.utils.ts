@@ -43,6 +43,10 @@ function withDataApiPath(url: string | undefined): string {
 export type EnrichedEntity = { id: string; displayName: string; camelCase: string }
 export type EntityMap = Record<string, EnrichedEntity>
 
+function getEntityName(id: string) {
+  return id.includes('.') ? id.split('.').slice(1).join('.') : id
+}
+
 /**
  * Partitions JSON schema paths into resource and RPC entity maps.
  */
@@ -59,10 +63,11 @@ export function buildEntityMaps(paths: ProjectJsonSchemaPaths | undefined): {
 
       const isRpc = trimmedName.startsWith(RPC_PREFIX)
       const id = isRpc ? trimmedName.slice(RPC_PREFIX.length) : trimmedName
+      const entityName = getEntityName(id)
       const enriched: EnrichedEntity = {
         id,
         displayName: id.replace(/_/g, ' '),
-        camelCase: snakeToCamel(id),
+        camelCase: snakeToCamel(entityName),
       }
 
       if (isRpc) {
