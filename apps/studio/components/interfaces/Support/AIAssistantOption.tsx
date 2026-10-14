@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { AiIconAnimation, Button } from 'ui'

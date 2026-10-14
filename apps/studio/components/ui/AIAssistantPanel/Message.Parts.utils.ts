@@ -122,6 +122,7 @@ const BLOCK_TOOLS = new Set([
   'update_notebook',
   'delete_notebook',
   'run_notebook',
+  'update_opt_in_level',
 ])
 
 /** Lookups get a compact row. Studio's own tools need a label; any MCP tool gets a generic one. */

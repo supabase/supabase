@@ -1,5 +1,5 @@
-import { motion, type Variants } from 'framer-motion'
 import { Check } from 'lucide-react'
+import { motion, type Variants } from 'motion/react'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 

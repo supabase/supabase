@@ -310,8 +310,21 @@ const SourcePanel = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement> &
       }
     }
 
+    const hasSource = Boolean(
+      doc.source?.radix ||
+      doc.source?.shadcn ||
+      doc.source?.vaul ||
+      doc.source?.inputOtp ||
+      doc.source?.reactAccessibleTreeview ||
+      doc.source?.recharts
+    )
+
+    if (!hasSource) {
+      return null
+    }
+
     return (
-      <div className="flex flex-col -space-y-px">
+      <div className="mb-6 flex flex-col -space-y-px">
         <RadixPanel />
         <ShadcnPanel />
         <VaulPanel />

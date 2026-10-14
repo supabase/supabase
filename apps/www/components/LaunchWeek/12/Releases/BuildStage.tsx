@@ -1,6 +1,6 @@
 import { buildDays as days } from '~/components/LaunchWeek/12/Releases/data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView } from 'motion/react'
 import React, { FC } from 'react'
 import { cn } from 'ui'
 

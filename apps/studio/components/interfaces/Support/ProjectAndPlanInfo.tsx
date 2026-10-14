@@ -1,8 +1,8 @@
 // End of third-party imports
 
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'

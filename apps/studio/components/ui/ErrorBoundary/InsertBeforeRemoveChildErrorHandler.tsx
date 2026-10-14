@@ -79,7 +79,7 @@ export const InsertBeforeRemoveChildErrorHandler = ({
           category: SupportCategories.DASHBOARD_BUG,
           subject: `Client error: Failed to execute '${isRemoveChildError ? 'removeChild' : 'insertBefore'}' on 'Node'`,
           sid: sentryIssueId,
-          error: urlMessage,
+          errorMessage: urlMessage,
         }}
       >
         Still stuck?

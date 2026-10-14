@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatCurrency } from '@/lib/helpers'
