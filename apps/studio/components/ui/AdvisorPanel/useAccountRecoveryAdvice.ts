@@ -47,7 +47,9 @@ const previewInputs: Record<Preview, AccountRecoveryInput> = {
 }
 
 const getPreview = (): Preview | undefined => {
-  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined') return undefined
+  const isPreviewEnabled =
+    process.env.NODE_ENV === 'development' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+  if (!isPreviewEnabled || typeof window === 'undefined') return undefined
   const value = new URLSearchParams(window.location.search).get('mockAccountAdvisor')
   return previewValues.find((preview) => preview === value)
 }

@@ -4,11 +4,11 @@ Local branch: `dnywh/account-recovery-advisors`.
 
 ## Previewing the mock
 
-Run Studio in development and append `?mockAccountAdvisor=exhausted` to any dashboard URL. If the URL already has query parameters, append `&mockAccountAdvisor=exhausted` instead. The supported values are `exhausted`, `missing`, `low`, `single-identity`, and `single-factor`.
+Open Studio in development or a Vercel preview deployment and append `?mockAccountAdvisor=exhausted` to any dashboard URL. If the URL already has query parameters, append `&mockAccountAdvisor=exhausted` instead. The supported values are `exhausted`, `missing`, `low`, `single-identity`, and `single-factor`.
 
 Open Advisor Center and select **Regenerate account recovery codes**. The example represents one verified authenticator and no unused recovery codes. It appears under Security with Account scope and links to the recovery codes section of Account Security.
 
-The mock disables live account reads for the advice and evaluates the selected case through the shared recovery evaluator. It does not change the account or generate recovery codes. It is disabled outside development.
+The mock disables live account reads for the advice and evaluates the selected case through the shared recovery evaluator. It does not change the account or generate recovery codes. It is disabled in production deployments.
 
 Remove the query parameter and reload to restore real account evaluation. The preview switch lives in `useAccountRecoveryAdvice.ts`.
 
