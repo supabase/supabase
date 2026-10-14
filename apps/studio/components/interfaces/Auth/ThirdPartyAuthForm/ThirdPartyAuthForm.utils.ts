@@ -71,7 +71,7 @@ export const getIntegrationTypeIcon = (type: INTEGRATION_TYPES) => {
       return `${BASE_PATH}/img/icons/workos-icon.svg`
     case 'custom':
     default:
-      return `${BASE_PATH}/img/icons/user-round-key-icon.svg`
+      return `${BASE_PATH}/img/icons/badge-check-icon.svg`
   }
 }
 

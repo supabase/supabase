@@ -34,10 +34,7 @@ const FormSchema = z.object({
     .string()
     .trim()
     .min(1, 'Issuer URL is required')
-    .refine(
-      isValidOidcIssuerUrl,
-      'Enter an HTTPS URL without a query string or fragment, for example https://login.example.com'
-    ),
+    .refine(isValidOidcIssuerUrl, 'Enter an HTTPS URL without a query string or fragment'),
 })
 type FormValues = z.infer<typeof FormSchema>
 
@@ -81,19 +78,21 @@ export const CreateCustomOidcIntegrationDialog = ({
           <Form {...form}>
             <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <p className="text-sm text-foreground-light">
-                Allows JWTs from any OpenID Connect (OIDC) provider to access data from this
-                Supabase project. Supabase discovers the signing keys from the issuer's OIDC
-                discovery document at{' '}
-                <code className="text-code-inline">/.well-known/openid-configuration</code>. Tokens
-                must be signed with an asymmetric key and include a{' '}
-                <code className="text-code-inline">kid</code> header. Key changes can take up to 30
-                minutes to be picked up.
+                Accept JWTs from any OpenID Connect (OIDC) provider.
               </p>
               <FormField
                 control={form.control}
                 name="issuerUrl"
                 render={({ field }) => (
-                  <FormItemLayout label="Issuer URL">
+                  <FormItemLayout
+                    label="Issuer URL"
+                    description={
+                      <>
+                        Signing keys are found at the issuer's{' '}
+                        <code className="text-code-inline">/.well-known/openid-configuration</code>
+                      </>
+                    }
+                  >
                     <FormControl>
                       <Input {...field} placeholder="https://login.example.com" />
                     </FormControl>
