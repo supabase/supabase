@@ -737,6 +737,11 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
+    "./article.css": {
+      "style": "./src/article.css",
+      "import": "./src/article.css",
+      "types": "./src/article.css"
+    },
     "./consent": {
       "import": "./src/consent.tsx",
       "types": "./src/consent.tsx"

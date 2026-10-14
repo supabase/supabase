@@ -1,2 +1,3 @@
 /* apps import this file once. add each component stylesheet here */
+@import './article.css';
 @import './CodeBlock/code-block.css';
