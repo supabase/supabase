@@ -1,6 +1,14 @@
 'use client'
 
-import { Fragment, useRef, type ComponentProps, type HTMLAttributes, type ReactNode } from 'react'
+import { ChevronRight } from 'lucide-react'
+import {
+  Fragment,
+  useRef,
+  type ComponentProps,
+  type HTMLAttributes,
+  type MouseEvent,
+  type ReactNode,
+} from 'react'
 import { cn, removeAnchor, ScrollArea, ScrollViewport } from 'ui'
 
 import type { TOCItemType } from './server/get-toc'
@@ -8,13 +16,7 @@ import * as Primitive from './toc-primitive'
 import { TocThumb } from './toc-thumb'
 
 export interface TOCProps {
-  /**
-   * Custom content in TOC container, before the main TOC
-   */
   header?: ReactNode
-  /**
-   * Custom content in TOC container, after the main TOC
-   */
   footer?: ReactNode
   children: ReactNode
 }
@@ -57,6 +59,98 @@ export function TOCScrollArea({
     </ScrollArea>
   )
 }
+
+export function TocDisclosure({ items, className }: { items: TOCItemType[]; className?: string }) {
+  if (items.length === 0) return null
+
+  // close once a heading is picked so the list doesn't stay open behind the jump
+  const handleLinkClick = (event: MouseEvent<HTMLDetailsElement>) => {
+    if (event.target instanceof Element && event.target.closest('a')) {
+      event.currentTarget.open = false
+    }
+  }
+
+  return (
+    <details
+      onClick={handleLinkClick}
+      className={cn(
+        'group not-prose overflow-hidden rounded-lg border border-default bg-surface-100',
+        'has-[summary:focus-visible]:outline-2 has-[summary:focus-visible]:-outline-offset-2 has-[summary:focus-visible]:outline-ring',
+        className
+      )}
+    >
+      <summary
+        className={cn(
+          'flex min-h-8 cursor-pointer select-none items-center gap-2 px-3 py-1.5 font-mono text-xs uppercase text-foreground-light',
+          'transition-[background-color,color] duration-150 ease-out hover:bg-surface-200 hover:text-foreground',
+          'focus-visible:outline-none [&::-webkit-details-marker]:hidden'
+        )}
+      >
+        On this page
+        <ChevronRight
+          aria-hidden
+          strokeWidth={2}
+          className="ms-auto size-3 shrink-0 text-foreground-muted transition-transform duration-200 ease-out group-open:rotate-90 motion-reduce:transition-none"
+        />
+      </summary>
+      <ul
+        className={cn(
+          'm-0 list-none border-t border-default px-3 py-2 text-sm leading-6',
+          // links carry the spacing as padding so the gaps between them stay clickable, a parent's bottom gap moves to its first child
+          '[&>li>a:has(+ul)]:pb-0'
+        )}
+      >
+        {toTocTree(items).map(({ item, children }) => (
+          <li key={item.url}>
+            <TocDisclosureLink item={item} />
+            {children.length > 0 ? (
+              <ul
+                className={cn(
+                  'relative m-0 list-none p-0 pl-5 [&>li]:relative [&>li:last-child>a]:pb-2',
+                  // border-muted flattened onto the box so the spine and elbow can meet without a darker overlap
+                  '[--toc-line:color-mix(in_oklab,oklch(from_var(--border-muted)_l_c_h/1)_8%,var(--background-surface-100))]',
+                  "[&>li]:before:absolute [&>li]:before:-left-4.5 [&>li]:before:top-0 [&>li]:before:h-4 [&>li]:before:w-3.5 [&>li]:before:rounded-bl-md [&>li]:before:border-b [&>li]:before:border-l [&>li]:before:border-(--toc-line) [&>li]:before:content-['']",
+                  "[&>li:not(:last-child)]:after:absolute [&>li:not(:last-child)]:after:-left-4.5 [&>li:not(:last-child)]:after:top-2.5 [&>li:not(:last-child)]:after:bottom-0 [&>li:not(:last-child)]:after:w-px [&>li:not(:last-child)]:after:bg-(--toc-line) [&>li:not(:last-child)]:after:content-['']"
+                )}
+              >
+                {children.map((child) => (
+                  <li key={child.url}>
+                    <TocDisclosureLink item={child} />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </details>
+  )
+}
+
+function TocDisclosureLink({ item }: { item: TOCItemType }) {
+  return (
+    <a
+      href={`#${formatSlug(item.url)}`}
+      className="block rounded-sm py-1 text-foreground-lighter hover:text-foreground focus-ring"
+    >
+      <TOCTitle title={item.title} />
+    </a>
+  )
+}
+
+interface TocTreeNode {
+  item: TOCItemType
+  children: TOCItemType[]
+}
+
+// level 3 headings hang off the level 2 heading before them, a leading level 3 stays top level
+const toTocTree = (items: TOCItemType[]) =>
+  items.reduce<TocTreeNode[]>((tree, item) => {
+    const parent = tree.at(-1)
+    if (item.depth === 3 && parent) parent.children.push(item)
+    else tree.push({ item, children: [] })
+    return tree
+  }, [])
 
 export function TOCItems({
   items,
@@ -137,11 +231,15 @@ function TOCItem({ item }: { item: TOCItemType }) {
         item.depth >= 4 && 'ps-8'
       )}
     >
-      {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
-        <Fragment key={index}>
-          {x.type === 'code' ? <code className="text-code-inline">{x.value}</code> : x.value}
-        </Fragment>
-      ))}
+      <TOCTitle title={item.title} />
     </Primitive.TOCItem>
   )
+}
+
+function TOCTitle({ title }: { title: TOCItemType['title'] }) {
+  return formatTOCHeader(removeAnchor(title)).map((x, index) => (
+    <Fragment key={index}>
+      {x.type === 'code' ? <code className="text-code-inline">{x.value}</code> : x.value}
+    </Fragment>
+  ))
 }
