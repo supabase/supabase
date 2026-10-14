@@ -11,7 +11,6 @@ import {
   CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
   FormControl,
@@ -24,7 +23,8 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { ROLE_PERMISSIONS } from './Roles.constants'
+import { ROLE_PERMISSIONS, SYSTEM_ROLES } from './Roles.constants'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useDatabaseRoleUpdateMutation } from '@/data/database-roles/database-role-update-mutation'
 import type { PgRole } from '@/data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -47,6 +47,7 @@ const formSchema = z.object(
 )
 
 export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const isSystemRole = SYSTEM_ROLES.some((name) => name === role.name)
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
@@ -171,8 +172,15 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               <TooltipContent side="bottom">More options</TooltipContent>
             </Tooltip>
             <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
-              <DropdownMenuItem
+              <DropdownMenuItemTooltip
                 className="space-x-2"
+                disabled={isSystemRole}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: `The ${role.name} role is a system role and cannot be deleted`,
+                  },
+                }}
                 onClick={(event) => {
                   event.stopPropagation()
                   onSelectDelete(role.id.toString())
@@ -180,7 +188,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               >
                 <TrashIcon className="text-red-800" size="14" strokeWidth={2} />
                 <p>Delete</p>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
