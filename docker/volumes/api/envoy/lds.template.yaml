@@ -260,6 +260,29 @@ resources:
                                       - any: true
 
                       - match:
+                          path: /.well-known/oauth-protected-resource/mcp
+                        route:
+                          cluster: functions
+                          timeout: 30s
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': >-
+                              type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': >-
+                              type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  allow_all:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - any: true
+
+                      - match:
                           prefix: /auth/v1/sso/saml/acs
                         route:
                           cluster: auth
