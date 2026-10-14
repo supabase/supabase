@@ -7,6 +7,7 @@ import type { ToolContext } from './types'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 import {
   EDGE_FUNCTION_PROMPT,
   LOGS_PROMPT,
@@ -15,7 +16,7 @@ import {
   RLS_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
-import { isOptInLevelAtLeast, updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import { updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
