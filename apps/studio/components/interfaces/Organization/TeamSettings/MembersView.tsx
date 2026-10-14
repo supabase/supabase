@@ -209,7 +209,7 @@ export const MembersView = ({ searchString, mfaFilter, roleId }: MembersViewProp
                 <p className="text-foreground-lighter text-sm">
                   {searchString.length > 0
                     ? `No members matched the search query "${searchString}"`
-                    : 'No members match the selected MFA filter'}
+                    : 'No members match the selected filters'}
                 </p>
               </div>
             )}
