@@ -1,5 +1,6 @@
 'use client'
 
+import { parseProjectRef } from '~/lib/compute-project-ref'
 import { CircleAlert } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -22,6 +23,7 @@ interface FormData {
   lastName: string
   email: string
   company: string
+  projectRef: string
   useCase: string
   details: string
 }
@@ -31,6 +33,7 @@ const defaultFormValue: FormData = {
   lastName: '',
   email: '',
   company: '',
+  projectRef: '',
   useCase: '',
   details: '',
 }
@@ -64,6 +67,8 @@ export function WaitlistForm() {
     if (!formData.lastName) newErrors.lastName = 'This field is required'
     if (!formData.email) newErrors.email = 'This field is required'
     else if (!isValidEmail(formData.email)) newErrors.email = 'Invalid email address'
+    if (!formData.projectRef) newErrors.projectRef = 'This field is required'
+    else if (!parseProjectRef(formData.projectRef)) newErrors.projectRef = 'Invalid project ref'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -85,7 +90,11 @@ export function WaitlistForm() {
       const response = await fetch('/api-v2/submit-form-compute-waitlist', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, honeypot }),
+        body: JSON.stringify({
+          ...formData,
+          projectRef: parseProjectRef(formData.projectRef),
+          honeypot,
+        }),
       })
 
       if (response.ok) {
@@ -186,6 +195,36 @@ export function WaitlistForm() {
               onChange={handleChange}
               placeholder="Company name"
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label
+              htmlFor="projectRef"
+              className="text-foreground-light flex justify-between text-left"
+            >
+              Project ref
+              {errors.projectRef && (
+                <span className="text-foreground-muted text-xs">{errors.projectRef}</span>
+              )}
+            </Label>
+            <Input
+              id="projectRef"
+              name="projectRef"
+              value={formData.projectRef}
+              onChange={handleChange}
+              placeholder="abcdefghijklmnopqrst"
+              aria-describedby="projectRef-description"
+            />
+            <div
+              id="projectRef-description"
+              className="text-foreground-lighter text-xs text-left flex flex-col gap-1"
+            >
+              <p>
+                The 20-letter ID in your project URL: https://
+                <span className="text-foreground">your-project-ref</span>.supabase.co (shown as
+                Project ID in Settings → General)
+              </p>
+              <p>Only projects created in us-west-2 can access Compute.</p>
+            </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="useCase" className="text-foreground-light text-left">
