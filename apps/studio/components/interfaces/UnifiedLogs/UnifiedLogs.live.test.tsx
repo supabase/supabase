@@ -242,6 +242,35 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         'refresh',
         'initial-log',
       ])
+      await waitForLiveUpdate(() =>
+        expect(screen.getByRole('button', { name: 'Refresh logs' })).toBeEnabled()
+      )
+      fireEvent.click(screen.getByRole('button', { name: 'Live' }))
+      rows.push(createRow('manual-arrival'))
+      fireEvent.click(screen.getByRole('button', { name: 'Refresh logs' }))
+      await waitForLiveUpdate(() => expect(screen.getByText('manual-arrival')).toBeInTheDocument())
+      expect(screen.getByRole('button', { name: '2 new logs' })).toBeVisible()
+      expect(getLogSequence()).toEqual([
+        'manual-arrival',
+        'refresh',
+        'paused-arrival',
+        'refresh',
+        'second-arrival',
+        'refresh',
+        'first-arrival',
+        'late-arrival',
+        'refresh',
+        'initial-log',
+      ])
+      await waitForLiveUpdate(() =>
+        expect(screen.getByRole('button', { name: 'Refresh logs' })).toBeEnabled()
+      )
+      fireEvent.click(screen.getByRole('button', { name: 'Refresh logs' }))
+      await waitForLiveUpdate(() =>
+        expect(screen.getByRole('button', { name: 'Refresh logs' })).toBeEnabled()
+      )
+      expect(screen.getAllByText('Refresh', { exact: true })).toHaveLength(4)
+      expect(screen.getByRole('button', { name: '2 new logs' })).toBeVisible()
       unmount()
     },
     20_000

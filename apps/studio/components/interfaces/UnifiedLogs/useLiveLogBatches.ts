@@ -29,6 +29,7 @@ export function useLiveLogBatches<T extends { id: string }>({
   firstPage,
   isPlaceholderData,
   fetchPreviousPage,
+  refetchLogs,
   refetchCounts,
 }: {
   scope: string
@@ -36,6 +37,7 @@ export function useLiveLogBatches<T extends { id: string }>({
   firstPage: { data: T[] } | undefined
   isPlaceholderData: boolean
   fetchPreviousPage: FetchLogs<T>
+  refetchLogs: FetchLogs<T>
   refetchCounts: () => Promise<{ isError: boolean }>
 }) {
   const [session, setSession] = useState(() => createSession(scope))
@@ -55,6 +57,7 @@ export function useLiveLogBatches<T extends { id: string }>({
     firstPage,
     isPlaceholderData,
     fetchPreviousPage,
+    refetchLogs,
     refetchCounts,
   })
   latest.current = {
@@ -63,6 +66,7 @@ export function useLiveLogBatches<T extends { id: string }>({
     firstPage,
     isPlaceholderData,
     fetchPreviousPage,
+    refetchLogs,
     refetchCounts,
   }
 
@@ -70,20 +74,24 @@ export function useLiveLogBatches<T extends { id: string }>({
     setSession((current) => (current.unreadCount === 0 ? current : { ...current, unreadCount: 0 }))
   }, [])
 
-  const fetchLiveLogs = useCallback(async () => {
+  const fetchLogs = useCallback(async (mode: 'live' | 'manual') => {
     const previous = latest.current
     if (previous.isPlaceholderData) return
 
-    const response = await previous.fetchPreviousPage()
+    const response = await (mode === 'live' ? previous.fetchPreviousPage() : previous.refetchLogs())
     if (response.isError || previous.session.generation !== latest.current.session.generation) {
       return response
     }
 
     const page = response.data?.pages[0]
     const hasCompletedRefresh =
-      previous.firstPage !== undefined && page !== undefined && page !== previous.firstPage
+      previous.firstPage !== undefined &&
+      page !== undefined &&
+      (mode === 'manual' || page !== previous.firstPage)
     if (hasCompletedRefresh) {
-      const batch = getNewLiveLogBatch(page.data, previous.rows, Date.now())
+      const refreshedRows =
+        mode === 'live' ? page.data : (response.data?.pages.flatMap((entry) => entry.data) ?? [])
+      const batch = getNewLiveLogBatch(refreshedRows, previous.rows, Date.now())
       setSession((current) => {
         if (current.generation !== previous.session.generation) return current
         const batchedIds = new Set(current.batches.flatMap((entry) => entry.ids))
@@ -104,6 +112,9 @@ export function useLiveLogBatches<T extends { id: string }>({
     return response
   }, [])
 
+  const fetchLiveLogs = useCallback(() => fetchLogs('live'), [fetchLogs])
+  const refreshLogs = useCallback(() => fetchLogs('manual'), [fetchLogs])
+
   return {
     rows: orderedRows,
     batches: currentSession.batches,
@@ -111,5 +122,6 @@ export function useLiveLogBatches<T extends { id: string }>({
     sessionKey: currentSession.generation,
     acknowledgeLiveLogs,
     fetchLiveLogs,
+    refreshLogs,
   }
 }
