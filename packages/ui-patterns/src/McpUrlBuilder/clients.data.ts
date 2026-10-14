@@ -16,7 +16,6 @@ import type {
   OmpMcpConfig,
   OpenCodeMcpConfig,
   VSCodeMcpConfig,
-  WindsurfMcpConfig,
 } from './types'
 import { getMcpUrl } from './types'
 
@@ -248,17 +247,7 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
     icon: 'devin',
     hasDistinctDarkIcon: true,
     configFile: '~/.config/devin/mcp_config.json',
-    externalDocsUrl: '',
-    transformConfig: (config): WindsurfMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            command: 'npx',
-            args: ['-y', 'mcp-remote', config.mcpServers.supabase.url],
-          },
-        },
-      }
-    },
+    externalDocsUrl: 'https://docs.devin.ai/cli/extensibility/mcp/configuration',
   },
   {
     key: 'warp',
@@ -422,6 +411,10 @@ export interface McpCliCommands {
  * never drift. Clients absent here are configured via file only.
  */
 export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
+  windsurf: {
+    install: (url) => `devin mcp add -s user supabase "${url}"`,
+    authenticate: 'devin mcp login supabase',
+  },
   'claude-code': {
     install: (url) => `claude mcp add --scope project --transport http supabase "${url}"`,
     authenticate: 'claude /mcp',

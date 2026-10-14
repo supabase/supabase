@@ -51,6 +51,40 @@ export const calloutVariant = (data: unknown): McpCalloutVariant | undefined =>
 const GEMINI_EXTENSION_URL = 'https://github.com/supabase-community/gemini-extension'
 
 export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
+  windsurf: {
+    primary: ({ url }) => (
+      <>
+        <paragraph>
+          These instructions use the Devin Local agent in Devin Desktop or Devin CLI. Add the
+          Supabase MCP server to your user configuration:
+        </paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['windsurf'].install!(url)} />
+      </>
+    ),
+    alternate: ({ isPlatform }) => (
+      <>
+        <paragraph>
+          On Windows, the configuration file is{' '}
+          <inlineCode value="%APPDATA%\devin\mcp_config.json" />. On macOS and Linux, it is{' '}
+          <inlineCode value="~/.config/devin/mcp_config.json" />.
+        </paragraph>
+        {isPlatform && (
+          <>
+            <paragraph>
+              For hosted connections, authenticate with Supabase from your terminal:
+            </paragraph>
+            <code lang="bash" value={MCP_CLI_COMMANDS['windsurf'].authenticate!} />
+            <paragraph>Complete the authorization flow in your browser.</paragraph>
+          </>
+        )}
+        <paragraph>Check the server configuration:</paragraph>
+        <code lang="bash" value="devin mcp list" />
+        <paragraph>
+          Start a new Devin Local or Devin CLI session to load the server's tools.
+        </paragraph>
+      </>
+    ),
+  },
   'claude-code': {
     primary: ({ url }) => (
       <>

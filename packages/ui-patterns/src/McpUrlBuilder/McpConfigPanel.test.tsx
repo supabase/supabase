@@ -3,6 +3,7 @@ import { TooltipProvider } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { McpConfigPanel } from './McpConfigPanel'
+import { MCP_CLIENTS } from './mcpClients'
 
 const props = {
   isPlatform: true,
@@ -76,5 +77,38 @@ describe('McpConfigPanel opt-out transitions', () => {
 
     fireEvent.click(screen.getByRole('option', { name: new RegExp(`^${feature}`) }))
     expect(container.textContent).not.toContain('skip_elicitations=')
+  })
+})
+
+const devin = MCP_CLIENTS.find((client) => client.key === 'windsurf')!
+
+describe('Devin setup', () => {
+  it('renders native hosted configuration and authentication steps', () => {
+    const { container } = render(
+      <McpConfigPanel {...props} projectRef="test-project" initialSelectedClient={devin} />,
+      { wrapper: TooltipProvider }
+    )
+
+    fireEvent.click(screen.getByRole('switch', { name: 'Read-only' }))
+
+    expect(container.textContent).toContain('"url":')
+    expect(container.textContent).toContain('project_ref=test-project&read_only=true&features=')
+    expect(container.textContent).not.toContain('mcp-remote')
+    expect(container.textContent).toContain('devin mcp add -s user supabase')
+    expect(container.textContent).toContain('devin mcp login supabase')
+    expect(container.textContent).toContain('%APPDATA%\\devin\\mcp_config.json')
+  })
+
+  it('renders local setup without requiring hosted authentication', () => {
+    const { container } = render(
+      <McpConfigPanel {...props} isPlatform={false} initialSelectedClient={devin} />,
+      { wrapper: TooltipProvider }
+    )
+
+    expect(container.textContent).toContain('"url": "http://localhost:54321/mcp?features=')
+    expect(container.textContent).toContain('devin mcp add -s user supabase')
+    expect(container.textContent).toContain('devin mcp list')
+    expect(container.textContent).not.toContain('devin mcp login')
+    expect(container.textContent).not.toContain('mcp-remote')
   })
 })
