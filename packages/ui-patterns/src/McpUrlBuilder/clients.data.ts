@@ -411,10 +411,6 @@ export interface McpCliCommands {
  * never drift. Clients absent here are configured via file only.
  */
 export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
-  windsurf: {
-    install: (url) => `devin mcp add -s user supabase "${url}"`,
-    authenticate: 'devin mcp login supabase',
-  },
   'claude-code': {
     install: (url) => `claude mcp add --scope project --transport http supabase "${url}"`,
     authenticate: 'claude /mcp',
@@ -433,6 +429,10 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
   'copilot-cli': {
     install: (url) => `copilot mcp add --transport http supabase "${url}"`,
     authenticate: 'copilot -i /mcp',
+  },
+  windsurf: {
+    install: (url) => `devin mcp add -s user supabase "${url}"`,
+    authenticate: 'devin mcp login supabase',
   },
   goose: {
     install: (url) => `goose session --with-streamable-http-extension "${url}"`,
