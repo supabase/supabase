@@ -123,7 +123,7 @@ export async function POST(req: Request) {
       : null
 
   if (!parsedProjectRef) {
-    return new Response(JSON.stringify({ message: 'Invalid project ref' }), {
+    return new Response(JSON.stringify({ message: 'Invalid project ID' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 422,
     })

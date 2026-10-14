@@ -68,7 +68,7 @@ export function WaitlistForm() {
     if (!formData.email) newErrors.email = 'This field is required'
     else if (!isValidEmail(formData.email)) newErrors.email = 'Invalid email address'
     if (!formData.projectRef) newErrors.projectRef = 'This field is required'
-    else if (!parseProjectRef(formData.projectRef)) newErrors.projectRef = 'Invalid project ref'
+    else if (!parseProjectRef(formData.projectRef)) newErrors.projectRef = 'Invalid project ID'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -201,7 +201,7 @@ export function WaitlistForm() {
               htmlFor="projectRef"
               className="text-foreground-light flex justify-between text-left"
             >
-              Project ref
+              Project ID
               {errors.projectRef && (
                 <span className="text-foreground-muted text-xs">{errors.projectRef}</span>
               )}
