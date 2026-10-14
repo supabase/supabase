@@ -7,13 +7,13 @@ import { CsatSurvey } from './CsatSurvey'
 import { API_URL } from '@/lib/constants'
 import { customRender } from '@/tests/lib/custom-render'
 import { mswServer } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
-const params = vi.hoisted(() => ({ current: {} as Record<string, string | undefined> }))
-
-vi.mock('common', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('common')>()),
-  useParams: () => params.current,
-}))
+// The global test setup stubs useParams; restore the real one so the URL query drives the page.
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return { ...actual, useParams: actual.useParams }
+})
 
 const CSAT_URL = `${API_URL?.replace('/platform', '')}/platform/support/csat`
 
@@ -37,11 +37,11 @@ const submitForm = () => {
 
 describe('CsatSurvey', () => {
   beforeEach(() => {
-    params.current = { conversation_id: 'cnv_1abc2', helpful: 'yes' }
+    routerMock.setCurrentUrl('/support/csat?conversation_id=cnv_1abc2&helpful=yes')
   })
 
   test('shows the ticket error when the link has no ticket reference', () => {
-    params.current = {}
+    routerMock.setCurrentUrl('/support/csat')
 
     customRender(<CsatSurvey />)
 
@@ -78,7 +78,7 @@ describe('CsatSurvey', () => {
   })
 
   test('defaults to yes when the link did not preselect an answer', async () => {
-    params.current = { conversation_id: 'cnv_1abc2' }
+    routerMock.setCurrentUrl('/support/csat?conversation_id=cnv_1abc2')
     const requests = mockSubmit(200)
 
     customRender(<CsatSurvey />)
