@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 
 import { LogFields } from '../components/LogFields'
@@ -28,7 +28,7 @@ function RequestOverview({ children, ...props }: LogOverviewProps & { children: 
       <DetailSectionHeader
         title="Request started"
         className="border-b"
-        icon={Clock}
+        icon={ClockIcon}
         summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
       />
       <MemoizedNetworkBlock {...props} />

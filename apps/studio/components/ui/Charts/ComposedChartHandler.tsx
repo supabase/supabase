@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { List, Loader2 } from 'lucide-react'
+import { ListIcon, Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { Card, cn, WarningIcon } from 'ui'
@@ -251,7 +251,7 @@ const ComposedChartHandler = ({
       {
         id: 'open-logs',
         label: 'Open in Postgres Logs',
-        icon: <List size={12} />,
+        icon: <ListIcon size={12} />,
         onSelect: ({ start, end }) => {
           const projectRef = ref as string
           if (!projectRef) return
@@ -272,7 +272,7 @@ const ComposedChartHandler = ({
           className
         )}
       >
-        <Loader2 size={18} className="animate-spin text-border-strong" />
+        <Loader2Icon size={18} className="animate-spin text-border-strong" />
         <p className="text-xs text-foreground-lighter">Loading data for {label}</p>
       </Card>
     )

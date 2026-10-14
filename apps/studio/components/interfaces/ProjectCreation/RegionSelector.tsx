@@ -1,5 +1,5 @@
 import { useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
@@ -296,7 +296,7 @@ export const RegionSelector = ({
                         >
                           {!!dbRegion && (
                             <div className="flex items-center gap-x-3">
-                              {isLoading && <Loader2 size={14} className="animate-spin" />}
+                              {isLoading && <Loader2Icon size={14} className="animate-spin" />}
                               {selectedRegion?.code && (
                                 <RegionFlag className="w-5" region={selectedRegion.code} />
                               )}

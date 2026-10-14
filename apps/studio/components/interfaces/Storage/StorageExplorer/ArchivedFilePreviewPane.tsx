@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
-import { RotateCcw, Trash2, X } from 'lucide-react'
+import { RotateCcwIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button } from 'ui'
@@ -166,7 +166,7 @@ export const ArchivedFilePreviewPane = () => {
             onClick={clearArchivedSelection}
             aria-label="Close preview"
           >
-            <X size={14} />
+            <XIcon size={14} />
           </Button>
         </div>
 
@@ -209,7 +209,7 @@ export const ArchivedFilePreviewPane = () => {
                   <ButtonTooltip
                     variant="outline"
                     size="tiny"
-                    icon={<RotateCcw size={14} />}
+                    icon={<RotateCcwIcon size={14} />}
                     loading={isRestoring}
                     disabled={!canUpdateFiles}
                     onClick={() => handleRestore()}
@@ -227,7 +227,7 @@ export const ArchivedFilePreviewPane = () => {
                   <ButtonTooltip
                     variant="outline"
                     size="tiny"
-                    icon={<Trash2 size={14} />}
+                    icon={<Trash2Icon size={14} />}
                     disabled={!canUpdateFiles}
                     onClick={() => setIsPurgeConfirmVisible(true)}
                     tooltip={{

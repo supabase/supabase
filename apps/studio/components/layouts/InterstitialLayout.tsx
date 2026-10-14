@@ -1,4 +1,4 @@
-import { ArrowRightLeft } from 'lucide-react'
+import { ArrowRightLeftIcon } from 'lucide-react'
 import { motion, useReducedMotion } from 'motion/react'
 import type { PropsWithChildren, ReactNode } from 'react'
 import { Card, CardContent, CardHeader, cn } from 'ui'
@@ -127,7 +127,7 @@ export const LogoBox = ({ children, className }: { children: ReactNode; classNam
 export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
   <div className="flex items-center justify-center gap-2.5">
     {left}
-    <ArrowRightLeft className="size-4 text-foreground-muted" />
+    <ArrowRightLeftIcon className="size-4 text-foreground-muted" />
     {right}
   </div>
 )

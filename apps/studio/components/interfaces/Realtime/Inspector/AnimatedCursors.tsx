@@ -1,4 +1,4 @@
-import { MousePointer2 } from 'lucide-react'
+import { MousePointer2Icon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
@@ -42,7 +42,7 @@ export const AnimatedCursors = () => {
         }}
         style={{ width: 20, height: 20 }}
       >
-        <MousePointer2 size={20} />
+        <MousePointer2Icon size={20} />
       </motion.div>
       <motion.div
         className="absolute text-primary"
@@ -54,7 +54,7 @@ export const AnimatedCursors = () => {
         }}
         style={{ width: 20, height: 20 }}
       >
-        <MousePointer2 size={20} />
+        <MousePointer2Icon size={20} />
       </motion.div>
     </div>
   )

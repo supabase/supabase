@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { ChevronDownIcon, ExternalLinkIcon } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -195,7 +195,7 @@ export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                                 <Button
                                   className="group"
                                   iconRight={
-                                    <ChevronDown className="transition-transform group-data-[state=open]:rotate-180" />
+                                    <ChevronDownIcon className="transition-transform group-data-[state=open]:rotate-180" />
                                   }
                                 >
                                   Edit
@@ -233,7 +233,7 @@ export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                 showNode={false}
                 disabled={isBranch}
                 href={integrationUrl}
-                icon={<ExternalLink />}
+                icon={<ExternalLinkIcon />}
                 disabledTooltip="Install the Vercel integration on your project's main branch"
               >
                 Install Vercel integration

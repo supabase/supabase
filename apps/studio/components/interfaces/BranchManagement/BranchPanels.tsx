@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Github } from 'lucide-react'
+import { GithubIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
@@ -104,7 +104,7 @@ export const BranchRow = ({
               rel="noreferrer noopener"
               href={`https://github.com/${repo}/tree/${branch.git_branch}`}
             >
-              <Github size={14} className="text-foreground-light" />
+              <GithubIcon size={14} className="text-foreground-light" />
             </a>
           </ButtonTooltip>
         )}

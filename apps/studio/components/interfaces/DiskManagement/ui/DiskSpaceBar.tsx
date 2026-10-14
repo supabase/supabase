@@ -1,6 +1,6 @@
 import MotionNumber from '@number-flow/react'
 import { useParams } from 'common'
-import { Info } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
@@ -185,7 +185,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex items-center justify-center cursor-help text-foreground-lighter hover:text-foreground transition-colors">
-                    <Info size={14} />
+                    <InfoIcon size={14} />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent

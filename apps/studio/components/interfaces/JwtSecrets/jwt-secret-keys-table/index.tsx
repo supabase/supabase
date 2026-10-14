@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { AlertCircle, RotateCw, Timer } from 'lucide-react'
+import { AlertCircleIcon, RotateCwIcon, TimerIcon } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -188,7 +188,7 @@ export const JWTSecretKeysTable = () => {
     return (
       <div className="bg-surface-100 rounded-md border shadow-xs">
         <div className="flex items-center py-8 px-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             You don't have permission to view JWT signing keys. These keys are restricted to users
             with higher access levels.
@@ -214,7 +214,7 @@ export const JWTSecretKeysTable = () => {
                 buttonLabel="Rotate keys"
                 onClick={() => setShownDialog('rotate')}
                 loading={isUpdatingJWTSigningKey}
-                icon={<RotateCw className="size-4" />}
+                icon={<RotateCwIcon className="size-4" />}
                 variant="primary"
               />
             ) : (
@@ -225,7 +225,7 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
                 variant="primary"
-                icon={<Timer className="size-4" />}
+                icon={<TimerIcon className="size-4" />}
                 shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
@@ -368,7 +368,7 @@ export const JWTSecretKeysTable = () => {
                   </Table>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center text-foreground-light p-8 gap-2">
-                    <Timer className="size-6 text-foreground-lighter" />
+                    <TimerIcon className="size-6 text-foreground-lighter" />
                     <div className="flex flex-col gap-1">
                       <p className="text-sm font-medium">No previously used keys</p>
                       <p className="text-xs text-foreground-lighter">

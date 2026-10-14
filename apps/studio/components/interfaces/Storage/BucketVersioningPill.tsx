@@ -1,4 +1,4 @@
-import { FileStack } from 'lucide-react'
+import { FileStackIcon } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getBucketVersioningState } from './StorageVersioning.constants'
@@ -36,7 +36,7 @@ export const BucketVersioningPill = ({ bucket, showPrefix = true }: BucketVersio
       <TooltipTrigger asChild>
         <span tabIndex={0} className="shrink-0">
           <Badge variant={variant}>
-            <FileStack size={12} aria-hidden />
+            <FileStackIcon size={12} aria-hidden />
             {showPrefix ? `Versioning ${state.toLowerCase()}` : state}
           </Badge>
         </span>

@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, MoreVertical, Trash } from 'lucide-react'
+import { Edit2Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -68,13 +68,13 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
         <div className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button aria-label="More options" className="px-1" icon={<MoreVertical />} />
+              <Button aria-label="More options" className="px-1" icon={<MoreVerticalIcon />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem asChild>
                 <ButtonTooltip
                   variant="text"
-                  icon={<Edit2 size={14} />}
+                  icon={<Edit2Icon size={14} />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}
                   onClick={() => onSelectEdit()}
@@ -96,7 +96,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
               <DropdownMenuItem asChild>
                 <ButtonTooltip
                   variant="text"
-                  icon={<Trash size={14} className="group-not-disabled:text-destructive" />}
+                  icon={<TrashIcon size={14} className="group-not-disabled:text-destructive" />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}
                   onClick={() => onSelectDelete()}

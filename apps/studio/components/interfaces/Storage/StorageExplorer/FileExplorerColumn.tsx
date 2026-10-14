@@ -1,6 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { get, noop, sum, uniqBy } from 'lodash'
-import { ChevronsDown, ChevronsUp, Copy, Eye, FolderPlus, Upload } from 'lucide-react'
+import {
+  ChevronsDownIcon,
+  ChevronsUpIcon,
+  CopyIcon,
+  EyeIcon,
+  FolderPlusIcon,
+  UploadIcon,
+} from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -57,7 +64,7 @@ const DragOverOverlay = ({ isOpen, onDragLeave, onDrop, folderIsEmpty }: any) =>
                 className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
                 style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
               >
-                <Upload className="text-white pointer-events-none" size={20} />
+                <UploadIcon className="text-white pointer-events-none" size={20} />
                 <p className="text-center text-sm  text-white mt-2 pointer-events-none">
                   Drop your files to upload to this folder
                 </p>
@@ -347,19 +354,19 @@ export const FileExplorerColumn = ({
         {canUpdateStorage && (
           <>
             <ContextMenuItem className="gap-x-2" onSelect={onSelectCreateFolder}>
-              <FolderPlus size={14} />
+              <FolderPlusIcon size={14} />
               <span className="text-xs">New folder</span>
             </ContextMenuItem>
             <ContextMenuSeparator />
           </>
         )}
         <ContextMenuItem className="gap-x-2" onSelect={onSelectAllItems}>
-          <Copy size={14} />
+          <CopyIcon size={14} />
           <span className="text-xs">Select all items</span>
         </ContextMenuItem>
         <ContextMenuSub>
           <ContextMenuSubTrigger className="gap-x-2">
-            <Eye size={14} />
+            <EyeIcon size={14} />
             <span className="text-xs">View</span>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
@@ -373,7 +380,7 @@ export const FileExplorerColumn = ({
         </ContextMenuSub>
         <ContextMenuSub>
           <ContextMenuSubTrigger className="gap-x-2">
-            <ChevronsDown size={14} />
+            <ChevronsDownIcon size={14} />
             <span className="text-xs">Sort by</span>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>
@@ -393,7 +400,7 @@ export const FileExplorerColumn = ({
         </ContextMenuSub>
         <ContextMenuSub>
           <ContextMenuSubTrigger className="gap-x-2">
-            <ChevronsUp size={14} />
+            <ChevronsUpIcon size={14} />
             <span className="text-xs">Sort by order</span>
           </ContextMenuSubTrigger>
           <ContextMenuSubContent>

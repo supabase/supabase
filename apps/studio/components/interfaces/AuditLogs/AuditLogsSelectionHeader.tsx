@@ -1,5 +1,5 @@
 import type { Table } from '@tanstack/react-table'
-import { Copy, X } from 'lucide-react'
+import { CopyIcon, XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
@@ -39,7 +39,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
           <div className="flex items-center justify-center gap-x-2">
             <ButtonTooltip
               size="tiny"
-              icon={<Copy size={12} />}
+              icon={<CopyIcon size={12} />}
               className="w-7"
               onClick={handleCopy}
               tooltip={{ content: { side: 'bottom', text: 'Copy selected logs' } }}
@@ -47,7 +47,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
             <ButtonTooltip
               size="tiny"
               variant="text"
-              icon={<X />}
+              icon={<XIcon />}
               className="px-1"
               onClick={() => table.resetRowSelection()}
               tooltip={{ content: { side: 'bottom', text: 'Clear selection' } }}

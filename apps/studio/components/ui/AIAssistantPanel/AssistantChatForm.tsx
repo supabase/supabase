@@ -1,5 +1,5 @@
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2, Square } from 'lucide-react'
+import { ArrowUpIcon, Loader2Icon, SquareIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
 import { Button, cn, ExpandingTextArea } from 'ui'
@@ -83,7 +83,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       isEditing = false,
       selectedModel,
       onSelectModel,
-      submitIcon = <ArrowUp />,
+      submitIcon = <ArrowUpIcon />,
       submitLabel = 'Send message',
       secondaryAction,
       ...props
@@ -187,13 +187,17 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
                   <ButtonTooltip
                     variant="outline"
                     aria-label="Stop response"
-                    icon={<Square fill="currentColor" className="scale-75" />}
+                    icon={<SquareIcon fill="currentColor" className="scale-75" />}
                     onClick={onStop}
                     className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
                     tooltip={{ content: { side: 'top', text: 'Stop response' } }}
                   />
                 ) : (
-                  <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
+                  <Loader2Icon
+                    size={22}
+                    className="animate-spin size-7 text-muted"
+                    strokeWidth={1}
+                  />
                 )
               ) : (
                 <ButtonTooltip

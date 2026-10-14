@@ -3,16 +3,15 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import {
-  Clock,
-  ExternalLink,
-  Infinity,
-  MoreVertical,
-  Pencil,
-  Redo,
-  RefreshCw,
+  ClockIcon,
+  ExternalLinkIcon,
+  InfinityIcon,
+  MoreVerticalIcon,
+  PencilIcon,
+  RedoIcon,
   RefreshCwIcon,
-  Shield,
-  Trash2,
+  ShieldIcon,
+  Trash2Icon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -96,7 +95,7 @@ export const Overview = ({
             isGithubConnected={isGithubConnected}
             label={
               <div className="flex items-center gap-x-2">
-                <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                <ShieldIcon size={14} strokeWidth={1.5} className="text-warning" />
                 {mainBranch.name}
               </div>
             }
@@ -108,7 +107,7 @@ export const Overview = ({
           <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
             <Link href={`/project/${projectRef}`} className="text-foreground block w-full">
               <div className="flex items-center gap-x-3">
-                <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                <ShieldIcon size={14} strokeWidth={1.5} className="text-warning" />
                 main
               </div>
             </Link>
@@ -344,7 +343,7 @@ const PreviewBranchActions = ({
           <Button
             variant="text"
             aria-label="More branch actions"
-            icon={<MoreVertical />}
+            icon={<MoreVerticalIcon />}
             className="px-1"
             onClick={(e) => e.stopPropagation()}
           />
@@ -372,7 +371,7 @@ const PreviewBranchActions = ({
               },
             }}
           >
-            <Pencil size={14} /> Edit branch
+            <PencilIcon size={14} /> Edit branch
           </DropdownMenuItemTooltip>
 
           {!branch.deletion_scheduled_at && (
@@ -397,7 +396,7 @@ const PreviewBranchActions = ({
                   },
                 }}
               >
-                <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
+                <RedoIcon size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
@@ -419,7 +418,7 @@ const PreviewBranchActions = ({
                   },
                 }}
               >
-                <RefreshCw size={14} /> Reset branch
+                <RefreshCwIcon size={14} /> Reset branch
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
@@ -447,11 +446,11 @@ const PreviewBranchActions = ({
               >
                 {branch.persistent ? (
                   <>
-                    <Clock size={14} /> Switch to preview
+                    <ClockIcon size={14} /> Switch to preview
                   </>
                 ) : (
                   <>
-                    <Infinity size={14} className="scale-110" /> Switch to persistent
+                    <InfinityIcon size={14} className="scale-110" /> Switch to persistent
                   </>
                 )}
               </DropdownMenuItemTooltip>
@@ -467,7 +466,7 @@ const PreviewBranchActions = ({
                 href={generateCreatePullRequestURL(branch.git_branch)}
                 onClick={(e) => e.stopPropagation()}
               >
-                <ExternalLink size={14} /> Create pull request
+                <ExternalLinkIcon size={14} /> Create pull request
               </a>
             </DropdownMenuItem>
           )}
@@ -494,7 +493,7 @@ const PreviewBranchActions = ({
                 },
               }}
             >
-              <Clock size={14} /> Restore branch
+              <ClockIcon size={14} /> Restore branch
             </DropdownMenuItemTooltip>
           )}
 
@@ -514,7 +513,7 @@ const PreviewBranchActions = ({
               },
             }}
           >
-            <Trash2 size={14} /> Delete branch
+            <Trash2Icon size={14} /> Delete branch
           </DropdownMenuItemTooltip>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -610,7 +609,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
             variant="text"
-            icon={<MoreVertical />}
+            icon={<MoreVerticalIcon />}
             className="px-1"
             tooltip={{ content: { side: 'bottom', text: 'More options' } }}
           />
@@ -619,7 +618,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
           {repo ? (
             <DropdownMenuItem asChild className="gap-x-2">
               <Link href={`/project/${projectRef}/settings/integrations`}>
-                <Pencil size={14} />
+                <PencilIcon size={14} />
                 Change production branch
               </Link>
             </DropdownMenuItem>
@@ -630,7 +629,7 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
               onSelect={() => setShowEditBranchModal(true)}
               onClick={() => setShowEditBranchModal(true)}
             >
-              <Pencil size={14} /> Edit Branch
+              <PencilIcon size={14} /> Edit Branch
             </DropdownMenuItem>
           )}
           {branch.git_branch ? (

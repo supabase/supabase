@@ -3,7 +3,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { IS_PLATFORM } from 'common'
 import { Auth, EdgeFunctions, Storage } from 'icons'
-import { Database } from 'lucide-react'
+import { DatabaseIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
@@ -38,7 +38,7 @@ const SEARCH_CONTEXT_OPTIONS: SearchContextOption[] = [
     label: 'Database Tables',
     pageName: 'Search Database Tables',
     placeholder: 'Search database schema or tables...',
-    icon: Database,
+    icon: DatabaseIcon,
   },
   {
     value: 'auth-policies',
