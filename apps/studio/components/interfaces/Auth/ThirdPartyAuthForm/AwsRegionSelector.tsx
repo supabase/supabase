@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
   cn,
@@ -89,7 +89,7 @@ export const AwsRegionSelector = ({
                       setOpen(false)
                     }}
                   >
-                    <Check
+                    <CheckIcon
                       className={cn('mr-2 h-4 w-4', option === value ? 'opacity-100' : 'opacity-0')}
                     />
                     {option}

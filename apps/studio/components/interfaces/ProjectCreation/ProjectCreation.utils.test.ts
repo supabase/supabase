@@ -8,13 +8,17 @@ import {
 } from './ProjectCreation.constants'
 import type { AvailableRegions } from './ProjectCreation.utils'
 import {
+  extractPostgresVersionDetails,
   filterHighAvailabilityRegions,
   getAvailableRegions,
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
+  getSpecificRegionsLinkVariant,
   resolveDefaultDbRegion,
+  resolvePostgresVersion,
 } from './ProjectCreation.utils'
+import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 
 describe('resolveDefaultDbRegion', () => {
   const base = {
@@ -137,6 +141,12 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
     )
   })
 
+  it('returns undefined when overridden, even if otherwise enrolled', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, isOverridden: true })
+    ).toBeUndefined()
+  })
+
   it('returns undefined for a paid plan', () => {
     expect(
       getFreeTierGeneralRegionExperimentVariant({ ...base, isFreePlan: false })
@@ -196,5 +206,128 @@ describe('getRegionSelectionType', () => {
     expect(
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
     ).toBeUndefined()
+  })
+
+  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'East US (North Virginia)',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBe('auto')
+  })
+
+  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'Nonexistent',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBeUndefined()
+  })
+
+  it('classifies a touched field normally', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
+    ).toBe('general')
+  })
+})
+
+describe('getSpecificRegionsLinkVariant', () => {
+  const base = {
+    isFreePlan: true,
+    smartRegionEnabled: true,
+    linkFlag: true,
+  }
+
+  it('returns test when eligible and the flag is on', () => {
+    expect(getSpecificRegionsLinkVariant(base)).toBe('test')
+  })
+
+  it('returns control when eligible and the flag is off', () => {
+    expect(getSpecificRegionsLinkVariant({ ...base, linkFlag: false })).toBe('control')
+  })
+
+  it('returns undefined for a paid plan', () => {
+    expect(getSpecificRegionsLinkVariant({ ...base, isFreePlan: false })).toBeUndefined()
+  })
+
+  it('returns undefined when smart regions are disabled (AWS_NIMBUS)', () => {
+    expect(getSpecificRegionsLinkVariant({ ...base, smartRegionEnabled: false })).toBeUndefined()
+  })
+})
+
+describe('extractPostgresVersionDetails', () => {
+  it('splits engine and release channel', () => {
+    expect(extractPostgresVersionDetails('17|ga')).toEqual({
+      postgresEngine: '17',
+      releaseChannel: 'ga',
+    })
+  })
+
+  it('returns undefined fields for an empty value', () => {
+    expect(extractPostgresVersionDetails('')).toEqual({
+      postgresEngine: undefined,
+      releaseChannel: undefined,
+    })
+  })
+})
+
+describe('resolvePostgresVersion', () => {
+  const availableOrioleVersion: {
+    postgres_engine: PostgresEngine
+    release_channel: ReleaseChannel
+  } = { postgres_engine: '17-oriole', release_channel: 'preview' }
+
+  it('uses the selection for OrioleDB when it is an OrioleDB version', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17-oriole|ga',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'ga' })
+  })
+
+  it('falls back to the available OrioleDB image when there is no selection', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'preview' })
+  })
+
+  it('falls back to the available OrioleDB image when the selection is a stale Postgres version', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17|ga',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'preview' })
+  })
+
+  it('uses the selection for Postgres', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17|ga',
+        useOrioleDb: false,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17', releaseChannel: 'ga' })
+  })
+
+  it('ignores a stale OrioleDB selection when OrioleDB is off', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17-oriole|ga',
+        useOrioleDb: false,
+        availableOrioleVersion,
+      })
+    ).toEqual({})
   })
 })

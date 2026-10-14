@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLinkIcon, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from 'ui'
@@ -105,7 +105,7 @@ export const StorageReport: NextPageWithLayout = () => {
               >
                 <Button
                   disabled={report.isLoading}
-                  icon={<RefreshCw className={report.isLoading ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={report.isLoading ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -124,7 +124,7 @@ export const StorageReport: NextPageWithLayout = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}

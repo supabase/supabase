@@ -19,8 +19,28 @@ export const getBucketVersioningState = (bucket?: Bucket): BucketVersioningState
   }
 }
 
-export const isBucketVersioned = (bucket?: Bucket) => getBucketVersioningState(bucket) === 'enabled'
+/**
+ * The bucket versions writes right now: a delete becomes a recoverable archive and an
+ * overwrite becomes a new version. Drives what the actions are called.
+ */
+export const isVersioningActive = (bucket?: Bucket) =>
+  getBucketVersioningState(bucket) === 'enabled'
 
 /** A suspended bucket can still be retaining versions. */
 export const hasVersioningHistory = (bucket?: Bucket) =>
   getBucketVersioningState(bucket) !== 'disabled'
+
+/**
+ * A suspended bucket retains a copy when the object it replaces
+ * was itself written while versioning was enabled.
+ */
+export const willRetainVersionOnWrite = ({
+  versioningState,
+  isObjectVersioned,
+}: {
+  versioningState: BucketVersioningState
+  isObjectVersioned?: boolean | null
+}) => {
+  if (versioningState === 'enabled') return true
+  return versioningState === 'suspended' && !!isObjectVersioned
+}

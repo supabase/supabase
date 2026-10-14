@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangleIcon } from 'lucide-react'
 import {
   Alert,
   AlertDescription,
@@ -99,7 +99,7 @@ const ErrorExplanation = ({
 
 const ErrorState = ({ refetch }: { refetch?: () => void }) => (
   <Alert variant="warning">
-    <AlertTriangle />
+    <AlertTriangleIcon />
     <AlertTitle>Lookup failed</AlertTitle>
     <AlertDescription>
       <p>Failed to look up error code help info</p>
