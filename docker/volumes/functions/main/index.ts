@@ -8,6 +8,9 @@ const JWT_SECRET = Deno.env.get('JWT_SECRET')
 const SUPABASE_JWKS = parseJwks(Deno.env.get('SUPABASE_JWKS'))
 const LOCAL_JWKS = SUPABASE_JWKS ? jose.createLocalJWKSet(SUPABASE_JWKS) : null
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
+const SUPABASE_PUBLIC_URL = Deno.env.get('SUPABASE_PUBLIC_URL')
+const JWT_ISSUER = Deno.env.get('JWT_ISSUER')
+const mcpResourcePath = '/.well-known/oauth-protected-resource/mcp'
 
 type AuthFailure = {
   code: RequestErrors
@@ -282,6 +285,14 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
 }
 
 Deno.serve(async (req: Request) => {
+  if (req.url.endsWith(mcpResourcePath)) {
+    return Response.json({
+      resource: SUPABASE_PUBLIC_URL + mcpResourcePath,
+      authorization_servers: [JWT_ISSUER],
+      scopes_supported: ['openid', 'profile', 'email'],
+    })
+  }
+
   if (req.method !== 'OPTIONS' && VERIFY_JWT) {
     try {
       const token = getAuthToken(req)
