@@ -4,31 +4,6 @@ import { ArrowRightFromLine, Check, Copy, WrapText, type LucideIcon } from 'luci
 import { useEffect, useState } from 'react'
 import { Button, cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-function CrossfadeIcon({
-  active,
-  activeIcon: ActiveIcon,
-  inactiveIcon: InactiveIcon,
-}: {
-  active: boolean
-  activeIcon: LucideIcon
-  inactiveIcon: LucideIcon
-}) {
-  const iconClass = (shown: boolean) =>
-    cn(
-      'absolute inset-0 m-auto text-lighter group-hover/btn:text-foreground',
-      'transition-[opacity,scale,filter,color] duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)]',
-      'motion-reduce:transition-none',
-      shown ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[4px]'
-    )
-
-  return (
-    <span className="relative block size-3.5">
-      <ActiveIcon size={14} aria-hidden="true" className={iconClass(active)} />
-      <InactiveIcon size={14} aria-hidden="true" className={iconClass(!active)} />
-    </span>
-  )
-}
-
 export function CodeCopyButton({
   className,
   content,
@@ -82,7 +57,7 @@ export function CodeCopyButton({
               className
             )}
             aria-label={label}
-            // Tooltip repeats the label; screen readers would read it twice
+            // the tooltip repeats the label, so screen readers read it twice
             aria-describedby={undefined}
           >
             <CrossfadeIcon active={copied} activeIcon={Check} inactiveIcon={Copy} />
@@ -128,7 +103,7 @@ export function CodeBlockControls({ content }: { content: string }) {
               'hover:bg-[var(--btn-active)]'
             )}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
-            // Tooltip repeats the label; screen readers would read it twice
+            // the tooltip repeats the label, so screen readers read it twice
             aria-describedby={undefined}
           >
             <CrossfadeIcon
@@ -142,5 +117,30 @@ export function CodeBlockControls({ content }: { content: string }) {
       </Tooltip>
       <CodeCopyButton content={content} />
     </div>
+  )
+}
+
+function CrossfadeIcon({
+  active,
+  activeIcon: ActiveIcon,
+  inactiveIcon: InactiveIcon,
+}: {
+  active: boolean
+  activeIcon: LucideIcon
+  inactiveIcon: LucideIcon
+}) {
+  const iconClass = (shown: boolean) =>
+    cn(
+      'absolute inset-0 m-auto text-lighter group-hover/btn:text-foreground',
+      'transition-[opacity,scale,filter,color] duration-300 [transition-timing-function:cubic-bezier(0.2,0,0,1)]',
+      'motion-reduce:transition-none',
+      shown ? 'opacity-100 scale-100 blur-none' : 'opacity-0 scale-[0.25] blur-[4px]'
+    )
+
+  return (
+    <span className="relative block size-3.5">
+      <ActiveIcon size={14} aria-hidden="true" className={iconClass(active)} />
+      <InactiveIcon size={14} aria-hidden="true" className={iconClass(!active)} />
+    </span>
   )
 }

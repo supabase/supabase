@@ -33,7 +33,6 @@ describe('CodeBlockFrame', () => {
       [...container.querySelectorAll('.code-line-number')].map((el) => el.textContent)
     ).toEqual(['1', '2', '3'])
     expect(container.querySelectorAll('pre')).toHaveLength(1)
-    expect(container.querySelector('pre pre')).toBeNull()
     expect(container.querySelector('button')).toBeNull()
     expect(container.querySelector('.code-scroll')).toHaveAttribute(
       'aria-label',
