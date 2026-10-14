@@ -91,9 +91,11 @@ const Columns = () => {
     <>
       <p data-testid="cursor">{`${cursor.columnIndex}:${cursor.itemIndex}`}</p>
       <p data-testid="is-focused">{String(isListFocused)}</p>
-      <button>outside the list</button>
+      <button tabIndex={0}>outside the list</button>
       {/* Stands in for the folder row in the bucket root being clicked */}
-      <button onClick={() => activateRow({ columnIndex: 0, itemIndex: 0 })}>click images</button>
+      <button tabIndex={0} onClick={() => activateRow({ columnIndex: 0, itemIndex: 0 })}>
+        click images
+      </button>
       {snapshot.columns.map((column: StorageColumn, index: number) => (
         <div
           key={column.id}
@@ -107,7 +109,7 @@ const Columns = () => {
           onBlur={onColumnBlur}
           onKeyDown={(event) => onColumnKeyDown(index, event)}
         >
-          <button>row action</button>
+          <button tabIndex={0}>row action</button>
         </div>
       ))}
     </>
