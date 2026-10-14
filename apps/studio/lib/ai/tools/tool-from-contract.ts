@@ -22,11 +22,9 @@ export function toolFromContract<TInput, TOutput>(
     inputSchema: contract.inputSchema,
     needsApproval: contract.needsApproval,
     execute,
-    ...(toModelOutput && {
-      toModelOutput: ({ output }: { output: TOutput }) => ({
-        type: 'json' as const,
-        value: toModelOutput(output, aiOptInLevel),
-      }),
+    toModelOutput: ({ output }: { output: TOutput }) => ({
+      type: 'json' as const,
+      value: toModelOutput(output, aiOptInLevel),
     }),
   } as unknown as Tool<TInput, TOutput>
 }

@@ -22,10 +22,11 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
   minOptInLevel: AiOptInLevel | null
   needsApproval: boolean
   /**
-   * What the model may see of the output. Applied to the current turn and again on
-   * history replay, so it must be safe to run on its own result.
+   * What the model may see of the output. Required, so a contract can't forget to decide.
+   * Applied to the current turn and again on history replay, so it must be safe to run on
+   * its own result. Return the output unchanged only if all of it is safe at every level.
    */
-  toModelOutput?(output: TOutput, optInLevel: AiOptInLevel): JSONValue
+  toModelOutput(output: TOutput, optInLevel: AiOptInLevel): JSONValue
 }
 
 export type ToolContractInput<C extends ToolContract> = z.infer<C['inputSchema']>

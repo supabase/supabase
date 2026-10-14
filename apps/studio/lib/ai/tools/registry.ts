@@ -49,7 +49,6 @@ export function sanitizeContractPart<Part extends ToolUIPart>(
 ): Part | undefined {
   const contract = getToolContract(part.type.slice('tool-'.length))
   if (!contract) return undefined
-  if (!contract.toModelOutput) return part
 
   const parsed = contract.outputSchema.safeParse(part.output)
   return {
