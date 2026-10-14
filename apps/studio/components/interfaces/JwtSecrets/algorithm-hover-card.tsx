@@ -1,9 +1,4 @@
-import {
-  ExternalLinkIcon,
-  HelpCircleIcon,
-  LockKeyholeOpenIcon,
-  RectangleEllipsisIcon,
-} from 'lucide-react'
+import { ExternalLinkIcon, HelpCircleIcon } from 'lucide-react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
 import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
@@ -17,13 +12,9 @@ export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProp
   const details: AlgorithmDetail = algorithmDetails[algorithm]
 
   return (
-    <div className="flex items-center gap-x-2">
-      {algorithm === 'HS256' ? (
-        <RectangleEllipsisIcon className="shrink-0" size={14} />
-      ) : (
-        <LockKeyholeOpenIcon className="shrink-0" size={14} />
-      )}
-      <p>{legacy ? `Legacy ${details.label}` : details.label}</p>
+    <div className="flex items-center gap-x-2 whitespace-nowrap">
+      <p>{details.label}</p>
+
       <HoverCard closeDelay={50} openDelay={300}>
         <HoverCardTrigger className="min-w-0">
           <HelpCircleIcon size={14} className="text-foreground-lighter" />
