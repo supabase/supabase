@@ -3029,6 +3029,9 @@ importers:
       scroll-into-view-if-needed:
         specifier: ^3.1.0
         version: 3.1.0
+      shiki:
+        specifier: 'catalog:'
+        version: 4.5.0
       smol-toml:
         specifier: ^1.6.1
         version: 1.9.0

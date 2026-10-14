@@ -31,7 +31,8 @@ describe('token class names', () => {
     const colors = themeColors()
     expect(colors.length).toBeGreaterThan(0)
 
-    const css = readFileSync(new URL('../../../styles/code-block.css', import.meta.url), 'utf8')
+    const css = readFileSync(`${import.meta.dirname}/code-block.css`, 'utf8')
+
     for (const color of colors) {
       expect(getTokenClassName(color, 0), `${color} is missing from the class table`).toMatch(
         /^s-[a-z]$/
