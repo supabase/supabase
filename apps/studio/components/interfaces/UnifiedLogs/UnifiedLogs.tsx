@@ -51,6 +51,7 @@ import {
   getFacetedUniqueValues,
   getLevelRowClassName,
 } from './UnifiedLogs.utils'
+import { useLiveLogBatches } from './useLiveLogBatches'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -67,7 +68,10 @@ import { useTableRowSelection } from '@/components/ui/DataTable/useTableRowSelec
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
-import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import {
+  useUnifiedLogsBackend,
+  useUnifiedLogsInfiniteQuery,
+} from '@/data/logs/unified-logs-infinite-query'
 import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -94,6 +98,7 @@ export const UnifiedLogs = () => {
   useResetFocus()
 
   const { ref: projectRef } = useParams()
+  const useOtel = useUnifiedLogsBackend()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
@@ -186,13 +191,15 @@ export const UnifiedLogs = () => {
     isError,
     isLoading,
     isFetching,
-    isFetchingNextPage,
-    isFetchingPreviousPage,
+    isPlaceholderData,
     hasNextPage,
     refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+  } = useUnifiedLogsInfiniteQuery({
+    projectRef,
+    search: searchParameters,
+  })
 
   const {
     data: counts,
@@ -221,13 +228,16 @@ export const UnifiedLogs = () => {
 
   const isRefetchingData = isFetching || isFetchingCounts || isFetchingCharts
 
-  // Only fade when filtering (not when loading more data or live mode)
-  const isFetchingButNotPaginating = isFetching && !isFetchingNextPage && !isFetchingPreviousPage
-
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
   const flatData = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
+  const { fetchLiveLogs } = useLiveLogBatches({
+    scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
+    isPlaceholderData,
+    fetchPreviousPage,
+    refetchCounts,
+  })
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -471,12 +481,10 @@ export const UnifiedLogs = () => {
                   />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
-                  {fetchPreviousPage ? (
-                    <LiveButton
-                      fetchPreviousPage={fetchPreviousPage}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
-                  ) : null}
+                  <LiveButton
+                    fetchPreviousPage={fetchLiveLogs}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
                 </div>
               </div>
 
@@ -503,14 +511,7 @@ export const UnifiedLogs = () => {
               className="flex-1 border-t"
               orientation={dock === 'bottom' ? 'vertical' : 'horizontal'}
             >
-              <ResizablePanel
-                defaultSize="100"
-                minSize="10"
-                className={cn(
-                  'bg',
-                  isFetchingButNotPaginating && 'opacity-60 transition-opacity duration-150'
-                )}
-              >
+              <ResizablePanel defaultSize="100" minSize="10" className="bg">
                 <div
                   className={cn(
                     'h-full [&>div]:h-full',
