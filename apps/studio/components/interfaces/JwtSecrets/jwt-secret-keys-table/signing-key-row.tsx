@@ -132,10 +132,7 @@ export const SigningKeyRow = ({
     <TableCell className="font-mono whitespace-nowrap">{signingKey.id}</TableCell>
 
     <TableCell>
-      <AlgorithmHoverCard
-        algorithm={signingKey.algorithm}
-        legacy={signingKey.id === legacyKey?.id}
-      />
+      <AlgorithmHoverCard algorithm={signingKey.algorithm} />
     </TableCell>
 
     {isLastUsedVisible && (

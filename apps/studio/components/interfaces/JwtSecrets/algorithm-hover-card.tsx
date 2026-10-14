@@ -5,10 +5,9 @@ import { AlgorithmDetail, algorithmDetails } from './algorithm-details'
 
 interface AlgorithmHoverCardProps {
   algorithm: keyof typeof algorithmDetails
-  legacy?: boolean
 }
 
-export const AlgorithmHoverCard = ({ algorithm, legacy }: AlgorithmHoverCardProps) => {
+export const AlgorithmHoverCard = ({ algorithm }: AlgorithmHoverCardProps) => {
   const details: AlgorithmDetail = algorithmDetails[algorithm]
 
   return (
