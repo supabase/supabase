@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -534,7 +534,7 @@ export const GitHubIntegrationConnectionForm = ({
                                 </FormControl>
                                 <div className="absolute top-2.5 right-3 flex items-center gap-2">
                                   {isCheckingBranch && (
-                                    <Loader2 size={14} className="animate-spin" />
+                                    <Loader2Icon size={14} className="animate-spin" />
                                   )}
                                 </div>
                               </div>

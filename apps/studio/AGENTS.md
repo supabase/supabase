@@ -83,7 +83,7 @@ Older Studio code predates some of these conventions. For new or modified code, 
 - **Permissions**: `useAsyncCheckPermissions` from `hooks/misc/useCheckPermissions` (returns `can: true` when self-hosted).
 - **Gating**: `useIsFeatureEnabled` for product features, `useFlag` from `'common'` for feature flags — two different systems.
 - **Dates**: `dayjs` (plugins pre-loaded at both entries, `pages/_app.tsx` and `routes/__root.tsx`), not `date-fns`. **Toasts**: `toast` from `'sonner'`.
-- **Import split**: `'ui'` = primitives, `'ui-patterns'` = composed patterns (`ConfirmationModal`, …), `@ui/*` = alias into `packages/ui/src`. Icons come from `lucide-react`.
+- **Import split**: `'ui'` = primitives, `'ui-patterns'` = composed patterns (`ConfirmationModal`, …), `@ui/*` = alias into `packages/ui/src`. Icons come from `lucide-react`, always imported with the `Icon` suffix (`import { CheckIcon, Trash2Icon } from 'lucide-react'`) — never the bare names (`Check`) or `Check as CheckIcon` aliases (lint-enforced).
 - **New tables** use `@tanstack/react-table`; `react-data-grid` is banned for new code.
 - **Ad-hoc SQL** against the user's database goes through `executeSql` / `useExecuteSqlMutation` (`data/sql/execute-sql-mutation`).
 - **Confirmations**: `ConfirmationModal` / `TextConfirmModal` from `ui-patterns`, never `window.confirm`. Disabled buttons needing an explanation use `ButtonTooltip`; inline warnings use `Admonition`.

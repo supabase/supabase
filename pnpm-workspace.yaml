@@ -38,6 +38,7 @@ catalog:
   lodash: ^4.18.1
   lodash-es: ^4.18.1
   monaco-editor: 0.52.2
+  motion: ^11.18.2
   next: ^16.3.6
   next-themes: ^0.4.6
   postcss: ^8.5.18
@@ -45,6 +46,8 @@ catalog:
   react: ^19.2.6
   react-dom: ^19.2.6
   recharts: ^2.15.4
+  rehype-pretty-code: ^0.14.5
+  shiki: ^4.5.0
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
   typescript: ~6.0.2

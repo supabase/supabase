@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Book, Github, Loader2 } from 'lucide-react'
+import { BookIcon, GithubIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { extensions } from 'shared-data'
@@ -129,7 +129,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell>
           <div className="flex gap-2 items-center">
             {extensionMeta?.github_url && (
-              <Button asChild icon={<Github />} className="rounded-full">
+              <Button asChild icon={<GithubIcon />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -141,7 +141,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               </Button>
             )}
             {docsUrl !== undefined && (
-              <Button asChild icon={<Book />} className="rounded-full">
+              <Button asChild icon={<BookIcon />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -162,7 +162,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell className="w-20 relative">
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">
             {isDisabling ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2Icon className="animate-spin" size={16} />
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>

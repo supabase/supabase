@@ -93,11 +93,11 @@ export const IntegrationSettings = () => {
         </Admonition>
       )}
 
-      <GitHubSection isProjectScoped={true} />
+      <GitHubSection isProjectScoped />
 
       {showVercelIntegration && (
         <>
-          <VercelSection isProjectScoped={true} />
+          <VercelSection isProjectScoped />
           <SidePanelVercelProjectLinker />
         </>
       )}

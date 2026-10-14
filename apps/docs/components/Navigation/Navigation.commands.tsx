@@ -62,7 +62,7 @@ const navCommands = [
   {
     id: 'nav-local-cli',
     name: 'Go to Local Dev / CLI',
-    route: '/guides/cli',
+    route: '/guides/local-development',
     icon: () => <ArrowRight />,
   },
   {

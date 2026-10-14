@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Calendar, Info, PartyPopper } from 'lucide-react'
+import { CalendarIcon, InfoIcon, PartyPopperIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -218,7 +218,7 @@ export const CreditCodeRedemption = ({
         {!!codeRedemptionResult ? (
           <div className="p-8">
             <div className="text-center flex items-center justify-center">
-              <PartyPopper strokeWidth={1} className="h-14 w-14" />
+              <PartyPopperIcon strokeWidth={1} className="h-14 w-14" />
             </div>
 
             <div className="text-center">
@@ -235,7 +235,7 @@ export const CreditCodeRedemption = ({
 
             {codeRedemptionResult.credits_expire_at && (
               <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
-                <Calendar className="h-4 w-4" />
+                <CalendarIcon className="h-4 w-4" />
                 <span>
                   Your credits expire on{' '}
                   <TimestampInfo
@@ -250,7 +250,7 @@ export const CreditCodeRedemption = ({
 
             {!!redemptionNotice && (
               <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
-                <Info className="h-4 w-4 shrink-0" />
+                <InfoIcon className="h-4 w-4 shrink-0" />
                 <span>{redemptionNotice}</span>
               </div>
             )}
