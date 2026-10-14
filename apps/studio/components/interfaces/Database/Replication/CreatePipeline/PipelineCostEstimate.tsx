@@ -174,11 +174,10 @@ export const PipelineCostEstimate = ({
               </Table>
             </div>
             <p className="text-sm text-foreground-lighter">
-              Replication usage depends on how often published data changes. See{' '}
+              Replication usage depends on how often published data changes.{' '}
               <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
-                how data processed is measured
+                Learn more
               </InlineLink>
-              .
             </p>
           </section>
         </div>
