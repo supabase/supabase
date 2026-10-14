@@ -20,7 +20,6 @@ function AiTools({
   /** ID of the rendered article, copied as HTML when the page's markdown can't be fetched. */
   articleId: string
   showAgentSetup?: boolean
-  /** Replaces the default heading classes so the heading can match the surrounding layout. */
   headingClassName?: string
   className?: string
 }) {
