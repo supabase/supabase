@@ -1,7 +1,7 @@
 import type { Provider } from '@supabase/auth-js'
-import { useFlag } from 'common'
+import { useFlag, useUser } from 'common'
 import dayjs from 'dayjs'
-import { Edit, Unlink } from 'lucide-react'
+import { Edit, Mail, Unlink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -19,6 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
@@ -37,11 +38,13 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 import { captureCriticalError } from '@/lib/error-reporting'
 import {
   buildProviderAuthRedirect,
@@ -51,10 +54,21 @@ import {
 import { getErrorMessage } from '@/lib/get-error-message'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
 
-export const AccountIdentities = () => {
+type AccountIdentitiesProps = {
+  findings?: AccountRecoveryFinding[]
+  primaryAction?: AccountRecoveryFinding['action'] | 'enable-mfa'
+}
+
+export const AccountIdentities = ({ findings = [], primaryAction }: AccountIdentitiesProps) => {
   const router = useRouter()
 
-  const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
+  const {
+    data,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useProfileIdentitiesQuery({ userId: useUser()?.id })
 
   const enabledProviders = useEnabledIdentityProviders()
   const connectableExternalProviders = useMemo(
@@ -65,6 +79,8 @@ export const AccountIdentities = () => {
   const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
 
   const identities = data?.identities ?? []
+  const isManagedAccount = identities.some((identity) => identity.provider.startsWith('sso'))
+  const hasPasswordFinding = findings.some((finding) => finding.id === 'single-oauth-identity')
   const showAddPasswordRow =
     isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
   const isChangeExpired = data?.email_change_sent_at
@@ -106,7 +122,9 @@ export const AccountIdentities = () => {
     setLinkingProviderId(provider.id)
 
     try {
-      const redirectTo = buildPathWithParams(buildProviderAuthRedirect(provider.id, '/account/me'))
+      const redirectTo = buildPathWithParams(
+        buildProviderAuthRedirect(provider.id, '/account/security')
+      )
 
       const { error } = await auth.linkIdentity({
         provider: provider.authProvider as Provider,
@@ -129,114 +147,172 @@ export const AccountIdentities = () => {
     if (message) toast.success(message)
   }, [message])
 
+  const renderMethods = () => (
+    <Card>
+      {isLoading && (
+        <CardContent>
+          <ShimmeringLoader />
+        </CardContent>
+      )}
+      {isSuccess && (
+        <div className="divide-y">
+          {identities.map((identity) => {
+            const { identity_id, provider } = identity
+            const username = identity.identity_data?.user_name
+            const providerDisplay = getProviderDisplay(provider)
+            const providerName = providerDisplay.displayName
+            const configuredProvider = getConfiguredExternalProvider(provider)
+            const canUpdateEmail = !configuredProvider
+
+            return (
+              <CardContent
+                key={identity_id}
+                className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex gap-x-4">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
+                  >
+                    {provider === 'email' ? (
+                      <Mail size={18} strokeWidth={2.5} />
+                    ) : (
+                      <IdentityProviderIcon display={providerDisplay} size={30} />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-x-2">
+                      <p className="text-sm capitalize">{providerName}</p>
+                      {provider === 'email' && data.new_email && !isChangeExpired && (
+                        <Tooltip>
+                          <TooltipTrigger className="flex items-center">
+                            <Badge variant="default">Pending change</Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>Changing to {data.new_email}</TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <p className="text-sm text-foreground-lighter">
+                      {!!username ? <span>{username} · </span> : null}
+                      {identity.email}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-x-1">
+                  {provider === 'email' && (
+                    <Button variant="default" asChild>
+                      <Link href="/reset-password?type=change">Change password</Link>
+                    </Button>
+                  )}
+                  {canUpdateEmail && (
+                    <ButtonTooltip
+                      variant="default"
+                      size="tiny"
+                      icon={<Edit size={14} />}
+                      aria-label="Update email address"
+                      onClick={() => setSelectedProviderUpdateEmail(provider)}
+                      tooltip={{ content: { side: 'top', text: 'Update email address' } }}
+                    />
+                  )}
+                  {identities.length > 1 && (
+                    <ButtonTooltip
+                      variant="text"
+                      icon={<Unlink />}
+                      className="w-7"
+                      onClick={() => setSelectedProviderUnlink(provider)}
+                      tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
+                    />
+                  )}
+                </div>
+              </CardContent>
+            )
+          })}
+
+          {unlinkedExternalProviders.map((provider) => {
+            const providerDisplay = getProviderDisplay(provider.authProvider)
+
+            return (
+              <CardContent
+                key={provider.id}
+                className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="flex gap-x-4">
+                  <div
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${providerDisplay.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'}`}
+                  >
+                    <IdentityProviderIcon display={providerDisplay} size={30} />
+                  </div>
+                  <div>
+                    <p className="text-sm">{provider.displayName}</p>
+                    <p className="text-sm text-foreground-lighter">
+                      Link your {provider.displayName} account to sign in with{' '}
+                      {provider.displayName}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="default"
+                  loading={linkingProviderId === provider.id}
+                  disabled={!!linkingProviderId}
+                  onClick={() => onLinkExternalProvider(provider)}
+                >
+                  Connect
+                </Button>
+              </CardContent>
+            )
+          })}
+        </div>
+      )}
+    </Card>
+  )
+
   return (
-    <PageSection>
+    <PageSection id="sign-in-methods" className="scroll-mt-6">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Sign-in methods</PageSectionTitle>
           <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
+            Choose how you sign in to your Supabase account.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
-      <PageSectionContent>
-        <Card>
-          {isLoading && (
-            <CardContent>
-              <ShimmeringLoader />
-            </CardContent>
-          )}
-          {isSuccess && (
-            <div className="divide-y">
-              {showAddPasswordRow && !!data.email && <AddPasswordRow email={data.email} />}
-
-              {identities.map((identity) => {
-                const { identity_id, provider } = identity
-                const username = identity.identity_data?.user_name
-                const providerDisplay = getProviderDisplay(provider)
-                const providerName = providerDisplay.displayName
-                const configuredProvider = getConfiguredExternalProvider(provider)
-                const canUpdateEmail = !configuredProvider
-
-                return (
-                  <CardContent key={identity_id} className="flex justify-between items-center py-4">
-                    <div className="flex gap-x-4">
-                      <IdentityProviderIcon display={providerDisplay} size={30} />
-                      <div>
-                        <div className="flex items-center gap-x-2">
-                          <p className="text-sm capitalize">{providerName}</p>
-                          {provider === 'email' && data.new_email && !isChangeExpired && (
-                            <Tooltip>
-                              <TooltipTrigger className="flex items-center">
-                                <Badge variant="default">Pending change</Badge>
-                              </TooltipTrigger>
-                              <TooltipContent>Changing to {data.new_email}</TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                        <p className="text-sm text-foreground-lighter">
-                          {!!username ? <span>{username} · </span> : null}
-                          {identity.email}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-x-1">
-                      {provider === 'email' && (
-                        <Button asChild>
-                          <Link href="/reset-password?type=change">Change password</Link>
-                        </Button>
-                      )}
-                      {canUpdateEmail && (
-                        <ButtonTooltip
-                          variant="text"
-                          icon={<Edit />}
-                          className="w-7"
-                          onClick={() => setSelectedProviderUpdateEmail(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
-                        />
-                      )}
-                      {identities.length > 1 && (
-                        <ButtonTooltip
-                          variant="text"
-                          icon={<Unlink />}
-                          className="w-7"
-                          onClick={() => setSelectedProviderUnlink(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
-                        />
-                      )}
-                    </div>
-                  </CardContent>
-                )
-              })}
-
-              {unlinkedExternalProviders.map((provider) => {
-                const providerDisplay = getProviderDisplay(provider.authProvider)
-
-                return (
-                  <CardContent key={provider.id} className="flex justify-between items-center py-4">
-                    <div className="flex gap-x-4">
-                      <IdentityProviderIcon display={providerDisplay} size={30} />
-                      <div>
-                        <p className="text-sm">{provider.displayName}</p>
-                        <p className="text-sm text-foreground-lighter">
-                          Link your {provider.displayName} account to sign in with{' '}
-                          {provider.displayName}
-                        </p>
-                      </div>
-                    </div>
-                    <Button
-                      loading={linkingProviderId === provider.id}
-                      disabled={!!linkingProviderId}
-                      onClick={() => onLinkExternalProvider(provider)}
-                    >
-                      Connect
-                    </Button>
-                  </CardContent>
-                )
-              })}
-            </div>
-          )}
-        </Card>
+      <PageSectionContent className="flex flex-col gap-4">
+        {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
+        {!!data?.email && (
+          <AddPasswordRow email={data.email} isPrimary={primaryAction === 'set-password'}>
+            {({ onOpen }) => {
+              if (!isSuccess || !showAddPasswordRow) return renderMethods()
+              return (
+                <>
+                  <Admonition
+                    type={hasPasswordFinding ? 'warning' : 'default'}
+                    layout="responsive"
+                    title="Add a password for email sign-in"
+                    description={
+                      hasPasswordFinding
+                        ? `Use ${data.email} and a password as another way to sign in if you lose access to ${getProviderDisplay(identities[0]?.provider ?? '').displayName}.`
+                        : `Add a password to sign in with ${data.email}.`
+                    }
+                    actions={
+                      <Button
+                        variant={primaryAction === 'set-password' ? 'primary' : 'default'}
+                        onClick={onOpen}
+                      >
+                        Add password
+                      </Button>
+                    }
+                  />
+                  {renderMethods()}
+                </>
+              )
+            }}
+          </AddPasswordRow>
+        )}
+        {isSuccess && isManagedAccount && (
+          <p className="text-sm text-foreground-light">
+            Your organization manages how you sign in.
+          </p>
+        )}
+        {!data?.email && renderMethods()}
 
         <Dialog
           open={!!selectedProviderUpdateEmail}

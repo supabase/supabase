@@ -118,7 +118,7 @@ describe('AccountIdentities', () => {
     renderAccountIdentities()
 
     expect(await screen.findByRole('button', { name: 'Add password' })).toBeInTheDocument()
-    expect(screen.getByText('Email')).toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Change password' })).not.toBeInTheDocument()
   })
 
@@ -211,5 +211,48 @@ describe('AccountIdentities', () => {
       )
     ).toBeInTheDocument()
     expect(updateUserMock).not.toHaveBeenCalled()
+  })
+  it('shows the password fallback recommendation from the evaluator', async () => {
+    mockGetUser([githubIdentity])
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/enabled-features-overrides`, () =>
+        HttpResponse.json({ disabled_features: [] })
+      )
+    )
+    customRender(
+      <AccountIdentities
+        findings={[{ id: 'single-oauth-identity', severity: 'warning', action: 'set-password' }]}
+        primaryAction="set-password"
+      />
+    )
+    expect(await screen.findByText('Add a password for email sign-in')).toBeInTheDocument()
+    expect(
+      await screen.findByText(
+        `Use ${EMAIL} and a password as another way to sign in if you lose access to GitHub.`
+      )
+    ).toBeInTheDocument()
+    expect(screen.getByText('Choose how you sign in to your Supabase account.')).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Add password' })).toHaveLength(1)
+    await userEvent.click(screen.getByRole('button', { name: 'Add password' }))
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+  })
+
+  it('opens the password action from a deep link and clears only that parameter on cancel', async () => {
+    mockGetUser([githubIdentity])
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/enabled-features-overrides`, () =>
+        HttpResponse.json({ disabled_features: [] })
+      )
+    )
+    const onUrlUpdate = vi.fn()
+    customRender(<AccountIdentities />, {
+      nuqs: { searchParams: '?securityAction=set-password&other=keep', onUrlUpdate },
+    })
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(onUrlUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryString: '?other=keep' })
+    )
   })
 })

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { profileKeys } from './keys'
+import { permissionKeys } from '@/data/permissions/keys'
 import { captureCriticalError } from '@/lib/error-reporting'
 import { auth } from '@/lib/gotrue'
 import { UseCustomMutationOptions } from '@/types'
@@ -48,6 +49,7 @@ export const useMfaChallengeAndVerifyMutation = ({
           ? [queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors() })]
           : []),
         queryClient.invalidateQueries({ queryKey: profileKeys.aaLevel() }),
+        queryClient.resetQueries({ queryKey: permissionKeys.list() }),
       ])
 
       await onSuccess?.(data, variables, context)

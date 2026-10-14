@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
-import { useState } from 'react'
+import { Eye, EyeOff, Mail } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+import { useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -22,7 +23,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
 import PasswordConditionsHelper from '@/components/interfaces/SignIn/PasswordConditionsHelper'
-import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useSetPasswordMutation } from '@/data/profile/profile-set-password-mutation'
 import { getProviderDisplay } from '@/lib/external-identity-providers'
 import { passwordValidation } from '@/lib/password-validation'
@@ -42,29 +42,51 @@ const defaultValues: FormValues = { password: '' }
  * Auth creates the email identity for the user's current email when the password is
  * saved.
  */
-export const AddPasswordRow = ({ email }: { email: string }) => {
+export const AddPasswordRow = ({
+  email,
+  isPrimary = false,
+  children,
+}: {
+  email: string
+  isPrimary?: boolean
+  children?: (options: { onOpen: () => void; row: ReactNode }) => ReactNode
+}) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
+  const isOpen = isDialogOpen || securityAction === 'set-password'
+  const handleOpenChange = (open: boolean) => {
+    setIsDialogOpen(open)
+    if (!open && securityAction === 'set-password') void setSecurityAction(null)
+  }
   const providerDisplay = getProviderDisplay('email')
+
+  const row = (
+    <CardContent className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex gap-x-4">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+          <Mail size={18} strokeWidth={2.5} />
+        </div>
+        <div>
+          <p className="text-sm">{providerDisplay.displayName}</p>
+          <p className="text-sm text-foreground-lighter">{email}</p>
+        </div>
+      </div>
+      <Button variant={isPrimary ? 'primary' : 'default'} onClick={() => handleOpenChange(true)}>
+        Add password
+      </Button>
+    </CardContent>
+  )
 
   return (
     <>
-      <CardContent className="flex justify-between items-center py-4">
-        <div className="flex gap-x-4">
-          <IdentityProviderIcon display={providerDisplay} size={30} />
-          <div>
-            <p className="text-sm">{providerDisplay.displayName}</p>
-            <p className="text-sm text-foreground-lighter">{email}</p>
-          </div>
-        </div>
-        <Button onClick={() => setIsDialogOpen(true)}>Add password</Button>
-      </CardContent>
+      {children ? children({ onOpen: () => handleOpenChange(true), row }) : row}
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogContent>
           <DialogHeader className="border-b">
             <DialogTitle>Add password</DialogTitle>
           </DialogHeader>
-          <AddPasswordForm email={email} onClose={() => setIsDialogOpen(false)} />
+          <AddPasswordForm email={email} onClose={() => handleOpenChange(false)} />
         </DialogContent>
       </Dialog>
     </>

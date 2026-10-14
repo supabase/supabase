@@ -26,7 +26,10 @@ interface RecoveryCodesModalProps<T>
   extends
     Omit<ComponentProps<typeof Dialog>, 'onOpenChange'>,
     Required<Pick<ComponentProps<typeof Dialog>, 'onOpenChange'>> {
-  mutation: UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>
+  mutation: Pick<
+    UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>,
+    'data' | 'status' | 'error' | 'isError' | 'isPending' | 'isSuccess' | 'reset'
+  >
 }
 
 export const RecoveryCodesModal = <T = unknown,>({
@@ -153,7 +156,7 @@ export const RecoveryCodesModal = <T = unknown,>({
 
               <Admonition
                 type="warning"
-                title="You won't see these codes again"
+                title="You won’t see these codes again"
                 description="Save them somewhere safe. If you lose them, you'll need to regenerate new codes."
               >
                 <div className="flex items-center space-x-2 mt-2">
