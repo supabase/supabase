@@ -39,6 +39,15 @@ const NO_MODULE_SCOPE_CREATE_CLIENT = {
     'Do not construct a Supabase client at module scope in API route files — the TanStack server evaluates every route module at boot, so a missing env var (e.g. SUPABASE_URL on platform) crashes every route. Construct it lazily inside the handler (see lib/api/self-hosted-admin.ts).',
 }
 
+const LUCIDE_ICON_IMPORT_PATTERNS = [
+  {
+    group: ['lucide-react'],
+    importNamePattern: '^(?!.*Icon$)(?!Lucide)(?!icons$)(?!create)',
+    message:
+      'Import Lucide icons with the Icon suffix (e.g. `CheckIcon`, not `Check` or `Check as CheckIcon`).',
+  },
+]
+
 const BASE_RESTRICTED_IMPORT_PATHS = [
   {
     name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
@@ -85,6 +94,7 @@ module.exports = defineConfig([
         'error',
         {
           paths: BASE_RESTRICTED_IMPORT_PATHS,
+          patterns: LUCIDE_ICON_IMPORT_PATTERNS,
         },
       ],
       'barrel-files/avoid-re-export-all': 'error',
@@ -133,7 +143,10 @@ module.exports = defineConfig([
     rules: {
       'no-restricted-imports': [
         'error',
-        { paths: [...BASE_RESTRICTED_IMPORT_PATHS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATHS] },
+        {
+          paths: [...BASE_RESTRICTED_IMPORT_PATHS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATHS],
+          patterns: LUCIDE_ICON_IMPORT_PATTERNS,
+        },
       ],
     },
   },

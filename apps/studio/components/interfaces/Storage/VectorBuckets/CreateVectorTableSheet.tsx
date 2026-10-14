@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus, Trash2 } from 'lucide-react'
+import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -202,7 +202,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           size="tiny"
           variant="primary"
           className="w-fit"
-          icon={<Plus size={14} />}
+          icon={<PlusIcon size={14} />}
           disabled={!canCreateBuckets}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -376,7 +376,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                       variant="text"
                       className="w-[34px] h-[34px]" // Match the height of the input
                       size="tiny"
-                      icon={<Trash2 size={12} />}
+                      icon={<Trash2Icon size={12} />}
                       onClick={() => remove(index)}
                     />
                   </div>

@@ -1,6 +1,6 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { noop } from 'lodash'
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDownIcon, XIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -185,7 +185,7 @@ export const FilterPopover = <T extends Record<string, any>>({
           variant={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
           className={variant === 'rounded' ? 'rounded-full' : ''}
-          iconRight={<ChevronDown />}
+          iconRight={<ChevronDownIcon />}
         >
           <div>
             <span>{name}</span>
@@ -226,7 +226,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             placeholder="Search for a project..."
             actions={
               (search ?? '').length > 0 ? (
-                <X size={14} className="cursor-pointer mr-1" onClick={() => setSearch('')} />
+                <XIcon size={14} className="cursor-pointer mr-1" onClick={() => setSearch('')} />
               ) : null
             }
           />

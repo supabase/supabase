@@ -1,4 +1,4 @@
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -18,7 +18,7 @@ export const UnenrollRecoveryCodesModal = () => {
   return (
     <>
       <ButtonTooltip
-        icon={<Trash />}
+        icon={<TrashIcon />}
         aria-label="Delete recovery codes"
         onClick={() => setShowConfirm(true)}
         tooltip={{ content: { side: 'bottom', text: 'Delete recovery codes' } }}

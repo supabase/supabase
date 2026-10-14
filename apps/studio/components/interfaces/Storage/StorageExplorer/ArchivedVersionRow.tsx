@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { MoreVertical, RotateCcw, Trash2 } from 'lucide-react'
+import { MoreVerticalIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -84,7 +84,7 @@ export const ArchivedVersionRow = ({
           variant="text"
           size="tiny"
           className="px-1.5"
-          icon={<MoreVertical size={14} />}
+          icon={<MoreVerticalIcon size={14} />}
           aria-label={`Actions for version ${shortVersion(version.versionId)}`}
         />
       </DropdownMenuTrigger>
@@ -94,7 +94,7 @@ export const ArchivedVersionRow = ({
           disabled={!canUpdateFiles || isRestoring}
           onClick={onRestore}
         >
-          <RotateCcw size={14} />
+          <RotateCcwIcon size={14} />
           Restore as current
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -103,7 +103,7 @@ export const ArchivedVersionRow = ({
           disabled={!canUpdateFiles || isDeleting}
           className="gap-x-2 text-destructive focus:text-destructive"
         >
-          <Trash2 size={14} />
+          <Trash2Icon size={14} />
           Delete permanently
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,4 +1,4 @@
-import { ArrowUpRight, Book, BookOpen } from 'lucide-react'
+import { ArrowUpRightIcon, BookIcon, BookOpenIcon } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
 import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
@@ -97,7 +97,7 @@ export const generateDocsMenu = (
             />
           ),
           items: [],
-          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          rightIcon: <ArrowUpRightIcon strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },
@@ -108,7 +108,7 @@ export const generateDocsMenu = (
           name: 'Guides',
           key: 'guides',
           url: DOCS_URL,
-          icon: <Book size={14} strokeWidth={2} />,
+          icon: <BookIcon size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
         },
@@ -116,7 +116,7 @@ export const generateDocsMenu = (
           name: 'API Reference',
           key: 'api-reference',
           url: `${DOCS_URL}/guides/api`,
-          icon: <BookOpen size={14} strokeWidth={2} />,
+          icon: <BookOpenIcon size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
         },

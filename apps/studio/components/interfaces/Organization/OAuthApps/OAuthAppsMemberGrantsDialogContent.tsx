@@ -1,6 +1,6 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Building, User } from 'lucide-react'
+import { BuildingIcon, UserIcon } from 'lucide-react'
 import { ComponentProps, useEffect, useMemo } from 'react'
 import {
   Button,
@@ -119,7 +119,7 @@ export const OAuthAppsMemberGrantsDialogContent = ({
 const GrantAccordionItem = ({ grant }: { grant: OAuthGrantItem }) => {
   const isOrganizationBound = grant.kind === 'organization_bound'
   const permissionCount = grant.approved_scopes.length
-  const Icon = isOrganizationBound ? Building : User
+  const Icon = isOrganizationBound ? BuildingIcon : UserIcon
 
   const projectsSummary =
     grant.projects == null

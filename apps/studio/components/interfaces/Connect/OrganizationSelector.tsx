@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheck } from 'ui'
 
@@ -122,7 +122,7 @@ export const OrganizationSelector = ({
           <Collapsible open={showMore} onOpenChange={setShowMore}>
             <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>{showMore ? 'Show fewer' : `Show ${overflowOrganizations.length} more`}</span>
-              <ChevronDown className="size-3.5 transition-transform" />
+              <ChevronDownIcon className="size-3.5 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-2 pt-1">
@@ -147,7 +147,7 @@ export const OrganizationSelector = ({
           <Collapsible>
             <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>Organizations that can't be linked</span>
-              <ChevronDown className="size-3.5 transition-transform" />
+              <ChevronDownIcon className="size-3.5 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-2 pt-1">

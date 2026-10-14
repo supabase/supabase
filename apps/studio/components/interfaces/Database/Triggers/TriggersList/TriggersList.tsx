@@ -1,6 +1,6 @@
 import { safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Search } from 'lucide-react'
+import { DatabaseZapIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -264,7 +264,7 @@ execute function function_name();`
                 onKeyDown={onSearchInputEscape(filterString, setFilterString)}
               />
               <InputGroupAddon>
-                <Search />
+                <SearchIcon />
               </InputGroupAddon>
             </InputGroup>
             <ReportsSelectFilter
@@ -293,7 +293,7 @@ execute function function_name();`
 
         {!isSchemaLocked && (schemaTriggers ?? []).length === 0 ? (
           <EmptyStatePresentational
-            icon={DatabaseZap}
+            icon={DatabaseZapIcon}
             title="Add your first trigger"
             description="Make your database reactive. Send updates in realtime, call edge functions, or validate data as it comes in."
           >

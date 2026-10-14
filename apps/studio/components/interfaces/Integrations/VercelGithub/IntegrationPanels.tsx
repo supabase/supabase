@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, Github } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, GithubIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
@@ -29,7 +29,7 @@ type HandleIconType = Integration['integration']['name'] | 'Supabase'
 const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
     case 'GitHub':
-      return <Github strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+      return <GithubIcon strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
     // case 'Netlify':
     //   return <Square strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
@@ -118,7 +118,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} iconRight={<ExternalLink />}>
+        <Button asChild disabled={disabled} iconRight={<ExternalLinkIcon />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -190,7 +190,7 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
                 </span>
               </div>
 
-              <ArrowRight
+              <ArrowRightIcon
                 size={14}
                 className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
@@ -259,7 +259,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <ArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
+            <ArrowRightIcon size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
