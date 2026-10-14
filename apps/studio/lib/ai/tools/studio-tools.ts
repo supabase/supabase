@@ -2,6 +2,8 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import type { ToolContext } from './types'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -13,6 +15,7 @@ import {
   RLS_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
+import { isOptInLevelAtLeast, updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
@@ -53,39 +56,33 @@ export const loadKnowledgeInputSchema = z.object({
     .describe('The knowledge to load'),
 })
 
-export type StudioToolsContext = {
-  projectRef?: string
-  connectionString?: string
-  authorization?: string
-  aiOptInLevel?: AiOptInLevel
-}
-
-export const getStudioTools = (ctx: StudioToolsContext = {}) => {
+export const getStudioTools = (ctx: ToolContext = {}) => {
   const { projectRef, connectionString, authorization, aiOptInLevel = 'schema' } = ctx
-  const authHeaders = authorization
-    ? { 'Content-Type': 'application/json', Authorization: authorization }
-    : undefined
+  const authHeaders = getAuthHeaders(authorization, { contentType: true })
 
   return {
+    // Tools that wait on the user use `needsApproval` with a server-side `execute`, not a
+    // client tool resolved through `addToolResult`. Client results never land in a Braintrust
+    // tool span: https://github.com/supabase/supabase/pull/45654
     execute_sql: tool({
       description:
         'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
-      execute: async ({ sql }) => {
+      execute: async ({ sql }, { abortSignal }) => {
         // The `needsApproval: true` gate on this tool means the user has
         // explicitly approved this AI-generated SQL before execute runs —
         // that approval is the user gesture that promotes untrusted to safe.
         const { result } = await executeSql(
           { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
-          undefined,
+          abortSignal,
           authHeaders
         )
-        return result
+        return { rows: Array.isArray(result) ? result : [], optInLevel: aiOptInLevel }
       },
       toModelOutput: ({ output }) => {
         return aiOptInLevel === 'schema_and_log_and_data'
-          ? { type: 'json', value: output }
+          ? { type: 'json', value: output.rows }
           : { type: 'text', value: NO_DATA_PERMISSIONS }
       },
     }),
@@ -129,3 +126,31 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
     }),
   }
 }
+
+// Rewritten at parse time so the stored input is what the card shows. A level the org already
+// has is a review request, and `levelWhenAsked` outlives the user changing the setting.
+export const createUpdateOptInLevelInputSchema = (aiOptInLevel: AiOptInLevel) =>
+  updateOptInLevelInputSchema.transform(({ requiredLevel }) => ({
+    levelWhenAsked: aiOptInLevel,
+    ...(requiredLevel && !isOptInLevelAtLeast(aiOptInLevel, requiredLevel) && { requiredLevel }),
+  }))
+
+/** Registered at every level so an approval that lands on the top level can still execute. */
+export const getOptInTools = ({ aiOptInLevel }: { aiOptInLevel: AiOptInLevel }) => ({
+  update_opt_in_level: tool({
+    description:
+      'Asks the user to review or change the organization-wide AI opt-in level. Call it with `requiredLevel` when a tool needs a higher level than the organization has or you need to read query results. Call it without `requiredLevel` whenever the user asks to change the setting, including lowering it. Do not call it again in the same chat after the user skipped it unless they ask.',
+    inputSchema: createUpdateOptInLevelInputSchema(aiOptInLevel),
+    needsApproval: true,
+    execute: async ({ requiredLevel }) => {
+      const sufficient = !requiredLevel || isOptInLevelAtLeast(aiOptInLevel, requiredLevel)
+      return {
+        levelAfterReview: aiOptInLevel,
+        ...(requiredLevel && { sufficient }),
+        ...(!sufficient && {
+          status: `The opt-in level is still below the requested ${requiredLevel}. If you still need that access, call update_opt_in_level again.`,
+        }),
+      }
+    },
+  }),
+})

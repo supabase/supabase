@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2, NotebookText, SquareCode } from 'lucide-react'
+import { Loader2Icon, NotebookTextIcon, SquareCodeIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -23,13 +23,16 @@ export const ExplorerHomeTab = () => {
   return <ExplorerHomeContent />
 }
 
-const ExplorerHomeLoading = () => (
+export const ExplorerHomeLoading = () => (
   <div
     role="status"
     aria-label="Opening Explorer"
     className="flex h-full items-center justify-center bg-surface-100"
   >
-    <Loader2 size={18} className="animate-spin motion-reduce:animate-none text-foreground-muted" />
+    <Loader2Icon
+      size={18}
+      className="animate-spin motion-reduce:animate-none text-foreground-muted"
+    />
   </div>
 )
 
@@ -91,14 +94,14 @@ const ExplorerHomeContent = () => {
           <section className="mt-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ActionCard
-                icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                icon={<SquareCodeIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                 title="Run SQL"
                 description="Write and run an ad-hoc query"
                 bgColor="bg-blue-500"
                 onClick={() => createQuery()}
               />
               <ActionCard
-                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                icon={<NotebookTextIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                 title="Create a notebook"
                 description="Combine notes, queries, and results"
                 bgColor="bg-blue-500"
@@ -114,7 +117,7 @@ const ExplorerHomeContent = () => {
               {NOTEBOOK_TEMPLATES.map((template) => (
                 <ActionCard
                   key={template.title}
-                  icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                  icon={<NotebookTextIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                   title={template.title}
                   description={template.description}
                   bgColor="bg-blue-500"

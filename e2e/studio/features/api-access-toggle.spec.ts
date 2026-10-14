@@ -1,5 +1,6 @@
 import { expect, Page } from '@playwright/test'
 
+import { env } from '../env.config.js'
 import { dropTable, query } from '../utils/db/index.js'
 import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { openTableContextMenu } from '../utils/table-helpers.js'
@@ -199,6 +200,14 @@ test.describe('API Access Toggle', () => {
   })
 
   test('shows Manage access link when editing an existing table', async ({ page, ref }) => {
+    // TODO(tanstack): the entity-types pg-meta query that waitForTableToLoad
+    // waits on consistently times out (>30s) under the TanStack Start server
+    // but not under Next — see PR #51141. Re-enable once the root cause is found.
+    test.skip(
+      env.STUDIO_FRAMEWORK === 'tanstack',
+      'pg-meta entity-types query hangs under the TanStack Start server (#51141)'
+    )
+
     const tableName = `${TABLE_NAME_PREFIX}_edit`
     await using _ = await withSetupCleanup(
       async () => {
@@ -257,6 +266,14 @@ test.describe('API Access Toggle', () => {
     page,
     ref,
   }) => {
+    // TODO(tanstack): the entity-types pg-meta query that waitForTableToLoad
+    // waits on consistently times out (>30s) under the TanStack Start server
+    // but not under Next — see PR #51141. Re-enable once the root cause is found.
+    test.skip(
+      env.STUDIO_FRAMEWORK === 'tanstack',
+      'pg-meta entity-types query hangs under the TanStack Start server (#51141)'
+    )
+
     const tableName = `${TABLE_NAME_PREFIX}_preserve_grants`
     await using _ = await withSetupCleanup(
       async () => {

@@ -3,6 +3,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
 
+import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
@@ -17,7 +18,18 @@ vi.mock('ui', async (importOriginal) => ({
   copyToClipboard: mockCopyToClipboard,
 }))
 
-const codes = Array.from(Array(10).keys()).map((i) => `code_${i}`)
+const codes = [
+  'wto24t5xbeulvjmi',
+  'ade6in2sufndbbwd',
+  'oge3npsrhrr66k25',
+  'pxbkfvxlbi6ggvnf',
+  'kc3oaioqdjn4htc3',
+  '363gseoknplambiy',
+  '3urgae2p2jegem4m',
+  'tbxog2guayp6uvud',
+  'rpcvcf4owbclxrfp',
+  'kyyfsp3eqjydj53t',
+]
 
 describe('RegenerateRecoveryCodesModal', () => {
   test('regenerate the recovery codes after confirmation and allow users to copy them', async () => {
@@ -31,7 +43,7 @@ describe('RegenerateRecoveryCodesModal', () => {
       error: null,
     })
     customRender(<RegenerateRecoveryCodesModal />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Regenerate my recovery codes' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Regenerate' }))
 
     // Confirm regeneration
     await userEvent.type(
@@ -46,21 +58,25 @@ describe('RegenerateRecoveryCodesModal', () => {
 
     // Codes are generated
     await screen.findByText('Save your recovery codes')
-    await screen.findByText('code_0')
-    await screen.findByText('code_9')
+    await screen.findByText('WTO2-4T5X-BEUL-VJMI')
+    await screen.findByText('KYYF-SP3E-QJYD-J53T')
 
-    // Users have to copy the codes to close the modal, next click should fail if they managed to close it
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(1)
-    fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy to clipboard' }))
-    await waitFor(() =>
-      expect(screen.getByRole('checkbox', { name: 'I have copied the codes' })).toBeChecked()
+    // Users have to copy the codes before they can close the modal
+    expect(await screen.findByRole('button', { name: 'Done' })).toBeDisabled()
+    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    fireEvent.click(
+      screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
     )
-    expect(mockCopyToClipboard).toHaveBeenCalledWith(codes.join('\n'), expect.any(Function))
 
-    // We should have 2 close buttons (header icon and a standard button)
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Close' })).at(1)!)
+    expect(mockCopyToClipboard).toHaveBeenCalledWith(
+      codes.map((code) => formatRecoveryCode(code)).join('\n'),
+      expect.any(Function)
+    )
+
+    // Done button is now enabled and closes the modal
+    const doneButton = await screen.findByRole('button', { name: 'Done' })
+    expect(doneButton).toBeEnabled()
+    fireEvent.click(doneButton)
     await waitFor(() => expect(screen.queryByText('Save your recovery codes')).toBeNull())
   })
 
@@ -80,7 +96,7 @@ describe('RegenerateRecoveryCodesModal', () => {
         error: null,
       })
     customRender(<RegenerateRecoveryCodesModal />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Regenerate my recovery codes' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Regenerate' }))
 
     // Confirm regeneration
     await userEvent.type(
@@ -92,17 +108,16 @@ describe('RegenerateRecoveryCodesModal', () => {
     fireEvent.click(
       await within(await screen.findByRole('dialog')).findByRole('button', { name: 'Regenerate' })
     )
-    await screen.findByText(
-      "We couldn't generate your recovery code. Please try again later or contact support if the problem persists."
+    await screen.findByText('Unable to generate recovery codes')
+    expect(await screen.findByText(/Try refreshing your browser/)).toHaveTextContent(
+      'Try refreshing your browser, but if the issue persists for more than a few minutes, contact support.'
     )
 
-    // We should have 2 close buttons (header icon and a standard button)
-    expect(await screen.findAllByRole('button', { name: 'Close' })).toHaveLength(2)
-    fireEvent.click((await screen.findAllByRole('button', { name: 'Close' })).at(1)!)
+    fireEvent.click(await screen.findByRole('button', { name: 'Close' }))
     await waitFor(() => expect(screen.queryByText('Save your recovery codes')).toBeNull())
 
     // Retry
-    fireEvent.click(await screen.findByRole('button', { name: 'Regenerate my recovery codes' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Regenerate' }))
     // Confirm regeneration
     await userEvent.type(
       await within(await screen.findByRole('dialog')).findByRole('textbox', {
@@ -115,7 +130,7 @@ describe('RegenerateRecoveryCodesModal', () => {
     )
     // Codes are generated
     await screen.findByText('Save your recovery codes')
-    await screen.findByText('code_0')
-    await screen.findByText('code_9')
+    await screen.findByText('WTO2-4T5X-BEUL-VJMI')
+    await screen.findByText('KYYF-SP3E-QJYD-J53T')
   })
 })

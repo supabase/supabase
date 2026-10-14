@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
@@ -311,7 +311,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 maxSize={resizableSidebar ? 512 : 256}
                 defaultSize={256}
                 id="panel-left"
-                disabled={!resizableSidebar}
               >
                 <AnimatePresence initial={false}>
                   <motion.div

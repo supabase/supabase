@@ -21,7 +21,7 @@ const OrgAuditLogs: NextPageWithLayout = () => {
 
   return (
     <>
-      <PageHeader size="default">
+      <PageHeader size="full">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Audit Logs</PageHeaderTitle>

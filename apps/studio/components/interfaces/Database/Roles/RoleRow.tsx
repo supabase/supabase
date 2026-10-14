@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronUp, MoreVertical, Trash } from 'lucide-react'
+import { ChevronUpIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -126,7 +126,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             }}
           >
             <div className="flex items-start space-x-3">
-              <ChevronUp
+              <ChevronUpIcon
                 className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
@@ -140,8 +140,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               {role.activeConnections > 0 && (
                 <div className="relative h-2 w-2">
                   <span className="flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-default opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-default opacity-75"></span>
                   </span>
                 </div>
               )}
@@ -163,7 +163,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                 <DropdownMenuTrigger asChild>
                   <Button
                     className="px-1"
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     aria-label={`${role.name} actions`}
                   />
                 </DropdownMenuTrigger>
@@ -178,7 +178,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
                   onSelectDelete(role.id.toString())
                 }}
               >
-                <Trash className="text-red-800" size="14" strokeWidth={2} />
+                <TrashIcon className="text-red-800" size="14" strokeWidth={2} />
                 <p>Delete</p>
               </DropdownMenuItem>
             </DropdownMenuContent>

@@ -9,9 +9,15 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { WarehouseOverviewTab } from './OverviewTab'
+import type { SchemasData } from '@/data/database/schemas-query'
+import type { ProjectDetail } from '@/data/projects/project-detail-query'
+import type { TablesData } from '@/data/tables/tables-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
+type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type RunQueryBody = components['schemas']['RunQueryBody']
 type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
 type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
@@ -101,6 +107,120 @@ const mockProject = () =>
     },
   })
 
+const REPLICATION_PROJECT: ProjectDetail = {
+  cloud_provider: 'AWS',
+  connectionString: 'postgresql://postgres@localhost:5432/postgres',
+  db_host: 'db.default.supabase.co',
+  high_availability: false,
+  id: 1,
+  inserted_at: '2026-01-01T00:00:00.000Z',
+  integration_source: null,
+  is_branch_enabled: false,
+  is_hibernating: false,
+  is_physical_backups_enabled: false,
+  name: 'Test project',
+  organization_id: 1,
+  ref: 'default',
+  region: 'us-east-1',
+  restUrl: 'https://default.supabase.co/rest/v1',
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: '2026-01-01T00:00:00.000Z',
+}
+
+const SCHEMAS: SchemasData = [
+  { id: 1, name: 'public', owner: 'postgres', comment: null },
+  { id: 2, name: 'analytics', owner: 'postgres', comment: null },
+]
+
+const createTable = (id: number, schema: string, name: string): TablesData[number] => ({
+  id,
+  schema,
+  name,
+  rls_enabled: false,
+  rls_forced: false,
+  replica_identity: 'DEFAULT',
+  bytes: 1024,
+  size: '1024 bytes',
+  live_rows_estimate: 10,
+  dead_rows_estimate: 0,
+  comment: null,
+  primary_keys: [],
+  relationships: [],
+})
+
+const TABLES: TablesData = [
+  createTable(1, 'public', 'orders'),
+  createTable(2, 'public', 'customers'),
+  createTable(3, 'analytics', 'events'),
+  createTable(4, 'analytics', 'sessions'),
+]
+
+const SOURCES: ReplicationSourcesResponse = {
+  sources: [
+    {
+      id: 1,
+      name: 'default',
+      tenant_id: 'tenant',
+      config: { host: 'db.internal', name: 'main-db', port: 5432, username: 'etl_user' },
+    },
+  ],
+}
+
+// Every table of `public` plus one table of `analytics`: one schema target, one table target.
+const PUBLICATION_TABLES: PublicationDetailsResponse['tables'] = [
+  { id: 1, schema: 'public', name: 'orders', kind: 'table', partition_parent_id: null },
+  { id: 2, schema: 'public', name: 'customers', kind: 'table', partition_parent_id: null },
+  { id: 3, schema: 'analytics', name: 'events', kind: 'table', partition_parent_id: null },
+]
+
+// The disable card reads what is currently replicated from these four queries.
+const mockReplicatedTableQueries = () => {
+  const publicationRequests: string[] = []
+  addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: REPLICATION_PROJECT })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const body = (await request.json()) as RunQueryBody
+      const result = body.query.includes("obj_description(n.oid, 'pg_namespace')")
+        ? SCHEMAS
+        : TABLES
+      return HttpResponse.json<SchemasData | TablesData>(result)
+    },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: () => HttpResponse.json<ReplicationSourcesResponse>(SOURCES),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+    response: ({ params }) => {
+      publicationRequests.push(String(params.publication_name))
+      return HttpResponse.json<PublicationDetailsResponse>({
+        name: 'supabase_warehouse',
+        config: {
+          type: 'tables',
+          tables: PUBLICATION_TABLES.map(({ id, schema, name }) => ({
+            id,
+            schema,
+            name,
+            columns: null,
+            row_filter: null,
+          })),
+          operations: ['insert', 'update', 'delete', 'truncate'],
+          publish_via_partition_root: false,
+        },
+        tables: PUBLICATION_TABLES,
+      })
+    },
+  })
+
+  return { publicationRequests }
+}
+
 describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
     mockIsMarketplaceEnabled.mockReturnValue(true)
@@ -135,6 +255,7 @@ describe('WarehouseOverviewTab', () => {
                   name: 'customers',
                   copy_name: 'public.customers',
                   state: 'syncing',
+                  lag_ms: 0,
                 },
               ]
             : [],
@@ -150,6 +271,7 @@ describe('WarehouseOverviewTab', () => {
         ).toBeInTheDocument()
         expect(screen.getByText('orders')).toBeInTheDocument()
         expect(screen.getByText('customers')).toBeInTheDocument()
+        expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
       }
     }
   )
@@ -212,6 +334,7 @@ describe('WarehouseOverviewTab', () => {
         { schema: 'analytics', name: 'events', copy_name: 'analytics.events', state: 'error' },
       ],
     })
+    mockReplicatedTableQueries()
 
     customRender(<WarehouseOverviewTab />)
 
@@ -220,9 +343,13 @@ describe('WarehouseOverviewTab', () => {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
-    expect(screen.getByText('Synced')).toBeInTheDocument()
+    expect(screen.getByText('Live')).toBeInTheDocument()
     expect(screen.getByText('Backfilling')).toBeInTheDocument()
     expect(screen.getByText('Error')).toBeInTheDocument()
+    expect(screen.getByText('Caught up')).toBeInTheDocument()
+    expect(screen.queryByText(/behind$/)).not.toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Lag' })).toBeInTheDocument()
+    expect(screen.queryByRole('columnheader', { name: 'Size' })).not.toBeInTheDocument()
 
     const headings = screen
       .getAllByRole('heading')
@@ -254,6 +381,7 @@ describe('WarehouseOverviewTab', () => {
 
   test('does not track an edited table selection as enablement', async () => {
     mockSetupStatus({ setup_status: 'complete' })
+    mockReplicatedTableQueries()
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
@@ -269,6 +397,7 @@ describe('WarehouseOverviewTab', () => {
 
   test('disables Warehouse with an empty target list after confirmation', async () => {
     mockSetupStatus({ setup_status: 'complete' })
+    mockReplicatedTableQueries()
     const setupRequests: WarehouseSetupBody[] = []
     addAPIMock({
       method: 'post',
@@ -293,8 +422,34 @@ describe('WarehouseOverviewTab', () => {
     await waitFor(() => expect(setupRequests).toEqual([{ targets: [] }]))
   })
 
+  test('tracks how much was being replicated when Warehouse is disabled', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    const { publicationRequests } = mockReplicatedTableQueries()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/warehouse/:ref/setup',
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+    })
+
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
+    const dialog = await screen.findByRole('alertdialog')
+    await waitFor(() => expect(publicationRequests).toEqual(['supabase_warehouse']))
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
+
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('warehouse_disabled', {
+        schemaTargetCount: 1,
+        tableTargetCount: 1,
+      })
+    )
+  })
+
   test('shows a disable error and allows retrying from the open confirmation', async () => {
     mockSetupStatus({ setup_status: 'complete' })
+    mockReplicatedTableQueries()
     let attempts = 0
     addAPIMock({
       method: 'post',

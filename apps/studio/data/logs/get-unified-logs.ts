@@ -1,9 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { useFlag } from 'common'
 import { toast } from 'sonner'
 
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
-import { getUnifiedLogsISOStartEnd } from './unified-logs-infinite-query'
+import { getUnifiedLogsISOStartEnd, useUnifiedLogsBackend } from './unified-logs-infinite-query'
 import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
@@ -58,7 +57,7 @@ export const useGetUnifiedLogsMutation = ({
   UseCustomMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
   'mutationFn'
 > = {}) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend()
   return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
     mutationFn: (vars) => retrieveUnifiedLogs({ ...vars, useOtel: vars.useOtel ?? useOtel }),
     async onSuccess(data, variables, context) {

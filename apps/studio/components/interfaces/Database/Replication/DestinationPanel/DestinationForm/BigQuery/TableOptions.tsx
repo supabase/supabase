@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Table2, Trash2 } from 'lucide-react'
+import { Table2Icon, Trash2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useFormState, useWatch, type Control } from 'react-hook-form'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
@@ -213,7 +213,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
                   className="px-3.5 py-3 font-normal hover:bg-surface-200 hover:no-underline [&>svg]:text-foreground-lighter"
                 >
                   <span className="flex min-w-0 items-center gap-3.5">
-                    <Table2
+                    <Table2Icon
                       size={16}
                       strokeWidth={1.5}
                       className="shrink-0 text-foreground-lighter"
@@ -271,7 +271,11 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
               className="flex items-center justify-between gap-3 border-t px-3.5 py-3"
             >
               <span className="flex min-w-0 items-center gap-3.5">
-                <Table2 size={16} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
+                <Table2Icon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="shrink-0 text-foreground-lighter"
+                />
                 <span className="flex min-w-0 flex-col gap-0.5">
                   <span className="truncate text-sm font-medium text-foreground">
                     {sourceTable ? tableLabel(sourceTable) : 'Previously configured table'}
@@ -282,7 +286,7 @@ export const TableOptions = ({ control }: TableOptionsProps) => {
               <Button
                 type="button"
                 variant="default"
-                icon={<Trash2 size={14} />}
+                icon={<Trash2Icon size={14} />}
                 onClick={() => remove(index)}
               >
                 Remove

@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
+import { motion } from 'motion/react'
 import React, { forwardRef } from 'react'
 import { cn } from 'ui'
 
@@ -59,7 +59,7 @@ function FilterBarContent({ className }: { className?: string }) {
     <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 overflow-auto',
           className
         )}
       >

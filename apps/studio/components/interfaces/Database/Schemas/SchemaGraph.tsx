@@ -12,7 +12,14 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react'
-import { Check, ChevronDown, Copy, Download, Loader2, Plus } from 'lucide-react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DownloadIcon,
+  Loader2Icon,
+  PlusIcon,
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -298,9 +305,6 @@ export const SchemaGraph = () => {
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_SVG, () => downloadImage('svg'), {
     enabled: shortcutsEnabled,
   })
-  useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_FIND_TABLE, () => setFindTableOpen(true), {
-    enabled: shortcutsEnabled,
-  })
 
   const isFirstLoad = useRef(true)
   const fitViewOnNextLayout = useRef(false)
@@ -433,7 +437,7 @@ export const SchemaGraph = () => {
                 <div className="flex items-center gap-0">
                   <ButtonTooltip
                     className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-                    icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
+                    icon={copied ? <CheckIcon data-testid="copy-sql-ready" /> : <CopyIcon />}
                     onClick={copyAsSQL}
                     tooltip={{
                       content: {
@@ -458,7 +462,7 @@ export const SchemaGraph = () => {
                         size="tiny"
                         aria-label="Export options"
                         className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                        icon={<ChevronDown size={12} />}
+                        icon={<ChevronDownIcon size={12} />}
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-44">
@@ -471,9 +475,9 @@ export const SchemaGraph = () => {
                         }}
                       >
                         {isMarkdownDataLoading ? (
-                          <Loader2 size={12} className="animate-spin" />
+                          <Loader2Icon size={12} className="animate-spin" />
                         ) : (
-                          <Copy size={12} />
+                          <CopyIcon size={12} />
                         )}
                         <span>Copy as Markdown</span>
                       </DropdownMenuItem>
@@ -484,7 +488,7 @@ export const SchemaGraph = () => {
                           downloadImage('png')
                         }}
                       >
-                        <Download size={12} />
+                        <DownloadIcon size={12} />
                         <span>Download as PNG</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -494,7 +498,7 @@ export const SchemaGraph = () => {
                           downloadImage('svg')
                         }}
                       >
-                        <Download size={12} />
+                        <DownloadIcon size={12} />
                         <span>Download as SVG</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -532,7 +536,7 @@ export const SchemaGraph = () => {
       </div>
       {isLoadingTables && (
         <div className="w-full h-full flex items-center justify-center gap-x-2">
-          <Loader2 className="animate-spin text-foreground-light" size={16} />
+          <Loader2Icon className="animate-spin text-foreground-light" size={16} />
           <p className="text-sm text-foreground-light">Loading tables</p>
         </div>
       )}
@@ -559,7 +563,7 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2 w-min" icon={<Plus />}>
+                  <Button asChild className="mt-2 w-min" icon={<PlusIcon />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}

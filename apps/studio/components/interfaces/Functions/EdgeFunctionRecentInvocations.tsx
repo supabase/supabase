@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Clock, ExternalLink, RefreshCw } from 'lucide-react'
+import { ClockIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
@@ -42,7 +42,7 @@ export const EdgeFunctionRecentInvocations = ({
         <Button
           loading={isLoading}
           disabled={isLoading}
-          icon={<RefreshCw size={14} />}
+          icon={<RefreshCwIcon size={14} />}
           onClick={() => refresh()}
         >
           Refresh
@@ -90,7 +90,7 @@ export const EdgeFunctionRecentInvocations = ({
                     <div
                       className={cn(
                         'flex items-center justify-center border px-1.5 py-0.5 rounded-sm text-xs font-mono',
-                        is2xx && 'text-brand border-brand bg-brand-300',
+                        is2xx && 'text-primary border-brand-default bg-brand-300',
                         is4xx && 'text-warning border-warning bg-warning-300',
                         is5xx && 'text-destructive border-destructive bg-destructive-300',
                         !is2xx &&
@@ -108,7 +108,7 @@ export const EdgeFunctionRecentInvocations = ({
                 <span className="text-xs text-foreground-light">{method || '-'}</span>
                 {executionTime !== undefined && (
                   <span className="flex items-center gap-1 text-xs text-foreground-light">
-                    <Clock size={12} className="text-foreground-muted" />
+                    <ClockIcon size={12} className="text-foreground-muted" />
                     {Number(executionTime).toFixed(0)}ms
                   </span>
                 )}
@@ -119,7 +119,7 @@ export const EdgeFunctionRecentInvocations = ({
                     statusCode
                   )}
                 </span>
-                <ExternalLink
+                <ExternalLinkIcon
                   size={14}
                   className="shrink-0 text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
                 />

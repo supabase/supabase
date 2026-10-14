@@ -18,6 +18,10 @@ import {
   gettingStartedUseCases,
   gettingStartedWebAppDemos,
 } from './getting-started.data'
+import {
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
+} from './local-development.data'
 import { logDrainsDestinations } from './log-drains.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import { resourcesMigrate, resourcesOverview, resourcesPostgres } from './resources.data'
@@ -25,6 +29,7 @@ import {
   selfHostingCommunity,
   selfHostingGetStarted,
   selfHostingSupport,
+  selfHostingThirdPartyGuides,
 } from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 import {
@@ -71,6 +76,8 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   gettingStartedFrameworkQuickstarts,
   gettingStartedWebAppDemos,
   gettingStartedMobileTutorials,
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
   logDrainsDestinations,
   realtimeGetStarted,
   realtimeExamples,
@@ -80,6 +87,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   resourcesPostgres,
   selfHostingGetStarted,
   selfHostingCommunity,
+  selfHostingThirdPartyGuides,
   selfHostingSupport,
   storageGetStarted,
   storageExamples,

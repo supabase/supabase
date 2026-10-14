@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
+import { LockIcon, PaintbrushIcon, PlusCircleIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
@@ -113,7 +113,7 @@ export const QueueTab = () => {
             variant="text"
             className="px-1.5"
             onClick={() => setPurgeQueueModalShown(true)}
-            icon={<Paintbrush />}
+            icon={<PaintbrushIcon />}
             title="Purge messages"
             aria-label="Purge messages"
             tooltip={{ content: { side: 'bottom', text: 'Purge messages' } }}
@@ -123,7 +123,7 @@ export const QueueTab = () => {
             variant="text"
             className="px-1.5"
             onClick={() => setDeleteQueueModalShown(true)}
-            icon={<Trash2 />}
+            icon={<Trash2Icon />}
             title="Delete queue"
             aria-label="Delete queue"
             tooltip={{ content: { side: 'bottom', text: 'Delete queue' } }}
@@ -139,7 +139,7 @@ export const QueueTab = () => {
                 <ButtonTooltip
                   asChild
                   className="group"
-                  icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                  icon={<PlusCircleIcon strokeWidth={1.5} className="text-foreground-muted" />}
                   tooltip={{
                     content: {
                       side: 'bottom',
@@ -190,14 +190,14 @@ export const QueueTab = () => {
               <PopoverTrigger asChild>
                 <Button
                   variant={isExposed ? 'warning' : 'default'}
-                  icon={<Lock strokeWidth={1.5} />}
+                  icon={<LockIcon strokeWidth={1.5} />}
                 >
                   RLS disabled
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-80 text-sm" align="end">
                 <h3 className="text-xs flex items-center gap-x-2">
-                  <Lock size={14} /> Row Level Security (RLS)
+                  <LockIcon size={14} /> Row Level Security (RLS)
                 </h3>
                 <div className="grid gap-2 mt-2 text-foreground-light text-xs">
                   {isExposed ? (

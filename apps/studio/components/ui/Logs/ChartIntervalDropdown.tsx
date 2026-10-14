@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -48,7 +48,7 @@ export const ChartIntervalDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button iconRight={<ChevronDown size={14} />}>
+        <Button iconRight={<ChevronDownIcon size={14} />}>
           <span>{selectedInterval.label}</span>
         </Button>
       </DropdownMenuTrigger>

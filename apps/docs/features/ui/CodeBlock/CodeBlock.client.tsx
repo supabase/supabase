@@ -180,7 +180,20 @@ function CrossfadeIcon({
   )
 }
 
-export function CodeCopyButton({ className, content }: { className?: string; content: string }) {
+export function CodeCopyButton({
+  className,
+  content,
+  label = 'Copy code',
+  copiedLabel = 'Code copied',
+  onCopied,
+}: {
+  className?: string
+  content: string
+  label?: string
+  copiedLabel?: string
+  /** Runs after a successful clipboard write. */
+  onCopied?: () => void
+}) {
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -193,6 +206,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   const handleCopy = async () => {
     copyToClipboard(content, () => {
       setCopied(true)
+      onCopied?.()
     })
   }
 
@@ -203,7 +217,7 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   return (
     <>
       <span className="sr-only" aria-live="polite">
-        {copied ? 'Code copied' : ''}
+        {copied ? copiedLabel : ''}
       </span>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -218,14 +232,14 @@ export function CodeCopyButton({ className, content }: { className?: string; con
               'hover:bg-[var(--btn-active)]',
               className
             )}
-            aria-label="Copy code"
-            // Tooltip repeats the label; the description would read the name twice
+            aria-label={label}
+            // Tooltip repeats the label; screen readers would read it twice
             aria-describedby={undefined}
           >
             <CrossfadeIcon active={copied} activeIcon={Check} inactiveIcon={Copy} />
           </Button>
         </TooltipTrigger>
-        <TooltipContent>Copy code</TooltipContent>
+        <TooltipContent>{label}</TooltipContent>
       </Tooltip>
     </>
   )
@@ -274,7 +288,7 @@ export function CodeBlockControls({ content }: { content: string }) {
               'hover:bg-[var(--btn-active)]'
             )}
             aria-label={isWrapped ? 'Disable word wrap' : 'Enable word wrap'}
-            // Tooltip repeats the label; the description would read the name twice
+            // Tooltip repeats the label; screen readers would read it twice
             aria-describedby={undefined}
           >
             <CrossfadeIcon

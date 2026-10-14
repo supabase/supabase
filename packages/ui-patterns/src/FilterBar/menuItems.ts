@@ -76,10 +76,15 @@ export function buildPropertyItems(params: {
 }): MenuItem[] {
   const { filterProperties, inputValue, supportsOperators, actions, freeformDefaultProperty } =
     params
+  const availableProperties = filterProperties.filter((property) => property.isAvailable !== false)
   const items: MenuItem[] = []
 
   const trimmedInput = inputValue.trim()
-  if (freeformDefaultProperty && trimmedInput.length > 0) {
+  if (
+    freeformDefaultProperty &&
+    freeformDefaultProperty.isAvailable !== false &&
+    trimmedInput.length > 0
+  ) {
     items.push({
       value: '__freeform_search__',
       label: `Search ${freeformDefaultProperty.label.toLowerCase()}: "${trimmedInput}"`,
@@ -90,7 +95,7 @@ export function buildPropertyItems(params: {
   }
 
   items.push(
-    ...filterProperties
+    ...availableProperties
       .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
       .map((prop) => ({ value: prop.name, label: prop.label }))
   )
@@ -123,6 +128,7 @@ export function buildPropertyChangeItems(params: {
   const { filterProperties, currentPropertyName, inputValue } = params
 
   return filterProperties
+    .filter((property) => property.isAvailable !== false)
     .filter((prop) => prop.name !== currentPropertyName)
     .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
     .map((prop) => ({ value: prop.name, label: prop.label }))

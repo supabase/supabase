@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { Edit, File, Trash } from 'lucide-react'
+import { EditIcon, FileIcon, TrashIcon } from 'lucide-react'
 import {
   cn,
   ContextMenu,
@@ -65,7 +65,7 @@ export const FileExplorerAndEditorRow = ({
                     ? 'text-code_block-2'
                     : ''
             )}
-            icon={<File size={14} className="text-foreground-light shrink-0" />}
+            icon={<FileIcon size={14} className="text-foreground-light shrink-0" />}
             isEditing={isEditing}
             onEditSubmit={(value) => {
               if (IS_PLATFORM && originalId !== null) {
@@ -108,7 +108,7 @@ export const FileExplorerAndEditorRow = ({
             }}
             onFocusCapture={(e) => e.stopPropagation()}
           >
-            <Edit size={14} />
+            <EditIcon size={14} />
             Rename file
           </ContextMenuItem>
 
@@ -124,7 +124,7 @@ export const FileExplorerAndEditorRow = ({
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Trash size={14} />
+                <TrashIcon size={14} />
                 Delete file
               </ContextMenuItem>
             </>

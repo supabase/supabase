@@ -1,6 +1,6 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useCallback } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
@@ -115,7 +115,7 @@ const SQLEditorResultsPanel = () => {
 
   return isLoading ? (
     <div className="flex h-full w-full items-center justify-center">
-      <Loader2 className="animate-spin text-brand" />
+      <Loader2Icon className="animate-spin text-primary" />
     </div>
   ) : (
     <UtilityPanel

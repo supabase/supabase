@@ -58,8 +58,8 @@ test.describe('column editor complex types', () => {
       'Type dropdown should show the bare base type, not the raw _int4 pg format'
     ).toBeVisible()
     await expect(
-      columnEditor.getByRole('checkbox', { name: 'Define as Array' }),
-      'Define as Array should be checked for an existing array column'
+      columnEditor.getByRole('checkbox', { name: 'Define as array' }),
+      'Define as array should be checked for an existing array column'
     ).toBeChecked()
 
     // Make an unrelated change and save - this must not corrupt the column's type.

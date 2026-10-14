@@ -70,3 +70,19 @@ export const generateHelpersFromInput = (input: string): DatetimeHelper[] | null
       return null
   }
 }
+
+export const formatDateRange = (from: string, to: string): string =>
+  `${dayjs(from).format('DD MMM, HH:mm')} - ${dayjs(to || new Date()).format('DD MMM, HH:mm')}`
+
+export const findMatchingDateHelper = (
+  from: Date,
+  to: Date,
+  helpers: DatetimeHelper[]
+): DatetimeHelper | undefined =>
+  helpers.find((helper) => {
+    const tolerance = 60_000
+    return (
+      Math.abs(from.getTime() - new Date(helper.calcFrom()).getTime()) < tolerance &&
+      Math.abs(to.getTime() - new Date(helper.calcTo()).getTime()) < tolerance
+    )
+  })

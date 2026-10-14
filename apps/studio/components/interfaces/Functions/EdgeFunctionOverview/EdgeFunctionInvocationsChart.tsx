@@ -1,4 +1,4 @@
-import { Rocket } from 'lucide-react'
+import { RocketIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Bar,
@@ -117,7 +117,7 @@ export const EdgeFunctionInvocationsChart = ({
                   dateTimeFormat
                 )}`}
               >
-                <Rocket size={12} strokeWidth={1.75} aria-hidden />
+                <RocketIcon size={12} strokeWidth={1.75} aria-hidden />
               </span>
             </TooltipTrigger>
             <TooltipContent side="top" align="center">

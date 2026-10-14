@@ -122,7 +122,7 @@ const secretKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const secretKey = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)['default']
 ```
 
-The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. Read [the Managing Secrets guide](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
+The publishable keys work the same way through `SUPABASE_PUBLISHABLE_KEYS`. Read [Environment variables](/docs/guides/functions/secrets) for more on environment variables in Edge Functions.
 
 If you created more than one secret key in [step 1](#step-1-create-the-new-api-keys), every key lives in the same `SUPABASE_SECRET_KEYS` object, each under its own name. Read a non-default key the same way:
 
@@ -149,7 +149,7 @@ Wrap your existing `Deno.serve` handler with `withSupabase` and declare an `auth
 For a function your users call from the client, use `auth: 'user'`. The SDK validates the user's session JWT and gives you a client scoped to their Row Level Security policies.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
   withSupabase({ auth: 'user' }, async (_req, ctx) => {
@@ -162,7 +162,7 @@ Deno.serve(
 For a function called by your own backend, a worker, or `pg_net`, use `auth: 'secret'`. The SDK validates the secret key and gives you a client that bypasses Row Level Security.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 Deno.serve(
   withSupabase({ auth: 'secret' }, async (_req, ctx) => {
@@ -177,7 +177,7 @@ To accept a specific named key instead of `default`, add its name after the mode
 `withSupabase` returns a standard request handler, so you can also export it as a `fetch` handler instead of passing it to `Deno.serve`:
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {

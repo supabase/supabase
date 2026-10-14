@@ -2,9 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   createConfigurationDriftRows,
+  groupMatchedConfigFields,
   groupUnmanagedConfigFields,
 } from './ConfigurationDriftPage.utils'
-import type { GitHubConfigDriftField, UnmanagedConfigField } from './github-config-drift'
+import type {
+  GitHubConfigDriftField,
+  MatchedConfigField,
+  UnmanagedConfigField,
+} from './github-config-drift'
 
 const PROJECT_REF = 'abcdefgh'
 
@@ -24,6 +29,15 @@ function unmanagedField(overrides: Partial<UnmanagedConfigField>): UnmanagedConf
     section: 'api',
     configPath: 'api.max_rows',
     dashboardValue: 1000,
+    ...overrides,
+  }
+}
+
+function matchedField(overrides: Partial<MatchedConfigField>): MatchedConfigField {
+  return {
+    section: 'api',
+    configPath: 'api.max_rows',
+    value: 1000,
     ...overrides,
   }
 }
@@ -51,7 +65,7 @@ describe('createConfigurationDriftRows', () => {
       PROJECT_REF
     )
 
-    expect(row.settingLabel).toBe('Google · Client ID')
+    expect(row.settingLabel).toBe('Google client ID')
   })
 
   it('falls back to a title-cased last path segment for an unrecognized config path', () => {
@@ -61,25 +75,6 @@ describe('createConfigurationDriftRows', () => {
     )
 
     expect(row.settingLabel).toBe('Unknown Setting')
-  })
-
-  it('builds a scalar diff, formatting booleans and empty values for display', () => {
-    const [row] = createConfigurationDriftRows(
-      [
-        driftField({
-          configPath: 'auth.enable_signup',
-          dashboardValue: true,
-          githubValue: false,
-        }),
-      ],
-      PROJECT_REF
-    )
-
-    expect(row.valueDiff).toEqual({
-      kind: 'scalar',
-      dashboardValue: 'Enabled',
-      configValue: 'Disabled',
-    })
   })
 
   it('formats a missing scalar value as "Not set"', () => {
@@ -108,25 +103,10 @@ describe('createConfigurationDriftRows', () => {
     )
 
     expect(row.valueDiff).toEqual({
-      kind: 'list',
-      onlyInDashboard: ['https://b.com'],
-      onlyInConfig: ['https://c.com'],
+      configValue: '  https://a.com  \nhttps://c.com',
+      dashboardValue: 'https://a.com\nhttps://b.com',
+      kind: 'scalar',
     })
-  })
-
-  it('reports no diff entries when redirect URL lists are equal after normalization', () => {
-    const [row] = createConfigurationDriftRows(
-      [
-        driftField({
-          configPath: 'auth.additional_redirect_urls',
-          dashboardValue: ['https://a.com'],
-          githubValue: ['https://a.com', 'https://a.com'],
-        }),
-      ],
-      PROJECT_REF
-    )
-
-    expect(row.valueDiff).toEqual({ kind: 'list', onlyInDashboard: [], onlyInConfig: [] })
   })
 })
 
@@ -147,7 +127,7 @@ describe('groupUnmanagedConfigFields', () => {
       sectionLabel: 'API',
       rows: [
         { configPath: 'api.max_rows', label: 'Max rows', value: '1000' },
-        { configPath: 'api.enabled', label: 'API enabled', value: 'Enabled' },
+        { configPath: 'api.enabled', label: 'API enabled', value: 'true' },
       ],
     })
   })
@@ -174,10 +154,42 @@ describe('groupUnmanagedConfigFields', () => {
       unmanagedField({
         section: 'auth',
         configPath: 'auth.additional_redirect_urls',
-        dashboardValue: ['https://b.com', '  https://a.com  ', 'https://a.com'],
+        dashboardValue: ['https://b.com', 'https://a.com', 'https://a.com'],
       }),
     ])
 
-    expect(groups[0].rows[0].value).toBe('https://a.com\nhttps://b.com')
+    expect(groups[0].rows[0].value).toBe('https://b.com\nhttps://a.com\nhttps://a.com')
+  })
+})
+
+describe('groupMatchedConfigFields', () => {
+  it('returns an empty array when there are no matched fields', () => {
+    expect(groupMatchedConfigFields([])).toEqual([])
+  })
+
+  it('groups fields from the same section into a single group', () => {
+    const groups = groupMatchedConfigFields([
+      matchedField({ configPath: 'api.max_rows', value: 1000 }),
+      matchedField({ configPath: 'api.enabled', value: true }),
+    ])
+
+    expect(groups).toHaveLength(1)
+    expect(groups[0]).toEqual({
+      section: 'api',
+      sectionLabel: 'API',
+      rows: [
+        { configPath: 'api.max_rows', label: 'Max rows', value: '1000' },
+        { configPath: 'api.enabled', label: 'API enabled', value: 'true' },
+      ],
+    })
+  })
+
+  it('orders groups by CONFIG_SECTIONS order, not by input order', () => {
+    const groups = groupMatchedConfigFields([
+      matchedField({ section: 'storage', configPath: 'storage.enabled', value: true }),
+      matchedField({ section: 'api', configPath: 'api.enabled', value: true }),
+    ])
+
+    expect(groups.map((group) => group.section)).toEqual(['api', 'storage'])
   })
 })

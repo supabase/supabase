@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,6 +10,8 @@ import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 
 import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
+import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
+import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -45,11 +47,15 @@ import { PipelineCostDialog } from './PipelineCostDialog'
 import { PipelineRegionField } from './PipelineRegionField'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
-import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
+import {
+  getSnowflakeValidationIssues,
+  SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE,
+} from './Snowflake/Snowflake.utils'
 import { TableCopySelection } from './TableCopySelection'
 import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -101,6 +107,8 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
+  const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
+  const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
@@ -176,10 +184,9 @@ export const DestinationForm = ({
         pipelineData,
         catalogToken,
         region: projectSettings?.region,
-        projectRef,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
+    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -223,11 +230,12 @@ export const DestinationForm = ({
             }
           )
         } else if (selectedType === 'Snowflake') {
-          getSnowflakeValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getSnowflakeValidationIssues(data, {
+            secretsOptional: editMode,
+            validatePrivateKeyFormat: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'ClickHouse') {
           getClickHouseValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
@@ -283,10 +291,10 @@ export const DestinationForm = ({
       return existingDestination?.enabled ? 'Apply and restart pipeline' : 'Apply changes'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start pipeline anyway'
+        return 'Start pipeline anyway'
       }
 
-      return 'Create and start pipeline'
+      return 'Start pipeline'
     }
   }
 
@@ -341,6 +349,16 @@ export const DestinationForm = ({
       )
       if (jsonIssue) {
         form.setError(jsonIssue.path, { message: jsonIssue.message })
+        return
+      }
+    }
+
+    if (selectedType === 'Snowflake') {
+      const privateKeyIssue = getSnowflakeValidationIssues(data, {
+        secretsOptional: editMode,
+      }).find((issue) => issue.message === SNOWFLAKE_PRIVATE_KEY_FORMAT_MESSAGE)
+      if (privateKeyIssue) {
+        form.setError(privateKeyIssue.path, { message: privateKeyIssue.message })
         return
       }
     }
@@ -438,6 +456,30 @@ export const DestinationForm = ({
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
 
+  const destinationFields = (
+    <>
+      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+        <BigQueryFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
+        <AnalyticsBucketFields
+          form={form}
+          editMode={editMode}
+          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+        />
+      )}
+      {selectedType === 'DuckLake' && etlEnableDucklake && (
+        <DuckLakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+        <SnowflakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+        <ClickHouseFields form={form} editMode={editMode} />
+      )}
+    </>
+  )
+
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
@@ -448,53 +490,52 @@ export const DestinationForm = ({
           <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <fieldset disabled={!isExistingConfigReady} className="contents">
-                <div className="p-5 flex flex-col gap-y-6">
-                  {isErrorExistingConfig && (
-                    <Admonition type="warning">
-                      <p className="leading-normal!">
-                        The existing destination or pipeline settings could not be loaded. Refresh
-                        before applying changes.
-                      </p>
-                    </Admonition>
-                  )}
-                  <p className="text-sm font-medium text-foreground">Destination details</p>
-
-                  <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} />
-                    <PublicationSelection
-                      form={form}
-                      onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                    />
-                    <TableCopySelection form={form} editMode={editMode} />
-                    <PipelineRegionField destinationType={selectedType} />
-                  </div>
-                </div>
-
-                <DialogSectionSeparator />
-
-                {selectedType === 'BigQuery' && etlEnableBigQuery && (
-                  <BigQueryFields form={form} editMode={editMode} />
+                {shouldShowConnectionSection && (
+                  <>
+                    <PipelineConnectionSection type={selectedType} form={form}>
+                      {destinationFields}
+                    </PipelineConnectionSection>
+                    <DialogSectionSeparator />
+                  </>
                 )}
-                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-                  <AnalyticsBucketFields
+                {shouldShowConnectionSection ? (
+                  <PipelineDataSection
+                    type={selectedType}
                     form={form}
-                    editMode={editMode}
-                    onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
                   />
-                )}
-                {selectedType === 'DuckLake' && etlEnableDucklake && (
-                  <DuckLakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'Snowflake' && etlEnableSnowflake && (
-                  <SnowflakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
-                  <ClickHouseFields form={form} editMode={editMode} />
-                )}
+                ) : (
+                  <>
+                    <div className="p-5 flex flex-col gap-y-6">
+                      {isErrorExistingConfig && (
+                        <Admonition type="warning">
+                          <p className="leading-normal!">
+                            The existing destination or pipeline settings could not be loaded.
+                            Refresh before applying changes.
+                          </p>
+                        </Admonition>
+                      )}
+                      <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                <DialogSectionSeparator />
+                      <div className="flex flex-col gap-y-4">
+                        <DestinationNameInput form={form} destinationType={selectedType} />
+                        <PublicationSelection
+                          form={form}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
+                        <TableCopySelection form={form} editMode={editMode} />
+                        <PipelineRegionField destinationType={selectedType} />
+                      </div>
+                    </div>
 
-                <AdvancedSettings type={selectedType} form={form} />
+                    <DialogSectionSeparator />
+                    {destinationFields}
+
+                    <DialogSectionSeparator />
+
+                    <AdvancedSettings type={selectedType} form={form} group="all" />
+                  </>
+                )}
 
                 {!editMode && hasRunValidation && !isValidating && (
                   <>
@@ -524,7 +565,7 @@ export const DestinationForm = ({
               exit={{ opacity: 0, y: 5 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              <Loader2 className="animate-spin" size={14} />
+              <Loader2Icon className="animate-spin" size={14} />
               <p className="text-foreground-light text-sm">{getSavingMessage()}</p>
             </motion.div>
           ) : (

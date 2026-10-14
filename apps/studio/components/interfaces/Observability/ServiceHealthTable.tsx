@@ -1,4 +1,4 @@
-import { ChevronRight, HelpCircle } from 'lucide-react'
+import { ChevronRightIcon, HelpCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -47,7 +47,7 @@ const colorClassMap: Record<string, string> = {
   muted: 'bg-gray-500',
   destructive: 'bg-destructive',
   warning: 'bg-warning',
-  brand: 'bg-brand',
+  brand: 'bg-brand-default',
 }
 
 const LEVEL_CHART_CONFIG: ChartConfig = {
@@ -131,7 +131,7 @@ const ServiceCell = ({
                   className="relative z-10 text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
                   aria-label={`About ${service.name}`}
                 >
-                  <HelpCircle size={12} />
+                  <HelpCircleIcon size={12} />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="top" className="max-w-xs">
@@ -163,7 +163,7 @@ const ServiceCell = ({
                 asChild
               >
                 <Link href={reportUrl}>
-                  <ChevronRight size={14} strokeWidth={1.5} />
+                  <ChevronRightIcon size={14} strokeWidth={1.5} />
                 </Link>
               </Button>
             </TooltipTrigger>

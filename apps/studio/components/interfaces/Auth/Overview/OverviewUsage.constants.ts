@@ -111,5 +111,5 @@ export const calculatePercentagePointChange = (
 }
 
 export const getChangeColor = (percentageChange: number): string => {
-  return percentageChange >= 0 ? 'text-brand' : 'text-destructive'
+  return percentageChange >= 0 ? 'text-primary' : 'text-destructive'
 }

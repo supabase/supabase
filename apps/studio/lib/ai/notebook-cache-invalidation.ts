@@ -4,17 +4,22 @@ import type { ToolUIPart, UIMessage } from 'ai'
 import { notebookToolOutputSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import { contentKeys } from '@/data/content/keys'
 import { evictNotebookFromCaches } from '@/data/content/notebooks/notebook-cache'
+import type { ToolName } from '@/lib/ai/tool-filter'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 
 export type NotebookCacheEffect =
   | { _tag: 'upserted'; toolCallId: string; id: string }
   | { _tag: 'deleted'; toolCallId: string; id: string }
 
-const NOTEBOOK_MUTATION_TOOL_TYPES = new Set([
-  'tool-create_notebook',
-  'tool-update_notebook',
-  'tool-delete_notebook',
-])
+const NOTEBOOK_MUTATION_TOOLS = [
+  'create_notebook',
+  'update_notebook',
+  'delete_notebook',
+] as const satisfies readonly ToolName[]
+
+const NOTEBOOK_MUTATION_TOOL_TYPES: ReadonlySet<string> = new Set(
+  NOTEBOOK_MUTATION_TOOLS.map((name) => `tool-${name}`)
+)
 
 function isNotebookMutationPart(part: UIMessage['parts'][number]): part is ToolUIPart {
   return NOTEBOOK_MUTATION_TOOL_TYPES.has(part.type)

@@ -116,6 +116,7 @@ SignInPage.getLayout = (page) => (
       subheading="Sign in to your account"
       logoLinkToMarketingSite={true}
       inboundFlow="sign-in"
+      hasStatusBanner
     >
       {page}
     </SignInLayout>
