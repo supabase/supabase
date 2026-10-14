@@ -1,49 +1,32 @@
 import { RefreshCw } from 'lucide-react'
-import { useState } from 'react'
+import { ComponentProps } from 'react'
 import { Button } from 'ui'
 
-import { RecoveryCodesModal } from './RecoveryCodesModal'
-import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { RecoveryCodesFlow } from './RecoveryCodesFlow'
 import { useRecoveryCodesRegenerateMutation } from '@/data/recovery-codes/recovery-codes-regenerate-mutation'
 
-export const RegenerateRecoveryCodesModal = () => {
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [open, setOpen] = useState(false)
+type RegenerateRecoveryCodesModalProps = Partial<
+  Pick<ComponentProps<typeof RecoveryCodesFlow>, 'children' | 'onComplete' | 'onStart'>
+>
 
-  const recoveryCodesRegenerateMutation = useRecoveryCodesRegenerateMutation({
-    onSettled: () => {
-      setShowConfirm(false)
-      setOpen(true)
-    },
-  })
-
-  const { mutate: regenerateCodes, isPending } = recoveryCodesRegenerateMutation
-
+export const RegenerateRecoveryCodesModal = ({
+  children,
+  ...props
+}: RegenerateRecoveryCodesModalProps = {}) => {
+  const mutation = useRecoveryCodesRegenerateMutation()
   return (
-    <>
-      <Button icon={<RefreshCw />} onClick={() => setShowConfirm(true)}>
-        Regenerate
-      </Button>
-      <TextConfirmModal
-        visible={showConfirm}
-        size="small"
-        variant="warning"
-        title="Regenerate my recovery codes"
-        confirmPlaceholder="REGENERATE"
-        confirmString="REGENERATE"
-        confirmLabel="Regenerate"
-        loading={isPending}
-        onConfirm={() => regenerateCodes()}
-        onCancel={() => setShowConfirm(false)}
-      >
-        <p className="text-sm">Your existing recovery codes won't work anymore.</p>
-      </TextConfirmModal>
-
-      <RecoveryCodesModal
-        open={open}
-        onOpenChange={(open) => setOpen(open)}
-        mutation={recoveryCodesRegenerateMutation}
-      />
-    </>
+    <RecoveryCodesFlow
+      action="regenerate"
+      mutation={mutation}
+      onGenerate={() => mutation.mutate()}
+      {...props}
+    >
+      {children ??
+        (({ onClick, isPending }) => (
+          <Button icon={<RefreshCw />} onClick={onClick} loading={isPending}>
+            Regenerate
+          </Button>
+        ))}
+    </RecoveryCodesFlow>
   )
 }

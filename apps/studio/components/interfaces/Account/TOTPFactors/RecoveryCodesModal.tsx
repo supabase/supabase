@@ -26,7 +26,10 @@ interface RecoveryCodesModalProps<T>
   extends
     Omit<ComponentProps<typeof Dialog>, 'onOpenChange'>,
     Required<Pick<ComponentProps<typeof Dialog>, 'onOpenChange'>> {
-  mutation: UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>
+  mutation: Pick<
+    UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>,
+    'data' | 'status' | 'error' | 'isError' | 'isPending' | 'isSuccess' | 'reset'
+  >
 }
 
 export const RecoveryCodesModal = <T = unknown,>({

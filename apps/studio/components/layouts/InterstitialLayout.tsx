@@ -59,7 +59,7 @@ export const InterstitialLayout = ({
   const descriptionElement = description ? (
     <DescriptionElement
       className={cn(
-        '!m-0 px-3 !text-balance text-sm text-foreground-lighter leading-tight',
+        'm-0! px-3 text-balance! text-sm text-foreground-lighter',
         descriptionClassName
       )}
     >
@@ -115,7 +115,7 @@ export const InterstitialLayout = ({
 export const LogoBox = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div
     className={cn(
-      'flex size-12 items-center justify-center overflow-hidden rounded-xl border bg-muted',
+      'flex size-12 items-center justify-center overflow-hidden rounded-lg border bg-muted',
       className
     )}
   >
