@@ -124,5 +124,13 @@ it('includes custom settings in Connection without a separate heading', () => {
   )
   expect(screen.getByLabelText('Connection pool size')).toHaveValue('3')
   expect(screen.getByLabelText('Maximum staleness')).toHaveValue('10 minutes')
+  expect(
+    screen.getByText('Number of BigQuery connections used for destination writes.')
+  ).toBeInTheDocument()
+  expect(
+    screen.getByText(
+      'Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results.'
+    )
+  ).toBeInTheDocument()
   expect(screen.queryByText('Custom connection settings')).not.toBeInTheDocument()
 })
