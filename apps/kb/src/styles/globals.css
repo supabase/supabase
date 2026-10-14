@@ -1,5 +1,5 @@
 @import 'config/tailwind.config.css';
-@import '../../../../packages/ui-patterns/src/CodeBlock/code-block.css';
+@import 'ui-patterns/styles.css';
 
 @source '../pages/**/*.astro';
 @source '../components/**/*.{astro,tsx}';

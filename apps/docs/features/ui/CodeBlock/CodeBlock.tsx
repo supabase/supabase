@@ -2,7 +2,7 @@ import { type PropsWithChildren } from 'react'
 import { bundledLanguages, type BundledLanguage } from 'shiki'
 import { createTwoslasher, type ExtraFiles, type NodeHover } from 'twoslash'
 import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
-import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.utils'
+import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
 import { CodeBlockControls } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import {
   CodeBlockFrame,

@@ -56,7 +56,7 @@
   --code-highlight-color: #1c1c1c;
 }
 
-/* Token classes emitted by CodeBlock.utils.ts */
+/* Token classes emitted by CodeBlock.tokens.ts */
 .shiki .s-f {
   color: var(--code-foreground);
 }

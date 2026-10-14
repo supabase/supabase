@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.utils'
+import { getCodeBlockLabel, getTokenClassName } from './CodeBlock.tokens'
 import theme from './supabase-2.json' with { type: 'json' }
 
 const themeColors = (): Array<string> => {
@@ -32,7 +32,6 @@ describe('token class names', () => {
     expect(colors.length).toBeGreaterThan(0)
 
     const css = readFileSync(`${import.meta.dirname}/code-block.css`, 'utf8')
-
     for (const color of colors) {
       expect(getTokenClassName(color, 0), `${color} is missing from the class table`).toMatch(
         /^s-[a-z]$/

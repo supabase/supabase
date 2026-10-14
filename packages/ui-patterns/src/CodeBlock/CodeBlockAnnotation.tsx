@@ -1,11 +1,10 @@
 'use client'
 
 import { useCallback, useEffect, useState, type MouseEvent } from 'react'
-// deep imports: kb renders the frame inside astro's config, where the `ui` barrel can't load
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui/src/components/shadcn/ui/tooltip'
 import { cn } from 'ui/src/lib/utils/cn'
 
-// structural copy of twoslash's hover fields, so renderers don't depend on twoslash
+// this type copies the twoslash hover fields, so the renderers do not depend on twoslash
 export interface CodeAnnotation {
   text: string
   docs?: string
