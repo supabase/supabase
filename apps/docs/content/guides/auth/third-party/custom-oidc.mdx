@@ -1,0 +1,78 @@
+---
+id: 'auth-third-party-custom-oidc'
+title: 'Custom OIDC provider'
+subtitle: 'Use any OIDC-compliant identity provider with your Supabase project'
+---
+
+Use an identity provider that is not in the list of [supported providers](/docs/guides/auth/third-party/overview) by registering its OIDC issuer URL through the Management API. Your project then trusts the JWTs the issuer signs, in the same way it does for Clerk, Auth0 or Firebase Auth.
+
+<Admonition type="note">
+
+There is no option to add a custom OIDC issuer in the Dashboard today, and no `supabase/config.toml` key for it in the Supabase CLI. Use the Management API as described below.
+
+</Admonition>
+
+## Requirements
+
+Your provider must meet the [limitations](/docs/guides/auth/third-party/overview#limitations) of third-party auth:
+
+1. It exposes an OIDC Issuer Discovery URL.
+2. It signs JWTs with an asymmetric key and includes a `kid` header parameter. Symmetrically signed JWTs, such as HS256, are not supported.
+3. The JWTs sent to Supabase contain a `role` claim. Your project uses it to pick the Postgres role for the [Data API](/docs/guides/database/overview), [Storage](/docs/guides/storage) and [Realtime](/docs/guides/realtime). Set it to `authenticated` for signed-in users. Without it, requests run as the `anon` role. Use your provider's custom claims feature to add it.
+
+## Add the integration
+
+Create a [personal access token](/docs/guides/platform/personal-access-tokens) and call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint with your issuer URL:
+
+```bash
+export PROJECT_REF="your-project-ref"
+
+curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth/third-party-auth" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "oidc_issuer_url": "https://login.acme.com"
+  }'
+```
+
+The response includes the integration `id`, along with `resolved_jwks` and `resolved_at` once your project has loaded the issuer's signing keys. The request body also accepts `jwks_url` and `custom_jwks`. See the [API reference](/docs/reference/api/v1-create-project-tpa-integration) for the full schema.
+
+To list or remove integrations, use the [list](/docs/reference/api/v1-list-project-tpa-integrations) and [delete](/docs/reference/api/v1-delete-project-tpa-integration) endpoints. Signing keys are checked for changes periodically, so allow up to 30 minutes for a key rotation to be picked up.
+
+## Send the provider's JWT to Supabase
+
+Pass the JWT from your provider to the client library, the same way as with the supported providers:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return getAccessTokenFromYourProvider()
+    },
+  }
+)
+```
+
+## Write RLS policies
+
+The `sub` claim identifies the user. `auth.uid()` reads `sub` and casts it to `uuid`, so it fails if your provider issues subjects that are not UUIDs. In that case, read the claim directly:
+
+```sql
+create policy "Users can read their own rows"
+  on table_name
+  for select
+  to authenticated
+  using (user_id = (select auth.jwt()->>'sub'));
+```
+
+Here `user_id` must be a `text` column.
+
+Your project trusts every issuer you add, and `sub` values from different issuers can collide. If you use more than one issuer, or you also use Supabase Auth, add a restrictive policy that checks the `iss` claim, as shown in the [Firebase Auth guide](/docs/guides/auth/third-party/firebase-auth).
+
+## Pricing
+
+Usage by third-party auth providers is billed as [Monthly Active Third-Party Users](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party).
