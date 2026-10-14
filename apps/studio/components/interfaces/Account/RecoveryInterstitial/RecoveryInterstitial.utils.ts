@@ -25,8 +25,9 @@ export function getRecoveryReturnTo(value: string | null): string {
 
 export function getMockRecoveryGap(
   value: string | null,
-  isDevelopment: boolean
+  isDevelopment: boolean,
+  vercelEnvironment?: string
 ): RecoveryGap | null {
-  if (!isDevelopment) return null
+  if (!isDevelopment && vercelEnvironment !== 'preview') return null
   return value === 'missing' || value === 'exhausted' ? value : null
 }

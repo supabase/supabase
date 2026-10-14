@@ -27,7 +27,11 @@ export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
   const [returnTo] = useQueryState('returnTo', parseAsString)
   const [mockTasks] = useQueryState('mockRecoveryTasks', parseAsString)
-  const mockGap = getMockRecoveryGap(mock, process.env.NODE_ENV === 'development')
+  const mockGap = getMockRecoveryGap(
+    mock,
+    process.env.NODE_ENV === 'development',
+    process.env.NEXT_PUBLIC_VERCEL_ENV
+  )
   const destination = getRecoveryReturnTo(returnTo)
 
   if (mockGap)
