@@ -7,7 +7,6 @@ import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from 'ui'
 
 function AiTools({
   pageType,
@@ -41,10 +40,10 @@ function AiTools({
   }
 
   return (
-    <section className={cn(className)} aria-labelledby="ai-tools-title">
-      <h3 id="ai-tools-title" className={headingClassName}>
+    <section className={className} aria-labelledby="ai-tools-title">
+      <h2 id="ai-tools-title" className={headingClassName}>
         AI tools
-      </h3>
+      </h2>
       <div className="flex flex-col gap-2">
         {showAgentSetup && (
           <Link
