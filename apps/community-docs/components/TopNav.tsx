@@ -29,7 +29,12 @@ const SupabaseMark = ({ className }: { className?: string }) => (
   </svg>
 )
 
-const TopNav = ({ className }: { className?: string }) => {
+type TopNavProps = {
+  className?: string
+  userEmail?: string
+}
+
+const TopNav = ({ className, userEmail }: TopNavProps) => {
   const { query, setQuery } = useCommunityDocsSearch()
 
   return (
@@ -56,6 +61,27 @@ const TopNav = ({ className }: { className?: string }) => {
             placeholder="Search by title or tag"
             value={query}
           />
+          <Link
+            className="hidden text-sm text-foreground-light transition-colors hover:text-foreground sm:inline"
+            href="/quality"
+          >
+            Quality
+          </Link>
+          {userEmail ? (
+            <Link
+              className="text-sm text-foreground-light transition-colors hover:text-foreground"
+              href="/auth/signout"
+            >
+              Sign out
+            </Link>
+          ) : (
+            <Link
+              className="text-sm text-foreground-light transition-colors hover:text-foreground"
+              href="/login?next=/quality"
+            >
+              Login
+            </Link>
+          )}
           <a
             aria-label="View supabase-community on GitHub"
             className="text-foreground-light transition-colors hover:text-foreground"

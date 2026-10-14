@@ -85,14 +85,14 @@ const ProjectPage = async ({ params }: ProjectPageProps) => {
 
         <nav className="mt-16 grid gap-4 border-t pt-8 md:grid-cols-2">
           {previous ? (
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={`/${previous.slug}`}>Previous: {previous.frontmatter.title}</Link>
             </Button>
           ) : (
             <div />
           )}
           {next && (
-            <Button asChild className="md:justify-self-end" type="default">
+            <Button asChild className="md:justify-self-end" variant="default">
               <Link href={`/${next.slug}`}>Next: {next.frontmatter.title}</Link>
             </Button>
           )}

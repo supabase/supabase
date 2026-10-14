@@ -19,6 +19,7 @@
     "@anthropic-ai/sdk": "^0.107.0",
     "@mdx-js/react": "^3.0.0",
     "@next/mdx": "15.3.1",
+    "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "config": "workspace:*",
     "eslint-config-supabase": "workspace:*",

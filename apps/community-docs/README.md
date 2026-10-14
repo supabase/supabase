@@ -58,15 +58,52 @@ For this proof of concept, metadata is inferred locally from the repo name, topi
 
 A second script, `scripts/sync-repos-to-supabase.ts`, writes an append-only history of repo metadata and a computed quality score to Supabase Postgres. Content generation (`fetch-content`) stays untouched — the two pipelines are decoupled.
 
-Copy `.env.example` to `.env.local` and set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (prefer a Supabase branch of your project during testing). Then run:
+Copy `.env.example` to `.env.local` and set the Supabase env vars (prefer a Supabase branch of your project during testing). Then run:
 
 ```bash
 pnpm --filter community-docs sync-repos
 ```
 
-Each run inserts one row into `community_sync_runs`, upserts `community_repos`, and appends one row per repo to `community_repo_snapshots`. Dashboards read from `latest_repo_metrics` and `quality_deltas_by_week` — see `supabase/migrations/20260630120000_community_repos.sql`.
+Each run inserts one row into `community_sync_runs`, upserts `community_repos`, and appends one row per repo to `community_repo_snapshots`. The authenticated dashboard reads from `latest_repo_metrics` and `quality_deltas_by_week` — see `supabase/migrations/`.
 
-Human tier grades (`A`/`B`/`C`) live in `community_repo_grades` and are updated manually via SQL in Studio.
+Human tier grades (`A`/`B`/`C`) live in `community_repo_grades` (editor role can update via SQL or a future UI).
+
+## Quality dashboard Auth (dogfooding)
+
+The public MDX site stays open. `/quality` requires a magic-link session for an allowlisted `@supabase.com` or `@supabase.io` email.
+
+### Setup checklist
+
+1. Create or link a Supabase project (prefer a branch).
+2. Apply both migrations under `apps/community-docs/supabase/migrations/` (SQL editor or CLI).
+3. Seed the allowlist:
+
+```sql
+insert into community_dashboard_allowlist (email, role)
+values
+  ('nik.richers@supabase.io', 'editor');
+```
+
+4. In Auth settings, enable the Email provider (magic link).
+5. Configure Auth URLs for both local and Vercel demos (Studio → Authentication → URL configuration):
+   - **Site URL**: your primary demo host (stable Vercel URL or production), e.g.  
+     `https://community-docs-….vercel.app/community-docs`
+   - **Redirect URLs** (add all that apply):
+     - `http://localhost:3002/community-docs/**` (local)
+     - `https://*-….vercel.app/community-docs/**` (Vercel preview wildcard for your team/project)
+     - Exact preview URL if wildcards are restricted:  
+       `https://<preview-host>/community-docs/**`
+6. Copy `.env.example` → `.env.local` (and set the same `NEXT_PUBLIC_*` + service-role vars on the Vercel project):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon / publishable key)
+   - `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (sync script / CI only)
+7. Run `pnpm --filter community-docs sync-repos` when you need fresh metrics.
+8. Local: `pnpm --filter community-docs dev` → `http://localhost:3002/community-docs/login`.  
+   Demo: open the Vercel preview `/community-docs/login`, request a magic link, then `/quality`.
+
+Magic links use the **current request origin**, so the same app works on localhost and on a Vercel preview as long as that origin is in the Auth redirect allow list.
+
+Domain gate: only `@supabase.com` and `@supabase.io` emails can complete sign-in. Access also requires a matching row in `community_dashboard_allowlist`.
 
 ## Monorepo fit
 

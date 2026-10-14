@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
 
-import { createServiceRoleClient } from '../lib/supabase'
+import { createServiceRoleClient } from '../lib/supabase/service-role'
 
 const execFileAsync = promisify(execFile)
 
