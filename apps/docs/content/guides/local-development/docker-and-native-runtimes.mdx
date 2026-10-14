@@ -110,5 +110,6 @@ The `runtime` field is `docker`, `podman`, or `native`. The text output of `supa
 - A local project keeps the runtime it was created with, and the CLI doesn't move data between runtimes. See [How the CLI picks a runtime](#how-the-cli-picks-a-runtime).
 - Running several native local projects on one machine works, but they share host resources without the isolation containers provide. Use Docker for that case.
 - If Postgres takes too long to become ready on a cold start, raise `health_timeout` under `[db]` in `config.toml`. Both runtimes use that setting.
+- In CLI v2.121.0 or later, the native runtime runs each `pg_cron` job in a background worker instead of over a new connection. As a result, a job body can't contain its own `BEGIN` or `COMMIT`. Earlier versions fail every native `pg_cron` job with `connection failed` or with `job startup timeout` on macOS.
 
 <ContentListings id="local-development-runtimes-learn-more" />
