@@ -4,7 +4,7 @@ import { posthogClient } from './posthog-client'
 import type { SharedTelemetryData } from './telemetry-first-touch-store'
 import { getSharedTelemetryData, getTelemetryCookieOptions } from './telemetry-utils'
 
-function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
+export function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   const urlString = telemetryData.page_url
 
   try {
