@@ -14,6 +14,7 @@ import {
 } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import { resolveFeaturePreviewToggle } from './FeaturePreviews.utils'
 import {
   useFeaturePreviewContext,
   useFeaturePreviewModal,
@@ -68,21 +69,20 @@ export function useFeaturePreviewCommands() {
       origin: 'command_menu',
     })
 
-    if (!isEnabling) {
+    const outcome = resolveFeaturePreviewToggle({
+      preview,
+      isEnabling,
+      ...routeContextRef.current,
+    })
+
+    if (outcome.type === 'disabled') {
       toast(`${preview.name} disabled`)
       return
     }
 
-    // Only route into a project when actually on a project-scoped page —
-    // `ref` alone isn't enough, since it can retain a stale value after
-    // client-side navigating to a route without a `ref` segment (e.g. the org
-    // view).
-    const { ref: currentRef, pathname } = routeContextRef.current
-    const isProjectScopedRoute = pathname.startsWith('/project/')
-    const route = isProjectScopedRoute ? preview.getRoute?.(currentRef) : undefined
-    if (route !== undefined && currentRef !== undefined) {
+    if (outcome.route !== undefined) {
       setIsOpen(false)
-      router.push(route)
+      router.push(outcome.route)
       toast.success(`${preview.name} enabled`, {
         description: "We've taken you to where you can try it out.",
       })
