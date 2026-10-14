@@ -131,7 +131,7 @@ function TocDisclosureLink({ item }: { item: TOCItemType }) {
   return (
     <a
       href={`#${formatSlug(item.url)}`}
-      className="block rounded-sm py-1 text-foreground-lighter hover:text-foreground focus-ring"
+      className="block rounded-sm py-1 text-foreground-lighter wrap-anywhere hover:text-foreground focus-ring"
     >
       <TOCTitle title={item.title} />
     </a>
@@ -143,11 +143,11 @@ interface TocTreeNode {
   children: TOCItemType[]
 }
 
-// level 3 headings hang off the level 2 heading before them, a leading level 3 stays top level
+// level 3 headings hang off the level 2 heading before them, leading level 3s stay top level
 const toTocTree = (items: TOCItemType[]) =>
   items.reduce<TocTreeNode[]>((tree, item) => {
     const parent = tree.at(-1)
-    if (item.depth === 3 && parent) parent.children.push(item)
+    if (item.depth === 3 && parent?.item.depth === 2) parent.children.push(item)
     else tree.push({ item, children: [] })
     return tree
   }, [])

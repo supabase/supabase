@@ -30,11 +30,15 @@ describe('TocDisclosure', () => {
     ).toBeNull()
   })
 
-  it('keeps a level 3 heading with no level 2 before it at the top level', () => {
-    render(<TocDisclosure items={[heading('intro', 3), heading('setup', 2)]} />)
+  it('keeps level 3 headings with no level 2 before them at the top level', () => {
+    render(
+      <TocDisclosure items={[heading('intro', 3), heading('overview', 3), heading('setup', 2)]} />
+    )
 
-    expect(screen.getByRole('link', { name: 'intro' }).closest('li')!.parentElement).toBe(
-      screen.getByRole('link', { name: 'setup' }).closest('li')!.parentElement
+    const topLevel = screen.getByRole('link', { name: 'setup' }).closest('li')!.parentElement
+    expect(screen.getByRole('link', { name: 'intro' }).closest('li')!.parentElement).toBe(topLevel)
+    expect(screen.getByRole('link', { name: 'overview' }).closest('li')!.parentElement).toBe(
+      topLevel
     )
   })
 
