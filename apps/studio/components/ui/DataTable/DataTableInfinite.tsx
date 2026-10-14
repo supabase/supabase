@@ -1,7 +1,7 @@
 import { type FetchNextPageOptions } from '@tanstack/react-query'
 import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
-import { LoaderCircle } from 'lucide-react'
+import { ArrowUp, LoaderCircle } from 'lucide-react'
 import { Fragment, KeyboardEvent, MouseEvent, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -9,6 +9,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { AlertError } from '../AlertError'
 import { formatCompactNumber } from './DataTable.utils'
 import { useDataTable } from './providers/DataTableProvider'
+import { TableScrollPreservation, useTableScrollAnchor } from './useTableScrollAnchor'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -30,6 +31,8 @@ export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
   emptyStateMessage?: string | ReactNode
   /** Overrides the subject shown in the error state, e.g. "Failed to retrieve X" */
   errorSubject?: string
+  rowDecorations?: ReadonlyMap<string, ReactNode>
+  scrollPreservation?: TableScrollPreservation
 }
 
 // [Joshen] JFYI this component is NOT virtualized and hence will struggle handling many data points
@@ -45,6 +48,8 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   setColumnVisibility,
   emptyStateMessage = 'No results found',
   errorSubject = 'Failed to retrieve data',
+  rowDecorations,
+  scrollPreservation,
 }: DataTableInfiniteProps<TData, TValue, TMeta>) {
   const tableRef = useRef<HTMLTableElement>(null)
   const { table, error, isError, isLoading, isFetching, openRowId, setOpenRowId, onSelectRow } =
@@ -53,6 +58,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
   const rows = table.getRowModel().rows ?? []
+  const { handleScroll, scrollToTop } = useTableScrollAnchor({ tableRef, scrollPreservation })
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
@@ -79,12 +85,17 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   )
 
   return (
-    <>
+    <div className="relative h-full">
       <Table
         ref={tableRef}
         containerProps={{
-          onScroll,
+          containerClassName: 'h-full',
+          onScroll: (event) => {
+            handleScroll()
+            onScroll(event)
+          },
           className: 'h-full w-full overflow-auto caption-bottom text-sm @container',
+          style: scrollPreservation ? { overflowAnchor: 'none' } : undefined,
         }}
         className={cn(
           !isLoading && rows.length === 0 && 'h-full',
@@ -142,16 +153,18 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         >
           {rows.length ? (
             rows.map((row) => (
-              <DataTableRow
-                key={row.id}
-                row={row}
-                table={table}
-                selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
-                onSelect={(event) => {
-                  if (onSelectRow) onSelectRow(row.id, event)
-                  else setOpenRowId(row.id === openRowId ? undefined : row.id)
-                }}
-              />
+              <Fragment key={row.id}>
+                <DataTableRow
+                  row={row}
+                  table={table}
+                  selected={onSelectRow ? row.getIsSelected() : row.id === openRowId}
+                  onSelect={(event) => {
+                    if (onSelectRow) onSelectRow(row.id, event)
+                    else setOpenRowId(row.id === openRowId ? undefined : row.id)
+                  }}
+                />
+                {rowDecorations?.get(row.id)}
+              </Fragment>
             ))
           ) : isLoading ? (
             <Fragment>
@@ -258,7 +271,20 @@ export function DataTableInfinite<TData, TValue, TMeta>({
           )}
         </TableBody>
       </Table>
-    </>
+      {scrollPreservation?.scrollToTopLabel && (
+        <div className="pointer-events-none absolute inset-x-0 top-12 z-10 flex justify-center">
+          <Button
+            size="tiny"
+            variant="outline"
+            className="pointer-events-auto rounded-full border-stronger bg-card! shadow-sm hover:bg-popover!"
+            icon={<ArrowUp aria-hidden="true" />}
+            onClick={scrollToTop}
+          >
+            {scrollPreservation.scrollToTopLabel}
+          </Button>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -285,6 +311,7 @@ function DataTableRow<TData>({
   return (
     <TableRow
       id={row.id}
+      data-row-id={row.id}
       tabIndex={0}
       data-state={selected && 'selected'}
       aria-selected={!!selected}

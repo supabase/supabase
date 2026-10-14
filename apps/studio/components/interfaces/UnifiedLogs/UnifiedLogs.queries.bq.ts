@@ -387,8 +387,12 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+export const getUnifiedLogsQuery = (
+  search: QuerySearchParamsType,
+  paginationFilter?: SafeLogSqlFragment
+): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
+  if (paginationFilter) conditions.push(paginationFilter)
   const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`
@@ -494,7 +498,7 @@ level_counts AS (
 ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
 ${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })}
 
-SELECT 'total' AS dimension, 'all' AS value, total AS count FROM log_type_counts
+SELECT 'total' AS facet, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'postgrest', postgrest_count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'storage', storage_count FROM log_type_counts
