@@ -72,7 +72,7 @@ export const TelemetryTagManager = () => {
   )
 }
 
-function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
+export function getFirstTouchAttributionProps(telemetryData: SharedTelemetryData) {
   const urlString = telemetryData.page_url
 
   try {
