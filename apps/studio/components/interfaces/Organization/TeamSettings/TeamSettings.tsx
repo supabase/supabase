@@ -147,9 +147,11 @@ export const TeamSettings = () => {
                           {organizationRoles.map((role) => (
                             <CommandItem
                               key={role.id}
-                              value={role.id.toString()}
+                              value={role.name}
                               onSelect={(currentValue) => {
-                                const newRoleId = parseInt(currentValue)
+                                const newRoleId = organizationRoles.find(
+                                  (org) => org.name === currentValue
+                                )?.id
                                 setRoleId(newRoleId === roleId ? undefined : newRoleId)
                                 setIsRolesComboboxOpen(false)
                               }}
