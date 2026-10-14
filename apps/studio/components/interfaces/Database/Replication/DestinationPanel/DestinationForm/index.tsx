@@ -14,6 +14,8 @@ import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnecti
 import { PipelineDataReview } from '../../CreatePipeline/PipelineDataReview'
 import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
 import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinationReview'
+import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
+import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -549,6 +551,8 @@ export const DestinationForm = ({
                       control={form.control}
                       publication={selectedPublication}
                     />
+                    <DialogSectionSeparator />
+                    <PipelineReviewCosts control={form.control} publication={selectedPublication} />
                   </>
                 )}
 
@@ -557,10 +561,17 @@ export const DestinationForm = ({
                     <DialogSectionSeparator />
 
                     <div ref={validationSectionRef}>
-                      <ValidationFailuresSection
-                        destinationFailures={destinationValidationFailures}
-                        pipelineFailures={pipelineValidationFailures}
-                      />
+                      {shouldShowConnectionSection ? (
+                        <PipelineValidationAdmonition
+                          failures={allValidationFailures}
+                          hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
+                        />
+                      ) : (
+                        <ValidationFailuresSection
+                          destinationFailures={destinationValidationFailures}
+                          pipelineFailures={pipelineValidationFailures}
+                        />
+                      )}
                     </div>
                   </>
                 )}
