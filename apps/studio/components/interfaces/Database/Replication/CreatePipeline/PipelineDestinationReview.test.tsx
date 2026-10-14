@@ -128,9 +128,7 @@ it('includes custom settings in Connection without a separate heading', () => {
     screen.getByText('Number of BigQuery connections used for destination writes.')
   ).toBeInTheDocument()
   expect(
-    screen.getByText(
-      'Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results.'
-    )
+    screen.getByText('Maximum age of BigQuery query results for newly created or recreated tables.')
   ).toBeInTheDocument()
   expect(screen.queryByText('Custom connection settings')).not.toBeInTheDocument()
 })

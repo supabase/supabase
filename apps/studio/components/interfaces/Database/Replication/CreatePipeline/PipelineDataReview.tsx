@@ -36,20 +36,30 @@ export const PipelineDataReview = ({
     ],
   })
   const tables = publication?.name === publicationName ? publication.tables : undefined
-  const rows: { label: string; value: string; description?: string }[] = [
+  const rows: { label: string; value: string; description: string }[] = [
     { ...PUBLICATION_FIELD_COPY, value: publicationName || 'None selected' },
     {
       label: 'Publication tables',
+      description: 'Tables whose ongoing changes will be replicated to this destination.',
       value: tables
         ? `${tables.length} ${tables.length === 1 ? 'table' : 'tables'}`
         : 'Unavailable',
     },
-    { ...INITIAL_SYNC_FIELD_COPY, value: INITIAL_SYNC_LABELS[mode] ?? 'Not set' },
+    {
+      ...INITIAL_SYNC_FIELD_COPY,
+      description:
+        'Controls which publication tables copy their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
+      value: INITIAL_SYNC_LABELS[mode] ?? 'Not set',
+    },
   ]
   if (mode === 'include_tables' || mode === 'skip_tables') {
     const selected = tables?.filter((table) => ids?.includes(String(table.id)))
     rows.push({
       label: mode === 'include_tables' ? 'Tables to include' : 'Tables to exclude',
+      description:
+        mode === 'include_tables'
+          ? 'Only these tables copy their existing rows during initial sync. Ongoing changes from every publication table are replicated.'
+          : 'These tables skip copying existing rows during initial sync. Ongoing changes from every publication table are replicated.',
       value: selected?.map(({ schema, name }) => `${schema}.${name}`).join(', ') || 'None selected',
     })
   }
@@ -57,23 +67,37 @@ export const PipelineDataReview = ({
     label: string,
     value: number | '' | undefined,
     defaultValue: number,
+    description: string,
     unit = ''
   ) => {
     if (typeof value === 'number' && value !== defaultValue)
-      rows.push({ label, value: `${value}${unit}` })
+      rows.push({ label, value: `${value}${unit}`, description })
   }
-  addNumber('Batch wait time', batch, defaults.DEFAULT_MAX_FILL_MS, ' milliseconds')
-  addNumber('Table sync workers', workers, defaults.DEFAULT_MAX_TABLE_SYNC_WORKERS)
+  addNumber(
+    'Batch wait time',
+    batch,
+    defaults.DEFAULT_MAX_FILL_MS,
+    'Maximum time before sending a partially filled batch.',
+    ' milliseconds'
+  )
+  addNumber(
+    'Table sync workers',
+    workers,
+    defaults.DEFAULT_MAX_TABLE_SYNC_WORKERS,
+    'Maximum number of tables synced at the same time.'
+  )
   addNumber(
     'Initial sync connections per table',
     copies,
-    defaults.DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE
+    defaults.DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+    'Maximum number of source connections used to sync existing rows for each table.'
   )
   if (slot === 'recreate')
     rows.push({
       label: 'Invalidated slot behavior',
       value: 'Recreate slot',
-      description: 'Replaces destination tables and runs a new, billable initial sync.',
+      description:
+        'If the replication slot becomes invalid, the pipeline replaces destination tables and runs a new, billable initial sync.',
     })
   const layouts =
     type === 'BigQuery'
@@ -86,7 +110,12 @@ export const PipelineDataReview = ({
         <ReviewField key={row.label} {...row} />
       ))}
       {layouts.length > 0 && (
-        <FormItemLayout isReactForm={false} layout="horizontal" label="Table layout">
+        <FormItemLayout
+          isReactForm={false}
+          layout="horizontal"
+          label="Table layout"
+          description="Partitioning and clustering applied when destination tables are first created or reset."
+        >
           <div className="min-w-0 space-y-3">
             {layouts.map((option) => {
               const table = tables?.find(({ id }) => id === option.tableId)
@@ -114,7 +143,7 @@ const ReviewField = ({
 }: {
   label: string
   value: string
-  description?: string
+  description: string
 }) => (
   <FormItemLayout isReactForm={false} layout="horizontal" label={label} description={description}>
     <Input readOnly aria-label={label} value={value} />

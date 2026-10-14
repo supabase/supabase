@@ -63,6 +63,9 @@ describe('PipelineDataReview', () => {
     expect(screen.queryByText('Custom connection settings')).not.toBeInTheDocument()
     fireEvent.click(screen.getByText('Change workers'))
     expect(screen.getByLabelText('Table sync workers')).toHaveValue('8')
+    expect(
+      screen.getByText('Maximum number of tables synced at the same time.')
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByText('Change publication'))
     expect(screen.getByLabelText('Publication tables')).toHaveValue('Unavailable')
   })
@@ -91,6 +94,19 @@ describe('PipelineDataReview', () => {
       />
     )
     expect(screen.getByLabelText('Batch wait time')).toHaveValue('500 milliseconds')
+    expect(
+      screen.getByText('Maximum time before sending a partially filled batch.')
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Maximum number of source connections used to sync existing rows for each table.'
+      )
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'If the replication slot becomes invalid, the pipeline replaces destination tables and runs a new, billable initial sync.'
+      )
+    ).toBeInTheDocument()
     expect(screen.getByLabelText('Connection pool size')).toHaveValue('6')
     expect(screen.getByLabelText('Maximum staleness')).toHaveValue('0 minutes')
     expect(screen.getByText('public.orders')).toBeInTheDocument()
@@ -129,6 +145,11 @@ describe('PipelineDataReview', () => {
       />
     )
     expect(screen.getByText('Table layout')).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        'Partitioning and clustering applied when destination tables are first created or reset.'
+      )
+    ).toBeInTheDocument()
     expect(screen.getByText('public.orders')).toHaveClass('break-all')
     expect(screen.getByText('Partition by Not selected (month); Cluster by table_id')).toHaveClass(
       'break-words'

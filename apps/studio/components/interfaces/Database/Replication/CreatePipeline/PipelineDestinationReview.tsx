@@ -23,10 +23,7 @@ import {
   SNOWFLAKE_DATABASE_FIELD_COPY,
   SNOWFLAKE_SCHEMA_FIELD_COPY,
 } from '../DestinationPanel/DestinationForm/DestinationFormFieldCopy'
-import {
-  getPipelineRegionDescription,
-  PipelineRegionReadonly,
-} from '../DestinationPanel/DestinationForm/PipelineRegionField'
+import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionReview } from './PipelineConnectionReview'
 
@@ -94,7 +91,7 @@ export const PipelineDestinationReview = ({
       'newNamespaceName',
     ],
   })
-  const rows: { label: string; value?: string; description?: string; isMasked?: boolean }[] = []
+  const rows: { label: string; value?: string; description: string; isMasked?: boolean }[] = []
   switch (type) {
     case 'BigQuery':
       rows.push(
@@ -107,7 +104,7 @@ export const PipelineDestinationReview = ({
         rows.push(
           {
             ...DUCKLAKE_CATALOG_URL_FIELD_COPY,
-            description: DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription,
+            description: 'Postgres URL of the database used for the DuckLake catalog.',
             value: catalogUrl,
             isMasked: true,
           },
@@ -183,7 +180,7 @@ export const PipelineDestinationReview = ({
           isReactForm={false}
           layout="horizontal"
           label="Pipeline region"
-          description={getPipelineRegionDescription(type)}
+          description={`All pipelines run from this region. ${type} connections originate here.`}
         >
           <PipelineRegionReadonly />
         </FormItemLayout>

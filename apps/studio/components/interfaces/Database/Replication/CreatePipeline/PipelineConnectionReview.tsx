@@ -32,8 +32,7 @@ export const PipelineConnectionReview = ({
       rows.push({
         label: 'Maximum staleness',
         value: `${staleness} minutes`,
-        description:
-          'Maximum age of BigQuery query results for newly created or recreated tables; leave blank for the freshest results.',
+        description: 'Maximum age of BigQuery query results for newly created or recreated tables.',
       })
   }
   if (
@@ -44,14 +43,13 @@ export const PipelineConnectionReview = ({
     rows.push({
       label: 'Pool size',
       value: String(lakePool),
-      description:
-        'Maximum concurrent connections this pipeline opens to the catalog. Choose 1 to 6.',
+      description: 'Maximum concurrent connections this pipeline opens to the catalog.',
     })
   if (type === 'Snowflake' && role?.trim())
     rows.push({
       label: 'Role',
       value: role,
-      description: 'Role for SQL requests. Leave blank to use the service user’s default role.',
+      description: 'Snowflake role used for SQL requests.',
     })
   return (
     <>
