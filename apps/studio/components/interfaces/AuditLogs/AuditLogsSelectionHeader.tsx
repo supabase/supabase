@@ -1,6 +1,6 @@
 import type { Table } from '@tanstack/react-table'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Copy, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 

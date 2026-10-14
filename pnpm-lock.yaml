@@ -63,6 +63,9 @@ catalogs:
     cn:
       specifier: ^0.4.0
       version: 0.4.0
+    motion:
+      specifier: ^11.18.2
+      version: 11.18.2
     next:
       specifier: ^16.3.6
       version: 16.3.6
@@ -416,9 +419,6 @@ importers:
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -491,6 +491,9 @@ importers:
       micromark-extension-mdxjs:
         specifier: ^1.0.0
         version: 1.0.1
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: ^15.5.24
         version: 15.5.25(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -841,15 +844,15 @@ importers:
       common:
         specifier: workspace:*
         version: link:../../packages/common
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       jotai:
         specifier: ^2.8.0
         version: 2.8.1(@types/react@19.2.14)(react@19.2.6)
       lucide-react:
         specifier: '*'
         version: 0.511.0(react@19.2.6)
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
         version: 16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -1212,9 +1215,6 @@ importers:
       file-saver:
         specifier: ^2.0.5
         version: 2.0.5
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       fuse.js:
         specifier: ^7.4.0
         version: 7.4.0
@@ -1269,6 +1269,9 @@ importers:
       monaco-editor:
         specifier: 0.52.2
         version: 0.52.2
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
         version: 16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -1600,9 +1603,6 @@ importers:
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       icons:
         specifier: workspace:*
         version: link:../../packages/icons
@@ -1615,6 +1615,9 @@ importers:
       monaco-editor:
         specifier: 0.52.2
         version: 0.52.2
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
         version: 16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -1904,9 +1907,6 @@ importers:
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       globby:
         specifier: ^13.2.2
         version: 13.2.2
@@ -1952,6 +1952,9 @@ importers:
       micromark-extension-mdxjs:
         specifier: ^1.0.1
         version: 1.0.1
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: ^15.5.24
         version: 15.5.25(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@24.19.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -2748,9 +2751,6 @@ importers:
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       input-otp:
         specifier: ^1.4.2
         version: 1.4.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -2760,6 +2760,9 @@ importers:
       lucide-react:
         specifier: ^0.436.0
         version: 0.436.0(react@19.2.6)
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       prop-types:
         specifier: ^15.7.2
         version: 15.8.1
@@ -2890,9 +2893,6 @@ importers:
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
-      framer-motion:
-        specifier: ^11.18.2
-        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -2923,6 +2923,9 @@ importers:
       monaco-editor:
         specifier: 0.52.2
         version: 0.52.2
+      motion:
+        specifier: 'catalog:'
+        version: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       next:
         specifier: 'catalog:'
         version: 16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -14895,6 +14898,20 @@ packages:
 
   motion-utils@12.9.4:
     resolution: {integrity: sha512-BW3I65zeM76CMsfh3kHid9ansEJk9Qvl+K5cu4DVHKGsI52n76OJ4z2CUJUV+Mn3uEP9k1JJA3tClG0ggSrRcg==}
+
+  motion@11.18.2:
+    resolution: {integrity: sha512-JLjvFDuFr42NFtcVoMAyC2sEjnpA8xpy6qWPyzQvCloznAyQ8FIXioxWfHiLtgYhoVpfUqSWpn1h9++skj9+Wg==}
+    peerDependencies:
+      '@emotion/is-prop-valid': '*'
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@emotion/is-prop-valid':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
 
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -33543,6 +33560,15 @@ snapshots:
   motion-utils@12.36.0: {}
 
   motion-utils@12.9.4: {}
+
+  motion@11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      framer-motion: 11.18.2(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      tslib: 2.8.1
+    optionalDependencies:
+      '@emotion/is-prop-valid': 1.4.0
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   mri@1.2.0: {}
 

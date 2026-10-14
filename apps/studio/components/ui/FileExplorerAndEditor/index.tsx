@@ -1,6 +1,6 @@
 import { IS_PLATFORM } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Plus } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, flattenTree, INodeRendererProps, TreeView } from 'ui'

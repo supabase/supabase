@@ -139,7 +139,7 @@ vi.mock('common', async (importOriginal) => {
   return { ...actual, useParams: () => ({ ref: 'project-ref' }) }
 })
 
-vi.mock('framer-motion', () => ({
+vi.mock('motion/react', () => ({
   AnimatePresence: ({ children }: PropsWithChildren) => children,
   motion: { div: ({ children }: PropsWithChildren) => <div>{children}</div> },
 }))

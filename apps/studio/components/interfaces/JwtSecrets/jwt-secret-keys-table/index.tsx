@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { AnimatePresence } from 'framer-motion'
 import { AlertCircle, RotateCw, Timer } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {

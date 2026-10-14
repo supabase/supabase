@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useBreakpoint, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Trash } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {

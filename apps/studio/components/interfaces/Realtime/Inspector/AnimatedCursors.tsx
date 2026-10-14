@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
 import { MousePointer2 } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 
 export const AnimatedCursors = () => {
