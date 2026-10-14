@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { http, HttpResponse } from 'msw'
+import { http, HttpResponse, type JsonBodyType } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { CsatSurvey } from './CsatSurvey'
@@ -17,7 +17,7 @@ vi.mock('common', async (importOriginal) => ({
 
 const CSAT_URL = `${API_URL?.replace('/platform', '')}/platform/support/csat`
 
-const mockSubmit = (status: number, body: unknown = { result: 'success' }) => {
+const mockSubmit = (status: number, body: JsonBodyType = { result: 'success' }) => {
   const requests: unknown[] = []
   mswServer.use(
     http.post(CSAT_URL, async ({ request }) => {
