@@ -18,13 +18,20 @@ import {
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
 const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!
+  process.env.SUPABASE_URL || 'http://localhost:8000',
+  process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!,
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  }
 )
 
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
 const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
-const mcpResourceUrl = process.env.SUPABASE_PUBLIC_URL + '/.well-known/oauth-protected-resource/mcp'
+const mcpResourceUrl =
+  process.env.SUPABASE_PUBLIC_URL! + '/.well-known/oauth-protected-resource/mcp'
 
 const mcpQuerySchema = z.object({
   features: z
