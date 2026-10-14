@@ -284,7 +284,7 @@ export const UnifiedLogs = () => {
     return generateDynamicColumns({ data: flatData })
   }, [flatData])
 
-  const table: Table<ColumnSchema> = useReactTable({
+  const table: Table<ColumnSchema> = useReactTable<ColumnSchema>({
     data: flatData,
     columns: dynamicColumns,
     state: {
