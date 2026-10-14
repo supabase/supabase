@@ -34,26 +34,11 @@ The provider appears in the Third-Party Auth list with its issuer URL. To remove
 
 ## Add the integration with the Management API
 
-Create a [personal access token](/docs/guides/platform/personal-access-tokens), then call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint with your issuer URL:
+Create a [personal access token](/docs/guides/platform/personal-access-tokens), then call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint with your provider's issuer URL in the `oidc_issuer_url` field. To list or remove integrations, use the [list](/docs/reference/api/v1-list-project-tpa-integrations) and [delete](/docs/reference/api/v1-delete-project-tpa-integration) endpoints.
 
-```bash
-export PROJECT_REF="your-project-ref"
+## Supabase CLI
 
-curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth/third-party-auth" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "oidc_issuer_url": "https://login.example.com"
-  }'
-```
-
-The response includes the integration `id`. To list or remove integrations, use the [list](/docs/reference/api/v1-list-project-tpa-integrations) and [delete](/docs/reference/api/v1-delete-project-tpa-integration) endpoints.
-
-<Admonition type="note">
-
-The Supabase CLI has no `supabase/config.toml` key for custom OIDC providers. Add the integration in the Dashboard or with the Management API.
-
-</Admonition>
+Custom OIDC providers are not available in the Supabase CLI. There is no `supabase/config.toml` option for them.
 
 ## Assign the role claim
 
