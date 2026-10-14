@@ -287,7 +287,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
 Deno.serve(async (req: Request) => {
   if (req.url.endsWith(mcpResourcePath)) {
     return Response.json({
-      resource: SUPABASE_PUBLIC_URL + mcpResourcePath,
+      resource: `${SUPABASE_PUBLIC_URL}/mcp`,
       authorization_servers: [JWT_ISSUER],
       scopes_supported: ['openid', 'profile', 'email'],
     })

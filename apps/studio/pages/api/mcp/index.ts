@@ -57,8 +57,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 const isTokenValid = async (token: string): Promise<boolean> => {
-  const { error } = await supabase.auth.getClaims(token)
-  return !error
+  try {
+    const { error } = await supabase.auth.getClaims(token)
+    return !error
+  } catch {
+    return false
+  }
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
