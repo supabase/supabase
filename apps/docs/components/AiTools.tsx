@@ -17,7 +17,6 @@ function AiTools({
   className,
 }: {
   pageType: MarkdownAffordancePageType
-  /** ID of the rendered article, copied as HTML when the page's markdown can't be fetched. */
   articleId: string
   showAgentSetup?: boolean
   headingClassName?: string
