@@ -7,6 +7,7 @@ type LiveLogSession = {
   generation: symbol
   batches: LiveLogBatch[]
   baselineIds: string[]
+  unreadCount: number
 }
 
 type FetchLogs<T> = () => Promise<{
@@ -19,6 +20,7 @@ const createSession = (scope: string): LiveLogSession => ({
   generation: Symbol(),
   batches: [],
   baselineIds: [],
+  unreadCount: 0,
 })
 
 export function useLiveLogBatches<T extends { id: string }>({
@@ -64,6 +66,10 @@ export function useLiveLogBatches<T extends { id: string }>({
     refetchCounts,
   }
 
+  const acknowledgeLiveLogs = useCallback(() => {
+    setSession((current) => (current.unreadCount === 0 ? current : { ...current, unreadCount: 0 }))
+  }, [])
+
   const fetchLiveLogs = useCallback(async () => {
     const previous = latest.current
     if (previous.isPlaceholderData) return
@@ -90,6 +96,7 @@ export function useLiveLogBatches<T extends { id: string }>({
               ? [{ ...batch, ids: newIds }, ...current.batches]
               : current.batches,
           baselineIds: [...baselineIds].filter((id) => !batchedIds.has(id)),
+          unreadCount: current.unreadCount + newIds.length,
         }
       })
     }
@@ -100,6 +107,9 @@ export function useLiveLogBatches<T extends { id: string }>({
   return {
     rows: orderedRows,
     batches: currentSession.batches,
+    unreadCount: currentSession.unreadCount,
+    sessionKey: currentSession.generation,
+    acknowledgeLiveLogs,
     fetchLiveLogs,
   }
 }

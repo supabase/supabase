@@ -142,6 +142,8 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         expect(screen.getByRole('checkbox', { name: /^Postgres/ })).toHaveAccessibleName(/\b1\b/)
       )
       expect(screen.getByText('initial-log')).toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: /new logs?/ })).not.toBeInTheDocument()
+      Object.defineProperty(screen.getByRole('table').parentElement, 'scrollTo', { value: vi.fn() })
 
       await waitFor(() =>
         expect(screen.getByRole('button', { name: 'Refresh logs' })).toBeEnabled()
@@ -178,6 +180,7 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
         expect(screen.getByText(/No more data to load/)).toHaveTextContent('3 of 3 rows')
       })
       expect(getLogSequence()).toEqual(['first-arrival', 'late-arrival', 'refresh', 'initial-log'])
+      expect(screen.getByRole('button', { name: '2 new logs' })).toBeVisible()
       const separator = screen.getByText('Refresh', { exact: true })
       expect(separator.closest('tr')).toHaveTextContent(
         /\d{2} \w{3} \d{2} \d{2}:\d{2}:\d{2}Refresh/
@@ -206,11 +209,13 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
       ])
       expect(screen.getAllByText('initial-log')).toHaveLength(1)
       expect(screen.getAllByText('first-arrival')).toHaveLength(1)
+      expect(screen.getByRole('button', { name: '3 new logs' })).toBeVisible()
       expect(requests).toHaveLength(10)
 
       await act(async () => vi.advanceTimersByTimeAsync(10_000))
       await waitForLiveUpdate(() => expect(requests).toHaveLength(12))
       expect(screen.getAllByText('Refresh', { exact: true })).toHaveLength(2)
+      expect(screen.getByRole('button', { name: '3 new logs' })).toBeVisible()
 
       fireEvent.click(screen.getByRole('button', { name: 'Live' }))
       const requestsAfterPause = requests.length
@@ -220,6 +225,23 @@ describe('UnifiedLogs Live counts and arrival batches', () => {
       expect(screen.queryByText('paused-arrival')).not.toBeInTheDocument()
       expect(screen.getByRole('checkbox', { name: /^Postgres/ })).toHaveAccessibleName(/\b4\b/)
       expect(screen.getAllByText('Refresh', { exact: true })).toHaveLength(2)
+      fireEvent.click(screen.getByRole('button', { name: '3 new logs' }))
+      expect(screen.queryByRole('button', { name: /new logs?/ })).not.toBeInTheDocument()
+      expect(screen.getAllByText('Refresh', { exact: true })).toHaveLength(2)
+
+      fireEvent.click(screen.getByRole('button', { name: 'Live' }))
+      await waitForLiveUpdate(() => expect(screen.getByText('paused-arrival')).toBeInTheDocument())
+      expect(screen.getByRole('button', { name: '1 new log' })).toBeVisible()
+      expect(getLogSequence()).toEqual([
+        'paused-arrival',
+        'refresh',
+        'second-arrival',
+        'refresh',
+        'first-arrival',
+        'late-arrival',
+        'refresh',
+        'initial-log',
+      ])
       unmount()
     },
     20_000
