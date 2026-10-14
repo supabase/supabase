@@ -146,14 +146,16 @@ Use an ordered list for steps taken in sequence, and an unordered list when orde
 doesn't matter. Use Arabic numerals (`1`, `2`, `3`) for ordered lists and dashes (`-`)
 for unordered lists.
 
-#### Introduce a list in the sentence before it
+#### Point forward to a list with _the following_
 
-Use _the following_ in the lead-in sentence, and end the sentence with a colon. _These_
-can read as pointing back at something earlier on the page. _The following_ tells the
-reader that a list comes next.
+When a sentence refers to a list but another sentence sits between it and the list, use
+_the following_. _These_ reads as pointing back at something already on the page, so the
+reader can't tell which items it means. When the referring sentence is directly before
+the list, either word works.
 
-- **Recommended**: `Start from either of the following tabs:`
-- **Not recommended**: `Start from either of these tabs:`
+- **Recommended**: `To open Supabase Studio, start from either of the following tabs. Each one opens a different page in Supabase:`
+- **Recommended**: `Start from either of these tabs:`
+- **Not recommended**: `To open Supabase Studio, start from either of these tabs. Each one opens a different page in Supabase:`
 
 #### Prefer a paragraph to a single-item list
 
@@ -213,7 +215,7 @@ rather than adding `Locate the **Save** button` as a separate step.
 #### Put the location before the action
 
 Write UI instructions in the order the reader acts: where to look first, then which
-control to use. The reader finds the place before they can act on it. 
+control to use. The reader finds the place before they can act on it.
 
 - **Recommended**: `Next to Supabase, click **Manage**, then click **Open in Supabase**.`
 - **Not recommended**: `Click **Manage** next to Supabase, then click **Open in Supabase**.`
