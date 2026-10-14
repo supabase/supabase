@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Check, Search } from 'lucide-react'
+import { CheckIcon, SearchIcon } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -94,7 +94,7 @@ export const TeamSettings = () => {
                 <Input
                   size="tiny"
                   autoComplete="off"
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   value={searchString}
                   onChange={(e) => setSearchString(e.target.value)}
                   name="email"
@@ -156,7 +156,7 @@ export const TeamSettings = () => {
                                 setIsRolesComboboxOpen(false)
                               }}
                             >
-                              <Check
+                              <CheckIcon
                                 className={cn(
                                   'mr-2 h-4 w-4',
                                   roleId === role.id ? 'opacity-100' : 'opacity-0'

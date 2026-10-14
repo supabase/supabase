@@ -1,5 +1,5 @@
 import { type ToolUIPart } from 'ai'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 
 import { AssistantQueryCell } from './AssistantQueryCell'
 import { useMessageInfoContext } from './Message.Context'
@@ -26,7 +26,7 @@ export function MessagePartQueryLogs({ toolPart }: { toolPart: QueryLogsToolPart
   if (state === 'input-streaming' || state === 'input-available') {
     return (
       <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader2Icon className="w-4 h-4 animate-spin" />
         Querying logs...
       </div>
     )

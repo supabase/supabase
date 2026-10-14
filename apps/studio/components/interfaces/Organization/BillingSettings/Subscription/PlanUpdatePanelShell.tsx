@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { ArrowLeftIcon, ExternalLinkIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 import { Button } from 'ui'
 
@@ -30,7 +30,7 @@ export function PlanUpdateFullScreenShell({
     >
       <Button
         variant="text"
-        icon={<ArrowLeft />}
+        icon={<ArrowLeftIcon />}
         onClick={onClose}
         className="fixed top-4 left-4 z-10"
       >
@@ -40,14 +40,14 @@ export function PlanUpdateFullScreenShell({
         <Button
           asChild
           variant="text"
-          iconRight={<ExternalLink />}
+          iconRight={<ExternalLinkIcon />}
           className="hidden sm:inline-flex"
         >
           <a href="https://supabase.com/pricing#faq" target="_blank" rel="noreferrer">
             Pricing FAQ
           </a>
         </Button>
-        <Button asChild iconRight={<ExternalLink />}>
+        <Button asChild iconRight={<ExternalLinkIcon />}>
           <a href="https://supabase.com/pricing#compare-plans" target="_blank" rel="noreferrer">
             Compare plans
           </a>

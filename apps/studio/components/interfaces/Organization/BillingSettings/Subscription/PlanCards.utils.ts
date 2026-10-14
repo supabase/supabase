@@ -1,4 +1,4 @@
-import type { Variants } from 'framer-motion'
+import type { Variants } from 'motion/react'
 
 const CARD_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 8 },

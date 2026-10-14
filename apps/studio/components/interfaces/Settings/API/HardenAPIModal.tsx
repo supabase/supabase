@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -136,7 +136,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             className="py-4 px-5"
             icon={
               hasAPISchema && isAPISchemaExposed ? (
-                <Check size={16} className="text-primary" />
+                <CheckIcon size={16} className="text-primary" />
               ) : undefined
             }
           >
@@ -214,7 +214,9 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
         <DialogDisclosure>
           <DialogDisclosureTrigger
             className="py-4 px-5"
-            icon={!isPublicSchemaExposed ? <Check size={16} className="text-primary" /> : undefined}
+            icon={
+              !isPublicSchemaExposed ? <CheckIcon size={16} className="text-primary" /> : undefined
+            }
           >
             2. Remove the <code className="text-code-inline">public</code> schema from the exposed
             schemas

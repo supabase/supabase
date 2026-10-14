@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Archive, Download, Move, Trash2, X } from 'lucide-react'
+import { ArchiveIcon, DownloadIcon, MoveIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { isVersioningActive } from '../StorageVersioning.constants'
@@ -40,7 +40,7 @@ export const FileExplorerHeaderSelection = () => {
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.STORAGE_EXPLORER_DOWNLOAD_SELECTED} side="bottom">
           <Button
             size="tiny"
-            icon={<Download size={12} />}
+            icon={<DownloadIcon size={12} />}
             onClick={async () => {
               if (selectedItems.length === 1) {
                 await downloadFile(selectedItems[0])
@@ -60,7 +60,7 @@ export const FileExplorerHeaderSelection = () => {
         >
           <ButtonTooltip
             size="tiny"
-            icon={canArchive ? <Archive size={12} /> : <Trash2 size={12} />}
+            icon={canArchive ? <ArchiveIcon size={12} /> : <Trash2Icon size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToDelete(selectedItems)}
             tooltip={{
@@ -78,7 +78,9 @@ export const FileExplorerHeaderSelection = () => {
         {canArchive && (
           <ButtonTooltip
             size="tiny"
-            icon={<Trash2 size={12} className={canUpdateFiles ? 'text-destructive' : undefined} />}
+            icon={
+              <Trash2Icon size={12} className={canUpdateFiles ? 'text-destructive' : undefined} />
+            }
             disabled={!canUpdateFiles}
             onClick={() => setItemsToPurge(selectedItems)}
             tooltip={{
@@ -101,7 +103,7 @@ export const FileExplorerHeaderSelection = () => {
         >
           <ButtonTooltip
             size="tiny"
-            icon={<Move size={12} />}
+            icon={<MoveIcon size={12} />}
             disabled={!canUpdateFiles}
             onClick={() => setSelectedItemsToMove(selectedItems)}
             tooltip={{
@@ -118,7 +120,7 @@ export const FileExplorerHeaderSelection = () => {
         <Button
           variant="text"
           size="tiny"
-          icon={<X size={12} />}
+          icon={<XIcon size={12} />}
           title="Clear selection"
           className="px-1.5 text-foreground-lighter hover:text-foreground"
           onClick={() => clearSelectedItems()}

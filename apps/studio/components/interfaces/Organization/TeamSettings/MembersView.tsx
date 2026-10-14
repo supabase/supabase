@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { Card, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -205,7 +205,7 @@ export const MembersView = ({ searchString, mfaFilter, roleId }: MembersViewProp
 
             {isFiltering && filteredMembers.length === 0 && (
               <div className="flex items-center gap-x-3 p-4">
-                <AlertCircle size={16} strokeWidth={2} className="text-foreground-lighter" />
+                <AlertCircleIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
                 <p className="text-foreground-lighter text-sm">
                   {searchString.length > 0
                     ? `No members matched the search query "${searchString}"`

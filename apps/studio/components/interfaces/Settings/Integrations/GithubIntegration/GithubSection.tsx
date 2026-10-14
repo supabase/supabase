@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
@@ -159,7 +159,7 @@ export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: b
                     onClick={onAddGitHubConnection}
                     showNode={false}
                     disabled={!canCreateGitHubConnection}
-                    icon={<Plus />}
+                    icon={<PlusIcon />}
                   >
                     Add connection
                   </EmptyIntegrationConnection>
@@ -203,7 +203,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
         >
           {disabled ? (
             <ButtonTooltip
-              icon={<Plus />}
+              icon={<PlusIcon />}
               size="tiny"
               disabled
               tooltip={{
@@ -216,7 +216,7 @@ function GitHubOrgEmptyState({ disabled, onClick }: { disabled: boolean; onClick
               Add connection
             </ButtonTooltip>
           ) : (
-            <Button icon={<Plus />} size="tiny" type="button" onClick={onClick}>
+            <Button icon={<PlusIcon />} size="tiny" type="button" onClick={onClick}>
               Add connection
             </Button>
           )}

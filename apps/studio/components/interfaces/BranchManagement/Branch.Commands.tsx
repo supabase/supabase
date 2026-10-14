@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Forward, GitBranch, Plus } from 'lucide-react'
+import { ForwardIcon, GitBranchIcon, PlusIcon } from 'lucide-react'
 import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
 
 import { COMMAND_MENU_SECTIONS } from '../App/CommandMenu/CommandMenu.utils'
@@ -45,7 +45,7 @@ export function useBranchCommands() {
             id: `branch-${branch.id}`,
             name: branch.name,
             route: `/project/${branch.project_ref}`,
-            icon: () => <Forward />,
+            icon: () => <ForwardIcon />,
           })),
         },
       ],
@@ -61,7 +61,7 @@ export function useBranchCommands() {
         name: 'Switch branch',
         value: 'Switch branch, Change branch, Select branch',
         action: () => setPage(SWITCH_BRANCH_PAGE_NAME),
-        icon: () => <GitBranch />,
+        icon: () => <GitBranchIcon />,
       },
     ],
     {
@@ -79,7 +79,7 @@ export function useBranchCommands() {
         name: 'Create branch',
         value: 'Create branch, New branch',
         action: () => setShowCreateBranchModal(true),
-        icon: () => <Plus />,
+        icon: () => <PlusIcon />,
       },
     ],
     {

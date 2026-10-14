@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { MoreVertical, RotateCcw, Trash2 } from 'lucide-react'
+import { MoreVerticalIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -110,7 +110,7 @@ const VersionActionsMenu = ({
           variant="text"
           size="tiny"
           className="px-1.5"
-          icon={<MoreVertical size={14} />}
+          icon={<MoreVerticalIcon size={14} />}
           aria-label={isDeleteMarker ? 'Actions for delete marker' : `Actions for version ${label}`}
         />
       </DropdownMenuTrigger>
@@ -119,7 +119,7 @@ const VersionActionsMenu = ({
         {!isDeleteMarker && (
           <>
             <DropdownMenuItem className="gap-x-2" disabled={isRestoring} onClick={onRestore}>
-              <RotateCcw size={14} />
+              <RotateCcwIcon size={14} />
               Restore as current
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -129,7 +129,7 @@ const VersionActionsMenu = ({
           onClick={onDelete}
           className="gap-x-2 text-destructive focus:text-destructive"
         >
-          <Trash2 size={14} />
+          <Trash2Icon size={14} />
           {isDeleteMarker ? 'Delete marker permanently' : 'Delete permanently'}
         </DropdownMenuItem>
       </DropdownMenuContent>

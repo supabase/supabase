@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
-import { AlertCircle, Search } from 'lucide-react'
+import { AlertCircleIcon, SearchIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Card,
@@ -90,14 +90,14 @@ export const Extensions = () => {
             onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
           <InputGroupAddon>
-            <Search />
+            <SearchIcon />
           </InputGroupAddon>
         </InputGroup>
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
         <InformationBox
-          icon={<AlertCircle className="text-foreground-light" size={18} strokeWidth={2} />}
+          icon={<AlertCircleIcon className="text-foreground-light" size={18} strokeWidth={2} />}
           title="You need additional permissions to update database extensions"
         />
       )}

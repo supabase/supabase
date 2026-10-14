@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Button,
@@ -116,7 +116,7 @@ export const ExposedSchemaSelector = ({
               size="small"
               className="w-full [&>span]:w-full pr-1! space-x-1"
               iconRight={
-                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                <ChevronsUpDownIcon className="text-foreground-muted" strokeWidth={2} size={14} />
               }
               aria-label="Select schemas"
               // Tooltip repeats the label; the description would read the name twice
@@ -177,7 +177,7 @@ export const ExposedSchemaSelector = ({
                       >
                         <div className="w-full flex flex-col">
                           <div className="w-full flex items-center gap-x-2">
-                            <Check size={16} className="text-primary shrink-0" />
+                            <CheckIcon size={16} className="text-primary shrink-0" />
                             <span className="truncate">{schema}</span>
                           </div>
                           {internalSchemasCannotExpose.has(schema) ? (
@@ -208,7 +208,7 @@ export const ExposedSchemaSelector = ({
                           <div
                             className={cn('w-full flex items-center gap-x-2', !isExposed && 'ml-6')}
                           >
-                            {isExposed && <Check size={16} className="text-primary shrink-0" />}
+                            {isExposed && <CheckIcon size={16} className="text-primary shrink-0" />}
                             <span className="truncate">{schema.name}</span>
                           </div>
                         </CommandItem>

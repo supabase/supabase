@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Github } from 'lucide-react'
+import { GithubIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
@@ -48,7 +48,7 @@ export const ConnectToGitHub = () => {
           Keep this preview branch in sync with a chosen GitHub branch
         </p>
       </div>
-      <Button icon={<Github />} onClick={onClick}>
+      <Button icon={<GithubIcon />} onClick={onClick}>
         {showAuthorizeCta ? 'Authorize' : 'Configure'}
       </Button>
     </div>

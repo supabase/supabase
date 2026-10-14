@@ -1,4 +1,4 @@
-import { Boxes, MoreVertical, X } from 'lucide-react'
+import { BoxesIcon, MoreVerticalIcon, XIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -78,7 +78,7 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     ref={menuTriggerRef}
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     className="px-1"
                     aria-label="Manage app"
                     aria-describedby={undefined}
@@ -95,7 +95,7 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
                       className="gap-x-2"
                       onClick={() => setDialogContent('projects')}
                     >
-                      <Boxes size={14} />
+                      <BoxesIcon size={14} />
                       View projects
                     </DropdownMenuItem>
                   </DialogTrigger>
@@ -107,7 +107,7 @@ export const GrantRow = ({ grant }: OAuthAppsAuthorizedRowProps) => {
                   className="gap-x-2"
                   onClick={() => setDialogContent('disconnect')}
                 >
-                  <X size={14} />
+                  <XIcon size={14} />
                   Revoke access
                 </DropdownMenuItem>
               </DialogTrigger>
