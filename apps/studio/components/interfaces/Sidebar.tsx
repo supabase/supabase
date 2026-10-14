@@ -1,7 +1,15 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
+import {
+  BlocksIcon,
+  BoxesIcon,
+  ChartAreaIcon,
+  PanelLeftDashedIcon,
+  ReceiptIcon,
+  SettingsIcon,
+  UsersIcon,
+} from 'lucide-react'
 import { AnimatePresence, motion, MotionProps } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -98,7 +106,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                   <Button
                     variant="text"
                     className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
-                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    icon={<PanelLeftDashedIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                     aria-label="Sidebar control"
                   />
                 </DropdownMenuTrigger>
@@ -418,28 +426,28 @@ const OrganizationLinks = () => {
       label: 'Projects',
       href: `/org/${organizationSlug}`,
       key: 'projects',
-      icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BoxesIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     },
     {
       label: 'Team',
       href: `/org/${organizationSlug}/team`,
       key: 'team',
-      icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <UsersIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_TEAM,
     },
     {
       label: 'Integrations',
       href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BlocksIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     },
     {
       label: 'Usage',
       href: `/org/${organizationSlug}/usage`,
       key: 'usage',
-      icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <ChartAreaIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_USAGE,
     },
     ...(showBilling
@@ -448,7 +456,7 @@ const OrganizationLinks = () => {
             label: 'Billing',
             href: `/org/${organizationSlug}/billing`,
             key: 'billing',
-            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <ReceiptIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             shortcutId: SHORTCUT_IDS.NAV_ORG_BILLING,
           },
         ]
@@ -457,7 +465,7 @@ const OrganizationLinks = () => {
       label: 'Organization Settings',
       href: `/org/${organizationSlug}/general`,
       key: 'settings',
-      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <SettingsIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     },
   ]

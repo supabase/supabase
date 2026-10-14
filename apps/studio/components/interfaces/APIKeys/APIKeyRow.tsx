@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { MoreVertical } from 'lucide-react'
+import { MoreVerticalIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import {
   Button,
@@ -74,7 +74,7 @@ export const APIKeyRow = ({
                         variant="text"
                         size="tiny"
                         icon={
-                          <MoreVertical
+                          <MoreVerticalIcon
                             size="14"
                             className="text-foreground-light hover:text-foreground"
                           />

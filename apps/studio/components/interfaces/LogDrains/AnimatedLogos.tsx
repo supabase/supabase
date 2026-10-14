@@ -1,5 +1,5 @@
 import { Axiom, Datadog, Grafana, Last9, Otlp, Sentry } from 'icons'
-import { BracesIcon, Cloud, Server } from 'lucide-react'
+import { BracesIcon, CloudIcon, ServerIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
@@ -25,11 +25,11 @@ export const AnimatedLogos = ({ iconSize = 36, className }: AnimatedLogosProps) 
     { id: 'otlp', name: 'OTLP', icon: <Otlp fill="currentColor" size={iconSize} /> },
     { id: 'datadog', name: 'Datadog', icon: <Datadog fill="currentColor" size={iconSize} /> },
     { id: 'loki', name: 'Loki', icon: <Grafana fill="currentColor" size={iconSize} /> },
-    { id: 's3', name: 'Amazon S3', icon: <Cloud size={iconSize} /> },
+    { id: 's3', name: 'Amazon S3', icon: <CloudIcon size={iconSize} /> },
     { id: 'sentry', name: 'Sentry', icon: <Sentry fill="currentColor" size={iconSize} /> },
     { id: 'axiom', name: 'Axiom', icon: <Axiom fill="currentColor" size={iconSize} /> },
     { id: 'last9', name: 'Last9', icon: <Last9 fill="currentColor" size={iconSize} /> },
-    { id: 'syslog', name: 'Syslog', icon: <Server size={iconSize} /> },
+    { id: 'syslog', name: 'Syslog', icon: <ServerIcon size={iconSize} /> },
   ]
 
   useEffect(() => {

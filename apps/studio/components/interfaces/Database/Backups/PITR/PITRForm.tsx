@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Calendar, cn } from 'ui'
 
@@ -165,7 +165,7 @@ export function PITRForm({
                   <InformationBox
                     defaultVisibility
                     hideCollapse
-                    icon={<HelpCircle size={14} strokeWidth={2} />}
+                    icon={<HelpCircleIcon size={14} strokeWidth={2} />}
                     title="Select a date which you'd like to restore your database to"
                   />
                 </div>

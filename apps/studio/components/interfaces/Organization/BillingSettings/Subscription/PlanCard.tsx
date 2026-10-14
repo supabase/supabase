@@ -1,5 +1,5 @@
 import { isArray } from 'lodash'
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { motion, type Variants } from 'motion/react'
 import type { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
@@ -166,7 +166,7 @@ export function PlanCard({
             >
               <div className="flex items-center">
                 <div className="flex w-5">
-                  <Check className="h-4 w-4 text-primary" aria-hidden="true" strokeWidth={3} />
+                  <CheckIcon className="h-4 w-4 text-primary" aria-hidden="true" strokeWidth={3} />
                 </div>
                 <span className="text-foreground">
                   {typeof feature === 'string' ? feature : feature[0]}

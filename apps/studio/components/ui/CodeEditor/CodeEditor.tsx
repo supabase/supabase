@@ -1,6 +1,6 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { RefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
@@ -266,7 +266,7 @@ export const CodeEditor = ({
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <Loader2 className="animate-spin" strokeWidth={2} size={20} />}
+        loading={loading || <Loader2Icon className="animate-spin" strokeWidth={2} size={20} />}
         options={optionsMerged}
         onMount={handleMount}
         onChange={onChangeContent}

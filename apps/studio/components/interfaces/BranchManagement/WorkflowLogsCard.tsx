@@ -1,4 +1,4 @@
-import { CircleDotDashed, GitMerge, X } from 'lucide-react'
+import { CircleDotDashedIcon, GitMergeIcon, XIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useEffect, useRef } from 'react'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
@@ -58,10 +58,10 @@ export const WorkflowLogsCard = ({
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
       >
-        <CircleDotDashed size={16} strokeWidth={1.5} className="text-warning" />
+        <CircleDotDashedIcon size={16} strokeWidth={1.5} className="text-warning" />
       </motion.div>
     ) : isSuccess ? (
-      <GitMerge size={16} strokeWidth={1.5} className="text-primary" />
+      <GitMergeIcon size={16} strokeWidth={1.5} className="text-primary" />
     ) : null)
 
   return (
@@ -85,7 +85,7 @@ export const WorkflowLogsCard = ({
               <Button
                 variant="text"
                 size="tiny"
-                icon={<X size={12} strokeWidth={1.5} />}
+                icon={<XIcon size={12} strokeWidth={1.5} />}
                 onClick={onClose}
                 className="h-5 w-5 p-0"
               />

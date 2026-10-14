@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { RotateCcw, X } from 'lucide-react'
+import { RotateCcwIcon, XIcon } from 'lucide-react'
 
 import type { ArchivedVersionRow } from './archivedVersions.utils'
 import { FilePreview } from './FilePreview'
@@ -28,7 +28,7 @@ export const ArchivedVersionRestoreWidget = ({
 }: ArchivedVersionRestoreWidgetProps) => (
   <div className="space-y-3 border-b border-overlay bg-brand-200/30 p-3">
     <div className="flex items-center gap-x-1.5">
-      <RotateCcw size={13} className="shrink-0 text-brand" />
+      <RotateCcwIcon size={13} className="shrink-0 text-brand" />
       <p className="truncate text-sm font-medium text-foreground">
         Restore version {shortVersion(version.versionId)}?
       </p>
@@ -39,7 +39,7 @@ export const ArchivedVersionRestoreWidget = ({
         onClick={onDismiss}
         aria-label="Cancel restore"
       >
-        <X size={13} />
+        <XIcon size={13} />
       </button>
     </div>
 
@@ -60,7 +60,7 @@ export const ArchivedVersionRestoreWidget = ({
     <ButtonTooltip
       variant="primary"
       block
-      icon={<RotateCcw size={14} />}
+      icon={<RotateCcwIcon size={14} />}
       loading={isRestoring}
       disabled={!canUpdateFiles}
       onClick={onRestore}

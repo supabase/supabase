@@ -1,7 +1,7 @@
 import type { Provider } from '@supabase/auth-js'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { Edit, Unlink } from 'lucide-react'
+import { EditIcon, UnlinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -189,7 +189,7 @@ export const AccountIdentities = () => {
                       {canUpdateEmail && (
                         <ButtonTooltip
                           variant="text"
-                          icon={<Edit />}
+                          icon={<EditIcon />}
                           className="w-7"
                           onClick={() => setSelectedProviderUpdateEmail(provider)}
                           tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
@@ -198,7 +198,7 @@ export const AccountIdentities = () => {
                       {identities.length > 1 && (
                         <ButtonTooltip
                           variant="text"
-                          icon={<Unlink />}
+                          icon={<UnlinkIcon />}
                           className="w-7"
                           onClick={() => setSelectedProviderUnlink(provider)}
                           tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}

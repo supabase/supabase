@@ -1,15 +1,15 @@
 import { components } from 'api-types'
 import dayjs from 'dayjs'
 import {
-  CircleArrowDown,
-  CircleArrowUp,
-  Eye,
-  Key,
-  Minus,
-  MoreVertical,
-  ShieldOff,
-  Timer,
-  Trash2,
+  CircleArrowDownIcon,
+  CircleArrowUpIcon,
+  EyeIcon,
+  KeyIcon,
+  MinusIcon,
+  MoreVerticalIcon,
+  ShieldOffIcon,
+  TimerIcon,
+  Trash2Icon,
 } from 'lucide-react'
 import { motion } from 'motion/react'
 import {
@@ -68,7 +68,7 @@ const LastUsedCell = ({
   if (!isLastUsedSupported)
     return (
       <TableCell>
-        <Minus size={14} className="text-foreground-lighter ml-auto" />
+        <MinusIcon size={14} className="text-foreground-lighter ml-auto" />
       </TableCell>
     )
 
@@ -138,9 +138,9 @@ export const SigningKeyRow = ({
           )}
         >
           {signingKey.status === 'standby' ? (
-            <Timer className="shrink-0" size={14} />
+            <TimerIcon className="shrink-0" size={14} />
           ) : (
-            <Key className="shrink-0" size={14} />
+            <KeyIcon className="shrink-0" size={14} />
           )}
           <span className="truncate text-xs">{statusLabels[signingKey.status]}</span>
         </Badge>
@@ -194,7 +194,7 @@ export const SigningKeyRow = ({
               variant="text"
               className="px-1.5"
               loading={isLoading}
-              icon={<MoreVertical className="size-4" />}
+              icon={<MoreVerticalIcon className="size-4" />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-52">
@@ -205,7 +205,7 @@ export const SigningKeyRow = ({
                   setShownDialog('key-details')
                 }}
               >
-                <Eye className="mr-2 size-4" />
+                <EyeIcon className="mr-2 size-4" />
                 View key details
               </DropdownMenuItem>
             )}
@@ -215,7 +215,7 @@ export const SigningKeyRow = ({
                   onSelect={() => handlePreviouslyUsedKey(signingKey.id)}
                   className="text-destructive"
                 >
-                  <CircleArrowDown className="mr-2 size-4" />
+                  <CircleArrowDownIcon className="mr-2 size-4" />
                   Move to previously used
                 </DropdownMenuItem>
               </>
@@ -234,7 +234,7 @@ export const SigningKeyRow = ({
                     },
                   }}
                 >
-                  <CircleArrowUp className="mr-2 size-4" />
+                  <CircleArrowUpIcon className="mr-2 size-4" />
                   Move to standby key
                 </DropdownMenuItemTooltip>
                 <DropdownMenuItem
@@ -244,7 +244,7 @@ export const SigningKeyRow = ({
                   }}
                   className="text-destructive"
                 >
-                  <ShieldOff className="mr-2 size-4" />
+                  <ShieldOffIcon className="mr-2 size-4" />
                   Revoke key
                 </DropdownMenuItem>
               </>
@@ -263,7 +263,7 @@ export const SigningKeyRow = ({
                     },
                   }}
                 >
-                  <CircleArrowUp className="mr-2 size-4" />
+                  <CircleArrowUpIcon className="mr-2 size-4" />
                   Move to standby key
                 </DropdownMenuItemTooltip>
                 <DropdownMenuItem
@@ -274,7 +274,7 @@ export const SigningKeyRow = ({
                   className="text-destructive"
                   disabled={legacyKey?.id === signingKey.id}
                 >
-                  <Trash2 className="mr-2 size-4" />
+                  <Trash2Icon className="mr-2 size-4" />
                   Delete permanently
                 </DropdownMenuItem>
               </>

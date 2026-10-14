@@ -1,7 +1,7 @@
 // End of third-party imports
 
 import { useParams } from 'common'
-import { Check, ChevronsUpDown, ExternalLink } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, ExternalLinkIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
@@ -89,7 +89,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                     aria-controls={listboxId}
                     size="small"
                     className="justify-between"
-                    iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                    iconRight={<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
                   >
                     {!!orgSlug && isLoading ? (
                       <ShimmeringLoader className="w-44 py-2" />
@@ -110,7 +110,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                       setOpen(false)
                     }}
                   >
-                    {field.value === NO_PROJECT_MARKER && <Check size={16} />}
+                    {field.value === NO_PROJECT_MARKER && <CheckIcon size={16} />}
                     <p className={cn(field.value !== NO_PROJECT_MARKER && 'ml-6')}>
                       No specific project
                     </p>
@@ -205,7 +205,7 @@ export const PlanExpectationInfoContent = ({
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild size="tiny" icon={<ExternalLink />}>
+          <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

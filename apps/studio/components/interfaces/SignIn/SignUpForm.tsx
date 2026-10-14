@@ -1,6 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryStates } from 'nuqs'
@@ -193,7 +193,7 @@ export const SignUpForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                       title={passwordHidden ? `Show password` : `Hide password`}
                       aria-label={passwordHidden ? `Show password` : `Hide password`}
                       className="absolute right-1 top-1 px-1.5"
-                      icon={passwordHidden ? <Eye /> : <EyeOff />}
+                      icon={passwordHidden ? <EyeIcon /> : <EyeOffIcon />}
                       disabled={isSubmitting}
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />

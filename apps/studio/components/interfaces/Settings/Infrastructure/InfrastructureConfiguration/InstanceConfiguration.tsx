@@ -1,7 +1,7 @@
 import { Edge, ReactFlowProvider } from '@xyflow/react'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { Globe2, Loader2, Network } from 'lucide-react'
+import { Globe2Icon, Loader2Icon, NetworkIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, FloatingPlate, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -167,7 +167,7 @@ const InstanceConfigurationUI = () => {
         {(isLoading || isLoadingProject) && (
           <div role="status">
             <span className="sr-only">Loading infrastructure...</span>
-            <Loader2
+            <Loader2Icon
               aria-hidden="true"
               className="motion-safe:animate-spin text-foreground-light"
             />
@@ -183,7 +183,7 @@ const InstanceConfigurationUI = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          icon={<Network size={15} />}
+                          icon={<NetworkIcon size={15} />}
                           className={`rounded-r-none transition motion-reduce:transition-none ${
                             view === 'flow' ? 'opacity-100' : 'opacity-50'
                           }`}
@@ -201,7 +201,7 @@ const InstanceConfigurationUI = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          icon={<Globe2 size={15} />}
+                          icon={<Globe2Icon size={15} />}
                           className={`rounded-l-none transition motion-reduce:transition-none ${
                             view === 'map' ? 'opacity-100' : 'opacity-50'
                           }`}
@@ -245,7 +245,10 @@ export const InstanceConfiguration = () => {
     return (
       <div role="status" className="h-full w-full flex items-center justify-center">
         <span className="sr-only">Loading infrastructure...</span>
-        <Loader2 aria-hidden="true" className="motion-safe:animate-spin text-foreground-light" />
+        <Loader2Icon
+          aria-hidden="true"
+          className="motion-safe:animate-spin text-foreground-light"
+        />
       </div>
     )
   }

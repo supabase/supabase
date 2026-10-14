@@ -1,6 +1,6 @@
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { Fragment, useRef, useState, type ReactNode } from 'react'
@@ -354,7 +354,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
       <div className="flex gap-2 items-center">
         <Button asChild variant="text" className=" py-0! p-1!" title="Show more route details">
           <span>
-            <ChevronRight
+            <ChevronRightIcon
               size={14}
               className="transition data-open-parent:rotate-90 data-closed-parent:rotate-0"
             />

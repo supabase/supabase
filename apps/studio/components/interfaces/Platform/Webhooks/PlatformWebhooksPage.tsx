@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { EllipsisVertical, Pencil, RotateCw, Send, Trash2 } from 'lucide-react'
+import { EllipsisVerticalIcon, PencilIcon, RotateCwIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -448,7 +448,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 options={{ enabled: !isEndpointSheetOpen }}
               >
                 <Button
-                  icon={<Pencil size={14} />}
+                  icon={<PencilIcon size={14} />}
                   onClick={() => {
                     setEditEnabledOverride(null)
                     setPanel('edit')
@@ -459,25 +459,25 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
               </Shortcut>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button icon={<EllipsisVertical />} className="w-7" />
+                  <Button icon={<EllipsisVerticalIcon />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="bottom" className="w-48">
                   <DropdownMenuItem className="gap-x-2" onClick={handleSendTestEvent}>
-                    <Send size={14} className="text-foreground-lighter" />
+                    <SendIcon size={14} className="text-foreground-lighter" />
                     <span>Send test event</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setShowRegenerateSecretConfirm(true)}
                   >
-                    <RotateCw size={14} className="text-foreground-lighter" />
+                    <RotateCwIcon size={14} className="text-foreground-lighter" />
                     <span>Regenerate secret</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setEndpointIdPendingDelete(selectedEndpoint.id)}
                   >
-                    <Trash2 size={14} className="text-foreground-lighter" />
+                    <Trash2Icon size={14} className="text-foreground-lighter" />
                     <span>Delete endpoint</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

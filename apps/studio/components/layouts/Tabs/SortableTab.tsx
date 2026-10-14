@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useMemo, type KeyboardEvent } from 'react'
 import { cn, TabsTrigger } from 'ui'
@@ -164,7 +164,7 @@ export const SortableTab = ({
               'cursor-pointer'
             )}
           >
-            <X size={12} className="text-foreground-light" />
+            <XIcon size={12} className="text-foreground-light" />
           </button>
         )}
       </div>

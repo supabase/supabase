@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronRight, Plus, SquareCode } from 'lucide-react'
+import { ChevronRightIcon, PlusIcon, SquareCodeIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -63,9 +63,9 @@ export const ExplorerNavHome = ({
             className={rowClassName(false)}
             onClick={() => createQuery()}
           >
-            <SquareCode size={14} className="shrink-0" />
+            <SquareCodeIcon size={14} className="shrink-0" />
             <span className="flex-1 text-left">Run SQL</span>
-            <Plus size={14} className="shrink-0 text-foreground-muted" />
+            <PlusIcon size={14} className="shrink-0 text-foreground-muted" />
           </button>
           {EXPLORER_SECTIONS.map(({ type, label, icon: Icon }) => {
             return (
@@ -87,7 +87,7 @@ export const ExplorerNavHome = ({
                 ) : (
                   <span className="text-xs text-foreground-lighter">{chats.length}</span>
                 )}
-                <ChevronRight size={14} className="shrink-0 text-foreground-muted" />
+                <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
               </button>
             )
           })}
