@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowRight, Check, ChevronRight, X } from 'lucide-react'
+import { ArrowRightIcon, CheckIcon, ChevronRightIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { memo, useMemo } from 'react'
 import {
@@ -134,9 +134,9 @@ export const MemberRow = memo(function MemberRow({
           <Tooltip>
             <TooltipTrigger>
               {member.mfa_enabled ? (
-                <Check className="text-primary" strokeWidth={2} size={16} />
+                <CheckIcon className="text-primary" strokeWidth={2} size={16} />
               ) : (
-                <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
+                <XIcon className="text-foreground-muted" strokeWidth={1.5} size={16} />
               )}
             </TooltipTrigger>
             <TooltipContent side="bottom" className="max-w-70 text-center">
@@ -163,7 +163,7 @@ export const MemberRow = memo(function MemberRow({
               <p className="text-foreground-light whitespace-nowrap">{roleName}</p>
               {hasProjectScopedRoles && (
                 <>
-                  <ChevronRight className="text-foreground-muted/50 shrink-0" size={14} />
+                  <ChevronRightIcon className="text-foreground-muted/50 shrink-0" size={14} />
                   {projectsApplied.length === 1 ? (
                     <span
                       className="text-foreground-light truncate"
@@ -196,7 +196,7 @@ export const MemberRow = memo(function MemberRow({
                                 <span className="text-xs truncate max-w-[60%]">{name}</span>
                                 <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
                                   Go to project
-                                  <ArrowRight size={14} />
+                                  <ArrowRightIcon size={14} />
                                 </span>
                               </Link>
                             ))}

@@ -1,6 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
+import { CheckCircle2Icon, ChevronRightIcon, ChevronsLeftRightIcon } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
@@ -92,7 +92,7 @@ export const ProjectClaimConfirm = ({
             <div className="flex items-center justify-center w-28 relative">
               <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
               <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-xs">
-                <ChevronsLeftRight className="text-muted-foreground" size={24} />
+                <ChevronsLeftRightIcon className="text-muted-foreground" size={24} />
               </div>
               <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
             </div>
@@ -117,7 +117,7 @@ export const ProjectClaimConfirm = ({
           <ul className="space-y-3">
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-primary h-5 w-5" />
+                <CheckCircle2Icon className="text-primary h-5 w-5" />
               </span>
               <span>
                 The project will be transferred to your Supabase organization{' '}
@@ -133,7 +133,7 @@ export const ProjectClaimConfirm = ({
             </li>
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-primary h-5 w-5" />
+                <CheckCircle2Icon className="text-primary h-5 w-5" />
               </span>
               <span>
                 <span className="text-foreground">{requester?.name}</span> will receive API access
@@ -143,7 +143,7 @@ export const ProjectClaimConfirm = ({
             </li>
             <li className="flex space-x-2">
               <span>
-                <CheckCircle2 className="text-primary h-5 w-5" />
+                <CheckCircle2Icon className="text-primary h-5 w-5" />
               </span>
               <span>
                 You'll be responsible for maintaining the project, which may include additional
@@ -175,7 +175,7 @@ export const ProjectClaimConfirm = ({
                   </span>
                 </p>
 
-                <ChevronRight
+                <ChevronRightIcon
                   size={16}
                   className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}

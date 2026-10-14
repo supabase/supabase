@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -98,7 +98,7 @@ export const BillingMetric = ({
                 </p>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
-                    <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+                    <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
                   </span>
                 )}
               </div>

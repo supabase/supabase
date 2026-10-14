@@ -7,6 +7,11 @@ import { TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
+	const troubleshooting = await getCollection('troubleshooting')
+	const entries = [
+		...guides.map((guide) => ({ data: guide.data, href: `/guides/${guide.id}` })),
+		...troubleshooting.map((entry) => ({ data: entry.data, href: `/troubleshooting/${entry.id}` })),
+	]
 
 	// One page per topic in TOPICS — not just topics a guide already uses —
 	// so every link on the "Topics" nav resolves instead of 404ing.
@@ -15,7 +20,7 @@ export async function getStaticPaths() {
 		props: {
 			topic: topic.name,
 			description: topic.description,
-			guides: guides.filter((guide) => guide.data.topics?.includes(topic.name)),
+			guides: entries.filter((entry) => entry.data.topics?.includes(topic.name)),
 		},
 	}))
 }
@@ -39,7 +44,7 @@ const jsonLd = breadcrumbListSchema([
 				<ul>
 					{guides.map((guide) => (
 						<li>
-							<a href={`${import.meta.env.BASE_URL}/guides/${guide.id}`}>{guide.data.title}</a>
+							<a href={`${import.meta.env.BASE_URL}${guide.href}`}>{guide.data.title}</a>
 						</li>
 					))}
 				</ul>

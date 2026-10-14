@@ -180,6 +180,7 @@ export const useIsStorageVersioningEnabled = () => {
   const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
   const { data } = useProjectStorageConfigQuery({ projectRef: ref })
   const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
+
   return (
     isStorageVersioningEnabled &&
     isObjectVersioningAvailable &&

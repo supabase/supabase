@@ -7,14 +7,20 @@ import { get, handleError } from '@/data/fetchers'
 import { useProfile } from '@/lib/profile'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
-// [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards view
-// So that the last row will always be a full row of cards while there's a next page
-// API max rows is 100, I'm just choosing 96 here as the highest value thats a multiple of 6
+/**
+ * [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards
+ * view on the project home page, So that the last row will always be a full row of cards while
+ * there's a next page. API max rows is 100, I'm just choosing 96 here as the highest value thats a
+ * multiple of 6.
+ *
+ * Also deliberately omitting limit as a param in this RQ hook just so we can consistently use the same
+ * cached data and not unnecessarily ping API for different limit values. (Let me know if there happens
+ * to be a UI that might need a specific limit value that we need to reintroduce that param)
+ */
 const DEFAULT_LIMIT = 96
 
 interface GetOrgProjectsInfiniteVariables {
   slug?: string
-  limit?: number
   sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
   search?: string
   page?: number
@@ -27,7 +33,6 @@ export type OrgProject = OrgProjectsResponse['projects'][number]
 export async function getOrganizationProjects(
   {
     slug,
-    limit = DEFAULT_LIMIT,
     page = 0,
     sort = 'name_asc',
     search: _search = '',
@@ -38,6 +43,7 @@ export async function getOrganizationProjects(
 ) {
   if (!slug) throw new Error('Slug is required')
 
+  const limit = DEFAULT_LIMIT
   const offset = page * limit
   const search = _search.length === 0 ? undefined : _search
   const statuses = _statuses.length === 0 ? undefined : _statuses.join(',')
@@ -56,13 +62,7 @@ export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationP
 export type OrgProjectsInfiniteError = ResponseError
 
 export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
-  {
-    slug,
-    limit = DEFAULT_LIMIT,
-    sort = 'name_asc',
-    search,
-    statuses = [],
-  }: GetOrgProjectsInfiniteVariables,
+  { slug, sort = 'name_asc', search, statuses = [] }: GetOrgProjectsInfiniteVariables,
   {
     enabled = true,
     ...options
@@ -76,15 +76,15 @@ export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
 ) => {
   const { profile } = useProfile()
   return useInfiniteQuery({
-    queryKey: projectKeys.infiniteListByOrg(slug, { limit, sort, search, statuses }),
+    queryKey: projectKeys.infiniteListByOrg(slug, { sort, search, statuses }),
     queryFn: ({ signal, pageParam }) =>
-      getOrganizationProjects({ slug, limit, page: pageParam, sort, search, statuses }, signal),
+      getOrganizationProjects({ slug, page: pageParam, sort, search, statuses }, signal),
     enabled: enabled && profile !== undefined && typeof slug !== 'undefined',
     staleTime: 30 * 60 * 1000, // 30 minutes
     initialPageParam: 0,
     getNextPageParam(lastPage, pages) {
       const page = pages.length
-      const currentTotalCount = page * limit
+      const currentTotalCount = page * DEFAULT_LIMIT
       const totalCount = lastPage.pagination?.count
 
       if (totalCount === undefined || currentTotalCount >= totalCount) return undefined

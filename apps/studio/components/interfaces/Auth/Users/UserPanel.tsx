@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -63,7 +63,7 @@ export const UserPanel = () => {
         <Button
           variant="text"
           className="absolute top-3 right-3 z-10 px-1"
-          icon={<X />}
+          icon={<XIcon />}
           onClick={() => setSelectedId(null)}
           aria-label="Close panel"
         />

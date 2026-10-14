@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -549,7 +549,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                             {allSelected ? 'Clear all' : 'Select all'}
                                           </span>
                                         )}
-                                        <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-open:rotate-180" />
+                                        <ChevronDownIcon className="h-4 w-4 shrink-0 transition-transform duration-200 group-data-open:rotate-180" />
                                       </div>
                                     </div>
                                   </AccordionTrigger>

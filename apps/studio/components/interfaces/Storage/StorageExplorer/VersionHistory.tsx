@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { MoreVertical, RotateCcw, Trash2 } from 'lucide-react'
+import { MoreVerticalIcon, RotateCcwIcon, Trash2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -110,7 +110,7 @@ const VersionActionsMenu = ({
           variant="text"
           size="tiny"
           className="px-1.5"
-          icon={<MoreVertical size={14} />}
+          icon={<MoreVerticalIcon size={14} />}
           aria-label={isDeleteMarker ? 'Actions for delete marker' : `Actions for version ${label}`}
         />
       </DropdownMenuTrigger>
@@ -119,7 +119,7 @@ const VersionActionsMenu = ({
         {!isDeleteMarker && (
           <>
             <DropdownMenuItem className="gap-x-2" disabled={isRestoring} onClick={onRestore}>
-              <RotateCcw size={14} />
+              <RotateCcwIcon size={14} />
               Restore as current
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -129,7 +129,7 @@ const VersionActionsMenu = ({
           onClick={onDelete}
           className="gap-x-2 text-destructive focus:text-destructive"
         >
-          <Trash2 size={14} />
+          <Trash2Icon size={14} />
           {isDeleteMarker ? 'Delete marker permanently' : 'Delete permanently'}
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -141,9 +141,9 @@ interface VersionHistoryProps {
   projectRef?: string
   bucketId?: string
   objectName: string
-  /** Full path within the bucket, which is what the version endpoints address. */
   path: string
   versioningState: BucketVersioningState
+  willRetainVersionOnWrite: boolean
   lifecyclePolicy: LifecyclePolicy
   expirationMode: ExpirationMode
   mimeType?: string
@@ -159,6 +159,7 @@ export const VersionHistory = ({
   objectName,
   path,
   versioningState,
+  willRetainVersionOnWrite,
   lifecyclePolicy,
   expirationMode,
   mimeType,
@@ -218,10 +219,11 @@ export const VersionHistory = ({
           expiryDays,
           cap,
           mode: expirationMode,
+          willRetainVersionOnWrite,
         }),
       ])
     )
-  }, [versions, expiryDays, cap, expirationMode])
+  }, [versions, expiryDays, cap, expirationMode, willRetainVersionOnWrite])
 
   const handleRestore = (version: ObjectVersion) => {
     if (!projectRef || !bucketId) return
@@ -242,22 +244,23 @@ export const VersionHistory = ({
         />
       )}
 
-      {versioningState === 'suspended' && (
+      {versioningState === 'suspended' && willRetainVersionOnWrite && (
         <Admonition
           type="default"
           title="Versioning is suspended on this bucket"
-          description="New noncurrent versions are no longer created. Everything already retained here stays as it is until you delete it or a lifecycle policy expires it."
+          description="Replacing this file retains the current version one last time. Anything uploaded after that overwrites it in place."
         />
       )}
 
-      {isSuccess && versions.length === 0 && versioningState === 'disabled' && (
-        <p className="text-sm text-foreground-light">
-          Versioning is off for this bucket, so previous versions aren&apos;t retained. Turn it on
-          in the bucket settings to start keeping them.
-        </p>
+      {versioningState === 'suspended' && !willRetainVersionOnWrite && (
+        <Admonition
+          type="default"
+          title="Versioning is suspended on this bucket"
+          description="Replacing this file overwrites it in place. The versions below stay retained until you delete them or a lifecycle policy expires them."
+        />
       )}
 
-      {isSuccess && versions.length === 0 && versioningState !== 'disabled' && (
+      {isSuccess && versions.length === 0 && (
         <p className="text-sm text-foreground-light">
           No previous versions yet. Overwriting this file will retain a recoverable copy here.
         </p>

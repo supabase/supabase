@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { useBucketFilePickerStateSnapshot } from './BucketFilePickerState'
@@ -9,7 +9,7 @@ export const BucketFilePickerHeaderSelection = () => {
   return (
     <div className="z-10 flex h-[40px] items-center rounded-t-md bg-brand-400 px-2 py-1 shadow in-data-[theme*=dark]:bg-brand-500">
       <Button
-        icon={<X size={16} strokeWidth={2} />}
+        icon={<XIcon size={16} strokeWidth={2} />}
         variant="text"
         onClick={() => clearSelectedItems()}
         aria-label="Clear selected items"

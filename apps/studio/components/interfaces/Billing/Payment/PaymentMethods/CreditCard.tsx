@@ -1,4 +1,4 @@
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontalIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -157,7 +157,7 @@ const CreditCard = ({
                 <Button
                   variant="outline"
                   className="hover:border-muted px-1"
-                  icon={<MoreHorizontal />}
+                  icon={<MoreHorizontalIcon />}
                   aria-label="More options"
                 />
               </DropdownMenuTrigger>

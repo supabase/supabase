@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
@@ -76,7 +76,7 @@ export const HooksList = () => {
             onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
           <InputGroupAddon>
-            <Search />
+            <SearchIcon />
           </InputGroupAddon>
         </InputGroup>
         <div className="flex items-center gap-x-2">
