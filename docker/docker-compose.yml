@@ -58,6 +58,7 @@ services:
 
       # See: docker-compose.logs.yml
       ENABLED_FEATURES_LOGS_ALL: "false"
+      ENABLED_FEATURES_MCP_OAUTH: "false"
 
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
@@ -455,6 +456,7 @@ services:
 
       SUPABASE_URL: http://api-gw:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
+      JWT_ISSUER: ${API_EXTERNAL_URL}
       # Legacy API keys (HS256-signed JWTs)
       SUPABASE_ANON_KEY: ${ANON_KEY}
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
