@@ -22,7 +22,7 @@ Open `http://localhost:8082/account/security?mockRecoveryCodes=VALUE`, replacing
 - http://localhost:8082/account/security?mockRecoveryCodes=backup
 - http://localhost:8082/account/security?mockRecoveryCodes=mfa-off
 
-The query parameter works only in development on localhost or 127.0.0.1. Invalid values, production builds and remote hosts use live account state. Preview findings use the shared evaluator.
+The query parameter works in development on localhost or 127.0.0.1, and in Vercel deploy previews where `NEXT_PUBLIC_VERCEL_ENV=preview`. Use the same `/account/security?mockRecoveryCodes=VALUE` paths on the deploy preview URL. Invalid values and production deployments use live account state. Preview findings use the shared evaluator.
 
 The MFA and recovery sections use local sample data, not the account query cache. Their preview actions must never call Auth mutations. Sign-in methods still show live account data and keep their normal actions.
 

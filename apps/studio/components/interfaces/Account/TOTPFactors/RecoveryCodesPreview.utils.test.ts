@@ -29,6 +29,32 @@ describe('getRecoveryCodesPreview', () => {
       ).toBeUndefined()
     }
   )
+  it.each(['0', '1', '2', '3', 'missing', 'healthy', 'backup', 'mfa-off'])(
+    'accepts demo state %s in a deploy preview build',
+    (value) => {
+      expect(
+        getRecoveryCodesPreview({
+          value,
+          environment: 'production',
+          deploymentEnvironment: 'preview',
+          hostname: 'studio-preview.vercel.app',
+        })
+      ).toBe(Number.isNaN(Number(value)) ? value : Number(value))
+    }
+  )
+  it.each(['production', 'staging', undefined])(
+    'ignores remote overrides in deployment environment %s',
+    (deploymentEnvironment) => {
+      expect(
+        getRecoveryCodesPreview({
+          value: '1',
+          environment: 'production',
+          deploymentEnvironment,
+          hostname: 'studio-preview.vercel.app',
+        })
+      ).toBeUndefined()
+    }
+  )
   it('ignores remote hosts and missing values', () => {
     expect(
       getRecoveryCodesPreview({

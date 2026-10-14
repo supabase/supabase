@@ -28,6 +28,7 @@ const Security: NextPageWithLayout = () => {
   const previewRemaining = getRecoveryCodesPreview({
     value: mockRecoveryCodes,
     environment: process.env.NODE_ENV,
+    deploymentEnvironment: process.env.NEXT_PUBLIC_VERCEL_ENV,
     hostname: typeof window === 'undefined' ? '' : window.location.hostname,
   })
   let previewFactorCount = 1
