@@ -1,4 +1,4 @@
-import { Book } from 'lucide-react'
+import { BookIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
 import { cn } from 'ui'
@@ -44,7 +44,7 @@ export const BuiltBySection = forwardRef<ElementRef<'div'>, BuiltBySectionProps>
               rel="noreferrer"
               className="text-foreground-light hover:text-foreground text-sm flex items-center gap-2"
             >
-              <Book size={16} />
+              <BookIcon size={16} />
               {docsUrl.includes('supabase.com/docs')
                 ? 'Supabase Docs'
                 : docsUrl.includes('github.com')

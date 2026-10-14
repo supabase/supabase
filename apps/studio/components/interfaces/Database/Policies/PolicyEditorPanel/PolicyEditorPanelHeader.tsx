@@ -1,5 +1,5 @@
 import type { PGPolicy } from '@supabase/pg-meta'
-import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
+import { ChevronDownIcon, PanelLeftCloseIcon, PanelRightCloseIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   cn,
@@ -35,7 +35,7 @@ export const PolicyEditorPanelHeader = ({
             'mt-1.5'
           )}
         >
-          <X className="h-3 w-3" />
+          <XIcon className="h-3 w-3" />
           <span className="sr-only">Close</span>
         </SheetClose>
         <div className="h-[24px] w-px bg-border-overlay" />
@@ -56,7 +56,7 @@ export const PolicyEditorPanelHeader = ({
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details
                   </p>
-                  <ChevronDown
+                  <ChevronDownIcon
                     className="transition-transform duration-200"
                     strokeWidth={1.5}
                     size={14}
@@ -114,9 +114,9 @@ export const PolicyEditorPanelHeader = ({
             onClick={() => setShowTools(!showTools)}
           >
             {!showTools ? (
-              <PanelLeftClose size={19} strokeWidth={1} />
+              <PanelLeftCloseIcon size={19} strokeWidth={1} />
             ) : (
-              <PanelRightClose size={19} strokeWidth={1} />
+              <PanelRightCloseIcon size={19} strokeWidth={1} />
             )}
             <span className="sr-only">{showTools ? 'Hide' : 'Show'} tools</span>
           </button>

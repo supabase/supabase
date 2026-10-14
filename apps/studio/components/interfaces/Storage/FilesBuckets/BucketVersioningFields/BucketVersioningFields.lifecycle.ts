@@ -11,7 +11,7 @@ export const COUNT_RULE_ID = 'supabase-noncurrent-count'
  * S3 honors `newer_noncurrent_versions` only alongside `noncurrent_days`, so "either
  * condition" becomes two rules, the second pinned at the shortest age the API accepts.
  */
-const MIN_NONCURRENT_DAYS = 1
+export const MIN_NONCURRENT_DAYS = 1
 
 export interface LifecycleFormPolicy {
   versionExpiryDays: number | null

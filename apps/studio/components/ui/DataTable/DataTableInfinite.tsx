@@ -1,7 +1,7 @@
 import { type FetchNextPageOptions } from '@tanstack/react-query'
 import type { ColumnDef, Row, Table as TTable, VisibilityState } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
-import { ArrowUp, LoaderCircle } from 'lucide-react'
+import { ArrowUpIcon, LoaderCircleIcon } from 'lucide-react'
 import { Fragment, KeyboardEvent, MouseEvent, ReactNode, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -103,7 +103,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
         )}
       >
         <TableHeader className="sticky top-0 z-1">
-          <TableRow className={cn(TableRowClassName, 'bg-surface-75')}>
+          <TableRow className={cn(TableRowClassName, 'bg-surface-75 hover:bg-surface-75')}>
             {headers.map((header) => {
               const sort = header.column.getIsSorted()
               const canResize = header.column.getCanResize()
@@ -233,7 +233,9 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                         onClick={() => fetchNextPage()}
                         size="tiny"
                         icon={
-                          isFetching ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : null
+                          isFetching ? (
+                            <LoaderCircleIcon className="mr-2 h-4 w-4 animate-spin" />
+                          ) : null
                         }
                       >
                         Load more
@@ -277,7 +279,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
             size="tiny"
             variant="outline"
             className="pointer-events-auto rounded-full border-stronger bg-card! shadow-sm hover:bg-popover!"
-            icon={<ArrowUp aria-hidden="true" />}
+            icon={<ArrowUpIcon aria-hidden="true" />}
             onClick={scrollToTop}
           >
             {scrollPreservation.scrollToTopLabel}

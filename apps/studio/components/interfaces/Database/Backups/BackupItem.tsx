@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -75,7 +75,7 @@ export const BackupItem = ({
 
           {!backup.isPhysicalBackup && (
             <ButtonTooltip
-              icon={<Download />}
+              icon={<DownloadIcon />}
               loading={isDownloading}
               disabled={!canTriggerScheduledBackups || isDownloading}
               onClick={() => {

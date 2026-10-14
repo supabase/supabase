@@ -1,9 +1,8 @@
 import dayjs from 'dayjs'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Calendar, cn } from 'ui'
 
-import { type Timezone } from './PITR.types'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,
@@ -15,6 +14,7 @@ import { TimezoneSelection } from './TimezoneSelection'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import InformationBox from '@/components/ui/InformationBox'
+import type { Timezone } from '@/lib/constants/timezones'
 
 type Props = {
   onSubmit: (data: {
@@ -165,7 +165,7 @@ export function PITRForm({
                   <InformationBox
                     defaultVisibility
                     hideCollapse
-                    icon={<HelpCircle size={14} strokeWidth={2} />}
+                    icon={<HelpCircleIcon size={14} strokeWidth={2} />}
                     title="Select a date which you'd like to restore your database to"
                   />
                 </div>
@@ -179,6 +179,7 @@ export function PITRForm({
                     <div className="w-[350px]">
                       <TimezoneSelection
                         selectedTimezone={selectedTimezone}
+                        date={selectedDate}
                         onSelectTimezone={setSelectedTimezone}
                       />
                     </div>

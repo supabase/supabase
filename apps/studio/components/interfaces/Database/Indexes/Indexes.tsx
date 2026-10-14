@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { AlertCircle, Search, Trash } from 'lucide-react'
+import { AlertCircleIcon, SearchIcon, TrashIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -156,7 +156,7 @@ export const Indexes = () => {
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
               <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded-sm flex items-center space-x-2">
-                <AlertCircle strokeWidth={2} size={16} />
+                <AlertCircleIcon strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
             )}
@@ -186,7 +186,7 @@ export const Indexes = () => {
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={onSearchInputEscape(search, setSearch)}
               placeholder="Search for an index"
-              icon={<Search />}
+              icon={<SearchIcon />}
             />
 
             {!isSchemaLocked && (
@@ -267,7 +267,7 @@ export const Indexes = () => {
                                       aria-label="Delete index"
                                       variant="text"
                                       className="px-1"
-                                      icon={<Trash />}
+                                      icon={<TrashIcon />}
                                       onClick={() => setDeleteIndexId(index.name)}
                                     />
                                   </TooltipTrigger>

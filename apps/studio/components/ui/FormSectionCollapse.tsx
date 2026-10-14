@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import type { ReactNode } from 'react'
 
 /** Wrap the parent in `<AnimatePresence initial={false}>` to avoid animating on first paint. */
