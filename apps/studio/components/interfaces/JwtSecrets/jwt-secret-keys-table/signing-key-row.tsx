@@ -147,7 +147,7 @@ export const SigningKeyRow = ({
     {!isLastUsedVisible && !hasRotationTimestamp(signingKey.status) && <TableCell />}
 
     {hasRotationTimestamp(signingKey.status) && (
-      <TableCell className="max-w-[100px] text-right text-sm text-foreground-light whitespace-nowrap hidden lg:table-cell">
+      <TableCell className="max-w-[100px] text-right text-sm text-foreground-light whitespace-nowrap hidden xl:table-cell">
         <TimestampInfo
           className="text-sm"
           utcTimestamp={signingKey.updated_at}
