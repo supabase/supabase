@@ -205,7 +205,7 @@ export const PublishableApps = () => {
                   >
                     <span className="sr-only">Avatar</span>
                   </TableHead>
-                  <TableHead className={cn('pl-0', !hasPublishedApps && 'text-foreground-muted')}>
+                  <TableHead className={cn(!hasPublishedApps ? 'text-foreground-muted' : 'pl-0')}>
                     Name
                   </TableHead>
                   <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>

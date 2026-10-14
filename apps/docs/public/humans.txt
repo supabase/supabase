@@ -104,6 +104,7 @@ Divit D
 Divya Sharma
 Donna Alexandra
 Douglas Hunley
+Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
@@ -126,6 +127,7 @@ Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
+Gonzalo Servat
 Greg Kress
 Greg Marzouka
 Greg P
@@ -230,6 +232,7 @@ Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
+Matt McGill
 Matt Robinson
 Matt Rossman
 Matt Smiley

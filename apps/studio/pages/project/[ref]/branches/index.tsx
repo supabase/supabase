@@ -4,7 +4,6 @@ import { partition } from 'lodash'
 import { useRouter } from 'next/router'
 import { useState, type PropsWithChildren } from 'react'
 
-import { BranchingEmptyState } from '@/components/interfaces/BranchManagement/BranchingEmptyState'
 import { CreateBranchButton } from '@/components/interfaces/BranchManagement/CreateBranchButton'
 import { DeleteBranchModal } from '@/components/interfaces/BranchManagement/DeleteBranchModal'
 import { Overview } from '@/components/interfaces/BranchManagement/Overview'
@@ -70,9 +69,7 @@ const BranchesPage: NextPageWithLayout = () => {
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
-  const showEmptyState = isSuccessConnections && isSuccessBranches && previewBranches.length === 0
 
-  const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
 
@@ -108,21 +105,17 @@ const BranchesPage: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isError && showEmptyState ? (
-                    <BranchingEmptyState isGithubConnected={isGithubConnected} />
-                  ) : (
-                    <Overview
-                      isGithubConnected={isGithubConnected}
-                      isLoading={isLoading}
-                      isSuccess={isSuccess}
-                      repo={repo}
-                      mainBranch={mainBranch}
-                      previewBranches={previewBranches}
-                      onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
-                      onSelectDeleteBranch={setSelectedBranchToDelete}
-                      generateCreatePullRequestURL={generateCreatePullRequestURL}
-                    />
-                  )}
+                  <Overview
+                    isGithubConnected={isGithubConnected}
+                    isLoading={isLoading}
+                    isSuccess={isSuccess}
+                    repo={repo}
+                    mainBranch={mainBranch}
+                    previewBranches={previewBranches}
+                    onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  />
                 </>
               )}
             </div>
