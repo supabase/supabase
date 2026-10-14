@@ -3238,7 +3238,12 @@ commands:
 
       If no entries exist in the migration history table, the behavior depends on the diff engine. Under `pg-delta`, the remote database is diffed against an empty shadow database. Under the legacy `migra` engine, the CLI uses `pg_dump` to capture all contents of the remote schemas you have created. Otherwise, this command only diffs schema changes against the remote database, similar to running `db diff --linked`.
 
-      When `[experimental.pgdelta] enabled = true`, the migration-file `db pull` workflow uses pg-delta for the shadow diff step; pass `--diff-engine migra` to fall back for a single run. Projects without that setting use migra; pass `--diff-engine pg-delta` to use pg-delta for a single run. Pass `--declarative` to replace the declarative schema tree (`supabase/schemas` by default, configurable with `experimental.pgdelta.declarative_schema_path`) from the selected database instead of creating a migration.
+      When `[experimental.pgdelta] enabled = true`, the migration-file `db pull` workflow uses pg-delta for the shadow diff step; pass `--diff-engine migra` to fall back for a single run. Projects without that setting use migra; pass `--diff-engine pg-delta` to use pg-delta for a single run. Pass `--declarative` to export the selected database into the declarative schema tree (`supabase/schemas` by default, configurable with `experimental.pgdelta.declarative_schema_path`) instead of creating a migration.
+
+      On a project without pg-delta enabled, don't use `--declarative`. The export also points `[db.migrations].schema_paths` at the tree it writes. The next `db diff` applies those files in lexicographic order without resolving dependencies between them, and fails. If you've already run it, enable pg-delta, or undo both changes:
+
+      1. Delete the generated tree under `supabase/schemas/`.
+      2. Remove the `schema_paths` entry the command added to `config.toml`.
 
       Under the pg-delta engine, your own customizations in Supabase-managed schemas are captured automatically, such as triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, the initial pull's `pg_dump` skips managed schemas, but the diff pass that follows appends your trigger and RLS policy changes there to the same migration. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
     examples:
@@ -3262,7 +3267,6 @@ commands:
           Diffing schemas...
           No schema changes found
           The remote database is already in sync with your local migrations — nothing to pull.
-          exit status 1
       - id: custom-schemas
         name: Custom schemas
         code: supabase db pull --schema public,extensions
@@ -3274,7 +3278,6 @@ commands:
           Diffing schemas: public,extensions
           No schema changes found
           The remote database is already in sync with your local migrations — nothing to pull.
-          exit status 1
     tags: []
     links: []
     usage: supabase db pull [migration name] [flags]
