@@ -39,6 +39,7 @@ import byocEarlyAccess from './pre-release/byoc-early-access'
 import multigresEarlyAccess from './pre-release/multigres-early-access'
 import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-thank-you'
 import storageObjectVersioningEarlyAccess from './pre-release/storage-object-versioning-early-access'
+import storageObjectVersioningEarlyAccessThankYou from './pre-release/storage-object-versioning-early-access-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
@@ -49,6 +50,7 @@ const pages: GoPageInput[] = [
   multigresEarlyAccess, // maintain while the Multigres private alpha is active
   multigresEarlyAccessThankYou, // maintain while the Multigres private alpha is active
   storageObjectVersioningEarlyAccess, // maintain while the Storage object versioning private alpha is active
+  storageObjectVersioningEarlyAccessThankYou, // maintain while the Storage object versioning private alpha is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever
