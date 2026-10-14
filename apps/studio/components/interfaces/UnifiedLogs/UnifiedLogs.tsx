@@ -13,7 +13,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -446,7 +446,7 @@ export const UnifiedLogs = () => {
                   <Button
                     size="tiny"
                     variant="text"
-                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"
                     aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
@@ -482,7 +482,7 @@ export const UnifiedLogs = () => {
 
               {isLoading ? (
                 <div className="h-[60px] flex items-center justify-center">
-                  <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+                  <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
                 </div>
               ) : (
                 <TimelineChart

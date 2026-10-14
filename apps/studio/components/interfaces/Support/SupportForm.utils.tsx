@@ -8,7 +8,7 @@ import {
 } from 'common'
 import dayjs from 'dayjs'
 import { partition } from 'lodash'
-import { Book, Github, Hash, MessageSquare } from 'lucide-react'
+import { BookIcon, GithubIcon, HashIcon, MessageSquareIcon } from 'lucide-react'
 import {
   createLoader,
   createParser,
@@ -74,9 +74,9 @@ export function getPageIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <BookIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <GithubIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -87,9 +87,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <HashIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <MessageSquareIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -149,7 +149,8 @@ const supportFormUrlState = {
   category: parseAsCategoryOption,
   subject: parseAsString.withDefault(''),
   message: parseAsString.withDefault(''),
-  error: parseAsString,
+  // Not `error`: auth-js treats `?error=` in any URL as a failed auth redirect
+  errorMessage: parseAsString,
   /** Sentry event ID */
   sid: parseAsString,
 } satisfies UseQueryStatesKeysMap

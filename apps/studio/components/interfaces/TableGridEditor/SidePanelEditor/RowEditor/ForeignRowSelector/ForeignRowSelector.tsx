@@ -1,6 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Loader2, X } from 'lucide-react'
+import { Loader2Icon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, SidePanel, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -171,7 +171,7 @@ export const ForeignRowSelector = ({
           <div className="flex items-center gap-x-4">
             {isSaving && (
               <div className="flex items-center gap-x-2">
-                <Loader2 className="animate-spin" size={12} />
+                <Loader2Icon className="animate-spin" size={12} />
                 <p className="text-xs text-foreground-light">Saving</p>
               </div>
             )}
@@ -179,7 +179,7 @@ export const ForeignRowSelector = ({
               <TooltipTrigger asChild>
                 <Button
                   variant="text"
-                  icon={<X />}
+                  icon={<XIcon />}
                   className="w-7"
                   onClick={closePanel}
                   aria-label="Close panel"
@@ -196,7 +196,7 @@ export const ForeignRowSelector = ({
         <div className="h-full">
           {isLoading && (
             <div className="flex h-full py-6 flex-col items-center justify-center space-y-2">
-              <Loader2 size={14} className="animate-spin" />
+              <Loader2Icon size={14} className="animate-spin" />
               <p className="text-sm text-foreground-light">Loading rows</p>
             </div>
           )}

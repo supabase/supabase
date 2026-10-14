@@ -1,6 +1,7 @@
 import type { JSONValue } from 'ai'
 import { z } from 'zod'
 
+import { lowerOptInLevel, optInLevelSchema } from '../tool-filter'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 const jsonValueSchema: z.ZodType<JSONValue> = z.lazy(() =>
@@ -19,6 +20,8 @@ export const notebookRunOutputSchema = z
     id: z.string(),
     name: z.string(),
     updated_at: z.string(),
+    // Level the notebook ran under. Missing on runs saved before the stamp existed.
+    optInLevel: optInLevelSchema.optional(),
     cells: z.array(
       z
         .object({
@@ -64,12 +67,15 @@ export function sanitizeNotebookRunOutput(
   const parsedOutput = notebookRunOutputSchema.safeParse(output)
   if (!parsedOutput.success) return INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE
 
+  // Rows are shared only up to the level they ran under. Unstamped runs count as `schema`.
+  const sharingLevel = lowerOptInLevel(parsedOutput.data.optInLevel ?? 'schema', aiOptInLevel)
+
   return {
     ...parsedOutput.data,
     cells: parsedOutput.data.cells.map((cell) => {
       const canShareRows =
-        aiOptInLevel === 'schema_and_log_and_data' ||
-        (cell.source === 'logs' && aiOptInLevel === 'schema_and_log')
+        sharingLevel === 'schema_and_log_and_data' ||
+        (cell.source === 'logs' && sharingLevel === 'schema_and_log')
 
       if (cell.status === 'success') {
         return canShareRows

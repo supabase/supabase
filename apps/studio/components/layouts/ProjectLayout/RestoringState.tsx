@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { CheckCircle, Download, Loader } from 'lucide-react'
+import { CheckCircleIcon, DownloadIcon, LoaderIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -125,7 +125,7 @@ export const RestoringState = () => {
           <div className="space-y-6 pt-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <CheckCircle className="text-primary" size={18} strokeWidth={2} />
+                <CheckCircleIcon className="text-primary" size={18} strokeWidth={2} />
               </div>
               <div className="space-y-1">
                 <p>Restoration complete!</p>
@@ -150,7 +150,7 @@ export const RestoringState = () => {
             <div className="space-y-6 py-6">
               <div className="flex px-8 space-x-8">
                 <div className="mt-1">
-                  <Loader className="animate-spin" size={18} />
+                  <LoaderIcon className="animate-spin" size={18} />
                 </div>
                 <div className="space-y-1">
                   <p>Restoration in progress</p>
@@ -187,7 +187,7 @@ export const RestoringState = () => {
             </div>
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
               <ButtonTooltip
-                icon={<Download />}
+                icon={<DownloadIcon />}
                 loading={isDownloading}
                 disabled={logicalBackups.length === 0}
                 tooltip={{

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Maximize } from 'lucide-react'
+import { MaximizeIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -180,7 +180,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                         <Button
                           className="px-1"
                           onClick={() => onSelectExpand()}
-                          icon={<Maximize size={12} strokeWidth={2} />}
+                          icon={<MaximizeIcon size={12} strokeWidth={2} />}
                           aria-label="Expand editor"
                         />
                       </TooltipTrigger>

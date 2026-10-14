@@ -3,7 +3,7 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import pageData from '~/data/surveys/state-of-startups-2026'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { forwardRef, useEffect, useRef, useState, type RefObject } from 'react'
 import { Button, cn } from 'ui'
