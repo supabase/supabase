@@ -231,9 +231,11 @@ export const UnifiedLogs = () => {
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
-  const flatData = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
-  const { fetchLiveLogs } = useLiveLogBatches({
+  const uniqueRows = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
+  const { rows: flatData, fetchLiveLogs } = useLiveLogBatches({
     scope: JSON.stringify([projectRef, useOtel, searchParameters, columnFilters, sorting]),
+    rows: uniqueRows,
+    firstPage: unifiedLogsData?.pages[0],
     isPlaceholderData,
     fetchPreviousPage,
     refetchCounts,
