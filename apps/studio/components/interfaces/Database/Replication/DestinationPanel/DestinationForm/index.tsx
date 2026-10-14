@@ -12,6 +12,7 @@ import * as z from 'zod'
 
 import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
 import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
+import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinationReview'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -534,6 +535,13 @@ export const DestinationForm = ({
                     <DialogSectionSeparator />
 
                     <AdvancedSettings type={selectedType} form={form} group="all" />
+                  </>
+                )}
+
+                {shouldShowConnectionSection && (
+                  <>
+                    <DialogSectionSeparator />
+                    <PipelineDestinationReview type={selectedType} control={form.control} />
                   </>
                 )}
 
