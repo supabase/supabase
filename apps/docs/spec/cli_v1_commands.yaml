@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 2.120.0
+  version: 2.121.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -855,7 +855,7 @@ commands:
 
       Requires the local development stack to be running when diffing against the local database. To diff against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
 
-      Runs [djrobstep/migra](https://github.com/djrobstep/migra) in a container to compare schema differences between the target database and a shadow database. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
+      Compares schema differences between the target database and a shadow database. Projects with `[experimental.pgdelta] enabled = true` use the bundled pg-delta engine. Other projects run the legacy [djrobstep/migra](https://github.com/djrobstep/migra) engine in a container, unless you pass `--use-pg-delta` for a single run. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
 
       Explicit `--from`/`--to` mode always uses pg-delta. In this mode, `-f` is ignored and stdout (or `--output`) is a flattened representation for review, not a portable apply script. Do not apply it directly with plain `psql -f`: transactional units can contain `SET LOCAL` preambles that only take effect inside a transaction, while plans that mix transactional and non-transactional units cannot safely be wrapped in one transaction. To create an applicable migration, use normal target mode with `supabase db diff -f <name>`, then apply it through `supabase db reset` locally or `supabase db push` against the linked project. These paths preserve the plan's per-unit transaction semantics.
 
@@ -865,10 +865,9 @@ commands:
 
       With the bundled pg-delta engine, diff SQL defaults to uppercase keywords, indent 2, a maximum width of 180, trailing commas, and column/key alignment, matching its declarative export. When `-f` writes migrations, execution-aware transaction semantics are preserved as ordered per-unit files; non-transactional units carry a directive that the CLI apply path honors. Flattened review output retains the rendered SQL and preambles, but not the unit boundaries supplied to a migration runner. Configure overrides with `[experimental.pgdelta] format_options`, or set `format_options = "null"` to emit raw, unformatted statements.
 
-      While the diff command is able to capture most schema changes, there are cases where it is known to fail. Currently, this could happen if you schema contains:
+      Storage buckets are data, not schema, so no diff engine captures them. Under the legacy migra engine, the diff can also miss:
 
       - Changes to publication
-      - Changes to storage buckets
       - Views with `security_invoker` attributes
     examples:
       - id: basic-usage
@@ -1172,15 +1171,22 @@ commands:
 
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
-      If no entries exist in the migration history table, the default diff engine uses `pg_dump` to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
+      If no entries exist in the migration history table, the behavior depends on the diff engine. Under `pg-delta`, the CLI diffs the remote database against an empty shadow database. Under the legacy `migra` engine, the CLI uses `pg_dump` to capture all contents of the remote schemas you have created. Otherwise the command behaves like `db diff --linked` and only diffs schema changes against the remote database.
 
-      Pass `--diff-engine pg-delta` to keep the migration-file `db pull` workflow while using pg-delta for the shadow diff step. On initial pull, pg-delta replaces `pg_dump` and produces the full migration from the shadow diff alone. Pass `--declarative` to switch to the declarative pg-delta export workflow instead.
+      Pass `--diff-engine pg-delta` to use pg-delta for a single run on a project that hasn't enabled it. The migration-file workflow is unchanged. On an initial pull, the full migration comes from the shadow diff alone. Pass `--declarative` to export the selected database into the declarative schema tree instead of creating a migration. The tree lives in `supabase/schemas` by default. Change the location with `experimental.pgdelta.declarative_schema_path`.
+
+      On a project without pg-delta enabled, don't use `--declarative`. The export also points `[db.migrations].schema_paths` at the tree it writes. The next local `db diff` applies those files in lexicographic order without resolving dependencies between them, so it fails when a file sorts before an object it depends on. If you've already run it, enable pg-delta, or undo both changes:
+
+      1. Delete the files the export wrote to the declarative directory (`supabase/schemas/` by default). Files that were already there are left in place.
+      2. Restore `[db.migrations].schema_paths` in `config.toml` to its previous value, or remove it if the export added it.
 
       pg-delta plans are execution-aware: when a plan crosses a transaction boundary — for example `ALTER TYPE ... ADD VALUE` followed by a statement that uses the new enum value, which cannot run in the same transaction — `db pull` writes one ordered migration file per plan unit instead of a single file (for example `<ts>_remote_schema_schema_changes.sql` and `<ts+1s>_remote_schema_after_enum_values.sql`), each recorded in the migration history. The common case (a single unit) still produces exactly one `<ts>_remote_schema.sql` file.
 
       By default the emitted SQL is formatted with the same settings the declarative export uses (uppercase keywords, wrapped at a max width of 180, indented and column-aligned). Configure overrides with `[experimental.pgdelta] format_options` in `config.toml`, or set `format_options = "null"` to opt out and emit raw, unformatted statements.
 
       When `[experimental.pgdelta] enabled = true` (the default for projects created by a recent `supabase init`), the migration-file `db pull` workflow uses pg-delta for the shadow diff step by default; it does not switch to declarative output. Existing projects without the section are unaffected and keep using migra. To fall back to the legacy migra engine, set `enabled = false` under `[experimental.pgdelta]`, or pass `--diff-engine migra` for a single run.
+
+      Under the pg-delta engine, the pull captures your own customizations in Supabase-managed schemas automatically. Examples are triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, the initial pull's `pg_dump` skips managed schemas. The diff pass that follows appends your trigger and RLS policy changes there to the same migration. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
 
       When pulling from a remote database with `--db-url`, prefer a direct connection (`db.<project-ref>.supabase.co:5432`) over the connection pooler so pg-delta can introspect the full catalog reliably.
 
@@ -1205,29 +1211,28 @@ commands:
           Update remote migration history table? [Y/n]
           Repaired migration history: [20240414044403] => applied
           Finished supabase db pull.
-          The auth and storage schemas are excluded. Run supabase db pull --schema auth,storage again to diff them.
       - id: local-studio
         name: Local studio
         code: supabase db pull --local
         response: |
           Connecting to local database...
-          Setting up initial schema....
-          Creating custom roles supabase/roles.sql...
+          Creating shadow database...
+          Seeding globals from roles.sql...
           Applying migration 20240414044403_remote_schema.sql...
+          Diffing schemas...
           No schema changes found
-          The auth and storage schemas are excluded. Run supabase db pull --schema auth,storage again to diff them.
-          exit status 1
+          The remote database is already in sync with your local migrations — nothing to pull.
       - id: custom-schemas
         name: Custom schemas
-        code: supabase db pull --schema auth,storage
+        code: supabase db pull --schema public,extensions
         response: |
           Connecting to remote database...
-          Setting up initial schema....
-          Creating custom roles supabase/roles.sql...
+          Creating shadow database...
+          Seeding globals from roles.sql...
           Applying migration 20240414044403_remote_schema.sql...
+          Diffing schemas: public,extensions
           No schema changes found
-          Try rerunning the command with --debug to troubleshoot the error.
-          exit status 1
+          The remote database is already in sync with your local migrations — nothing to pull.
     tags: []
     links: []
     usage: supabase db pull [migration name] [flags]
