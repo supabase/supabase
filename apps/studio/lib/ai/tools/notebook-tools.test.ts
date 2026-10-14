@@ -6,9 +6,9 @@ import { sanitizeNotebookRunOutput, type NotebookRunOutput } from './notebook-ru
 import {
   decodeNotebookToolError,
   encodeNotebookToolError,
-  getNotebookTools,
   NotebookToolError,
-} from './notebook-tools'
+} from './notebook-tool-error'
+import { getNotebookTools } from './notebook-tools'
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
