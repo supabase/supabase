@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
@@ -108,7 +108,7 @@ export const ThirdPartyAuthForm = () => {
               'border rounded-sm border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
             )}
           >
-            <Loader2 size={24} className="animate-spin" />
+            <Loader2Icon size={24} className="animate-spin" />
           </div>
         )}
 

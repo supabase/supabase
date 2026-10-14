@@ -10,6 +10,7 @@ import {
   formatBytes,
   formatCurrency,
   formatRestoreWindow,
+  getBasePathURL,
   getDatabaseMajorVersion,
   getDistanceLatLonKM,
   getSemanticVersion,
@@ -104,6 +105,33 @@ describe('getURL', () => {
     const result = getURL()
 
     expect(result).toEqual('https://supabase.com/dashboard')
+  })
+})
+
+describe('getBasePathURL', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('appends the base path to the site URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('does not double the base path on the fallback URL', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', '')
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_BRANCH_URL', '')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('strips a trailing slash before appending the base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://supabase.com/')
+    expect(getBasePathURL('/dashboard')).toEqual('https://supabase.com/dashboard')
+  })
+
+  it('returns the site URL when there is no base path', () => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'http://localhost:8082')
+    expect(getBasePathURL('')).toEqual('http://localhost:8082')
   })
 })
 

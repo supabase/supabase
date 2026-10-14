@@ -928,7 +928,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?error=${encodeURIComponent(initialError)}`),
+      value: createMockLocation(`?errorMessage=${encodeURIComponent(initialError)}`),
       writable: true,
     })
 
@@ -1191,7 +1191,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: createMockLocation('?projectRef=project-3&error=Connection timeout detected'),
+      value: createMockLocation('?projectRef=project-3&errorMessage=Connection timeout detected'),
       writable: true,
     })
 

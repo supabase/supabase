@@ -13,7 +13,7 @@ import {
   VisibilityState,
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
-import { Loader2, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -97,7 +97,7 @@ export const UnifiedLogs = () => {
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const computeEnabled = !!useFlag('compute')
+  const computeEnabled = useFlag('compute')
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -131,6 +131,7 @@ export const UnifiedLogs = () => {
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
+  const [localFilterOrigin, setLocalFilterOrigin] = useState<string | null>(null)
 
   const [dock, setDock] = useLocalStorageQuery<'bottom' | 'right'>(
     LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK,
@@ -168,6 +169,9 @@ export const UnifiedLogs = () => {
     }
     return parameters
   }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
+  const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
+
+  useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
     scope: JSON.stringify([projectRef, searchParameters]),
@@ -280,7 +284,10 @@ export const UnifiedLogs = () => {
     meta: { getRowClassName },
     getRowId: (row) => row.id,
     onColumnVisibilityChange: setColumnVisibility,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: (updater) => {
+      setLocalFilterOrigin(urlFilterScope)
+      setColumnFilters(updater)
+    },
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
     getSortedRowModel: getSortedRowModel(),
@@ -416,6 +423,7 @@ export const UnifiedLogs = () => {
       columnOrder={columnOrder}
       columnVisibility={columnVisibility}
       searchParameters={searchParameters}
+      hasPendingFilterChange={localFilterOrigin === urlFilterScope}
       enableColumnOrdering={true}
       isFetching={isFetching}
       isError={isError}
@@ -441,7 +449,7 @@ export const UnifiedLogs = () => {
                   <Button
                     size="tiny"
                     variant="text"
-                    icon={isFilterBarOpen ? <PanelLeftClose /> : <PanelLeftOpen />}
+                    icon={isFilterBarOpen ? <PanelLeftCloseIcon /> : <PanelLeftOpenIcon />}
                     onClick={() => setIsFilterBarOpen((prev) => !prev)}
                     className="hidden w-[26px] sm:flex"
                     aria-label={isFilterBarOpen ? 'Hide filters' : 'Show filters'}
@@ -477,7 +485,7 @@ export const UnifiedLogs = () => {
 
               {isLoading ? (
                 <div className="h-[60px] flex items-center justify-center">
-                  <Loader2 size={14} className="animate-spin text-foreground-lighter" />
+                  <Loader2Icon size={14} className="animate-spin text-foreground-lighter" />
                 </div>
               ) : (
                 <TimelineChart

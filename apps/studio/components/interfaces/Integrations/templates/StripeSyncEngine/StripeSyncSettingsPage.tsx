@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { formatRelative } from 'date-fns'
-import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
+import { BadgeCheckIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -82,7 +82,7 @@ export const StripeSyncSettingsPage = () => {
                     ) : (
                       <>
                         <div className="flex items-center gap-x-3 text-foreground-light">
-                          <BadgeCheck size={14} />
+                          <BadgeCheckIcon size={14} />
                           <p>All up to date</p>
                         </div>
                         {syncState.closed_at && (

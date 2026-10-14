@@ -25,7 +25,7 @@ export const gettingStartedOverview: ContentListingGroup = {
 export const gettingStartedUseCases: ContentListingGroup = {
   id: 'getting-started-use-cases',
   heading: 'Use cases',
-  headingLevel: 'h3',
+  headingLevel: 'h2',
   type: 'grid',
   items: [
     {
@@ -56,7 +56,7 @@ export const gettingStartedUseCases: ContentListingGroup = {
 export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
   id: 'getting-started-framework-quickstarts',
   heading: 'Framework quickstarts',
-  headingLevel: 'h3',
+  headingLevel: 'h2',
   type: 'grid',
   items: [
     {
@@ -223,7 +223,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
 export const gettingStartedWebAppDemos: ContentListingGroup = {
   id: 'getting-started-web-app-demos',
   heading: 'Web app demos',
-  headingLevel: 'h3',
+  headingLevel: 'h2',
   type: 'grid',
   items: [
     {
@@ -304,7 +304,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
 export const gettingStartedMobileTutorials: ContentListingGroup = {
   id: 'getting-started-mobile-tutorials',
   heading: 'Mobile tutorials',
-  headingLevel: 'h3',
+  headingLevel: 'h2',
   type: 'grid',
   items: [
     {

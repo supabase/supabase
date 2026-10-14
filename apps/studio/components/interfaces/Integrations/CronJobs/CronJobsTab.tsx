@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
@@ -182,7 +182,7 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
   <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
     {count.isLoading ? (
       <span className="flex items-center gap-2">
-        <Loader2 size={14} className="animate-spin" /> Loading...
+        <Loader2Icon size={14} className="animate-spin" /> Loading...
       </span>
     ) : (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`
