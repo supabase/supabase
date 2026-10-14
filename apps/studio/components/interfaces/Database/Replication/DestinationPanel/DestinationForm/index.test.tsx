@@ -19,6 +19,7 @@ type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const mocks = vi.hoisted(() => ({
   isSaving: false,
+  isPreviewEnabled: false,
   resetValidation: vi.fn(),
   submitPipeline: vi.fn(),
   validateConfiguration: vi.fn(),
@@ -188,6 +189,10 @@ vi.mock('../../useIsETLPrivateAlpha', () => ({
   useIsETLSnowflakePrivateAlpha: () => false,
 }))
 
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({ isEnabled: mocks.isPreviewEnabled }),
+}))
+
 vi.mock('./useDestinationForm', () => ({
   useDestinationForm: () => ({
     isValidating: false,
@@ -254,6 +259,7 @@ describe('DestinationForm edit submission', () => {
   beforeEach(() => {
     pipelineTableIds = [101, 999]
     mocks.isSaving = false
+    mocks.isPreviewEnabled = false
     mocks.submitPipeline.mockResolvedValue(undefined)
     mocks.validateConfiguration.mockResolvedValue({ canContinue: true, warnings: [] })
 
@@ -294,6 +300,36 @@ describe('DestinationForm edit submission', () => {
       response: () => HttpResponse.json<ProjectSettingsResponse>(projectSettings),
     })
   })
+
+  it.each([
+    { isPreviewEnabled: false, isEditing: false, shouldShowSection: false },
+    { isPreviewEnabled: true, isEditing: false, shouldShowSection: true },
+    { isPreviewEnabled: true, isEditing: true, shouldShowSection: false },
+  ])(
+    'shows the connection section only for preview creation ($isPreviewEnabled, $isEditing)',
+    ({ isPreviewEnabled, isEditing, shouldShowSection }) => {
+      mocks.isPreviewEnabled = isPreviewEnabled
+      customRender(
+        <DestinationForm
+          selectedType="BigQuery"
+          visible
+          existingDestination={isEditing ? existingDestination : undefined}
+          onClose={vi.fn()}
+        />
+      )
+      expect(screen.queryByRole('region', { name: 'Data' }) !== null).toBe(shouldShowSection)
+      expect(screen.queryByRole('region', { name: 'Destination connection' }) !== null).toBe(
+        shouldShowSection
+      )
+      if (shouldShowSection) {
+        const section = screen.getByRole('region', { name: 'Destination connection' })
+        expect(
+          section.compareDocumentPosition(screen.getByText('Data')) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy()
+      }
+    }
+  )
 
   it.each([true, false])(
     'describes saving without claiming a stopped pipeline will start (enabled: %s)',
