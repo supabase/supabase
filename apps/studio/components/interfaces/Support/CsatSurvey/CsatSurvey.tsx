@@ -9,9 +9,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   CSAT_COMMENT_MAX_LENGTH,
   CsatSurveyFormSchema,
+  csatSurveyParamsSchema,
   type CsatSurveyFormValues,
 } from './CsatSurvey.schema'
-import { parseCsatSurveyParams } from './CsatSurvey.utils'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { useCsatSurveyMutation } from '@/data/support/csat-survey-mutation'
 
@@ -25,9 +25,9 @@ const withLayout = (children: ReactNode) => (
 
 export const CsatSurvey = () => {
   const { conversation_id, helpful } = useParams()
-  const params = parseCsatSurveyParams({ conversation_id, helpful })
+  const paramsParsingResult = csatSurveyParamsSchema.safeParse({ conversation_id, helpful })
 
-  if (params.status === 'invalid') {
+  if (!paramsParsingResult.success) {
     return withLayout(
       <Admonition type="destructive" title="Error" description="Invalid or mismatched ticket" />
     )
@@ -35,8 +35,8 @@ export const CsatSurvey = () => {
 
   return (
     <CsatSurveyForm
-      conversationId={params.conversationId}
-      initialSatisfied={params.initialSatisfied}
+      conversationId={paramsParsingResult.data.conversation_id}
+      initialSatisfied={paramsParsingResult.data.helpful}
     />
   )
 }
