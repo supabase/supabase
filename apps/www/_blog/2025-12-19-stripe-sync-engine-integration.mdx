@@ -107,11 +107,11 @@ The Sync Engine takes a fundamentally different approach. Instead of translating
 
 Ultimately, the FDW is great for occasional lookups and simple queries. The Sync Engine is built for applications that need billing data as a first-class part of their database.
 
-## Reliable syncing with Supabase Queues
+## Reliable syncing with [Supabase Queues](/docs/guides/queues)
 
 There can be a lot of data to import from your Stripe account to your database, especially when you're setting up syncing with an existing account. To perform this backfilling process efficiently and reliably, the sync engine uses [Supabase Queues](/blog/supabase-queues) (powered by pgmq) to sync data incrementally and in batches.
 
-When you install the integration, the backfilling process will automatically start and spread the work across Edge Functions that can concurrently fetch data from the Stripe API and retry if there are any failures or rate limits.
+When you install the integration, the backfilling process will automatically start and spread the work across [Edge Functions](/docs/guides/functions) that can concurrently fetch data from the Stripe API and retry if there are any failures or rate limits.
 
 ## Getting started
 

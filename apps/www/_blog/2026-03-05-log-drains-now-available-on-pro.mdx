@@ -59,7 +59,7 @@ Send logs to Sentry. Search and filter Supabase logs next to your application er
 
 Sentry recently launched their Structured Logs product with trace-connected logging. When you send Supabase logs to Sentry, your database errors appear in the same trace as your frontend exceptions. You can follow a slow query from the user-facing error it caused all the way back to the Postgres execution. This is particularly valuable if you already use Sentry for error tracking and want a unified debugging experience.
 
-[Sentry setup guide](/docs/guides/platform/log-drains#sentry)
+[Sentry setup guide](/docs/guides/observability/log-drains#sentry)
 
 ### Grafana Loki
 
@@ -67,7 +67,7 @@ Send logs to Grafana Loki. Query them with LogQL in your existing Grafana dashbo
 
 Loki works well for teams running Grafana for infrastructure monitoring. You can create alerts on specific error patterns, build log-based metrics for SLOs, and correlate database events with system metrics like CPU and memory. Stream labels automatically include the log source, so filtering by Postgres, Auth, Storage, or Edge Functions requires no additional configuration.
 
-[Loki setup guide](/docs/guides/platform/log-drains#grafana-loki)
+[Loki setup guide](/docs/guides/observability/log-drains#grafana-loki)
 
 ### Datadog
 
@@ -75,7 +75,7 @@ Send logs to Datadog. Use Log Management for search and dashboards. Connect logs
 
 Datadog excels at anomaly detection and ML-powered alerting. You can configure monitors that trigger when Postgres error rates spike or when auth failures exceed normal patterns. The integration works especially well for teams that want to trace slow API calls from their frontend through Supabase and into the database, seeing exactly where latency accumulates.
 
-[Datadog setup guide](/docs/guides/platform/log-drains#datadog)
+[Datadog setup guide](/docs/guides/observability/log-drains#datadog)
 
 ### AWS S3
 
@@ -83,7 +83,7 @@ Send logs to S3 for low-cost archival. Query historical data with Athena when yo
 
 S3 is the most economical option for long-term retention. Store years of logs for pennies per gigabyte. This destination is useful for compliance requirements, post-incident analysis, or organizations that want to own their log data without paying for real-time indexing they rarely use.
 
-[S3 setup guide](/docs/guides/platform/log-drains#amazon-s3)
+[S3 setup guide](/docs/guides/observability/log-drains#amazon-s3)
 
 ### Axiom
 
@@ -91,7 +91,7 @@ Send logs to Axiom for fast searches across high-volume data without expensive i
 
 Axiom handles bursty, high-volume workloads well. If you run many Edge Functions or have database traffic that spikes unpredictably, Axiom provides real-time search without the per-GB costs adding up as quickly as traditional SIEM tools.
 
-[Axiom setup guide](/docs/guides/platform/log-drains#axiom)
+[Axiom setup guide](/docs/guides/observability/log-drains#axiom)
 
 ### Generic HTTP endpoint
 
@@ -99,7 +99,7 @@ Send logs to any HTTP endpoint when you need full control or when we do not have
 
 You can point logs at your own Edge Function to transform, filter, or route them. Some teams use this to enrich logs with business context before forwarding to a final destination. Others use it to split logs between multiple tools based on severity or source type.
 
-[Generic HTTP endpoint setup guide](/docs/guides/platform/log-drains#generic-http-endpoint)
+[Generic HTTP endpoint setup guide](/docs/guides/observability/log-drains#generic-http-endpoint)
 
 ## How it works
 
@@ -120,11 +120,11 @@ Supabase sends logs in small batches over HTTP. Your vendor stores and indexes t
 - $0.20 per million events
 - $0.09 per GB egress
 
-For full billing details, see the [usage guide](/docs/guides/platform/log-drains#pricing).
+For full billing details, see the [usage guide](/docs/guides/observability/log-drains#pricing).
 
 ## Getting started
 
 Read the log drains documentation, select a destination, and set up your first drain:
 
-- [Log drains documentation](/docs/guides/platform/log-drains)
-- [Usage and billing guide](/docs/guides/platform/log-drains#pricing)
+- [Log drains documentation](/docs/guides/observability/log-drains)
+- [Usage and billing guide](/docs/guides/observability/log-drains#pricing)

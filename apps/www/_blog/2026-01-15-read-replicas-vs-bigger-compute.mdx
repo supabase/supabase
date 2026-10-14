@@ -116,7 +116,7 @@ Supabase offers [compute tiers](/docs/guides/platform/compute-and-disk) from Mic
 
 Before scaling hardware, check that your queries use indexes effectively. An index is like the index at the back of a book. Instead of reading every page to find a topic, you look it up in the index and jump straight to the right page. Postgres works the same way. Without an index, Postgres reads every row in a table to find matching data. This is called a sequential scan. With an index, Postgres looks up which rows match and jumps directly to them. The difference can be dramatic: a query that takes 30 seconds without an index might take 30 milliseconds with one.
 
-Run `EXPLAIN ANALYZE` on slow queries to see if Postgres is using indexes or doing sequential scans. If you see "Seq Scan" on a large table, you probably need an index. The [Database Advisor](/docs/guides/database/database-advisors) in your Supabase Dashboard can also identify missing indexes and other performance issues automatically.
+Run `EXPLAIN ANALYZE` on slow queries to see if Postgres is using indexes or doing sequential scans. If you see "Seq Scan" on a large table, you probably need an index. The [Database Advisor](/docs/guides/observability/advisors) in your Supabase Dashboard can also identify missing indexes and other performance issues automatically.
 
 **Quick index guidelines:**
 

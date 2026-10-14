@@ -36,7 +36,7 @@ And then an important technical distinction:
 
 ## Supabase's approach
 
-Security is a [Shared Responsibility Model](https://supabase.com/docs/guides/platform/shared-responsibility-model). The more control you are given with a technology, the more opportunity you have to make a mistake.
+Security is a [Shared Responsibility Model](https://supabase.com/docs/guides/deployment/shared-responsibility-model). The more control you are given with a technology, the more opportunity you have to make a mistake.
 
 We believe that we can give developers full control of their tools, while _also_ being the most secure platform to develop with. How?
 
@@ -53,7 +53,7 @@ Eva has added support for Supabase in [Lunchcat](https://lunchcat.dev/), the AI-
 
 ### Security Advisor
 
-We launched our [Security Advisor](https://supabase.com/blog/security-performance-advisor) in the last Launch Week. Eva was a big contributor to this, helping to set up a robust set of [security rules](https://supabase.com/docs/guides/database/database-advisors). These rules are available in [the Dashboard](https://supabase.com/dashboard/project/_/advisors/security), many with one-click solutions.
+We launched our [Security Advisor](https://supabase.com/blog/security-performance-advisor) in the last Launch Week. Eva was a big contributor to this, helping to set up a robust set of [security rules](https://supabase.com/docs/guides/observability/advisors). These rules are available in [the Dashboard](https://supabase.com/dashboard/project/_/advisors/security), many with one-click solutions.
 
 ### Security emails and notifications
 
@@ -61,11 +61,11 @@ The security rules in our Security Advisor are run against all of your projects 
 
 ### Disabling the default Data API
 
-We have made it even easier to turn off the Data API if you don’t plan to use it. When you launch a project you can choose whether you want to create it with _only_ Postgres connections, or if you also want the Data API. You can also turn off the Data API at any time in your [project settings](https://supabase.com/dashboard/project/_/settings/api).
+We have made it even easier to turn off the Data API if you don’t plan to use it. When you launch a project you can choose whether you want to create it with _only_ Postgres connections, or if you also want the Data API. You can also turn off the Data API at any time in your [project settings](https://supabase.com/dashboard/project/_/integrations/data_api/overview).
 
 ### API hardening
 
-We have made it simple to switch the default schema from `public` to `api` in the [API Settings page](https://supabase.com/dashboard/project/_/settings/api). We have also released a guide for [Hardening the Data API](https://supabase.com/docs/guides/database/hardening-data-api), outlining various approaches for using the Data API. It’s very likely that we will make this the default set up in the future to align with PostgREST’s [Schema Isolation](https://docs.postgrest.org/en/v12/explanations/schema_isolation.html) guide.
+We have made it simple to switch the default schema from `public` to `api` in the [API Settings page](https://supabase.com/dashboard/project/_/integrations/data_api/overview). We have also released a guide for [Hardening the Data API](https://supabase.com/docs/guides/api/securing-your-api), outlining various approaches for using the Data API. It’s very likely that we will make this the default set up in the future to align with PostgREST’s [Schema Isolation](https://docs.postgrest.org/en/v12/explanations/schema_isolation.html) guide.
 
 ### Column level security
 
@@ -73,7 +73,7 @@ We’ve added [guides](https://supabase.com/docs/guides/database/postgres/column
 
 ### User impersonation
 
-We have added [User/Role impersonation](https://supabase.com/blog/studio-introducing-assistant) to the Dashboard. You can use this to switch between anonymous and authenticated roles, or even go as deep as selecting an individual user (if you use Supabase Auth) to see the level of data that they use.
+We have added [User/Role impersonation](https://supabase.com/blog/studio-introducing-assistant) to the Dashboard. You can use this to switch between anonymous and authenticated roles, or even go as deep as selecting an individual user (if you use [Supabase Auth](https://supabase.com/docs/guides/auth)) to see the level of data that they use.
 
 ### RLS AI Assistant
 
@@ -87,9 +87,9 @@ You can [restrict access](https://supabase.com/docs/guides/platform/network-rest
 
 Our docs are full of best practices and useful info:
 
-- [Production Checklist](https://supabase.com/docs/guides/platform/going-into-prod)
-- [Shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model)
-- [Maturity model](https://supabase.com/docs/guides/platform/maturity-model)
+- [Production Checklist](https://supabase.com/docs/guides/deployment/going-into-prod)
+- [Shared responsibility model](https://supabase.com/docs/guides/deployment/shared-responsibility-model)
+- [Maturity model](https://supabase.com/docs/guides/deployment/maturity-model)
 
 ## Misconceptions and bad practices
 
@@ -113,7 +113,7 @@ Since we see a few common complaints about Row Level Security, we figured we wou
 
 - _“I turned off RLS while prototyping.”_
 
-  By default, Supabase enables RLS for all tables created via the dashboard. Some developers disable this while they are prototyping which is not recommended. The best way to solve this is to use our [CLI for Local Development](https://supabase.com/docs/guides/cli). The CLI provides the entire Supabase stack, directly on your local development machine.
+  By default, Supabase enables RLS for all tables created via the dashboard. Some developers disable this while they are prototyping which is not recommended. The best way to solve this is to use our [CLI for Local Development](https://supabase.com/docs/guides/local-development). The CLI provides the entire Supabase stack, directly on your local development machine.
 
 - _"I forgot to enable RLS."_
 
@@ -139,11 +139,11 @@ This is just the beginning of our tooling efforts, with many more ideas in the p
 
 - _Development on "Hard mode"_
 
-  Not all projects are alike. While some require extremely strict levels of access, others can be a bit more relaxed. This is explained in our [Maturity Models](https://supabase.com/docs/guides/platform/maturity-model) framework. We are brainstorming ways to codify this, so that developers can “turn up” the enforced security levels on their projects, restricting what developers can and cannot do.
+  Not all projects are alike. While some require extremely strict levels of access, others can be a bit more relaxed. This is explained in our [Maturity Models](https://supabase.com/docs/guides/deployment/maturity-model) framework. We are brainstorming ways to codify this, so that developers can “turn up” the enforced security levels on their projects, restricting what developers can and cannot do.
 
 - _CI/CD warnings_
 
-  We will be adding the [Security Advisories](https://github.com/supabase/splinter) into our CLI for first-class support within GitHub Actions and CI/CD pipelines. Combined with [Branching](https://supabase.com/docs/guides/platform/branching), this prevents security misconfigurations before they ever reach production.
+  We will be adding the [Security Advisories](https://github.com/supabase/splinter) into our CLI for first-class support within GitHub Actions and CI/CD pipelines. Combined with [Branching](https://supabase.com/docs/guides/deployment/branching), this prevents security misconfigurations before they ever reach production.
 
 - _Revamped API keys_
 
@@ -151,7 +151,7 @@ This is just the beginning of our tooling efforts, with many more ideas in the p
 
 ## Supabase Responsible Disclosure Program
 
-Eva approached us during our last Launch Week. While she was helping us with the Security Advisor she discovered a misconfiguration in one of our own applications using Supabase with [Lunchcat](https://lunchcat.dev/). We were able to solve this quickly by toggling off read access to the `anon` role and scanning the [access logs](https://supabase.com/docs/guides/platform/logs) to ensure no malicious actors had accessed the data.
+Eva approached us during our last Launch Week. While she was helping us with the Security Advisor she discovered a misconfiguration in one of our own applications using Supabase with [Lunchcat](https://lunchcat.dev/). We were able to solve this quickly by toggling off read access to the `anon` role and scanning the [access logs](https://supabase.com/docs/guides/observability/logs) to ensure no malicious actors had accessed the data.
 
 At the time, we didn’t have the Security Advisor to help the developer discover the misconfiguration before publishing. The Supabase Security suite is being developed to prevent this ever occurring again - for us and for our customers.
 
@@ -161,9 +161,9 @@ If you find any misconfigured projects, please let us know. We will work with th
 
 ## Security Resources
 
-- [Production Checklist](https://supabase.com/docs/guides/platform/going-into-prod)
-- [Shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model)
-- [Maturity Model](https://supabase.com/docs/guides/platform/maturity-model)
+- [Production Checklist](https://supabase.com/docs/guides/deployment/going-into-prod)
+- [Shared responsibility model](https://supabase.com/docs/guides/deployment/shared-responsibility-model)
+- [Maturity Model](https://supabase.com/docs/guides/deployment/maturity-model)
 - [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) & [Column Level Security](https://supabase.com/docs/guides/database/postgres/column-level-security)
-- [Securing the Data API](https://supabase.com/docs/guides/api/securing-your-api) & [Hardening the Data API](https://supabase.com/docs/guides/database/hardening-data-api)
-- [Custom Claims & RBAC](https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac)
+- [Securing the Data API](https://supabase.com/docs/guides/api/securing-your-api) & [Hardening the Data API](https://supabase.com/docs/guides/api/securing-your-api)
+- [Custom Claims & RBAC](https://supabase.com/docs/guides/api/custom-claims-and-role-based-access-control-rbac)
