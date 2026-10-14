@@ -135,7 +135,7 @@ If configuration changes aren't applying:
 1. **Syntax errors**: Validate your `config.toml` syntax
 2. **Git sync**: Ensure changes are committed and pushed
 3. **Branch refresh**: Try deleting and recreating the branch
-4. **Protected branch**: Configuration runs on a protected branch only when a `[remotes]` block names its project ID. For the `[remotes]` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration)
+4. **Persistent branch**: Configuration runs on a persistent branch, including your production branch, only when a `[remotes]` block names its project ID. For the `[remotes]` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration)
 5. **Section not applied by branching**: The `configure` step applies only the `[db]`, `[api]`, `[auth]`, `[storage]`, and `[experimental]` sections. For which steps read the other sections, see [Configuration](/docs/guides/deployment/branching/github-integration#configuration)
 
 ### Secrets not available

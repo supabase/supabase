@@ -87,7 +87,7 @@ Every Supabase branch, preview or persistent, is created as a clone of your base
 
 ### What runs on each push
 
-After Supabase creates the branch and copies your base project's settings, it runs the branching workflow against the files in your repository. The workflow applies your `config.toml` first, then runs any migrations the branch hasn't applied yet. After that it seeds the database and Storage buckets, and finally deploys your Edge Functions. The same workflow runs again on every push to the git branch. You don't need a GitHub Action to deploy migrations or sync `config.toml` to a branch.
+After Supabase creates the branch and copies your base project's settings, it runs the branching workflow against the files in your repository. The workflow applies your `config.toml` first, then runs any migrations the branch hasn't applied yet. After that it seeds the database and Storage buckets, and finally deploys your Edge Functions. On a persistent branch, including your production branch, the `config.toml` and seed steps apply only when a `[remotes]` block names that branch, as described in [Configuration](#configuration). The same workflow runs again on every push to the git branch. You don't need a GitHub Action to deploy migrations or sync `config.toml` to a branch.
 
 For what each step does, see [Deploying to production](/docs/guides/deployment/branching#deploying-to-production). To check a step's status and read its logs, see [Monitoring deployments](/docs/guides/deployment/branching/troubleshooting#monitoring-deployments).
 
@@ -99,7 +99,7 @@ Supabase applies the settings in your `config.toml` on top of the configuration 
 
 The `configure` step compares the `[db]`, `[api]`, `[auth]`, `[storage]`, and `[experimental]` sections of `config.toml` with the branch's current settings and updates the ones that differ. The migrate, seed, and deploy steps read the other sections, such as `[functions]` and `[db.seed]`. If your repository has no `config.toml`, the step only turns on Database Webhooks.
 
-On a protected branch, such as your production branch, the step runs only when a `[remotes]` block names that branch's project ID. For the `[remotes]` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration).
+On a persistent branch, including your production branch, the step runs only when a `[remotes]` block names that branch's project ID. For the `[remotes]` syntax, see [Remote-specific configuration](/docs/guides/deployment/branching/configuration#remote-specific-configuration).
 
 A comment is added to your PR with the deployment status of your preview branch.
 
