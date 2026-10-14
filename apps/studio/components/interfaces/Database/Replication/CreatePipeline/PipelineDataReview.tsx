@@ -60,7 +60,9 @@ export const PipelineDataReview = ({
         mode === 'include_tables'
           ? 'Only these tables copy their existing rows during initial sync. Ongoing changes from every publication table are replicated.'
           : 'These tables skip copying existing rows during initial sync. Ongoing changes from every publication table are replicated.',
-      value: selected?.map(({ schema, name }) => `${schema}.${name}`).join(', ') || 'None selected',
+      value: tables
+        ? selected?.map(({ schema, name }) => `${schema}.${name}`).join(', ') || 'None selected'
+        : 'Unavailable',
     })
   }
   const addNumber = (
@@ -101,7 +103,11 @@ export const PipelineDataReview = ({
     })
   const layouts =
     type === 'BigQuery'
-      ? (options ?? []).filter((option) => option.partitionBy || option.clusterBy?.length)
+      ? (options ?? []).filter(
+          (option) =>
+            tables?.some(({ id }) => id === option.tableId) &&
+            (option.partitionBy || option.clusterBy?.length)
+        )
       : []
   return (
     <section aria-label="Data review" className="space-y-6 p-5">

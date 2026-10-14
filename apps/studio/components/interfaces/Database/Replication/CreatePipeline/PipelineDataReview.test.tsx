@@ -157,6 +157,24 @@ describe('PipelineDataReview', () => {
     expect(screen.queryByText('Table layout: public.orders')).not.toBeInTheDocument()
   })
 
+  it('does not describe unavailable selections as empty or show stale layouts', () => {
+    const view = customRender(
+      <TestReview
+        available={false}
+        values={{
+          tableSyncCopyMode: 'include_tables',
+          tableSyncCopyTableIds: ['101'],
+          tableOptions: [{ tableId: 999, clusterBy: ['id'] }],
+        }}
+      />
+    )
+    expect(screen.getByLabelText('Tables to include')).toHaveValue('Unavailable')
+    expect(screen.queryByText('Table 999')).not.toBeInTheDocument()
+    view.unmount()
+    customRender(<TestReview values={{ tableOptions: [{ tableId: 999, clusterBy: ['id'] }] }} />)
+    expect(screen.queryByText('Table layout')).not.toBeInTheDocument()
+  })
+
   it('describes each partition mode', () => {
     expect(
       describeBigQueryTableLayout({
