@@ -421,40 +421,40 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     title: 'Branching',
     subtitle: 'Test schema changes without touching production.',
     description: `
-Branching without Git is now the default for all Supabase projects. Create a branch directly from the Supabase Dashboard, make schema changes, review the diff, and merge. No Git configuration required. Git-based branching remains fully supported for teams that manage migrations in version control. You can start with dashboard branching and add a Git integration later.
+Branching without Git is the default for every Supabase project. Create a branch from the Supabase Dashboard, make schema changes, review the diff, and merge. Git-based branching stays fully supported for teams that manage migrations in version control, and GitHub-connected branches are now ready more than five times faster than before.
 
 ## Two ways to branch
 
 **Dashboard branching (default)**
-Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes using the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes in the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
 
 **Git-based branching**
-Connect a GitHub repo to your Supabase project. Migrations live in version control, and branches are created automatically when you open a pull request and cleaned up when it closes.
+Connect a GitHub repo to your project. Migrations live in version control, and branches are created when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
+1. No-Git workflow: Create and merge branches from the dashboard with no GitHub connection.
 2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
-3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
-4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
-6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
-7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
+3. Inherited configuration: Each branch has its own Supabase instance with separate API credentials and starts with its base project's Postgres, Auth, Storage, network, and Edge Functions configuration.
+4. Fast provisioning: GitHub-connected branches are ready in about 20 seconds at the median, down from nearly two minutes.
+5. Automatic migrations: Runs new migrations when changes are pushed to \`./supabase/migrations\`.
+6. Data seeding: Seed branches with sample data from \`./supabase/seed.sql\`.
+7. Merge requests: Review schema diffs and merge directly in the dashboard.
+8. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 
 ## When to use branching
 - Developers prototyping schema changes who want fast iteration without upfront configuration
-- AI agents that need to create and manage database branches programmatically
-- Teams managing database migrations in Git who want PR-driven schema reviews
-- Projects with complex schemas requiring careful diff review before merging
-- CI/CD pipelines integrating database changes alongside application code
+- AI agents that create and manage database branches programmatically
+- Teams managing migrations in Git who want PR-driven schema reviews
+- CI/CD pipelines that ship database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '/images/features/branching.png',
     heroImageLight: '/images/features/branching-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/platform/branching',
+    docsUrl: 'https://supabase.com/docs/guides/deployment/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -2119,36 +2119,60 @@ Automatic Embeddings eliminate the manual work of generating and maintaining vec
   },
   // Platform
   {
-    title: 'CLI',
-    subtitle: 'Use our CLI to develop your project locally and deploy.',
+    title: 'Local development',
+    subtitle: 'Run a local Supabase project for every agent, with or without Docker.',
     description: `
-Supabase's Command Line Interface (CLI) tool provides developers with a powerful and flexible way to manage their Supabase projects directly from the terminal. This feature streamlines the development workflow, allowing for local development, testing, and seamless deployment of Supabase projects.
+The Supabase CLI runs several local projects on one machine, one per git worktree, so each coding agent gets its own Postgres, Storage, Edge Functions, and MCP server. Projects start in seconds and idle services use no memory, so nine projects fit where one used to. In sandboxes and CI runners that have no container engine, the native runtime runs every Supabase service as a plain process at the same pinned versions as the Docker images.
 
-## Key benefits
-1. Local development: Set up and run a local Supabase instance for development and testing.
-2. Version control integration: Easily manage database migrations and schema changes with Git-like workflows.
-3. Automated deployments: Deploy changes to your Supabase project with simple CLI commands.
-4. Database migrations: Generate, apply, and revert database migrations effortlessly.
-5. Environment management: Handle multiple environments (development, staging, production) efficiently.
-6. Seed data management: Populate your database with test data for consistent development and testing.
-7. CI/CD integration: Incorporate Supabase operations into your continuous integration and deployment pipelines.
-8. Parallel local projects: Run a separate local project for each app, git worktree, or named environment with the experimental \`supabase stack\` commands.
+## Key features
+1. One project per worktree: The CLI picks and remembers ports for each project, so agents stop coordinating project IDs by hand.
+2. Isolated data: Reset one project's database while another is mid test run. Schema changes, resets, and Storage uploads never cross over.
+3. Services start on demand: Postgres comes up first and everything else wakes on its first request. Pass \`--eager\` to start everything up front.
+4. Native runtime: Run without Docker or Podman on Linux (amd64 and arm64) and macOS 14 or later on Apple silicon. The CLI picks it when no container engine responds.
+5. Per-project MCP server: Each local project serves its own \`/mcp\` endpoint, so an agent only sees the database it's working on.
 
-## The CLI is particularly valuable for:
-- Development teams working on Supabase projects collaboratively
-- DevOps professionals managing Supabase deployments across multiple environments
-- Open-source projects requiring reproducible Supabase setups
-- Developers preferring command-line tools for increased productivity
-- Projects with complex database schemas requiring careful version control
-- Any application needing a streamlined local-to-production workflow with Supabase
+## When to use it
+- Several coding agents working on the same app in parallel
+- Hosted sandboxes and CI runners with no Docker daemon
+- Laptops where the default stack is too heavy to run more than once
 
-By leveraging the Supabase CLI, you can significantly improve your development workflow, ensuring consistency between local and production environments, streamlining deployments, and making it easier to manage complex Supabase projects. This tool empowers developers to work more efficiently with Supabase, whether they're building small prototypes or large-scale applications.
+Turn it on with \`SUPABASE_EXPERIMENTAL_STACK=1 supabase init\` for a new app, or add \`stack = true\` under \`[experimental]\` in \`supabase/config.toml\` for an existing one. Read the [multiple local projects guide](https://supabase.com/docs/guides/local-development/running-multiple-local-projects) and the [Docker and native runtimes guide](https://supabase.com/docs/guides/local-development/docker-and-native-runtimes).
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/_2N6ApZ0MmI',
-    docsUrl:
-      'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
+    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'local-development',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'CLI',
+    subtitle: 'Develop locally, manage migrations, and deploy from the terminal.',
+    description: `
+The Supabase CLI runs the full Supabase stack on your machine or in CI, captures schema changes as migrations, and pushes them to a hosted project. Run one local project or several at once, in Docker containers or as native processes.
+
+## Key features
+1. Local development: Run one or many local projects, with Docker or as native processes. See [Local development](/features/local-development).
+2. Migrations: Generate, apply, and roll back database migrations, or write declarative schema files and let the CLI diff them.
+3. Config as code: Define project settings in \`config.toml\` and apply them to hosted projects and branches.
+4. Deployments: Push migrations, Edge Functions, and config to a linked project with one command.
+5. Type generation: Generate TypeScript types from your database schema.
+6. Seed data: Populate local databases with test data on every reset.
+7. CI/CD: Run every command headlessly in GitHub Actions or any other runner.
+
+## When to use it
+- Teams that want schema changes reviewed in pull requests
+- Projects that need reproducible local environments
+- Coding agents that set up, test, and deploy a backend without a browser
+- Deployments managed from CI
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    docsUrl: 'https://supabase.com/docs/guides/local-development',
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
