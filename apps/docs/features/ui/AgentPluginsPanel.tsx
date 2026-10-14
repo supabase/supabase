@@ -99,6 +99,26 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     )
   }
 
+  if (client.key === 'antigravity') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          The Supabase plugin works in the Antigravity CLI and Antigravity IDE. To install and
+          manage plugins on each surface, follow the{' '}
+          <a
+            href="https://antigravity.google/docs/plugins/#managing-plugins-by-surface"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            Antigravity plugins docs
+          </a>
+          .
+        </p>
+      </div>
+    )
+  }
+
   if (client.key === 'gemini-cli') {
     return (
       <div className="space-y-3">
