@@ -31,7 +31,7 @@ function walk(d) {
     if (SKIP.has(e.name)) continue
     const f = path.join(d, e.name)
     if (e.isDirectory()) walk(f)
-    else if (/\.(tsx?|jsx?)$/.test(e.name)) files.push(f)
+    else if (/\.(tsx?|jsx?|astro)$/.test(e.name)) files.push(f)
   }
 }
 for (const r of ['apps', 'packages', 'blocks', 'examples']) {
