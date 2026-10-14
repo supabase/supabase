@@ -1,4 +1,5 @@
 import { forwardRef } from 'react'
+import { Badge } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -68,6 +69,9 @@ export const PipelineValidationAdmonition = forwardRef<
       <ul className="space-y-2">
         {failures.map((failure, index) => (
           <li key={`${failure.name}-${index}`}>
+            <Badge className="mb-1">
+              {failure.failure_type === 'critical' ? 'Required' : 'Warning'}
+            </Badge>
             {failures.length > 1 ? (
               <p className="mb-0.5! font-medium text-foreground">{failure.name}</p>
             ) : null}

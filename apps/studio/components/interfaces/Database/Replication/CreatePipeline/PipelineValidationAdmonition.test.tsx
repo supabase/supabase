@@ -56,3 +56,16 @@ test('shows critical issues without suggesting replication can start', () => {
   expect(screen.getByText('Check your key.')).toBeInTheDocument()
   expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
 })
+
+test('distinguishes blockers and warnings in mixed results', () => {
+  customRender(
+    <PipelineValidationAdmonition
+      failures={[
+        { name: 'Credentials', reason: 'Replace the key.', failure_type: 'critical' },
+        { name: 'Replica identity', reason: 'Review table settings.', failure_type: 'warning' },
+      ]}
+    />
+  )
+  expect(screen.getByText('Required').closest('li')).toHaveTextContent('Replace the key.')
+  expect(screen.getByText('Warning').closest('li')).toHaveTextContent('Review table settings.')
+})
