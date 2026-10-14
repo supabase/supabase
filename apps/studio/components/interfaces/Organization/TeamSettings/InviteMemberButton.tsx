@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { UserPlus } from 'lucide-react'
+import { UserPlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -288,7 +288,7 @@ export const InviteMemberButton = () => {
           <ButtonTooltip
             variant="primary"
             disabled={isInviteDisabled}
-            icon={<UserPlus size={14} />}
+            icon={<UserPlusIcon size={14} />}
             className="pointer-events-auto grow md:grow-0"
             onClick={() => setIsOpen(true)}
             tooltip={{

@@ -1,5 +1,5 @@
 import { useDocsSearch, type DocsSearchResult } from 'common'
-import { Book, Github, Loader2 } from 'lucide-react'
+import { BookIcon, GithubIcon, Loader2Icon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { useChangedSync } from '@/hooks/misc/useChanged'
@@ -45,7 +45,7 @@ export function DocsSuggestions({ searchString }: DocsSuggestionsProps) {
 function DocsSuggestions_Loading() {
   return (
     <div className="flex items-center gap-2 text-sm text-foreground-light">
-      <Loader2 className="animate-spin" size={14} />
+      <Loader2Icon className="animate-spin" size={14} />
       <span>Searching for relevant resources...</span>
     </div>
   )
@@ -72,9 +72,9 @@ function DocsSuggestions_Results({ results, isStale }: DocsSuggestions_ResultsPr
           return (
             <li key={page.id} className="flex items-center gap-x-1">
               {page.type === 'github-discussions' ? (
-                <Github size={16} className="text-foreground-muted" />
+                <GithubIcon size={16} className="text-foreground-muted" />
               ) : (
-                <Book size={16} className="text-foreground-muted" />
+                <BookIcon size={16} className="text-foreground-muted" />
               )}
               <a
                 href={page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`}

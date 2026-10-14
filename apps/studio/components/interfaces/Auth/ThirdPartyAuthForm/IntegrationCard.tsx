@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import Image from 'next/image'
 import { Badge, Button } from 'ui'
 
@@ -210,7 +210,7 @@ export const IntegrationCard = ({
           {true ? (
             <Badge className="space-x-1" variant="success">
               <div className="h-3.5 w-3.5 bg-brand-default rounded-full flex justify-center items-center">
-                <Check className="h-2 w-2 text-background-overlay" strokeWidth={6} />
+                <CheckIcon className="h-2 w-2 text-background-overlay" strokeWidth={6} />
               </div>
               <span>Enabled</span>
             </Badge>

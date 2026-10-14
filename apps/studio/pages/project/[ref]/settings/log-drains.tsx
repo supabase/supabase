@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { cloneElement, useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
 import {
@@ -226,7 +226,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                       variant="primary"
                       aria-label="Choose destination type"
                       className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                      icon={<ChevronDown />}
+                      icon={<ChevronDownIcon />}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">
