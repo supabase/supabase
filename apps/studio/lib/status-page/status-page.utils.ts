@@ -1,6 +1,7 @@
 import type { AffectedComponent, StatusPageResponse, WorstImpact } from './status-page.schema'
 
 export const PROJECT_CREATION_GROUP_NAME = 'project creation'
+export const DASHBOARD_COMPONENT_NAME = 'dashboard'
 
 // Pattern, not a hardcoded region list, so new or test regions (e.g. a new AWS region, or a
 // staging-only region) are recognized without a code change.
@@ -28,6 +29,13 @@ export function isRegionCode(name: string): boolean {
 
 export function isProjectCreationComponent(component: AffectedComponent): boolean {
   return normalizeLabel(component.group_name ?? '') === PROJECT_CREATION_GROUP_NAME
+}
+
+export function isDashboardComponent(component: AffectedComponent): boolean {
+  return (
+    normalizeLabel(component.name) === DASHBOARD_COMPONENT_NAME ||
+    normalizeLabel(component.group_name ?? '') === DASHBOARD_COMPONENT_NAME
+  )
 }
 
 export type RegionScope = { type: 'global' } | { type: 'regions'; regions: ReadonlyArray<string> }
@@ -163,4 +171,12 @@ export function isRelevantToUser(item: StatusItem, user: UserRegionContext): boo
 
   const userRegions = new Set(Array.from(user.regions, normalizeRegion))
   return item.scope.regions.some((region) => userRegions.has(normalizeRegion(region)))
+}
+
+/**
+ * Relevance check for signed-out surfaces (e.g. the sign-in page), where there's no
+ * project/region context to match against.
+ */
+export function isRelevantToSignedOutUser(item: StatusItem): boolean {
+  return item.components.some(isDashboardComponent)
 }

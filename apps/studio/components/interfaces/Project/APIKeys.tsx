@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
-import { Loader } from 'lucide-react'
+import { LoaderIcon } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -102,7 +102,7 @@ export const APIKeys = () => {
       ) : showJwtLoading ? (
         <CardContent>
           <div className="flex items-center justify-center py-4 space-x-2">
-            <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+            <LoaderIcon className="animate-spin" size={16} strokeWidth={1.5} />
             <p className="text-sm text-foreground-light">JWT secret is being updated</p>
           </div>
         </CardContent>

@@ -186,6 +186,25 @@ type TablePrivilegesGrant = {
     | 'MAINTAIN'
   isGrantable?: boolean
 }
+/**
+ * The `%I.%I` arguments of a `format()` call that name a relation: the schema
+ * and name of the relation with the given oid.
+ *
+ * The statements below deliberately avoid `format('… %s …', <oid>::regclass)`:
+ * `%s` substitutes raw text, so a PL/pgSQL body using it can't be proven to
+ * build a fixed statement. Servers that statically check `DO` blocks (such as
+ * Multigres) reject those. A format string made only of `%I`/`%L` conversions
+ * can be checked, and builds the same statement.
+ */
+function relationIdentArgs(relationId: number): SafeSqlFragment {
+  const id = literal(relationId)
+  return safeSql`(select n.nspname from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = ${id}), (select relname from pg_class where oid = ${id})`
+}
+
+function granteeSql(grantee: string): SafeSqlFragment {
+  return grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+}
+
 function grant(grants: TablePrivilegesGrant[]): { sql: SafeSqlFragment } {
   const sql = safeSql`
 do $$
@@ -193,9 +212,11 @@ begin
 ${joinSqlFragments(
   grants.map(
     ({ privilegeType, relationId, grantee, isGrantable }) =>
-      safeSql`execute format('grant ${keyword(privilegeType)} on table %s to ${
-        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-      } ${isGrantable ? safeSql`with grant option` : safeSql``}', ${literal(relationId)}::regclass);`
+      safeSql`execute format(${literal(
+        `grant ${keyword(privilegeType)} on table %I.%I to ${granteeSql(grantee)}${
+          isGrantable ? ' with grant option' : ''
+        }`
+      )}, ${relationIdentArgs(relationId)});`
   ),
   '\n'
 )}
@@ -225,9 +246,9 @@ begin
 ${joinSqlFragments(
   revokes.map(
     ({ privilegeType, relationId, grantee }) =>
-      safeSql`execute format('revoke ${keyword(privilegeType)} on table %s from ${
-        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-      }', ${literal(relationId)}::regclass);`
+      safeSql`execute format(${literal(
+        `revoke ${keyword(privilegeType)} on table %I.%I from ${granteeSql(grantee)}`
+      )}, ${relationIdentArgs(relationId)});`
   ),
   '\n'
 )}

@@ -1,6 +1,6 @@
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { Plus, RectangleEllipsis } from 'lucide-react'
+import { PlusIcon, RectangleEllipsisIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -65,7 +65,7 @@ export const TOTPFactors = () => {
           </PageSectionSummary>
           {canAddApp && (
             <PageSectionAside>
-              <Button variant="primary" icon={<Plus />} onClick={handleAddNewApp}>
+              <Button variant="primary" icon={<PlusIcon />} onClick={handleAddNewApp}>
                 Add app
               </Button>
             </PageSectionAside>
@@ -79,7 +79,7 @@ export const TOTPFactors = () => {
               title="Avoid being locked out"
               description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
               actions={
-                <Button icon={<Plus />} onClick={handleAddNewApp}>
+                <Button icon={<PlusIcon />} onClick={handleAddNewApp}>
                   Add another app
                 </Button>
               }
@@ -153,7 +153,7 @@ export const TOTPFactors = () => {
                 <CardContent className="flex items-center justify-between">
                   <div className="flex items-center gap-x-4">
                     <div className="w-9 h-9 rounded-full bg-selection flex items-center justify-center">
-                      <RectangleEllipsis size={18} className="text-foreground-lighter" />
+                      <RectangleEllipsisIcon size={18} className="text-foreground-lighter" />
                     </div>
                     <div className="text-sm">
                       <p className={cn(codes.remaining < 2 ? 'text-warning' : '')}>

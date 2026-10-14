@@ -1,5 +1,5 @@
 import type { PGTable } from '@supabase/pg-meta'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 import { Popover, PopoverContent, PopoverTrigger } from 'ui'
@@ -105,7 +105,7 @@ export const ForeignKeyFormatter = (props: Props) => {
                 <ButtonTooltip
                   className="w-6 h-6"
                   aria-label="View referencing record"
-                  icon={<ArrowRight />}
+                  icon={<ArrowRightIcon />}
                   onClick={(e) => e.stopPropagation()}
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
                 />

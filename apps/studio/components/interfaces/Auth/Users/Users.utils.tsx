@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { SqlEditor, TableEditor } from 'icons'
-import { Copy, ScrollText, Trash, UserIcon } from 'lucide-react'
+import { CopyIcon, ScrollTextIcon, TrashIcon, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
   Checkbox,
@@ -438,7 +438,7 @@ export const formatUserColumns = ({
                   if (value) copyToClipboard(value)
                 }}
               >
-                <Copy size={12} />
+                <CopyIcon size={12} />
                 <span>Copy {col.id === 'id' ? col.name : col.name.toLowerCase()}</span>
               </ContextMenuItem>
 
@@ -473,7 +473,7 @@ export const formatUserColumns = ({
                   if (user) onSelectViewLogs(user)
                 }}
               >
-                <ScrollText size={12} />
+                <ScrollTextIcon size={12} />
                 <span>View user logs</span>
               </ContextMenuItem>
 
@@ -486,7 +486,7 @@ export const formatUserColumns = ({
                   if (user) onSelectDeleteUser(user)
                 }}
               >
-                <Trash size={12} />
+                <TrashIcon size={12} />
                 <span>Delete user</span>
               </ContextMenuItem>
             </ContextMenuContent>

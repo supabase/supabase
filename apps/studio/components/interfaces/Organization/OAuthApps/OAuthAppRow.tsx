@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit, MoreVertical, Trash } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -37,7 +37,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
 
   return (
     <TableRow>
-      <TableCell className="w-[62px] min-w-[62px] max-w-[62px]">
+      <TableCell className="w-[54px] min-w-[54px] max-w-[54px] pr-2">
         <div
           className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center text-xs"
           style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
@@ -45,7 +45,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
           {!!app.icon ? '' : `${app.name[0]}`}
         </div>
       </TableCell>
-      <TableCell>
+      <TableCell className="pl-0">
         <p title={app.name} className="truncate">
           {app.name}
         </p>
@@ -68,7 +68,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button icon={<MoreVertical />} className="px-1" />
+            <Button icon={<MoreVerticalIcon />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom" className="w-32">
             <Tooltip>
@@ -81,7 +81,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                     if (canUpdateOAuthApps) onSelectEdit()
                   }}
                 >
-                  <Edit size={16} />
+                  <EditIcon size={16} />
                   <p>Edit app</p>
                 </DropdownMenuItem>
               </TooltipTrigger>
@@ -102,7 +102,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                     if (canDeleteOAuthApps) onSelectDelete()
                   }}
                 >
-                  <Trash size={16} />
+                  <TrashIcon size={16} />
                   <p>Delete app</p>
                 </DropdownMenuItem>
               </TooltipTrigger>

@@ -82,7 +82,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
     if (searchState.status === 'results' || searchState.status === 'noResults') {
       sendTelemetryEvent({
         action: 'docs_search_v2_search_submitted',
-        properties: { query: searchState.query },
+        properties: { query: searchState.query, hasResults: searchState.status === 'results' },
       })
     }
   }, [searchState, sendTelemetryEvent])

@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { cn } from 'ui'
 
@@ -65,7 +65,7 @@ export const FolderPickerRow = ({
             {location}
           </span>
         )}
-        <ChevronRight size={14} className="shrink-0 text-foreground-lighter" />
+        <ChevronRightIcon size={14} className="shrink-0 text-foreground-lighter" />
       </button>
     </div>
   )
