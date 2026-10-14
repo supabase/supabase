@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import { PipelineConnectionReview } from './PipelineConnectionReview'
 import { PipelineDataReview } from './PipelineDataReview'
 import { describeBigQueryTableLayout } from './PipelineReviewSummary.utils'
 import type { ReplicationPublicationData } from '@/data/replication/publication-query'
@@ -40,6 +41,7 @@ const TestReview = ({
   })
   return (
     <>
+      <PipelineConnectionReview type={type} control={form.control} />
       <PipelineDataReview
         type={type}
         control={form.control}
@@ -91,10 +93,9 @@ describe('PipelineDataReview', () => {
     expect(screen.getByLabelText('Batch wait time')).toHaveValue('500 milliseconds')
     expect(screen.getByLabelText('Connection pool size')).toHaveValue('6')
     expect(screen.getByLabelText('Maximum staleness')).toHaveValue('0 minutes')
-    expect(screen.getByLabelText('Table layout: public.orders')).toHaveValue(
-      'No partitioning; Cluster by id'
-    )
-    expect(screen.queryByLabelText('Table layout: Table 999')).not.toBeInTheDocument()
+    expect(screen.getByText('public.orders')).toBeInTheDocument()
+    expect(screen.getByText('No partitioning; Cluster by id')).toBeInTheDocument()
+    expect(screen.queryByText('Table 999')).not.toBeInTheDocument()
   })
   it.each([
     { type: 'DuckLake', values: { ducklakePoolSize: 6 }, label: 'Pool size', value: '6' },
@@ -113,6 +114,28 @@ describe('PipelineDataReview', () => {
     customRender(<TestReview available={false} />)
     expect(screen.getByLabelText('Publication tables')).toHaveValue('Unavailable')
   })
+  it('puts the table name and incomplete partition summary in the value column', () => {
+    customRender(
+      <TestReview
+        values={{
+          tableOptions: [
+            {
+              tableId: 101,
+              partitionBy: { kind: 'time_column', column: '', granularity: 'month' },
+              clusterBy: ['table_id'],
+            },
+          ],
+        }}
+      />
+    )
+    expect(screen.getByText('Table layout')).toBeInTheDocument()
+    expect(screen.getByText('public.orders')).toHaveClass('break-all')
+    expect(screen.getByText('Partition by Not selected (month); Cluster by table_id')).toHaveClass(
+      'break-words'
+    )
+    expect(screen.queryByText('Table layout: public.orders')).not.toBeInTheDocument()
+  })
+
   it('describes each partition mode', () => {
     expect(
       describeBigQueryTableLayout({

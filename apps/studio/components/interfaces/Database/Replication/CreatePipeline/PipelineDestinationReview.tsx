@@ -28,6 +28,7 @@ import {
   PipelineRegionReadonly,
 } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import { PipelineConnectionReview } from './PipelineConnectionReview'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -177,6 +178,7 @@ export const PipelineDestinationReview = ({
             )}
           </FormItemLayout>
         ))}
+        <PipelineConnectionReview type={type} control={control} />
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"

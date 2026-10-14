@@ -22,20 +22,7 @@ export const PipelineDataReview = ({
   control: Control<DestinationPanelSchemaType>
   publication?: ReplicationPublicationData
 }) => {
-  const [
-    publicationName,
-    mode,
-    ids,
-    workers,
-    copies,
-    slot,
-    batch,
-    pool,
-    staleness,
-    lakePool,
-    role,
-    options,
-  ] = useWatch({
+  const [publicationName, mode, ids, workers, copies, slot, batch, options] = useWatch({
     control,
     name: [
       'publicationName',
@@ -45,10 +32,6 @@ export const PipelineDataReview = ({
       'maxCopyConnectionsPerTable',
       'invalidatedSlotBehavior',
       'maxFillMs',
-      'connectionPoolSize',
-      'maxStalenessMins',
-      'ducklakePoolSize',
-      'snowflakeRole',
       'tableOptions',
     ],
   })
@@ -92,42 +75,34 @@ export const PipelineDataReview = ({
       value: 'Recreate slot',
       description: 'Replaces destination tables and runs a new, billable initial sync.',
     })
-  const connectionRows: typeof rows = []
-  if (type === 'BigQuery') {
-    if (typeof pool === 'number' && pool !== defaults.DEFAULT_CONNECTION_POOL_SIZE)
-      connectionRows.push({ label: 'Connection pool size', value: String(pool) })
-    if (typeof staleness === 'number')
-      connectionRows.push({ label: 'Maximum staleness', value: `${staleness} minutes` })
-    for (const option of options ?? []) {
-      if (!option.partitionBy && !option.clusterBy?.length) continue
-      const table = tables?.find(({ id }) => id === option.tableId)
-      rows.push({
-        label: `Table layout: ${table ? `${table.schema}.${table.name}` : `Table ${option.tableId}`}`,
-        value: describeBigQueryTableLayout(option),
-      })
-    }
-  }
-  if (
-    type === 'DuckLake' &&
-    typeof lakePool === 'number' &&
-    lakePool !== defaults.DEFAULT_DUCKLAKE_POOL_SIZE
-  )
-    connectionRows.push({ label: 'Pool size', value: String(lakePool) })
-  if (type === 'Snowflake' && role?.trim()) connectionRows.push({ label: 'Role', value: role })
+  const layouts =
+    type === 'BigQuery'
+      ? (options ?? []).filter((option) => option.partitionBy || option.clusterBy?.length)
+      : []
   return (
     <section aria-label="Data review" className="space-y-6 p-5">
-      {connectionRows.length > 0 && (
-        <>
-          <h3 className="text-sm font-medium text-foreground">Custom connection settings</h3>
-          {connectionRows.map((row) => (
-            <ReviewField key={row.label} {...row} />
-          ))}
-        </>
-      )}
       <h3 className="text-sm font-medium text-foreground">Data</h3>
       {rows.map((row) => (
         <ReviewField key={row.label} {...row} />
       ))}
+      {layouts.length > 0 && (
+        <FormItemLayout isReactForm={false} layout="horizontal" label="Table layout">
+          <div className="min-w-0 space-y-3">
+            {layouts.map((option) => {
+              const table = tables?.find(({ id }) => id === option.tableId)
+              const name = table ? `${table.schema}.${table.name}` : `Table ${option.tableId}`
+              return (
+                <div key={option.tableId} className="min-w-0 rounded-md border bg-surface-200 p-3">
+                  <p className="break-all text-sm text-foreground">{name}</p>
+                  <p className="mt-1 break-words text-sm text-foreground-light">
+                    {describeBigQueryTableLayout(option)}
+                  </p>
+                </div>
+              )
+            })}
+          </div>
+        </FormItemLayout>
+      )}
     </section>
   )
 }
