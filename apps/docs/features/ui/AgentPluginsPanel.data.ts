@@ -36,7 +36,7 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     icon: 'antigravity',
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl: 'https://antigravity.google/docs/plugins/#managing-plugins-by-surface',
-    docsLinkText: 'View Antigravity plugins docs',
+    docsLinkText: 'View Antigravity plugin documentation',
   },
   {
     key: 'gemini-cli',

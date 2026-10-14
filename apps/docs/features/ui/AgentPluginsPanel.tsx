@@ -111,7 +111,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             rel="noopener noreferrer"
             className="text-primary hover:underline"
           >
-            Antigravity plugins docs
+            Antigravity plugin documentation
           </a>
           .
         </p>
