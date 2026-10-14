@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, ScrollText, X } from 'lucide-react'
+import { FilePlusIcon, FolderPlusIcon, PlusIcon, ScrollTextIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -121,7 +121,7 @@ export const SQLEditorMenu = () => {
                       setShowSearch(false)
                     }}
                   >
-                    <X size={18} />
+                    <XIcon size={18} />
                   </TooltipTrigger>
                   <TooltipContent>Clear search</TooltipContent>
                 </Tooltip>
@@ -146,7 +146,7 @@ export const SQLEditorMenu = () => {
                 <DropdownMenuTrigger asChild>
                   <Button
                     data-testid="sql-editor-new-query-button"
-                    icon={<Plus className="text-foreground" />}
+                    icon={<PlusIcon className="text-foreground" />}
                     className="w-[26px]"
                     aria-label="Create a new query"
                   />
@@ -156,17 +156,17 @@ export const SQLEditorMenu = () => {
             </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
               <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
-                <FilePlus size={14} />
+                <FilePlusIcon size={14} />
                 Create a new snippet
               </DropdownMenuItem>
               {canCreateLogsSnippet && (
                 <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery('logs')}>
-                  <ScrollText size={14} />
+                  <ScrollTextIcon size={14} />
                   Create a new logs query
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
-                <FolderPlus size={14} />
+                <FolderPlusIcon size={14} />
                 Create a new folder
               </DropdownMenuItem>
             </DropdownMenuContent>

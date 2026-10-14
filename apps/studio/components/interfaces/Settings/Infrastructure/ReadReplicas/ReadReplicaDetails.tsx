@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { BarChart2 } from 'lucide-react'
+import { BarChart2Icon } from 'lucide-react'
 import { useMemo } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { Card, CardContent, CardHeader, CardTitle } from 'ui'
@@ -94,7 +94,7 @@ export const ReadReplicaDetails = () => {
             isEmpty={chartData.length === 0}
             emptyState={
               <ChartEmptyState
-                icon={<BarChart2 size={16} />}
+                icon={<BarChart2Icon size={16} />}
                 title="No data to show"
                 description="It may take up to 24 hours for data to refresh"
               />

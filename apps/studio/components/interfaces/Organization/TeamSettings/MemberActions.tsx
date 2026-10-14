@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useIsLoggedIn, useParams } from 'common'
-import { MoreVertical, Redo2, Trash } from 'lucide-react'
+import { MoreVerticalIcon, Redo2Icon, TrashIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -197,7 +197,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               className="px-1.5"
               disabled={isLoading}
               loading={isLoading}
-              icon={<MoreVertical />}
+              icon={<MoreVerticalIcon />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
@@ -215,7 +215,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Redo2 size={14} />
+                    <Redo2Icon size={14} />
                     <p>Resend invitation</p>
                   </DropdownMenuItemTooltip>
 
@@ -232,7 +232,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     <p>Cancel invitation</p>
                   </DropdownMenuItemTooltip>
                 </>
@@ -249,7 +249,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
                       },
                     }}
                   >
-                    <Trash size={12} />
+                    <TrashIcon size={12} />
                     <p>Remove member</p>
                   </DropdownMenuItemTooltip>
                 )

@@ -1,5 +1,5 @@
 import { useFeatureFlags, useParams } from 'common'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
@@ -184,7 +184,7 @@ export const DestinationPanel = () => {
                       <Button
                         asChild
                         variant="primary"
-                        iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
+                        iconRight={<ArrowUpRightIcon size={16} strokeWidth={1.5} />}
                       >
                         <Link
                           target="_blank"

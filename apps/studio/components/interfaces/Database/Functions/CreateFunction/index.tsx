@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-format'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { Plus, Trash } from 'lucide-react'
+import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -543,7 +543,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      icon={<Trash size={12} />}
+                      icon={<TrashIcon size={12} />}
                       onClick={() => remove(index)}
                       className="h-[34px] w-[34px]"
                       aria-label="Remove argument"
@@ -560,7 +560,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
         {!readonly && (
           <Button
-            icon={<Plus size={12} />}
+            icon={<PlusIcon size={12} />}
             onClick={() => append({ name: '', type: 'integer' })}
             disabled={readonly}
           >

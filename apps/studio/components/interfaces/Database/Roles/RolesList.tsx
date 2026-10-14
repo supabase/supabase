@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
-import { Plus, Search, X } from 'lucide-react'
+import { PlusIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -130,7 +130,7 @@ export const RolesList = () => {
             size="tiny"
             className="w-52"
             placeholder="Search for a role"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={filterString}
             onChange={(event) => setFilterString(event.target.value)}
             onKeyDown={onSearchInputEscape(filterString, setFilterString)}
@@ -142,7 +142,7 @@ export const RolesList = () => {
                   onClick={() => setFilterString('')}
                   className="px-1 mr-1"
                 >
-                  <X size={12} strokeWidth={2} />
+                  <XIcon size={12} strokeWidth={2} />
                 </Button>
               )
             }
@@ -223,7 +223,7 @@ export const RolesList = () => {
             >
               <Button
                 variant="primary"
-                icon={<Plus size={12} />}
+                icon={<PlusIcon size={12} />}
                 onClick={() => setIsCreatingRole(true)}
               >
                 Add role
@@ -233,7 +233,7 @@ export const RolesList = () => {
             <ButtonTooltip
               variant="primary"
               disabled
-              icon={<Plus size={12} />}
+              icon={<PlusIcon size={12} />}
               tooltip={{
                 content: {
                   side: 'bottom',

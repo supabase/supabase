@@ -1,5 +1,5 @@
 import type { FetchPreviousPageOptions } from '@tanstack/react-query'
-import { CirclePause, CirclePlay } from 'lucide-react'
+import { CirclePauseIcon, CirclePlayIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
 import { Button } from 'ui'
@@ -69,7 +69,9 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
         onClick={handleClick}
         variant={live ? 'primary' : 'default'}
         size="tiny"
-        icon={live ? <CirclePause className="h-4 w-4" /> : <CirclePlay className="h-4 w-4" />}
+        icon={
+          live ? <CirclePauseIcon className="h-4 w-4" /> : <CirclePlayIcon className="h-4 w-4" />
+        }
       >
         Live
       </Button>
