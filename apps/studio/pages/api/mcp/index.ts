@@ -22,8 +22,8 @@ const supabase = createClient(
   process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!
 )
 
-const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
+const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
 const mcpResourceUrl = process.env.SUPABASE_PUBLIC_URL + '/.well-known/oauth-protected-resource/mcp'
 
 const mcpQuerySchema = z.object({
