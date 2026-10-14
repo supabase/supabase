@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -76,7 +76,7 @@ export function GeneratingTypes({ selectedLang }: Props) {
               <Button
                 disabled={isGeneratingTypes}
                 loading={isGeneratingTypes}
-                icon={<Download strokeWidth={1.5} />}
+                icon={<DownloadIcon strokeWidth={1.5} />}
                 onClick={onClickGenerateTypes}
               >
                 Generate and download types

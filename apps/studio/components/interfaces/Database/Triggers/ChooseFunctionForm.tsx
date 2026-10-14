@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { map as lodashMap, uniqBy } from 'lodash'
-import { HelpCircle, Terminal } from 'lucide-react'
+import { HelpCircleIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, SidePanel } from 'ui'
@@ -74,7 +74,7 @@ const NoticeBox = () => {
   return (
     <div className="px-6">
       <InformationBox
-        icon={<HelpCircle size="20" strokeWidth={1.5} />}
+        icon={<HelpCircleIcon size="20" strokeWidth={1.5} />}
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={
@@ -150,7 +150,7 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center rounded-sm bg-foreground p-1 text-background">
-                <Terminal strokeWidth={2} size={14} />
+                <TerminalIcon strokeWidth={2} size={14} />
               </div>
               <p className="mb-0 text-sm">{name}</p>
             </div>

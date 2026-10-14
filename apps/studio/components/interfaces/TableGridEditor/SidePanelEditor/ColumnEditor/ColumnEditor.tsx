@@ -1,7 +1,7 @@
 import { safeSql } from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
-import { ExternalLink, Plus } from 'lucide-react'
+import { ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
@@ -300,7 +300,7 @@ export const ColumnEditor = ({
                 className="lg:col-span-4!"
                 description={
                   <div className="space-y-2">
-                    <Button asChild icon={<Plus />}>
+                    <Button asChild icon={<PlusIcon />}>
                       <Link
                         target="_blank"
                         rel="noreferrer"
@@ -309,7 +309,7 @@ export const ColumnEditor = ({
                         Create enum types
                       </Link>
                     </Button>
-                    <Button asChild icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLinkIcon />}>
                       <Link
                         target="_blank"
                         rel="noreferrer"

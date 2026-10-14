@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { MessageSquare, NotebookText } from 'lucide-react'
+import { MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import { type ComponentType, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
@@ -18,10 +18,10 @@ export const EXPLORER_SECTIONS: Array<{
   {
     type: 'notebook',
     label: 'Notebooks',
-    icon: NotebookText,
+    icon: NotebookTextIcon,
     searchPlaceholder: 'Search notebooks',
   },
-  { type: 'chat', label: 'Chats', icon: MessageSquare, searchPlaceholder: 'Search chats' },
+  { type: 'chat', label: 'Chats', icon: MessageSquareIcon, searchPlaceholder: 'Search chats' },
 ]
 
 export const rowClassName = (isActive: boolean) =>

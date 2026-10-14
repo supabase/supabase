@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronRight, Minus } from 'lucide-react'
+import { ChevronRightIcon, MinusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -141,7 +141,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     if (isReplicationStatusError || !applyLag)
       return (
         <>
-          <Minus size={18} className="text-foreground-lighter" aria-hidden />
+          <MinusIcon size={18} className="text-foreground-lighter" aria-hidden />
           <span className="sr-only">Lag unavailable</span>
         </>
       )
@@ -251,7 +251,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                       onUpdateClick={() => setShowUpdateVersionModal(true)}
                     />
                   </div>
-                  <ChevronRight
+                  <ChevronRightIcon
                     size={16}
                     strokeWidth={1.5}
                     className="text-foreground-lighter"

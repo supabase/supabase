@@ -68,6 +68,14 @@ module.exports = defineConfig([
               message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
             },
           ],
+          patterns: [
+            {
+              group: ['lucide-react'],
+              importNamePattern: '^(?!.*Icon$)(?!Lucide)(?!icons$)(?!create)',
+              message:
+                'Import Lucide icons with the Icon suffix (e.g. `CheckIcon`, not `Check` or `Check as CheckIcon`).',
+            },
+          ],
         },
       ],
       'barrel-files/avoid-re-export-all': 'error',

@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { groupBy, isEqual, isNull } from 'lodash'
-import { Plus, RefreshCw, Save } from 'lucide-react'
+import { PlusIcon, RefreshCwIcon, SaveIcon } from 'lucide-react'
 import { DragEvent, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, LogoLoader } from 'ui'
@@ -391,7 +391,7 @@ const Reports = () => {
               </Button>
               <Button
                 variant="primary"
-                icon={<Save />}
+                icon={<SaveIcon />}
                 loading={isSaving}
                 onClick={() => onSaveReport()}
               >
@@ -423,7 +423,7 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
             <ButtonTooltip
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
@@ -432,7 +432,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button icon={<Plus />}>
+                  <Button icon={<PlusIcon />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -443,7 +443,7 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                icon={<Plus />}
+                icon={<PlusIcon />}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -472,7 +472,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button iconRight={<Plus size={14} />}>Add your first chart</Button>
+                  <Button iconRight={<PlusIcon size={14} />}>Add your first chart</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="center">
                   <MetricOptions config={config} handleChartSelection={handleChartSelection} />
