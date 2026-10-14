@@ -3240,10 +3240,10 @@ commands:
 
       When `[experimental.pgdelta] enabled = true`, the migration-file `db pull` workflow uses pg-delta for the shadow diff step; pass `--diff-engine migra` to fall back for a single run. Projects without that setting use migra; pass `--diff-engine pg-delta` to use pg-delta for a single run. Pass `--declarative` to export the selected database into the declarative schema tree (`supabase/schemas` by default, configurable with `experimental.pgdelta.declarative_schema_path`) instead of creating a migration.
 
-      On a project without pg-delta enabled, don't use `--declarative`. The export also points `[db.migrations].schema_paths` at the tree it writes. The next `db diff` applies those files in lexicographic order without resolving dependencies between them, and fails. If you've already run it, enable pg-delta, or undo both changes:
+      On a project without pg-delta enabled, don't use `--declarative`. The export also points `[db.migrations].schema_paths` at the tree it writes. The next local `db diff` applies those files in lexicographic order without resolving dependencies between them, so it fails when a file sorts before an object it depends on. If you've already run it, enable pg-delta, or undo both changes:
 
-      1. Delete the generated tree under `supabase/schemas/`.
-      2. Remove the `schema_paths` entry the command added to `config.toml`.
+      1. Delete the files the export wrote to the declarative directory (`supabase/schemas/` by default). Files that were already there are left in place.
+      2. Restore `[db.migrations].schema_paths` in `config.toml` to its previous value, or remove it if the export added it.
 
       Under the pg-delta engine, your own customizations in Supabase-managed schemas are captured automatically, such as triggers on managed tables like `auth.users` and RLS policies on `storage.objects` and `storage.buckets`. Under the legacy migra engine, the initial pull's `pg_dump` skips managed schemas, but the diff pass that follows appends your trigger and RLS policy changes there to the same migration. If an older CLI reports that `auth` and `storage` were excluded, capture existing customizations there with `--schema auth,storage`.
     examples:
@@ -3525,7 +3525,7 @@ commands:
 
       Requires the local development stack to be running when diffing against the local database. To diff against a remote or self-hosted database, specify the `--linked` or `--db-url` flag respectively.
 
-      Compares schema differences between the target database and a shadow database. Projects with `[experimental.pgdelta] enabled = true` use the bundled pg-delta engine; other projects run the legacy [djrobstep/migra](https://github.com/djrobstep/migra) engine in a container. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
+      Compares schema differences between the target database and a shadow database. Projects with `[experimental.pgdelta] enabled = true` use the bundled pg-delta engine; other projects run the legacy [djrobstep/migra](https://github.com/djrobstep/migra) engine in a container, unless you pass `--use-pg-delta` for a single run. The shadow database is created by applying migrations in local `supabase/migrations` directory in a separate container. Output is written to stdout by default. For convenience, you can also save the schema diff as a new migration file by passing in `-f` flag.
 
       By default, all schemas in the target database are diffed. Use the `--schema public,extensions` flag to restrict diffing to a subset of schemas.
 

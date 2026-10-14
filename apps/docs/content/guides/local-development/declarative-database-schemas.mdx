@@ -357,12 +357,12 @@ Projects that haven't enabled `pg-delta` can still use declarative schemas. The 
 
 <Admonition type="caution">
 
-On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `[experimental.pgdelta]` setting and writes a per-object tree meant for the `db schema declarative` commands. It also points `[db.migrations].schema_paths` in `config.toml` at that tree. The next `db diff` applies the files in lexicographic order without resolving dependencies between them, and fails.
+On the legacy engine, don't run `supabase db pull --declarative`. The command runs regardless of the `[experimental.pgdelta]` setting and writes a per-object tree meant for the `db schema declarative` commands. It also points `[db.migrations].schema_paths` in `config.toml` at that tree. The next local `db diff` applies the files in lexicographic order without resolving dependencies between them, so it fails when a file sorts before an object it depends on.
 
 If you've already run it, [switch to `pg-delta`](#switching-to-pg-delta), or undo both changes:
 
-1. Delete the generated tree under `supabase/schemas/`.
-2. Remove the `schema_paths` entry the command added to `config.toml`.
+1. Delete the files the export wrote to the declarative directory (`supabase/schemas/` by default). Files that were already there are left in place.
+2. Restore `[db.migrations].schema_paths` in `config.toml` to its previous value, or remove it if the export added it.
 
 </Admonition>
 
