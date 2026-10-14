@@ -2140,7 +2140,7 @@ Turn it on with \`SUPABASE_EXPERIMENTAL_STACK=1 supabase init\` for a new app, o
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
     slug: 'local-development',
     status: {
