@@ -289,7 +289,7 @@ Deno.serve(async (req: Request) => {
     return Response.json({
       resource: `${SUPABASE_PUBLIC_URL}/mcp`,
       authorization_servers: [JWT_ISSUER],
-      scopes_supported: ['openid', 'profile', 'email'],
+      scopes_supported: ['openid', 'profile', 'email', 'offline_access'],
     })
   }
 
