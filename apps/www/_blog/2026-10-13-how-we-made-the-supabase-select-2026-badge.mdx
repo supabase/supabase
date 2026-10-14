@@ -95,6 +95,11 @@ The badges arrived two weeks before Select: 800 of them, in 20 boxes of 40, and 
 
 We bought as many USB chargers as Amazon could get to us in time. Each badge draws less than half an amp, so the cheap 30-port hubs schools use to charge iPads overnight were plenty. A full charge takes about three hours, so 60 ports at a time works out to 14 batches, and with an hour per batch for plugging and unplugging, about 56 hours of charging. On top of that, every badge had to be plugged into a computer, one at a time, for the firmware update that fixed the battery drain, then go back into deep sleep while it finished charging.
 
+<Img
+  alt="Dozens of badges on a table, each plugged into a 30-port USB charging hub"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/charging.jpg"
+/>
+
 Then the Wi-Fi. The plan was a 2.4 GHz network just for the badges, covering the whole venue, so they could stay online all day. When we tested on site, we couldn't get a single badge to connect.
 
 Luckily, the badge was designed to work offline from day one, so nobody at Select noticed. But a few hidden features needed the network and never got their time to shine:
@@ -104,6 +109,11 @@ Luckily, the badge was designed to work offline from day one, so nobody at Selec
 - **A public leaderboard:** live high scores from the badge games.
 
 The one thing that did need the network was the schedule. The badge software was finished before the conference schedule was, so every badge had to get online once to download the latest version. Plan B: a Wi-Fi hotspot, with two badges at a time sitting on top of it. Each one woke up, got the time, opened a TLS connection to Supabase and pulled the schedule. About a minute a badge, close to seven hours in all.
+
+<Img
+  alt="A badge showing the updated Select schedule"
+  src="/images/blog/how-we-made-the-supabase-select-2026-badge/schedule.jpg"
+/>
 
 The last few days were an assembly line, in shifts, with anyone who had spare hands: charge, update, sync, sleep, box, lanyard. Two days before the doors opened, we were still working through the last boxes. On the day, we spotted attendees huddled around a laptop, already hacking their badges.
 
