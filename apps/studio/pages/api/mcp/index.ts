@@ -22,12 +22,9 @@ const supabase = createClient(
   process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY!
 )
 
-const ENABLE_MCP_OAUTH = process.env.ENABLE_MCP_AUTH === 'true'
-
+const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
 const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
-
-const MCP_RESOURCE_URL =
-  process.env.SUPABASE_PUBLIC_URL + '/.well-known/oauth-protected-resource/mcp'
+const mcpResourceUrl = process.env.SUPABASE_PUBLIC_URL + '/.well-known/oauth-protected-resource/mcp'
 
 const mcpQuerySchema = z.object({
   features: z
@@ -65,13 +62,13 @@ const isTokenValid = async (token: string): Promise<boolean> => {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  if (ENABLE_MCP_OAUTH) {
+  if (mcpOAuthEnabled) {
     const token = req.headers.authorization?.replace('Bearer ', '')
 
     if (!token || !(await isTokenValid(token))) {
       res.setHeader(
         'WWW-Authenticate',
-        `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${MCP_RESOURCE_URL}"`
+        `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${mcpResourceUrl}"`
       )
 
       return res.status(401).json({ error: 'Unauthorized' })
