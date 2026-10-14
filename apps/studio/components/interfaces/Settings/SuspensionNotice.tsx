@@ -1,8 +1,10 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
-import { ContactSupportButton } from '@/components/ui/AlertError'
+import { SupportLink } from '../Support/SupportLink'
 
 export const SuspensionNotice = ({ suspendedAt }: { suspendedAt?: string | null }) => {
   const { ref } = useParams()
@@ -26,10 +28,17 @@ export const SuspensionNotice = ({ suspendedAt }: { suspendedAt?: string | null 
         </>
       }
       actions={
-        <ContactSupportButton
-          projectRef={ref}
-          subject="Enquiry on realtime suspension for project"
-        />
+        <Button asChild className="w-min">
+          <SupportLink
+            queryParams={{
+              category: SupportCategories.DASHBOARD_BUG,
+              projectRef: ref,
+              subject: 'Enquiry on realtime suspension for project',
+            }}
+          >
+            Contact support
+          </SupportLink>
+        </Button>
       }
     />
   )

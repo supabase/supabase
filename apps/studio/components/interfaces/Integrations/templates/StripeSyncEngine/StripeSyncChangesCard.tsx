@@ -1,6 +1,6 @@
 import { SchemaInstallationStatus } from '@stripe/sync-engine/supabase'
 import { EdgeFunctions } from 'icons'
-import { Layers, Loader2, Table } from 'lucide-react'
+import { LayersIcon, Loader2Icon, TableIcon } from 'lucide-react'
 import { Card, CardContent, cn } from 'ui'
 
 import {
@@ -112,9 +112,13 @@ export const StripeSyncChangesCard = ({
           <ul className="text-foreground-light text-sm">
             <li className={ListItemClassName}>
               {isInProgress ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2Icon size={16} className="animate-spin" />
               ) : (
-                <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+                <TableIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter shrink-0"
+                />
               )}
               <span>
                 {dbLine} <code className="text-code-inline">stripe</code>
@@ -122,9 +126,13 @@ export const StripeSyncChangesCard = ({
             </li>
             <li className={ListItemClassName}>
               {isInProgress ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2Icon size={16} className="animate-spin" />
               ) : (
-                <Table size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+                <TableIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter shrink-0"
+                />
               )}
               <span>
                 {tableAndViewLine} <code className="text-code-inline">stripe</code> schema for
@@ -133,7 +141,7 @@ export const StripeSyncChangesCard = ({
             </li>
             <li className={ListItemClassName}>
               {isInProgress ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2Icon size={16} className="animate-spin" />
               ) : (
                 <EdgeFunctions
                   size={16}
@@ -145,9 +153,13 @@ export const StripeSyncChangesCard = ({
             </li>
             <li className="flex items-center gap-x-3 py-2 px-3">
               {isInProgress ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2Icon size={16} className="animate-spin" />
               ) : (
-                <Layers size={16} strokeWidth={1.5} className="text-foreground-lighter shrink-0" />
+                <LayersIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter shrink-0"
+                />
               )}
               <span>{scheduleLine}</span>
             </li>

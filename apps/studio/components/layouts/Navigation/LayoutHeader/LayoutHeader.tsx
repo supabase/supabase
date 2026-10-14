@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
@@ -109,7 +109,7 @@ export const LayoutHeader = ({
               onClick={() => track('header_back_to_dashboard_clicked')}
               className="flex items-center justify-center border-none bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
             >
-              <ChevronLeft strokeWidth={1.5} size={16} />
+              <ChevronLeftIcon strokeWidth={1.5} size={16} />
             </Link>
           </div>
         )}

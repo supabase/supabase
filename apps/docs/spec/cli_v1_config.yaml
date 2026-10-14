@@ -468,7 +468,7 @@ parameters:
     default: '[]'
     description: |
       An ordered list of schema files, directories, or glob patterns describing your database, relative to the `supabase` directory. For example: `["./schemas/*.sql"]`.
-      Only the legacy `migra` diff engine uses this setting, where it controls the order in which declarative schema files are applied. The `pg-delta` diff engine (see `experimental.pgdelta.enabled`) ignores it and orders declarative files automatically based on the dependencies between statements.
+      Only the legacy `migra` diff engine uses this setting, where it controls the order in which declarative schema files are applied. On that engine, `supabase db pull --declarative` sets it to the declarative schema directory automatically. The `pg-delta` diff engine (see `experimental.pgdelta.enabled`) ignores it and orders declarative files by the dependencies between statements. It warns when the setting lists any paths.
     links:
       - name: 'Declarative database schemas'
         link: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas'
@@ -1855,6 +1855,7 @@ parameters:
     default: './schemas'
     description: |
       The directory where the `pg-delta` engine reads and writes declarative schema files. Relative paths resolve from the `supabase` directory.
+      CLI versions before 2.115.0 defaulted to `./database`. If that directory still holds schema files, `./schemas` is empty, and this setting is unset, the CLI warns and reads `./schemas` instead. To keep that tree, set `./database` here.
       Note: This is an experimental feature and may change in future releases.
     links:
       - name: 'Declarative database schemas'

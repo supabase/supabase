@@ -1,8 +1,8 @@
 'use client'
 
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import React, { FC, useRef, useState } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
-import { Switch, cn } from 'ui'
+import { cn, Switch } from 'ui'
 
 interface Props {
   className?: string

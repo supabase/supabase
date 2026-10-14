@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Filter, Plus } from 'lucide-react'
+import { FilterIcon, PlusIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import {
@@ -194,7 +194,7 @@ export const TableEditorMenu = () => {
                 name="New table"
                 disabled={!canCreateTables}
                 size="tiny"
-                icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+                icon={<PlusIcon size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 className="justify-start"
                 onClick={() => snap.onAddTable()}
                 tooltip={{
@@ -247,7 +247,7 @@ export const TableEditorMenu = () => {
                 <ButtonTooltip
                   className="h-[32px] md:h-[28px] px-1.5"
                   variant={hasFiltersApplied ? 'default' : 'dashed'}
-                  icon={<Filter />}
+                  icon={<FilterIcon />}
                   aria-label="Filter"
                   tooltip={{ content: { side: 'bottom', text: 'Filter' } }}
                 />

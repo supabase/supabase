@@ -1,4 +1,10 @@
-import { Clipboard, MessageSquare, MoreVertical, Settings, Trash } from 'lucide-react'
+import {
+  ClipboardIcon,
+  MessageSquareIcon,
+  MoreVerticalIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -62,7 +68,7 @@ export const ExplorerChatToolbar = ({
     <div className="z-30 sticky top-0">
       <ExplorerToolbar aria-label="Chat toolbar">
         <ExplorerToolbarIcon>
-          <MessageSquare size={16} strokeWidth={2} />
+          <MessageSquareIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveName}>{chat?.name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -70,14 +76,14 @@ export const ExplorerChatToolbar = ({
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction
                 aria-label="More options"
-                icon={<MoreVertical size={16} strokeWidth={2} />}
+                icon={<MoreVerticalIcon size={16} strokeWidth={2} />}
                 disabled={isChatLoading}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-60">
               <DropdownMenuItem className="justify-between" onClick={handleCopyChatId}>
                 <div className="flex items-center gap-x-2">
-                  <Clipboard size={14} />
+                  <ClipboardIcon size={14} />
                   <span>Copy chat ID</span>
                 </div>
                 <ShortcutPills
@@ -89,7 +95,7 @@ export const ExplorerChatToolbar = ({
                 onClick={() => setIsOptInModalOpen(true)}
               >
                 <div className="flex items-center gap-x-2">
-                  <Settings size={14} />
+                  <SettingsIcon size={14} />
                   <span>Permission settings</span>
                 </div>
                 <ShortcutPills
@@ -103,7 +109,7 @@ export const ExplorerChatToolbar = ({
                 className="gap-x-2"
                 onClick={() => onSelectDelete({ id: chatId, type: 'chat', name: chat?.name ?? '' })}
               >
-                <Trash size={14} />
+                <TrashIcon size={14} />
                 <span>Delete chat</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

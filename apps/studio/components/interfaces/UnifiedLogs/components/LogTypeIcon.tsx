@@ -1,5 +1,5 @@
 import { Auth, Compute, EdgeFunctions, Realtime, Storage } from 'icons'
-import { Box, Cable, Code2, Database, Network } from 'lucide-react'
+import { BoxIcon, CableIcon, Code2Icon, DatabaseIcon, NetworkIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface LogTypeIconProps {
@@ -9,20 +9,20 @@ interface LogTypeIconProps {
   className?: string
 }
 
-type IconComponent = typeof Box | typeof Auth
+type IconComponent = typeof BoxIcon | typeof Auth
 
 // [Alaister]: commented out types coming in the future
 // edge: Globe,
 const ICON_MAP = new Map<string, IconComponent>([
-  ['postgrest', Code2],
+  ['postgrest', Code2Icon],
   ['auth', Auth],
   ['edge function', EdgeFunctions],
-  ['postgres', Database],
+  ['postgres', DatabaseIcon],
   ['storage', Storage],
   ['realtime', Realtime],
-  ['supavisor', Cable],
-  ['pgbouncer', Cable],
-  ['multigres', Network],
+  ['supavisor', CableIcon],
+  ['pgbouncer', CableIcon],
+  ['multigres', NetworkIcon],
   ['compute', Compute],
 ])
 
@@ -32,7 +32,7 @@ export const LogTypeIcon = ({
   strokeWidth = 1.5,
   className,
 }: LogTypeIconProps) => {
-  const Icon = ICON_MAP.get(type) ?? Box
+  const Icon = ICON_MAP.get(type) ?? BoxIcon
 
   return (
     <Tooltip>
