@@ -167,7 +167,7 @@
     "postcss": "catalog:",
     "remark-frontmatter": "^5.0.0",
     "remark-parse": "^11.0.0",
-    "shiki": "^3.2.1",
+    "shiki": "catalog:",
     "shx": "^0.4.0",
     "simple-git": "^3.24.0",
     "slugify": "^1.6.6",

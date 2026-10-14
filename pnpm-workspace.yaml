@@ -46,6 +46,7 @@ catalog:
   react: ^19.2.6
   react-dom: ^19.2.6
   recharts: ^2.15.4
+  shiki: ^4.5.0
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
   typescript: ~6.0.2
