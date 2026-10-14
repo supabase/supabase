@@ -37,9 +37,11 @@ export interface StorageItem {
   created_at: string | null
   updated_at: string | null
   last_accessed_at: string | null
+  is_versioned?: boolean | null
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
+  archived?: { archivedObjectId?: string }
 }
 
 export type StorageItemWithColumn = StorageItem & { columnIndex: number }

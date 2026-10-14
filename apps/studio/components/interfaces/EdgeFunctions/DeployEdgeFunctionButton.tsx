@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown, Code, Terminal } from 'lucide-react'
+import { ChevronDownIcon, CodeIcon, TerminalIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
@@ -33,7 +33,7 @@ export const DeployEdgeFunctionButton = () => {
         <ButtonTooltip
           variant="primary"
           disabled={!isProjectActive}
-          iconRight={<ChevronDown className="w-4 h-4" strokeWidth={1.5} />}
+          iconRight={<ChevronDownIcon className="w-4 h-4" strokeWidth={1.5} />}
           tooltip={{
             content: {
               side: 'bottom',
@@ -54,7 +54,7 @@ export const DeployEdgeFunctionButton = () => {
           }}
           className="gap-4"
         >
-          <Code className="shrink-0" size={16} strokeWidth={1.5} />
+          <CodeIcon className="shrink-0" size={16} strokeWidth={1.5} />
           <div>
             <span className="text-foreground">Via Editor</span>
             <p>Write and deploy in the browser</p>
@@ -67,7 +67,7 @@ export const DeployEdgeFunctionButton = () => {
             track('edge_function_via_cli_button_clicked', { origin: 'secondary_action' })
           }}
         >
-          <Terminal className="shrink-0" size={16} strokeWidth={1.5} />
+          <TerminalIcon className="shrink-0" size={16} strokeWidth={1.5} />
           <div>
             <span className="text-foreground">Via CLI</span>
             <p>Write locally, deploy with the CLI</p>

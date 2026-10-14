@@ -1,4 +1,4 @@
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { Badge, DialogSection, DialogSectionSeparator, FormControl, FormField, Switch } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -48,6 +48,9 @@ export const BucketVersioningFields = ({
   // Turning the switch off suspends rather than disables, so this is a heads-up.
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
 
+  // A suspended bucket keeps expiring the versions it still holds, so the policy stays editable.
+  const canEditLifecycle = isVersioningEnabled || initialVersioningState === 'suspended'
+
   // A bound nobody has read, or that the fields only partly represent, can't be compared against.
   const hasKnownBounds = !isLoadingPolicy && !isUnsupportedPolicy && !policyError
 
@@ -86,7 +89,6 @@ export const BucketVersioningFields = ({
             >
               <FormControl>
                 <Switch
-                  // Matches the field name, which is what the layout's label points at.
                   id="enable_versioning"
                   aria-label="Object versioning"
                   size="large"
@@ -139,7 +141,7 @@ export const BucketVersioningFields = ({
             </FormSectionCollapse>
           )}
 
-          {isVersioningEnabled && (
+          {canEditLifecycle && (
             <FormSectionCollapse key="lifecycle-policy">
               <LifecyclePolicySection
                 form={form}

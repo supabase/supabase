@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
+import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
@@ -74,6 +75,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
     deleteBucket({ projectRef, id: bucket.id })
   }
 
+  // Not gated on the feature preview: the retained data is destroyed either way, so the
+  // warning has to reflect the bucket rather than what the dashboard happens to be showing.
+  const isRetainingVersions = hasVersioningHistory(bucket)
+
   return (
     <TextConfirmModal
       visible={visible}
@@ -94,6 +99,8 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       <p className="text-sm">
         Your bucket <span className="font-bold text-foreground">{bucket.id}</span> and all of its
         contents will be permanently deleted.
+        {isRetainingVersions &&
+          ' That includes every archived file and every retained version, which cannot be restored afterwards.'}
       </p>
     </TextConfirmModal>
   )

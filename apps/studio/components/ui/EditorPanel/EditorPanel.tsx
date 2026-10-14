@@ -4,14 +4,14 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import {
-  AlertCircle,
-  Book,
-  CheckCircle2,
-  FolderOpen,
-  Loader2,
-  Maximize,
+  AlertCircleIcon,
+  BookIcon,
+  CheckCircle2Icon,
+  FolderOpenIcon,
+  Loader2Icon,
+  MaximizeIcon,
   PlusIcon,
-  X,
+  XIcon,
 } from 'lucide-react'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import { useRouter } from 'next/router'
@@ -367,7 +367,7 @@ export const EditorPanel = () => {
                 role="combobox"
                 aria-expanded={isSnippetsOpen}
                 className="w-7 h-7 p-0"
-                icon={<FolderOpen size={14} />}
+                icon={<FolderOpenIcon size={14} />}
                 tooltip={{
                   content: {
                     side: 'bottom',
@@ -419,7 +419,7 @@ export const EditorPanel = () => {
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
-                  icon={<Book size={14} />}
+                  icon={<BookIcon size={14} />}
                 >
                   Templates
                 </Button>
@@ -473,7 +473,7 @@ export const EditorPanel = () => {
           <ButtonTooltip
             variant="text"
             className="w-7 h-7 p-0"
-            icon={<Maximize strokeWidth={1.5} />}
+            icon={<MaximizeIcon strokeWidth={1.5} />}
             aria-label={isExplorerEnabled ? 'Open in Explorer' : 'Open in SQL editor'}
             tooltip={{
               content: {
@@ -488,7 +488,7 @@ export const EditorPanel = () => {
             variant="text"
             className="w-7 h-7 p-0"
             onClick={handleClosePanel}
-            icon={<X strokeWidth={1.5} />}
+            icon={<XIcon strokeWidth={1.5} />}
             tooltip={{
               content: {
                 side: 'bottom',
@@ -618,9 +618,9 @@ export const EditorPanel = () => {
                 saveStatus === 'idle' && 'text-foreground-light'
               )}
             >
-              {isUpserting && <Loader2 size={13} className="animate-spin" />}
-              {saveStatus === 'success' && <CheckCircle2 size={13} />}
-              {saveStatus === 'error' && <AlertCircle size={13} />}
+              {isUpserting && <Loader2Icon size={13} className="animate-spin" />}
+              {saveStatus === 'success' && <CheckCircle2Icon size={13} />}
+              {saveStatus === 'error' && <AlertCircleIcon size={13} />}
               <span>
                 {isUpserting
                   ? 'Saving...'

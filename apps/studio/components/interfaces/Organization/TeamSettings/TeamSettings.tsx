@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
@@ -73,7 +73,7 @@ export const TeamSettings = () => {
                 <Input
                   size="tiny"
                   autoComplete="off"
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   value={searchString}
                   onChange={(e) => setSearchString(e.target.value)}
                   name="email"

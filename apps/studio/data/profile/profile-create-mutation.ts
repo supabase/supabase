@@ -28,6 +28,17 @@ export const useProfileCreateMutation = ({
 
   return useMutation<ProfileCreateData, ResponseError, void>({
     mutationFn: () => createProfile(),
+    // Retry transient failures (5xx, network, 429), but never 4xx - a 409 means the profile
+    // already exists, so retrying the POST can't help
+    retry: (failureCount, error) => {
+      const isClientError = error.code !== undefined && error.code >= 400 && error.code < 500
+      if (isClientError && error.code !== 429) return false
+      return failureCount < 3
+    },
+    retryDelay: (failureCount, error) => {
+      if (error.code === 429 && error.retryAfter) return error.retryAfter * 1000
+      return Math.min(1000 * 2 ** failureCount, 8000)
+    },
     async onSuccess(data, variables, context) {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: profileKeys.profile() }),

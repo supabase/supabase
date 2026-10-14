@@ -1,7 +1,7 @@
 import { isToolUIPart, type DynamicToolUIPart, type ToolUIPart, type UIMessage } from 'ai'
 
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { decodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
+import { decodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
 
 const INVALID_TOOL_STATES = [

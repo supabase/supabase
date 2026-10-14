@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
-import { ChevronDown, ListPlus } from 'lucide-react'
+import { ChevronDownIcon, ListPlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -58,7 +58,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
     <Sheet open={open} onOpenChange={setOpen}>
       {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
-        <Button icon={<ListPlus size={12} className="text-foreground-lighter" />}>
+        <Button icon={<ListPlusIcon size={12} className="text-foreground-lighter" />}>
           Insert vectors
         </Button>
       </SheetTrigger>
@@ -219,7 +219,7 @@ const result = await index.putVectors({
                   Language
                 </span>
                 <Button
-                  iconRight={<ChevronDown size={14} strokeWidth={2} />}
+                  iconRight={<ChevronDownIcon size={14} strokeWidth={2} />}
                   className="rounded-l-none"
                 >
                   {language === 'javascript' ? 'JavaScript' : 'SQL'}
