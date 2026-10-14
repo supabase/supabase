@@ -64,6 +64,7 @@ export const UserPanel = () => {
           variant="text"
           className="absolute top-3 right-3 z-10 px-1"
           icon={<X />}
+          aria-label="Close panel"
           onClick={() => setSelectedId(null)}
           aria-label="Close panel"
         />
