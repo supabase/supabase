@@ -196,8 +196,12 @@ to need one.
 The format makes that expectation explicit.
 
 Write sequential actions as an ordered list. **Begin each step with an imperative verb,
-and include one action or a closely related set of actions per step.** Give the reader
-enough context to know where to act.
+or with a short location phrase followed by one, and include one action or a closely
+related set of actions per step.** When a step says where to act, put the location
+first. Give the reader enough context to know where to act.
+
+- **Recommended**: `Next to Supabase, click **Manage**, then click **Open in Supabase**.`
+- **Not recommended**: `Click **Manage** next to Supabase, then click **Open in Supabase**.`
 
 For how many steps to present at once and when to split a procedure into phases, see
 chunking in [`03-page-structure.md`](./03-page-structure.md).
@@ -211,14 +215,6 @@ action:
 The first step establishes the operating context for both readers and agents. Don't add
 a redundant orientation step to a genuinely atomic instruction. Write `Click **Save**.`
 rather than adding `Locate the **Save** button` as a separate step.
-
-#### Put the location before the action
-
-Write UI instructions in the order the reader acts: where to look first, then which
-control to use. The reader finds the place before they can act on it.
-
-- **Recommended**: `Next to Supabase, click **Manage**, then click **Open in Supabase**.`
-- **Not recommended**: `Click **Manage** next to Supabase, then click **Open in Supabase**.`
 
 ### Code blocks
 
