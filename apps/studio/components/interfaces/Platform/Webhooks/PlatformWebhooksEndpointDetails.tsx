@@ -79,6 +79,11 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
     ),
   },
   {
+    accessorKey: 'eventType',
+    header: ({ column }) => <TanStackTableHeadSort column={column}>Event</TanStackTableHeadSort>,
+    cell: ({ row }) => <code className="text-code-inline text-xs">{row.original.eventType}</code>,
+  },
+  {
     accessorKey: 'responseCode',
     header: ({ column }) => <TanStackTableHeadSort column={column}>Response</TanStackTableHeadSort>,
     sortingFn: (rowA, rowB, columnId) => {

@@ -40,13 +40,8 @@ export const toWebhookEndpointAttributes = (
 type WebhookEndpointResource =
   operations['v2-organizations-slug-webhooks-endpoints-id-get']['responses'][200]['content']['application/json']['data']
 
-// The single-delivery endpoint — includes the full nested `event` (type + payload).
 type WebhookDeliveryResource =
   operations['v2-organizations-slug-webhooks-deliveries-id-get']['responses'][200]['content']['application/json']['data']
-
-// The deliveries-list-for-an-endpoint endpoint — lighter weight, no `event` at all.
-type WebhookDeliveryListItemResource =
-  operations['v2-organizations-slug-webhooks-endpoints-id-deliveries-get']['responses'][200]['content']['application/json']['data'][number]
 
 export const toWebhookEndpoint = (resource: WebhookEndpointResource): WebhookEndpoint => ({
   id: resource.id,
@@ -72,22 +67,6 @@ export const toWebhookDelivery = (
   eventId: resource.attributes.event_id,
   eventType: resource.attributes.event.type,
   eventPayload: resource.attributes.event.payload,
-  status: resource.attributes.status,
-  responseCode: resource.attributes.response_code,
-  responseBody: resource.attributes.response_body,
-  responseHeaders: resource.attributes.response_headers,
-  attemptAt: resource.attributes.attempt_timestamp,
-})
-
-// No `eventType` here — the list endpoint doesn't return it. See the comment on
-// `WebhookDelivery.eventType` in PlatformWebhooks.types.ts.
-export const toWebhookDeliverySummary = (
-  resource: WebhookDeliveryListItemResource,
-  endpointId: string
-): WebhookDelivery => ({
-  id: resource.id,
-  endpointId,
-  eventId: resource.attributes.event_id,
   status: resource.attributes.status,
   responseCode: resource.attributes.response_code,
   responseBody: resource.attributes.response_body,

@@ -60,6 +60,7 @@ const createDelivery = (overrides: Partial<WebhookDelivery>): WebhookDelivery =>
   endpointId: SELECTED_ENDPOINT_ID,
   eventId: 'event',
   eventType: 'v1.project.updated',
+  eventPayload: {},
   status: 'success',
   responseCode: 200,
   responseBody: null,

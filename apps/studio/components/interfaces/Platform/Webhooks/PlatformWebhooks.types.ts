@@ -25,10 +25,8 @@ export interface WebhookDelivery {
   id: string
   endpointId: string
   eventId: string
-  // Only present when fetched via the single-delivery endpoint (drill-down view) —
-  // the deliveries *list* endpoint doesn't return either, so list rows leave these unset.
-  eventType?: string
-  eventPayload?: Record<string, unknown>
+  eventType: string
+  eventPayload: Record<string, unknown>
   status: WebhookDeliveryStatus
   responseCode: number
   responseBody: string | Record<string, string> | null

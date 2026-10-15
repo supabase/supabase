@@ -23,6 +23,8 @@ const createDelivery = (overrides: Partial<WebhookDelivery> = {}): WebhookDelive
   id: 'delivery-1',
   endpointId: 'endpoint-1',
   eventId: 'event-1',
+  eventType: 'v1.project.updated',
+  eventPayload: {},
   status: 'success',
   responseCode: 200,
   responseBody: null,
