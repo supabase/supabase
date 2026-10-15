@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { Fragment, useEffect, useMemo, useRef } from 'react'
 
 import { CommandListItem } from './CommandListItem'
 import { EmptyState, GroupHeader, GroupSeparator } from './DefaultCommandList.helpers'
@@ -73,16 +73,18 @@ export function DefaultCommandList({
           {showGroupHeaders && groupData.group && (
             <GroupHeader label={OPERATOR_GROUP_LABELS[groupData.group]} />
           )}
-          {groupData.items.map(({ item, index }) => (
-            <CommandListItem
-              showSelection={showSelection}
-              key={`${item.value}-${item.label}`}
-              item={item}
-              isHighlighted={index === highlightedIndex}
-              includeIcon={includeIcon}
-              onSelect={onSelect}
-              setRef={setItemRef(index)}
-            />
+          {groupData.items.map(({ item, index }, itemIndex) => (
+            <Fragment key={`${item.value}-${item.label}`}>
+              {item.value === '__new_group__' && itemIndex > 0 && <GroupSeparator />}
+              <CommandListItem
+                showSelection={showSelection}
+                item={item}
+                isHighlighted={index === highlightedIndex}
+                includeIcon={includeIcon}
+                onSelect={onSelect}
+                setRef={setItemRef(index)}
+              />
+            </Fragment>
           ))}
         </div>
       ))}

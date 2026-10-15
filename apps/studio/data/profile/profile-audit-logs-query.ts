@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { profileKeys } from './keys'
+import { getMockProfileAuditLogs } from './profile-audit-logs.mock'
 import { get, handleError } from '@/data/fetchers'
 import { AuditLog } from '@/data/organizations/organization-audit-logs-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
+
+const USE_MOCK = true // TEMPORARY
 
 export type ProfileAuditLogsVariables = {
   iso_timestamp_start: string
@@ -15,6 +18,9 @@ export async function getProfileAuditLogs(
   { iso_timestamp_start, iso_timestamp_end }: ProfileAuditLogsVariables,
   signal?: AbortSignal
 ) {
+  // TEMPORARY MOCK: revert before committing
+  if (USE_MOCK) return (await getMockProfileAuditLogs(signal)) as ProfileAuditLogsData
+
   const { data, error } = await get('/platform/profile/audit', {
     params: {
       query: {
