@@ -4,11 +4,12 @@ import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { OrioleDbUndoLogSize } from '@/components/interfaces/Observability/OrioleDbUndoLogSize'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -34,6 +35,7 @@ import { analyticsKeys } from '@/data/analytics/keys'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
 import { useDatabaseSizeQuery } from '@/data/database/database-size-query'
+import { databaseKeys } from '@/data/database/keys'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { getReportAttributesV2 } from '@/data/reports/database-charts'
@@ -43,7 +45,11 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsHighAvailability,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
@@ -153,6 +159,7 @@ const DatabaseUsage = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const isHighAvailability = useIsHighAvailability()
+  const isOrioleDb = useIsOrioleDb()
 
   const {
     selectedDateRange,
@@ -172,6 +179,7 @@ const DatabaseUsage = () => {
   const [showDatePicker, setShowDatePicker] = useState(false)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
+  const canShowUndoLogSize = isOrioleDb && !isReplicaSelected && project !== undefined
 
   const report = useDatabaseReport()
   const { data, params, largeObjectsSql, isPending: isLoading, refresh } = report
@@ -247,6 +255,7 @@ const DatabaseUsage = () => {
 
       setIsRefreshing(true)
       refresh()
+      queryClient.invalidateQueries({ queryKey: databaseKeys.orioleDbUndoSize(ref) })
       const { period_start, period_end, interval } = selectedDateRange
 
       REPORT_ATTRIBUTES.flatMap((chart) => chart.attributes || [])
@@ -351,24 +360,31 @@ const DatabaseUsage = () => {
               isEntitlementLoading ||
               entitledFeatures.includes(chart.entitlement)
             return chartAvailable ? (
-              <LazyComposedChartHandler
-                key={chart.id}
-                {...chart}
-                attributes={chart.attributes as MultiAttribute[]}
-                interval={selectedDateRange.interval}
-                startDate={selectedDateRange?.period_start?.date}
-                endDate={selectedDateRange?.period_end?.date}
-                updateDateRange={updateDateRange}
-                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                syncId="database-charts"
-                showMaxValue={
-                  chart.id === 'client-connections' ||
-                  chart.id === 'client-connections-basic' ||
-                  chart.id === 'pgbouncer-connections'
-                    ? true
-                    : chart.showMaxValue
-                }
-              />
+              <Fragment key={chart.id}>
+                <LazyComposedChartHandler
+                  {...chart}
+                  attributes={chart.attributes as MultiAttribute[]}
+                  interval={selectedDateRange.interval}
+                  startDate={selectedDateRange?.period_start?.date}
+                  endDate={selectedDateRange?.period_end?.date}
+                  updateDateRange={updateDateRange}
+                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                  syncId="database-charts"
+                  showMaxValue={
+                    chart.id === 'client-connections' ||
+                    chart.id === 'client-connections-basic' ||
+                    chart.id === 'pgbouncer-connections'
+                      ? true
+                      : chart.showMaxValue
+                  }
+                />
+                {chart.id === 'disk-size' && canShowUndoLogSize && (
+                  <OrioleDbUndoLogSize
+                    projectRef={project.ref}
+                    connectionString={project.connectionString}
+                  />
+                )}
+              </Fragment>
             ) : (
               <ReportChartUpsell
                 key={chart.id}
