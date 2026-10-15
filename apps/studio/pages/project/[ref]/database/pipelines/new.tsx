@@ -44,7 +44,7 @@ const PipelineCreationPage = () => {
   return (
     <>
       <Head>
-        <title>New pipeline | Supabase</title>
+        <title>New Pipeline | Supabase</title>
       </Head>
       <PipelineCreationFlow
         availableDestinations={[
