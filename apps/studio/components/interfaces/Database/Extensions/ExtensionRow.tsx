@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BookIcon, GithubIcon, Loader2Icon } from 'lucide-react'
+import { BookIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { extensions } from 'shared-data'
@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import {
   Badge,
   Button,
+  GithubIcon,
   Switch,
   TableCell,
   TableRow,
