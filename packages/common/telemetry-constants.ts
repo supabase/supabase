@@ -456,11 +456,25 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * Whether the submitted region is a smart region group ('general', e.g. Americas) or an
-     * exact region ('specific', e.g. us-east-1). Only set when smart regions are enabled for
-     * the selected cloud provider.
+     * Org's arm in the projectCreationSpecificRegionsLink experiment at submission time.
+     * Omitted when the org isn't in the eligible population (paid plan, or smart regions
+     * disabled for the selected cloud provider) — the link can never show for them regardless
+     * of the ConfigCat flag.
      */
-    regionSelectionType?: 'general' | 'specific'
+    specificRegionsLinkExperiment?: 'control' | 'test'
+    /**
+     * How the submitted region was arrived at. 'auto' = the user never touched the region field
+     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
+     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
+     * smart regions are enabled for the selected cloud provider.
+     */
+    regionSelectionType?: 'general' | 'auto' | 'specific'
+    /**
+     * The exact region code the project was provisioned in (e.g. sa-east-1), as returned by
+     * the create-project API. This is the resolved region — for a smart group selection (e.g.
+     * Americas) it's the specific region the backend picked, not the group name.
+     */
+    regionCode?: string
   }
   groups: TelemetryGroups
 }
@@ -545,6 +559,19 @@ export interface FreeTierGeneralRegionExperimentExposedEvent {
  */
 export interface FreeTierGeneralRegionUpgradeClickedEvent {
   action: 'free_tier_general_region_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Need a specific region?" link to reveal the specific regions
+ * list in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSpecificRegionLinkClickedEvent {
+  action: 'project_creation_specific_region_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -1116,6 +1143,10 @@ export interface DocsSearchV2SearchSubmittedEvent {
      * The search term sent to the Search V2 endpoint.
      */
     query: string
+    /**
+     * Whether the Search V2 endpoint returned at least one result for the query.
+     */
+    hasResults: boolean
   }
 }
 
@@ -3845,25 +3876,6 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
- * User was exposed to the plan-change panel presentation experiment.
- * Fires once per session per enrolled user in any variant (including control), so the
- * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
- * GROWTH experiment: `pricingPanelPlanPresentation`.
- *
- * @group Events
- * @page /org/[slug]/billing (plan-change side panel)
- * @source studio
- */
-export interface PricingPanelPlanPresentationExperimentExposedEvent {
-  action: 'pricing_panel_plan_presentation_experiment_exposed'
-  properties: {
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -4183,6 +4195,7 @@ export type TelemetryEvent =
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
+  | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -4354,7 +4367,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent

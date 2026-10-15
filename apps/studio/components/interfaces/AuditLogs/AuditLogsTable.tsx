@@ -1,8 +1,13 @@
 import { flexRender, type Table as TanStackTable } from '@tanstack/react-table'
-import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+import { useRef } from 'react'
+import { cn, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 import { formatCompactNumber } from '@/components/ui/DataTable/DataTable.utils'
+import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
 import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
+
+// py-2 padding + text-xs line height; rows are re-measured after mount
+const ESTIMATED_ROW_HEIGHT = 41
 
 interface AuditLogColumnMeta {
   cellClassName?: string
@@ -16,15 +21,17 @@ interface AuditLogsTableProps {
 }
 
 export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTableProps) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
   const rows = table.getRowModel().rows
 
   return (
-    <Table
+    <VirtualizedTable
+      data={rows}
       className="table-fixed"
-      containerProps={{
-        containerClassName: 'h-full',
-        className: 'h-full w-full overflow-auto @container',
-      }}
+      estimateSize={() => ESTIMATED_ROW_HEIGHT}
+      getItemKey={(row) => row.id}
+      scrollContainerRef={scrollContainerRef}
+      scrollContainerProps={{ className: '@container' }}
     >
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
@@ -47,8 +54,30 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
           </TableRow>
         ))}
       </TableHeader>
-      <TableBody>
-        {rows.map((row) => (
+      <VirtualizedTableBody<(typeof rows)[number]>
+        paddingColSpan={table.getAllLeafColumns().length}
+        trailingContent={
+          rows.length > 0 ? (
+            <TableRow className="hover:bg-transparent">
+              <TableCell
+                colSpan={table.getAllLeafColumns().length}
+                className="p-0! overflow-visible"
+              >
+                <div className="sticky left-0 w-[100cqw] py-2 text-center">
+                  <p className="text-xs text-foreground-lighter">
+                    Viewing{' '}
+                    <span className="font-mono font-medium">
+                      {formatCompactNumber(rows.length)}
+                    </span>{' '}
+                    logs
+                  </p>
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : undefined
+        }
+      >
+        {(row) => (
           <TableRow
             key={row.id}
             tabIndex={0}
@@ -80,21 +109,8 @@ export const AuditLogsTable = ({ table, selectedLog, onSelectLog }: AuditLogsTab
               </TableCell>
             ))}
           </TableRow>
-        ))}
-        {rows.length > 0 && (
-          <TableRow className="hover:bg-transparent">
-            <TableCell colSpan={table.getAllLeafColumns().length} className="p-0! overflow-visible">
-              <div className="sticky left-0 w-[100cqw] py-2 text-center">
-                <p className="text-xs text-foreground-lighter">
-                  Viewing{' '}
-                  <span className="font-mono font-medium">{formatCompactNumber(rows.length)}</span>{' '}
-                  logs
-                </p>
-              </div>
-            </TableCell>
-          </TableRow>
         )}
-      </TableBody>
-    </Table>
+      </VirtualizedTableBody>
+    </VirtualizedTable>
   )
 }

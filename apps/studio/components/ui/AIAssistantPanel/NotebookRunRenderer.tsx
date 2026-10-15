@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -89,7 +89,7 @@ export const NotebookRunRenderer = ({
     >
       {isLoading && (
         <>
-          <Loader2 className="w-4 h-4 animate-spin motion-reduce:animate-none" />
+          <Loader2Icon className="w-4 h-4 animate-spin motion-reduce:animate-none" />
           Loading notebook...
         </>
       )}

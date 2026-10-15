@@ -2,6 +2,8 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import type { ToolContext } from './types'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -54,18 +56,9 @@ export const loadKnowledgeInputSchema = z.object({
     .describe('The knowledge to load'),
 })
 
-export type StudioToolsContext = {
-  projectRef?: string
-  connectionString?: string
-  authorization?: string
-  aiOptInLevel?: AiOptInLevel
-}
-
-export const getStudioTools = (ctx: StudioToolsContext = {}) => {
+export const getStudioTools = (ctx: ToolContext = {}) => {
   const { projectRef, connectionString, authorization, aiOptInLevel = 'schema' } = ctx
-  const authHeaders = authorization
-    ? { 'Content-Type': 'application/json', Authorization: authorization }
-    : undefined
+  const authHeaders = getAuthHeaders(authorization, { contentType: true })
 
   return {
     // Tools that wait on the user use `needsApproval` with a server-side `execute`, not a

@@ -1,10 +1,9 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { EnterpriseCard } from './EnterpriseCard'
-import type { PlanPresentationVariant } from './plan-presentation'
 import { PlanCard } from './PlanCard'
 import { getPlanCardsEntryAnimation } from './PlanCards.utils'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
@@ -21,9 +20,8 @@ export interface PlanCardsProps {
   isPartnerBilledOrganization: boolean
   hasOrioleProjects: boolean
   selectedOrganization: Organization | undefined
-  variant: PlanPresentationVariant
-  /** Seconds to wait before the cards stagger in. Omit to render them without an entry animation. */
-  entryDelay?: number
+  /** Seconds to wait before the cards stagger in. */
+  entryDelay: number
   showAwsMarketplacePurchase?: boolean
   onSelectTier: (tier: 'tier_free' | 'tier_pro' | 'tier_team') => void
 }
@@ -37,7 +35,6 @@ export function PlanCards({
   isPartnerBilledOrganization,
   hasOrioleProjects,
   selectedOrganization,
-  variant,
   entryDelay,
   showAwsMarketplacePurchase = false,
   onSelectTier,
@@ -86,7 +83,6 @@ export function PlanCards({
             currentSubscriptionPlanId={currentSubscriptionPlanId}
             managedBy={selectedOrganization?.managed_by}
             shouldHighlight={shouldHighlight}
-            variant={variant}
             variants={entryAnimation.card}
             onSelectTier={() => onSelectTier(plan.id as 'tier_free' | 'tier_pro' | 'tier_team')}
             onTrackCtaClick={() =>

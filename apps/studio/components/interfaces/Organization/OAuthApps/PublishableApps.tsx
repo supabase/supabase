@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Check, X } from 'lucide-react'
+import { CheckIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Button,
@@ -156,7 +156,7 @@ export const PublishableApps = () => {
             <div className="absolute top-4 right-4">
               <Button
                 variant="text"
-                icon={<X size={18} />}
+                icon={<XIcon size={18} />}
                 className="px-1"
                 onClick={() => setCreatedApp(undefined)}
                 aria-label="Cancel"
@@ -165,7 +165,7 @@ export const PublishableApps = () => {
             <div className="w-full space-y-4">
               <div className="flex flex-col gap-0">
                 <div className="flex items-center gap-2">
-                  <Check size={14} className="text-primary" strokeWidth={3} />
+                  <CheckIcon size={14} className="text-primary" strokeWidth={3} />
                   <p className="text-sm">You've created your new OAuth application.</p>
                 </div>
                 <p className="text-sm text-foreground-light">
@@ -205,7 +205,7 @@ export const PublishableApps = () => {
                   >
                     <span className="sr-only">Avatar</span>
                   </TableHead>
-                  <TableHead className={cn('pl-0', !hasPublishedApps && 'text-foreground-muted')}>
+                  <TableHead className={cn(!hasPublishedApps ? 'text-foreground-muted' : 'pl-0')}>
                     Name
                   </TableHead>
                   <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>

@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useBreakpoint, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Trash } from 'lucide-react'
+import { ChevronDownIcon, TrashIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -354,7 +354,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
           {!snap.allRowsSelected ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button size="tiny" iconRight={<ChevronDown />} loading={isCopying}>
+                <Button size="tiny" iconRight={<ChevronDownIcon />} loading={isCopying}>
                   Copy
                 </Button>
               </DropdownMenuTrigger>
@@ -381,7 +381,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="tiny" iconRight={<ChevronDown />} loading={isExporting}>
+              <Button size="tiny" iconRight={<ChevronDownIcon />} loading={isExporting}>
                 Export
               </Button>
             </DropdownMenuTrigger>
@@ -433,7 +433,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
             <ButtonTooltip
               variant="danger"
               size="tiny"
-              icon={<Trash />}
+              icon={<TrashIcon />}
               onClick={onRowsDelete}
               disabled={snap.allRowsSelected && isImpersonatingRole}
               tooltip={{

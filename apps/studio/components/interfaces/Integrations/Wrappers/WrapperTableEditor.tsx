@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, ChevronsUpDown, XIcon } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, XIcon } from 'lucide-react'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Control,
@@ -128,7 +128,7 @@ export const WrapperTableEditor = ({
                     )}
                     size="small"
                     iconRight={
-                      <ChevronsUpDown
+                      <ChevronsUpDownIcon
                         className="ml-2 h-4 w-4 shrink-0 opacity-50"
                         strokeWidth={1}
                       />
@@ -162,7 +162,7 @@ export const WrapperTableEditor = ({
                                 <p className="text-foreground-lighter">{table.description}</p>
                               </div>
                               {String(i) === selectedTableIndex && (
-                                <Check className={cn('mr-2 h-4 w-4')} />
+                                <CheckIcon className={cn('mr-2 h-4 w-4')} />
                               )}
                             </CommandItem>
                           ))}

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDownIcon, XIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
@@ -218,7 +218,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
                           : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                       </span>
-                      <ChevronDown size={14} className="transition group-data-open:-rotate-180" />
+                      <ChevronDownIcon
+                        size={14}
+                        className="transition group-data-open:-rotate-180"
+                      />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="text-foreground-light text-sm px-4">
                       <p>
@@ -324,7 +327,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                             variant="text"
                             disabled={!canRemoveRole}
                             className="px-1"
-                            icon={<X />}
+                            icon={<XIcon />}
                             onClick={() => onRemoveProject(project?.ref)}
                             tooltip={{
                               content: {

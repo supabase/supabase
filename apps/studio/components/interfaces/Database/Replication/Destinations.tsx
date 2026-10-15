@@ -1,6 +1,6 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -285,7 +285,7 @@ export const Destinations = () => {
             ref={searchInputRef}
             placeholder="Search pipelines"
             size="tiny"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={filterString}
             className="w-full lg:w-52"
             onChange={(e) => setFilterString(e.target.value)}
@@ -295,7 +295,7 @@ export const Destinations = () => {
                 <Button
                   aria-label="Clear search"
                   variant="text"
-                  icon={<X />}
+                  icon={<XIcon />}
                   className="p-0 h-5 w-5"
                   onClick={() => setFilterString('')}
                 />
@@ -309,7 +309,7 @@ export const Destinations = () => {
               <Button
                 aria-label="More actions"
                 variant="default"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
                 className="w-6.5 hit-area-1"
               />
             </DropdownMenuTrigger>
@@ -362,7 +362,7 @@ export const Destinations = () => {
                 content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
               }}
               variant="primary"
-              icon={<Plus />}
+              icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
               onClick={openDestinationPanel}
@@ -451,7 +451,7 @@ export const Destinations = () => {
 
         {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
           <EmptyStatePresentational
-            icon={Workflow}
+            icon={WorkflowIcon}
             title="Add a pipeline"
             description="Send tables to an external destination for analytics workloads."
           >
@@ -460,7 +460,7 @@ export const Destinations = () => {
                 content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
               }}
               variant="default"
-              icon={<Plus />}
+              icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
               onClick={openDestinationPanel}

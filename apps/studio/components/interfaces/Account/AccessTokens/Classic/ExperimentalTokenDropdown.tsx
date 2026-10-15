@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -36,7 +36,7 @@ export const ExperimentalTokenDropdown = ({ onCreateToken }: ExperimentalTokenDr
                 variant="primary"
                 aria-label="Choose token scope"
                 className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                icon={<ChevronDown />}
+                icon={<ChevronDownIcon />}
               />
             </DropdownMenuTrigger>
           </TooltipTrigger>

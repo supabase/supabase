@@ -1,6 +1,6 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { isToolUIPart, type TextUIPart, type ToolUIPart } from 'ai'
-import { BrainIcon, CheckIcon, CircleStop, Loader2, XIcon } from 'lucide-react'
+import { BrainIcon, CheckIcon, CircleStopIcon, Loader2Icon, XIcon } from 'lucide-react'
 import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
 import { Markdown } from 'ui-patterns/Markdown'
@@ -62,7 +62,7 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
 }
 
 const COMPACT_STATUS_ICONS: Record<CompactPartStatus, ReactNode> = {
-  running: <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />,
+  running: <Loader2Icon strokeWidth={1.5} size={12} className="animate-spin" />,
   done: <CheckIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />,
   failed: <XIcon strokeWidth={1.5} size={12} className="text-destructive" />,
 }
@@ -95,7 +95,7 @@ function MessagePartCompact({ part, isActive }: { part: CompactPart; isActive?: 
 function ToolDisplayExecuteSqlLoading({ label = 'Writing SQL...' }: { label?: string }) {
   return (
     <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-      <Loader2 className="w-4 h-4 animate-spin" />
+      <Loader2Icon className="w-4 h-4 animate-spin" />
       {label}
     </div>
   )
@@ -171,7 +171,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   if (state === 'input-streaming') {
     return (
       <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader2Icon className="w-4 h-4 animate-spin" />
         Writing Edge Function...
       </div>
     )
@@ -366,7 +366,7 @@ export const MessagePartSwitcher = memo(
     if (!isActiveMessage && isIncompletePart) {
       return (
         <Tool
-          icon={<CircleStop strokeWidth={1.5} size={12} className="text-foreground-muted" />}
+          icon={<CircleStopIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />}
           label={INTERRUPTED_LABEL}
         >
           {part.type === 'reasoning' ? part.text : undefined}

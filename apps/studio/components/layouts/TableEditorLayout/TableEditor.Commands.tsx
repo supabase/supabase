@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Table2 } from 'lucide-react'
+import { Table2Icon } from 'lucide-react'
 import type { CommandOptions } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
@@ -18,7 +18,7 @@ export function useProjectLevelTableEditorCommands(options?: CommandOptions) {
         id: 'create-table',
         name: 'Create new table',
         route: `/project/${ref}/editor?create=table`,
-        icon: () => <Table2 />,
+        icon: () => <Table2Icon />,
       },
     ],
     {
@@ -42,7 +42,7 @@ export function useTableEditorGotoCommands(options?: CommandOptions) {
         id: 'view-tables',
         name: 'View your tables',
         route: `/project/${ref}/editor`,
-        icon: () => <Table2 />,
+        icon: () => <Table2Icon />,
       },
     ],
     {

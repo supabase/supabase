@@ -1,6 +1,7 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 
+import { getToolContract, type ContractToolName } from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
@@ -27,6 +28,7 @@ export const toolSetValidationSchema = z.record(
     'search_docs',
     'get_advisors',
     'query_logs',
+    'get_active_incidents',
 
     // Local tools
     'execute_sql',
@@ -107,9 +109,10 @@ export const TOOL_CATEGORIES = {
 type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
 
 /**
- * Mapping of tool names to their categories
+ * Mapping of tool names to their categories. Tools that have migrated to a contract
+ * (`TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and aren't listed here.
  */
-export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
+export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, ToolCategory> = {
   // UI tools - always available
   execute_sql: TOOL_CATEGORIES.UI,
   deploy_edge_function: TOOL_CATEGORIES.UI,
@@ -134,7 +137,6 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   get_notebook: TOOL_CATEGORIES.SCHEMA,
   run_notebook: TOOL_CATEGORIES.SCHEMA,
   create_notebook: TOOL_CATEGORIES.SCHEMA,
-  update_notebook: TOOL_CATEGORIES.SCHEMA,
   delete_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
@@ -164,17 +166,30 @@ function getMinimumOptInLevel(category: ToolCategory): AiOptInLevel | null {
   }
 }
 
+function isCategorizedTool(name: string): name is keyof typeof TOOL_CATEGORY_MAP {
+  return Object.hasOwn(TOOL_CATEGORY_MAP, name)
+}
+
+/**
+ * The lowest opt-in level a tool needs, `null` if it's always available, or `undefined` if the
+ * tool isn't on the allowlist. A contract's `minOptInLevel` wins over the category map.
+ */
+function getToolMinimumLevel(toolName: string): AiOptInLevel | null | undefined {
+  const contract = getToolContract(toolName)
+  if (contract) return contract.minOptInLevel
+  if (isCategorizedTool(toolName)) return getMinimumOptInLevel(TOOL_CATEGORY_MAP[toolName])
+  return undefined
+}
+
 /**
  * Check if a tool is allowed based on the current opt-in level
  */
 function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
-  const category = TOOL_CATEGORY_MAP[toolName]
+  const minimumLevel = getToolMinimumLevel(toolName)
 
-  if (!category) {
+  if (minimumLevel === undefined) {
     return false
   }
-
-  const minimumLevel = getMinimumOptInLevel(category)
 
   // UI tools are always allowed
   if (!minimumLevel) {
@@ -218,7 +233,7 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
 export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLevel): ToolSet {
   return Object.fromEntries(
     Object.entries(tools)
-      .filter(([toolName]) => TOOL_CATEGORY_MAP[toolName] !== undefined)
+      .filter(([toolName]) => getToolMinimumLevel(toolName) !== undefined)
       .map(([toolName, toolInstance]) => {
         if (isToolAllowed(toolName, aiOptInLevel)) {
           return [toolName, toolInstance]
