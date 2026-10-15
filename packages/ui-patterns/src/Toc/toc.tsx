@@ -58,6 +58,19 @@ export function TOCScrollArea({
   )
 }
 
+export function TocSection({ items, className }: { items: TOCItemType[]; className?: string }) {
+  return (
+    <Toc className={cn('-ml-[calc(0.25rem+6px)]', className)}>
+      <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-7.5">
+        On this page
+      </h3>
+      <TOCScrollArea>
+        <TOCItems items={items} />
+      </TOCScrollArea>
+    </Toc>
+  )
+}
+
 export function TOCItems({
   items,
   showTrack = false,
