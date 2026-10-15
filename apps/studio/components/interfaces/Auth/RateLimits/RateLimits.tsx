@@ -134,7 +134,7 @@ export const RateLimits = () => {
       .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     SMTP_MAX_FREQUENCY: z.coerce
       .number()
-      .min(1, 'Must be more than 0')
+      .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 seconds'),
   })
 
@@ -161,6 +161,11 @@ export const RateLimits = () => {
 
   const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+
+    if (rateLimitForm.formState.dirtyFields.SMTP_MAX_FREQUENCY && data.SMTP_MAX_FREQUENCY < 1) {
+      rateLimitForm.setError('SMTP_MAX_FREQUENCY', { message: 'Must be more than 0' })
+      return
+    }
 
     const payload: Partial<z.infer<typeof RateLimitFormSchema>> = {}
     const params = [
@@ -193,7 +198,7 @@ export const RateLimits = () => {
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
         RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
         RATE_LIMIT_WEB3: authConfig.RATE_LIMIT_WEB3 ?? 0,
-        SMTP_MAX_FREQUENCY: authConfig.SMTP_MAX_FREQUENCY ?? 60,
+        SMTP_MAX_FREQUENCY: authConfig.SMTP_MAX_FREQUENCY,
       })
 
       ipForwardingForm.reset({
