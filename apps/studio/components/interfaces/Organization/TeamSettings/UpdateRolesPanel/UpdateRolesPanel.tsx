@@ -1,16 +1,13 @@
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDownIcon, XIcon } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
   Button,
   cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
   Select,
   SelectContent,
   SelectGroup,
@@ -27,6 +24,7 @@ import {
   TooltipTrigger,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { ROLE_DESCRIPTIONS } from '../Roles.constants'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
@@ -204,24 +202,17 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               {!isApplyingRoleToAllProjects &&
                 projectsRoleConfiguration.length > 0 &&
                 projectsRoleConfiguration.length < totalNumOrgProjects && (
-                  <Collapsible className="bg-alternative border rounded-lg py-4 group">
-                    <CollapsibleTrigger className="w-full text-left px-4 flex items-center justify-between">
-                      <span className="text-sm">
-                        {hasNoChanges
-                          ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
-                          : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
-                      </span>
-                      <p>
-                        {member.username} {hasNoChanges ? 'does' : 'will'} not have access to the
-                        following {numberOfNoAccessProjects} project
-                        {numberOfNoAccessProjects > 1 ? 's' : ''}:
-                      </p>
-                      <ChevronDownIcon
-                        size={14}
-                        className="transition group-data-open:-rotate-180"
-                      />
-                    </CollapsibleTrigger>
-                  </Collapsible>
+                  <Admonition>
+                    <span className="text-sm">
+                      {hasNoChanges
+                        ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}. They ${hasNoChanges ? 'do' : 'will'} not have access to the other
+                      ${numberOfNoAccessProjects} project${numberOfNoAccessProjects > 1 ? 's' : ''}`
+                        : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}. They ${hasNoChanges ? 'do' : 'will'} not have access to the other
+                      ${numberOfNoAccessProjects} project${numberOfNoAccessProjects > 1 ? 's' : ''}`}
+                    </span>
+                    <span className="text-sm">:</span>
+                    <ChevronDownIcon size={14} className="transition group-data-open:-rotate-180" />
+                  </Admonition>
                 )}
 
               <div className="flex flex-col divide-y divide-border">
