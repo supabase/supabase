@@ -56,6 +56,7 @@ const nextConfig = {
     'dayjs',
     'shared-data',
     'api-types',
+    'docs-search',
     'icons',
     'next-mdx-remote',
   ],

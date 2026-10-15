@@ -419,6 +419,9 @@ importers:
       dev-tools:
         specifier: workspace:*
         version: link:../../packages/dev-tools
+      docs-search:
+        specifier: workspace:*
+        version: link:../../packages/docs-search
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
@@ -771,6 +774,9 @@ importers:
       common:
         specifier: workspace:*
         version: link:../../packages/common
+      docs-search:
+        specifier: workspace:*
+        version: link:../../packages/docs-search
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -2553,6 +2559,49 @@ importers:
       vite:
         specifier: 'catalog:'
         version: 8.2.1(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@22.13.14)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.2.1(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+
+  packages/docs-search:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.117.3(@opentelemetry/api@1.9.1)
+      fast-glob:
+        specifier: ^3.3.3
+        version: 3.3.3
+      mdast-util-to-string:
+        specifier: ^3.1.1
+        version: 3.2.0
+      remark-frontmatter:
+        specifier: ^5.0.0
+        version: 5.0.0(supports-color@8.1.1)
+      remark-gfm:
+        specifier: ^4.0.0
+        version: 4.0.1(supports-color@8.1.1)
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0(supports-color@8.1.1)
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
+    devDependencies:
+      '@types/mdast':
+        specifier: ^3.0.0
+        version: 3.0.15
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.13.14
+      '@typescript/native':
+        specifier: 'catalog:'
+        version: typescript@7.0.2
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
       vitest:
         specifier: 'catalog:'
         version: 5.0.0(@opentelemetry/api@1.9.1)(@types/node@22.13.14)(@vitest/coverage-v8@5.0.0)(@vitest/ui@5.0.0)(happy-dom@20.14.5)(jsdom@28.1.0(@noble/hashes@1.8.0)(supports-color@8.1.1))(msw@2.11.3(@types/node@22.13.14)(typescript@6.0.2))(vite@8.2.1(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
