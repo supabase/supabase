@@ -58,7 +58,8 @@ describe('shared code block highlighting', () => {
   )
 
   it('shares pending initialization across concurrent languages and aliases', async () => {
-    const { promise, resolve } = Promise.withResolvers<typeof highlighter>()
+    let resolve: (value: typeof highlighter) => void = () => {}
+    const promise = new Promise<typeof highlighter>((done) => (resolve = done))
     create.mockReturnValue(promise)
     const { highlightCode } = await import('./CodeBlock.highlight')
     const pending = [

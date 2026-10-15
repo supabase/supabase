@@ -8,7 +8,7 @@ import ReactMarkdown from 'react-markdown'
 // shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
 import { cn, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
 
-import { CodeCopyButton } from './CodeBlock/CodeBlock.client'
+import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 
 type PromptTitleProps = {
   children: ReactNode
