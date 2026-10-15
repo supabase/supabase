@@ -23,8 +23,8 @@ import { type RowComponentBaseProps } from '@/components/ui/InfiniteList'
 import { InlineLink } from '@/components/ui/InlineLink'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
-import { OrganizationRole } from '@/data/organization-members/organization-roles-query'
-import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { type OrganizationRole } from '@/data/organization-members/organization-roles-query'
+import { type OrganizationMember } from '@/data/organizations/organization-members-query'
 import { useProfile } from '@/lib/profile'
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
@@ -54,25 +54,16 @@ export const MemberRow = memo(function MemberRow({
     return map
   }, [roles])
 
-  const projectNameByRef = useMemo(
-    () => new Map(orgProjects.map((p) => [p.ref, p.name])),
-    [orgProjects]
-  )
-
   const roleRows = useMemo(() => {
     return member.role_ids.map((id) => {
       const role = roleById.get(id)
       const roleName = (role?.name ?? '').split('_')[0]
       const appliesToAllProjects = role?.projects.length === 0
-      const projectsApplied = appliesToAllProjects
-        ? orgProjects.map((p) => ({ ref: p.ref, name: p.name }))
-        : (role?.projects ?? [])
-            .map(({ ref }) => ({ ref, name: projectNameByRef.get(ref) ?? '' }))
-            .filter(({ name }) => name.length > 0)
+      const projectsApplied = appliesToAllProjects ? orgProjects : (role?.projects ?? [])
 
       return { id, roleName, appliesToAllProjects, projectsApplied }
     })
-  }, [member.role_ids, roleById, orgProjects, projectNameByRef])
+  }, [member.role_ids, roleById, orgProjects])
 
   return (
     <div
