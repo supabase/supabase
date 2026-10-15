@@ -7,18 +7,17 @@ import { Chatgpt, Claude } from 'icons'
 import { Check, Copy, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { cn } from 'ui'
 
 function AiTools({
   pageType,
   articleId,
   showAgentSetup = false,
-  headingClassName = 'block font-mono uppercase text-xs text-foreground-light mb-3',
   className,
 }: {
   pageType: MarkdownAffordancePageType
   articleId: string
   showAgentSetup?: boolean
-  headingClassName?: string
   className?: string
 }) {
   const path = usePathname()
@@ -41,7 +40,15 @@ function AiTools({
 
   return (
     <section className={className} aria-labelledby="ai-tools-title">
-      <h2 id="ai-tools-title" className={headingClassName}>
+      <h2
+        id="ai-tools-title"
+        className={cn(
+          'mb-3',
+          pageType === 'troubleshooting'
+            ? 'text-sm text-foreground-lighter'
+            : 'block font-mono uppercase text-xs text-foreground-light'
+        )}
+      >
         AI tools
       </h2>
       <div className="flex flex-col gap-2">
