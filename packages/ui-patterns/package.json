@@ -550,6 +550,18 @@
       "import": "./src/PrivacySettings/index.tsx",
       "types": "./src/PrivacySettings/index.tsx"
     },
+    "./ProjectSelector/ProjectSelector": {
+      "import": "./src/ProjectSelector/ProjectSelector.tsx",
+      "types": "./src/ProjectSelector/ProjectSelector.tsx"
+    },
+    "./ProjectSelector/ProjectSelector.utils": {
+      "import": "./src/ProjectSelector/ProjectSelector.utils.ts",
+      "types": "./src/ProjectSelector/ProjectSelector.utils.ts"
+    },
+    "./ProjectSelector": {
+      "import": "./src/ProjectSelector/index.tsx",
+      "types": "./src/ProjectSelector/index.tsx"
+    },
     "./PromoToast/PromoBg": {
       "import": "./src/PromoToast/PromoBg.tsx",
       "types": "./src/PromoToast/PromoBg.tsx"

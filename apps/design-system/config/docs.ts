@@ -203,6 +203,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Project Selector',
+          href: '/docs/fragments/project-selector',
+          items: [],
+        },
+        {
           title: 'Filter Bar',
           href: '/docs/fragments/filter-bar',
           items: [],

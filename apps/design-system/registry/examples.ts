@@ -1564,6 +1564,21 @@ export const examples: Registry = [
     files: ['example/toc-single-demo.tsx'],
   },
   {
+    name: 'project-selector-demo',
+    type: 'components:example',
+    files: ['example/project-selector-demo.tsx'],
+  },
+  {
+    name: 'project-selector-signed-out',
+    type: 'components:example',
+    files: ['example/project-selector-signed-out.tsx'],
+  },
+  {
+    name: 'project-selector-form',
+    type: 'components:example',
+    files: ['example/project-selector-form.tsx'],
+  },
+  {
     name: 'multi-select-demo',
     type: 'components:example',
     files: ['example/multi-select-demo.tsx'],

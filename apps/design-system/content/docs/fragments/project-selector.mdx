@@ -1,0 +1,94 @@
+---
+title: Project Selector
+description: Search and select a Supabase project, grouped by organization. Returns the project ref.
+component: true
+fragment: true
+---
+
+<ComponentPreview name="project-selector-demo" description="" peekCode wide />
+
+Use `ProjectSelector` in forms that need a project ref, such as configuration builders in Docs or marketing pages. It works like a select: the dropdown has a search input at the top and lists the user's projects grouped by organization. Search matches the project name, project ref, organization name, and organization slug.
+
+The value is the project ref by default. Pass `getProjectValue` to return a different value.
+
+## Usage
+
+```tsx
+import { ProjectSelector } from 'ui-patterns/ProjectSelector'
+```
+
+```tsx
+<ProjectSelector
+  value={projectRef}
+  onValueChange={setProjectRef}
+  organizations={[{ slug: 'acme', name: 'Acme Inc' }]}
+  projects={[{ ref: 'qwertyuiopasdfghjklz', name: 'Marketing site', organizationSlug: 'acme' }]}
+  authState={isUserLoading ? 'loading' : isLoggedIn ? 'authenticated' : 'unauthenticated'}
+  signInUrl="https://supabase.com/dashboard/sign-in"
+/>
+```
+
+The component doesn't fetch data. Each app passes in its own organizations, projects, and auth state, so the same component works in Studio, Docs, and www.
+
+## Authentication
+
+Organizations and projects are only available to signed-in users. Apps outside Studio read the session through `AuthProvider` from `common`, which `apps/docs` and `apps/www` already mount in their providers. Map it to `authState`:
+
+```tsx
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+
+const isUserLoading = useIsUserLoading()
+const isLoggedIn = useIsLoggedIn()
+const authState = isUserLoading ? 'loading' : isLoggedIn ? 'authenticated' : 'unauthenticated'
+```
+
+When the user is signed out, or when the project list fails to load (`isError`), the selector becomes a plain text input for the project ref, with a hint below it. The user can still complete the form.
+
+In Docs, fetch the data with the existing hooks in `apps/docs/lib/fetch` (`useOrganizationsQuery` and `useProjectsInfiniteQuery`), the same ones used by `ProjectConfigVariables`. Map each project's `organization_id` to the matching organization's `slug`.
+
+### Testing locally
+
+The session is shared between Studio, Docs, and www only when they're served from the same origin (for example, `supabase.com/dashboard` and `supabase.com/docs`). Locally each app runs on its own port, so Docs and www usually see a signed-out user. Use the toggle in the demo above to check every state, and test the signed-in state against mock data or on a preview deployment.
+
+## Examples
+
+### Signed out
+
+The selector falls back to a project ref input. Pass `signInUrl` to link the sign-in hint.
+
+<ComponentPreview name="project-selector-signed-out" />
+
+### In a form
+
+`ProjectSelector` accepts `id`, `name`, `onBlur`, and the ARIA props that `FormControl` passes down, so it works inside `FormItemLayout`. Validate the value with `isValidProjectRef`, since a signed-out user can type any value.
+
+<ComponentPreview name="project-selector-form" />
+
+### Using a project ref that isn't listed
+
+When the search is a valid project ref that isn't in the list, the dropdown offers to use it. This helps when the list is paginated or the project belongs to another account. Set `allowManualRef={false}` to turn this off.
+
+### Server-side search
+
+For long, paginated project lists, set `shouldFilter={false}` and filter in `onSearchChange`, for example by passing the search term to `useProjectsInfiniteQuery`.
+
+## Props
+
+| Prop              | Type                                                        | Default                    |
+| ----------------- | ----------------------------------------------------------- | -------------------------- |
+| `value`           | `string`                                                    | `''`                       |
+| `onValueChange`   | `(value: string, project?: ProjectSelectorProject) => void` |                            |
+| `organizations`   | `{ slug: string; name: string }[]`                          |                            |
+| `projects`        | `ProjectSelectorProject[]`                                  |                            |
+| `getProjectValue` | `(project: ProjectSelectorProject) => string`               | `(project) => project.ref` |
+| `authState`       | `'loading' \| 'authenticated' \| 'unauthenticated'`         | `'authenticated'`          |
+| `signInUrl`       | `string`                                                    |                            |
+| `isLoading`       | `boolean`                                                   | `false`                    |
+| `isError`         | `boolean`                                                   | `false`                    |
+| `allowManualRef`  | `boolean`                                                   | `true`                     |
+| `shouldFilter`    | `boolean`                                                   | `true`                     |
+| `onSearchChange`  | `(search: string) => void`                                  |                            |
+| `placeholder`     | `string`                                                    | `'Select a project'`       |
+| `size`            | `'tiny' \| 'small' \| 'medium' \| 'large' \| 'xlarge'`      | `'small'`                  |
+
+A `ProjectSelectorProject` has a `ref`, `name`, and `organizationSlug`, plus an optional `status` label (for example, `Paused`) and `disabled` flag.
