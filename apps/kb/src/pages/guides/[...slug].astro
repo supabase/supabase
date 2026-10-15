@@ -1,5 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content'
+import { createElement, type ComponentProps } from 'react'
+import { Table } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
@@ -21,6 +23,8 @@ const { Content, headings } = await render(guide)
 const toc = headings
 	.filter((heading) => heading.depth === 2 || heading.depth === 3)
 	.map((heading) => ({ title: heading.text, url: `#${heading.slug}`, depth: heading.depth }))
+
+const ProseTable = (props: ComponentProps<'table'>) => createElement(Table, { prose: true, ...props })
 
 // guide.filePath is relative to the kb app root, e.g. "src/content/guides/foo.mdx"
 const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${guide.filePath}`
@@ -46,5 +50,5 @@ const jsonLd = [
 	toc={toc}
 	related={related}
 >
-	<Content components={{ Admonition }} />
+	<Content components={{ Admonition, table: ProseTable }} />
 </ArticleLayout>
