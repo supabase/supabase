@@ -37,9 +37,15 @@ export interface MembersViewProps {
   searchString: string
   mfaFilter: MfaFilter
   roleNames: string[]
+  totalNumOrgProjects: number
 }
 
-export const MembersView = ({ searchString, mfaFilter, roleNames }: MembersViewProps) => {
+export const MembersView = ({
+  searchString,
+  mfaFilter,
+  roleNames,
+  totalNumOrgProjects,
+}: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
 
@@ -140,6 +146,7 @@ export const MembersView = ({ searchString, mfaFilter, roleNames }: MembersViewP
       roles={roles}
       isLoadingRoles={isLoadingRoles}
       permissions={permissions}
+      totalNumOrgProjects={totalNumOrgProjects}
       selectedOrganization={selectedOrganization}
       organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
       onManageAccess={handleManageAccess}

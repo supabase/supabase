@@ -11,6 +11,7 @@ type TeamSettingsDataContextValue = {
   roles: OrganizationRolesResponse | undefined
   isLoadingRoles: boolean
   permissions: Permission[] | undefined
+  totalNumOrgProjects: number
   selectedOrganization: OrganizationBase | undefined
   organizationMembersDeletionEnabled: boolean
   onManageAccess: (member: OrganizationMember) => void
@@ -32,6 +33,7 @@ export const TeamSettingsDataProvider = ({
   roles,
   isLoadingRoles,
   permissions,
+  totalNumOrgProjects,
   selectedOrganization,
   organizationMembersDeletionEnabled,
   onManageAccess,
@@ -42,6 +44,7 @@ export const TeamSettingsDataProvider = ({
       roles,
       isLoadingRoles,
       permissions,
+      totalNumOrgProjects,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,
@@ -51,6 +54,7 @@ export const TeamSettingsDataProvider = ({
       roles,
       isLoadingRoles,
       permissions,
+      totalNumOrgProjects,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,

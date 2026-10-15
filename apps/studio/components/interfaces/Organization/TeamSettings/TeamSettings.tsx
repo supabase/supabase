@@ -134,6 +134,7 @@ export const TeamSettings = () => {
                 searchString={searchString.length === 0 ? searchString : debouncedSearch}
                 mfaFilter={mfaFilter}
                 roleNames={rolesFilter}
+                totalNumOrgProjects={totalCount}
               />
             </ScaffoldSectionContent>
           </ScaffoldFilterAndContent>

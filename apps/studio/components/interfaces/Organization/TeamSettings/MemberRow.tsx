@@ -25,7 +25,7 @@ import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { type OrganizationRole } from '@/data/organization-members/organization-roles-query'
 import { type OrganizationMember } from '@/data/organizations/organization-members-query'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { pluralize } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
@@ -39,9 +39,7 @@ export const MemberRow = memo(function MemberRow({
 }: RowComponentBaseProps<OrganizationMember>) {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { roles, isLoadingRoles } = useTeamSettingsData()
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
+  const { roles, isLoadingRoles, totalNumOrgProjects } = useTeamSettingsData()
 
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
@@ -171,7 +169,7 @@ export const MemberRow = memo(function MemberRow({
                         <span className="text-foreground-light truncate">
                           {appliesToAllProjects
                             ? 'Organization'
-                            : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
+                            : `${projectsApplied.length} ${pluralize(projectsApplied.length, 'project')}`}
                         </span>
                       </HoverCardTrigger>
                       <HoverCardContent className="p-0">
@@ -179,14 +177,14 @@ export const MemberRow = memo(function MemberRow({
                           // If the role is org scoped, don't list all projects
                           appliesToAllProjects ? (
                             <p className="p-2 text-xs">
-                              {roleName} role applies to {totalNumOrgProjects} project
-                              {totalNumOrgProjects ? 's' : ''}
+                              {roleName} role applies to {totalNumOrgProjects}{' '}
+                              {pluralize(totalNumOrgProjects, 'project')}
                             </p>
                           ) : (
                             <>
                               <p className="p-2 text-xs">
-                                {roleName} role applies to {projectsApplied.length} project
-                                {projectsApplied.length > 1 ? 's' : ''}
+                                {roleName} role applies to {projectsApplied.length}{' '}
+                                {pluralize(projectsApplied.length, 'project')}
                               </p>
                               <div className="border-t flex flex-col py-1">
                                 <ScrollArea
