@@ -42,15 +42,18 @@ export default function ProjectSelectorDemo() {
         <ToggleGroupItem value="loading">Loading</ToggleGroupItem>
         <ToggleGroupItem value="error">Error</ToggleGroupItem>
       </ToggleGroup>
-      <ProjectSelector
-        value={projectRef}
-        onValueChange={setProjectRef}
-        organizations={organizations}
-        projects={projects}
-        authState={state === 'error' ? 'authenticated' : state}
-        isError={state === 'error'}
-        signInUrl="https://supabase.com/dashboard/sign-in"
-      />
+      {/* Fixed height keeps the input in place when the signed-out and error hints appear */}
+      <div className="h-20">
+        <ProjectSelector
+          value={projectRef}
+          onValueChange={setProjectRef}
+          organizations={organizations}
+          projects={projects}
+          authState={state === 'error' ? 'authenticated' : state}
+          isError={state === 'error'}
+          signInUrl="https://supabase.com/dashboard/sign-in"
+        />
+      </div>
       <p className="text-xs text-foreground-lighter">
         Value: <code className="text-foreground">{projectRef || '""'}</code>
       </p>
