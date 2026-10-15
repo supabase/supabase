@@ -7,9 +7,11 @@ import { TOPICS, topicToSlug } from '../../lib/topics'
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
 	const troubleshooting = await getCollection('troubleshooting')
+	const faqs = await getCollection('faqs')
 	const entries = [
 		...guides.map((guide) => ({ data: guide.data, href: `/guides/${guide.id}` })),
 		...troubleshooting.map((entry) => ({ data: entry.data, href: `/troubleshooting/${entry.id}` })),
+		...faqs.map((faq) => ({ data: faq.data, href: `/faqs/${faq.id}` })),
 	]
 
 	// One page per topic in TOPICS — not just topics a guide already uses —
