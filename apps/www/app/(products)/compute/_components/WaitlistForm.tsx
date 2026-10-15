@@ -214,13 +214,14 @@ export function WaitlistForm() {
                     The 20-letter ID in your project URL: https://
                     <span className="text-foreground">your-project-ref</span>.supabase.co (shown as
                     Project ID in{' '}
-                    <Link
+                    <a
                       className="hover:text-foreground underline"
                       target="_blank"
+                      rel="noreferrer"
                       href="https://supabase.com/dashboard/project/_/settings/general"
                     >
                       Settings → General
-                    </Link>
+                    </a>
                     )
                   </p>
                 </InfoTooltip>
@@ -238,7 +239,7 @@ export function WaitlistForm() {
               placeholder="abcdefghijklmnopqrst"
               aria-describedby="projectRef-description"
             />
-            <p className="text-foreground-lighter text-xs">
+            <p id="projectRef-description" className="text-foreground-lighter text-xs">
               Only projects created in us-west-2 can access Compute during private alpha.
             </p>
           </div>
