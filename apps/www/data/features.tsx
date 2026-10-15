@@ -95,6 +95,10 @@ export type FeatureType = {
    */
   heroImageLight?: string
   /**
+   * omit the hero block (image, video, or icon placeholder) from the feature page
+   */
+  hideHero?: boolean
+  /**
    * url to docs or blog page for this feature
    */
   docsUrl?: string
@@ -2206,6 +2210,7 @@ Running several local projects is experimental and needs CLI v2.119.0 or later. 
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
+    hideHero: true,
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
     slug: 'parallel-local-projects',
     status: {
@@ -2234,7 +2239,8 @@ The native runtime supports Linux on amd64 and arm64 with glibc 2.35 or later, a
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: '/images/features/local-development.png',
+    heroImageLight: '/images/features/local-development-light.png',
     docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
     slug: 'native-local-runtime',
     status: {
