@@ -53,9 +53,7 @@ export const TeamSettings = () => {
 
   const { data: roles } = useOrganizationRolesV2Query({ slug })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
-  const organizationRoles = (roles?.org_scoped_roles ?? []).filter(
-    (role) => role.name.toLowerCase() !== 'no-access'
-  )
+  const organizationRoles = roles?.org_scoped_roles ?? []
 
   const { data } = useOrgProjectsInfiniteQuery({ slug })
   const totalCount = data?.pages[0].pagination.count ?? 0
@@ -136,6 +134,7 @@ export const TeamSettings = () => {
                 searchString={searchString.length === 0 ? searchString : debouncedSearch}
                 mfaFilter={mfaFilter}
                 roleNames={rolesFilter}
+                totalNumOrgProjects={totalCount}
               />
             </ScaffoldSectionContent>
           </ScaffoldFilterAndContent>
