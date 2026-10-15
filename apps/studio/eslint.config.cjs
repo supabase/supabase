@@ -69,6 +69,14 @@ const TOOL_MODULE_RESTRICTED_IMPORT_PATHS = [
     message: APPROVAL_GATE_MESSAGE,
   },
 ]
+// The gate itself is also off limits: only `approvalGatedToolFromContract` may hand it out.
+const TOOL_MODULE_RESTRICTED_IMPORT_PATTERNS = [
+  {
+    group: ['**/approval-gate', './approval-gate'],
+    importNames: ['approvalGate'],
+    message: APPROVAL_GATE_MESSAGE,
+  },
+]
 
 module.exports = defineConfig([
   { files: ['**/*.ts', '**/*.tsx'] },
@@ -145,7 +153,7 @@ module.exports = defineConfig([
         'error',
         {
           paths: [...BASE_RESTRICTED_IMPORT_PATHS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATHS],
-          patterns: LUCIDE_ICON_IMPORT_PATTERNS,
+          patterns: [...LUCIDE_ICON_IMPORT_PATTERNS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATTERNS],
         },
       ],
     },
