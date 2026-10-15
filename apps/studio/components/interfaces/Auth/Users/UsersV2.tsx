@@ -175,7 +175,7 @@ export const UsersV2 = () => {
     'userType',
     parseAsStringEnum(['all', 'verified', 'unverified', 'anonymous']).withDefault('all')
   )
-  const [filterKeywords] = useQueryState('keywords', { defaultValue: '' })
+  const [filterKeywords, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
   const [sortByValue, setSortByValue] = useQueryState('sortBy', { defaultValue: 'created_at:desc' })
   const [sortColumn, sortOrder] = sortByValue.split(':')
   const [selectedColumns, setSelectedColumns] = useQueryState(
@@ -245,6 +245,12 @@ export const UsersV2 = () => {
   )
   const totalUsers = totalUsersCountData?.count ?? 0
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
+  const hasActiveFilters =
+    Boolean(filterKeywords) ||
+    filterUserType !== 'all' ||
+    selectedProviders.length > 0 ||
+    specificFilterColumn !== 'email'
+  const isFiltered = hasActiveFilters || totalUsers > 0
 
   const isImprovedUserSearchFlagEnabled = useFlag('improvedUserSearch')
   const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
@@ -381,6 +387,16 @@ export const UsersV2 = () => {
     setSpecificFilterColumn(value)
     if (value !== 'freeform' && !improvedSearchEnabled) {
       updateSortByValue('id:asc')
+    }
+  }
+
+  const handleResetFilters = () => {
+    setSearch('')
+    setFilterKeywords('')
+    setFilterUserType('all')
+    setSelectedProviders([])
+    if (specificFilterColumn !== 'email') {
+      updateStorageFilter('email')
     }
   }
 
@@ -632,6 +648,7 @@ export const UsersV2 = () => {
                   ref={searchInputRef}
                   search={search}
                   setSearch={setSearch}
+                  specificFilterColumn={specificFilterColumn}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
                   onSelectFilterColumn={(value) => {
@@ -886,16 +903,37 @@ export const UsersV2 = () => {
                       <Users className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
                         <p className="text-foreground">
-                          {filterUserType !== 'all' || filterKeywords.length > 0
-                            ? 'No users found'
-                            : 'No users in your project'}
+                          {isFiltered ? 'No users found' : 'No users in your project'}
                         </p>
                         <p className="text-foreground-light">
-                          {filterUserType !== 'all' || filterKeywords.length > 0
-                            ? 'There are currently no users based on the filters applied'
+                          {isFiltered
+                            ? totalUsers > 0 && !hasActiveFilters
+                              ? 'There are users in your project, but none match the email column filter'
+                              : 'There are currently no users based on the filters applied'
                             : 'There are currently no users who signed up to your project'}
                         </p>
                       </div>
+                      {totalUsers > 0 && !hasActiveFilters ? (
+                        !improvedSearchEnabled && (
+                          <Button
+                            type="button"
+                            size="tiny"
+                            onClick={() => {
+                              if (isCountWithinThresholdForSortBy) {
+                                updateStorageFilter('freeform')
+                              } else {
+                                setShowFreeformWarning(true)
+                              }
+                            }}
+                          >
+                            Search across all columns
+                          </Button>
+                        )
+                      ) : hasActiveFilters ? (
+                        <Button type="button" size="tiny" onClick={handleResetFilters}>
+                          Clear filters
+                        </Button>
+                      ) : null}
                     </div>
                   ) : null,
                 }}

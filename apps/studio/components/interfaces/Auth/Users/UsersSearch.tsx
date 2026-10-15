@@ -1,6 +1,6 @@
 import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
 import { Search, X } from 'lucide-react'
-import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
+import { parseAsString, useQueryState } from 'nuqs'
 import { Dispatch, forwardRef, SetStateAction } from 'react'
 import {
   Button,
@@ -46,13 +46,21 @@ const getSearchPlaceholder = (column: SpecificFilterColumn): string => {
 interface UsersSearchProps {
   search: string
   setSearch: Dispatch<SetStateAction<string>>
+  specificFilterColumn: SpecificFilterColumn
   improvedSearchEnabled?: boolean
   telemetryProps: Omit<AuthUsersSearchSubmittedEvent['properties'], 'trigger'>
   onSelectFilterColumn: (value: SpecificFilterColumn) => void
 }
 
 export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(function UsersSearch(
-  { search, setSearch, improvedSearchEnabled = false, telemetryProps, onSelectFilterColumn },
+  {
+    search,
+    setSearch,
+    specificFilterColumn,
+    improvedSearchEnabled = false,
+    telemetryProps,
+    onSelectFilterColumn,
+  },
   ref
 ) {
   const [, setSelectedId] = useQueryState(
@@ -60,16 +68,6 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
   )
   const [, setFilterKeywords] = useQueryState('keywords', { defaultValue: '' })
-  const [specificFilterColumn] = useQueryState<SpecificFilterColumn>(
-    'filter',
-    parseAsStringEnum<SpecificFilterColumn>([
-      'id',
-      'email',
-      'phone',
-      'name',
-      'freeform',
-    ]).withDefault('email')
-  )
 
   const track = useTrack()
 
