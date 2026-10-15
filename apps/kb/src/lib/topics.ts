@@ -99,3 +99,10 @@ export function getTopicDescription(topic: Topic): string {
 export function topicToSlug(topic: Topic): string {
   return topic.toLowerCase().replace(/\s+/g, '-')
 }
+
+// Visible topics with at least one entry tagged with them. Takes each entry's
+// `topics` array so guides and troubleshooting entries can be counted together.
+export function getTopicsWithEntries(entryTopics: (readonly string[] | undefined)[]) {
+  const used = new Set(entryTopics.flatMap((topics) => topics ?? []))
+  return TOPICS.filter((topic) => topic.visible && used.has(topic.name))
+}

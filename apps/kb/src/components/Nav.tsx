@@ -9,12 +9,7 @@ import {
   navigationMenuTriggerStyle,
 } from 'ui'
 
-import { TOPICS, topicToSlug } from '../lib/topics'
-
-const visibleTopics = TOPICS.filter((topic) => topic.visible).map((topic) => ({
-  label: topic.name,
-  href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
-}))
+import { topicToSlug, type Topic } from '../lib/topics'
 
 /**
  * Hard-codding links in here for now until we have actual content. Might be worth putting these arrays in their on data file too.
@@ -23,11 +18,6 @@ const resources = [
   { label: 'Status', href: 'https://status.supabase.com' },
   { label: 'Changelog', href: 'https://supabase.com/changelog' },
   { label: 'Docs', href: 'https://supabase.com/docs' },
-]
-
-const menus = [
-  { label: 'Topics', items: visibleTopics },
-  { label: 'Resources', items: resources },
 ]
 
 const triggerClass =
@@ -42,7 +32,18 @@ const contentClass =
 const itemClass =
   'w-full flex h-8 items-center text-foreground-light text-sm hover:text-foreground select-none rounded-md p-2 leading-none no-underline focus-ring focus-visible:text-foreground'
 
-function Nav() {
+function Nav({ topics }: { topics: readonly Topic[] }) {
+  const menus = [
+    {
+      label: 'Topics',
+      items: topics.map((topic) => ({
+        label: topic,
+        href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`,
+      })),
+    },
+    { label: 'Resources', items: resources },
+  ]
+
   return (
     <div className="flex relative gap-2 justify-start items-end w-full h-full">
       <NavigationMenu

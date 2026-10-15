@@ -1,3 +1,4 @@
+import type { Topic } from '../lib/topics'
 import { Logo } from './Logo'
 import { Nav } from './Nav'
 import { ThemeToggle } from './ThemeToggle'
@@ -5,12 +6,12 @@ import { ThemeToggle } from './ThemeToggle'
 // Bare-bones port of apps/docs' TopNavBar — logo, nav, and theme toggle, each
 // split into their own component (Logo.tsx, Nav.tsx, ThemeToggle.tsx). No
 // search, no user menu, no dashboard link — kb doesn't have any of that yet.
-function Header() {
+function Header({ topics }: { topics: readonly Topic[] }) {
   return (
     <header className="relative z-50 backdrop-blur-sm backdrop-filter bg-default/75 border-b border-default w-full px-5 lg:pl-10 items-center flex h-(--header-height) gap-3">
       <div className="flex basis-full h-full items-center justify-center gap-2">
         <Logo />
-        <Nav />
+        <Nav topics={topics} />
       </div>
       <ThemeToggle />
     </header>
