@@ -4,12 +4,12 @@ const page: GoPageInput = {
   template: 'lead-gen',
   slug: 'storage-object-versioning-early-access',
   metadata: {
-    title: 'Storage object versioning - Request access',
+    title: 'Object Versioning and Lifecycle Policies - Request access',
     description:
-      'Request access to the Storage object versioning private alpha. Keep previous copies of a file, archive instead of delete, restore any version, and expire the rest with lifecycle policies.',
+      'Request access to the Object Versioning and Lifecycle Policies private alpha for Supabase Storage. Keep every version of a file and expire old ones.',
   },
   hero: {
-    title: 'Storage object versioning',
+    title: 'Storage Object Versioning and Lifecycle Policies',
     subtitle: 'Private alpha',
     description:
       'Keep the previous copy every time a file changes, archive files instead of destroying them, and restore any version. The private alpha is by invite.',
@@ -26,7 +26,7 @@ const page: GoPageInput = {
       type: 'feature-grid',
       title: 'Recover a file after a bad write',
       description:
-        'Versioning is set per bucket, so you can turn it on for the files that matter and leave the rest alone.',
+        'Versioning is enabled per bucket, so you can turn it on for the files that matter and leave the rest alone.',
       columns: 2,
       items: [
         {
@@ -58,45 +58,24 @@ const page: GoPageInput = {
         'Tell us what you store and we will get in touch as places open up. The alpha is limited while we work through feedback.',
       fields: [
         {
-          type: 'text',
-          name: 'first_name',
-          label: 'First Name',
-          placeholder: 'First Name',
-          required: true,
-          half: true,
-        },
-        {
-          type: 'text',
-          name: 'last_name',
-          label: 'Last Name',
-          placeholder: 'Last Name',
-          required: true,
-          half: true,
-        },
-        {
           type: 'email',
           name: 'email',
-          label: 'Email Address',
+          label: 'Email address',
           placeholder: 'Work email',
           required: true,
         },
         {
           type: 'text',
-          name: 'company_name',
-          label: 'Company Name',
-          placeholder: 'Company name',
+          name: 'project_ref',
+          label: 'Supabase project ref',
+          placeholder: 'abcdefghijklmnopqrst',
+          description:
+            'Use the ref from your Supabase dashboard URL, for example /project/abcdefghijklmnopqrst.',
           required: true,
-        },
-        {
-          type: 'text',
-          name: 'supabase_org_name',
-          label: 'Supabase Organization Name',
-          placeholder: 'Organization name (if applicable)',
-          required: false,
         },
       ],
       submitLabel: 'Request access',
-      successMessage: "Thanks. We'll be in touch when a place opens up.",
+      successRedirect: '/go/storage-object-versioning-early-access/thank-you',
       disclaimer:
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
@@ -105,11 +84,8 @@ const page: GoPageInput = {
             process.env.HUBSPOT_STORAGE_VERSIONING_WAITLIST_FORM_GUID ||
             '00000000-0000-0000-0000-000000000000',
           fieldMap: {
-            first_name: 'firstname',
-            last_name: 'lastname',
             email: 'email',
-            company_name: 'company',
-            supabase_org_name: 'what_is_your_supabase_org_slug',
+            // TODO(storage-versioning): set the HubSpot property name for the project ref.
           },
           consent:
             'By submitting this form, I confirm that I have read and understood the Privacy Policy.',
