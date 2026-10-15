@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createUpdateOptInLevelInputSchema, getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
@@ -196,7 +196,7 @@ describe('ai/tools/studio-tools', () => {
       )
       expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
-        type: 'text',
+        type: 'json',
         value: NO_DATA_PERMISSIONS,
       })
     })
