@@ -1,16 +1,20 @@
-import { ArrowRight, Building2, Check, ExternalLink, ReceiptText, WalletCards } from 'lucide-react'
+import { ArrowRight, Building2, Check, ReceiptText, WalletCards } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { BuyWithAwsButton } from '@/components/AwsMarketplace/BuyWithAwsButton'
+import { BuyWithAwsScript } from '@/components/AwsMarketplace/BuyWithAwsScript'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import SectionHeading from '@/components/Layouts/SectionHeading'
 import Panel from '@/components/Panel'
 import BackgroundPattern from '@/components/Partners/BackgroundPattern'
+import {
+  AWS_MARKETPLACE_DOCS_URL,
+  AWS_MARKETPLACE_LANDING_URL,
+} from '@/lib/aws-marketplace'
 
-const AWS_MARKETPLACE_LISTING_URL = 'https://aws.amazon.com/marketplace/pp/prodview-zjciuce2qsb3q'
-const AWS_MARKETPLACE_DOCS_URL = '/docs/guides/platform/aws-marketplace'
 const ENTERPRISE_CONTACT_URL = 'https://forms.supabase.com/enterprise'
 
 export const metadata: Metadata = {
@@ -21,7 +25,7 @@ export const metadata: Metadata = {
     title: 'Supabase on AWS Marketplace',
     description:
       'Purchase Supabase through AWS Marketplace, apply spend toward your AWS commitment, or request a private offer.',
-    url: 'https://supabase.com/aws-marketplace',
+    url: AWS_MARKETPLACE_LANDING_URL,
     images: [{ url: 'https://supabase.com/images/og/supabase-og.png' }],
   },
 }
@@ -65,6 +69,7 @@ const steps = [
 export default function AwsMarketplacePage() {
   return (
     <DefaultLayout>
+      <BuyWithAwsScript />
       <div className="overflow-x-clip">
         <section
           className="relative isolate overflow-hidden border-b bg-alternative"
@@ -86,11 +91,7 @@ export default function AwsMarketplacePage() {
               AWS account.
             </p>
             <div className="mt-8 flex w-full flex-col justify-center gap-2 sm:w-auto sm:flex-row">
-              <Button asChild variant="primary" size="medium" iconRight={<ExternalLink />}>
-                <a href={AWS_MARKETPLACE_LISTING_URL} target="_blank" rel="noreferrer">
-                  View purchase options
-                </a>
-              </Button>
+              <BuyWithAwsButton size="medium" />
               <Button asChild size="medium" iconRight={<ArrowRight />}>
                 <a href={ENTERPRISE_CONTACT_URL}>Request a private offer</a>
               </Button>
@@ -149,17 +150,7 @@ export default function AwsMarketplacePage() {
                   Subscribe through the public AWS Marketplace listing, then link the subscription
                   to a new or existing Supabase organization.
                 </p>
-                <Button
-                  asChild
-                  variant="primary"
-                  size="small"
-                  className="mt-8 self-start"
-                  iconRight={<ExternalLink />}
-                >
-                  <a href={AWS_MARKETPLACE_LISTING_URL} target="_blank" rel="noreferrer">
-                    View purchase options
-                  </a>
-                </Button>
+                <BuyWithAwsButton size="small" className="mt-8 self-start" />
               </Panel>
 
               <Panel
