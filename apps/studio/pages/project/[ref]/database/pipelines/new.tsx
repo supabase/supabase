@@ -38,7 +38,8 @@ const PipelineCreationPage = () => {
       window.location.replace(fallback)
     }
   }, [isAccessLoading, canOpenFlow, isEnabled, listHref])
-  if (isAccessLoading) return <GenericSkeletonLoader />
+  if (isAccessLoading)
+    return <GenericSkeletonLoader className="mx-auto w-full max-w-[760px] px-6 py-8" />
   if (!canOpenFlow) return <p role="status">Returning to Pipelines…</p>
   return (
     <>
