@@ -14,23 +14,19 @@ export const ProjectRefCopyButton = ({ projectRef }: ProjectRefCopyButtonProps) 
     // Prevent the parent row/card from navigating
     e.preventDefault()
     e.stopPropagation()
-    copyToClipboard(projectRef)
-    setIsCopied(true)
-    toast.success('Copied project ID to clipboard')
-    setTimeout(() => setIsCopied(false), 2000)
+    copyToClipboard(projectRef, () => {
+      setIsCopied(true)
+      toast.success('Copied project ID to clipboard')
+      setTimeout(() => setIsCopied(false), 2000)
+    })
   }
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
-          tabIndex={0}
           onClick={handleCopyProjectRef}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              handleCopyProjectRef(e)
-            }
-          }}
+          onKeyDown={(e) => e.stopPropagation()}
           className="inline-flex self-start items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-[5px]"
         >
           {projectRef}
