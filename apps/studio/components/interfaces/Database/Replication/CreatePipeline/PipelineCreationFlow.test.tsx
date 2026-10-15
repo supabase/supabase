@@ -8,6 +8,23 @@ import { PipelineCreationFlow } from './PipelineCreationFlow'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
+vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
+  HomeIcon: () => (
+    <a tabIndex={0} href="/organizations">
+      Supabase home
+    </a>
+  ),
+}))
+vi.mock('@/components/layouts/AppLayout/OrganizationDropdown', () => ({
+  OrganizationDropdown: () => <span>Organisation</span>,
+}))
+vi.mock('@/components/layouts/Navigation/NavigationBar/OrgSelector', () => ({
+  OrgSelector: () => <span>Organisation</span>,
+}))
+vi.mock('@/components/layouts/AppLayout/ProjectDropdown', () => ({
+  ProjectDropdown: () => <span>Project</span>,
+}))
+
 mockAnimationsApi()
 beforeEach(() => {
   addAPIMock({
@@ -89,6 +106,10 @@ describe('PipelineCreationFlow', () => {
     expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
     expect(onClose).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('link', { name: 'Supabase home' }))
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(onClose).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Keep me')
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     fireEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))

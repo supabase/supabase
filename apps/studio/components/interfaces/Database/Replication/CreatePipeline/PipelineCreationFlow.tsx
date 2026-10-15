@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
-import { Button, Form, Separator } from 'ui'
+import { Form, Separator } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
@@ -12,6 +12,7 @@ import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fie
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
+import { PipelineCreationHeader } from './PipelineCreationHeader'
 import { PipelineDataReview } from './PipelineDataReview'
 import { PipelineDataSection } from './PipelineDataSection'
 import { PipelineDestinationReview } from './PipelineDestinationReview'
@@ -47,14 +48,20 @@ export const PipelineCreationFlow = ({
     shouldUnregister: false,
   })
   const canLeaveRef = useRef(false)
+  const pendingHrefRef = useRef<string | undefined>(undefined)
   const { isDirty } = form.formState
   const { confirmOnClose, modalProps } = useConfirmOnClose({
     checkIsDirty: () => isDirty,
     onClose: () => {
       canLeaveRef.current = true
-      onClose()
+      if (pendingHrefRef.current) window.location.assign(pendingHrefRef.current)
+      else onClose()
     },
   })
+  const handleClose = () => {
+    pendingHrefRef.current = undefined
+    confirmOnClose()
+  }
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
@@ -79,12 +86,13 @@ export const PipelineCreationFlow = ({
 
   return (
     <div className="flex min-h-screen flex-col bg-dash-sidebar">
-      <header className="flex h-14 shrink-0 items-center justify-between border-b px-6">
-        <h1 className="text-sm text-foreground">New pipeline</h1>
-        <Button type="button" onClick={confirmOnClose}>
-          Close
-        </Button>
-      </header>
+      <PipelineCreationHeader
+        onClose={handleClose}
+        onNavigate={(href) => {
+          pendingHrefRef.current = href
+          confirmOnClose()
+        }}
+      />
       <main className="flex-1">
         <Form {...form}>
           <form id={formId} onSubmit={(event) => event.preventDefault()}>
@@ -94,7 +102,7 @@ export const PipelineCreationFlow = ({
               onStepChange={setStep}
               nextLabel="Continue"
               nextDisabled={step === 'destination' && !canSelectDestination}
-              onCancel={confirmOnClose}
+              onCancel={handleClose}
               finalAction={{ label: 'Start pipeline', disabled: true }}
             >
               <SteppedFlowHeader title={currentStep.title} />
