@@ -1,18 +1,40 @@
+import { cva, type VariantProps } from 'class-variance-authority'
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 import type { ComponentProps, ComponentPropsWithRef, ReactNode } from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
 
-interface TableProps extends ComponentPropsWithRef<'table'> {
+const tableVariants = cva('group/table w-full caption-bottom', {
+  variants: {
+    prose: {
+      true: cn(
+        'my-0',
+        '[&_td:first-child_code]:whitespace-nowrap',
+        '[&_td:not(:first-child)_code]:break-all',
+        '[&_td]:box-content [&_td]:min-w-18',
+        '[&_:is(th,td):not(:last-child)]:pr-8',
+        '[&_th]:whitespace-nowrap'
+      ),
+      false: 'text-sm',
+    },
+  },
+  defaultVariants: { prose: false },
+})
+
+interface TableProps extends ComponentPropsWithRef<'table'>, VariantProps<typeof tableVariants> {
   containerProps?: Partial<ComponentProps<typeof ShadowScrollArea>>
 }
 
-const Table = ({ className, containerProps, ...props }: TableProps) => (
-  <ShadowScrollArea {...containerProps}>
-    <table className={cn('group/table w-full caption-bottom text-sm', className)} {...props} />
-  </ShadowScrollArea>
-)
+const Table = ({ className, containerProps, prose, ...props }: TableProps) => {
+  const table = <table className={cn(tableVariants({ prose }), className)} {...props} />
+
+  // prose pages can render without hydration, so prose uses a css-only scroll fade. other tables
+  // keep ShadowScrollArea for its sticky last column
+  if (prose) return <div className="my-7 overflow-x-auto scroll-fade-x">{table}</div>
+
+  return <ShadowScrollArea {...containerProps}>{table}</ShadowScrollArea>
+}
 
 const TableHeader = ({ className, ...props }: ComponentPropsWithRef<'thead'>) => (
   <thead className={cn('[&_tr]:border-b [&>tr]:bg-200', className)} {...props} />
