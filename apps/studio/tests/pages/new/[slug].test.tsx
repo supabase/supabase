@@ -285,7 +285,6 @@ const DEFAULT_FLAGS = {
   disableOrioleProjectCreation: false,
   defaultRegionRestrictedPool: false,
   projectCreationRestrictedRegions: false,
-  projectCreationSpecificRegionsLink: false,
   freeTierGeneralRegionEnrollment: false,
   freeTierGeneralRegionSelection: false,
 }
@@ -556,13 +555,12 @@ describe('project creation wizard', () => {
     })
 
     describe('specific regions behind a link', () => {
-      const SPECIFIC_REGIONS_LINK_FLAG = { projectCreationSpecificRegionsLink: true }
       const FREE_PLAN_ORG = [mockOrg({ plan: { id: 'free', name: 'Free' } })]
 
       test('opens on the general regions alone for a free-plan org', async () => {
         mockWizardEndpoints({ organizations: FREE_PLAN_ORG })
 
-        await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
+        await renderWizard()
 
         await screen.findByPlaceholderText('Project name')
         await user.click(getSelectTriggerByLabel('Region'))
@@ -576,7 +574,7 @@ describe('project creation wizard', () => {
         const onRequest = vi.fn()
         mockCreateProject(onRequest)
 
-        await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
+        await renderWizard()
 
         await fillProjectName('Specific Region Link Project')
         await generateAndWaitForStrongPassword()
@@ -596,10 +594,10 @@ describe('project creation wizard', () => {
         expect(await submitAndReadRegionSelection(onRequest)).toMatchObject({ code: 'us-east-1' })
       })
 
-      test('has no effect for a paid-plan org: the full region list shows directly with no link', async () => {
+      test('does not apply to a paid-plan org: the full region list shows directly with no link', async () => {
         mockWizardEndpoints()
 
-        await renderWizard({ flags: SPECIFIC_REGIONS_LINK_FLAG })
+        await renderWizard()
 
         await screen.findByPlaceholderText('Project name')
         await user.click(getSelectTriggerByLabel('Region'))
@@ -713,7 +711,28 @@ describe('project creation wizard', () => {
         )
       })
 
-      test('shows the full region picker with no upgrade footer for a free-plan org in the control arm', async () => {
+      test('the upgrade footer replaces the specific-regions link for a free-plan org in the test arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.getByRole('link', { name: 'Upgrade to Pro' })).toBeInTheDocument()
+        expect(screen.queryByText('Need a specific region?')).not.toBeInTheDocument()
+      })
+
+      test('collapses specific regions behind the link for a free-plan org in the control arm', async () => {
         mockWizardEndpoints({
           organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
         })
@@ -722,27 +741,6 @@ describe('project creation wizard', () => {
           flags: {
             freeTierGeneralRegionEnrollment: true,
             freeTierGeneralRegionSelection: false,
-          },
-        })
-
-        await screen.findByPlaceholderText('Project name')
-        await user.click(getSelectTriggerByLabel('Region'))
-
-        expect(await screen.findByText('Specific regions')).toBeInTheDocument()
-        expect(screen.getByRole('option', { name: /North Virginia/ })).toBeInTheDocument()
-        expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
-      })
-
-      test('the specific-regions link takes precedence when both flags are on', async () => {
-        mockWizardEndpoints({
-          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
-        })
-
-        await renderWizard({
-          flags: {
-            projectCreationSpecificRegionsLink: true,
-            freeTierGeneralRegionEnrollment: true,
-            freeTierGeneralRegionSelection: true,
           },
         })
 

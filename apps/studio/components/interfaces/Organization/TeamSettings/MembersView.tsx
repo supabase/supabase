@@ -23,7 +23,6 @@ import {
   type OrganizationMember,
 } from '@/data/organizations/organization-members-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
@@ -38,9 +37,15 @@ export interface MembersViewProps {
   searchString: string
   mfaFilter: MfaFilter
   roleNames: string[]
+  totalNumOrgProjects: number
 }
 
-export const MembersView = ({ searchString, mfaFilter, roleNames }: MembersViewProps) => {
+export const MembersView = ({
+  searchString,
+  mfaFilter,
+  roleNames,
+  totalNumOrgProjects,
+}: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
 
@@ -67,12 +72,6 @@ export const MembersView = ({ searchString, mfaFilter, roleNames }: MembersViewP
   } = useOrganizationRolesV2Query({
     slug,
   })
-
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const orgProjects = useMemo(
-    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
-    [projectsData?.pages]
-  )
 
   const filteredMembers = useMemo(() => {
     const searchedMembers = !searchString
@@ -146,8 +145,8 @@ export const MembersView = ({ searchString, mfaFilter, roleNames }: MembersViewP
       members={members}
       roles={roles}
       isLoadingRoles={isLoadingRoles}
-      orgProjects={orgProjects}
       permissions={permissions}
+      totalNumOrgProjects={totalNumOrgProjects}
       selectedOrganization={selectedOrganization}
       organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
       onManageAccess={handleManageAccess}
