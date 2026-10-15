@@ -53,6 +53,7 @@ import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
+import { Route as SupportCsatRouteImport } from './routes/support/csat'
 import { Route as AppAccountAppsRouteImport } from './routes/_app/account/apps'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
@@ -555,6 +556,11 @@ const ProjectRefRoute = ProjectRefRouteImport.update({
 const ProjectChar91_Char93Route = ProjectChar91_Char93RouteImport.update({
   id: '/project/_',
   path: '/project/_',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportCsatRoute = SupportCsatRouteImport.update({
+  id: '/support/csat',
+  path: '/support/csat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppAccountAppsRoute = AppAccountAppsRouteImport.update({
@@ -2194,6 +2200,7 @@ export interface FileRoutesByFullPath {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
   '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
@@ -2517,6 +2524,7 @@ export interface FileRoutesByTo {
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
   '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
@@ -2832,6 +2840,7 @@ export interface FileRoutesById {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
   '/_app/account/apps': typeof AppAccountAppsRoute
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
@@ -3159,6 +3168,7 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/support/csat'
     | '/account/apps'
     | '/account/audit'
     | '/account/me'
@@ -3482,6 +3492,7 @@ export interface FileRouteTypes {
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
+    | '/support/csat'
     | '/account/apps'
     | '/account/audit'
     | '/account/me'
@@ -3796,6 +3807,7 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/support/csat'
     | '/_app/account/apps'
     | '/_app/account/audit'
     | '/_app/account/me'
@@ -4112,6 +4124,7 @@ export interface RootRouteChildren {
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ProjectChar91_Char93Route: typeof ProjectChar91_Char93RouteWithChildren
+  SupportCsatRoute: typeof SupportCsatRoute
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
@@ -4514,6 +4527,13 @@ declare module '@tanstack/react-router' {
       path: '/project/_'
       fullPath: '/project/_'
       preLoaderRoute: typeof ProjectChar91_Char93RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/csat': {
+      id: '/support/csat'
+      path: '/support/csat'
+      fullPath: '/support/csat'
+      preLoaderRoute: typeof SupportCsatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/account/apps': {
@@ -7255,6 +7275,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,
   ProjectChar91_Char93Route: ProjectChar91_Char93RouteWithChildren,
+  SupportCsatRoute: SupportCsatRoute,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,
