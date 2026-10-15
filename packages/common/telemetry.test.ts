@@ -1,11 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { CLICK_ID_KEYS } from './first-referrer-cookie'
-import { getFirstTouchAttributionProps } from './telemetry'
+import { FIRST_TOUCH_CLICK_ID_KEYS, getFirstTouchAttributionProps } from './telemetry'
 import type { SharedTelemetryData } from './telemetry-first-touch-store'
-
-// bfcid is consent-gated, so it must stay out of the pre-consent CLICK_ID_KEYS.
-const FIRST_TOUCH_CLICK_IDS = [...CLICK_ID_KEYS, 'bfcid']
 
 const makeTelemetryData = (pageUrl: string) =>
   ({
@@ -17,9 +14,13 @@ const makeTelemetryData = (pageUrl: string) =>
   }) as SharedTelemetryData
 
 describe('getFirstTouchAttributionProps', () => {
+  it('sends the cookie click ids plus bfcid', () => {
+    expect([...FIRST_TOUCH_CLICK_ID_KEYS].sort()).toEqual([...CLICK_ID_KEYS, 'bfcid'].sort())
+  })
+
   it('sends every click id, and only the expected ones', () => {
     const url = new URL('https://supabase.com/dashboard')
-    for (const key of FIRST_TOUCH_CLICK_IDS) url.searchParams.set(key, `${key}-value`)
+    for (const key of FIRST_TOUCH_CLICK_ID_KEYS) url.searchParams.set(key, `${key}-value`)
     url.searchParams.set('not_a_click_id', 'ignored')
 
     const props = getFirstTouchAttributionProps(makeTelemetryData(url.href))
@@ -28,7 +29,7 @@ describe('getFirstTouchAttributionProps', () => {
     )
 
     expect(clickIdProps).toEqual(
-      Object.fromEntries(FIRST_TOUCH_CLICK_IDS.map((key) => [key, `${key}-value`]))
+      Object.fromEntries(FIRST_TOUCH_CLICK_ID_KEYS.map((key) => [key, `${key}-value`]))
     )
   })
 })

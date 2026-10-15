@@ -144,6 +144,10 @@ describe('first-referrer-cookie', () => {
       })
     })
 
+    it('keeps the consent-gated bfcid out of the pre-consent cookie', () => {
+      expect(CLICK_ID_KEYS).not.toContain('bfcid')
+    })
+
     it('extracts every click id in CLICK_ID_KEYS', () => {
       const landingUrl = new URL('https://supabase.com/')
       for (const key of CLICK_ID_KEYS) landingUrl.searchParams.set(key, `${key}-value`)
