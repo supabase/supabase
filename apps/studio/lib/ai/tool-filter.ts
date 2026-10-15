@@ -75,20 +75,12 @@ export const storedUpdateOptInLevelInputSchema = updateOptInLevelInputSchema.ext
   levelWhenAsked: optInLevelSchema.optional(),
 })
 
-export function isOptInLevelAtLeast(level: AiOptInLevel, minimum: AiOptInLevel): boolean {
-  return OPT_IN_LEVELS.indexOf(level) >= OPT_IN_LEVELS.indexOf(minimum)
-}
-
 /** A request for a level the org already had needs no review, so it gets no card or approval. */
 export function isOptInRequestAlreadyGranted({
   requiredLevel,
   levelWhenAsked,
 }: z.infer<typeof storedUpdateOptInLevelInputSchema>): boolean {
   return !!requiredLevel && !!levelWhenAsked && isOptInLevelAtLeast(levelWhenAsked, requiredLevel)
-}
-
-export function lowerOptInLevel(a: AiOptInLevel, b: AiOptInLevel): AiOptInLevel {
-  return isOptInLevelAtLeast(a, b) ? b : a
 }
 
 /**

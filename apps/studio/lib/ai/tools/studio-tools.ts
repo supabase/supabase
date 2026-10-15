@@ -18,11 +18,7 @@ import {
   RLS_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
-import {
-  isOptInLevelAtLeast,
-  isOptInRequestAlreadyGranted,
-  updateOptInLevelInputSchema,
-} from '@/lib/ai/tool-filter'
+import { isOptInRequestAlreadyGranted, updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
 import { NO_DATA_PERMISSIONS, toModelRows } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
