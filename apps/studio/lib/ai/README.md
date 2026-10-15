@@ -29,7 +29,7 @@ The state module owns the AI SDK chat instances, request transport, chat persist
 - **Keep execution approval separate from data sharing.** Full data opt-in does not approve AI-generated SQL execution. Promote untrusted SQL only after explicit user approval.
 - **Protect results on every model path.** Apply output filtering to both live tool results and replayed history. Raising opt-in must not expose SQL results collected under a lower level.
 - **Keep the tool allowlist.** Register tools explicitly and declare their minimum opt-in level. Remote MCP tools must pass the filter; the remote server's read-only setting does not replace it.
-- **Keep request context out of the shared system prompt.** Put project, chat, clock, and current opt-in information in `assistant-context.ts` to preserve provider caching.
+- **Keep request context out of the shared system prompt.** Put project, chat, clock, and logs context in `assistant-context.ts` to preserve provider caching.
 - **Keep tool contracts safe to import in the browser.** Shared contracts contain schemas and pure output transformations; database calls and other server execution belong in the server implementation.
 - **Preserve both runtimes.** Keep the TanStack adapter and Next.js handler aligned. The chat route currently delegates to the shared handler; do not remove that handler while the adapter uses it.
 
@@ -48,15 +48,15 @@ The state module owns the AI SDK chat instances, request transport, chat persist
 
 ### Model requests and context
 
-| Change                                               | Start here                                                                                                                                                                              |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chat endpoint and request validation                 | [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts)                                                                                                                                 |
-| Model streaming and response orchestration           | [generate-assistant-response.ts](./generate-assistant-response.ts)                                                                                                                      |
-| System instructions and topic knowledge              | [prompts.ts](./prompts.ts); `load_knowledge` in [studio-tools.ts](./tools/studio-tools.ts)                                                                                              |
-| Project, chat, opt-in level, clock, and logs context | [assistant-context.ts](./assistant-context.ts), [assistant-message-metadata.ts](./assistant-message-metadata.ts)                                                                        |
-| History preparation and output sanitization          | [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts), [tool-sanitizer.ts](./tools/tool-sanitizer.ts)                                                          |
-| Model catalog, defaults, and provider configuration  | [model.utils.ts](./model.utils.ts), [model.ts](./model.ts), [bedrock.ts](./bedrock.ts); entitlement and throttling decisions in [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts) |
-| Tracing and feedback                                 | [braintrust-logger.ts](./braintrust-logger.ts), [feedback API](../../pages/api/ai/feedback/), [rate-message-mutation.ts](../../data/ai/rate-message-mutation.ts)                        |
+| Change                                              | Start here                                                                                                                                                                              |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chat endpoint and request validation                | [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts)                                                                                                                                 |
+| Model streaming and response orchestration          | [generate-assistant-response.ts](./generate-assistant-response.ts)                                                                                                                      |
+| System instructions and topic knowledge             | [prompts.ts](./prompts.ts); `load_knowledge` in [studio-tools.ts](./tools/studio-tools.ts)                                                                                              |
+| Project, chat, clock, and logs context              | [assistant-context.ts](./assistant-context.ts), [assistant-message-metadata.ts](./assistant-message-metadata.ts)                                                                        |
+| History preparation and output sanitization         | [generate-assistant-response.utils.ts](./generate-assistant-response.utils.ts), [tool-sanitizer.ts](./tools/tool-sanitizer.ts)                                                          |
+| Model catalog, defaults, and provider configuration | [model.utils.ts](./model.utils.ts), [model.ts](./model.ts), [bedrock.ts](./bedrock.ts); entitlement and throttling decisions in [generate-v4.ts](../../pages/api/ai/sql/generate-v4.ts) |
+| Tracing and feedback                                | [braintrust-logger.ts](./braintrust-logger.ts), [feedback API](../../pages/api/ai/feedback/), [rate-message-mutation.ts](../../data/ai/rate-message-mutation.ts)                        |
 
 Keep per-request context in `assistant-context.ts`. The shared system prompt is deliberately static for provider caching.
 
@@ -99,7 +99,7 @@ These checks have different responsibilities:
 
 The opt-in levels are `disabled`, `schema`, `schema_and_log`, and `schema_and_log_and_data`. `execute_sql` is available at every level and requires user approval; sharing its result rows with the model requires `schema_and_log_and_data`. History sanitization also considers the level stamped on the original SQL output. Permission to change opt-in settings, user approval to run SQL, and the database's authorization checks are separate from result sharing.
 
-The per-request context states the current level. The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Calls without `requiredLevel` require approval through the opt-in request card, including when the organization already has full access. Only a call with an explicit `requiredLevel` already satisfied by `levelWhenAsked` skips approval and shows no card; an unchanged level alone does not bypass approval.
+The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Every call requires approval through the opt-in request card, even when the organization already has the requested level. If the requested level is already satisfied, the input transform removes `requiredLevel` and treats the call as a review request; `levelWhenAsked` records the organization's level when the call was made.
 
 On platform, the endpoint resolves organization access and `getTools` includes platform tools when an access token is available. It also registers the opt-in request tool. Self-hosted requests use the `schema` level and fallback tools instead of the platform tool set. Check [getTools](./tools/index.ts) and [generate-v4](../../pages/api/ai/sql/generate-v4.ts) when changing either environment.
 
