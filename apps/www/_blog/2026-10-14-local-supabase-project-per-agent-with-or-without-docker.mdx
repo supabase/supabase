@@ -15,7 +15,7 @@ imgThumb: '2026-10-14-local-supabase-project-per-agent-with-or-without-docker/th
 toc_depth: 2
 ---
 
-The Supabase CLI now runs several local projects on one machine, one per git worktree, and runs them without Docker. Each coding agent gets its own database to reset, migrate, and test against while the others keep working. Local projects start in seconds and use a tenth of the memory, and the remote branch that picks up the work when a pull request opens is ready more than five times faster.
+The Supabase CLI now runs several local projects on one machine, one per git worktree, and runs them without Docker. Each coding agent gets its own database to reset, migrate, and test against while the others keep working. Local projects start in seconds and use about a tenth of the memory, and the remote branch that picks up the work when a pull request opens is nearly five times faster.
 
 Multiple projects and the native runtime ship in CLI v2.119.0 behind an experimental flag. Faster branches are on for every project today.
 
@@ -39,12 +39,13 @@ No more coordinating project IDs or ports by hand, which has been one of the [mo
 
 `supabase start` brings up Postgres and leaves every other service asleep until its first request. If your task never touches Storage, Storage never runs. Sleeping services use no CPU or memory, stop again when idle, and wake on the next request. Pass `--eager` if you want everything up front.
 
-|                            | Default engine | Docker runtime | Native runtime |
-| -------------------------- | -------------- | -------------- | -------------- |
-| Start, artifacts cached    | 37 s           | 5.2 s          | 3.9 s          |
-| Restart with existing data | 32 s           | 2.1 s          | 1.4 s          |
-| Download size              | 1.9 GB         | 550 MB         | 360 MB         |
-| Idle memory                | 2.6 GiB        | 290 MiB        | 290 MiB        |
+| Measurement                       | Default engine | Docker runtime       | Native runtime       |
+| --------------------------------- | -------------- | -------------------- | -------------------- |
+| Start a project, artifacts cached | 37 s           | 5.2 s (86% faster)   | 3.9 s (90% faster)   |
+| Restart with existing data        | 32 s           | 2.1 s (93% faster)   | 1.4 s (96% faster)   |
+| First start, empty cache          | 93 s           | 18 s (81% faster)    | 16 s (82% faster)    |
+| Download size                     | 1.9 GB         | 550 MB (72% smaller) | 360 MB (81% smaller) |
+| Idle memory, default settings     | 2.6 GiB        | 290 MiB (89% less)   | 290 MiB (89% less)   |
 
 Nine idle projects now fit in the memory one used to take, which is what makes a project per worktree practical on a laptop.
 
@@ -58,14 +59,14 @@ supabase start --runtime native
 
 It runs on Linux (amd64 and arm64, glibc 2.35 or later) and macOS 14 or later on Apple silicon. Docker stays the default when it's present and is still the better fit for several projects on one laptop, since each container gets its own network and file system. Think of native as one project per sandbox. Running Supabase locally without Docker has been a [long-running request](https://github.com/orgs/supabase/discussions/20272) too.
 
-## Branches are ready more than five times faster
+## Branches are ready nearly five times faster
 
 When the pull request opens, a remote branch gives reviewers a URL to point a build at, and that branch now arrives configured like the project it came from. Auth, Storage, network restrictions, and deployed Edge Functions all carry over at creation, with function bundles copied in parallel so a project with 40 functions comes up as fast as one with two. Secrets stay behind and production data stays out unless you choose to branch with it, so the branch is safe to hand to a reviewer the moment it's ready.
 
-| Time to ready   | Before  | After |
-| --------------- | ------- | ----- |
-| Median          | 102 s   | 21 s  |
-| 95th percentile | 7.6 min | 41 s  |
+| Time to ready         | Before September rollout | After | Improvement |
+| --------------------- | ------------------------ | ----- | ----------- |
+| Median (p50)          | 102 s                    | 21 s  | 4.8x faster |
+| 95th percentile (p95) | 7.6 min                  | 41 s  | 11x faster  |
 
 ## Get started
 
