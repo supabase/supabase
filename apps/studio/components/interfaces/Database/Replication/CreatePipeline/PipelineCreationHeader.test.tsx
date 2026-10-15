@@ -31,7 +31,7 @@ describe('PipelineCreationHeader', () => {
     const onClose = vi.fn()
     customRender(<PipelineCreationHeader onClose={onClose} onNavigate={vi.fn()} />)
     expect(screen.getByRole('navigation', { name: 'Pipeline creation' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'New pipeline' })).toBeInTheDocument()
+    expect(screen.getByText('New pipeline')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(onClose).toHaveBeenCalledOnce()
   })

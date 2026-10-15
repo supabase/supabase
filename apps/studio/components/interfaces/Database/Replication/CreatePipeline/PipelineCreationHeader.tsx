@@ -1,10 +1,11 @@
-import { SlashIcon, XIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import type { MouseEvent } from 'react'
 import { Button, SidebarProvider } from 'ui'
 
 import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
 import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
+import { LayoutHeaderDivider } from '@/components/layouts/Navigation/LayoutHeader/LayoutHeaderDivider'
 import { OrgSelector } from '@/components/layouts/Navigation/NavigationBar/OrgSelector'
 
 export const PipelineCreationHeader = ({
@@ -31,15 +32,10 @@ export const PipelineCreationHeader = ({
     >
       <nav
         aria-label="Pipeline creation"
-        className="hide-scrollbar flex min-w-0 items-center gap-2 overflow-x-auto text-sm"
+        className="hide-scrollbar flex min-w-0 items-center gap-2 overflow-x-auto text-sm md:gap-0"
       >
-        <HomeIcon />
-        <SlashIcon
-          aria-hidden="true"
-          size={16}
-          strokeWidth={1}
-          className="hidden shrink-0 text-border-stronger md:block"
-        />
+        <HomeIcon className="md:mr-2" />
+        <LayoutHeaderDivider className="hidden shrink-0 md:block" />
         <div className="hidden md:block">
           <OrganizationDropdown />
         </div>
@@ -48,20 +44,10 @@ export const PipelineCreationHeader = ({
             <OrgSelector />
           </SidebarProvider>
         </div>
-        <SlashIcon
-          aria-hidden="true"
-          size={16}
-          strokeWidth={1}
-          className="hidden shrink-0 text-border-stronger md:block"
-        />
+        <LayoutHeaderDivider className="hidden shrink-0 md:block" />
         <ProjectDropdown />
-        <SlashIcon
-          aria-hidden="true"
-          size={16}
-          strokeWidth={1}
-          className="hidden shrink-0 text-border-stronger md:block"
-        />
-        <h1 className="shrink-0 text-foreground">New pipeline</h1>
+        <LayoutHeaderDivider className="hidden shrink-0 md:block" />
+        <span className="shrink-0 text-foreground">New pipeline</span>
       </nav>
       <Button
         type="button"
