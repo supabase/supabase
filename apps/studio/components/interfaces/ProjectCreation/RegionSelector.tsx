@@ -95,7 +95,7 @@ export const RegionSelector = ({
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
   const isSpecificRegionsLinkEnabled =
-    useFlag('projectCreationSpecificRegionsLink') === true && isFreePlan
+    useFlag('projectCreationSpecificRegionsLink') === true && isFreePlan && !hideSpecificRegions
 
   const { getRegionRestriction } = useRegionRestriction()
 

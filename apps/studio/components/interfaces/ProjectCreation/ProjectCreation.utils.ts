@@ -117,25 +117,21 @@ type GetFreeTierGeneralRegionExperimentVariantArgs = {
   smartRegionEnabled: boolean
   enrollmentFlag: boolean
   selectionFlag: boolean
-  /** When true, another feature owns the region selector and the experiment is inactive */
-  isOverridden?: boolean
 }
 
 /**
  * Org's arm in the freeTierGeneralRegionExperiment. The test arm only sees general regions.
- * Returns undefined when the org isn't enrolled, or when the experiment is overridden.
+ * Returns undefined when the org isn't enrolled.
  */
 export function getFreeTierGeneralRegionExperimentVariant({
   isFreePlan,
   smartRegionEnabled,
   enrollmentFlag,
   selectionFlag,
-  isOverridden = false,
 }: GetFreeTierGeneralRegionExperimentVariantArgs):
   | FreeTierGeneralRegionExperimentVariant
   | undefined {
-  const isInExperiment =
-    !isOverridden && isFreePlan && smartRegionEnabled && enrollmentFlag === true
+  const isInExperiment = isFreePlan && smartRegionEnabled && enrollmentFlag === true
   if (!isInExperiment) return undefined
   return selectionFlag === true ? 'test' : 'control'
 }

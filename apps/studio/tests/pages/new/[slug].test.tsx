@@ -733,7 +733,7 @@ describe('project creation wizard', () => {
         expect(screen.queryByRole('link', { name: 'Upgrade to Pro' })).not.toBeInTheDocument()
       })
 
-      test('the specific-regions link takes precedence when both flags are on', async () => {
+      test('the paywall takes precedence over the specific-regions link for a free-plan org in the test arm', async () => {
         mockWizardEndpoints({
           organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
         })
@@ -743,6 +743,28 @@ describe('project creation wizard', () => {
             projectCreationSpecificRegionsLink: true,
             freeTierGeneralRegionEnrollment: true,
             freeTierGeneralRegionSelection: true,
+          },
+        })
+
+        await screen.findByPlaceholderText('Project name')
+        await user.click(getSelectTriggerByLabel('Region'))
+
+        expect(await screen.findByText('General regions')).toBeInTheDocument()
+        expect(screen.queryByText('Specific regions')).not.toBeInTheDocument()
+        expect(screen.getByRole('link', { name: 'Upgrade to Pro' })).toBeInTheDocument()
+        expect(screen.queryByText('Need a specific region?')).not.toBeInTheDocument()
+      })
+
+      test('the specific-regions link still applies for a free-plan org in the paywall control arm', async () => {
+        mockWizardEndpoints({
+          organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
+        })
+
+        await renderWizard({
+          flags: {
+            projectCreationSpecificRegionsLink: true,
+            freeTierGeneralRegionEnrollment: true,
+            freeTierGeneralRegionSelection: false,
           },
         })
 
