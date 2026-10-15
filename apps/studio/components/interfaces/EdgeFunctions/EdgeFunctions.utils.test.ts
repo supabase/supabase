@@ -156,4 +156,37 @@ describe('getDefaultSelectedFileId', () => {
   it('returns undefined when there are no files', () => {
     expect(getDefaultSelectedFileId([], 'index.ts')).toBeUndefined()
   })
+
+  it('selects the entrypoint closest to the root when several files match its path', () => {
+    const entrypointPath = 'functions/hello/index.ts'
+
+    for (const names of [
+      ['index.ts', 'functions/hello/index.ts'],
+      ['functions/hello/index.ts', 'index.ts'],
+    ]) {
+      const files = formatFunctionBodyToFiles({
+        functionBody: {
+          files: names.map((name) => ({ name, content: name })),
+          metadata: { deno2_entrypoint_path: entrypointPath },
+        },
+      })
+      const id = getDefaultSelectedFileId(files, entrypointPath)
+
+      expect(files.map((f) => f.name)).toEqual(['functions/hello/index.ts', 'index.ts'])
+      expect(files.find((f) => f.id === id)?.name).toBe('index.ts')
+    }
+  })
+
+  it('does not match a file name that only shares trailing characters', () => {
+    const entrypointPath = 'functions/hello/index.ts'
+    const files = formatFunctionBodyToFiles({
+      functionBody: {
+        files: ['dex.ts', 'index.ts'].map((name) => ({ name, content: name })),
+        metadata: { deno2_entrypoint_path: entrypointPath },
+      },
+    })
+    const id = getDefaultSelectedFileId(files, entrypointPath)
+
+    expect(files.find((f) => f.id === id)?.name).toBe('index.ts')
+  })
 })

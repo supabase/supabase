@@ -229,12 +229,23 @@ export const getStaticPatterns = (files: Omit<FileData, 'id' | 'content' | 'stat
     .map(({ name }) => name)
 }
 
+// Finds the body file the entrypoint refers to: any file whose path is a trailing path of the
+// entrypoint. When several match (e.g. `index.ts` and `functions/hello/index.ts` for an entrypoint
+// ending in `functions/hello/index.ts`), the one closest to the root wins.
+function findEntrypointFileName(entrypoint: string, fileNames: string[]): string | undefined {
+  const depth = (name: string) => name.split('/').length
+
+  return fileNames
+    .filter((name) => entrypoint === name || entrypoint.endsWith(`/${name}`))
+    .sort((a, b) => depth(a) - depth(b))[0]
+}
+
 function getBasePath(entrypoint: string | undefined, fileNames: string[]): string {
   if (!entrypoint) {
     return '/'
   }
 
-  let candidate = fileNames.find((name) => entrypoint.endsWith(name))
+  let candidate = findEntrypointFileName(entrypoint, fileNames)
 
   if (candidate) {
     return dirname(candidate)
