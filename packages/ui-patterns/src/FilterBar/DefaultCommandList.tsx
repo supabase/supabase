@@ -59,14 +59,14 @@ export function DefaultCommandList({
 
   if (items.length === 0) {
     return (
-      <div ref={listRef} className="max-h-[300px] overflow-y-auto py-1">
+      <div ref={listRef} className="max-h-[300px] overflow-y-auto p-1">
         <EmptyState />
       </div>
     )
   }
 
   return (
-    <div ref={listRef} className="max-h-[300px] overflow-y-auto py-1">
+    <div ref={listRef} className="max-h-[300px] overflow-y-auto p-1">
       {groups.map((groupData, groupIndex) => (
         <div key={groupData.group}>
           {groupIndex > 0 && showGroupHeaders && <GroupSeparator />}
