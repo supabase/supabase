@@ -204,7 +204,10 @@ export function WaitlistForm() {
           </div>
           <div className="flex flex-col gap-2">
             <div className="w-full flex gap-2 justify-between text-left">
-              <Label htmlFor="projectRef" className="text-foreground-light flex gap-2 text-left">
+              <Label
+                htmlFor="projectRef"
+                className="text-foreground-light flex items-center gap-1.5 text-left"
+              >
                 <span>Project ID</span>
                 <InfoTooltip className="max-w-[450px] text-foreground-light text-pretty">
                   <p>
@@ -220,7 +223,6 @@ export function WaitlistForm() {
                     </Link>
                     )
                   </p>
-                  <p>Only projects created in us-west-2 can access Compute during Private Alpha.</p>
                 </InfoTooltip>
               </Label>
               {errors.projectRef && (
@@ -236,6 +238,9 @@ export function WaitlistForm() {
               placeholder="abcdefghijklmnopqrst"
               aria-describedby="projectRef-description"
             />
+            <p className="text-foreground-lighter text-xs">
+              Only projects created in us-west-2 can access Compute during private alpha.
+            </p>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="useCase" className="text-foreground-light text-left">
