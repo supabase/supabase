@@ -10,7 +10,7 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from './pg-format'
-import { FUNCTIONS_SQL } from './sql/functions'
+import { FUNCTIONS_SQL, getFunctionsSql } from './sql/functions'
 
 export const pgRoutineKindZod = z.enum(['function', 'procedure'])
 export type PGRoutineKind = z.infer<typeof pgRoutineKindZod>
@@ -103,31 +103,40 @@ type FunctionsRetrieveReturn = {
   zod: typeof pgFunctionOptionalZod
 }
 
-export function retrieve({ id }: { id: number }): FunctionsRetrieveReturn
+export function retrieve({ id, scoped }: { id: number; scoped?: boolean }): FunctionsRetrieveReturn
 export function retrieve({
   name,
   schema,
   args,
+  scoped,
 }: {
   name: string
   schema: string
   args: string[]
+  scoped?: boolean
 }): FunctionsRetrieveReturn
 export function retrieve({
   id,
   name,
   schema = 'public',
   args = [],
+  scoped = false,
 }: {
   id?: number
   name?: string
   schema?: string
   args?: string[]
+  scoped?: boolean
 }): FunctionsRetrieveReturn {
   if (id) {
+    // Scoped path: push the single OID literal into the functions CTE so the
+    // per-row deparse calls run once instead of for every function in the
+    // catalog. Output rows are identical -- the outer filter already
+    // restricted the result to this routine.
+    const fnSql = scoped ? getFunctionsSql(safeSql`${literal(id)}`) : FUNCTIONS_SQL
     const sql = safeSql`
       with f as (
-        ${FUNCTIONS_SQL}
+        ${fnSql}
       )
       select
         f.*
@@ -159,8 +168,18 @@ export function retrieve({
           ) args
         )`
       : literal('')
+    // Scoped path: resolve the single matching routine's OID once (via pg_proc's
+    // (proname, pronamespace) index) and push it into the functions CTE, so
+    // the per-row deparse calls run for the requested routine only. The
+    // argtypes predicate matches the legacy outer join filter exactly, so
+    // output rows are identical.
+    const fnSql = scoped
+      ? getFunctionsSql(
+          safeSql`(select q.oid from pg_proc q join pg_namespace qn on qn.oid = q.pronamespace where q.proname = ${literal(name)} and qn.nspname = ${literal(schema)} and q.proargtypes::text = ${argsFragment})`
+        )
+      : FUNCTIONS_SQL
     const sql = safeSql`with f as (
-      ${FUNCTIONS_SQL}
+      ${fnSql}
     )
     select
       f.*

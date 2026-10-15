@@ -157,6 +157,8 @@ function retrieve(identifier: TableIdentifier & { scoped?: boolean }): {
     }
   }
 
+  // Deprecated legacy path (scoped: false): full-catalog introspection with an
+  // outer filter. Kept for compatibility; will be removed.
   const sql = safeSql`${generateEnrichedTablesSql({ includeColumns: true })} where ${whereClause};`
   return {
     sql,
