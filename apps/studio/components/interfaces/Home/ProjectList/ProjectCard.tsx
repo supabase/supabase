@@ -117,7 +117,7 @@ export const ProjectCard = ({
                     />
                   )}
                   {isVercelIntegrated && (
-                    <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-md flex items-center justify-center text-black dark:text-white">
+                    <div className="bg-surface-100 w-5 h-5 p-1 border border-strong rounded-sm flex items-center justify-center text-black dark:text-white">
                       <InlineSVG
                         src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
                         title="Vercel Icon"
@@ -127,7 +127,7 @@ export const ProjectCard = ({
                   )}
                   <PartnerIcon organization={{ managed_by: projectManagedBy }} />
                   {isGithubIntegrated && (
-                    <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
+                    <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-sm min-w-0">
                       <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
                         <GithubIcon size={12} strokeWidth={1.5} />
                       </div>
