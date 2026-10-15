@@ -30,7 +30,7 @@ export interface WebhookEndpointAttributesInput {
   description?: string | null
   enabled?: boolean
   event_types: { type: WebhookEventType }[]
-  custom_headers?: Record<string, string> | null
+  custom_headers?: Record<string, string>
   signing_secret?: string
 }
 
