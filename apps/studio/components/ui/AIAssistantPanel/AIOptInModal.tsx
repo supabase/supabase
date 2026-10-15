@@ -19,7 +19,7 @@ import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { isOptInLevelAtLeast } from '@/lib/ai/tool-filter'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 
 interface AIOptInModalProps {
   visible: boolean
