@@ -59,6 +59,7 @@ services:
       # See: docker-compose.logs.yml
       ENABLED_FEATURES_LOGS_ALL: "false"
       ENABLED_FEATURES_MCP_OAUTH: "false"
+      # MCP_ALLOWED_USERS is required when ENABLED_FEATURES_MCP_OAUTH: "true"
       #MCP_ALLOWED_USERS: ""
 
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
