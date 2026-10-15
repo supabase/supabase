@@ -23,6 +23,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { findMatchingDateHelper, formatDateRange } from '../Settings/Logs/Logs.datePickerHelpers'
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { parseTimeRange, serializeTimeRange } from '../Settings/Logs/Logs.timeRange'
+import { createAuditLogsProjectOption } from './AuditLogsProjectOption'
 import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
 import { getAuditLogColumns } from '@/components/interfaces/AuditLogs/AuditLogs.columns'
 import {
@@ -94,6 +95,10 @@ export const AuditLogs = () => {
     ],
   }))
   const [freeformText, setFreeformText] = useState('')
+  const [projectNames, setProjectNames] = useState<Record<string, string>>({})
+
+  const handleSelectProject = (project: { ref: string; name: string }) =>
+    setProjectNames((prev) => ({ ...prev, [project.ref]: project.name }))
 
   const handleFilterChange = (next: FilterGroup) => {
     setFilterGroup(next)
@@ -139,7 +144,6 @@ export const AuditLogs = () => {
   const logs = useMemo(() => data?.result ?? [], [data?.result])
   const filteredLogs = useMemo(() => filterByFilterGroup(logs, filterGroup), [logs, filterGroup])
 
-  // Prototype: options are the already-loaded projects page (no server-side search/pagination)
   const hasDateFilter = !!findDateCondition(filterGroup)
   const filterProperties: FilterProperty[] = [
     {
@@ -147,8 +151,11 @@ export const AuditLogs = () => {
       name: PROJECT_FILTER_PROPERTY,
       type: 'string',
       operators: ['='],
-      options: projects.map((p) => ({ label: p.name, value: p.ref })),
-      formatValue: (value) => projects.find((p) => p.ref === value)?.name ?? String(value ?? ''),
+      options: { component: createAuditLogsProjectOption(handleSelectProject) },
+      formatValue: (value) => {
+        const ref = String(value ?? '')
+        return projectNames[ref] ?? projects.find((p) => p.ref === ref)?.name ?? ref
+      },
     },
     {
       label: 'Date range',
