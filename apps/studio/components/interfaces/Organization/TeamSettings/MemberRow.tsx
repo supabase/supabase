@@ -25,6 +25,7 @@ import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { type OrganizationRole } from '@/data/organization-members/organization-roles-query'
 import { type OrganizationMember } from '@/data/organizations/organization-members-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useProfile } from '@/lib/profile'
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
@@ -39,6 +40,8 @@ export const MemberRow = memo(function MemberRow({
   const { slug } = useParams()
   const { profile } = useProfile()
   const { roles, isLoadingRoles } = useTeamSettingsData()
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
 
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
@@ -162,8 +165,7 @@ export const MemberRow = memo(function MemberRow({
                     >
                       {projectsApplied[0].name}
                     </span>
-                  ) : // If the role is org scoped, don't show a hovercard with all projects
-                  !appliesToAllProjects ? (
+                  ) : (
                     <HoverCard openDelay={200}>
                       <HoverCardTrigger asChild>
                         <span className="text-foreground-light truncate">
@@ -173,30 +175,44 @@ export const MemberRow = memo(function MemberRow({
                         </span>
                       </HoverCardTrigger>
                       <HoverCardContent className="p-0">
-                        <p className="p-2 text-xs">
-                          {roleName} role applies to {projectsApplied.length} project
-                          {projectsApplied.length > 1 ? 's' : ''}
-                        </p>
-                        <div className="border-t flex flex-col py-1">
-                          <ScrollArea className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}>
-                            {projectsApplied.map(({ ref, name }) => (
-                              <Link
-                                key={ref}
-                                href={`/project/${ref}`}
-                                className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
-                              >
-                                <span className="text-xs truncate max-w-[60%]">{name}</span>
-                                <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
-                                  Go to project
-                                  <ArrowRightIcon size={14} />
-                                </span>
-                              </Link>
-                            ))}
-                          </ScrollArea>
-                        </div>
+                        {
+                          // If the role is org scoped, don't list all projects
+                          appliesToAllProjects ? (
+                            <p className="p-2 text-xs">
+                              {roleName} role applies to {totalNumOrgProjects} project
+                              {totalNumOrgProjects ? 's' : ''}
+                            </p>
+                          ) : (
+                            <>
+                              <p className="p-2 text-xs">
+                                {roleName} role applies to {projectsApplied.length} project
+                                {projectsApplied.length > 1 ? 's' : ''}
+                              </p>
+                              <div className="border-t flex flex-col py-1">
+                                <ScrollArea
+                                  className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}
+                                >
+                                  {projectsApplied.map(({ ref, name }) => (
+                                    <Link
+                                      key={ref}
+                                      href={`/project/${ref}`}
+                                      className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
+                                    >
+                                      <span className="text-xs truncate max-w-[60%]">{name}</span>
+                                      <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
+                                        Go to project
+                                        <ArrowRightIcon size={14} />
+                                      </span>
+                                    </Link>
+                                  ))}
+                                </ScrollArea>
+                              </div>
+                            </>
+                          )
+                        }
                       </HoverCardContent>
                     </HoverCard>
-                  ) : null}
+                  )}
                 </>
               )}
             </div>
