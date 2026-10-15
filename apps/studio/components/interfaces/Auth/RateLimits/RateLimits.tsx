@@ -158,11 +158,12 @@ export const RateLimits = () => {
   })
   const rateLimitVerify = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_VERIFY' })
   const rateLimitOtp = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_OTP' })
+  const { dirtyFields: rateLimitDirtyFields } = rateLimitForm.formState
 
   const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
 
-    if (rateLimitForm.formState.dirtyFields.SMTP_MAX_FREQUENCY && data.SMTP_MAX_FREQUENCY < 1) {
+    if (rateLimitDirtyFields.SMTP_MAX_FREQUENCY && data.SMTP_MAX_FREQUENCY < 1) {
       rateLimitForm.setError('SMTP_MAX_FREQUENCY', { message: 'Must be more than 0' })
       return
     }
@@ -625,7 +626,7 @@ export const RateLimits = () => {
                               <InputGroup>
                                 <FormInputGroupInput
                                   type="number"
-                                  min={1}
+                                  min={0}
                                   {...field}
                                   disabled={!canUpdateConfig || !isSmtpEnabled(authConfig)}
                                 />
