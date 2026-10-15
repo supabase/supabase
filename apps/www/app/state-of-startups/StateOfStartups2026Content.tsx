@@ -3,7 +3,7 @@
 import DefaultLayout from '~/components/Layouts/Default'
 import pageData from '~/data/surveys/state-of-startups-2026'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { forwardRef, useEffect, useRef, useState, type RefObject } from 'react'
 import { Button, cn } from 'ui'
@@ -301,7 +301,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
       </div>
       <div className="flex items-center justify-center gap-2 mt-4">
         <Button variant="primary" asChild size="medium">
-          <Link
+          <a
             href="https://supabase.com/dashboard"
             onClick={() =>
               sendTelemetryEvent({
@@ -311,7 +311,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
             }
           >
             Start your project
-          </Link>
+          </a>
         </Button>
         <Button asChild size="medium">
           <Link

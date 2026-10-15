@@ -1,18 +1,15 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import type { ToolContext } from './types'
 import { getContentById } from '@/data/content/content-id-query'
 import { getContent } from '@/data/content/content-query'
 import type { Dashboards, SqlSnippets } from '@/types'
 
-export type ReportToolsContext = {
-  projectRef?: string
-  authorization?: string
-}
-
-export const getReportTools = (ctx: ReportToolsContext = {}) => {
+export const getReportTools = (ctx: ToolContext = {}) => {
   const { projectRef, authorization } = ctx
-  const authHeaders = authorization ? { Authorization: authorization } : undefined
+  const authHeaders = getAuthHeaders(authorization)
 
   return {
     list_reports: tool({
@@ -26,10 +23,10 @@ export const getReportTools = (ctx: ReportToolsContext = {}) => {
           .default(20)
           .describe('Max number of reports to return.'),
       }),
-      execute: async ({ limit }) => {
+      execute: async ({ limit }, { abortSignal }) => {
         const { content } = await getContent(
           { projectRef, type: 'report', limit },
-          undefined,
+          abortSignal,
           authHeaders
         )
 
@@ -49,8 +46,8 @@ export const getReportTools = (ctx: ReportToolsContext = {}) => {
       inputSchema: z.object({
         id: z.string().describe('The id of the report to fetch.'),
       }),
-      execute: async ({ id }) => {
-        const report = await getContentById({ projectRef, id }, undefined, authHeaders)
+      execute: async ({ id }, { abortSignal }) => {
+        const report = await getContentById({ projectRef, id }, abortSignal, authHeaders)
         if (report.type !== 'report') {
           throw new Error(`Content ${id} is not a report (type: ${report.type})`)
         }
@@ -63,7 +60,7 @@ export const getReportTools = (ctx: ReportToolsContext = {}) => {
             // A SQL-block chart's `id` is the id of its linked `type: 'sql'` content row.
             const snippet = await getContentById(
               { projectRef, id: chart.id },
-              undefined,
+              abortSignal,
               authHeaders
             ).catch(() => null)
 

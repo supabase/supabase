@@ -3,13 +3,13 @@ import { FeatureFlagContext, useFlag, useParams } from 'common'
 import isEqual from 'lodash/isEqual'
 import { useContext, useState } from 'react'
 
-import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
+import {
+  PRESET_CONFIG,
+  REPORTS_DATEPICKER_HELPERS,
+} from '@/components/interfaces/Reports/Reports.constants'
 import type { ReportFilterItem } from '@/components/interfaces/Reports/Reports.types'
 import { getLogsSql } from '@/components/interfaces/Reports/Reports.utils'
-import {
-  EXPLORER_DATEPICKER_HELPERS,
-  getDefaultHelper,
-} from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { getDefaultHelper } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogData, LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
@@ -68,7 +68,7 @@ export const useApiReport = () => {
   const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
   const [filters, setFilters] = useState<ReportFilterItem[]>([])
   const [requestParams, setRequestParams] = useState<ApiReportRequestParams>(() => {
-    const defaultDateRange = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
+    const defaultDateRange = getDefaultHelper(REPORTS_DATEPICKER_HELPERS)
     return {
       iso_timestamp_start: defaultDateRange.calcFrom(),
       iso_timestamp_end: defaultDateRange.calcTo(),

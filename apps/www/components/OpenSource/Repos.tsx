@@ -1,5 +1,5 @@
-import { AnimatePresence } from 'framer-motion'
 import { Pencil, Users, Users2 } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'

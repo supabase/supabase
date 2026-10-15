@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ArrowUp, ChevronDown, FileText } from 'lucide-react'
+import { ArrowUpIcon, ChevronDownIcon, FileTextIcon } from 'lucide-react'
 import {
   Button,
   cn,
@@ -56,7 +56,7 @@ export const InsertButton = () => {
           data-testid="table-editor-insert-new-row"
           variant="primary"
           size="tiny"
-          icon={<ChevronDown strokeWidth={1.5} />}
+          icon={<ChevronDownIcon strokeWidth={1.5} />}
         >
           Insert
         </Button>
@@ -76,7 +76,7 @@ export const InsertButton = () => {
                     <div
                       className={cn([
                         'border border-foreground-light w-[15px] h-[4px] translate-x-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand-default group-data-highlighted:translate-x-0',
+                        'transition duration-200 group-data-highlighted:border-primary-bright group-data-highlighted:translate-x-0',
                       ])}
                     />
                   </div>
@@ -97,7 +97,7 @@ export const InsertButton = () => {
                     <div
                       className={cn([
                         'border border-foreground-light w-[4px] h-[15px] -translate-y-0.5',
-                        'transition duration-200 group-data-highlighted:border-brand-default group-data-highlighted:translate-y-0',
+                        'transition duration-200 group-data-highlighted:border-primary-bright group-data-highlighted:translate-y-0',
                       ])}
                     />
                   </div>
@@ -120,8 +120,8 @@ export const InsertButton = () => {
                   }}
                 >
                   <div className="relative shrink-0 w-4">
-                    <FileText size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
-                    <ArrowUp
+                    <FileTextIcon size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
+                    <ArrowUpIcon
                       className={cn(
                         'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
                         'group-data-highlighted:translate-y-0 group-data-highlighted:text-primary group-data-highlighted:opacity-100'

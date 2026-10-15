@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IS_PLATFORM } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -98,7 +98,7 @@ export const ChooseChannelPopover = ({
 
   const channelPopoverTrigger = (
     <PopoverTrigger asChild>
-      <Button className="rounded-r-none" size="tiny" iconRight={<ChevronDown />}>
+      <Button className="rounded-r-none" size="tiny" iconRight={<ChevronDownIcon />}>
         <p
           className="max-w-[120px] truncate"
           title={config.channelName.length > 0 ? config.channelName : ''}

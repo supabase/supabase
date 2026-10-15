@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Maximize } from 'lucide-react'
+import { MaximizeIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -223,7 +223,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                     ].join(' ')}
                     onClick={() => onSelectExpand()}
                   >
-                    <Maximize size={12} strokeWidth={2} />
+                    <MaximizeIcon size={12} strokeWidth={2} />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="center">

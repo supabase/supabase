@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -158,7 +158,7 @@ export const CreateAuth0IntegrationDialog = ({
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button variant="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<TrashIcon />}>
                 Remove connection
               </Button>
             </div>

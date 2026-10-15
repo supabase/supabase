@@ -1,7 +1,11 @@
-import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Home, MessageCirclePlus, NotebookText, Plus, SquareCode } from 'lucide-react'
-import Link from 'next/link'
+import {
+  HomeIcon,
+  MessageCirclePlusIcon,
+  NotebookTextIcon,
+  PlusIcon,
+  SquareCodeIcon,
+} from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { ComponentProps, ReactNode, useEffect, useEffectEvent, useState } from 'react'
 import {
   cn,
@@ -12,7 +16,6 @@ import {
   TabsTrigger,
 } from 'ui'
 
-import { EditorNavigationButton } from '../EditorNavigationButton'
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
 import { EditorTabs } from '../Tabs/Tabs'
 import { type ExplorerResourceType } from './ExplorerLayout.constants'
@@ -20,6 +23,7 @@ import { ExplorerNavChats } from './ExplorerNavChats'
 import { ExplorerNavHeader } from './ExplorerNavHeader'
 import { ExplorerNavHome } from './ExplorerNavHome'
 import { ExplorerNavNotebooks } from './ExplorerNavNotebooks'
+import { ExplorerPreferencesDropdown } from './ExplorerPreferencesDropdown'
 import { ExplorerProvider } from './ExplorerProvider'
 import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ExplorerNotebookTabCoordinator } from '@/components/interfaces/Explorer/ExplorerNotebookTabCoordinator'
@@ -30,8 +34,6 @@ import {
   useCreateQuery,
 } from '@/components/interfaces/Explorer/hooks'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
-import { useIsTemporarySqlEditorVisit } from '@/hooks/misc/useIsTemporarySqlEditorVisit'
-import { useTrack } from '@/lib/telemetry/track'
 import {
   editorEntityTypes,
   EXPLORER_HOME_TAB,
@@ -46,19 +48,12 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 }
 
 export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayoutProps) => {
-  const { ref } = useParams()
   const tabs = useTabsStateSnapshot()
   const { setLastVisitedExplorerTab } = useDashboardHistory()
   const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
   const shouldShowHomeTab = isReady && (!hasCompletedOnboarding || home === 'home')
 
   const [section, setSection] = useState<ExplorerResourceType>()
-
-  const { setIsTemporary: setIsTemporarySqlEditorVisit } = useIsTemporarySqlEditorVisit(ref)
-
-  useEffect(() => {
-    if (ref) setIsTemporarySqlEditorVisit(false)
-  }, [ref, setIsTemporarySqlEditorVisit])
 
   const activeTab = tabs.activeTab ? tabs.tabsMap[tabs.activeTab] : undefined
   const isActiveExplorerTab =
@@ -84,7 +79,7 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
           <ExplorerNavHeader
             section={section}
             onBack={() => setSection(undefined)}
-            rootAction={<BackToSqlEditorButton />}
+            rootAction={<ExplorerPreferencesDropdown />}
           />
         }
         productMenu={
@@ -117,30 +112,6 @@ export const ExplorerLayout = ({ browserTitle, children, title }: ExplorerLayout
   )
 }
 
-const BackToSqlEditorButton = () => {
-  const { ref } = useParams()
-  const track = useTrack()
-  const { setIsTemporary } = useIsTemporarySqlEditorVisit(ref)
-
-  if (!ref) return null
-
-  return (
-    <EditorNavigationButton
-      asChild
-      tooltip="Temporarily switch to SQL Editor to access your snippets"
-    >
-      <Link
-        href={`/project/${ref}/sql`}
-        aria-label="Switch to SQL Editor"
-        onClick={() => {
-          setIsTemporary(true)
-          track('explorer_temp_access_sql_editor_clicked')
-        }}
-      />
-    </EditorNavigationButton>
-  )
-}
-
 const TabClassName =
   'flex items-center justify-center min-w-(--header-height) min-h-(--header-height) hover:bg-surface-100 shrink-0'
 
@@ -170,7 +141,7 @@ const HomeTabButton = () => {
         'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100'
       )}
     >
-      <Home
+      <HomeIcon
         size={14}
         strokeWidth={1.5}
         className="text-foreground-lighter transition-colors group-hover:text-foreground-light group-data-[state=active]:text-foreground"
@@ -196,7 +167,7 @@ const NewTabButton = () => {
           animate={{ opacity: 1, scale: 1, x: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <Plus
+          <PlusIcon
             size={16}
             strokeWidth={1.5}
             className="text-foreground-lighter hover:text-foreground-light"
@@ -205,15 +176,15 @@ const NewTabButton = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem className="gap-x-2" onClick={() => createQuery()}>
-          <SquareCode size={14} />
+          <SquareCodeIcon size={14} />
           <span>Run SQL</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createNotebook()}>
-          <NotebookText size={14} />
+          <NotebookTextIcon size={14} />
           <span>New notebook</span>
         </DropdownMenuItem>
         <DropdownMenuItem className="gap-x-2" onClick={() => createChat()}>
-          <MessageCirclePlus size={14} />
+          <MessageCirclePlusIcon size={14} />
           <span>New chat</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

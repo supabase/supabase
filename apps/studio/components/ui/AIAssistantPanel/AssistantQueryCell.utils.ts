@@ -10,6 +10,7 @@ import {
   toQuerySourceBinding,
   type QuerySourceBinding,
 } from '@/data/query-sources/query-source-registry'
+import { executeSqlOutputSchema } from '@/lib/ai/tools/tool-sanitizer'
 
 export const DEFAULT_ASSISTANT_QUERY_TITLE = 'SQL query'
 export const DEFAULT_ASSISTANT_LOGS_QUERY_TITLE = 'Logs query'
@@ -108,7 +109,8 @@ export function inferAssistantChartDisplay(rows: readonly Record<string, unknown
 }
 
 export function toAssistantQueryResult(output: unknown): QueryResult | undefined {
-  return Array.isArray(output) ? { rows: output.filter(isPlainRow) } : undefined
+  const rows = Array.isArray(output) ? output : executeSqlOutputSchema.safeParse(output).data?.rows
+  return rows ? { rows: rows.filter(isPlainRow) } : undefined
 }
 
 export function createAssistantQueryModel(

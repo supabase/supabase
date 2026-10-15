@@ -325,7 +325,7 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout()
 
     const updateButton = await screen.findByRole('button', { name: 'Update available' })
-    expect(updateButton).toHaveClass('bg-primary')
+    expect(updateButton).toHaveClass('bg-primary-solid')
     await userEvent.click(updateButton)
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()

@@ -72,6 +72,8 @@ export const databaseKeys = {
     ['projects', projectRef, 'supamonitor-enabled'] as const,
   databaseActivity: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database-activity'] as const,
+  authenticatorRoleConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'authenticator-role-config'] as const,
 }
 
 export const getLiveTupleEstimateKey = (

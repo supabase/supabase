@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag } from 'common'
-import { ChevronDown, RefreshCw } from 'lucide-react'
+import { ChevronDownIcon, RefreshCwIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -133,7 +133,7 @@ export const RestartServerButton = () => {
                   type="button"
                   aria-label="Choose restart type"
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                  icon={<ChevronDown />}
+                  icon={<ChevronDownIcon />}
                   disabled={!canRestartProject}
                 />
               </DropdownMenuTrigger>
@@ -159,7 +159,7 @@ export const RestartServerButton = () => {
         </div>
       ) : (
         <Button
-          icon={<RefreshCw />}
+          icon={<RefreshCwIcon />}
           className="w-full @lg:w-auto"
           disabled={isLoading}
           onClick={() => {

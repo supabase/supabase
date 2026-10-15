@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -198,7 +198,7 @@ export const LinterDataGrid = ({
               <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL} side="left">
                 <Button
                   variant="text"
-                  icon={<X />}
+                  icon={<XIcon />}
                   onClick={handleSidepanelClose}
                   aria-label="Close lint details panel"
                 />

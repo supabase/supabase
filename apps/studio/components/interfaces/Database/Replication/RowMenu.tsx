@@ -1,13 +1,13 @@
 import { useParams } from 'common'
 import {
-  ArrowUpCircle,
-  CircleStop,
-  Edit,
-  Eye,
-  MoreVertical,
-  Play,
-  RotateCcw,
-  Trash,
+  ArrowUpCircleIcon,
+  CircleStopIcon,
+  EditIcon,
+  EyeIcon,
+  MoreVerticalIcon,
+  PlayIcon,
+  RotateCcwIcon,
+  TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
@@ -160,13 +160,13 @@ export const RowMenu = ({
           <div className="relative">
             <Button
               variant="default"
-              className="px-1.25 hit-area-2"
+              className="w-6.5 hit-area-1"
               aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
-              icon={<MoreVertical />}
+              icon={<MoreVerticalIcon />}
             />
             {hasUpdate && (
               <span
-                className="absolute -top-0.5 -right-0.5 h-2 w-2 bg-brand-default rounded-full"
+                className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-primary-bright"
                 aria-hidden
               />
             )}
@@ -176,7 +176,7 @@ export const RowMenu = ({
         <DropdownMenuContent side="bottom" align="end" className="w-44">
           <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
             <Link href={`/project/${projectRef}/database/pipelines/${pipeline?.id}`}>
-              <Eye size={14} />
+              <EyeIcon size={14} />
               <p>View details</p>
             </Link>
           </DropdownMenuItem>
@@ -184,12 +184,16 @@ export const RowMenu = ({
           {hasUpdate && (
             <>
               <DropdownMenuItem
-                className="space-x-2"
+                className="gap-x-2"
                 onClick={() => onUpdateClick?.()}
                 disabled={isPipelineRequestPending}
               >
-                <ArrowUpCircle size={14} />
+                <ArrowUpCircleIcon size={14} />
                 <p>Update available</p>
+                <span
+                  className="ml-auto h-2 w-2 shrink-0 rounded-full bg-primary-bright"
+                  aria-hidden
+                />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </>
@@ -197,7 +201,7 @@ export const RowMenu = ({
           {showStart && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
-                <Play size={14} />
+                <PlayIcon size={14} />
                 <p>Start pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -206,11 +210,11 @@ export const RowMenu = ({
           {showStopAndRestart && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={onRestartPipeline}>
-                <RotateCcw size={14} />
+                <RotateCcwIcon size={14} />
                 <p>Restart pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
-                <CircleStop size={14} />
+                <CircleStopIcon size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -222,7 +226,7 @@ export const RowMenu = ({
             onClick={() => setEdit(destinationId)}
             disabled={isPipelineRequestPending}
           >
-            <Edit size={14} />
+            <EditIcon size={14} />
             <p>Edit pipeline</p>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -230,7 +234,7 @@ export const RowMenu = ({
             onClick={onDeleteClick}
             disabled={isPipelineRequestPending}
           >
-            <Trash size={14} />
+            <TrashIcon size={14} />
             <p>Delete pipeline</p>
           </DropdownMenuItem>
         </DropdownMenuContent>

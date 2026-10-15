@@ -1,11 +1,11 @@
 import {
-  Clipboard,
-  Edit,
-  Maximize,
-  MessageCirclePlus,
-  MoreVertical,
-  Settings,
-  X,
+  ClipboardIcon,
+  EditIcon,
+  MaximizeIcon,
+  MessageCirclePlusIcon,
+  MoreVerticalIcon,
+  SettingsIcon,
+  XIcon,
 } from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
 import { toast } from 'sonner'
@@ -136,7 +136,7 @@ export const AIAssistantHeader = ({
             <Button
               variant="text"
               className="group min-w-0"
-              iconRight={<Edit className="transition opacity-0 group-hover:opacity-100" />}
+              iconRight={<EditIcon className="transition opacity-0 group-hover:opacity-100" />}
               onClick={() => {
                 setValue(snap.activeChat?.name)
                 setIsEditingName(true)
@@ -160,7 +160,7 @@ export const AIAssistantHeader = ({
                 variant="text"
                 aria-label="New chat"
                 size="tiny"
-                icon={<MessageCirclePlus />}
+                icon={<MessageCirclePlusIcon />}
                 onClick={onNewChat}
                 className="h-7 w-7 p-0"
               />
@@ -175,7 +175,7 @@ export const AIAssistantHeader = ({
                 variant="text"
                 aria-label={maximiseLabel}
                 size="tiny"
-                icon={<Maximize />}
+                icon={<MaximizeIcon />}
                 onClick={onSelectMaximise}
                 className={cn('h-7 w-7 p-0', !isExplorerEnabled && 'hidden md:flex')}
               />
@@ -186,7 +186,7 @@ export const AIAssistantHeader = ({
                 <ButtonTooltip
                   variant="text"
                   size="tiny"
-                  icon={<MoreVertical />}
+                  icon={<MoreVerticalIcon />}
                   className="h-7 w-7 p-0"
                   disabled={isChatLoading}
                   tooltip={{ content: { side: 'bottom', text: 'More options' } }}
@@ -195,7 +195,7 @@ export const AIAssistantHeader = ({
               <DropdownMenuContent align="end" className="w-60">
                 <DropdownMenuItem className="justify-between" onClick={handleCopyChatId}>
                   <div className="flex items-center gap-x-2">
-                    <Clipboard size={14} />
+                    <ClipboardIcon size={14} />
                     <span>Copy chat ID</span>
                   </div>
                   <ShortcutPills
@@ -208,7 +208,7 @@ export const AIAssistantHeader = ({
                   onClick={() => setIsOptInModalOpen(true)}
                 >
                   <div className="flex items-center gap-x-2">
-                    <Settings size={14} />
+                    <SettingsIcon size={14} />
                     <span>Permission settings</span>
                   </div>
                   <ShortcutPills
@@ -230,7 +230,7 @@ export const AIAssistantHeader = ({
                 variant="text"
                 className="w-7 h-7"
                 onClick={onCloseAssistant}
-                icon={<X strokeWidth={1.5} />}
+                icon={<XIcon strokeWidth={1.5} />}
               />
             </ShortcutTooltip>
           </div>

@@ -366,6 +366,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
 - [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
 - [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
+- [x] A `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 - [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 
 ### Error pages (handled at root)
@@ -442,8 +443,9 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
 - [x] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — Web-streams rewrite. Returns a `Response` whose body is a `ReadableStream`; each artifact file is converted via `Readable.toWeb(createReadStream(...))` and pulled chunk-by-chunk into the multipart stream. Skips the `apiWrapper` since `getFunctionsArtifactStore` already asserts self-hosted mode (the pages-router `withAuth` was a no-op outside `IS_PLATFORM`).
 - [x] `routes/api/mcp/index.ts` — uses `WebStandardStreamableHTTPServerTransport` from `@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js`. Takes a Web `Request`, returns a `Response` directly — no shim needed. Query parsing pulled from `request.url`'s search params; headers passed through unchanged.
-- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts` — App
-      Router routes under `app/api/**` (already Web-native, direct re-export)
+- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts`,
+      `routes/api/status-page.ts` — App Router routes under `app/api/**`
+      (already Web-native, direct re-export)
 
 ---
 

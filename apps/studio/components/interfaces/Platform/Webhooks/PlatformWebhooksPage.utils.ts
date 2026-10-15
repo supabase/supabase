@@ -14,6 +14,20 @@ export const shouldHandleEndpointNotFound = ({
   return endpointId !== pendingCreatedEndpointId
 }
 
+/**
+ * Only redirect away once the flags have loaded and the route params are populated; before
+ * that, the flag reads `false` and `slug`/`ref` are undefined even for enabled users.
+ */
+export const shouldRedirectFromWebhooks = ({
+  areFlagsReady,
+  isScopeReady,
+  isEnabled,
+}: {
+  areFlagsReady: boolean
+  isScopeReady: boolean
+  isEnabled: boolean
+}) => areFlagsReady && isScopeReady && !isEnabled
+
 interface PendingSigningSecretReveal {
   endpointId: string
   signingSecret: string

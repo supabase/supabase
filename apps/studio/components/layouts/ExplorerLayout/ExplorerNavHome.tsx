@@ -1,8 +1,6 @@
 import { useParams } from 'common'
-import { motion } from 'framer-motion'
-import { ChevronRight, Plus, Settings, SquareCode } from 'lucide-react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { ChevronRightIcon, PlusIcon, SquareCodeIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -15,11 +13,11 @@ import {
 import { formatRelativeTimeShort, getRecentlyUpdatedItems } from './ExplorerNavHome.utils'
 import { ExplorerNavItem } from './ExplorerNavItem'
 import { useExplorerDeleteItem } from './ExplorerProvider'
+import { ExplorerSqlEditorFooter } from './ExplorerSqlEditorFooter'
 import { useCreateQuery } from '@/components/interfaces/Explorer/hooks'
 import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { useAiAssistantChatList } from '@/state/ai-assistant-state'
-import { useAppStateSnapshot } from '@/state/app-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const ExplorerNavHome = ({
@@ -27,10 +25,8 @@ export const ExplorerNavHome = ({
 }: {
   onSelectSection: (section: ExplorerResourceType) => void
 }) => {
-  const router = useRouter()
   const { id, ref } = useParams()
   const tabs = useTabsStateSnapshot()
-  const appStateSnapshot = useAppStateSnapshot()
 
   const { createQuery } = useCreateQuery()
   const { onSelectDelete } = useExplorerDeleteItem()
@@ -67,9 +63,9 @@ export const ExplorerNavHome = ({
             className={rowClassName(false)}
             onClick={() => createQuery()}
           >
-            <SquareCode size={14} className="shrink-0" />
+            <SquareCodeIcon size={14} className="shrink-0" />
             <span className="flex-1 text-left">Run SQL</span>
-            <Plus size={14} className="shrink-0 text-foreground-muted" />
+            <PlusIcon size={14} className="shrink-0 text-foreground-muted" />
           </button>
           {EXPLORER_SECTIONS.map(({ type, label, icon: Icon }) => {
             return (
@@ -91,7 +87,7 @@ export const ExplorerNavHome = ({
                 ) : (
                   <span className="text-xs text-foreground-lighter">{chats.length}</span>
                 )}
-                <ChevronRight size={14} className="shrink-0 text-foreground-muted" />
+                <ChevronRightIcon size={14} className="shrink-0 text-foreground-muted" />
               </button>
             )
           })}
@@ -139,16 +135,7 @@ export const ExplorerNavHome = ({
         </section>
       </div>
 
-      <div className="shrink-0 border-t border-default p-3">
-        <Link
-          href="/account/me#dashboard"
-          className={rowClassName(false)}
-          onClick={() => appStateSnapshot.setLastRouteBeforeVisitingAccountPage(router.asPath)}
-        >
-          <Settings size={14} className="shrink-0" />
-          <span className="flex-1 text-left">Preferences</span>
-        </Link>
-      </div>
+      <ExplorerSqlEditorFooter />
     </motion.div>
   )
 }

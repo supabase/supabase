@@ -38,10 +38,9 @@ Provide a clear numbered procedure that the PR reviewer can walk through.
 1. For example, `Open the live and preview links side-by-side.`
 2. For example, `See the issue is fixed.`
 
-
 ## Checklist
 
 Check all before review:
 
 - [ ] I have read [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md)
-- [ ] If I wrote a new docs topic or edited an existing topic, I used the `/write-the-docs` or `/edit-the-docs` skill, which references [WORD_LIST](https://github.com/supabase/supabase/blob/master/apps/docs/WORD_LIST.md) and the docs [CONTRIBUTING](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) guide
+- [ ] If I wrote a new docs topic or edited an existing topic, I used the `/write-the-docs` or `/edit-the-docs` skill, which applies the docs [style guide](https://github.com/supabase/supabase/tree/master/apps/docs/style-guide)
