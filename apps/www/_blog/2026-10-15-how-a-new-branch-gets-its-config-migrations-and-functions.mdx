@@ -99,11 +99,11 @@ If your main project has no migration history, `pull` dumps its schema and uses 
 
 ### Migrate: running each file as one transaction
 
-The `migrate` step connects to the branch database and compares your migration files with the branch's `supabase_migrations.schema_migrations` table. Any file without a matching row is pending. Before running anything, `migrate` saves the Vault secrets from `config.toml` to your branch. We strongly suggest encrypting the secrets with dotenvx if you plan to commit them in your repo. You can turn migrations off with `[db.migrations]`.
+The `migrate` step connects to the branch database and compares your migration files with the branch's `supabase_migrations.schema_migrations` table. Any file without a matching row is pending. Before running anything, `migrate` saves the Vault secrets from `config.toml` to your branch. We suggest encrypting the secrets with dotenvx if you plan to commit them in your repo. You can turn migrations off with `[db.migrations]`.
 
-Each file is split into statements. A `;` ends a statement only outside string literals, quoted names, dollar-quoted function bodies, comments, parentheses, and `BEGIN ... END` blocks.
+Each file is split into statements. A `;` ends a statement only outside string literals, quoted names, dollar-quoted function bodies, comments, parentheses, and `BEGIN ... END` blocks. The migration file is expected to contain only valid SQL. We don't support any psql’s meta syntax like `COPY FROM STDIN`.
 
-The splitter is written in native Go and aims to be 100% compatible with psql's lexer - a file that psql splits one way should split the same way here. Our implementation is validated using a corpus that includes 121 hand-written edge cases, 199 SQL files from the Postgres regression tests, and about 8,000 random fuzz inputs with automatic shrinking.
+The splitter is written in native Go and aims to be 100% compatible with psql's own lexer - a file that psql splits one way should split the same way here. Our implementation is validated against PG 16 using a corpus that includes 121 hand-written edge cases, 199 SQL files from the Postgres regression tests, and about 8,000 random fuzz inputs with automatic shrinking.
 
 Each file then runs in pipeline mode. We send every statement in the file, plus the row for the history table, to Postgres in one round trip. The batch runs as one transaction. A file either applies in full and gets its history row, or rolls back and leaves no trace.
 
