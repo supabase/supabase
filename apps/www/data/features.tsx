@@ -2140,7 +2140,8 @@ Update to CLI v2.119.0 or later, then turn it on with \`SUPABASE_EXPERIMENTAL_ST
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: '/images/features/local-development.png',
+    heroImageLight: '/images/features/local-development-light.png',
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
     slug: 'local-development',
     status: {
