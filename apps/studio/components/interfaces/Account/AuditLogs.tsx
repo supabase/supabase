@@ -216,28 +216,6 @@ export const AuditLogs = () => {
     <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
       <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
         <div className="flex flex-col h-full min-h-0">
-          <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row md:items-center justify-between">
-            <FilterBar
-              supportsOperators
-              variant="pill"
-              defaultGroupOperator="OR"
-              className="bg-transparent border-0 [&>div>div>div>input]:!text-xs [&_[data-testid=filter-bar-freeform-input]]:min-w-64"
-              filterProperties={filterProperties}
-              freeformText={freeformText}
-              filters={filterGroup}
-              onFilterChange={handleFilterChange}
-              onFreeformTextChange={setFreeformText}
-            />
-            <ButtonTooltip
-              disabled={isLoading}
-              loading={isLoading || isRefetching}
-              className="w-7"
-              icon={<RefreshCwIcon />}
-              onClick={() => refetch()}
-              tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
-            />
-          </div>
-
           {isLoading && (
             <div className={cn(CONTENT_PADDING, 'space-y-2')}>
               <ShimmeringLoader />
@@ -254,6 +232,28 @@ export const AuditLogs = () => {
 
           {isSuccess && (
             <>
+              <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row md:items-center justify-between">
+                <FilterBar
+                  supportsOperators
+                  variant="pill"
+                  defaultGroupOperator="OR"
+                  className="bg-transparent border-0 [&>div>div>div>input]:!text-xs [&_[data-testid=filter-bar-freeform-input]]:min-w-64"
+                  filterProperties={filterProperties}
+                  freeformText={freeformText}
+                  filters={filterGroup}
+                  onFilterChange={handleFilterChange}
+                  onFreeformTextChange={setFreeformText}
+                />
+                <ButtonTooltip
+                  disabled={isLoading}
+                  loading={isLoading || isRefetching}
+                  className="w-7"
+                  icon={<RefreshCwIcon />}
+                  onClick={() => refetch()}
+                  tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
+                />
+              </div>
+
               {logs.length === 0 ? (
                 <div className={CONTENT_PADDING}>
                   <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
