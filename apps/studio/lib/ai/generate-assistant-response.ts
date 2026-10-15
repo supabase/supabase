@@ -126,6 +126,7 @@ export async function generateAssistantResponse({
         schemasString,
         supportMode,
         includesLogsSnippets,
+        aiOptInLevel,
       }),
       ...(await convertToModelMessages(messages)),
     ]
