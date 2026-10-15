@@ -62,10 +62,11 @@ rewrites guide, topic, and troubleshooting page requests that send `Accept: text
 (content negotiation), and sets `Vary: Accept` on those pages. The negotiated rewrites must stay above the generic
 `/kb/:path*` rewrite, since Vercel uses the first match.
 
-If you add a new content collection or top-level route, add a matching redirect and negotiated rewrite in
-`vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, and the `Accept` rewrite to
-`/markdown/<section>/:path+.md`), and check whether `generate-markdown.mjs` needs updating too — the content
-export falls out of its generic `src/content/**` walk automatically, but per-topic-style listing pages don't.
+If you add a new content collection or top-level route, add a matching redirect, negotiated rewrite, and
+`Vary: Accept` header in `vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, the
+`Accept` rewrite to `/markdown/<section>/:path+.md`, and a `headers` entry for `/kb/<section>/:path+`), and
+check whether `generate-markdown.mjs` needs updating too — the content export falls out of its generic
+`src/content/**` walk automatically, but per-topic-style listing pages don't.
 
 ## Topic-specific guidance
 
