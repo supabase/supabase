@@ -1,6 +1,9 @@
 ---
 import { getCollection, render } from 'astro:content'
+import remarkParse from 'remark-parse'
 import { Admonition } from 'ui-patterns/Admonition'
+import { unified } from 'unified'
+import { visit } from 'unist-util-visit'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
@@ -19,9 +22,19 @@ const { Content } = await render(faq)
 // faq.filePath is relative to the kb app root, e.g. "src/content/faqs/auth/foo.mdx"
 const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${faq.filePath}`
 
-// https://schema.org/FAQPage for this page's single question. The answer is the
-// raw markdown body for now, so its syntax appears in the schema text.
-// Escape "<" so the JSON can't close the script tag early.
+// Plain text of the answer's paragraphs and headings, for the schema below.
+const blocks: string[] = []
+visit(unified().use(remarkParse).parse(faq.body ?? ''), (node) => {
+	if (node.type !== 'paragraph' && node.type !== 'heading') return
+	let text = ''
+	visit(node, (child) => {
+		if (child.type === 'text' || child.type === 'inlineCode') text += child.value
+	})
+	if (text) blocks.push(text)
+})
+
+// https://schema.org/FAQPage for this page's single question. "<" is escaped so
+// the JSON can't close the script tag early.
 const faqPageJsonLd = JSON.stringify({
 	'@context': 'https://schema.org',
 	'@type': 'FAQPage',
@@ -29,7 +42,7 @@ const faqPageJsonLd = JSON.stringify({
 		{
 			'@type': 'Question',
 			name: title,
-			acceptedAnswer: { '@type': 'Answer', text: faq.body?.trim() ?? '' },
+			acceptedAnswer: { '@type': 'Answer', text: blocks.join('\n\n') },
 		},
 	],
 }).replace(/</g, '\\u003c')
