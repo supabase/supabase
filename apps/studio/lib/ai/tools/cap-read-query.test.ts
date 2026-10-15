@@ -22,6 +22,14 @@ describe('capReadQuery', () => {
     )
   })
 
+  it('wraps queries with LIMIT ALL instead of appending a second limit', () => {
+    const { sql, isCappedInDatabase } = capReadQuery(safeSql`select * from users limit all`, 101)
+    expect(isCappedInDatabase).toBe(true)
+    expect(sql).toBe(
+      'select * from (\nselect * from users limit all\n) as capped_result limit 101;'
+    )
+  })
+
   it('wraps FETCH FIRST and CTE queries', () => {
     expect(
       capReadQuery(safeSql`select * from users fetch first 5000 rows only`, 101).isCappedInDatabase
@@ -34,6 +42,21 @@ describe('capReadQuery', () => {
   it('keeps a trailing line comment from swallowing the closing paren', () => {
     const { sql } = capReadQuery(safeSql`select * from users limit 5000 -- all`, 101)
     expect(sql).toContain('-- all\n)')
+  })
+
+  it('ignores keywords and semicolons inside literals and comments', () => {
+    for (const q of [
+      safeSql`select * from t where note = 'please update; into' limit 5000`,
+      safeSql`select "update", $$delete;$$ from t limit 5000 -- insert`,
+      safeSql`select * from t /* for update */ limit 5000`,
+    ]) {
+      expect(capReadQuery(q, 101).isCappedInDatabase).toBe(true)
+    }
+  })
+
+  it('still rejects writes that follow a literal', () => {
+    const q = safeSql`with d as (delete from t where a = 'x' returning *) select * from d`
+    expect(capReadQuery(q, 101)).toEqual({ sql: q, isCappedInDatabase: false })
   })
 
   it('leaves multiple statements and writes untouched', () => {
