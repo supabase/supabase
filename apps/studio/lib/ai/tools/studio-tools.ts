@@ -2,6 +2,10 @@ import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import { capReadQuery } from './cap-read-query'
+import type { ToolContext } from './types'
+import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -13,7 +17,8 @@ import {
   RLS_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
-import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+import { isOptInLevelAtLeast, updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import { NO_DATA_PERMISSIONS, toModelRows } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
 const KNOWLEDGE = {
@@ -53,39 +58,48 @@ export const loadKnowledgeInputSchema = z.object({
     .describe('The knowledge to load'),
 })
 
-export type StudioToolsContext = {
-  projectRef?: string
-  connectionString?: string
-  authorization?: string
-  aiOptInLevel?: AiOptInLevel
-}
-
-export const getStudioTools = (ctx: StudioToolsContext = {}) => {
+export const getStudioTools = (ctx: ToolContext = {}) => {
   const { projectRef, connectionString, authorization, aiOptInLevel = 'schema' } = ctx
-  const authHeaders = authorization
-    ? { 'Content-Type': 'application/json', Authorization: authorization }
-    : undefined
+  const authHeaders = getAuthHeaders(authorization, { contentType: true })
 
   return {
+    // Tools that wait on the user use `needsApproval` with a server-side `execute`, not a
+    // client tool resolved through `addToolResult`. Client results never land in a Braintrust
+    // tool span: https://github.com/supabase/supabase/pull/45654
     execute_sql: tool({
       description:
         'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
-      execute: async ({ sql }, { abortSignal }) => {
+      execute: async ({ sql, isWriteQuery }, { abortSignal }) => {
         // The `needsApproval: true` gate on this tool means the user has
         // explicitly approved this AI-generated SQL before execute runs —
         // that approval is the user gesture that promotes untrusted to safe.
+        const approvedSql = acceptUntrustedSql(untrustedSql(sql))
+        // Push the cap into the query so the database doesn't load rows we'd throw away. The
+        // extra row lets `totalRows > DEFAULT_CELL_ROW_LIMIT` still signal a truncated result.
+        const { sql: limitedSql, isCappedInDatabase } = isWriteQuery
+          ? { sql: approvedSql, isCappedInDatabase: false }
+          : capReadQuery(approvedSql, DEFAULT_CELL_ROW_LIMIT + 1)
         const { result } = await executeSql(
-          { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
+          { projectRef, connectionString, sql: limitedSql },
           abortSignal,
           authHeaders
         )
-        return result
+        const rows = Array.isArray(result) ? result : []
+        // same row cap as the query cell, unbounded results freeze the chat and overflow the model
+        const isCapped = rows.length > DEFAULT_CELL_ROW_LIMIT
+        // When the limit ran in the database, `rows.length` stops at the cap and isn't a real total
+        const hasMoreRows = isCappedInDatabase && isCapped
+        return {
+          rows: rows.slice(0, DEFAULT_CELL_ROW_LIMIT),
+          ...(hasMoreRows ? { hasMoreRows } : { totalRows: rows.length }),
+          optInLevel: aiOptInLevel,
+        }
       },
       toModelOutput: ({ output }) => {
         return aiOptInLevel === 'schema_and_log_and_data'
-          ? { type: 'json', value: output }
+          ? { type: 'json', value: toModelRows(output.rows, output) }
           : { type: 'text', value: NO_DATA_PERMISSIONS }
       },
     }),
@@ -129,3 +143,31 @@ export const getStudioTools = (ctx: StudioToolsContext = {}) => {
     }),
   }
 }
+
+// Rewritten at parse time so the stored input is what the card shows. A level the org already
+// has is a review request, and `levelWhenAsked` outlives the user changing the setting.
+export const createUpdateOptInLevelInputSchema = (aiOptInLevel: AiOptInLevel) =>
+  updateOptInLevelInputSchema.transform(({ requiredLevel }) => ({
+    levelWhenAsked: aiOptInLevel,
+    ...(requiredLevel && !isOptInLevelAtLeast(aiOptInLevel, requiredLevel) && { requiredLevel }),
+  }))
+
+/** Registered at every level so an approval that lands on the top level can still execute. */
+export const getOptInTools = ({ aiOptInLevel }: { aiOptInLevel: AiOptInLevel }) => ({
+  update_opt_in_level: tool({
+    description:
+      'Asks the user to review or change the organization-wide AI opt-in level. Call it with `requiredLevel` when a tool needs a higher level than the organization has or you need to read query results. Call it without `requiredLevel` whenever the user asks to change the setting, including lowering it. Do not call it again in the same chat after the user skipped it unless they ask.',
+    inputSchema: createUpdateOptInLevelInputSchema(aiOptInLevel),
+    needsApproval: true,
+    execute: async ({ requiredLevel }) => {
+      const sufficient = !requiredLevel || isOptInLevelAtLeast(aiOptInLevel, requiredLevel)
+      return {
+        levelAfterReview: aiOptInLevel,
+        ...(requiredLevel && { sufficient }),
+        ...(!sufficient && {
+          status: `The opt-in level is still below the requested ${requiredLevel}. If you still need that access, call update_opt_in_level again.`,
+        }),
+      }
+    },
+  }),
+})

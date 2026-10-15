@@ -30,6 +30,17 @@ describe('buildAssistantContextMessages', () => {
     expect(messages).toEqual([])
   })
 
+  it('tells the model the current opt-in level so it does not ask for access it has', () => {
+    const messages = buildAssistantContextMessages({
+      schemasString: NO_SCHEMA_ACCESS_MESSAGE,
+      aiOptInLevel: 'schema_and_log_and_data',
+    })
+
+    expect(messages).toHaveLength(1)
+    expect(messages[0].content).toContain('schema_and_log_and_data')
+    expect(messages[0].content).toContain('update_opt_in_level')
+  })
+
   it('adds the support instructions in support mode', () => {
     const messages = buildAssistantContextMessages({
       schemasString: NO_SCHEMA_ACCESS_MESSAGE,

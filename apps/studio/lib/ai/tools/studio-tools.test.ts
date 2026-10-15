@@ -1,7 +1,7 @@
 import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getStudioTools } from './studio-tools'
+import { createUpdateOptInLevelInputSchema, getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 
@@ -189,12 +189,12 @@ describe('ai/tools/studio-tools', () => {
         {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
-          sql: 'SELECT email FROM users',
+          sql: 'SELECT email FROM users limit 101;',
         },
         undefined,
         undefined
       )
-      expect(result).toEqual(rows)
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'text',
         value: NO_DATA_PERMISSIONS,
@@ -226,15 +226,103 @@ describe('ai/tools/studio-tools', () => {
         {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
-          sql: 'SELECT email FROM users',
+          sql: 'SELECT email FROM users limit 101;',
         },
         undefined,
         undefined
       )
-      expect(result).toEqual(rows)
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema_and_log_and_data' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'json',
         value: rows,
+      })
+    })
+
+    it('should push a row limit into read queries but leave write queries untouched', async () => {
+      vi.mocked(executeSql).mockResolvedValue({ result: [] })
+      const tools = getStudioTools({ projectRef: 'test-project' })
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const options = { toolCallId: 'test', messages: [], context: {} }
+      const base = { label: 'Query', chartConfig: { view: 'table' as const } }
+
+      await tools.execute_sql.execute(
+        { ...base, sql: 'SELECT * FROM users', isWriteQuery: false },
+        options
+      )
+      await tools.execute_sql.execute(
+        { ...base, sql: 'SELECT cron.schedule(1)', isWriteQuery: true },
+        options
+      )
+
+      const sqls = vi.mocked(executeSql).mock.calls.map(([vars]) => vars.sql)
+      expect(sqls).toEqual(['SELECT * FROM users limit 101;', 'SELECT cron.schedule(1)'])
+    })
+
+    it('should cap rows and say the total is unknown when the limit ran in the database', async () => {
+      const rows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      const truncatedOutput = {
+        rows: rows.slice(0, 100),
+        hasMoreRows: true as const,
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(truncatedOutput)
+      const modelOutput = await tools.execute_sql.toModelOutput?.({
+        toolCallId: 'test',
+        input,
+        output: truncatedOutput,
+      })
+      expect(modelOutput).toMatchObject({
+        type: 'json',
+        value: { rows: rows.slice(0, 100), note: expect.stringContaining('more than 100 rows') },
+      })
+      expect(JSON.stringify(modelOutput)).toContain('Do not state a specific total')
+    })
+
+    it('should report the real total when the query could not be limited in the database', async () => {
+      const rows = Array.from({ length: 150 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users; SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      const output = {
+        rows: rows.slice(0, 100),
+        totalRows: 150,
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(output)
+      expect(
+        await tools.execute_sql.toModelOutput?.({ toolCallId: 'test', input, output })
+      ).toEqual({
+        type: 'json',
+        value: { rows: rows.slice(0, 100), note: 'Only the first 100 of 150 rows are included.' },
       })
     })
 
@@ -257,5 +345,43 @@ describe('ai/tools/studio-tools', () => {
         expect(schema).toBeDefined()
       }
     })
+  })
+})
+
+describe('ai/tools/studio-tools getOptInTools', () => {
+  it.each([
+    ['schema', 'schema_and_log_and_data', false],
+    ['schema_and_log_and_data', 'schema', true],
+    ['schema', 'schema', true],
+    ['schema', undefined, undefined],
+  ] as const)(
+    'level %s after approval, required %s → sufficient %s',
+    async (level, requiredLevel, sufficient) => {
+      const { update_opt_in_level } = getOptInTools({ aiOptInLevel: level })
+      if (!update_opt_in_level.execute) throw new Error('execute is undefined')
+
+      const result = await update_opt_in_level.execute(
+        { levelWhenAsked: level, requiredLevel },
+        { toolCallId: 'test', messages: [], context: {} }
+      )
+
+      expect(update_opt_in_level.needsApproval).toBe(true)
+      expect(result).toMatchObject({
+        levelAfterReview: level,
+        ...(sufficient !== undefined && { sufficient }),
+      })
+      // Only an insufficient result carries an instruction for the model
+      if (sufficient === false) expect(result).toHaveProperty('status')
+      else expect(result).not.toHaveProperty('status')
+    }
+  )
+
+  it.each([
+    ['schema_and_log_and_data', 'schema', undefined],
+    ['schema', 'schema', undefined],
+    ['schema', 'schema_and_log', 'schema_and_log'],
+  ] as const)('at level %s, requested %s is stored as %s', (level, requested, stored) => {
+    const parsed = createUpdateOptInLevelInputSchema(level).parse({ requiredLevel: requested })
+    expect(parsed).toEqual({ levelWhenAsked: level, requiredLevel: stored })
   })
 })

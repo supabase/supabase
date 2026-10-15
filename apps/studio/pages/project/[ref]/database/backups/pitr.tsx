@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertCircle, DatabaseBackup } from 'lucide-react'
+import { AlertCircleIcon, DatabaseBackupIcon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -116,7 +116,7 @@ const PITR = () => {
   if (isHighAvailability) {
     return (
       <HighAvailabilityDisabledEmptyState
-        icon={DatabaseBackup}
+        icon={DatabaseBackupIcon}
         title="Point-in-Time Recovery unavailable on High Availability projects"
         description="We're working to bring point-in-time recovery to High Availability projects. Contact support if this is blocking your work."
         className="max-w-none mx-0"
@@ -147,7 +147,7 @@ const PITR = () => {
             />
           ) : !isActiveHealthy ? (
             <Alert>
-              <AlertCircle />
+              <AlertCircleIcon />
               <AlertTitle>
                 Point in Time Recovery is not available while project is offline
               </AlertTitle>

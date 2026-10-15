@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table'
 import { useDebounce } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -159,6 +159,7 @@ export const AuditLogs = () => {
                 isFetching={isFetchingProjects}
                 isFetchingNextPage={isFetchingNextPage}
                 fetchNextPage={fetchNextPage}
+                searchPlaceholder="Search for a project..."
               />
               <LogsDatePicker
                 hideWarnings
@@ -198,7 +199,7 @@ export const AuditLogs = () => {
               disabled={isLoading}
               loading={isLoading || isRefetching}
               className="w-7"
-              icon={<RefreshCw />}
+              icon={<RefreshCwIcon />}
               onClick={() => refetch()}
               tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
             />

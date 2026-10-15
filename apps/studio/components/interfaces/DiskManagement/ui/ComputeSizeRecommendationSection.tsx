@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { ReactNode } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
 import { COMPUTE_BASELINE_IOPS, COMPUTE_MAX_IOPS } from 'shared-data'

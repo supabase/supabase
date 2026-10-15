@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Globe } from 'lucide-react'
+import { GlobeIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
@@ -146,7 +146,7 @@ export const BannedIPs = () => {
                     ipList.banned_ipv4_addresses.map((ip) => (
                       <CardContent key={ip} className="flex items-center justify-between">
                         <div className="flex items-center space-x-5">
-                          <Globe size={16} className="text-foreground-lighter" />
+                          <GlobeIcon size={16} className="text-foreground-lighter" />
                           <p className="text-sm font-mono">{ip}</p>
                           {ip === userIPAddress && <Badge>Your IP address</Badge>}
                         </div>
