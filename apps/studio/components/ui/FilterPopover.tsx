@@ -284,7 +284,7 @@ export const FilterPopover = <T extends Record<string, any>, ValueType extends k
             variant="primary"
             onClick={() => {
               // Order the selection based on the options provided
-              const sortingOrder = options.map((option) => option[valueKey]) as string[]
+              const sortingOrder = options.map((option) => option[valueKey])
               const sortedSelection = selectedOptions.sort(
                 (a, b) => sortingOrder.indexOf(a) - sortingOrder.indexOf(b)
               )
