@@ -122,7 +122,7 @@ export async function POST(req: Request) {
       ? parseProjectRef(projectRef)
       : null
 
-  if (!parsedProjectRef) {
+  if (projectRef && !parsedProjectRef) {
     return new Response(JSON.stringify({ message: 'Invalid project ID' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 422,
@@ -139,7 +139,9 @@ export async function POST(req: Request) {
       { objectTypeId: '0-1', name: 'lastname', value: lastName },
       { objectTypeId: '0-1', name: 'email', value: email },
       ...(company ? [{ objectTypeId: '0-1', name: 'company', value: company }] : []),
-      { objectTypeId: '0-1', name: 'supabase_project_ref', value: parsedProjectRef },
+      ...(parsedProjectRef
+        ? [{ objectTypeId: '0-1', name: 'supabase_project_ref', value: parsedProjectRef }]
+        : []),
       ...(useCase ? [{ objectTypeId: '0-1', name: 'compute_use_case', value: useCase }] : []),
       ...(details ? [{ objectTypeId: '0-1', name: 'message', value: details }] : []),
     ]
