@@ -64,7 +64,12 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const {
+    data: projectsData,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+  } = useOrgProjectsInfiniteQuery({ slug })
   const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
   const orgProjects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
@@ -161,6 +166,13 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       }
     }
   }
+
+  // The panel needs the full project list (e.g. to apply roles to every project), so load all pages
+  useEffect(() => {
+    if (visible && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [visible, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   useEffect(() => {
     if (visible && isSuccessRoles) {
