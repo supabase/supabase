@@ -1,5 +1,6 @@
 import { COMPUTE_DISK, COMPUTE_MAX_IOPS } from 'shared-data'
 
+import { getMemoryCommitmentRanges } from './database-charts.utils'
 import {
   hasBurstableIO,
   mapComputeSizeNameToAddonVariantId,
@@ -132,14 +133,42 @@ export const getReportAttributesV2: (
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'bar',
-      showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
+        domain: [0, 'auto'],
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
+      titleTooltip:
+        'Risk zones estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.',
+      referenceZones: [
+        {
+          label: 'Acknowledgment',
+          color: 'hsl(var(--warning-600))',
+          fillOpacity: 0.08,
+          tooltip:
+            'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
+          getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
+        },
+        {
+          label: 'Be proactive',
+          color: 'hsl(var(--warning-600))',
+          fillOpacity: 0.16,
+          tooltip:
+            'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
+          getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
+        },
+        {
+          label: 'Extreme hazard',
+          color: 'hsl(var(--destructive-default))',
+          fillOpacity: 0.16,
+          tooltip:
+            'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
+          getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
+        },
+      ],
       attributes: [
         {
           attribute: 'ram_commit_used',
@@ -148,17 +177,13 @@ export const getReportAttributesV2: (
           color: 'var(--chart-1)',
           fill: 'var(--chart-1-fill)',
           tooltip:
-            'Total memory the kernel has promised to processes (RAM plus swap). Sustained values near or above the commit limit indicate overcommitment and a high risk of out-of-memory failures',
+            'Memory the kernel has promised to processes, which may remain unused until needed and does not by itself indicate an out-of-memory failure',
         },
         {
           attribute: 'ram_commit_limit',
           provider: 'infra-monitoring',
-          label: 'Commit limit',
-          color: 'var(--chart-reference)',
-          isMaxValue: true,
+          enabled: false,
           omitFromTotal: true,
-          tooltip:
-            'Maximum memory the kernel will commit (RAM plus swap, adjusted by the overcommit ratio). Committed memory approaching this limit puts the database at risk of being killed when the system runs out of memory',
         },
       ],
     },

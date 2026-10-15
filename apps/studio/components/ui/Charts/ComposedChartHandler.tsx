@@ -7,7 +7,7 @@ import { Card, cn, WarningIcon } from 'ui'
 import type { ChartHighlightAction } from './ChartHighlightActions'
 import type { ChartData } from './Charts.types'
 import { ComposedChart } from './ComposedChart'
-import { MultiAttribute } from './ComposedChart.utils'
+import { MultiAttribute, ReferenceZone } from './ComposedChart.utils'
 import { useChartHighlight } from './useChartHighlight'
 import Panel from '@/components/ui/Panel'
 import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
@@ -27,6 +27,7 @@ export interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
+  referenceZones?: ReferenceZone[]
   startDate: string
   endDate: string
   interval?: string

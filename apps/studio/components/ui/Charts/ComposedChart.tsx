@@ -40,6 +40,7 @@ import {
   CustomTooltip,
   getStackId,
   MultiAttribute,
+  ReferenceZone,
   resolveChartColor,
 } from './ComposedChart.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
@@ -51,6 +52,7 @@ import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
   attributes: MultiAttribute[]
+  referenceZones?: ReferenceZone[]
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
@@ -102,6 +104,7 @@ export function ComposedChart({
   chartId,
   data,
   attributes,
+  referenceZones,
   yAxisKey,
   xAxisKey,
   format,
@@ -373,6 +376,18 @@ export function ComposedChart({
     [data, normalizeVisibleStackToPercent, visibleAttributes]
   )
 
+  const referenceZoneData = useMemo(() => {
+    if (!referenceZones?.length) return displayData
+
+    const ranges = referenceZones.map((zone) => zone.getRanges(data))
+    return displayData.map((point, index) => ({
+      ...point,
+      ...Object.fromEntries(
+        ranges.map((zoneRanges, zoneIndex) => [`reference-zone-${zoneIndex}`, zoneRanges[index]])
+      ),
+    }))
+  }, [data, displayData, referenceZones])
+
   const isPercentage = format === '%'
   const isRamChart =
     !chartData?.some((att: any) => att.name.toLowerCase() === 'ram_usage') &&
@@ -467,7 +482,7 @@ export function ComposedChart({
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={displayData}
+          data={referenceZoneData}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
           onMouseMove={({ activeLabel, activeTooltipIndex }) => {
@@ -556,6 +571,22 @@ export function ComposedChart({
               </linearGradient>
             ))}
           </defs>
+
+          {referenceZones?.map((zone, index) => (
+            <Area
+              key={zone.label}
+              type="stepAfter"
+              dataKey={`reference-zone-${index}`}
+              fill={zone.color}
+              fillOpacity={zone.fillOpacity}
+              stroke="none"
+              dot={false}
+              activeDot={false}
+              isAnimationActive={false}
+              tooltipType="none"
+              legendType="none"
+            />
+          ))}
 
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
@@ -723,6 +754,7 @@ export function ComposedChart({
           <CustomLabel
             payload={[maxAttributeData, ...chartData]}
             attributes={attributes}
+            referenceZones={referenceZones}
             showMaxValue={_showMaxValue}
             onToggleAttribute={(attribute, options) => {
               setHiddenAttributes((prev) => {

@@ -162,3 +162,27 @@ describe('resource warning metrics chart IDs', () => {
     expect(missingChartIds).toEqual([])
   })
 })
+
+describe('getReportAttributesV2 memory commitment chart', () => {
+  it('replaces the limit line with three risk zones while fetching the underlying limit', () => {
+    const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
+      (chart) => chart.id === 'memory-commitment'
+    )
+    const commitLimit = chart?.attributes?.find(
+      (attribute) => attribute !== false && attribute.attribute === 'ram_commit_limit'
+    )
+
+    expect(chart?.showMaxValue).toBeUndefined()
+    expect(commitLimit).toMatchObject({
+      provider: 'infra-monitoring',
+      enabled: false,
+      omitFromTotal: true,
+    })
+    expect(commitLimit).not.toHaveProperty('isMaxValue')
+    expect(chart?.referenceZones?.map((zone) => zone.label)).toEqual([
+      'Acknowledgment',
+      'Be proactive',
+      'Extreme hazard',
+    ])
+  })
+})

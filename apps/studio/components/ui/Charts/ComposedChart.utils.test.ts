@@ -1,6 +1,8 @@
+import { render, screen } from '@testing-library/react'
+import { createElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
-import { getStackId } from './ComposedChart.utils'
+import { CustomTooltip, getStackId } from './ComposedChart.utils'
 import type { MultiAttribute } from './ComposedChart.utils'
 
 const attr = (attribute: string, stackId?: string): MultiAttribute => ({ attribute, stackId })
@@ -56,5 +58,61 @@ describe('getStackId', () => {
 
   it('treats an empty-string stackId as configured', () => {
     expect(getStackId([attr('reads', '')], 'reads', '1')).toBe('')
+  })
+})
+
+describe('CustomTooltip reference zones', () => {
+  const GIB = 1024 ** 3
+  const point = {
+    period_start: '2026-10-15T12:00:00.000Z',
+    ram_commit_used: 4 * GIB,
+  }
+  const zoneEntry = {
+    name: 'Extreme hazard',
+    dataKey: 'reference-zone-0',
+    type: 'none',
+    value: [8.2 * GIB, 9 * GIB],
+    payload: point,
+  }
+
+  it('omits reference zone rows and excludes their ranges from the total', () => {
+    render(
+      createElement(CustomTooltip, {
+        active: true,
+        isActiveHoveredChart: true,
+        showTotal: true,
+        attributes: [{ attribute: 'ram_commit_used', label: 'Committed' }],
+        data: [point],
+        payload: [
+          zoneEntry,
+          {
+            name: 'ram_commit_used',
+            dataKey: 'ram_commit_used',
+            type: 'square',
+            value: point.ram_commit_used,
+            color: 'var(--chart-1)',
+            payload: point,
+          },
+        ],
+      })
+    )
+
+    expect(screen.getByText('Committed')).toBeInTheDocument()
+    expect(screen.getByText('Total')).toBeInTheDocument()
+    expect(screen.getAllByText('4 GB')).toHaveLength(2)
+    expect(screen.queryByText('Extreme hazard')).not.toBeInTheDocument()
+  })
+
+  it('renders no tooltip when only reference zones remain', () => {
+    const { container } = render(
+      createElement(CustomTooltip, {
+        active: true,
+        isActiveHoveredChart: true,
+        showTotal: true,
+        payload: [zoneEntry],
+      })
+    )
+
+    expect(container).toBeEmptyDOMElement()
   })
 })
