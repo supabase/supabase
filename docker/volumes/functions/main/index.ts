@@ -3,6 +3,8 @@ import * as jose from 'jsr:@panva/jose@6'
 console.log('main function started')
 
 addEventListener('unhandledrejection', (ev) => {
+  // Without preventDefault(), a floating rejection destroys the main worker and the process exits.
+  // Sync throws inside timer callbacks are still fatal; wrap them in try/catch.
   ev.preventDefault()
   console.error('unhandled promise rejection in main worker', ev.reason)
 })
@@ -298,21 +300,13 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
 
 Deno.serve({ onError }, async (req: Request) => {
   if (req.method !== 'OPTIONS' && VERIFY_JWT) {
-    try {
-      const token = getAuthToken(req)
-      if (typeof token !== 'string') {
-        return getAuthErrorResponse(token)
-      }
-      const authFailure = await isValidHybridJWT(token)
-      if (authFailure) {
-        return getAuthErrorResponse(authFailure)
-      }
-    } catch (e) {
-      console.error(e)
-      return getAuthErrorResponse({
-        code: RequestErrors.InvalidTokenFormat,
-        message: 'Invalid JWT format',
-      })
+    const token = getAuthToken(req)
+    if (typeof token !== 'string') {
+      return getAuthErrorResponse(token)
+    }
+    const authFailure = await isValidHybridJWT(token)
+    if (authFailure) {
+      return getAuthErrorResponse(authFailure)
     }
   }
 
