@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
@@ -39,7 +39,7 @@ const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
         size="tiny"
         aria-label={`${isVisible ? 'Hide' : 'Show'} ${label.replace(/^[A-Z][a-z]+/, (word) => word.toLowerCase())}`}
         aria-pressed={isVisible}
-        icon={isVisible ? <EyeOff size={14} /> : <Eye size={14} />}
+        icon={isVisible ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
         onClick={() => setIsVisible(!isVisible)}
       />
     </div>
