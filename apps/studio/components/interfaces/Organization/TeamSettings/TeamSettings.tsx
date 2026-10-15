@@ -3,7 +3,6 @@ import { useParams } from 'common'
 import { SearchIcon } from 'lucide-react'
 import {
   parseAsArrayOf,
-  parseAsInteger,
   parseAsString,
   parseAsStringEnum,
   useQueryState,
@@ -47,7 +46,7 @@ export const TeamSettings = () => {
   )
   const [rolesFilter, setRoleNamesFilter] = useQueryState(
     'roles',
-    parseAsArrayOf(parseAsInteger).withDefault([])
+    parseAsArrayOf(parseAsString).withDefault([])
   )
 
   const mfaFilterLabel =
@@ -59,7 +58,9 @@ export const TeamSettings = () => {
 
   const { data: roles } = useOrganizationRolesV2Query({ slug })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
-  const organizationRoles = roles?.org_scoped_roles ?? []
+  const organizationRoles = (roles?.org_scoped_roles ?? []).filter(
+    (role) => role.name.toLowerCase() !== 'no-access'
+  )
 
   const { data } = useOrgProjectsInfiniteQuery({ slug })
   const totalCount = data?.pages[0].pagination.count ?? 0
@@ -116,7 +117,7 @@ export const TeamSettings = () => {
                   name="Roles"
                   options={organizationRoles}
                   labelKey="name"
-                  valueKey="id"
+                  valueKey="name"
                   activeOptions={rolesFilter}
                   onSaveFilters={(values) => setRoleNamesFilter(values)}
                 />
@@ -139,7 +140,7 @@ export const TeamSettings = () => {
               <MembersView
                 searchString={searchString.length === 0 ? searchString : debouncedSearch}
                 mfaFilter={mfaFilter}
-                roleIds={rolesFilter}
+                roleNames={rolesFilter}
               />
             </ScaffoldSectionContent>
           </ScaffoldFilterAndContent>

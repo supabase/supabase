@@ -37,10 +37,10 @@ const getMemberKey = (member: OrganizationMember) =>
 export interface MembersViewProps {
   searchString: string
   mfaFilter: MfaFilter
-  roleIds: number[]
+  roleNames: string[]
 }
 
-export const MembersView = ({ searchString, mfaFilter, roleIds }: MembersViewProps) => {
+export const MembersView = ({ searchString, mfaFilter, roleNames }: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
 
@@ -89,10 +89,14 @@ export const MembersView = ({ searchString, mfaFilter, roleIds }: MembersViewPro
           return false
         })
 
+    const roleIds = (roles?.org_scoped_roles ?? [])
+      .filter((role) => roleNames.includes(role.name))
+      .map((role) => role.id)
+
     return searchedMembers.filter(
       (member) => matchesMfaFilter(member, mfaFilter) && matchesOrgRole(member, roleIds)
     )
-  }, [members, searchString, mfaFilter, roleIds])
+  }, [members, searchString, mfaFilter, roleNames, roles?.org_scoped_roles])
 
   const handleManageAccess = useCallback((member: OrganizationMember) => {
     setMemberForRoleUpdate(member)
@@ -134,7 +138,7 @@ export const MembersView = ({ searchString, mfaFilter, roleIds }: MembersViewPro
     [listedMembers]
   )
 
-  const isFiltering = searchString.length > 0 || mfaFilter !== 'all' || roleIds.length > 0
+  const isFiltering = searchString.length > 0 || mfaFilter !== 'all' || roleNames.length > 0
   const hasLimitedVisibility = isSuccessRoles && isSuccessMembers && !isOrgScopedRole
 
   return (
