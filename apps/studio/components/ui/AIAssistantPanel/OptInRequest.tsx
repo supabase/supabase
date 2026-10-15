@@ -9,7 +9,7 @@ import type { ConfirmFooterApprovalState } from './Confirm.utils'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useOrgAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { optInLevelSchema } from '@/lib/ai/tool-filter'
+import { optInLevelSchema } from '@/lib/ai/opt-in-level'
 
 const updateOptInLevelOutputSchema = z.object({
   levelAfterReview: optInLevelSchema,
