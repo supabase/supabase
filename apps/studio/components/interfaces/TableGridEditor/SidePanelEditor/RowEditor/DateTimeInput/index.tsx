@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Edit } from 'lucide-react'
+import { EditIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import {
   DropdownMenu,
@@ -69,7 +69,7 @@ export const DateTimeInput = ({
           {!disabled && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
+                <InputGroupButton variant="default" icon={<EditIcon />} className="px-1.5" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28 pointer-events-auto">
                 {isNullable && (

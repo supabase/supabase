@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Clock, HistoryIcon, Lock } from 'lucide-react'
+import { ClockIcon, HistoryIcon, LockIcon } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
@@ -286,7 +286,7 @@ export const LogsDatePicker = ({
 
   const triggerButton = (
     <PopoverTrigger asChild>
-      <Button icon={<Clock size={12} />} {...buttonTriggerProps}>
+      <Button icon={<ClockIcon size={12} />} {...buttonTriggerProps}>
         {value.isHelper ? value.text : formatDateRange(value.from, value.to)}
       </Button>
     </PopoverTrigger>
@@ -326,7 +326,7 @@ export const LogsDatePicker = ({
               />
               {helper.text}
               {showHelperBadge(helper) ? (
-                <Lock size={12} className="text-foreground-muted" />
+                <LockIcon size={12} className="text-foreground-muted" />
               ) : null}
             </Label>
           ))}

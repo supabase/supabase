@@ -1,5 +1,5 @@
-import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Check } from 'lucide-react'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import React, { useRef, useState } from 'react'

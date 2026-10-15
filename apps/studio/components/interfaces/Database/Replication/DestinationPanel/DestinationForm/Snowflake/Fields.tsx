@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Upload } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, UploadIcon } from 'lucide-react'
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { Button, cn, FormControl, FormField, Input, TextArea } from 'ui'
@@ -205,7 +205,7 @@ export const SnowflakeFields = ({
                   <Button
                     type="button"
                     size="tiny"
-                    icon={<Upload size={14} />}
+                    icon={<UploadIcon size={14} />}
                     onClick={() => privateKeyFileInputRef.current?.click()}
                   >
                     Upload private key
@@ -239,21 +239,23 @@ export const SnowflakeFields = ({
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
-                  type={showPrivateKeyPassphrase ? 'text' : 'password'}
+                  type={showPrivateKeyPassphrase && !editMode ? 'text' : 'password'}
                   placeholder={editMode ? STORED_SECRET_PLACEHOLDER : undefined}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
-                    <div className="flex items-center justify-center">
-                      <Button
-                        className="w-7"
-                        title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
-                        aria-label={
-                          showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'
-                        }
-                        icon={showPrivateKeyPassphrase ? <Eye /> : <EyeOff />}
-                        onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
-                      />
-                    </div>
+                    !editMode && (
+                      <div className="flex items-center justify-center">
+                        <Button
+                          className="w-7"
+                          title={showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'}
+                          aria-label={
+                            showPrivateKeyPassphrase ? 'Hide passphrase' : 'Show passphrase'
+                          }
+                          icon={showPrivateKeyPassphrase ? <EyeIcon /> : <EyeOffIcon />}
+                          onClick={() => setShowPrivateKeyPassphrase(!showPrivateKeyPassphrase)}
+                        />
+                      </div>
+                    )
                   }
                 />
               </FormControl>

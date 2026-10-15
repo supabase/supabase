@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { Copy, Eye, EyeOff, Play } from 'lucide-react'
+import { CopyIcon, EyeIcon, EyeOffIcon, PlayIcon } from 'lucide-react'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, {
   Column,
@@ -500,7 +500,10 @@ export const LogTable = ({
 
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
-          <Button icon={isHistogramShowing ? <Eye /> : <EyeOff />} onClick={onHistogramToggle}>
+          <Button
+            icon={isHistogramShowing ? <EyeIcon /> : <EyeOffIcon />}
+            onClick={onHistogramToggle}
+          >
             Histogram
           </Button>
         </div>
@@ -529,7 +532,7 @@ export const LogTable = ({
           variant="primary"
           disabled={!hasEditorValue}
           onClick={onRun}
-          iconRight={<Play size={12} />}
+          iconRight={<PlayIcon size={12} />}
           loading={isLoading}
         >
           Run
@@ -614,7 +617,7 @@ export const LogTable = ({
                     }
                   }}
                 >
-                  <Copy size={14} />
+                  <CopyIcon size={14} />
                   <span className="text-xs">Copy event message</span>
                 </ContextMenuItem>
               </ContextMenuContent>

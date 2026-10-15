@@ -1279,6 +1279,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/burndown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Retrieves the burndown of prepaid credit blocks for an organization */
+    get: operations['OrgCreditsController_getBurndown']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/preview': {
     parameters: {
       query?: never
@@ -1657,7 +1674,7 @@ export interface paths {
     options?: never
     head?: never
     /** Assign organization member with new role */
-    patch: operations['MembersController_assignMemberRoleV2']
+    patch: operations['MembersController_assignMemberRoleV2_2']
     trace?: never
   }
   '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
@@ -2417,6 +2434,23 @@ export interface paths {
     }
     /** Gets all the user's permissions */
     get: operations['PermissionsController_getPermissions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/permissions/v2': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the user's role and effective permissions per organization and project */
+    get: operations['getPermissionsV2']
     put?: never
     post?: never
     delete?: never
@@ -5193,6 +5227,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/warehouse/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Disable Warehouse
+     * @description Asynchronously stop and delete Warehouse replication, remove its publication and FDW, and revoke external catalog access. Optionally delete the DuckLake catalog schema and managed Storage bucket with delete_data=true, requiring SQL and Storage admin write permissions on the configured destination. Poll setup-status for completion. Source tables are preserved.
+     */
+    delete: operations['WarehouseController_deleteWarehouse']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/warehouse/{ref}/catalog': {
     parameters: {
       query?: never
@@ -5248,7 +5302,7 @@ export interface paths {
     put?: never
     /**
      * Set up Warehouse
-     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. An empty targets array stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection.
+     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. For backward compatibility, an empty targets array asynchronously stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection. Prefer DELETE to disable Warehouse and optionally delete its data; poll setup-status for completion.
      */
     post: operations['WarehouseController_setup']
     delete?: never
@@ -5266,7 +5320,7 @@ export interface paths {
     }
     /**
      * Get Warehouse setup status
-     * @description Return the async Warehouse setup status for the project. Overall completion follows the replication pipeline and table copy state; project database FDW markers are informational.
+     * @description Return Warehouse setup or disable status. During and after teardown, persisted lifecycle state is returned without querying ETL or inspecting the project FDW. Otherwise completion follows replication and table copy state.
      */
     get: operations['WarehouseController_getSetupStatus']
     put?: never
@@ -5812,19 +5866,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
-        | 'webhook'
-        | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
-        | 'last9'
-        | 'otlp'
-        | 'syslog'
+      type: 'webhook' | 'datadog' | 'loki' | 'sentry' | 's3' | 'axiom' | 'last9' | 'otlp' | 'syslog'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
@@ -6684,6 +6726,9 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -6749,6 +6794,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -7644,6 +7690,9 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -7709,6 +7758,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -7888,6 +7938,7 @@ export interface components {
       code: string
     }
     CreditRedemptionResponse_Output: {
+      already_redeemed_partner_credits: number
       amount_cents: number
       credits_expire_at: string | null
     }
@@ -8785,6 +8836,17 @@ export interface components {
       private: number
       shared: number
     }
+    GetCreditBurndownResponse_Output: {
+      data: {
+        amount_cents: number
+        breakdown: {
+          amount_cents: number
+          item: string
+        }[]
+        day: string
+        ending_balance_cents: number
+      }[]
+    }
     GetGitHubConnectionConfigResponse_Output: {
       /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
       config: {
@@ -8951,6 +9013,8 @@ export interface components {
       private_link_associations: {
         account_name?: string
         aws_account_id: string
+        /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+        custom_dns_name: string
         /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
         database_identifier: string
         /**
@@ -9735,6 +9799,7 @@ export interface components {
       payment_attempted: boolean
       payment_is_processing: boolean
       period_end: number
+      prepaid_credits_applied_cents: number
       status: string
       subscription: string | null
       subtotal: number
@@ -10437,6 +10502,7 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
+      high_availability?: boolean
       /** @enum {string} */
       provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
@@ -10454,6 +10520,8 @@ export interface components {
       billing_email: string | null
       /** @enum {string|null} */
       billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      /** Format: date-time */
+      created_at: string
       has_oriole_project: boolean
       id: number
       integration_source: string | null
@@ -13229,9 +13297,6 @@ export interface components {
       name?: string
       /** @enum {string} */
       type?:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
         | 'webhook'
         | 'datadog'
         | 'loki'
@@ -14243,6 +14308,9 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -14308,6 +14376,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -15306,6 +15375,20 @@ export interface components {
       role?: string
       updated_at?: string
     }
+    UserPermissionsResponse_Output: {
+      organizations: {
+        permissions: string[]
+        projects: {
+          permissions: string[]
+          ref: string
+          /** @enum {string} */
+          role: 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+        }[]
+        /** @enum {string} */
+        role: 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+        slug: string
+      }[]
+    }
     ValidateDestinationBody: {
       /** @description Destination configuration */
       config:
@@ -16085,6 +16168,10 @@ export interface components {
       /** @description Whether external catalog access is enabled */
       enabled: boolean
     }
+    WarehouseDeleteResponse_Output: {
+      /** @enum {string} */
+      status: 'accepted'
+    }
     WarehouseSetupBody: {
       /**
        * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
@@ -16096,7 +16183,7 @@ export interface components {
        * @example false
        */
       install_fdw?: boolean
-      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array disables Warehouse replication and external catalog access and uninstalls the Warehouse FDW. */
+      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array asynchronously disables Warehouse while retaining its data. Prefer DELETE to disable Warehouse; poll setup-status for completion. */
       targets: (
         | {
             /**
@@ -16125,7 +16212,7 @@ export interface components {
     }
     WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id, or null when Warehouse is disabled
+       * @description Warehouse replication pipeline id, or null when Warehouse disable has been requested
        * @example 101
        */
       pipeline_id: number | null
@@ -16171,7 +16258,11 @@ export interface components {
       }[]
     }
     WarehouseSetupStatusResponse_Output: {
-      /** @description Project database FDW setup markers used to derive the Warehouse FDW phase */
+      /** @description Whether the current disable request deletes DuckLake data. */
+      delete_data?: boolean
+      /** @description Warehouse cleanup failure, when present. */
+      error?: string
+      /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
       fdw_status: {
         /**
          * @description Whether fdw_warehouse is available to install on the project database instance
@@ -16203,18 +16294,26 @@ export interface components {
          * @example true
          */
         wrapper_installed: boolean
-      }
+      } | null
       /**
        * @description Warehouse replication pipeline id when it exists
        * @example 101
        */
       pipeline_id?: number
       /**
-       * @description Overall Warehouse setup status derived from replication state
+       * @description Overall Warehouse lifecycle status, using persisted state during teardown and replication state during setup
        * @example copying
        * @enum {string}
        */
-      setup_status: 'not_started' | 'setting_up' | 'copying' | 'complete' | 'error'
+      setup_status:
+        | 'not_started'
+        | 'setting_up'
+        | 'copying'
+        | 'complete'
+        | 'error'
+        | 'disabling'
+        | 'disabled'
+        | 'deletion_failed'
       /** @description Warehouse setup phases in execution order */
       steps: {
         /**
@@ -17813,6 +17912,27 @@ export interface operations {
           'application/json': components['schemas']['UpdateConversationCustomFieldsResponse_Output']
         }
       }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Failed to update conversation custom fields */
       500: {
         headers: {
@@ -17983,6 +18103,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SendFeedbackResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to send feedback */
       500: {
@@ -19112,6 +19253,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetOAuthAuthorizationResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -20441,6 +20603,59 @@ export interface operations {
       }
     }
   }
+  OrgCreditsController_getBurndown: {
+    parameters: {
+      query?: {
+        end_date?: string
+        start_date?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCreditBurndownResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve prepaid credit block burndown */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgCreditsController_previewTopUp: {
     parameters: {
       query?: never
@@ -21723,7 +21938,7 @@ export interface operations {
       }
     }
   }
-  MembersController_assignMemberRoleV2: {
+  MembersController_assignMemberRoleV2_2: {
     parameters: {
       query?: never
       header?: never
@@ -24728,6 +24943,25 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  getPermissionsV2: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserPermissionsResponse_Output']
+        }
       }
     }
   }
@@ -29754,6 +29988,7 @@ export interface operations {
           | '48xlarge_optimized_memory'
           | '48xlarge_optimized_cpu'
           | '48xlarge_high_memory'
+        high_availability?: string
         organization_slug: string
       }
       header?: never
@@ -35042,6 +35277,83 @@ export interface operations {
         }
       }
       /** @description Failed to get Vercel redirect url */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  WarehouseController_deleteWarehouse: {
+    parameters: {
+      query?: {
+        /** @description Permanently delete the managed DuckLake catalog schema and Storage bucket. Defaults to false. */
+        delete_data?: 'true' | 'false'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Warehouse disable accepted. Poll setup-status for completion. */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['WarehouseDeleteResponse_Output']
+        }
+      }
+      /** @description Invalid deletion option or unmanaged Warehouse destination. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another Warehouse mutation is running or the cleanup policy cannot be changed. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to request Warehouse disable. */
       500: {
         headers: {
           [name: string]: unknown

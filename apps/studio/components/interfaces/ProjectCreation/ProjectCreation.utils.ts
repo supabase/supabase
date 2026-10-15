@@ -2,7 +2,13 @@ import type { CloudProvider, Region } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import type { OrganizationAvailableRegionsData } from '@/data/organizations/organization-available-regions-query'
+import {
+  DesiredInstanceSize,
+  instanceSizeSpecs,
+  PostgresEngine,
+  ReleaseChannel,
+} from '@/data/projects/new-project.constants'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
   return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
@@ -68,26 +74,6 @@ export function resolveDefaultDbRegion({
     : fixedDefaultRegion
 }
 
-type ResolveSelectedRegionOptionTypeArgs = {
-  isBestAvailableSelected: boolean
-  dbRegion: string | undefined
-  smartGroupRegions: Array<{ name: string }>
-  specificRegions: Array<{ name: string }>
-}
-
-export function resolveSelectedRegionOptionType({
-  isBestAvailableSelected,
-  dbRegion,
-  smartGroupRegions,
-  specificRegions,
-}: ResolveSelectedRegionOptionTypeArgs): 'general' | 'specific' | undefined {
-  // The "Best available region" shortcut always resolves to a smart-group recommendation
-  if (isBestAvailableSelected) return 'general'
-  if (smartGroupRegions.some((region) => region.name === dbRegion)) return 'general'
-  if (specificRegions.some((region) => region.name === dbRegion)) return 'specific'
-  return undefined
-}
-
 /**
  * When launching new projects, they only get assigned a compute size once successfully launched,
  * this might assume wrong compute size, but only for projects being rapidly launched after one another on non-default compute sizes.
@@ -122,4 +108,130 @@ export const filterHighAvailabilityRegions = <T extends { code: string }>(
   return highAvailability && !isLocal && regionCode !== undefined
     ? regions.filter((region) => region.code === regionCode)
     : regions
+}
+
+export type FreeTierGeneralRegionExperimentVariant = 'test' | 'control'
+
+type GetFreeTierGeneralRegionExperimentVariantArgs = {
+  isFreePlan: boolean
+  smartRegionEnabled: boolean
+  enrollmentFlag: boolean
+  selectionFlag: boolean
+  /** When true, another feature owns the region selector and the experiment is inactive */
+  isOverridden?: boolean
+}
+
+/**
+ * Org's arm in the freeTierGeneralRegionExperiment. The test arm only sees general regions.
+ * Returns undefined when the org isn't enrolled, or when the experiment is overridden.
+ */
+export function getFreeTierGeneralRegionExperimentVariant({
+  isFreePlan,
+  smartRegionEnabled,
+  enrollmentFlag,
+  selectionFlag,
+  isOverridden = false,
+}: GetFreeTierGeneralRegionExperimentVariantArgs):
+  | FreeTierGeneralRegionExperimentVariant
+  | undefined {
+  const isInExperiment =
+    !isOverridden && isFreePlan && smartRegionEnabled && enrollmentFlag === true
+  if (!isInExperiment) return undefined
+  return selectionFlag === true ? 'test' : 'control'
+}
+
+export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['all']
+
+type GetRegionSelectionTypeArgs = {
+  dbRegion: string | undefined
+  availableRegions: AvailableRegions | undefined
+  /** Whether the user ever touched the region field. Defaults to true for untracked callers. */
+  isDbRegionDirty?: boolean
+}
+
+/**
+ * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
+ * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
+ * by the user (e.g. us-east-1, 'specific'). Returns undefined if dbRegion matches neither list,
+ * regardless of whether the field was touched.
+ */
+export function getRegionSelectionType({
+  dbRegion,
+  availableRegions,
+  isDbRegionDirty = true,
+}: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
+  if (!dbRegion || !availableRegions) return undefined
+  const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
+  const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
+  if (!isGeneral && !isSpecific) return undefined
+  if (!isDbRegionDirty) return 'auto'
+  return isGeneral ? 'general' : 'specific'
+}
+
+export type SpecificRegionsLinkVariant = 'test' | 'control'
+
+type GetSpecificRegionsLinkVariantArgs = {
+  isFreePlan: boolean
+  smartRegionEnabled: boolean
+  linkFlag: boolean
+}
+
+/**
+ * Org's arm in the projectCreationSpecificRegionsLink experiment. Returns undefined when the
+ * org isn't in the eligible population (paid plan, or smart regions disabled for the selected
+ * cloud provider) — the link can never show for them regardless of the flag.
+ */
+export function getSpecificRegionsLinkVariant({
+  isFreePlan,
+  smartRegionEnabled,
+  linkFlag,
+}: GetSpecificRegionsLinkVariantArgs): SpecificRegionsLinkVariant | undefined {
+  if (!isFreePlan || !smartRegionEnabled) return undefined
+  return linkFlag === true ? 'test' : 'control'
+}
+
+export interface PostgresVersionDetails {
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
+}
+
+export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
+  if (!value) {
+    return { postgresEngine: undefined, releaseChannel: undefined }
+  }
+
+  const [postgresEngine, releaseChannel] = value.split('|')
+  return { postgresEngine, releaseChannel } as PostgresVersionDetails
+}
+
+/**
+ * Picks the engine + release channel to submit on project creation. The selector's value is used
+ * only when it matches the selected Postgres Type in Advanced Config. Otherwise, OrioleDB falls
+ * back to the available OrioleDB image, and Postgres falls back to the API default
+ */
+export function resolvePostgresVersion({
+  postgresVersionSelection,
+  useOrioleDb,
+  availableOrioleVersion,
+}: {
+  postgresVersionSelection: string
+  useOrioleDb: boolean
+  availableOrioleVersion?: {
+    postgres_engine: Exclude<PostgresEngine, '13' | '14'>
+    release_channel: ReleaseChannel
+  }
+}): PostgresVersionDetails {
+  const selection = extractPostgresVersionDetails(postgresVersionSelection)
+  const isSelectionOriole = !!selection.postgresEngine?.endsWith('oriole')
+
+  if (useOrioleDb) {
+    if (isSelectionOriole) return selection
+    return {
+      postgresEngine: availableOrioleVersion?.postgres_engine,
+      releaseChannel: availableOrioleVersion?.release_channel,
+    }
+  }
+
+  if (isSelectionOriole) return {}
+  return selection
 }

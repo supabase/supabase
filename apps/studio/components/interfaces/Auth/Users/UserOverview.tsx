@@ -1,7 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Ban, Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
+import {
+  BanIcon,
+  CheckIcon,
+  CopyIcon,
+  MailIcon,
+  ShieldOffIcon,
+  TrashIcon,
+  XIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -275,7 +283,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 {isActive ? (
                   <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-primary">
                     <span className="rounded-full bg-brand-default p-0.5 text-xs text-brand-200">
-                      <Check strokeWidth={2} size={12} />
+                      <CheckIcon strokeWidth={2} size={12} />
                     </span>
                     <span className="px-1">Enabled</span>
                   </div>
@@ -298,7 +306,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 title="Reset password"
                 description="Send a password recovery email to the user"
                 button={{
-                  icon: <Mail />,
+                  icon: <MailIcon />,
                   text: 'Send password recovery',
                   isLoading: isResettingPassword,
                   disabled: !canSendRecovery,
@@ -323,7 +331,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     : 'Send a confirmation email to the user'
                 }
                 button={{
-                  icon: <Mail />,
+                  icon: <MailIcon />,
                   text: isVerified ? 'Send magic link' : 'Send confirmation email',
                   isLoading: isSendingMagicLink,
                   disabled: !canSendMagicLink,
@@ -349,7 +357,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
               title="Send OTP"
               description="Passwordless login via phone for the user"
               button={{
-                icon: <Mail />,
+                icon: <MailIcon />,
                 text: 'Send OTP',
                 isLoading: isSendingOTP,
                 disabled: !canSendOtp,
@@ -383,7 +391,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             title="Remove MFA factors"
             description="Removes all MFA factors associated with the user"
             button={{
-              icon: <ShieldOff />,
+              icon: <ShieldOffIcon />,
               text: 'Remove MFA factors',
               disabled: !canRemoveMFAFactors,
               onClick: () => setIsDeleteFactorsModalOpen(true),
@@ -402,7 +410,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 : 'Revoke access to the project for a set duration'
             }
             button={{
-              icon: <Ban />,
+              icon: <BanIcon />,
               text: isBanned ? 'Unban user' : 'Ban user',
               disabled: !canUpdateUser,
               onClick: () => {
@@ -419,7 +427,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             title="Delete user"
             description="User will no longer have access to the project"
             button={{
-              icon: <Trash />,
+              icon: <TrashIcon />,
               variant: 'danger',
               text: 'Delete user',
               disabled: !canRemoveUser,
@@ -491,11 +499,11 @@ export const RowData = ({ property, value }: { property: string; value?: string 
           <div className="h-[26px] flex items-center justify-center min-w-[70px]">
             {value ? (
               <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-                <Check size={10} className="text-contrast" strokeWidth={4} />
+                <CheckIcon size={10} className="text-contrast" strokeWidth={4} />
               </div>
             ) : (
               <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-                <X size={10} className="text-contrast" strokeWidth={4} />
+                <XIcon size={10} className="text-contrast" strokeWidth={4} />
               </div>
             )}
           </div>
@@ -506,7 +514,7 @@ export const RowData = ({ property, value }: { property: string; value?: string 
               <CopyButton
                 iconOnly
                 variant="text"
-                icon={<Copy />}
+                icon={<CopyIcon />}
                 className="transition opacity-0 group-hover:opacity-100 px-1"
                 text={value}
               />
@@ -555,7 +563,7 @@ export const RowAction = ({
 
       <ButtonTooltip
         variant={button?.variant ?? 'default'}
-        icon={success ? <Check className="text-primary" /> : button.icon}
+        icon={success ? <CheckIcon className="text-primary" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}
         disabled={disabled}

@@ -51,7 +51,6 @@ const TopNavBar: FC = () => {
               <DevToolbarTrigger />
               {searchVariant === 'search-v2-active' ? (
                 <SearchV2Trigger
-                  className="[&>div>p]:text-foreground-lighter"
                   placeholder={
                     <>
                       Search

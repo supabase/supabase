@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ExternalLink, Eye, EyeOff, Loader } from 'lucide-react'
+import { ExternalLinkIcon, EyeIcon, EyeOffIcon, LoaderIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -58,7 +58,7 @@ export const DecryptedReadOnlyInput = ({
                     rel="noreferrer noopener"
                     href={`/project/${ref}/integrations/vault/secrets?search=${value}`}
                   >
-                    <ExternalLink
+                    <ExternalLinkIcon
                       size={14}
                       className="text-foreground-lighter hover:text-foreground transition"
                     />
@@ -82,11 +82,17 @@ export const DecryptedReadOnlyInput = ({
             secureEntry ? (
               isLoading ? (
                 <div className="flex items-center justify-center">
+                  <Button disabled className="w-7" icon={<LoaderIcon className="animate-spin" />} />
+                </div>
+              ) : (
+                <div className="flex items-center justify-center">
                   <Button
                     disabled
                     className="w-7"
-                    icon={<Loader className="animate-spin" />}
+                    loading={showHidden && isDecryptedValueLoading}
                     aria-label={showHidden ? 'Hide value' : 'Show value'}
+                    icon={showHidden ? <EyeIcon /> : <EyeOffIcon />}
+                    onClick={() => setShowHidden(!showHidden)}
                   />
                 </div>
               ) : (
@@ -96,7 +102,7 @@ export const DecryptedReadOnlyInput = ({
                       <Button
                         className="w-7"
                         loading={showHidden && isDecryptedValueLoading}
-                        icon={showHidden ? <Eye /> : <EyeOff />}
+                        icon={showHidden ? <EyeIcon /> : <EyeOffIcon />}
                         onClick={() => setShowHidden(!showHidden)}
                         aria-label={showHidden ? 'Hide value' : 'Show value'}
                         // Tooltip repeats the label; screen readers would read it twice

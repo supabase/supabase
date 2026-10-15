@@ -1,6 +1,6 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Database, Loader2 } from 'lucide-react'
+import { DatabaseIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useMemo } from 'react'
 
 import {
@@ -92,16 +92,16 @@ export function TableSearchResults({ debouncedFilterString }: TableSearchResults
           <SkeletonResults />
         ) : isErrorTables ? (
           <div className="h-full flex flex-col items-center justify-center py-12 px-4 gap-4 text-center text-foreground-lighter">
-            <Database className="h-6 w-6" strokeWidth={1.5} />
+            <DatabaseIcon className="h-6 w-6" strokeWidth={1.5} />
             <p className="text-sm">Failed to load tables</p>
           </div>
         ) : tableResults.length === 0 ? (
-          <EmptyState icon={Database} label="Database Tables" query={debouncedFilterString} />
+          <EmptyState icon={DatabaseIcon} label="Database Tables" query={debouncedFilterString} />
         ) : (
           <>
             <ResultsList
               results={tableResults}
-              icon={Database}
+              icon={DatabaseIcon}
               getRoute={(result) => {
                 const table = tables?.find((t) => String(t.id) === result.id)
                 if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
@@ -116,7 +116,7 @@ export function TableSearchResults({ debouncedFilterString }: TableSearchResults
               <div className="flex items-center gap-x-2">
                 {isLoadingTables ? (
                   <span className="flex items-center gap-2">
-                    <Loader2 size={14} className="animate-spin" /> Loading...
+                    <Loader2Icon size={14} className="animate-spin" /> Loading...
                   </span>
                 ) : (
                   <span>

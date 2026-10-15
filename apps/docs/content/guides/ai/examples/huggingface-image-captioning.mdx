@@ -24,7 +24,7 @@ We can combine Hugging Face with [Supabase Storage](/storage) and [Database Webh
   - Create a `caption` column of type `text`.
 - Regenerate TypeScript types to include new `image_caption` table.
 - Deploy the function to Supabase: `supabase functions deploy huggingface-image-captioning`.
-- Create the Database Webhook in the [Supabase Dashboard](/dashboard/project/_/database/hooks) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
+- Create the Database Webhook in the [Supabase Dashboard](/dashboard/project/_/integrations/webhooks/overview) to trigger the `huggingface-image-captioning` function anytime a record is added to the `storage.objects` table.
 
 ## Generate TypeScript types
 

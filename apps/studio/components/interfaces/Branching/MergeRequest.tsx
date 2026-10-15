@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { GitBranchIcon, GitMerge, MoreVertical, Shield } from 'lucide-react'
+import { GitBranchIcon, GitMergeIcon, MoreVerticalIcon, ShieldIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -58,7 +58,7 @@ export const MergeTitle = () => {
 
         <Link href={`/project/${mainBranch?.project_ref}`} className="font-mono inline-flex gap-4">
           <code className="flex items-center text-code-inline font-mono gap-x-1.5 px-2 py-1 border border-border">
-            <Shield strokeWidth={1.5} size={14} className="text-warning" />
+            <ShieldIcon strokeWidth={1.5} size={14} className="text-warning" />
             {mainBranch?.name || 'main'}
           </code>
         </Link>
@@ -195,7 +195,7 @@ export const MergeActions = ({
           loading={isSubmitting}
           disabled={isMergeDisabled}
           onClick={onSelectMerge}
-          icon={<GitMerge size={16} strokeWidth={1.5} className="text-primary" />}
+          icon={<GitMergeIcon size={16} strokeWidth={1.5} className="text-primary" />}
         >
           Merge branch
         </ButtonTooltip>
@@ -204,7 +204,7 @@ export const MergeActions = ({
           variant="primary"
           loading={isSubmitting}
           onClick={onSelectMerge}
-          icon={<GitMerge size={16} strokeWidth={1.5} className="text-primary" />}
+          icon={<GitMergeIcon size={16} strokeWidth={1.5} className="text-primary" />}
         >
           Merge branch
         </Button>
@@ -212,7 +212,7 @@ export const MergeActions = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button loading={isUpdating} className="px-1.5" icon={<MoreVertical />} />
+          <Button loading={isUpdating} className="px-1.5" icon={<MoreVerticalIcon />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           <DropdownMenuItem

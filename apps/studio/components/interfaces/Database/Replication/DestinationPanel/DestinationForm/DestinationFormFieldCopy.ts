@@ -23,31 +23,21 @@ export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
   description: 'The namespace within the bucket where tables will be organized.',
 } as const
 
-export const DUCKLAKE_CATALOG_PROJECT_FIELD_COPY = {
-  label: 'Catalog project',
-  description:
-    "Pipelines connects to this project's Postgres instance to store the DuckLake catalog.",
-} as const
-
-export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
-  label: 'Storage project',
-  description: 'The project whose object storage holds the DuckLake data files.',
-} as const
-
 export const DUCKLAKE_BUCKET_FIELD_COPY = {
   label: 'Bucket',
-  description: 'The bucket in which DuckLake data files will be stored.',
+  description: 'Files bucket for DuckLake data.',
 } as const
 
 export const DUCKLAKE_CATALOG_URL_FIELD_COPY = {
   label: 'Catalog URL',
-  createDescription: 'A Postgres connection string for the DuckLake catalog.',
+  createDescription:
+    'Postgres URL for an existing database. Add TLS settings to the URL if required.',
   editDescription: 'Stored catalog URL is hidden. Enter a new URL to replace it.',
 } as const
 
 export const DUCKLAKE_DATA_PATH_FIELD_COPY = {
   label: 'Data path',
-  description: 'An S3 path where DuckLake data files will be written.',
+  description: 'S3 path for DuckLake data files.',
 } as const
 
 export const SNOWFLAKE_ACCOUNT_ID_FIELD_COPY = {
@@ -66,16 +56,47 @@ export const SNOWFLAKE_SCHEMA_FIELD_COPY = {
 } as const
 
 export const CLICKHOUSE_URL_FIELD_COPY = {
-  label: 'HTTPS URL',
-  description: 'The HTTPS endpoint for your ClickHouse server, including port.',
+  label: 'HTTPS endpoint',
+  description: 'Public ClickHouse HTTPS endpoint, including port.',
 } as const
 
 export const CLICKHOUSE_DATABASE_FIELD_COPY = {
   label: 'Database',
-  description: 'The ClickHouse database where replicated tables will be created.',
+  description: 'ClickHouse database where replicated tables are created.',
 } as const
 
 export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
-  description: 'Defaults to ReplacingMergeTree.',
+  description: 'Controls how ClickHouse stores and queries replicated changes.',
 } as const
+
+export const INITIAL_SYNC_LABELS = {
+  include_all_tables: 'All tables',
+  skip_all_tables: 'No tables',
+  include_tables: 'Selected tables only',
+  skip_tables: 'All except selected tables',
+}
+
+export const INITIAL_SYNC_FIELD_COPY = {
+  label: 'Initial sync',
+  description:
+    'Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
+}
+
+export const PUBLICATION_FIELD_COPY = {
+  label: 'Publication',
+  description: 'Tables in the selected publication will be replicated to this destination.',
+}
+
+export const getTableSyncSelectionDescription = ({
+  mode,
+  selectedCount,
+  tableCount,
+}: {
+  mode: 'include_tables' | 'skip_tables'
+  selectedCount: number
+  tableCount: number
+}) =>
+  mode === 'skip_tables'
+    ? `${selectedCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
+    : `${selectedCount} of ${tableCount} publication tables will run initial sync. Ongoing replication will still include every publication table.`

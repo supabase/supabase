@@ -27,11 +27,11 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
-import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tools'
+import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
-import { getURL } from '@/lib/helpers'
-import { trustedUserEmail } from '@/lib/server/configcat'
+import { getBasePathURL } from '@/lib/helpers'
+import { isServerFlagEnabled, trustedUserEmail } from '@/lib/server/configcat'
 
 export const maxDuration = 300
 
@@ -153,12 +153,15 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     }
   }
 
-  const explorerEnabled = await isExplorerEnabled(trustedUserEmail(claims?.email))
+  const [explorerEnabled, useStatusPageWidget] = await Promise.all([
+    isExplorerEnabled(trustedUserEmail(claims?.email)),
+    isServerFlagEnabled('incidentIoStatusPage'),
+  ])
 
   const envThrottled = process.env.IS_THROTTLED !== 'false'
 
   let effectiveModel: AssistantModelId = requestedModel ?? DEFAULT_ASSISTANT_BASE_MODEL_ID
-  if (!hasAccessToAdvanceModel || (envThrottled && !isAssistantBaseModelId(effectiveModel))) {
+  if (!isAssistantBaseModelId(effectiveModel) && (!hasAccessToAdvanceModel || envThrottled)) {
     effectiveModel = DEFAULT_ASSISTANT_BASE_MODEL_ID
   }
 
@@ -189,9 +192,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       authorization,
       aiOptInLevel,
       accessToken,
-      baseUrl: getURL(),
+      baseUrl: getBasePathURL(),
       supportMode,
       isExplorerEnabled: explorerEnabled,
+      useStatusPageWidget,
       signal: abortController.signal,
     })
 
@@ -238,6 +242,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       includesLogsSnippets,
       isExplorerEnabled: explorerEnabled,
       requestedModel,
+      effectiveModel,
       systemProviderOptions,
       abortSignal: abortController.signal,
       timeout: { totalMs: Math.max(0, ASSISTANT_TIMEOUT_MS - (Date.now() - requestStartedAt)) },

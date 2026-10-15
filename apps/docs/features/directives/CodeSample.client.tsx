@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { type PropsWithChildren, type ReactNode } from 'react'
+import { type CSSProperties, type PropsWithChildren, type ReactNode } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -26,18 +26,27 @@ interface SingleSourceProps {
 
 interface SourceFrameProps {
   footer: ReactNode
+  notchWidth?: number
 }
 
-const SOURCE_FOOTER_CLASSES = cn(
-  'not-prose absolute right-0 bottom-0 z-1 flex h-8 w-29.25 items-center gap-2 px-3 whitespace-nowrap',
+export const SOURCE_FOOTER_CLASSES = cn(
+  'not-prose absolute right-0 bottom-0 z-1 flex h-8 w-(--source-notch-width) items-center gap-2 px-3 whitespace-nowrap',
   'text-xs text-foreground-lighter no-underline transition-colors hover:text-foreground',
   'focus-inset rounded-md'
 )
 
-const SOURCE_NOTCH_OUTLINE =
-  'M0 39.5A7.5 7.5 0 0 0 7.5 32V16A8.5 8.5 0 0 1 16 7.5H117A7.5 7.5 0 0 0 124.5 0'
+const DEFAULT_NOTCH_WIDTH = 117
 
-const SOURCE_NOTCH_FOCUS_RING = 'M0 41A9 9 0 0 0 9 32V16A7 7 0 0 1 16 9H117A9 9 0 0 0 126 0'
+const getNotchOutline = (width: number): string =>
+  `M0 39.5A7.5 7.5 0 0 0 7.5 32V16A8.5 8.5 0 0 1 16 7.5H${width}A7.5 7.5 0 0 0 ${width + 7.5} 0`
+
+const getNotchFocusRing = (width: number): string =>
+  `M0 41A9 9 0 0 0 9 32V16A7 7 0 0 1 16 9H${width}A9 9 0 0 0 ${width + 9} 0`
+
+const getNotchMask = (width: number): string =>
+  `url("data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='${width + 10}' height='42'><path d='M0 40A8 8 0 0 0 8 32V16A8 8 0 0 1 16 8H${width}A8 8 0 0 0 ${width + 8} 0H${width + 10}V42H0Z'/></svg>`
+  )}")`
 
 const getSourcePath = (source: string | URL): string => {
   const [, org, repo, , , ...path] = new URL(source).pathname.split('/')
@@ -123,24 +132,38 @@ function SingleSource({ children, source }: PropsWithChildren<SingleSourceProps>
   )
 }
 
-function SourceFrame({ children, footer }: PropsWithChildren<SourceFrameProps>) {
+export function SourceFrame({
+  children,
+  footer,
+  notchWidth = DEFAULT_NOTCH_WIDTH,
+}: PropsWithChildren<SourceFrameProps>) {
+  const outline = getNotchOutline(notchWidth)
+  const notchStyle = {
+    '--source-notch-width': `${notchWidth}px`,
+    '--source-notch-mask': getNotchMask(notchWidth),
+    '--source-notch-mask-width': `${notchWidth + 10}px`,
+  } as CSSProperties
+
   return (
-    <div className="group/source code-sample-source shiki-wrapper relative w-full [&_.shiki]:pb-8 [&_.shiki]:shadow-none!">
+    <div
+      style={notchStyle}
+      className="group/source code-sample-source shiki-wrapper relative w-full [&_.shiki]:pb-8 [&_.shiki]:shadow-none!"
+    >
       <div className="codeblock-drop-shadow relative has-[.code-scroll:focus-visible]:z-1">
         {children}
       </div>
       <svg
         aria-hidden
-        width="125"
+        width={notchWidth + 8}
         height="40"
-        viewBox="0 0 125 40"
+        viewBox={`0 0 ${notchWidth + 8} 40`}
         fill="none"
         className="pointer-events-none absolute right-0 bottom-0 z-1 overflow-visible"
       >
-        <path d={SOURCE_NOTCH_OUTLINE} className="stroke-background-200" />
-        <path d={SOURCE_NOTCH_OUTLINE} className="stroke-border" />
+        <path d={outline} className="stroke-background-200" />
+        <path d={outline} className="stroke-border" />
         <path
-          d={SOURCE_NOTCH_FOCUS_RING}
+          d={getNotchFocusRing(notchWidth)}
           strokeWidth={2}
           className="hidden stroke-ring group-has-[.code-scroll:focus-visible]/source:inline"
         />
