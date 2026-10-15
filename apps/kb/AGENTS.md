@@ -58,14 +58,11 @@ Separately, `scripts/generate-markdown.mjs` runs as a `postbuild` step. It walks
 header and footer are dropped), writing a `.md` file under `dist/markdown/` that mirrors the page's URL.
 Admonitions are turned back into `> [!NOTE]`-style alerts, and links between guide/topic pages point at
 their `.md` exports. `vercel.json` permanently redirects `<page>.md` requests to these files, one redirect
-entry per route section (`guides`, `topics`). It also rewrites guide and topic page requests that send
-`Accept: text/markdown` to the same files (content negotiation), and sets `Vary: Accept` on those pages.
-The negotiated rewrites must stay above the generic `/kb/:path*` rewrite, since Vercel uses the first match.
+entry per route section (`guides`, `topics`).
 
-If you add a new content collection or top-level route, add a matching redirect and negotiated rewrite in
-`vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, and the `Accept` rewrite to
-`/markdown/<section>/:path+.md`), and add the section to `SECTIONS` in `generate-markdown.mjs`. Pages under a
-listed section export automatically.
+If you add a new content collection or top-level route, add a matching redirect in `vercel.json`
+(`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`), and add the section to `SECTIONS` in
+`generate-markdown.mjs`. Pages under a listed section export automatically.
 
 ## Topic-specific guidance
 
