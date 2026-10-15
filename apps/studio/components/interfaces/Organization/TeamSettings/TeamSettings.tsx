@@ -1,12 +1,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { SearchIcon } from 'lucide-react'
-import {
-  parseAsArrayOf,
-  parseAsString,
-  parseAsStringEnum,
-  useQueryState,
-} from 'nuqs'
+import { parseAsArrayOf, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { cn, Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
