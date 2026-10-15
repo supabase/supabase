@@ -9,11 +9,6 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { AssistantNotebookPreview } from './AssistantNotebookPreview'
 import { Confirm } from './Confirm'
 import { type ConfirmFooterApprovalState } from './Confirm.utils'
-import {
-  createNotebookInputSchema,
-  deleteNotebookInputSchema,
-  notebookToolOutputSchema,
-} from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { hasDiscardableChanges } from '@/data/content/notebooks/notebook-cache'
 import {
@@ -23,6 +18,8 @@ import {
 } from '@/data/content/notebooks/notebook-operations'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
+import { contract as createNotebookContract } from '@/lib/ai/tools/create-notebook'
+import { contract as deleteNotebookContract } from '@/lib/ai/tools/delete-notebook'
 import { contract as updateNotebookContract } from '@/lib/ai/tools/update-notebook'
 import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 
@@ -96,6 +93,12 @@ const NOTEBOOK_ACTION_NOUN: Record<NotebookProposalMode, string> = {
  * fetch, and the `expected_updated_at` version check. Wraps the preview in `Confirm` the
  * same way `AssistantQueryCell` wraps `QueryEditor`.
  */
+const MODE_CONTRACTS = {
+  create: createNotebookContract,
+  update: updateNotebookContract,
+  delete: deleteNotebookContract,
+} as const satisfies Record<NotebookProposalMode, unknown>
+
 export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) => {
   const { ref } = useParams()
   const { mode, state, input, output, confirmState, onApprove, onDeny, denyWithReason } = props
@@ -107,7 +110,7 @@ export const NotebookProposalRenderer = (props: NotebookProposalRendererProps) =
     return <UpdateNotebookTerminalSummary state={state} output={output} />
   }
 
-  const parsedOutput = notebookToolOutputSchema.safeParse(output)
+  const parsedOutput = MODE_CONTRACTS[mode].outputSchema.safeParse(output)
   // A deleted notebook no longer exists to open, so this action only applies to create/update.
   const canOpenNotebook = mode !== 'delete' && state === 'output-available'
   const footerAction =
@@ -163,7 +166,7 @@ function UpdateNotebookTerminalSummary({
   output,
 }: Pick<NotebookProposalRendererProps, 'state' | 'output'>) {
   const { ref } = useParams()
-  const parsedOutput = notebookToolOutputSchema.safeParse(output)
+  const parsedOutput = updateNotebookContract.outputSchema.safeParse(output)
   const label =
     state === 'output-available'
       ? parsedOutput.success
@@ -271,7 +274,7 @@ function CreateNotebookProposal({
   onApprove,
   onDeny,
 }: NotebookProposalStepProps) {
-  const parsedInput = createNotebookInputSchema.safeParse(input)
+  const parsedInput = createNotebookContract.inputSchema.safeParse(input)
 
   if (!parsedInput.success) {
     return (
@@ -523,7 +526,7 @@ function DeleteNotebookProposal({
 }: NotebookProposalStepPropsWithOutput) {
   const { ref } = useParams()
   const notebooksSnap = useNotebooksStateSnapshot()
-  const parsedInput = deleteNotebookInputSchema.safeParse(input)
+  const parsedInput = deleteNotebookContract.inputSchema.safeParse(input)
   const isCompleted = state === 'output-available'
   const hasUnsavedLocalChanges =
     confirmState === 'approval-requested' &&
@@ -552,7 +555,7 @@ function DeleteNotebookProposal({
   }
 
   if (isCompleted) {
-    const parsedOutput = notebookToolOutputSchema.safeParse(output)
+    const parsedOutput = deleteNotebookContract.outputSchema.safeParse(output)
     const notebookName = parsedOutput.success ? parsedOutput.data.name : undefined
 
     return (

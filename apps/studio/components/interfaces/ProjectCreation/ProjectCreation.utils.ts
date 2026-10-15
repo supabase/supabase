@@ -117,25 +117,21 @@ type GetFreeTierGeneralRegionExperimentVariantArgs = {
   smartRegionEnabled: boolean
   enrollmentFlag: boolean
   selectionFlag: boolean
-  /** When true, another feature owns the region selector and the experiment is inactive */
-  isOverridden?: boolean
 }
 
 /**
  * Org's arm in the freeTierGeneralRegionExperiment. The test arm only sees general regions.
- * Returns undefined when the org isn't enrolled, or when the experiment is overridden.
+ * Returns undefined when the org isn't enrolled.
  */
 export function getFreeTierGeneralRegionExperimentVariant({
   isFreePlan,
   smartRegionEnabled,
   enrollmentFlag,
   selectionFlag,
-  isOverridden = false,
 }: GetFreeTierGeneralRegionExperimentVariantArgs):
   | FreeTierGeneralRegionExperimentVariant
   | undefined {
-  const isInExperiment =
-    !isOverridden && isFreePlan && smartRegionEnabled && enrollmentFlag === true
+  const isInExperiment = isFreePlan && smartRegionEnabled && enrollmentFlag === true
   if (!isInExperiment) return undefined
   return selectionFlag === true ? 'test' : 'control'
 }
@@ -166,28 +162,6 @@ export function getRegionSelectionType({
   if (!isGeneral && !isSpecific) return undefined
   if (!isDbRegionDirty) return 'auto'
   return isGeneral ? 'general' : 'specific'
-}
-
-export type SpecificRegionsLinkVariant = 'test' | 'control'
-
-type GetSpecificRegionsLinkVariantArgs = {
-  isFreePlan: boolean
-  smartRegionEnabled: boolean
-  linkFlag: boolean
-}
-
-/**
- * Org's arm in the projectCreationSpecificRegionsLink experiment. Returns undefined when the
- * org isn't in the eligible population (paid plan, or smart regions disabled for the selected
- * cloud provider) — the link can never show for them regardless of the flag.
- */
-export function getSpecificRegionsLinkVariant({
-  isFreePlan,
-  smartRegionEnabled,
-  linkFlag,
-}: GetSpecificRegionsLinkVariantArgs): SpecificRegionsLinkVariant | undefined {
-  if (!isFreePlan || !smartRegionEnabled) return undefined
-  return linkFlag === true ? 'test' : 'control'
 }
 
 export interface PostgresVersionDetails {
