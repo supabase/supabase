@@ -96,7 +96,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    if (!data.claims.email || !mcpAllowedUsers!.includes(data.claims.email)) {
+    if (!data.claims.email || !mcpAllowedUsers!.includes(data.claims.email.toLowerCase())) {
       return res.status(403).json({ error: 'Forbidden' })
     }
   }
