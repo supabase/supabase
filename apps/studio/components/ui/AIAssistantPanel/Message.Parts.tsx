@@ -35,7 +35,10 @@ import { NotebookRunRenderer } from './NotebookRunRenderer'
 import { OptInRequest } from './OptInRequest'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
-import { storedUpdateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import {
+  isOptInRequestAlreadyGranted,
+  storedUpdateOptInLevelInputSchema,
+} from '@/lib/ai/tool-filter'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -280,6 +283,7 @@ function MessagePartUpdateOptInLevel({ toolPart }: { toolPart: ToolUIPart }) {
 
   const parsedInput = storedUpdateOptInLevelInputSchema.safeParse(input)
   if (state === 'input-streaming' || !parsedInput.success) return null
+  if (isOptInRequestAlreadyGranted(parsedInput.data)) return null
 
   const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
     state,

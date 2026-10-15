@@ -17,7 +17,11 @@ import {
   RLS_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
-import { isOptInLevelAtLeast, updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import {
+  isOptInLevelAtLeast,
+  isOptInRequestAlreadyGranted,
+  updateOptInLevelInputSchema,
+} from '@/lib/ai/tool-filter'
 import { NO_DATA_PERMISSIONS, toModelRows } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
@@ -144,12 +148,11 @@ export const getStudioTools = (ctx: ToolContext = {}) => {
   }
 }
 
-// Rewritten at parse time so the stored input is what the card shows. A level the org already
-// has is a review request, and `levelWhenAsked` outlives the user changing the setting.
+// Stamped at parse time because `levelWhenAsked` outlives the user changing the setting.
 export const createUpdateOptInLevelInputSchema = (aiOptInLevel: AiOptInLevel) =>
   updateOptInLevelInputSchema.transform(({ requiredLevel }) => ({
     levelWhenAsked: aiOptInLevel,
-    ...(requiredLevel && !isOptInLevelAtLeast(aiOptInLevel, requiredLevel) && { requiredLevel }),
+    ...(requiredLevel && { requiredLevel }),
   }))
 
 /** Registered at every level so an approval that lands on the top level can still execute. */
@@ -158,7 +161,7 @@ export const getOptInTools = ({ aiOptInLevel }: { aiOptInLevel: AiOptInLevel }) 
     description:
       'Asks the user to review or change the organization-wide AI opt-in level. Call it with `requiredLevel` when a tool needs a higher level than the organization has or you need to read query results. Call it without `requiredLevel` whenever the user asks to change the setting, including lowering it. Do not call it again in the same chat after the user skipped it unless they ask.',
     inputSchema: createUpdateOptInLevelInputSchema(aiOptInLevel),
-    needsApproval: true,
+    needsApproval: (input) => !isOptInRequestAlreadyGranted(input),
     execute: async ({ requiredLevel }) => {
       const sufficient = !requiredLevel || isOptInLevelAtLeast(aiOptInLevel, requiredLevel)
       return {
