@@ -2,8 +2,8 @@ import { ArrowDownIcon } from '@heroicons/react/outline'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { MarkdownActions } from '~/components/MarkdownActions'
-import { AwsMarketplacePurchaseCallout } from '~/components/Pricing/AwsMarketplacePurchaseCallout'
 import PricingAddons from '~/components/Pricing/PricingAddons'
+import PricingAwsMarketplaceSection from '~/components/Pricing/PricingAwsMarketplaceSection'
 import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
 import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
 import PricingFAQs from '~/components/Pricing/PricingFAQs'
@@ -40,10 +40,6 @@ export default function PricingContent() {
       </div>
 
       <PricingPlansSection />
-
-      <div className="mx-auto w-full max-w-md px-4 sm:px-6 lg:container lg:max-w-none lg:px-16 xl:px-12 mt-6 xl:mt-8">
-        <AwsMarketplacePurchaseCallout />
-      </div>
 
       <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
         <div className="flex justify-center gap-2">
@@ -97,6 +93,13 @@ export default function PricingContent() {
 
       <div id="addons" className="sm:py-18 container relative mx-auto px-4 py-16 md:py-24 lg:px-12">
         <PricingAddons />
+      </div>
+
+      <div
+        id="aws-marketplace"
+        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+      >
+        <PricingAwsMarketplaceSection />
       </div>
 
       <PricingComparisonSection />
