@@ -38,7 +38,7 @@ export const MemberRow = memo(function MemberRow({
 }: RowComponentBaseProps<OrganizationMember>) {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { roles, isLoadingRoles, orgProjects } = useTeamSettingsData()
+  const { roles, isLoadingRoles } = useTeamSettingsData()
 
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
@@ -59,11 +59,11 @@ export const MemberRow = memo(function MemberRow({
       const role = roleById.get(id)
       const roleName = (role?.name ?? '').split('_')[0]
       const appliesToAllProjects = role?.projects.length === 0
-      const projectsApplied = appliesToAllProjects ? orgProjects : (role?.projects ?? [])
+      const projectsApplied = role?.projects ?? []
 
       return { id, roleName, appliesToAllProjects, projectsApplied }
     })
-  }, [member.role_ids, roleById, orgProjects])
+  }, [member.role_ids, roleById])
 
   return (
     <div
@@ -162,7 +162,8 @@ export const MemberRow = memo(function MemberRow({
                     >
                       {projectsApplied[0].name}
                     </span>
-                  ) : (
+                  ) : // If the role is org scoped, don't show a hovercard with all projects
+                  !appliesToAllProjects ? (
                     <HoverCard openDelay={200}>
                       <HoverCardTrigger asChild>
                         <span className="text-foreground-light truncate">
@@ -195,7 +196,7 @@ export const MemberRow = memo(function MemberRow({
                         </div>
                       </HoverCardContent>
                     </HoverCard>
-                  )}
+                  ) : null}
                 </>
               )}
             </div>

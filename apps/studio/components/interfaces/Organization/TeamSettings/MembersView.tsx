@@ -23,7 +23,6 @@ import {
   type OrganizationMember,
 } from '@/data/organizations/organization-members-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
@@ -66,12 +65,6 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
   } = useOrganizationRolesV2Query({
     slug,
   })
-
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const orgProjects = useMemo(
-    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
-    [projectsData?.pages]
-  )
 
   const filteredMembers = useMemo(() => {
     const searchedMembers = !searchString
@@ -139,7 +132,6 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
       members={members}
       roles={roles}
       isLoadingRoles={isLoadingRoles}
-      orgProjects={orgProjects}
       permissions={permissions}
       selectedOrganization={selectedOrganization}
       organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}

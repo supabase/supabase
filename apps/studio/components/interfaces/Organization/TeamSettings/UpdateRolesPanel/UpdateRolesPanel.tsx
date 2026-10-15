@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { ChevronDownIcon, XIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Alert,
@@ -96,7 +96,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const canSaveRoles = projectsRoleConfiguration.length > 0
 
   const lowerPermissionsRole = orgScopedRoles.find((r) => r.name === 'Developer')?.id
-  const numberOfNoAccessProjects = totalNumOrgProjects - projectsRoleConfiguration.length
 
   const numberOfProjectsWithAccess = projectsRoleConfiguration.filter(
     (p) => p.ref !== undefined
@@ -205,7 +204,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   <Admonition>
                     <span className="text-sm">
                       {hasNoChanges
-                        ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''} out of ${totalNumOrgProjects} total project${totalNumOrgProjects > 1 ? 's' : ''}.}`
+                        ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''} out of ${totalNumOrgProjects} total project${totalNumOrgProjects > 1 ? 's' : ''}.`
                         : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''} out of ${totalNumOrgProjects} total project${totalNumOrgProjects > 1 ? 's' : ''}.`}
                     </span>
                   </Admonition>
