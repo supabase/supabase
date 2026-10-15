@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, type ComponentRef } from 'react'
 import { Badge } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -40,7 +40,7 @@ const getValidationHeading = ({
 }
 
 export const PipelineValidationAdmonition = forwardRef<
-  React.ComponentRef<typeof Admonition>,
+  ComponentRef<typeof Admonition>,
   {
     failures: ValidationFailure[]
     title?: string
