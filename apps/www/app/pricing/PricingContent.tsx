@@ -95,14 +95,14 @@ export default function PricingContent() {
         <PricingAddons />
       </div>
 
+      <PricingComparisonSection />
+
       <div
         id="aws-marketplace"
-        className="container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+        className="border-t container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
       >
         <PricingAwsMarketplaceSection />
       </div>
-
-      <PricingComparisonSection />
 
       <div id="faq" className="border-t">
         <PricingFAQs />
