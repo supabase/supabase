@@ -101,10 +101,9 @@ const page: GoPageInput = {
         'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
       crm: {
         hubspot: {
-          // TODO(storage-versioning): replace with the real HubSpot form GUID before launch.
-          // The all-zero placeholder keeps the schema valid and makes HubSpot reject the
-          // submission, rather than quietly filing signups against another team's form.
-          formGuid: '00000000-0000-0000-0000-000000000000',
+          formGuid:
+            process.env.HUBSPOT_STORAGE_VERSIONING_WAITLIST_FORM_GUID ||
+            '00000000-0000-0000-0000-000000000000',
           fieldMap: {
             first_name: 'firstname',
             last_name: 'lastname',
