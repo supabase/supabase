@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Form, Separator } from 'ui'
@@ -32,6 +33,10 @@ const steps = [
   { id: 'review', label: 'Review', title: 'Review and create' },
 ]
 
+const stepParser = parseAsStringEnum(steps.map(({ id }) => id))
+  .withDefault('destination')
+  .withOptions({ history: 'push', shallow: true, clearOnDefault: true })
+
 export const PipelineCreationFlow = ({
   availableDestinations,
   onClose,
@@ -39,7 +44,14 @@ export const PipelineCreationFlow = ({
   availableDestinations: FlowDestination[]
   onClose: () => void
 }) => {
-  const [step, setStep] = useState('destination')
+  const [step, setStep] = useQueryState('step', stepParser)
+  const hasInitializedStepRef = useRef(false)
+
+  useEffect(() => {
+    if (hasInitializedStepRef.current) return
+    hasInitializedStepRef.current = true
+    void setStep('destination', { history: 'replace' })
+  }, [setStep])
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
   const formId = useId()

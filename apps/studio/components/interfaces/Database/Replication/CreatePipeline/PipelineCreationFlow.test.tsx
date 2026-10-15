@@ -1,7 +1,8 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow } from './PipelineCreationFlow'
@@ -55,9 +56,58 @@ const next = () => fireEvent.click(screen.getByRole('button', { name: 'Continue'
 const back = () => fireEvent.click(screen.getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
+  it('uses browser Back and Forward to revisit steps without losing values', async () => {
+    window.history.replaceState(null, '', '/project/default/database/pipelines/new')
+    customRender(
+      <NuqsAdapter>
+        <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
+      </NuqsAdapter>
+    )
+    next()
+    await waitFor(() => expect(window.location.search).toBe('?step=connection'))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'history-project' },
+    })
+    next()
+    await waitFor(() => expect(window.location.search).toBe('?step=data'))
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('popstate', () => resolve(), { once: true })
+        window.history.back()
+      })
+    })
+    expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('history-project')
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('popstate', () => resolve(), { once: true })
+        window.history.forward()
+      })
+    })
+    expect(screen.getByText(/Step 3 of 4/)).toBeInTheDocument()
+    back()
+    await waitFor(() => expect(window.location.search).toBe('?step=connection'))
+    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('history-project')
+  })
+
+  it.each(['connection', 'data', 'review', 'invalid'])(
+    'starts a fresh session at Destination for step=%s',
+    async (step) => {
+      window.history.replaceState(null, '', `/project/default/database/pipelines/new?step=${step}`)
+      customRender(
+        <NuqsAdapter>
+          <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
+        </NuqsAdapter>
+      )
+      await waitFor(() => expect(window.location.search).toBe(''))
+      expect(screen.getByText(/Step 1 of 4/)).toBeInTheDocument()
+    }
+  )
+
   it('preserves connection and data values across steps and destination changes', () => {
     customRender(
-      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
+      { nuqs: { hasMemory: true } }
     )
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 1 of 4')
     next()
@@ -94,7 +144,9 @@ describe('PipelineCreationFlow', () => {
 
   it('confirms dirty dismissal and allows keeping the form', async () => {
     const onClose = vi.fn()
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />)
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
+      nuqs: { hasMemory: true },
+    })
     next()
     fireEvent.change(screen.getByRole('textbox', { name: 'Pipeline name' }), {
       target: { value: 'Keep me' },
