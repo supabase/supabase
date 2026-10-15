@@ -6,7 +6,7 @@ import PricingAddons from '~/components/Pricing/PricingAddons'
 import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
 import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
 import PricingFAQs from '~/components/Pricing/PricingFAQs'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -41,8 +41,8 @@ export default function PricingContent() {
 
       <PricingPlansSection />
 
-      <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col gap-8">
-        <div className="flex justify-center gap-2 flex-wrap">
+      <div className="text-center mt-10 xl:mt-16 mx-auto max-w-lg flex flex-col items-center gap-8">
+        <div className="flex justify-center gap-2">
           <a href="#compare-plans">
             <Button size="tiny" variant="secondary" iconRight={<ArrowDownIcon className="w-3" />}>
               Compare Plans
@@ -56,9 +56,17 @@ export default function PricingContent() {
               Learn how billing works
             </a>
           </Button>
-          <Button size="tiny" asChild iconRight={<ArrowUpRight className="w-4" />}>
-            <Link href="/aws-marketplace">AWS Marketplace</Link>
-          </Button>
+        </div>
+        <div className="space-y-2 text-left">
+          <p className="text-sm text-foreground-light m-0">More information</p>
+          <div className="space-y-1">
+            <Link href="/aws-marketplace">
+              <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                <p className="m-0 text-sm">AWS Marketplace</p>
+                <ExternalLink size={16} strokeWidth={1.5} />
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
 
