@@ -159,33 +159,22 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   )
 
   const isEndpointView = !!selectedEndpoint
-  const selectedEndpointHasName = selectedEndpoint ? selectedEndpoint.name.trim().length > 0 : false
   const selectedEndpointDisplayName = selectedEndpoint
     ? getWebhookEndpointDisplayName(selectedEndpoint)
     : ''
   const headerTitle = isEndpointView ? selectedEndpointDisplayName : scopeLabel
-  const headerDescription = isEndpointView
-    ? selectedEndpointHasName
-      ? (selectedEndpoint?.url ?? '')
-      : ''
-    : scopeDescription
+  const headerDescription = isEndpointView ? '' : scopeDescription
 
   const endpointPendingDelete = useMemo(
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
-  const endpointPendingDeleteHasName = endpointPendingDelete
-    ? endpointPendingDelete.name.trim().length > 0
-    : false
   const endpointPendingDeleteDisplayName = endpointPendingDelete
     ? getWebhookEndpointDisplayName(endpointPendingDelete)
     : ''
-  let deleteEndpointDescription = 'This action cannot be undone.'
-  if (endpointPendingDelete) {
-    deleteEndpointDescription = endpointPendingDeleteHasName
-      ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
-      : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
-  }
+  const deleteEndpointDescription = endpointPendingDelete
+    ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
+    : 'This action cannot be undone.'
 
   const shouldRedirect = shouldRedirectFromWebhooks({
     areFlagsReady: isFeaturePreviewInitialized,

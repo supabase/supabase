@@ -26,8 +26,6 @@ const toCustomHeaders = (
     ? Object.fromEntries(headers.map((header) => [header.key, header.value]))
     : undefined
 
-// The real API has no `name` field on an endpoint — it is never sent here.
-// See the comment on `WebhookEndpoint.name` in PlatformWebhooks.types.ts.
 export const toWebhookEndpointAttributes = (
   input: UpsertWebhookEndpointInput
 ): WebhookEndpointAttributesInput => ({
@@ -50,12 +48,8 @@ type WebhookDeliveryResource =
 type WebhookDeliveryListItemResource =
   operations['v2-organizations-slug-webhooks-endpoints-id-deliveries-get']['responses'][200]['content']['application/json']['data'][number]
 
-// Response → UI direction. The real API never returns a `name` — `name` is left blank
-// here; until the backend adds a field for it, there's nowhere to read a saved name
-// back from. Flagged with Ali/Paweł as an open product question, not yet resolved.
 export const toWebhookEndpoint = (resource: WebhookEndpointResource): WebhookEndpoint => ({
   id: resource.id,
-  name: '',
   url: resource.attributes.url,
   description: resource.attributes.description ?? '',
   enabled: resource.attributes.enabled,

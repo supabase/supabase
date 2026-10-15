@@ -46,7 +46,6 @@ const SELECTED_ENDPOINT_ID = '7f2c9d4a-6e31-4d9d-9a1f-2c4b5e6f7081'
 
 const selectedEndpoint: WebhookEndpoint = {
   id: SELECTED_ENDPOINT_ID,
-  name: 'Lovable production',
   url: 'https://api.lovable.dev/webhooks/supabase',
   description: 'Primary organization webhook endpoint',
   enabled: true,

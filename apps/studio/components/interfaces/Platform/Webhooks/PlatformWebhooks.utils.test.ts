@@ -1,16 +1,14 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import {
   filterWebhookDeliveries,
   filterWebhookEndpoints,
-  generateWebhookEndpointName,
   getWebhookEndpointDisplayName,
 } from './PlatformWebhooks.utils'
 
 const createEndpoint = (overrides: Partial<WebhookEndpoint> = {}): WebhookEndpoint => ({
   id: 'endpoint-1',
-  name: '',
   url: 'https://hooks.example.com/billing',
   description: '',
   enabled: true,
@@ -34,40 +32,29 @@ const createDelivery = (overrides: Partial<WebhookDelivery> = {}): WebhookDelive
 })
 
 describe('PlatformWebhooks.utils', () => {
-  afterEach(() => {
-    vi.restoreAllMocks()
-  })
-
-  it('returns the trimmed endpoint name when present', () => {
+  it('combines the endpoint url and subscribed event types', () => {
     expect(
       getWebhookEndpointDisplayName({
-        name: '  Billing events  ',
         url: 'https://hooks.example.com/billing',
+        eventTypes: ['v1.project.paused', 'v1.project.created'],
       })
-    ).toBe('Billing events')
+    ).toBe('https://hooks.example.com/billing (v1.project.paused, v1.project.created)')
   })
 
-  it('falls back to the endpoint url when the name is empty', () => {
+  it('shows "all events" when subscribed to every event type', () => {
     expect(
       getWebhookEndpointDisplayName({
-        name: '   ',
-        url: 'https://hooks.example.com/fallback',
+        url: 'https://hooks.example.com/billing',
+        eventTypes: ['*'],
       })
-    ).toBe('https://hooks.example.com/fallback')
+    ).toBe('https://hooks.example.com/billing (all events)')
   })
 
-  it('generates an adjective-noun endpoint name', () => {
-    vi.spyOn(Math, 'random').mockReturnValueOnce(0).mockReturnValueOnce(0.1)
-
-    expect(generateWebhookEndpointName()).toBe('swift-courier')
-  })
-
-  it('filters endpoints by name, url, and description', () => {
+  it('filters endpoints by url and description', () => {
     const endpoints = [
-      createEndpoint({ id: '1', name: 'Billing events', url: 'https://hooks.example.com/billing' }),
+      createEndpoint({ id: '1', url: 'https://hooks.example.com/billing' }),
       createEndpoint({
         id: '2',
-        name: 'Slack alerts',
         url: 'https://hooks.slack.com/x',
         description: 'operational alerts',
       }),

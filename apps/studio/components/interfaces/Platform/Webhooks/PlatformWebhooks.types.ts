@@ -12,8 +12,6 @@ export interface WebhookHeader {
 
 export interface WebhookEndpoint {
   id: string
-  // No `name` field in the real API — client-only until backend adds one.
-  name: string
   url: string
   description: string
   enabled: boolean
@@ -50,7 +48,6 @@ export interface PlatformWebhooksState {
 }
 
 export interface UpsertWebhookEndpointInput {
-  name: string
   url: string
   description: string
   enabled: boolean
