@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import {
   parseAsArrayOf,
   parseAsInteger,
