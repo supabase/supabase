@@ -56,6 +56,31 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
+const JWTSecretKeysTableHeader = ({
+  showLastRotatedAt = false,
+}: {
+  showLastRotatedAt?: boolean
+}) => {
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+
+  return (
+    <TableHeader>
+      <TableRow>
+        <TableHead className="w-[80px]">Status</TableHead>
+        <TableHead className="w-[315px]">Key ID</TableHead>
+        <TableHead className="w-[200px]">Type</TableHead>
+        {IS_PLATFORM && showApiKeysLastUsed && (
+          <TableHead className="text-right w-[160px]">Last used</TableHead>
+        )}
+        {showLastRotatedAt && (
+          <TableHead className="text-right hidden xl:table-cell">Last rotated at</TableHead>
+        )}
+        <TableHead />
+      </TableRow>
+    </TableHeader>
+  )
+}
+
 export const JWTSecretKeysTable = () => {
   const { ref: projectRef } = useParams()
   const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
@@ -83,15 +108,11 @@ export const JWTSecretKeysTable = () => {
     { enabled: canReadAPIKeys && showApiKeysLastUsed }
   )
   const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
-    {
-      projectRef,
-    },
+    { projectRef },
     { enabled: canReadAPIKeys }
   )
   const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
-    {
-      projectRef,
-    },
+    { projectRef },
     { enabled: canReadAPIKeys }
   )
   const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
@@ -225,7 +246,6 @@ export const JWTSecretKeysTable = () => {
                 onClick={() => setShownDialog('create')}
                 loading={isPendingMutation}
                 variant="primary"
-                icon={<TimerIcon className="size-4" />}
                 shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
               />
             )}
@@ -240,110 +260,65 @@ export const JWTSecretKeysTable = () => {
 
       {sortedKeys.length > 0 && (
         <>
-          <div>
-            <Card className="w-full overflow-hidden bg-surface-100 border rounded-md">
-              <CardContent className="p-0">
-                <Table className="p-5">
-                  <TableHeader className="bg-200">
-                    <TableRow>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
-                        Status
-                      </TableHead>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                        Key ID
-                      </TableHead>
-                      <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        Type
-                      </TableHead>
-                      <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        {IS_PLATFORM && showApiKeysLastUsed && 'Last used'}
-                      </TableHead>
-                      <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        Actions
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <AnimatePresence>
-                      {standbyKey && (
-                        <SigningKeyRow
-                          key={standbyKey.id}
-                          signingKey={standbyKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey}
-                          isLoading={
-                            selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey
-                          }
-                          setSelectedKey={setSelectedKey}
-                          setShownDialog={setShownDialog}
-                          handleStandbyKey={handleStandbyKey}
-                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          lastUsedAt={getLastUsedAt(standbyKey.id)}
-                          isLoadingLastUsed={isLoadingLastUsed}
-                          isLastUsedError={isLastUsedError}
-                          isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
-                        />
-                      )}
-                      {inUseKey && (
-                        <SigningKeyRow
-                          key={inUseKey.id}
-                          signingKey={inUseKey}
-                          setSelectedKey={setSelectedKey}
-                          setShownDialog={setShownDialog}
-                          handleStandbyKey={handleStandbyKey}
-                          handlePreviouslyUsedKey={handlePreviouslyUsedKey}
-                          legacyKey={legacyKey}
-                          standbyKey={standbyKey}
-                          lastUsedAt={getLastUsedAt(inUseKey.id)}
-                          isLoadingLastUsed={isLoadingLastUsed}
-                          isLastUsedError={isLastUsedError}
-                          isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
-                        />
-                      )}
-                    </AnimatePresence>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <JWTSecretKeysTableHeader />
+                <TableBody>
+                  <AnimatePresence>
+                    {inUseKey && (
+                      <SigningKeyRow
+                        key={inUseKey.id}
+                        signingKey={inUseKey}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        lastUsedAt={getLastUsedAt(inUseKey.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    )}
+                    {standbyKey && (
+                      <SigningKeyRow
+                        key={standbyKey.id}
+                        signingKey={standbyKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        isLoading={selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        lastUsedAt={getLastUsedAt(standbyKey.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    )}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <h2>Previously used keys</h2>
               <p className="text-sm text-foreground-lighter">
                 These JWT signing keys are still used to{' '}
-                <em className="text-primary not-italic">verify tokens</em> that are yet to expire.
-                Revoke once all tokens have expired.
+                <em className="text-foreground not-italic">verify tokens</em> that are yet to
+                expire. Revoke once all tokens have expired.
               </p>
             </div>
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 {previouslyUsedKeys.length > 0 ? (
-                  <Table className="p-5">
-                    <TableHeader className="bg-200">
-                      <TableRow>
-                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
-                          Status
-                        </TableHead>
-                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                          Key ID
-                        </TableHead>
-                        <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                          Type
-                        </TableHead>
-                        {IS_PLATFORM && showApiKeysLastUsed && (
-                          <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                            Last used
-                          </TableHead>
-                        )}
-                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
-                          Last rotated at
-                        </TableHead>
-                        <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                          Actions
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
+                  <Table>
+                    <JWTSecretKeysTableHeader showLastRotatedAt />
                     <TableBody>
                       <AnimatePresence>
                         {previouslyUsedKeys.map((key) => (
@@ -393,31 +368,8 @@ export const JWTSecretKeysTable = () => {
           </div>
           <Card className="overflow-hidden">
             <CardContent className="p-0">
-              <Table className="p-5">
-                <TableHeader className="bg-200">
-                  <TableRow>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pr-0 w-20">
-                      Status
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2 pl-0">
-                      Key ID
-                    </TableHead>
-                    <TableHead className="text-left font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                      Type
-                    </TableHead>
-                    {IS_PLATFORM && showApiKeysLastUsed && (
-                      <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                        Last used
-                      </TableHead>
-                    )}
-                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2 hidden lg:table-cell">
-                      Last rotated at
-                    </TableHead>
-                    <TableHead className="text-right font-mono uppercase text-xs text-foreground-muted h-auto py-2">
-                      Actions
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
+              <Table>
+                <JWTSecretKeysTableHeader showLastRotatedAt />
                 <TableBody>
                   <AnimatePresence>
                     {revokedKeys.map((key) => (
