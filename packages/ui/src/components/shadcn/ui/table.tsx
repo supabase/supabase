@@ -1,43 +1,25 @@
 import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
-import type { ComponentProps } from 'react'
-import * as React from 'react'
+import type { ComponentProps, ComponentPropsWithRef, ReactNode } from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
 
-interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
+interface TableProps extends ComponentPropsWithRef<'table'> {
   containerProps?: Partial<ComponentProps<typeof ShadowScrollArea>>
 }
 
-const Table = React.forwardRef<HTMLTableElement, TableProps>(
-  ({ className, containerProps, ...props }, ref) => {
-    return (
-      <ShadowScrollArea {...containerProps}>
-        <table
-          ref={ref}
-          className={cn('group/table w-full caption-bottom text-sm', className)}
-          {...props}
-        />
-      </ShadowScrollArea>
-    )
-  }
+const Table = ({ className, containerProps, ...props }: TableProps) => (
+  <ShadowScrollArea {...containerProps}>
+    <table className={cn('group/table w-full caption-bottom text-sm', className)} {...props} />
+  </ShadowScrollArea>
 )
-Table.displayName = 'Table'
 
-const TableHeader = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn('[&_tr]:border-b [&>tr]:bg-200', className)} {...props} />
-))
-TableHeader.displayName = 'TableHeader'
+const TableHeader = ({ className, ...props }: ComponentPropsWithRef<'thead'>) => (
+  <thead className={cn('[&_tr]:border-b [&>tr]:bg-200', className)} {...props} />
+)
 
-const TableBody = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
+const TableBody = ({ className, ...props }: ComponentPropsWithRef<'tbody'>) => (
   <tbody
-    ref={ref}
     className={cn(
       '[&_tr:last-child]:border-0',
       // :where() keeps this at lower specificity than a row's own hover:* class, so rows can opt out (e.g. loading/empty states)
@@ -46,34 +28,18 @@ const TableBody = React.forwardRef<
     )}
     {...props}
   />
-))
-TableBody.displayName = 'TableBody'
-
-const TableFooter = React.forwardRef<
-  HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tfoot ref={ref} className={cn('border-t font-medium', className)} {...props} />
-))
-TableFooter.displayName = 'TableFooter'
-
-const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn('border-b group data-[state=selected]:bg-muted', className)}
-      {...props}
-    />
-  )
 )
-TableRow.displayName = 'TableRow'
 
-const TableHead = React.forwardRef<
-  HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+const TableFooter = ({ className, ...props }: ComponentPropsWithRef<'tfoot'>) => (
+  <tfoot className={cn('border-t font-medium', className)} {...props} />
+)
+
+const TableRow = ({ className, ...props }: ComponentPropsWithRef<'tr'>) => (
+  <tr className={cn('border-b group data-[state=selected]:bg-muted', className)} {...props} />
+)
+
+const TableHead = ({ className, ...props }: ComponentPropsWithRef<'th'>) => (
   <th
-    ref={ref}
     className={cn(
       'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
       // Transition text color when NoSearchResults or NoFilterResults empty state is shown
@@ -82,14 +48,13 @@ const TableHead = React.forwardRef<
     )}
     {...props}
   />
-))
-TableHead.displayName = 'TableHead'
+)
 
 interface TableHeadSortProps<TColumn extends string = string> {
   column: TColumn
   currentSort: string
   onSortChange: (column: TColumn) => void
-  children: React.ReactNode
+  children: ReactNode
   className?: string
 }
 
@@ -152,24 +117,15 @@ function TableHeadSort<TColumn extends string = string>({
 }
 TableHeadSort.displayName = 'TableHeadSort'
 
-const TableCell = React.forwardRef<
-  HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+const TableCell = ({ className, ...props }: ComponentPropsWithRef<'td'>) => (
   <td
-    ref={ref}
     className={cn('transition-colors p-4 align-middle [&:has([role=checkbox])]:pr-0', className)}
     {...props}
   />
-))
-TableCell.displayName = 'TableCell'
+)
 
-const TableCaption = React.forwardRef<
-  HTMLTableCaptionElement,
-  React.HTMLAttributes<HTMLTableCaptionElement>
->(({ className, ...props }, ref) => (
+const TableCaption = ({ className, ...props }: ComponentPropsWithRef<'caption'>) => (
   <caption
-    ref={ref}
     className={cn(
       'border-t', // TableCaption is aligned by parent Table at caption-bottom
       'p-4 text-sm text-foreground-muted', // Match styling of TableCell
@@ -178,8 +134,7 @@ const TableCaption = React.forwardRef<
     // Should only contain inline elements
     {...props}
   />
-))
-TableCaption.displayName = 'TableCaption'
+)
 
 export {
   Table,
