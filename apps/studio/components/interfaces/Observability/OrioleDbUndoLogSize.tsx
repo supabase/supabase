@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Info } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 import { Button, Card, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -35,7 +35,7 @@ export const OrioleDbUndoLogSize = ({ projectRef, connectionString }: OrioleDbUn
               variant="text"
               aria-label="About undo log size"
               className="h-auto p-0 text-foreground-lighter hover:text-foreground"
-              icon={<Info size={14} />}
+              icon={<InfoIcon size={14} />}
             />
           </TooltipTrigger>
           <TooltipContent className="max-w-xs">
