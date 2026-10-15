@@ -16,6 +16,7 @@ import {
   Separator,
   TextArea,
 } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 
 interface FormData {
@@ -138,13 +139,16 @@ export function WaitlistForm() {
               >
                 First name
                 {errors.firstName && (
-                  <span className="text-foreground-muted text-xs">{errors.firstName}</span>
+                  <span className="text-foreground-muted text-xs leading-3">
+                    {errors.firstName}
+                  </span>
                 )}
               </Label>
               <Input
                 id="firstName"
                 name="firstName"
                 value={formData.firstName}
+                className={errors.firstName ? 'border-destructive!' : ''}
                 onChange={handleChange}
                 placeholder="Jane"
               />
@@ -156,13 +160,14 @@ export function WaitlistForm() {
               >
                 Last name
                 {errors.lastName && (
-                  <span className="text-foreground-muted text-xs">{errors.lastName}</span>
+                  <span className="text-foreground-muted text-xs leading-3">{errors.lastName}</span>
                 )}
               </Label>
               <Input
                 id="lastName"
                 name="lastName"
                 value={formData.lastName}
+                className={errors.lastName ? 'border-destructive!' : ''}
                 onChange={handleChange}
                 placeholder="Doe"
               />
@@ -172,7 +177,7 @@ export function WaitlistForm() {
             <Label htmlFor="email" className="text-foreground-light flex justify-between text-left">
               Work email
               {errors.email && (
-                <span className="text-foreground-muted text-xs">{errors.email}</span>
+                <span className="text-foreground-muted text-xs leading-3">{errors.email}</span>
               )}
             </Label>
             <Input
@@ -180,6 +185,7 @@ export function WaitlistForm() {
               name="email"
               type="email"
               value={formData.email}
+              className={errors.email ? 'border-destructive!' : ''}
               onChange={handleChange}
               placeholder="jane@company.com"
             />
@@ -197,34 +203,39 @@ export function WaitlistForm() {
             />
           </div>
           <div className="flex flex-col gap-2">
-            <Label
-              htmlFor="projectRef"
-              className="text-foreground-light flex justify-between text-left"
-            >
-              Project ID
+            <div className="w-full flex gap-2 justify-between text-left">
+              <Label htmlFor="projectRef" className="text-foreground-light flex gap-2 text-left">
+                <span>Project ID</span>
+                <InfoTooltip className="max-w-[450px] text-foreground-light text-pretty">
+                  <p>
+                    The 20-letter ID in your project URL: https://
+                    <span className="text-foreground">your-project-ref</span>.supabase.co (shown as
+                    Project ID in{' '}
+                    <Link
+                      className="hover:text-foreground underline"
+                      target="_blank"
+                      href="https://supabase.com/dashboard/project/_/settings/general"
+                    >
+                      Settings → General
+                    </Link>
+                    )
+                  </p>
+                  <p>Only projects created in us-west-2 can access Compute during Private Alpha.</p>
+                </InfoTooltip>
+              </Label>
               {errors.projectRef && (
-                <span className="text-foreground-muted text-xs">{errors.projectRef}</span>
+                <span className="text-foreground-muted text-xs leading-3">{errors.projectRef}</span>
               )}
-            </Label>
+            </div>
             <Input
               id="projectRef"
               name="projectRef"
               value={formData.projectRef}
+              className={errors.projectRef ? 'border-destructive!' : ''}
               onChange={handleChange}
               placeholder="abcdefghijklmnopqrst"
               aria-describedby="projectRef-description"
             />
-            <div
-              id="projectRef-description"
-              className="text-foreground-lighter text-xs text-left flex flex-col gap-1"
-            >
-              <p>
-                The 20-letter ID in your project URL: https://
-                <span className="text-foreground">your-project-ref</span>.supabase.co (shown as
-                Project ID in Settings → General)
-              </p>
-              <p>Only projects created in us-west-2 can access Compute.</p>
-            </div>
           </div>
           <div className="flex flex-col gap-2">
             <Label htmlFor="useCase" className="text-foreground-light text-left">
@@ -255,6 +266,7 @@ export function WaitlistForm() {
               onChange={handleChange}
               placeholder="What are you building, and what would you run on Compute?"
               rows={3}
+              className={errors.details ? 'border-destructive!' : ''}
             />
           </div>
 
