@@ -10,6 +10,7 @@ describe('buildAssistantContextMessages', () => {
       projectRef: 'abcdefghijklmnopqrst',
       chatName: 'Slow queries',
       schemasString: SCHEMAS,
+      aiOptInLevel: 'schema',
       now: new Date('2026-08-20T06:53:00.000Z'),
     })
 
@@ -22,9 +23,22 @@ describe('buildAssistantContextMessages', () => {
     expect(messages[0].content).toContain('iso_timestamp_start')
   })
 
+  it('states the opt-in level so the model only asks for a higher one', () => {
+    const messages = buildAssistantContextMessages({
+      projectRef: 'abcdefghijklmnopqrst',
+      schemasString: SCHEMAS,
+      aiOptInLevel: 'schema_and_log_and_data',
+    })
+
+    expect(messages[0].content).toContain(
+      "The organization's AI opt-in level is schema_and_log_and_data"
+    )
+  })
+
   it('omits the project message when there is nothing to say', () => {
     const messages = buildAssistantContextMessages({
       schemasString: NO_SCHEMA_ACCESS_MESSAGE,
+      aiOptInLevel: 'schema',
     })
 
     expect(messages).toEqual([])
@@ -33,6 +47,7 @@ describe('buildAssistantContextMessages', () => {
   it('adds the support instructions in support mode', () => {
     const messages = buildAssistantContextMessages({
       schemasString: NO_SCHEMA_ACCESS_MESSAGE,
+      aiOptInLevel: 'schema',
       supportMode: true,
     })
 
@@ -44,6 +59,7 @@ describe('buildAssistantContextMessages', () => {
     const messages = buildAssistantContextMessages({
       projectRef: 'abcdefghijklmnopqrst',
       schemasString: SCHEMAS,
+      aiOptInLevel: 'schema',
       includesLogsSnippets: true,
     })
 
@@ -62,6 +78,7 @@ describe('buildAssistantContextMessages', () => {
     const messages = buildAssistantContextMessages({
       projectRef: 'abcdefghijklmnopqrst',
       schemasString: SCHEMAS,
+      aiOptInLevel: 'schema',
       includesLogsSnippets: false,
     })
 

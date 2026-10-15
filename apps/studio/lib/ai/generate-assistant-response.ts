@@ -124,6 +124,7 @@ export async function generateAssistantResponse({
         projectRef,
         chatName,
         schemasString,
+        aiOptInLevel,
         supportMode,
         includesLogsSnippets,
       }),

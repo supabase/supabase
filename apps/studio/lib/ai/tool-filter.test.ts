@@ -5,6 +5,7 @@ import { z } from 'zod'
 import {
   createPrivacyMessageTool,
   filterToolsByOptInLevel,
+  isOptInRequestAlreadyGranted,
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
   toolSetValidationSchema,
@@ -232,6 +233,20 @@ describe('filterToolsByOptInLevel', () => {
     const tools = filterToolsByOptInLevel(mockTools, 'schema_and_log_and_data')
 
     await expectStubsFor(tools, [])
+  })
+})
+
+describe('isOptInRequestAlreadyGranted', () => {
+  it.each([
+    ['schema_and_log_and_data', 'schema_and_log_and_data', true],
+    ['schema_and_log_and_data', 'schema', true],
+    ['schema', 'schema', true],
+    ['schema', 'schema_and_log_and_data', false],
+    ['disabled', 'schema', false],
+    ['schema_and_log_and_data', undefined, false],
+    [undefined, 'schema', false],
+  ] as const)('asked at %s for %s → %s', (levelWhenAsked, requiredLevel, expected) => {
+    expect(isOptInRequestAlreadyGranted({ levelWhenAsked, requiredLevel })).toBe(expected)
   })
 })
 

@@ -277,7 +277,6 @@ describe('ai/tools/studio-tools getOptInTools', () => {
         { toolCallId: 'test', messages: [], context: {} }
       )
 
-      expect(update_opt_in_level.needsApproval).toBe(true)
       expect(result).toMatchObject({
         levelAfterReview: level,
         ...(sufficient !== undefined && { sufficient }),
@@ -289,11 +288,27 @@ describe('ai/tools/studio-tools getOptInTools', () => {
   )
 
   it.each([
-    ['schema_and_log_and_data', 'schema', undefined],
-    ['schema', 'schema', undefined],
-    ['schema', 'schema_and_log', 'schema_and_log'],
-  ] as const)('at level %s, requested %s is stored as %s', (level, requested, stored) => {
-    const parsed = createUpdateOptInLevelInputSchema(level).parse({ requiredLevel: requested })
-    expect(parsed).toEqual({ levelWhenAsked: level, requiredLevel: stored })
-  })
+    ['schema_and_log_and_data', 'schema_and_log_and_data', false],
+    ['schema_and_log_and_data', 'schema', false],
+    ['schema', 'schema_and_log', true],
+    ['schema_and_log_and_data', undefined, true],
+  ] as const)(
+    'at level %s, a request for %s needs approval: %s',
+    async (level, requiredLevel, expected) => {
+      const { update_opt_in_level } = getOptInTools({ aiOptInLevel: level })
+      if (typeof update_opt_in_level.needsApproval !== 'function') {
+        throw new Error('needsApproval is not a function')
+      }
+
+      const input = createUpdateOptInLevelInputSchema(level).parse({ requiredLevel })
+      const needsApproval = await update_opt_in_level.needsApproval(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      expect(input).toEqual({ levelWhenAsked: level, ...(requiredLevel && { requiredLevel }) })
+      expect(needsApproval).toBe(expected)
+    }
+  )
 })

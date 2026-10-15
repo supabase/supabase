@@ -1,3 +1,4 @@
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
@@ -43,6 +44,7 @@ export function buildAssistantContextMessages({
   projectRef,
   chatName,
   schemasString,
+  aiOptInLevel,
   supportMode,
   includesLogsSnippets,
   now = new Date(),
@@ -50,6 +52,7 @@ export function buildAssistantContextMessages({
   projectRef?: string
   chatName?: string
   schemasString: string
+  aiOptInLevel: AiOptInLevel
   supportMode?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
@@ -62,7 +65,7 @@ export function buildAssistantContextMessages({
   if (hasProjectContext) {
     messages.push({
       role: 'assistant',
-      content: `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}. The current time is ${now.toISOString()} (UTC). Use this clock when converting relative ranges such as "last hour" into iso_timestamp_start and iso_timestamp_end.`,
+      content: `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}. The organization's AI opt-in level is ${aiOptInLevel}, so anything that level allows is already available without calling update_opt_in_level. The current time is ${now.toISOString()} (UTC). Use this clock when converting relative ranges such as "last hour" into iso_timestamp_start and iso_timestamp_end.`,
     })
   }
 
