@@ -10,31 +10,44 @@ import {
   TOOL_CATEGORY_MAP,
   toolSetValidationSchema,
 } from './tool-filter'
+import { contract as createNotebookContract } from './tools/create-notebook'
+import { contract as deleteNotebookContract } from './tools/delete-notebook'
+import { contract as runNotebookContract } from './tools/run-notebook'
 import { contract as updateNotebookContract } from './tools/update-notebook'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
     expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
-    expect(TOOL_CATEGORY_MAP['run_notebook']).toBe(TOOL_CATEGORIES.SCHEMA)
+    expect(TOOL_CATEGORY_MAP['list_notebooks']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
 })
 
 describe('tools with a contract', () => {
-  const tools = {
-    update_notebook: { description: 'Update a notebook', execute: vitest.fn() },
-  } as unknown as ToolSet
+  const contracts = {
+    create_notebook: createNotebookContract,
+    delete_notebook: deleteNotebookContract,
+    run_notebook: runNotebookContract,
+    update_notebook: updateNotebookContract,
+  }
 
-  it('is gated by the contract minOptInLevel, not the category map', () => {
-    expect(updateNotebookContract.minOptInLevel).toBe('schema')
-    expect(Object.hasOwn(TOOL_CATEGORY_MAP, 'update_notebook')).toBe(false)
+  it.each(Object.entries(contracts))(
+    '%s is gated by the contract minOptInLevel, not the category map',
+    (name, contract) => {
+      const tools = {
+        [name]: { description: 'A notebook tool', execute: vitest.fn() },
+      } as unknown as ToolSet
 
-    const blocked = filterToolsByOptInLevel(tools, 'disabled').update_notebook
-    const allowed = filterToolsByOptInLevel(tools, 'schema').update_notebook
+      expect(contract.minOptInLevel).toBe('schema')
+      expect(Object.hasOwn(TOOL_CATEGORY_MAP, name)).toBe(false)
 
-    expect(blocked.description).toContain('Requires opting in')
-    expect(allowed.description).toBe('Update a notebook')
-  })
+      const blocked = filterToolsByOptInLevel(tools, 'disabled')[name]
+      const allowed = filterToolsByOptInLevel(tools, 'schema')[name]
+
+      expect(blocked.description).toContain('Requires opting in')
+      expect(allowed.description).toBe('A notebook tool')
+    }
+  )
 })
 
 describe('tool allowance by opt-in level', () => {

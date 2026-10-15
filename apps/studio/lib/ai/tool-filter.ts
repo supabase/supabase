@@ -1,6 +1,7 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 
+import { isOptInLevelAtLeast, optInLevelSchema } from './opt-in-level'
 import { getToolContract, type ContractToolName } from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -59,16 +60,6 @@ export const toolSetValidationSchema = z.record(
   basicToolSchema
 )
 export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
-
-/** Ordered from least to most data shared with the model. */
-export const OPT_IN_LEVELS = [
-  'disabled',
-  'schema',
-  'schema_and_log',
-  'schema_and_log_and_data',
-] as const
-
-export const optInLevelSchema = z.enum(OPT_IN_LEVELS)
 
 export const updateOptInLevelInputSchema = z.object({
   requiredLevel: z
@@ -143,9 +134,6 @@ export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, Tool
   list_databases: TOOL_CATEGORIES.SCHEMA,
   list_notebooks: TOOL_CATEGORIES.SCHEMA,
   get_notebook: TOOL_CATEGORIES.SCHEMA,
-  run_notebook: TOOL_CATEGORIES.SCHEMA,
-  create_notebook: TOOL_CATEGORIES.SCHEMA,
-  delete_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,

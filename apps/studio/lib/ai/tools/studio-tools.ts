@@ -9,6 +9,7 @@ import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCe
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 import {
   EDGE_FUNCTION_PROMPT,
   LOGS_PROMPT,
