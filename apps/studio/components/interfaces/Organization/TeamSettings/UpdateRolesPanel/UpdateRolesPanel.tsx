@@ -205,13 +205,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   <Admonition>
                     <span className="text-sm">
                       {hasNoChanges
-                        ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}. They ${hasNoChanges ? 'do' : 'will'} not have access to the other
-                      ${numberOfNoAccessProjects} project${numberOfNoAccessProjects > 1 ? 's' : ''}`
-                        : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}. They ${hasNoChanges ? 'do' : 'will'} not have access to the other
-                      ${numberOfNoAccessProjects} project${numberOfNoAccessProjects > 1 ? 's' : ''}`}
+                        ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''} out of ${totalNumOrgProjects} total project${totalNumOrgProjects > 1 ? 's' : ''}.}`
+                        : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''} out of ${totalNumOrgProjects} total project${totalNumOrgProjects > 1 ? 's' : ''}.`}
                     </span>
-                    <span className="text-sm">:</span>
-                    <ChevronDownIcon size={14} className="transition group-data-open:-rotate-180" />
                   </Admonition>
                 )}
 
