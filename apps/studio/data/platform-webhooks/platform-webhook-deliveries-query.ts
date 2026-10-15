@@ -38,6 +38,7 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
     queryFn: ({ signal }) =>
       getWebhookDeliveries({ scope, endpointId, size, after, before }, signal),
     enabled: enabled && Boolean(endpointId),
+    refetchInterval: 5000,
     ...options,
   })
 }
