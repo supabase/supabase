@@ -25,6 +25,7 @@ export const ProjectRefCopyButton = ({ projectRef }: ProjectRefCopyButtonProps) 
     <Tooltip>
       <TooltipTrigger asChild>
         <button
+          tabIndex={0}
           onClick={handleCopyProjectRef}
           onKeyDown={(e) => e.stopPropagation()}
           className="inline-flex self-start items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-[5px]"
