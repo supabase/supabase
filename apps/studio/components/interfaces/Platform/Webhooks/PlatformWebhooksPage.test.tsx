@@ -57,7 +57,6 @@ const ENDPOINT_ATTRIBUTES: EndpointResource['attributes'] = {
   description: '',
   enabled: true,
   event_types: [{ type: 'v1.project.paused' }],
-  custom_headers: null,
   created_by: 'user@supabase.io',
   created_at: '2026-02-18T11:23:00.000Z',
 }
@@ -168,6 +167,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
   })
 
   test('updates an endpoint without rotating the signing secret', async () => {
+    const updatedUrl = 'https://hooks.example.com/project-updated'
     mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
     mockDeliveriesList([])
 
@@ -177,8 +177,10 @@ describe('PlatformWebhooksPage (project scope)', () => {
       path: '/v2/projects/:ref/webhooks/endpoints/:id',
       response: async ({ request }) => {
         requests.push({ body: (await request.json()) as unknown as EndpointUpdateRequestBody })
+        const updatedAttributes = { ...ENDPOINT_ATTRIBUTES, url: updatedUrl }
+        mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: updatedAttributes }])
         return HttpResponse.json<EndpointUpdateResponse>({
-          data: { id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES },
+          data: { id: ENDPOINT_ID, type: 'endpoint', attributes: updatedAttributes },
         })
       },
     })
@@ -186,10 +188,15 @@ describe('PlatformWebhooksPage (project scope)', () => {
     renderPage(ENDPOINT_ID)
 
     fireEvent.click(await screen.findByRole('button', { name: 'Edit' }))
+    const urlInput = await screen.findByDisplayValue(ENDPOINT_ATTRIBUTES.url)
+    await userEvent.clear(urlInput)
+    await userEvent.type(urlInput, updatedUrl)
     fireEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
 
     await waitFor(() => expect(requests).toHaveLength(1))
     expect(requests[0].body.data.attributes).not.toHaveProperty('signing_secret')
+    expect(requests[0].body.data.attributes.url).toBe(updatedUrl)
+    await waitFor(() => expect(screen.getAllByText(updatedUrl).length).toBeGreaterThan(0))
   })
 
   test('deletes an endpoint after confirmation', async () => {
@@ -200,7 +207,8 @@ describe('PlatformWebhooksPage (project scope)', () => {
     addAPIMock({
       method: 'delete',
       path: '/v2/projects/:ref/webhooks/endpoints/:id',
-      response: () => {
+      response: ({ params }) => {
+        expect(params.id).toBe(ENDPOINT_ID)
         deleteCalled = true
         return HttpResponse.json<EndpointDeleteResponse>({
           data: { id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES },
@@ -225,7 +233,8 @@ describe('PlatformWebhooksPage (project scope)', () => {
     addAPIMock({
       method: 'post',
       path: '/v2/projects/:ref/webhooks/endpoints/:id/test',
-      response: () => {
+      response: ({ params }) => {
+        expect(params.id).toBe(ENDPOINT_ID)
         testCalled = true
         return HttpResponse.json<EndpointTestResponse>(
           { data: { id: 'evt_1', type: 'ingress' } },
@@ -267,6 +276,9 @@ describe('PlatformWebhooksPage (project scope)', () => {
     await waitFor(() => expect(requests).toHaveLength(1))
     expect(requests[0].body.data.attributes.signing_secret).toMatch(/^whsec_/)
     expect(await screen.findByRole('heading', { name: 'Signing secret' })).toBeInTheDocument()
+    expect(
+      await screen.findByDisplayValue(requests[0].body.data.attributes.signing_secret!)
+    ).toBeInTheDocument()
   })
 
   test('retries a failed delivery', async () => {
@@ -291,7 +303,8 @@ describe('PlatformWebhooksPage (project scope)', () => {
     addAPIMock({
       method: 'post',
       path: '/v2/projects/:ref/webhooks/deliveries/:id/retry',
-      response: () => {
+      response: ({ params }) => {
+        expect(params.id).toBe(DELIVERY_ID)
         retryCalled = true
         return HttpResponse.json<DeliveryRetryResponse>({
           data: { id: 'evt_1', type: 'ingress' },
