@@ -164,28 +164,6 @@ export function getRegionSelectionType({
   return isGeneral ? 'general' : 'specific'
 }
 
-export type SpecificRegionsLinkVariant = 'test' | 'control'
-
-type GetSpecificRegionsLinkVariantArgs = {
-  isFreePlan: boolean
-  smartRegionEnabled: boolean
-  linkFlag: boolean
-}
-
-/**
- * Org's arm in the projectCreationSpecificRegionsLink experiment. Returns undefined when the
- * org isn't in the eligible population (paid plan, or smart regions disabled for the selected
- * cloud provider) — the link can never show for them regardless of the flag.
- */
-export function getSpecificRegionsLinkVariant({
-  isFreePlan,
-  smartRegionEnabled,
-  linkFlag,
-}: GetSpecificRegionsLinkVariantArgs): SpecificRegionsLinkVariant | undefined {
-  if (!isFreePlan || !smartRegionEnabled) return undefined
-  return linkFlag === true ? 'test' : 'control'
-}
-
 export interface PostgresVersionDetails {
   postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
   releaseChannel?: ReleaseChannel

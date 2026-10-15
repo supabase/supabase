@@ -33,7 +33,6 @@ import {
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
-  getSpecificRegionsLinkVariant,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
@@ -208,12 +207,6 @@ export const ProjectCreationForm = ({
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
-  const specificRegionsLinkFlag = useFlag('projectCreationSpecificRegionsLink') === true
-  const specificRegionsLinkVariant = getSpecificRegionsLinkVariant({
-    isFreePlan,
-    smartRegionEnabled,
-    linkFlag: specificRegionsLinkFlag,
-  })
   const isResolvingFreeTierGeneralRegionExperiment =
     isFreePlan &&
     smartRegionEnabled &&
@@ -394,9 +387,6 @@ export const ProjectCreationForm = ({
           }),
           ...(freeTierGeneralRegionExperimentVariant !== undefined && {
             freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
-          }),
-          ...(specificRegionsLinkVariant !== undefined && {
-            specificRegionsLinkExperiment: specificRegionsLinkVariant,
           }),
           ...(regionSelectionType !== undefined && { regionSelectionType }),
           regionCode: res.region,
@@ -648,9 +638,15 @@ export const ProjectCreationForm = ({
     if (freeTierGeneralRegionExperimentVariant === undefined) return
     if (!canCreateProject || projectCreationDisabled || isLoadingFreeProjectLimit) return
     freeTierGeneralRegionExposedSlug.current = slug
-    track('free_tier_general_region_experiment_exposed', {
-      variant: freeTierGeneralRegionExperimentVariant,
-    })
+    track(
+      'free_tier_general_region_experiment_exposed',
+      {
+        variant: freeTierGeneralRegionExperimentVariant,
+      },
+      {
+        organization: slug,
+      }
+    )
   }, [
     slug,
     isResolvingFreeTierGeneralRegionExperiment,

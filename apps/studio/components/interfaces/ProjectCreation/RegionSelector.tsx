@@ -94,8 +94,7 @@ export const RegionSelector = ({
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
   const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
-  const isSpecificRegionsLinkEnabled =
-    useFlag('projectCreationSpecificRegionsLink') === true && isFreePlan && !hideSpecificRegions
+  const isSpecificRegionsLinkEnabled = isFreePlan && !hideSpecificRegions
 
   const { getRegionRestriction } = useRegionRestriction()
 
@@ -187,8 +186,6 @@ export const RegionSelector = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbRegion, form])
 
-  // Behind projectCreationSpecificRegionsLink the dropdown opens on the general regions alone, with
-  // a link that reveals the full list — the same list that ships today, general selection intact.
   const hasGeneralRegions = smartRegionEnabled && !highAvailability
   const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
   const [isOpen, setIsOpen] = useState(false)
