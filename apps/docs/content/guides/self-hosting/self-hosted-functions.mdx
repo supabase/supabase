@@ -224,7 +224,7 @@ Check the functions service logs:
 docker compose logs functions
 ```
 
-For 503 `BOOT_ERROR`, check for syntax errors, invalid imports, or missing dependencies that prevent the function from starting.
+For 503 `BOOT_ERROR` responses without `(ref: <uuid>)` in the message, check for syntax errors, invalid imports, or missing dependencies that prevent the function from starting.
 
 If the error message includes `(ref: <uuid>)`, the failure occurred in the main worker. Run `docker compose logs functions` and search for that reference to find the corresponding error.
 
