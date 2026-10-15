@@ -284,7 +284,12 @@ export const formatFunctionBodyToFiles = ({
         }
       })
 
-    return filesWithRelPath.map((file: { name: string; content: string }, index: number) => {
+    // sort by displayed (relative) name before assigning ids, so ids follow list order
+    const sortedFiles = [...filesWithRelPath].sort((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+    )
+
+    return sortedFiles.map((file: { name: string; content: string }, index: number) => {
       return {
         id: index + 1,
         name: file.name,
@@ -295,4 +300,17 @@ export const formatFunctionBodyToFiles = ({
   }
 
   return []
+}
+
+// Picks the file to open by default: the function's entrypoint, then `index.ts`, then the first file.
+export const getDefaultSelectedFileId = (
+  files: Pick<FileData, 'id' | 'name'>[],
+  entrypointPath?: string | null
+): number | undefined => {
+  const entrypointName = entrypointPath?.split('/').pop()
+  const entrypointFile = entrypointName
+    ? files.find((file) => file.name === entrypointName)
+    : undefined
+
+  return (entrypointFile ?? files.find((file) => file.name === 'index.ts') ?? files[0])?.id
 }
