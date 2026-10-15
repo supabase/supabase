@@ -142,6 +142,21 @@ describe('PipelineCreationFlow', () => {
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
+  it('confirms destination-only changes and treats a reverted selection as pristine', async () => {
+    const onClose = vi.fn()
+    customRender(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={onClose} />
+    )
+    fireEvent.click(screen.getByRole('radio', { name: /Snowflake/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(onClose).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
+    fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+    expect(onClose).toHaveBeenCalledOnce()
+  })
+
   it('confirms dirty dismissal and allows keeping the form', async () => {
     const onClose = vi.fn()
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {

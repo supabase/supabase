@@ -61,9 +61,11 @@ export const PipelineCreationFlow = ({
   })
   const canLeaveRef = useRef(false)
   const pendingHrefRef = useRef<string | undefined>(undefined)
+  const initialTypeRef = useRef(type)
   const { isDirty } = form.formState
+  const hasUnsavedChanges = isDirty || type !== initialTypeRef.current
   const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
+    checkIsDirty: () => hasUnsavedChanges,
     onClose: () => {
       canLeaveRef.current = true
       if (pendingHrefRef.current) window.location.assign(pendingHrefRef.current)
@@ -86,7 +88,7 @@ export const PipelineCreationFlow = ({
   const canSelectDestination = availableDestinations.includes(type)
 
   useEffect(() => {
-    if (!isDirty) return
+    if (!hasUnsavedChanges) return
     const handleBeforeUnload = (event: BeforeUnloadEvent) => {
       if (canLeaveRef.current) return
       event.preventDefault()
@@ -94,7 +96,7 @@ export const PipelineCreationFlow = ({
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [isDirty])
+  }, [hasUnsavedChanges])
 
   return (
     <div className="flex min-h-screen flex-col bg-dash-sidebar">

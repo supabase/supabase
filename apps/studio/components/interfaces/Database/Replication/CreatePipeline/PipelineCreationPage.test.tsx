@@ -74,3 +74,11 @@ it('does not expose the wizard for High Availability projects', () => {
   customRender(<PipelineCreationPage />)
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
 })
+
+it('falls back when the preview is off even if organisation and project queries stay pending', () => {
+  state.enabled = false
+  state.orgPending = true
+  state.flagsLoaded = false
+  customRender(<PipelineCreationPage />)
+  expect(screen.getByRole('status')).toHaveTextContent('Returning to Pipelines')
+})

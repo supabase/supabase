@@ -29,7 +29,8 @@ const PipelineCreationPage = () => {
   const snowflake = useIsETLSnowflakePrivateAlpha()
   const clickHouse = useIsETLClickHousePrivateAlpha()
   const listHref = `${BASE_PATH}/project/${ref}/database/pipelines`
-  const isAccessLoading = isLoading || !hasLoaded || isOrganizationPending || isPending
+  const isAccessLoading =
+    isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canOpenFlow = isEnabled && !isHighAvailability && canUseReplication
   useEffect(() => {
     if (!isAccessLoading && !canOpenFlow) {
@@ -37,7 +38,8 @@ const PipelineCreationPage = () => {
       window.location.replace(fallback)
     }
   }, [isAccessLoading, canOpenFlow, isEnabled, listHref])
-  if (isAccessLoading || !canOpenFlow) return <GenericSkeletonLoader />
+  if (isAccessLoading) return <GenericSkeletonLoader />
+  if (!canOpenFlow) return <p role="status">Returning to Pipelines…</p>
   return (
     <>
       <Head>

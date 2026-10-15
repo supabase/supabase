@@ -18,13 +18,18 @@ vi.mock('@/components/layouts/Navigation/NavigationBar/OrgSelector', async () =>
   const { SidebarMenuButton } = await import('ui')
   return { OrgSelector: () => <SidebarMenuButton>Organization</SidebarMenuButton> }
 })
-vi.mock('@/components/layouts/AppLayout/ProjectDropdown', () => ({
-  ProjectDropdown: () => (
-    <a tabIndex={0} href="/project/other/database/pipelines">
-      Project
-    </a>
-  ),
-}))
+vi.mock('@/components/layouts/AppLayout/ProjectDropdown', async () => {
+  const { createPortal } = await import('react-dom')
+  return {
+    ProjectDropdown: () =>
+      createPortal(
+        <a tabIndex={0} href="/project/other/database/pipelines">
+          Project
+        </a>,
+        document.body
+      ),
+  }
+})
 
 describe('PipelineCreationHeader', () => {
   it('shows the project context and routes close through its handler', () => {
