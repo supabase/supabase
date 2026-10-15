@@ -299,6 +299,16 @@ describe('execute_sql rows are shared only up to the level they ran under', () =
     })
   })
 
+  test('does not report a total when more rows existed than were fetched', () => {
+    const part = executeSqlPart({
+      rows: Array.from({ length: 100 }, (_, i) => ({ id: i })),
+      hasMoreRows: true,
+      optInLevel: 'schema_and_log_and_data',
+    })
+    const output = (sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output
+    expect(output).toMatchObject({ note: expect.stringContaining('more than 100 rows') })
+  })
+
   test('output saved before the stamp existed stays hidden', () => {
     const part = executeSqlPart(rows)
     expect((sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output).toBe(
