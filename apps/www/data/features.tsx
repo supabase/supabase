@@ -434,7 +434,7 @@ Connect a GitHub repo to your Supabase project. Migrations live in version contr
 ## Key features
 1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
 2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
-3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
+3. Inherited configuration: Each branch has its own Supabase instance with separate API credentials and starts with its base project's Postgres, Auth, Storage, network, and Edge Functions configuration.
 4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
 5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
 6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
@@ -451,7 +451,7 @@ Connect a GitHub repo to your Supabase project. Migrations live in version contr
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '/images/features/branching.png',
     heroImageLight: '/images/features/branching-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/platform/branching',
+    docsUrl: 'https://supabase.com/docs/guides/deployment/branching',
     slug: 'branching',
     status: {
       stage: PRODUCT_STAGES.BETA,
