@@ -1,0 +1,88 @@
+---
+title: 'A local Supabase project per agent, with or without Docker'
+description: 'Run several local Supabase projects on one machine, one per coding agent, with or without Docker. Faster starts, less memory, and branches ready in seconds.'
+author: jgoux, wenbo
+date: '2026-10-14'
+categories:
+  - product
+tags:
+  - cli
+  - local-development
+  - branching
+  - ai
+imgSocial: '2026-10-14-local-supabase-project-per-agent-with-or-without-docker/og.png'
+imgThumb: '2026-10-14-local-supabase-project-per-agent-with-or-without-docker/thumb.png'
+toc_depth: 2
+---
+
+The Supabase CLI now runs several local projects on one machine, one per git worktree, and runs them without Docker. Each coding agent gets its own database to reset, migrate, and test against while the others keep working. Local projects start in seconds and use a tenth of the memory, and the remote branch that picks up the work when a pull request opens is ready more than five times faster.
+
+Multiple projects and the native runtime ship in CLI v2.119.0 behind an experimental flag. Faster branches are on for every project today.
+
+## Each agent gets its own project
+
+Suppose one agent is adding billing while another reworks signup. Give each one a git worktree and run `supabase start` in both:
+
+```bash
+git worktree add ../app-billing -b billing
+git worktree add ../app-signup -b signup
+
+cd ../app-billing && supabase start
+cd ../app-signup && supabase start
+```
+
+Each worktree gets its own Postgres, Storage, Edge Functions, and MCP server, on ports the CLI picks and remembers across restarts. The billing agent can run `supabase db reset` whenever it likes and the signup agent's tests never notice. Agents read their URLs and keys from `supabase start --output-format json` instead of assuming the defaults, and with [Declarative Schemas 2.0](https://supabase.com/blog/declarative-schemas-2-0-pg-delta) they edit schema files and let the CLI write the migration.
+
+No more coordinating project IDs or ports by hand, which has been one of the [most requested changes](https://github.com/orgs/supabase/discussions/5968) to the CLI.
+
+## Projects start in seconds and stay small
+
+`supabase start` brings up Postgres and leaves every other service asleep until its first request. If your task never touches Storage, Storage never runs. Sleeping services use no CPU or memory, stop again when idle, and wake on the next request. Pass `--eager` if you want everything up front.
+
+|                            | Default engine | Docker runtime | Native runtime |
+| -------------------------- | -------------- | -------------- | -------------- |
+| Start, artifacts cached    | 37 s           | 5.2 s          | 3.9 s          |
+| Restart with existing data | 32 s           | 2.1 s          | 1.4 s          |
+| Download size              | 1.9 GB         | 550 MB         | 360 MB         |
+| Idle memory                | 2.6 GiB        | 290 MiB        | 290 MiB        |
+
+Nine idle projects now fit in the memory one used to take, which is what makes a project per worktree practical on a laptop.
+
+## No Docker required
+
+Agents increasingly work in hosted sandboxes and CI runners that have no container engine. The native runtime runs all 13 Supabase services as plain processes, at the same pinned versions as the Docker images, with the full Postgres extension set including pgvector. When Docker isn't available the CLI picks it for you, or select it directly:
+
+```bash
+supabase start --runtime native
+```
+
+It runs on Linux (amd64 and arm64, glibc 2.35 or later) and macOS 14 or later on Apple silicon. Docker stays the default when it's present and is still the better fit for several projects on one laptop, since each container gets its own network and file system. Think of native as one project per sandbox. Running Supabase locally without Docker has been a [long-running request](https://github.com/orgs/supabase/discussions/20272) too.
+
+## Branches are ready more than five times faster
+
+When the pull request opens, a remote branch gives reviewers a URL to point a build at, and that branch now arrives configured like the project it came from. Auth, Storage, network restrictions, and deployed Edge Functions all carry over at creation, with function bundles copied in parallel so a project with 40 functions comes up as fast as one with two. Secrets stay behind and production data stays out unless you choose to branch with it, so the branch is safe to hand to a reviewer the moment it's ready.
+
+| Time to ready   | Before  | After |
+| --------------- | ------- | ----- |
+| Median          | 102 s   | 21 s  |
+| 95th percentile | 7.6 min | 41 s  |
+
+## Get started
+
+Update to CLI v2.119.0 or later and turn on the experimental engine. For a new app:
+
+```bash
+SUPABASE_EXPERIMENTAL_STACK=1 supabase init
+```
+
+For an existing app, add `stack = true` under `[experimental]` in `supabase/config.toml` and follow the [port-removal checklist](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#remove-fixed-ports-from-configtoml) before your first start. Commit the file so every worktree gets the setting.
+
+Then pick the setup that matches where your agents work:
+
+- Several agents on your computer: run Docker or Podman, give each agent its own worktree, and run `supabase start` in each. The [multiple local projects guide](https://supabase.com/docs/guides/local-development/running-multiple-local-projects) covers listing, stopping, and removing projects.
+- One project in a sandbox or CI runner: run `supabase start --runtime native` on a supported platform. No container engine needed. The [runtimes guide](https://supabase.com/docs/guides/local-development/docker-and-native-runtimes) covers sandbox setup and download allowlists.
+- A branch on a pull request: nothing to turn on. Branches already inherit their base project's configuration, and the [Branching guide](https://supabase.com/docs/guides/deployment/branching) covers each way to create one.
+
+The experimental engine keeps its data separate from your existing local project, and its flags and output can still change, so read the [differences and limitations](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#differences-from-the-default-supabase-start) before moving a workflow over.
+
+**Have feedback?** Please share it in the [CLI repo](https://github.com/supabase/cli/issues).
