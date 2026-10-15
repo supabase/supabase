@@ -12,10 +12,11 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type WebhookEndpointTestVariables = {
   scope: WebhookScopeParams
   id: string
+  eventType?: string
 }
 
-async function testEndpoint({ scope, id }: WebhookEndpointTestVariables) {
-  return sendTestWebhookEvent(scope, id)
+async function testEndpoint({ scope, id, eventType }: WebhookEndpointTestVariables) {
+  return sendTestWebhookEvent(scope, id, eventType)
 }
 
 type WebhookEndpointTestData = Awaited<ReturnType<typeof testEndpoint>>
