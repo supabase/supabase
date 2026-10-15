@@ -32,6 +32,7 @@ Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start
 
 ## Orientation
 
+- **Supabase Assistant** — before working on Assistant chat, prompts, tools, or access handling, read the [Assistant code guide](lib/ai/README.md) for entry points, request flow, and validation references. Update the guide when moving entry points or changing the request/tool lifecycle.
 - **Data layer** — all platform API calls go through `data/fetchers.ts` (`openapi-fetch`, typed by the generated `api-types` package) with `handleError`; never raw `fetch`. One folder per resource in `data/`, most with a `keys.ts` query-key factory.
 - **State** — valtio for global state (`state/`), nuqs for URL state, react-hook-form + zod for forms.
 - **Platform vs self-hosted** — `IS_PLATFORM` gates platform-only behavior; `withAuth` is a no-op when self-hosted.
