@@ -3,11 +3,11 @@ import { tool } from 'ai'
 import { z } from 'zod'
 
 import { getAuthHeaders } from './auth-headers'
+import { capReadQuery } from './cap-read-query'
 import type { ToolContext } from './types'
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { applyAutoLimit } from '@/data/sql/utils'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   EDGE_FUNCTION_PROMPT,
@@ -78,11 +78,9 @@ export const getStudioTools = (ctx: ToolContext = {}) => {
         const approvedSql = acceptUntrustedSql(untrustedSql(sql))
         // Push the cap into the query so the database doesn't load rows we'd throw away. The
         // extra row lets `totalRows > DEFAULT_CELL_ROW_LIMIT` still signal a truncated result.
-        // applyAutoLimit leaves anything it can't safely rewrite alone, so the slice below
-        // remains the guarantee.
-        const { sql: limitedSql, appendAutoLimit } = isWriteQuery
-          ? { sql: approvedSql, appendAutoLimit: false }
-          : applyAutoLimit(approvedSql, DEFAULT_CELL_ROW_LIMIT + 1)
+        const { sql: limitedSql, isCappedInDatabase } = isWriteQuery
+          ? { sql: approvedSql, isCappedInDatabase: false }
+          : capReadQuery(approvedSql, DEFAULT_CELL_ROW_LIMIT + 1)
         const { result } = await executeSql(
           { projectRef, connectionString, sql: limitedSql },
           abortSignal,
@@ -92,7 +90,7 @@ export const getStudioTools = (ctx: ToolContext = {}) => {
         // same row cap as the query cell, unbounded results freeze the chat and overflow the model
         const isCapped = rows.length > DEFAULT_CELL_ROW_LIMIT
         // When the limit ran in the database, `rows.length` stops at the cap and isn't a real total
-        const hasMoreRows = appendAutoLimit && isCapped
+        const hasMoreRows = isCappedInDatabase && isCapped
         return {
           rows: rows.slice(0, DEFAULT_CELL_ROW_LIMIT),
           ...(hasMoreRows ? { hasMoreRows } : { totalRows: rows.length }),

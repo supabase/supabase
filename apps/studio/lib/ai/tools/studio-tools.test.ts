@@ -299,7 +299,7 @@ describe('ai/tools/studio-tools', () => {
       vi.mocked(executeSql).mockResolvedValue({ result: rows })
       const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
       const input = {
-        sql: 'WITH t AS (SELECT id FROM users) SELECT * FROM t',
+        sql: 'SELECT id FROM users; SELECT id FROM users',
         label: 'Get ids',
         chartConfig: { view: 'table' as const },
         isWriteQuery: false,
