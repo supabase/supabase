@@ -1,6 +1,6 @@
 import { SlashIcon, XIcon } from 'lucide-react'
 import type { MouseEvent } from 'react'
-import { Button } from 'ui'
+import { Button, SidebarProvider } from 'ui'
 
 import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
@@ -44,7 +44,9 @@ export const PipelineCreationHeader = ({
           <OrganizationDropdown />
         </div>
         <div className="md:hidden">
-          <OrgSelector />
+          <SidebarProvider defaultOpen={false} className="contents">
+            <OrgSelector />
+          </SidebarProvider>
         </div>
         <SlashIcon
           aria-hidden="true"

@@ -14,9 +14,10 @@ vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
 vi.mock('@/components/layouts/AppLayout/OrganizationDropdown', () => ({
   OrganizationDropdown: () => <span>Organization</span>,
 }))
-vi.mock('@/components/layouts/Navigation/NavigationBar/OrgSelector', () => ({
-  OrgSelector: () => <span>Organization</span>,
-}))
+vi.mock('@/components/layouts/Navigation/NavigationBar/OrgSelector', async () => {
+  const { SidebarMenuButton } = await import('ui')
+  return { OrgSelector: () => <SidebarMenuButton>Organization</SidebarMenuButton> }
+})
 vi.mock('@/components/layouts/AppLayout/ProjectDropdown', () => ({
   ProjectDropdown: () => (
     <a tabIndex={0} href="/project/other/database/pipelines">
