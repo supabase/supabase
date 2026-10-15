@@ -214,7 +214,7 @@ export const MembersView = ({ searchString, mfaFilter, roleIds }: MembersViewPro
               </div>
             )}
 
-            <div className="px-4 py-3 text-sm text-foreground-muted border-t">
+            <div aria-live="polite" className="px-4 py-3 text-sm text-foreground-muted border-t">
               {isFiltering
                 ? `${filteredMembers.length} of ${members.length} ${members.length === 1 ? 'member' : 'members'}`
                 : `${members.length || 0} ${members.length === 1 ? 'member' : 'members'}`}
