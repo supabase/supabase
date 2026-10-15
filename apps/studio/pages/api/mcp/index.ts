@@ -33,6 +33,16 @@ const mcpOAuthEnabled = process.env.ENABLED_FEATURES_MCP_OAUTH === 'true'
 const mcpResourceUrl =
   process.env.SUPABASE_PUBLIC_URL! + '/.well-known/oauth-protected-resource/mcp'
 
+const mcpAllowedUsers = process.env.MCP_ALLOWED_USERS?.split(',')
+  .map((email) => email.trim().toLowerCase())
+  .filter(Boolean)
+
+if (mcpOAuthEnabled && (!mcpAllowedUsers || mcpAllowedUsers.length === 0)) {
+  throw new Error(
+    'MCP OAuth is enabled, but MCP_ALLOWED_USERS is not configured. Set it to a comma-separated list of allowed user email addresses.'
+  )
+}
+
 const mcpQuerySchema = z.object({
   features: z
     .string()
@@ -63,26 +73,31 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-const isTokenValid = async (token: string): Promise<boolean> => {
+const getClaims = async (token?: string) => {
+  if (!token) return { data: null, error: new Error('invalid token') }
   try {
-    const { error } = await supabase.auth.getClaims(token)
-    return !error
-  } catch {
-    return false
+    return await supabase.auth.getClaims(token)
+  } catch (error) {
+    return { data: null, error: error as Error }
   }
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   if (mcpOAuthEnabled) {
     const token = req.headers.authorization?.replace('Bearer ', '')
+    const { data, error } = await getClaims(token)
 
-    if (!token || !(await isTokenValid(token))) {
+    if (error || !data) {
       res.setHeader(
         'WWW-Authenticate',
         `Bearer error="invalid_token", error_description="The access token provided is invalid", resource_metadata="${mcpResourceUrl}"`
       )
 
       return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    if (!data.claims.email || !mcpAllowedUsers!.includes(data.claims.email)) {
+      return res.status(403).json({ error: 'Forbidden' })
     }
   }
   const { error, data } = mcpQuerySchema.safeParse(req.query)
