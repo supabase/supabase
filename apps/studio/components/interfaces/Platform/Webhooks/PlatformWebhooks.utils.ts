@@ -28,6 +28,11 @@ export const getWebhookEndpointDisplayName = (
   return `${endpoint.url} (${eventTypesLabel})`
 }
 
+export const getTestWebhookEventType = (
+  subscribedEventTypes: string[],
+  fallbackEventTypes: string[]
+) => subscribedEventTypes.find((eventType) => eventType !== '*') ?? fallbackEventTypes[0]
+
 const normalizeSearch = (value: string) => value.trim().toLowerCase()
 
 export const filterWebhookEndpoints = (endpoints: WebhookEndpoint[], search: string) => {
