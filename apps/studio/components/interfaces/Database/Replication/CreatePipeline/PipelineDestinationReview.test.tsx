@@ -114,3 +114,21 @@ describe('PipelineDestinationReview', () => {
     expect(screen.queryByText('Catalog URL')).not.toBeInTheDocument()
   })
 })
+
+it('includes custom settings in Connection without a separate heading', () => {
+  customRender(
+    <TestReview
+      type="BigQuery"
+      values={{ ...defaults, connectionPoolSize: 3, maxStalenessMins: 10 }}
+    />
+  )
+  expect(screen.getByLabelText('Connection pool size')).toHaveValue('3')
+  expect(screen.getByLabelText('Maximum staleness')).toHaveValue('10 minutes')
+  expect(
+    screen.getByText('Number of BigQuery connections used for destination writes.')
+  ).toBeInTheDocument()
+  expect(
+    screen.getByText('Maximum age of BigQuery query results for newly created or recreated tables.')
+  ).toBeInTheDocument()
+  expect(screen.queryByText('Custom connection settings')).not.toBeInTheDocument()
+})

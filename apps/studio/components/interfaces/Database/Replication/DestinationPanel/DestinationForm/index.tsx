@@ -11,6 +11,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
 import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
+import { PipelineDataReview } from '../../CreatePipeline/PipelineDataReview'
 import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
 import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinationReview'
 import {
@@ -542,6 +543,12 @@ export const DestinationForm = ({
                   <>
                     <DialogSectionSeparator />
                     <PipelineDestinationReview type={selectedType} control={form.control} />
+                    <DialogSectionSeparator />
+                    <PipelineDataReview
+                      type={selectedType}
+                      control={form.control}
+                      publication={selectedPublication}
+                    />
                   </>
                 )}
 

@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
@@ -23,11 +23,9 @@ import {
   SNOWFLAKE_DATABASE_FIELD_COPY,
   SNOWFLAKE_SCHEMA_FIELD_COPY,
 } from '../DestinationPanel/DestinationForm/DestinationFormFieldCopy'
-import {
-  getPipelineRegionDescription,
-  PipelineRegionReadonly,
-} from '../DestinationPanel/DestinationForm/PipelineRegionField'
+import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import { PipelineConnectionReview } from './PipelineConnectionReview'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -41,7 +39,7 @@ const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
         size="tiny"
         aria-label={`${isVisible ? 'Hide' : 'Show'} ${label.replace(/^[A-Z][a-z]+/, (word) => word.toLowerCase())}`}
         aria-pressed={isVisible}
-        icon={isVisible ? <EyeOff size={14} /> : <Eye size={14} />}
+        icon={isVisible ? <EyeOffIcon size={14} /> : <EyeIcon size={14} />}
         onClick={() => setIsVisible(!isVisible)}
       />
     </div>
@@ -93,7 +91,7 @@ export const PipelineDestinationReview = ({
       'newNamespaceName',
     ],
   })
-  const rows: { label: string; value?: string; description?: string; isMasked?: boolean }[] = []
+  const rows: { label: string; value?: string; description: string; isMasked?: boolean }[] = []
   switch (type) {
     case 'BigQuery':
       rows.push(
@@ -106,7 +104,7 @@ export const PipelineDestinationReview = ({
         rows.push(
           {
             ...DUCKLAKE_CATALOG_URL_FIELD_COPY,
-            description: DUCKLAKE_CATALOG_URL_FIELD_COPY.createDescription,
+            description: 'Postgres URL of the database used for the DuckLake catalog.',
             value: catalogUrl,
             isMasked: true,
           },
@@ -177,11 +175,12 @@ export const PipelineDestinationReview = ({
             )}
           </FormItemLayout>
         ))}
+        <PipelineConnectionReview type={type} control={control} />
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"
           label="Pipeline region"
-          description={getPipelineRegionDescription(type)}
+          description={`All pipelines run from this region. ${type} connections originate here.`}
         >
           <PipelineRegionReadonly />
         </FormItemLayout>
