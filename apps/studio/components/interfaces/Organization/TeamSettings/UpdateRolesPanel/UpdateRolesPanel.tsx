@@ -64,15 +64,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
-  const {
-    data: projectsData,
-    hasNextPage,
-    isFetchingNextPage,
-    fetchNextPage,
-  } = useOrgProjectsInfiniteQuery({ slug })
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
   const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
-  const orgProjects =
-    useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
@@ -105,9 +98,8 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const canSaveRoles = projectsRoleConfiguration.length > 0
 
   const lowerPermissionsRole = orgScopedRoles.find((r) => r.name === 'Developer')?.id
-  const noAccessProjects = orgProjects.filter((project) => {
-    return !projectsRoleConfiguration.some((p) => p.ref === project.ref)
-  })
+  const numberOfNoAccessProjects = totalNumOrgProjects - projectsRoleConfiguration.length
+
   const numberOfProjectsWithAccess = projectsRoleConfiguration.filter(
     (p) => p.ref !== undefined
   ).length
@@ -158,21 +150,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       if (originalConfigurationType === 'project-scope') {
         setProjectsRoleConfiguration(originalConfiguration)
       } else {
-        setProjectsRoleConfiguration(
-          orgProjects.map((p) => {
-            return { ref: p.ref, name: p.name, roleId: roleIdToApply }
-          })
-        )
+        setProjectsRoleConfiguration([])
       }
     }
   }
-
-  // The panel needs the full project list (e.g. to apply roles to every project), so load all pages
-  useEffect(() => {
-    if (visible && hasNextPage && !isFetchingNextPage) {
-      fetchNextPage()
-    }
-  }, [visible, hasNextPage, isFetchingNextPage, fetchNextPage])
 
   useEffect(() => {
     if (visible && isSuccessRoles) {
@@ -230,23 +211,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
                           : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                       </span>
+                      <p>
+                        {member.username} {hasNoChanges ? 'does' : 'will'} not have access to the
+                        following {numberOfNoAccessProjects} project
+                        {numberOfNoAccessProjects > 1 ? 's' : ''}:
+                      </p>
                       <ChevronDownIcon
                         size={14}
                         className="transition group-data-open:-rotate-180"
                       />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="text-foreground-light text-sm px-4">
-                      <p>
-                        {member.username} {hasNoChanges ? 'does' : 'will'} not have access to the
-                        following {noAccessProjects.length} project
-                        {noAccessProjects.length > 1 ? 's' : ''}:
-                      </p>
-                      <ul className="list-disc pl-6">
-                        {noAccessProjects.map((project) => {
-                          return <li key={project.ref}>{project.name}</li>
-                        })}
-                      </ul>
-                    </CollapsibleContent>
                   </Collapsible>
                 )}
 
