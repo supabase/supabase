@@ -95,6 +95,10 @@ export type FeatureType = {
    */
   heroImageLight?: string
   /**
+   * omit the hero block (image, video, or icon placeholder) from the feature page
+   */
+  hideHero?: boolean
+  /**
    * url to docs or blog page for this feature
    */
   docsUrl?: string
@@ -2206,6 +2210,7 @@ Running several local projects is experimental and needs CLI v2.119.0 or later. 
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
+    hideHero: true,
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
     slug: 'parallel-local-projects',
     status: {
