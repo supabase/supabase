@@ -90,8 +90,10 @@ const POST = async ({ request }: { request: Request }) => {
         },
       })
     }
+    const { email, aud } = data.claims
+    const isValidAud = Array.isArray(aud) ? aud.includes('authenticated') : aud === 'authenticated'
 
-    if (!data.claims.email || !mcpAllowedUsers!.includes(data.claims.email.toLowerCase())) {
+    if (!isValidAud || !email || !mcpAllowedUsers!.includes(email.toLowerCase())) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
         headers: { 'Content-Type': 'application/json' },

@@ -95,8 +95,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       return res.status(401).json({ error: 'Unauthorized' })
     }
+    const { email, aud } = data.claims
+    const isValidAud = Array.isArray(aud) ? aud.includes('authenticated') : aud === 'authenticated'
 
-    if (!data.claims.email || !mcpAllowedUsers!.includes(data.claims.email.toLowerCase())) {
+    if (!isValidAud || !email || !mcpAllowedUsers!.includes(email.toLowerCase())) {
       return res.status(403).json({ error: 'Forbidden' })
     }
   }
