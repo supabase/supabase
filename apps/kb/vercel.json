@@ -40,16 +40,6 @@
     {
       "source": "/kb/topics/:path+",
       "headers": [{ "key": "Vary", "value": "Accept" }]
-    },
-    {
-      "source": "/kb/guides/:path+",
-      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
-      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
-    },
-    {
-      "source": "/kb/topics/:path+",
-      "has": [{ "type": "header", "key": "accept", "value": "(?i).*text/markdown.*" }],
-      "headers": [{ "key": "Content-Type", "value": "text/markdown; charset=utf-8" }]
     }
   ]
 }
