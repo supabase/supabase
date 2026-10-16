@@ -161,4 +161,63 @@ describe('useConnectServerEnv secret reveal', () => {
     expect(result.current.secret.isRevealed).toBe(false)
     expect(clearMock).toHaveBeenCalledTimes(1)
   })
+
+  describe('legacy service_role key', () => {
+    const LEGACY_SERVICE_KEY = {
+      name: 'service_role',
+      api_key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.legacy_service_token',
+      type: 'legacy',
+    }
+
+    beforeEach(() => {
+      vi.mocked(useAPIKeys).mockReturnValue({
+        data: {
+          secretKey: undefined,
+          serviceKey: LEGACY_SERVICE_KEY,
+          publishableKey: { api_key: 'sb_publishable_x' },
+        },
+        isLoading: false,
+      } as any)
+    })
+
+    it('toggles visibility and reveals legacy key without calling reveal API', async () => {
+      const { result } = renderHook(() => useConnectServerEnv())
+
+      expect(result.current.secret.isRevealed).toBe(false)
+      expect(result.current.secret.displayValue).toContain('••••')
+
+      await act(async () => {
+        await result.current.secret.toggle()
+      })
+
+      expect(result.current.secret.isRevealed).toBe(true)
+      expect(result.current.secret.displayValue).toBe(LEGACY_SERVICE_KEY.api_key)
+      expect(revealMock).not.toHaveBeenCalled()
+    })
+
+    it('returns legacy key on getValue() without calling reveal API', async () => {
+      const { result } = renderHook(() => useConnectServerEnv())
+
+      let val!: string
+      await act(async () => {
+        val = await result.current.secret.getValue()
+      })
+
+      expect(val).toBe(LEGACY_SERVICE_KEY.api_key)
+      expect(revealMock).not.toHaveBeenCalled()
+    })
+
+    it('builds .env string containing legacy service key without calling reveal API', async () => {
+      const { result } = renderHook(() => useConnectServerEnv())
+
+      let envContent!: string
+      await act(async () => {
+        envContent = await result.current.buildEnv()
+      })
+
+      expect(envContent).toContain(`SUPABASE_SECRET_KEY=${LEGACY_SERVICE_KEY.api_key}`)
+      expect(revealMock).not.toHaveBeenCalled()
+    })
+  })
 })
+
