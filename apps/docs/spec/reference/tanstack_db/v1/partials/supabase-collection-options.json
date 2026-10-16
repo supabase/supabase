@@ -12,7 +12,7 @@
       "name": "keys",
       "isOptional": false,
       "type": "string[]",
-      "description": "The primary key column(s) for the table. Should match the table's primary key."
+      "description": "The primary key column or columns for the table. Must match the table's primary key."
     },
     {
       "name": "schema",
@@ -42,15 +42,15 @@
       "name": "realtimeUseFilter",
       "isOptional": true,
       "type": "boolean",
-      "description": "Experimental. Apply server-side filtering to realtime updates instead of filtering on the client. Only applies when `realtime` is `true`. Queries that can't be expressed as a Realtime filter, like `or(...)`, fall back to the unfiltered subscription. Defaults to `false`."
+      "description": "Experimental. Apply server-side filtering to Realtime updates instead of filtering on the client. Only applies when `realtime` is `true`. Queries that can't be expressed as a Realtime filter, like `or(...)`, fall back to the unfiltered subscription. Defaults to `false`."
     }
   ],
-  "notes": "- Realtime sync is experimental.\n- To receive changes from other clients, enable Realtime for the table in the Table Editor, or run `alter publication supabase_realtime add table todos;`.\n- Collections work with an existing Supabase project and respect Row Level Security. No migrations required.\n- Create one collection per table.\n- Reads page past your project's max rows setting (1000 by default) automatically. If a collection can grow past it, order by a unique column so pages stay consistent.",
+  "notes": "- To receive changes from other clients, enable Realtime for the table in the Table Editor, or run `alter publication supabase_realtime add table todos;`.\n- Create one collection per table.\n- Reads page past your project's max rows setting automatically. The default is 1000 rows. If a collection can grow past it, order by a unique column so pages stay consistent.",
   "examples": [
     {
       "id": "create-collection",
       "name": "Create a collection",
-      "code": "```tsx\nimport { createCollection } from '@tanstack/react-db'\nimport { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'\nimport { z } from 'zod'\n\nconst todosSchema = z.object({\n  id: z.number(),\n  title: z.string(),\n  completed: z.boolean(),\n})\n\nexport const todos = createCollection(\n  supabaseCollectionOptions({\n    tableName: 'todos',\n    keys: ['id'],\n    schema: todosSchema,\n    supabase,\n    realtime: true,\n  })\n)\n```"
+      "code": "```tsx\nimport { createCollection } from '@tanstack/react-db'\nimport { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'\nimport { z } from 'zod'\n\nconst todosSchema = z.object({\n  id: z.string(),\n  title: z.string(),\n  completed: z.boolean(),\n})\n\nexport const todos = createCollection(\n  supabaseCollectionOptions({\n    tableName: 'todos',\n    keys: ['id'],\n    schema: todosSchema,\n    supabase,\n    realtime: true,\n  })\n)\n```"
     }
   ]
 }

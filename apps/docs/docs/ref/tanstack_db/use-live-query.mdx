@@ -3,12 +3,12 @@ id: use-live-query
 title: Live queries and mutations
 ---
 
-Read a collection reactively with `useLiveQuery()`, and mutate it optimistically. The UI updates immediately, and changes roll back if the server rejects them.
+Read a collection reactively with `useLiveQuery()`, and mutate it optimistically.
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    `useLiveQuery` re-runs whenever the underlying collection changes, so components stay in sync without manual cache invalidation. `.insert()`, `.update()`, and `.delete()` apply to the UI immediately and roll back if the server rejects the change.
+    `useLiveQuery` re-runs whenever the collection changes, so components stay in sync without manual cache invalidation. `.insert()`, `.update()`, and `.delete()` apply to the UI immediately and roll back if the server rejects the change.
 
   </RefSubLayout.Details>
 
@@ -16,21 +16,46 @@ Read a collection reactively with `useLiveQuery()`, and mutate it optimistically
 
     ```tsx
     import { useLiveQuery, eq } from '@tanstack/react-db'
+    // import the todos collection you defined
+    import { todos } from './collections'
 
-    const { data, isLoading } = useLiveQuery(
-      (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, false)),
-      []
-    )
+    const Todos = () => {
+      const { data, isLoading } = useLiveQuery(
+        (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, false)),
+        []
+      )
 
-    const id = data[0].id
+      const insertTodo = (title: string) => {
+        todos.insert({ id: crypto.randomUUID(), title, completed: false })
+      }
 
-    todos.insert({ id, title: 'Buy milk', completed: false })
+      const completeTodo = (id: string) => {
+        todos.update(id, (draft) => {
+          draft.completed = true
+        })
+      }
 
-    todos.update(id, (draft) => {
-      draft.completed = true
-    })
+      const deleteTodo = (id: string) => {
+        todos.delete(id)
+      }
 
-    todos.delete(id)
+      if (isLoading) return <p>Loading...</p>
+
+      return (
+        <div>
+          <button onClick={() => insertTodo('Buy milk')}>Add todo</button>
+          <ul>
+            {data.map((todo) => (
+              <li key={todo.id}>
+                {todo.title}
+                <button onClick={() => completeTodo(todo.id)}>Complete</button>
+                <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
     ```
 
   </RefSubLayout.Examples>
