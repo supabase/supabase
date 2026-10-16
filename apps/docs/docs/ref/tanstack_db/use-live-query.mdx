@@ -8,7 +8,7 @@ Read a collection reactively with `useLiveQuery()`, and mutate it optimistically
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    `useLiveQuery` re-runs whenever the underlying collection changes, so components stay in sync without manual cache invalidation. `.update()` and `.delete()` apply to the UI immediately and roll back if the server rejects the change.
+    `useLiveQuery` re-runs whenever the underlying collection changes, so components stay in sync without manual cache invalidation. `.insert()`, `.update()`, and `.delete()` apply to the UI immediately and roll back if the server rejects the change.
 
   </RefSubLayout.Details>
 
@@ -21,6 +21,8 @@ Read a collection reactively with `useLiveQuery()`, and mutate it optimistically
       (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, false)),
       []
     )
+
+    todos.insert({ id: 1, title: 'Buy milk', completed: false })
 
     todos.update(id, (draft) => {
       draft.completed = true

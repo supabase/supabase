@@ -7,8 +7,10 @@ title: Introduction
 
 Collections work with an existing Supabase project and respect Row Level Security. No migrations required.
 
+See it in action in the [example Todo app](https://todomvc-supabase-tanstack-db.vercel.app/).
+
 <Admonition type="caution" title="Experimental">
 
-`@supabase-labs/tanstack-db` is early (0.x). Realtime sync is still experimental, and there's no SSR support yet.
+`@supabase-labs/tanstack-db` is early (0.x). Realtime sync is still experimental and may use more Realtime messages than expected. Test with a spend cap, or set `realtime: false` on a collection to opt out. There's no SSR support yet.
 
 </Admonition>
