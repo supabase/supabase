@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 
 type RevealStyle = CSSProperties & { '--reveal-index': number }
 
-// roughly when the hero copy starts fading in
+// lets the hero canvas start drawing before on-screen groups reveal
 const ON_LOAD_OFFSET_MS = 300
 
 export const REVEAL_GROUP_CLASS = 'group/reveal'
@@ -10,12 +10,6 @@ export const REVEAL_GROUP_CLASS = 'group/reveal'
 export const REVEAL_ITEM_CLASS = [
   'motion-safe:opacity-0 motion-safe:group-data-revealed/reveal:opacity-100',
   'motion-safe:group-data-[revealed=true]/reveal:animate-[reveal-up_500ms_var(--ease-out-strong)_calc(var(--reveal-offset,0ms)_+_min(var(--reveal-index),8)*60ms)_both]',
-].join(' ')
-
-// fade only, no translate: the hero canvases measure the copy while it reveals
-export const REVEAL_FADE_ITEM_CLASS = [
-  'motion-safe:opacity-0 motion-safe:group-data-revealed/reveal:opacity-100',
-  'motion-safe:group-data-[revealed=true]/reveal:animate-[reveal-fade_450ms_ease-out_calc(180ms_+_var(--reveal-index)*70ms)_both]',
 ].join(' ')
 
 export const bindRevealOnce = (element: HTMLElement | null) => {

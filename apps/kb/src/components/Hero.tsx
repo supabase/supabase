@@ -11,7 +11,6 @@ import {
   type Lattice,
 } from '../lib/ascii/field'
 import type { GuideSummary } from '../lib/guides'
-import { bindRevealOnce, REVEAL_FADE_ITEM_CLASS, REVEAL_GROUP_CLASS } from '../lib/reveal'
 import { useQueryVariant } from '../lib/use-query-variant'
 import { AsciiCanvas, type CanvasSize } from './AsciiCanvas'
 import { AsciiHoverText } from './AsciiHoverText'
@@ -112,10 +111,7 @@ export const Hero = ({
           revealDuration={HERO_REVEAL_DURATION}
         />
       )}
-      <div
-        ref={bindRevealOnce}
-        className={cn('relative z-10 w-full max-w-6xl px-6', REVEAL_GROUP_CLASS)}
-      >
+      <div className="relative z-10 w-full max-w-6xl px-6">
         {isWarp ? (
           <div
             aria-hidden
@@ -127,23 +123,11 @@ export const Hero = ({
           />
         ) : null}
         <div ref={copyRef} className="flex flex-col items-center gap-5 py-16 text-center">
-          {breadcrumb ? (
-            <div className={cn('[--reveal-index:0]', REVEAL_FADE_ITEM_CLASS)}>{breadcrumb}</div>
-          ) : null}
-          <h1
-            className={cn(
-              'm-0 text-5xl tracking-display text-foreground sm:text-6xl [--reveal-index:0]',
-              REVEAL_FADE_ITEM_CLASS
-            )}
-          >
+          {breadcrumb}
+          <h1 className="m-0 text-5xl tracking-display text-foreground sm:text-6xl">
             <AsciiHoverText text={title} glyphClassName="after:text-foreground" />
           </h1>
-          <p
-            className={cn(
-              'm-0 min-h-[2lh] max-w-145 text-balance text-lg leading-7 text-foreground-light [--reveal-index:1]',
-              REVEAL_FADE_ITEM_CLASS
-            )}
-          >
+          <p className="m-0 min-h-[2lh] max-w-145 text-balance text-lg leading-7 text-foreground-light">
             {description}
           </p>
           {children}
@@ -204,9 +188,7 @@ const HeroSearch = ({ guides }: HeroSearchProps) => {
         className={cn(
           'relative mt-2 flex h-12 w-full max-w-85 items-center gap-2.5 rounded-lg pl-3 pr-4 sm:max-w-107',
           'border border-default bg-surface-75 text-left text-base text-foreground-lighter shadow-raised',
-          'transition-colors hover:border-strong hover:text-foreground-light focus-ring',
-          '[--reveal-index:2]',
-          REVEAL_FADE_ITEM_CLASS
+          'transition-colors hover:border-strong hover:text-foreground-light focus-ring'
         )}
       >
         <Search aria-hidden className="size-4.5 shrink-0" strokeWidth={2.25} />
