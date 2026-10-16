@@ -43,7 +43,7 @@ export const ReferenceZoneLabels = ({
           <g key={label.label}>
             {positions[index] !== targetPositions[index] && (
               <path
-                d={`M ${Math.max(offset.left, labelX - 12)} ${targetPositions[index]} H ${Math.max(offset.left, labelX - 6)} V ${positions[index]} H ${labelX}`}
+                d={`M ${Math.max(offset.left, labelX - 12)} ${targetPositions[index]} H ${Math.max(offset.left, labelX - 6)} V ${positions[index]} H ${labelX + labelWidth}`}
                 fill="none"
                 stroke={label.color}
                 strokeOpacity={0.6}
