@@ -17,6 +17,16 @@ toc_depth: 2
 
 On October 2 at Supabase Select we shipped `@supabase/middleware`, composable, type-safe middleware for Web Fetch handlers. You can now write per-request logic once and run it on any runtime that supports fetch. The same middleware also works inside frameworks like Hono, H3, Elysia, NestJS, and TanStack Start. To use it in a framework, you copy a short bridge file into your project. `@supabase/middleware` is free, MIT-licensed, and built for TypeScript developers who write fetch handlers.
 
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/kL4M0auf4UU"
+    title="Supabase Middleware: composable, reusable middleware for Web Fetch handlers"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
 ## Why we built Supabase Middleware
 
 `@supabase/server` has covered the setup step since May: one wrapper gives your handler a client scoped to the caller, an admin client, and verified identity and claims. But your handler still carries its own per-request logic on top: checking a flag, handling CORS, deciding what a request needs before your code runs. That logic stays stuck in the handler where you wrote it.
