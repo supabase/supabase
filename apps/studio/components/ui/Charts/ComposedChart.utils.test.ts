@@ -4,6 +4,10 @@ import { describe, expect, it } from 'vitest'
 
 import { CustomTooltip, getStackId } from './ComposedChart.utils'
 import type { MultiAttribute, ReferenceZone } from './ComposedChart.utils'
+import {
+  getHighestCrossedReferenceZone,
+  getReferenceZoneRuns,
+} from './ComposedChartReferenceZones.utils'
 import { getMemoryCommitmentRanges } from '@/data/reports/database-charts.utils'
 
 const attr = (attribute: string, stackId?: string): MultiAttribute => ({ attribute, stackId })
@@ -95,7 +99,7 @@ describe('CustomTooltip full commitment capacity', () => {
           isActiveHoveredChart: true,
           showTotal: true,
           data,
-          referenceZones: [warning, capacity],
+          referenceZones: [capacity],
           attributes: [{ attribute: 'ram_commit_used', label: 'Committed' }],
           payload: [
             {
@@ -113,6 +117,68 @@ describe('CustomTooltip full commitment capacity', () => {
       expect(capacityRow?.querySelector('line')).toHaveAttribute('stroke-dasharray')
       expect(screen.getAllByText(expectedUsed)).toHaveLength(2)
       expect(screen.queryByText('Acknowledgment')).not.toBeInTheDocument()
+    }
+  )
+
+  it.each([
+    { index: 0, expectedThreshold: '7.4 GB', expectedCapacity: '9 GB' },
+    { index: 1, expectedThreshold: '2.6 GB', expectedCapacity: '3 GB' },
+  ])(
+    'shows only the selected historical threshold at the hovered capacity at index $index',
+    ({ index, expectedThreshold, expectedCapacity }) => {
+      const problematic: ReferenceZone = {
+        ...warning,
+        label: 'Problematic',
+        color: 'var(--color-orange-900)',
+        getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
+      }
+      const severe: ReferenceZone = {
+        ...warning,
+        label: 'Severe',
+        getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
+      }
+      const history = data.map((point, index) => ({
+        ...point,
+        ram_commit_used: (index === 0 ? 7.5 : 1.5) * GIB,
+      }))
+      const zones = [warning, problematic, severe, capacity].map((zone) => ({
+        ...zone,
+        runs: getReferenceZoneRuns(zone.getRanges(history)),
+      }))
+      const selectedIndex = getHighestCrossedReferenceZone(history, zones, 'ram_commit_used')
+      const visibleZones = zones.filter(
+        (zone, index) => zone.isAlwaysVisible || index === selectedIndex
+      )
+      const point = history[index]
+      render(
+        createElement(CustomTooltip, {
+          active: true,
+          isActiveHoveredChart: true,
+          showTotal: true,
+          data: history,
+          referenceZones: visibleZones,
+          attributes: [{ attribute: 'ram_commit_used', label: 'Committed' }],
+          payload: [
+            {
+              name: 'ram_commit_used',
+              dataKey: 'ram_commit_used',
+              value: point.ram_commit_used,
+              payload: point,
+            },
+          ],
+        })
+      )
+
+      const thresholdRow = screen.getByText('Problematic').parentElement
+      expect(thresholdRow).toHaveTextContent(expectedThreshold)
+      expect(thresholdRow?.querySelector('line')).toHaveAttribute('stroke-dasharray')
+      expect(thresholdRow?.querySelector('line')).toHaveAttribute('stroke', problematic.color)
+      expect(screen.getByText('Full commitment capacity').parentElement).toHaveTextContent(
+        expectedCapacity
+      )
+      expect(screen.queryByText('Acknowledgment')).not.toBeInTheDocument()
+      expect(screen.queryByText('Severe')).not.toBeInTheDocument()
+      expect(screen.getAllByText(index === 0 ? '7.5 GB' : '1.5 GB')).toHaveLength(2)
     }
   )
 

@@ -709,7 +709,7 @@ export function ComposedChart({
                 <CustomTooltip
                   {...props}
                   data={data}
-                  referenceZones={referenceZones}
+                  referenceZones={referenceZoneChart.zones}
                   format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}

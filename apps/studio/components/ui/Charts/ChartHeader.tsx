@@ -38,7 +38,13 @@ export interface ChartHeaderProps {
   xAxisKey?: string
   yAxisKey?: string
   referenceZoneAttribute?: string
-  referenceZoneWarning?: { label: string; color: string; textColor?: string; tooltip: string }
+  referenceZoneWarning?: {
+    label: string
+    color: string
+    textColor?: string
+    badgeLabel?: string
+    tooltip: string
+  }
   xAxisIsDate?: boolean
   valuePrecision?: number
   shouldFormatBytes?: boolean
@@ -315,7 +321,7 @@ export const ChartHeader = ({
                   backgroundColor: `color-mix(in srgb, ${referenceZoneWarning.color} 10%, transparent)`,
                 }}
               >
-                Warning
+                {referenceZoneWarning.badgeLabel ?? 'Warning'}
               </Badge>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs" side="top">

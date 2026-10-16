@@ -146,6 +146,7 @@ export const getReportAttributesV2: (
       referenceZones: [
         {
           label: 'Acknowledgment',
+          badgeLabel: 'Warning',
           color: 'var(--color-yellow-900)',
           textColor: 'var(--color-yellow-1100)',
           tooltip:
@@ -154,6 +155,7 @@ export const getReportAttributesV2: (
         },
         {
           label: 'Problematic',
+          badgeLabel: 'Problematic',
           color: 'var(--color-orange-900)',
           textColor: 'var(--color-orange-1100)',
           tooltip:
@@ -162,6 +164,7 @@ export const getReportAttributesV2: (
         },
         {
           label: 'Severe',
+          badgeLabel: 'Severe',
           color: 'hsl(var(--destructive-600))',
           tooltip:
             'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',

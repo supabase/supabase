@@ -45,6 +45,7 @@ export type ReferenceZone = {
   label: string
   color: string
   textColor?: string
+  badgeLabel?: string
   isAlwaysVisible?: boolean
   tooltip: string
   getRanges: (data: Datum[]) => ([number, number] | null)[]
@@ -207,14 +208,12 @@ export const CustomTooltip = ({
       (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
     )
     const referenceValues = rawDataPoint
-      ? referenceZones
-          ?.filter((zone) => zone.isAlwaysVisible)
-          .flatMap((zone) => {
-            const range = zone.getRanges([rawDataPoint])[0]
-            return range && Number.isFinite(range[0])
-              ? [{ label: zone.label, color: zone.color, value: range[0] }]
-              : []
-          })
+      ? referenceZones?.flatMap((zone) => {
+          const range = zone.getRanges([rawDataPoint])[0]
+          return range && Number.isFinite(range[0])
+            ? [{ label: zone.label, color: zone.color, value: range[0] }]
+            : []
+        })
       : []
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValue =
