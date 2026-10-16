@@ -5,7 +5,7 @@ afterEach(() => vi.unstubAllEnvs())
 
 describe('metrics preview environment and project scope', () => {
   it.each(['local', 'staging'])(
-    'applies overrides only to the selected project in %s',
+    'keeps one project’s simulated metrics from affecting another project in %s',
     async (environment) => {
       vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', environment)
       const { getMemoryCommitmentPreview, setMemoryCommitmentPreview } =
@@ -23,7 +23,7 @@ describe('metrics preview environment and project scope', () => {
   )
 
   it.each(['prod', 'production', 'preview', 'test'])(
-    'rejects preview changes in %s',
+    'prevents simulated metrics from replacing real data in %s',
     async (environment) => {
       vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', environment)
       const { getMemoryCommitmentPreview, setMemoryCommitmentPreview } =

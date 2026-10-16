@@ -11,7 +11,7 @@ vi.hoisted(() => {
 
 afterAll(() => vi.unstubAllEnvs())
 
-it('keeps the preview across toolbar remounts and restores real data with Default', async () => {
+it('keeps the simulation selected when reopening the toolbar and lets users return to Default', async () => {
   const user = userEvent.setup()
   const first = render(<MetricsTab />)
 

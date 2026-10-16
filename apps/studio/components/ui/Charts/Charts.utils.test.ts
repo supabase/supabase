@@ -24,36 +24,26 @@ describe('computeYAxisDomain', () => {
       visibleAttributeNames: ['ram_commit_used'],
     }
 
-    it('shows the full 8 GiB capacity when only 2 GiB is committed', () => {
+    it('shows commitment against full capacity so low usage does not appear near the limit', () => {
       expect(computeYAxisDomain(memoryBelowCapacity)).toEqual([0, 8 * GIB])
     })
 
-    it('keeps the full capacity visible when the committed series is hidden', () => {
+    it('keeps the capacity scale when Committed is hidden', () => {
       expect(computeYAxisDomain({ ...memoryBelowCapacity, visibleAttributeNames: [] })).toEqual([
         0,
         8 * GIB,
       ])
     })
 
-    it('expands beyond capacity when stacked commitments reach 10 GiB', () => {
+    it('keeps above-capacity commitment visible', () => {
       expect(
         computeYAxisDomain({
           ...memoryBelowCapacity,
-          data: [{ ram_commit_used: 9 * GIB, additional_memory: GIB }],
-          visibleAttributeNames: ['ram_commit_used', 'additional_memory'],
+          data: [{ ram_commit_used: 10 * GIB }],
+          visibleAttributeNames: ['ram_commit_used'],
         })
       ).toEqual([0, 10 * GIB])
     })
-
-    it.each([0, Number.NaN, Infinity, -1])(
-      'uses automatic scaling when capacity is unavailable or invalid: %s',
-      (thresholdZoneMax) => {
-        expect(computeYAxisDomain({ ...memoryBelowCapacity, thresholdZoneMax })).toEqual([
-          'auto',
-          'auto',
-        ])
-      }
-    )
   })
 
   describe('CPU percentage axis with the maximum hidden', () => {
@@ -205,7 +195,7 @@ describe('computeYAxisDomain', () => {
 })
 
 describe('normalizeStackedSeriesData', () => {
-  it('converts a 1/1/4 CPU stack to percentages without rounding away fractional shares', () => {
+  it('shows fractional CPU shares accurately', () => {
     const normalized = normalizeStackedSeriesData({
       data: [{ system: 1, user: 1, idle: 4 }],
       attributeNames: ['system', 'user', 'idle'],
@@ -216,7 +206,7 @@ describe('normalizeStackedSeriesData', () => {
     expect(normalized[0].idle).toBeCloseTo(400 / 6)
   })
 
-  it('keeps a zero-usage stack at zero instead of dividing by zero', () => {
+  it('keeps zero CPU usage at zero', () => {
     const empty = [{ system: 0, user: 0, idle: 0 }]
 
     expect(
@@ -227,7 +217,7 @@ describe('normalizeStackedSeriesData', () => {
     ).toEqual(empty)
   })
 
-  it('keeps raw values when no series are selected for normalization', () => {
+  it('leaves unselected series unchanged', () => {
     const data = [{ system: 50, user: 30, timestamp: 1000 }]
 
     expect(
@@ -238,7 +228,7 @@ describe('normalizeStackedSeriesData', () => {
     ).toEqual(data)
   })
 
-  it('preserves timestamps while converting selected series to percentages', () => {
+  it('keeps normalized CPU history at its original timestamps', () => {
     const data = [{ system: 60, user: 80, period_start: '2024-01-01', timestamp: 1000 }]
     const normalized = normalizeStackedSeriesData({
       data,

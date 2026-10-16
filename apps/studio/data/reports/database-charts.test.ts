@@ -164,7 +164,7 @@ describe('resource warning metrics chart IDs', () => {
 })
 
 describe('getReportAttributesV2 memory commitment chart', () => {
-  it('keeps the capacity line tied to infrastructure changes when commitments exceed it', () => {
+  it('keeps capacity tied to compute size so overcommitment cannot raise the reference', () => {
     const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
       (chart) => chart.id === 'memory-commitment'
     )
