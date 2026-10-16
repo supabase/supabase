@@ -64,6 +64,11 @@ const GuidesSidebar = ({
             </TOCScrollArea>
           </Toc>
         )}
+        <div className="pl-5">
+          {/* Google's publisher.js renders the button into these divs; the dark: variant swaps which one is visible */}
+          <div google-add-preferred-source-btn="" data-theme="light" className="dark:hidden" />
+          <div google-add-preferred-source-btn="" data-theme="dark" className="hidden dark:block" />
+        </div>
       </div>
     </div>
   )
