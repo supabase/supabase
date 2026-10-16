@@ -125,14 +125,23 @@ export const SigningKeyRow = ({
       signingKey.status !== 'in_use' ? 'border-b border-dashed border-border' : 'border-b'
     )}
   >
-    <TableCell className={cn(signingKey.status !== 'in_use' && 'text-foreground-lighter')}>
-      {statusLabels[signingKey.status]}
+    <TableCell className="whitespace-nowrap">
+      <p className={cn(signingKey.status !== 'in_use' && 'text-foreground-lighter')}>
+        {statusLabels[signingKey.status]}
+      </p>
+      <p className="font-mono text-foreground-lighter text-xs mt-1">{signingKey.id}</p>
     </TableCell>
-
-    <TableCell className="font-mono whitespace-nowrap">{signingKey.id}</TableCell>
 
     <TableCell>
       <AlgorithmHoverCard algorithm={signingKey.algorithm} />
+    </TableCell>
+
+    <TableCell className="text-right text-sm text-foreground-light whitespace-nowrap hidden xl:table-cell">
+      <TimestampInfo
+        className="text-sm"
+        utcTimestamp={signingKey.created_at}
+        label={dayjs(signingKey.created_at).fromNow()}
+      />
     </TableCell>
 
     {isLastUsedVisible && (
