@@ -57,15 +57,25 @@ test('shows critical issues without suggesting replication can start', () => {
   expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
 })
 
-test('distinguishes blockers and warnings in mixed results', () => {
+test('preserves API copy and inline code in compact results', () => {
   customRender(
     <PipelineValidationAdmonition
+      stale
       failures={[
-        { name: 'Credentials', reason: 'Replace the key.', failure_type: 'critical' },
-        { name: 'Replica identity', reason: 'Review table settings.', failure_type: 'warning' },
+        {
+          name: 'BigQuery dataset not found',
+          reason: 'The dataset was not found.\n\nCheck access to project `my-gcp-proj`.',
+          failure_type: 'critical',
+        },
       ]}
     />
   )
-  expect(screen.getByText('Required').closest('li')).toHaveTextContent('Replace the key.')
-  expect(screen.getByText('Warning').closest('li')).toHaveTextContent('Review table settings.')
+  expect(screen.getByText('BigQuery dataset not found')).toBeInTheDocument()
+  expect(screen.getByText('The dataset was not found.').parentElement).toHaveTextContent(
+    'The dataset was not found. Check access to project my-gcp-proj.'
+  )
+  expect(screen.getByText('Settings changed. Test again.')).toBeInTheDocument()
+  expect(screen.queryByRole('list')).not.toBeInTheDocument()
+  expect(screen.getByText('my-gcp-proj').tagName).toBe('CODE')
+  expect(screen.getByText('my-gcp-proj')).toHaveClass('text-code-inline')
 })
