@@ -354,6 +354,8 @@ interface CustomLabelProps {
   onToggleAttribute?: (attribute: string, options?: { exclusive?: boolean }) => void
   hiddenAttributes?: Set<string>
   referenceZones?: ReferenceZone[]
+  onReferenceZoneHover?: (label: string | null) => void
+  onReferenceZoneFocus?: (label: string | null) => void
 }
 
 export const CustomLabel = ({
@@ -364,6 +366,8 @@ export const CustomLabel = ({
   onToggleAttribute,
   hiddenAttributes,
   referenceZones,
+  onReferenceZoneHover,
+  onReferenceZoneFocus,
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
@@ -444,6 +448,10 @@ export const CustomLabel = ({
                   type="button"
                   tabIndex={0}
                   className="flex items-center gap-1 p-1.5 rounded-lg"
+                  onMouseEnter={() => onReferenceZoneHover?.(zone.label)}
+                  onMouseLeave={() => onReferenceZoneHover?.(null)}
+                  onFocus={() => onReferenceZoneFocus?.(zone.label)}
+                  onBlur={() => onReferenceZoneFocus?.(null)}
                 >
                   <span
                     className="size-2.5 rounded-sm"

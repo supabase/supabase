@@ -153,6 +153,8 @@ export function ComposedChart({
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const [hiddenAttributes, setHiddenAttributes] = useState<Set<string>>(new Set())
+  const [hoveredReferenceZone, setHoveredReferenceZone] = useState<string | null>(null)
+  const [focusedReferenceZone, setFocusedReferenceZone] = useState<string | null>(null)
   const isDarkMode = resolvedTheme?.includes('dark')
 
   useEffect(() => {
@@ -587,7 +589,12 @@ export function ComposedChart({
                   y1={run.lower}
                   y2={run.upper}
                   fill={zone.color}
-                  fillOpacity={zone.fillOpacity}
+                  fillOpacity={
+                    zone.label === hoveredReferenceZone || zone.label === focusedReferenceZone
+                      ? Math.min(1, zone.fillOpacity * 2)
+                      : zone.fillOpacity
+                  }
+                  className="motion-safe:[&_.recharts-reference-area-rect]:transition-[fill-opacity] motion-safe:[&_.recharts-reference-area-rect]:duration-150"
                   stroke="none"
                 />
               )
@@ -761,6 +768,8 @@ export function ComposedChart({
             payload={[maxAttributeData, ...chartData]}
             attributes={attributes}
             referenceZones={referenceZones}
+            onReferenceZoneHover={setHoveredReferenceZone}
+            onReferenceZoneFocus={setFocusedReferenceZone}
             showMaxValue={_showMaxValue}
             onToggleAttribute={(attribute, options) => {
               setHiddenAttributes((prev) => {
