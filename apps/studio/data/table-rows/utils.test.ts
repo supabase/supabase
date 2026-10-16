@@ -9,6 +9,7 @@ const table = {
     { name: 'count', format: 'int4' },
     { name: 'name', format: 'text' },
     { name: 'price', format: 'numeric' },
+    { name: 'amount', format: 'decimal' },
   ],
 }
 
@@ -54,6 +55,24 @@ describe('formatFilterValue', () => {
     )
     expect(formatFilterValue(table, makeFilter('id', String(Number.MIN_SAFE_INTEGER)))).toBe(
       Number.MIN_SAFE_INTEGER
+    )
+  })
+
+  it('preserves high-precision numeric and decimal filter values as strings to avoid rounding', () => {
+    const highPrecisionDecimal = '0.123456789012345678901'
+    expect(formatFilterValue(table, makeFilter('price', highPrecisionDecimal))).toBe(
+      highPrecisionDecimal
+    )
+    expect(formatFilterValue(table, makeFilter('amount', highPrecisionDecimal))).toBe(
+      highPrecisionDecimal
+    )
+
+    const negativeHighPrecisionDecimal = '-0.123456789012345678901'
+    expect(formatFilterValue(table, makeFilter('price', negativeHighPrecisionDecimal))).toBe(
+      negativeHighPrecisionDecimal
+    )
+    expect(formatFilterValue(table, makeFilter('amount', negativeHighPrecisionDecimal))).toBe(
+      negativeHighPrecisionDecimal
     )
   })
 
