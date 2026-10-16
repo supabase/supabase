@@ -601,25 +601,6 @@ export function ComposedChart({
             ))}
           </defs>
 
-          {referenceZoneChart.zones.flatMap((zone) =>
-            zone.runs.map((run) => {
-              const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
-              return (
-                <ReferenceArea
-                  key={`${zone.label}-${run.startIndex}`}
-                  {...getReferenceZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
-                  y1={run.lower}
-                  y2={run.lower}
-                  fill="none"
-                  stroke={zone.color}
-                  shape={
-                    <ReferenceZoneLine label={zone.isAlwaysVisible ? zone.label : undefined} />
-                  }
-                />
-              )
-            })
-          )}
-
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
                 <Bar
@@ -654,6 +635,25 @@ export function ComposedChart({
                   activeDot={false}
                 />
               ))}
+          {referenceZoneChart.zones.flatMap((zone) =>
+            zone.runs.map((run) => {
+              const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
+              return (
+                <ReferenceArea
+                  key={`${zone.label}-${run.startIndex}`}
+                  {...getReferenceZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
+                  y1={run.lower}
+                  y2={run.lower}
+                  fill="none"
+                  stroke={zone.color}
+                  shape={
+                    <ReferenceZoneLine label={zone.isAlwaysVisible ? zone.label : undefined} />
+                  }
+                />
+              )
+            })
+          )}
+
           {/* Max value, if available */}
           {maxAttribute && _showMaxValue && (
             <Line
@@ -709,6 +709,7 @@ export function ComposedChart({
                 <CustomTooltip
                   {...props}
                   data={data}
+                  referenceZones={referenceZones}
                   format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}

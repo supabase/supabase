@@ -134,7 +134,8 @@ interface TooltipProps {
   payload?: any[]
   label?: string | number
   attributes?: MultiAttribute[]
-  data?: Record<string, unknown>[]
+  data?: Datum[]
+  referenceZones?: ReferenceZone[]
   xAxisKey?: string
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
@@ -185,6 +186,7 @@ export const CustomTooltip = ({
   label: _label,
   attributes,
   data,
+  referenceZones,
   xAxisKey = 'period_start',
   isPercentage,
   format,
@@ -204,6 +206,16 @@ export const CustomTooltip = ({
     const rawDataPoint = data?.find(
       (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
     )
+    const referenceValues = rawDataPoint
+      ? referenceZones
+          ?.filter((zone) => zone.isAlwaysVisible)
+          .flatMap((zone) => {
+            const range = zone.getRanges([rawDataPoint])[0]
+            return range && Number.isFinite(range[0])
+              ? [{ label: zone.label, color: zone.color, value: range[0] }]
+              : []
+          })
+      : []
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValue =
       maxValueAttribute && rawDataPoint
@@ -315,6 +327,15 @@ export const CustomTooltip = ({
         <div className="grid gap-0">
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
+          {referenceValues?.map((reference) => (
+            <div key={reference.label} className="flex items-center w-full">
+              <MaxConnectionsIcon color={reference.color} />
+              <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
+                {reference.label}
+              </span>
+              <span className="ml-3.5">{formatNumeric(reference.value)}</span>
+            </div>
           ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">

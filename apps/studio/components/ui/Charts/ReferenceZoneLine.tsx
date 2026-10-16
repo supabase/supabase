@@ -19,6 +19,7 @@ export const ReferenceZoneLine = ({
     stroke={stroke}
     strokeOpacity={strokeOpacity}
     strokeWidth={1}
+    pointerEvents="none"
     strokeDasharray="4 4"
   >
     {label && <title>{label}</title>}

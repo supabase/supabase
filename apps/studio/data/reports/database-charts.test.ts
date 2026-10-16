@@ -175,7 +175,7 @@ describe('getReportAttributesV2 memory commitment chart', () => {
     expect(chart?.referenceZoneAttribute).toBe('ram_commit_used')
     const capacity = chart?.referenceZones?.find((zone) => zone.isAlwaysVisible)
     expect(capacity).toMatchObject({
-      label: 'Estimated capacity',
+      label: 'Full commitment capacity',
       color: 'var(--chart-reference)',
     })
     const GIB = 1024 ** 3

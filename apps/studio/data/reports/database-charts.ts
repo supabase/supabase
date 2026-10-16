@@ -168,7 +168,7 @@ export const getReportAttributesV2: (
           getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
         },
         {
-          label: 'Estimated capacity',
+          label: 'Full commitment capacity',
           color: 'var(--chart-reference)',
           isAlwaysVisible: true,
           tooltip:
