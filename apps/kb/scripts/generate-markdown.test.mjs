@@ -3,40 +3,87 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
   absolutizeLinks,
   getInternalLinkBaseUrl,
-  parseFrontmatter,
-  renderMarkdown,
-  renderTopicMarkdown,
+  htmlToMarkdown,
+  splitFrontmatter,
+  toMarkdownPath,
 } from './generate-markdown.mjs'
 
-describe('parseFrontmatter', () => {
-  it('parses title/description out of the YAML frontmatter and returns the rest as body', () => {
-    const raw = `---\ntitle: 'Sample guide'\ndescription: 'A short summary.'\n---\n\nBody text here.\n`
+const PAGE_HTML = `<!doctype html>
+<html>
+  <head>
+    <title>Sample guide | Supabase Knowledge Base</title>
+    <meta name="description" content="A short summary." />
+  </head>
+  <body>
+    <nav><a href="/kb/topics/auth">Site navigation link</a></nav>
+    <main>
+      <article>
+        <h1>Sample guide</h1>
+        <p>Body text with a <a href="/kb/guides/other-guide">related guide</a>.</p>
+      </article>
+    </main>
+    <footer>Site footer text</footer>
+  </body>
+</html>`
 
-    const { data, body } = parseFrontmatter(raw)
+describe('splitFrontmatter', () => {
+  it('separates the leading YAML block from the body', () => {
+    const markdown = '---\ntitle: "Sample"\n---\n# Sample\n\nBody.\n'
 
-    expect(data.title).toBe('Sample guide')
-    expect(data.description).toBe('A short summary.')
-    // The blank line separating the closing `---` from the body is kept as-is
-    // here — renderMarkdown() is what trims it before composing the output.
-    expect(body).toBe('\nBody text here.\n')
+    expect(splitFrontmatter(markdown)).toEqual({
+      frontmatter: '---\ntitle: "Sample"\n---\n',
+      body: '# Sample\n\nBody.\n',
+    })
   })
 
-  it('parses values that would trip up a naive regex (colons and quotes in the text)', () => {
-    const raw = `---\ntitle: "Note: this has a colon"\ndescription: "Quoted 'inner' text: still one value"\n---\nBody\n`
+  it('returns an empty frontmatter and the whole input when there is none', () => {
+    const markdown = '# Sample\n\nBody.\n'
 
-    const { data } = parseFrontmatter(raw)
+    expect(splitFrontmatter(markdown)).toEqual({ frontmatter: '', body: markdown })
+  })
+})
 
-    expect(data.title).toBe('Note: this has a colon')
-    expect(data.description).toBe("Quoted 'inner' text: still one value")
+describe('toMarkdownPath', () => {
+  it('maps a page index.html to a sibling .md file named after its route', () => {
+    expect(toMarkdownPath('guides/sample-guide/index.html')).toBe('guides/sample-guide.md')
   })
 
-  it('returns an empty data object and the raw text untouched when there is no frontmatter', () => {
-    const raw = 'Just a plain paragraph, no frontmatter.\n'
+  it('keeps nested routes intact', () => {
+    expect(toMarkdownPath('guides/database/tables/index.html')).toBe('guides/database/tables.md')
+  })
+})
 
-    const { data, body } = parseFrontmatter(raw)
+describe('htmlToMarkdown', () => {
+  const ORIGINAL_ENV = process.env
 
-    expect(data).toEqual({})
-    expect(body).toBe(raw)
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('keeps the main content and drops the surrounding site chrome', () => {
+    const markdown = htmlToMarkdown(PAGE_HTML)
+
+    expect(markdown).toContain('# Sample guide')
+    expect(markdown).toContain('Body text with a')
+    expect(markdown).not.toContain('Site navigation link')
+    expect(markdown).not.toContain('Site footer text')
+  })
+
+  it('prepends the page metadata from <head> as frontmatter', () => {
+    const markdown = htmlToMarkdown(PAGE_HTML)
+
+    expect(markdown.startsWith('---\n')).toBe(true)
+    expect(markdown).toContain('description: A short summary.')
+  })
+
+  it('absolutizes root-relative links in the body', () => {
+    expect(htmlToMarkdown(PAGE_HTML)).toContain(
+      '[related guide](https://supabase.com/kb/guides/other-guide)'
+    )
   })
 })
 
@@ -104,7 +151,7 @@ describe('absolutizeLinks', () => {
   })
 
   it('leaves the link relative (base path only, no origin) outside of Vercel', () => {
-    process.env.VERCEL_ENV = undefined
+    delete process.env.VERCEL_ENV
     expect(absolutizeLinks('[another guide](/guides/other-guide)')).toBe(
       '[another guide](/kb/guides/other-guide)\n'
     )
@@ -139,39 +186,5 @@ describe('absolutizeLinks', () => {
   it('round-trips GFM tables and strikethrough without mangling them', () => {
     const body = '| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~'
     expect(absolutizeLinks(body)).toBe('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n')
-  })
-})
-
-describe('renderMarkdown', () => {
-  it('turns the title into an h1 and the description into the paragraph beneath it', () => {
-    const data = { title: 'Sample guide', description: 'A short summary.' }
-
-    expect(renderMarkdown(data, 'Body text.')).toBe(
-      '# Sample guide\n\nA short summary.\n\nBody text.\n'
-    )
-  })
-
-  it('skips the heading/lead lines gracefully when title or description are missing', () => {
-    expect(renderMarkdown({}, 'Body text.')).toBe('Body text.\n')
-  })
-})
-
-describe('renderTopicMarkdown', () => {
-  const topic = { name: 'Tutorial', description: 'Step-by-step walkthroughs.' }
-
-  it('renders the topic as an h1/description followed by a bullet list of its guides', () => {
-    const guides = [
-      { title: 'Sample guide', url: 'https://supabase.com/kb/guides/sample-guide.md' },
-    ]
-
-    expect(renderTopicMarkdown(topic, guides)).toBe(
-      '# Tutorial\n\nStep-by-step walkthroughs.\n\n- [Sample guide](https://supabase.com/kb/guides/sample-guide.md)\n'
-    )
-  })
-
-  it('falls back to "No guides for this topic" when the list is empty', () => {
-    expect(renderTopicMarkdown(topic, [])).toBe(
-      '# Tutorial\n\nStep-by-step walkthroughs.\n\nNo guides for this topic\n'
-    )
   })
 })
