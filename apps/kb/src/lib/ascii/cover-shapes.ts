@@ -263,14 +263,14 @@ export const COVER_SHAPES: Record<Topic, Shape> = {
   Comparison: pairedColumns,
   Rundowns: pairedColumns,
   Troubleshooting: brokenPath,
-  Tutorial: staircase,
+  Tutorials: staircase,
   Storage: stackedBuckets,
   Auth: policyWall,
   Database: bTree,
   'Edge Functions': linkedNodes,
   Queues: conveyor,
   Realtime: rings,
-  'Supabase Platform': stackedLayers,
+  Platform: stackedLayers,
 }
 
 const FALLBACK_SHAPE = hatch

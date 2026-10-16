@@ -36,7 +36,7 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'Tutorial',
+    name: 'Tutorials',
     description: 'Step-by-step walkthroughs for building with Supabase.',
     pinned: true,
     visible: true,
@@ -78,7 +78,7 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'Supabase Platform',
+    name: 'Platform',
     description: 'Project settings, billing, and infrastructure.',
     pinned: false,
     visible: true,
@@ -97,7 +97,7 @@ export const FORMAT_TOPICS: Topic[] = [
   'Comparison',
   'Rundowns',
   'Troubleshooting',
-  'Tutorial',
+  'Tutorials',
 ]
 
 // federated collections tag with their own vocabulary, which may not match kb's topics
