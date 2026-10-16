@@ -3062,9 +3062,9 @@ Enterprise-Managed Auth for MCP puts your company in control of MCP access to Su
 A member signs in to Claude through your existing SSO. Claude asks your identity provider for a short-lived identity assertion for Supabase. Your identity provider checks its own policy first. Supabase then exchanges that assertion for a short-lived access token bound to the member. The token cannot be refreshed, so the exchange repeats when it expires, with no reconnect step for the user.
 
 ## Get started
-An organization owner or admin opens the SSO page in organization settings, expands Advanced settings, and enters the identity provider's ID-JAG Issuer URL. An owner or admin then connects Claude to Supabase once and approves it for the organization. The connection then shows up under Authorized Apps where it can be reviewed or revoked.
+An organization owner opens the SSO page in organization settings, expands Advanced settings, and enters the identity provider's ID-JAG Issuer URL. An owner or admin then connects Claude to Supabase once and approves it for the organization. The connection then shows up under Authorized Apps where it can be reviewed or revoked.
 
-Requires a Supabase Team or Enterprise plan with SSO configured, an identity provider that issues ID-JAGs (Okta today), and a Claude Team or Enterprise plan.
+Requires a Supabase Team or Enterprise plan with SSO configured, Okta as your identity provider, and a Claude Team or Enterprise plan.
 `,
     icon: ShieldCheck,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
