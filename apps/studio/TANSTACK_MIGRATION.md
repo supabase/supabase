@@ -183,6 +183,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/database/publications/index.tsx` ← `pages/project/[ref]/database/publications/index.tsx`
 - [x] A `routes/project/$ref/database/publications/$id.tsx` ← `pages/project/[ref]/database/publications/[id].tsx`
 - [x] A `routes/project/$ref/database/pipelines/index.tsx` ← `pages/project/[ref]/database/pipelines/index.tsx`
+- [x] A `routes/project/$ref/database/pipelines/new.tsx` ← `pages/project/[ref]/database/pipelines/new.tsx`
 - [x] A `routes/project/$ref/database/pipelines/$pipelineId.tsx` ← `pages/project/[ref]/database/pipelines/[pipelineId].tsx`
 - [x] A `routes/project/$ref/database/replication/replica/$replicaId.tsx` ← `pages/project/[ref]/database/replication/replica/[replicaId].tsx` (redirects to Infrastructure)
 - [x] A `routes/project/$ref/database/triggers/index.tsx` ← `pages/project/[ref]/database/triggers/index.tsx`
@@ -366,6 +367,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/logout.tsx` ← `pages/logout.tsx`
 - [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
 - [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
+- [x] A `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 - [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 
 ### Error pages (handled at root)

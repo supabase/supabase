@@ -12,11 +12,7 @@ import {
   Form,
   FormControl,
   FormField,
-  FormInputGroupInput,
   Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -62,15 +58,6 @@ const smtpEnabledSchema = z.object({
       .min(1, 'Must be a valid port number more than 0')
       .max(65535, 'Must be a valid port number no more than 65535')
   ),
-  SMTP_MAX_FREQUENCY: preprocessEmptyNumberInput(
-    z.coerce
-      .number({
-        required_error: 'Rate limit is required',
-        invalid_type_error: 'Rate limit is required',
-      })
-      .min(1, 'Must be more than 0')
-      .max(32767, 'Must not be more than 32,767 an hour')
-  ),
   SMTP_USER: z.string().trim().min(1, 'SMTP Username is required'),
   SMTP_PASS: z.string().trim().optional(),
 })
@@ -81,7 +68,6 @@ const smtpDisabledSchema = z.object({
   SMTP_SENDER_NAME: z.string().optional(),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: preprocessEmptyNumberInput(z.coerce.number().optional()),
-  SMTP_MAX_FREQUENCY: preprocessEmptyNumberInput(z.coerce.number().optional()),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
 })
@@ -138,7 +124,6 @@ export const SmtpForm = () => {
       SMTP_SENDER_NAME: '',
       SMTP_HOST: '',
       SMTP_PORT: undefined,
-      SMTP_MAX_FREQUENCY: undefined,
       SMTP_USER: '',
       SMTP_PASS: '',
       ENABLE_SMTP: false,
@@ -418,31 +403,6 @@ export const SmtpForm = () => {
                                   placeholder="587"
                                   disabled={!canUpdateConfig}
                                 />
-                              </FormControl>
-                            </FormItemLayout>
-                          )}
-                        />
-
-                        <FormField
-                          control={form.control}
-                          name="SMTP_MAX_FREQUENCY"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Minimum interval per user"
-                              description="The minimum time in seconds between emails before another email can be sent to the same user."
-                            >
-                              <FormControl>
-                                <InputGroup>
-                                  <FormInputGroupInput
-                                    type="number"
-                                    value={field.value}
-                                    onChange={(e) => field.onChange(e.target.value)}
-                                    disabled={!canUpdateConfig}
-                                  />
-                                  <InputGroupAddon align="inline-end">
-                                    <InputGroupText>seconds</InputGroupText>
-                                  </InputGroupAddon>
-                                </InputGroup>
                               </FormControl>
                             </FormItemLayout>
                           )}

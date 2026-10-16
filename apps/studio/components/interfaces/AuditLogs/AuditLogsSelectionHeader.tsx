@@ -30,7 +30,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
           animate={{ height: '40px', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 420, damping: 30, mass: 0.4 }}
-          className="px-10 flex items-center justify-between border-b bg-surface-75 w-full overflow-hidden absolute top-0 left-0 right-0 z-20"
+          className="pl-10 pr-4 flex items-center justify-between border-b bg-surface-75 w-full overflow-hidden absolute top-0 left-0 right-0 z-20"
         >
           <p className="text-xs">
             {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected

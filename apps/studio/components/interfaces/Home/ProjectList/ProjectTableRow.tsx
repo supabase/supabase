@@ -1,4 +1,4 @@
-import { CheckIcon, CopyIcon, GithubIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
+import { CheckIcon, CopyIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
@@ -10,6 +10,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  GithubIcon,
   TableCell,
   TableRow,
   Tooltip,

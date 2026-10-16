@@ -37,6 +37,9 @@ catalog:
   cn: ^0.4.0
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  # Latest v1.x that satisfies minimumReleaseAge (72h). Newer patch releases
+  # (1.56+) will be picked up automatically once they age in.
+  lucide-react: ^1.55.0
   monaco-editor: 0.52.2
   motion: ^11.18.2
   next: ^16.3.6

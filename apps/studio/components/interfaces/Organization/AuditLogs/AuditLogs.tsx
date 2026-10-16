@@ -246,6 +246,7 @@ export const AuditLogs = () => {
                   isFetching={isFetchingProjects}
                   isFetchingNextPage={isFetchingNextPage}
                   fetchNextPage={fetchNextPage}
+                  searchPlaceholder="Search for a project..."
                 />
                 <LogsDatePicker
                   hideWarnings
