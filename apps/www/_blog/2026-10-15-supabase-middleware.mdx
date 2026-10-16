@@ -36,7 +36,7 @@ import { withSupabaseClient } from '@supabase/server/middleware/client'
 import { withRequiredClaims } from '@supabase/server/middleware/required-claims'
 
 export default {
-  fetch: pipeline([withCors(), withRequiredClaims(), withSupabaseClient()], async (req, ctx) => {
+  fetch: pipeline([withCors({}), withRequiredClaims(), withSupabaseClient()], async (req, ctx) => {
     // ctx.supabase is scoped to the caller
     const { data } = await ctx.supabase.from('todos').select()
     return Response.json(data)
@@ -50,19 +50,19 @@ Each entry does one job and doesn't know about the handler it sits in. It adds o
 
 ## What Supabase Middleware ships
 
-`@supabase/middleware` is the engine behind the pipeline above, and `withSupabase` in `@supabase/server` runs on it. The pieces `withSupabase` is built from now ship as public middleware, listed below, alongside the engine's own `withCors` and `withFeatureFlag`.
+`@supabase/middleware` is the engine behind the pipeline above, and `withSupabase` in `@supabase/server` runs on it. `@supabase/server` also ships the middleware below as standalone entries. Two of them, `withSupabaseClient` and `withSupabaseAdminClient`, are the same pieces `withSupabase` is built from. The engine adds `withCors` and `withFeatureFlag`.
 
-| Middleware                   | What it does                                                                                                       |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `withClaims`                 | Adds `ctx.jwtClaims`, which can be null. It never rejects a request                                                |
-| `withRequiredClaims`         | Verifies the caller's JWT and adds `ctx.jwtClaims`. Rejects with a 401 if it's invalid                             |
-| `withSupabaseClient`         | Adds `ctx.supabase`, a Supabase client scoped to the caller                                                        |
-| `withSupabaseAdminClient`    | Adds `ctx.supabaseAdmin`, a service-role client that bypasses RLS                                                  |
-| `withPostgresClient`         | Adds `ctx.postgres`, a Postgres connection with RLS applied. The caller's claims apply only within the transaction |
-| `withPostgresAdminClient`    | Adds `ctx.postgresAdmin`, a Postgres connection that uses the service role                                         |
-| `withOAuthProtectedResource` | Answers the OAuth protected-resource metadata request for MCP clients and adds an OAuth challenge header to a 401  |
+| Middleware                   | What it does                                                                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `withClaims`                 | Adds `ctx.jwtClaims`, null when the request has no token. Anonymous requests pass through. An invalid token still gets a 401 |
+| `withRequiredClaims`         | Verifies the caller's JWT and adds `ctx.jwtClaims`. Rejects with a 401 if it's invalid                                       |
+| `withSupabaseClient`         | Adds `ctx.supabase`, a Supabase client scoped to the caller                                                                  |
+| `withSupabaseAdminClient`    | Adds `ctx.supabaseAdmin`, a service-role client that bypasses RLS                                                            |
+| `withPostgresClient`         | Adds `ctx.postgres`, a Postgres connection with RLS applied. The caller's claims apply only within the transaction           |
+| `withPostgresAdminClient`    | Adds `ctx.postgresAdmin`, a Postgres connection that bypasses RLS. Queries run as the role in the connection string          |
+| `withOAuthProtectedResource` | Answers the OAuth protected-resource metadata request for MCP clients and adds an OAuth challenge header to a 401            |
 
-None of these are a new capability. `ctx.supabase`, for example, has been documented as RLS-scoped since May. What's new is the engine. Every piece is an entry in the same list, so you can add one, drop one, or write your own, and the same list goes wherever your handler goes.
+Most of these aren't new capabilities. `ctx.supabase`, for example, has been documented as RLS-scoped since May. What's new is the engine. Every piece is an entry in the same list, so you can add one, drop one, or write your own, and the same list goes wherever your handler goes.
 
 ## Where Supabase Middleware runs
 
@@ -121,8 +121,8 @@ With Supabase Middleware, that whole flow is one entry. `withOAuthProtectedResou
 import { pipeline } from 'npm:@supabase/middleware@1'
 import { withOAuthProtectedResource, withSupabase } from 'npm:@supabase/server@1'
 
-Deno.serve(
-  pipeline(
+export default {
+  fetch: pipeline(
     // 1. OAuth discovery for MCP clients, 2. verify the user's token and scope a client to them
     [withOAuthProtectedResource(), withSupabase({ auth: 'user' })],
     async (req, { supabase }) => {
@@ -130,8 +130,8 @@ Deno.serve(
       const { data } = await supabase.from('tasks').select('id, title')
       return Response.json(data)
     }
-  )
-)
+  ),
+}
 ```
 
 `withOAuthProtectedResource` answers the metadata request before the auth check, and on the way back out it adds the OAuth challenge header to a 401. Because the client is scoped to the signed-in user, every tool call runs as that user, so your tools can be plain queries. We checked this in a working MCP server on Edge Functions, and the [Bring your own MCP guide](https://supabase.com/docs/guides/ai-tools/byo-mcp) builds a full one on the same two entries.
@@ -172,6 +172,6 @@ npm install @supabase/middleware
 ```
 
 - Build an MCP server for your app with the [Bring your own MCP guide](https://supabase.com/docs/guides/ai-tools/byo-mcp)
-- Write your own middleware with the [authoring guide](https://github.com/supabase/middleware/blob/main/docs/authoring-guide.md)
+- [Write your own middleware](https://supabase.com/docs/reference/middleware/build-your-own)
 - Use it in a framework, or move off the framework adapters, with the [frameworks guide](https://supabase.com/docs/reference/server/frameworks)
-- Browse the [API reference](https://supabase.github.io/middleware/) and the [GitHub repo](https://github.com/supabase/middleware)
+- Browse the [API reference](https://supabase.com/docs/reference/middleware/introduction) and the [GitHub repo](https://github.com/supabase/middleware)
