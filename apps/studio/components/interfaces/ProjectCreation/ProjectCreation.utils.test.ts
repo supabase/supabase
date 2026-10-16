@@ -14,7 +14,6 @@ import {
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
-  getSpecificRegionsLinkVariant,
   resolveDefaultDbRegion,
   resolvePostgresVersion,
 } from './ProjectCreation.utils'
@@ -141,12 +140,6 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
     )
   })
 
-  it('returns undefined when overridden, even if otherwise enrolled', () => {
-    expect(
-      getFreeTierGeneralRegionExperimentVariant({ ...base, isOverridden: true })
-    ).toBeUndefined()
-  })
-
   it('returns undefined for a paid plan', () => {
     expect(
       getFreeTierGeneralRegionExperimentVariant({ ...base, isFreePlan: false })
@@ -232,30 +225,6 @@ describe('getRegionSelectionType', () => {
     expect(
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
     ).toBe('general')
-  })
-})
-
-describe('getSpecificRegionsLinkVariant', () => {
-  const base = {
-    isFreePlan: true,
-    smartRegionEnabled: true,
-    linkFlag: true,
-  }
-
-  it('returns test when eligible and the flag is on', () => {
-    expect(getSpecificRegionsLinkVariant(base)).toBe('test')
-  })
-
-  it('returns control when eligible and the flag is off', () => {
-    expect(getSpecificRegionsLinkVariant({ ...base, linkFlag: false })).toBe('control')
-  })
-
-  it('returns undefined for a paid plan', () => {
-    expect(getSpecificRegionsLinkVariant({ ...base, isFreePlan: false })).toBeUndefined()
-  })
-
-  it('returns undefined when smart regions are disabled (AWS_NIMBUS)', () => {
-    expect(getSpecificRegionsLinkVariant({ ...base, smartRegionEnabled: false })).toBeUndefined()
   })
 })
 
