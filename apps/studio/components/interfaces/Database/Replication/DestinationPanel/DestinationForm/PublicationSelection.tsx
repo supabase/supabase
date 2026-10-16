@@ -102,6 +102,7 @@ export const PublicationSelection = ({
                     })
                   }
                   field.onChange(value)
+                  form.clearErrors('publicationName')
                 },
               }}
               sourceId={sourceId}

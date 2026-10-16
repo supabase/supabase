@@ -23,7 +23,15 @@ export const AdvancedSettings = ({
 }) => {
   const [expanded, setExpanded] = useState('')
   const { errors } = useFormState({ control: form.control })
+  const dataError =
+    group !== 'connection' &&
+    (errors.maxFillMs ||
+      errors.maxTableSyncWorkers ||
+      errors.maxCopyConnectionsPerTable ||
+      errors.invalidatedSlotBehavior ||
+      errors.tableOptions)
   const advancedError =
+    dataError ||
     (type === 'BigQuery' && (errors.connectionPoolSize || errors.maxStalenessMins)) ||
     (type === 'DuckLake' && errors.ducklakePoolSize) ||
     (type === 'Snowflake' && errors.snowflakeRole)
