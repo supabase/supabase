@@ -1,8 +1,5 @@
 export { PlatformWebhooksPage } from './PlatformWebhooksPage'
-export {
-  generateWebhookEndpointName,
-  getWebhookEndpointDisplayName,
-} from './PlatformWebhooks.utils'
+export { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
 export type {
   PlatformWebhooksState,
   UpsertWebhookEndpointInput,

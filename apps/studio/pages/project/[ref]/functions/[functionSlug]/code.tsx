@@ -7,7 +7,10 @@ import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+} from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -73,6 +76,12 @@ const CodePage = () => {
         })
       : []
   }, [functionBody, selectedFunction?.entrypoint_path])
+
+  const [selectedFileId, setSelectedFileId] = useState<number>()
+  const defaultSelectedFileId = getDefaultSelectedFileId(
+    initialFiles,
+    functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction?.entrypoint_path
+  )
 
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
@@ -190,6 +199,8 @@ const CodePage = () => {
         <>
           <FileExplorerAndEditor
             files={files}
+            selectedFileId={selectedFileId ?? defaultSelectedFileId}
+            setSelectedFileId={setSelectedFileId}
             onFilesChange={(files) => {
               const formattedFiles: FileData[] = files.map((f) => {
                 const originalFile = initialFiles.find((x) => x.id === f.id)

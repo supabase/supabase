@@ -21,7 +21,7 @@ Before digging into the improvements, we're excited to point out our new [develo
 
 - The [Reference Docs](/docs/reference/javascript/installing) are auto-generated from our TypeScript definitions and then enriched with examples. This forces us to document our code and makes it easier to keep everything in sync.
 - We added placeholders for the other languages that the community is developing. They have already started with Python, C#, Dart, Rust, and Swift. Expect to see the docs filling up soon!
-- We've added sections for all of the open source tools we use, including [Postgres](/docs/postgres/server/about), PostgREST[^1], [GoTrue](/docs/guides/auth/architecture#auth-service), and Realtime[^2]. We'll be filling these with lots of valuable information including self-hosting, benchmarks, and simple guides.
+- We've added sections for all of the open source tools we use, including [Postgres](/docs/guides/database/overview), PostgREST[^1], [GoTrue](/docs/guides/auth/architecture#auth-service), and Realtime[^2]. We'll be filling these with lots of valuable information including self-hosting, benchmarks, and simple guides.
 
 ### Errors are returned, not thrown
 
@@ -51,7 +51,7 @@ After testing this for a while we're very happy with this pattern. Errors are ha
 
 Our goal for `supabase-js` is to tie together many sub-libraries. Each sub-library is a standalone implementation for a single external system. This is one of the ways we support existing open source tools.
 
-To maintain this philosophy, we created [`gotrue-js`](https://github.com/supabase/gotrue-js), a library for Netlify's GoTrue auth server. This library includes a number of new additions, including third-party logins.
+To maintain this philosophy, we created [`gotrue-js`](https://github.com/supabase/gotrue-js), a library for Netlify's GoTrue auth server. This library includes a number of new additions, including [third-party logins](/features/social-login).
 
 Previously:
 

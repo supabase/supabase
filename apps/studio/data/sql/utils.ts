@@ -65,7 +65,7 @@ export function applyAutoLimit(
     !hasComments &&
     !hasMultipleQueries &&
     cleanedSql.toLowerCase().startsWith('select') &&
-    !cleanedSql.toLowerCase().match(/fetch\s+first/i) &&
+    !cleanedSql.toLowerCase().match(/fetch\s+(first|next)/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
     !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&

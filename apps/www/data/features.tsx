@@ -95,6 +95,10 @@ export type FeatureType = {
    */
   heroImageLight?: string
   /**
+   * omit the hero block (image, video, or icon placeholder) from the feature page
+   */
+  hideHero?: boolean
+  /**
    * url to docs or blog page for this feature
    */
   docsUrl?: string
@@ -421,40 +425,40 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     title: 'Branching',
     subtitle: 'Test schema changes without touching production.',
     description: `
-Branching without Git is now the default for all Supabase projects. Create a branch directly from the Supabase Dashboard, make schema changes, review the diff, and merge. No Git configuration required. Git-based branching remains fully supported for teams that manage migrations in version control. You can start with dashboard branching and add a Git integration later.
+Branching without Git is the default for every Supabase project. Create a branch from the Supabase Dashboard, make schema changes, review the diff, and merge. Git-based branching stays fully supported for teams that manage migrations in version control, and GitHub-connected branches are now ready nearly five times faster than before.
 
 ## Two ways to branch
 
 **Dashboard branching (default)**
-Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes using the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes in the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
 
 **Git-based branching**
-Connect a GitHub repo to your Supabase project. Migrations live in version control, and branches are created automatically when you open a pull request and cleaned up when it closes.
+Connect a GitHub repo to your project. Migrations live in version control, and branches are created when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
+1. No-Git workflow: Create and merge branches from the dashboard with no GitHub connection.
 2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
-3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
-4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
-6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
-7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
+3. Inherited configuration: Each branch has its own Supabase instance with separate API credentials and starts with its base project's Postgres, Auth, Storage, network, and Edge Functions configuration.
+4. Fast provisioning: GitHub-connected branches are ready in about 20 seconds at the median, down from about a minute and a half.
+5. Automatic migrations: Runs new migrations when changes are pushed to \`./supabase/migrations\`.
+6. Data seeding: Seed branches with sample data from \`./supabase/seed.sql\`.
+7. Merge requests: Review schema diffs and merge directly in the dashboard.
+8. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 
 ## When to use branching
 - Developers prototyping schema changes who want fast iteration without upfront configuration
-- AI agents that need to create and manage database branches programmatically
-- Teams managing database migrations in Git who want PR-driven schema reviews
-- Projects with complex schemas requiring careful diff review before merging
-- CI/CD pipelines integrating database changes alongside application code
+- AI agents that create and manage database branches programmatically
+- Teams managing migrations in Git who want PR-driven schema reviews
+- CI/CD pipelines that ship database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '/images/features/branching.png',
     heroImageLight: '/images/features/branching-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/platform/branching',
+    docsUrl: 'https://supabase.com/docs/guides/deployment/branching',
     slug: 'branching',
     status: {
-      stage: PRODUCT_STAGES.BETA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
     },
   },
@@ -2119,36 +2123,61 @@ Automatic Embeddings eliminate the manual work of generating and maintaining vec
   },
   // Platform
   {
-    title: 'CLI',
-    subtitle: 'Use our CLI to develop your project locally and deploy.',
+    title: 'Local development',
+    subtitle: 'Run a local Supabase project for every agent, with or without Docker.',
     description: `
-Supabase's Command Line Interface (CLI) tool provides developers with a powerful and flexible way to manage their Supabase projects directly from the terminal. This feature streamlines the development workflow, allowing for local development, testing, and seamless deployment of Supabase projects.
+The Supabase CLI runs several local projects on one machine, one per git worktree. Each coding agent gets its own Postgres, Storage, Edge Functions, and MCP server. Projects start in seconds. In our Linux benchmark, nine idle projects fit in the memory one used to take because only the services you use are running. In sandboxes and CI runners that have no container engine, the native runtime runs every Supabase service as a plain process at the same pinned versions as the Docker images.
 
-## Key benefits
-1. Local development: Set up and run a local Supabase instance for development and testing.
-2. Version control integration: Easily manage database migrations and schema changes with Git-like workflows.
-3. Automated deployments: Deploy changes to your Supabase project with simple CLI commands.
-4. Database migrations: Generate, apply, and revert database migrations effortlessly.
-5. Environment management: Handle multiple environments (development, staging, production) efficiently.
-6. Seed data management: Populate your database with test data for consistent development and testing.
-7. CI/CD integration: Incorporate Supabase operations into your continuous integration and deployment pipelines.
-8. Parallel local projects: Run a separate local project for each app, git worktree, or named environment with the experimental \`supabase stack\` commands.
+## Key features
+1. One project per worktree: The CLI picks and remembers ports for each project. Agents stop coordinating project IDs by hand.
+2. Isolated data: Reset one project's database while another is mid test run. Schema changes, resets, and Storage uploads never cross over.
+3. Services start on demand: Postgres comes up first and everything else wakes on its first request. Pass \`--eager\` to start everything up front.
+4. Native runtime: Run without Docker or Podman on Linux (amd64 and arm64 with glibc 2.35 or later) and macOS 14 or later on Apple silicon. The CLI downloads and verifies the service archives on first start and picks the native runtime when no container engine responds. Use Docker or Podman for several projects on one machine. The native runtime is intended for one project per sandbox or CI runner.
+5. Per-project MCP server: Each local project serves its own \`/mcp\` endpoint. An agent only sees the database it's working on.
 
-## The CLI is particularly valuable for:
-- Development teams working on Supabase projects collaboratively
-- DevOps professionals managing Supabase deployments across multiple environments
-- Open-source projects requiring reproducible Supabase setups
-- Developers preferring command-line tools for increased productivity
-- Projects with complex database schemas requiring careful version control
-- Any application needing a streamlined local-to-production workflow with Supabase
+## When to use it
+- Several coding agents working on the same app in parallel
+- Hosted sandboxes and CI runners with no Docker daemon
+- Laptops where the default stack is too heavy to run more than once
 
-By leveraging the Supabase CLI, you can significantly improve your development workflow, ensuring consistency between local and production environments, streamlining deployments, and making it easier to manage complex Supabase projects. This tool empowers developers to work more efficiently with Supabase, whether they're building small prototypes or large-scale applications.
+Update to CLI v2.119.0 or later, then turn it on with \`SUPABASE_EXPERIMENTAL_STACK=1 supabase init\` for a new app. For an existing app, add \`stack = true\` under \`[experimental]\` in \`supabase/config.toml\` and remove the fixed ports from it before the first start. Read the [multiple local projects guide](https://supabase.com/docs/guides/local-development/running-multiple-local-projects) and the [Docker and native runtimes guide](https://supabase.com/docs/guides/local-development/docker-and-native-runtimes).
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/_2N6ApZ0MmI',
-    docsUrl:
-      'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
+    heroImage: '/images/features/local-development.png',
+    heroImageLight: '/images/features/local-development-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'local-development',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'CLI',
+    subtitle: 'Develop locally, manage migrations, and deploy from the terminal.',
+    description: `
+The Supabase CLI runs the full Supabase stack on your machine or in CI, captures schema changes as migrations, and pushes them to a hosted project. Run one local project or several at once, in Docker containers or as native processes.
+
+## Key features
+1. Local development: Run a local project with Docker, or opt into the experimental setting for several projects at once and the native runtime. See [Local development](/features/local-development).
+2. Migrations: Generate, apply, and roll back database migrations, or write declarative schema files and let the CLI diff them.
+3. Config as code: Define project settings in \`config.toml\` and apply them to hosted projects.
+4. Deployments: Push migrations, deploy Edge Functions, and apply config to a linked project, each with its own command.
+5. Type generation: Generate TypeScript types from your database schema.
+6. Seed data: Populate local databases with test data on every reset.
+7. CI/CD: Run every command headlessly in GitHub Actions or any other runner.
+
+## When to use it
+- Teams that want schema changes reviewed in pull requests
+- Projects that need reproducible local environments
+- Coding agents that set up, test, and deploy a backend without a browser
+- Deployments managed from CI
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    docsUrl: 'https://supabase.com/docs/guides/local-development',
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2161,12 +2190,12 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     description: `
 The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to its project directory and git branch. Every app or git worktree gets its own Postgres database, Auth, Storage, and other services, with separate ports and data.
 
-With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. The experimental \`supabase stack\` commands assign ports automatically and keep them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`, so a destructive test run never touches your development data.
+With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. With the experimental setting on, \`supabase start\` assigns ports automatically and keeps them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`. A destructive test run never touches your development data. See [Local development](/features/local-development) for the overview.
 
 ## Key benefits
 1. One local project per worktree: Run coding agents in separate git worktrees, each against its own database.
-2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or create the project with the stack commands turned on.
-3. Named environments: Start \`--stack dev\` and \`--stack test\` side by side in one app.
+2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or initialize the app with \`SUPABASE_EXPERIMENTAL_STACK=1 supabase init\`.
+3. Named environments: Run a dev and a test project side by side in one app.
 4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
 5. Services start on demand: Postgres starts right away. Other services start on their first request. Most of them stop when idle, which keeps idle local projects light.
 
@@ -2176,11 +2205,12 @@ With the default ports, a second \`supabase start\` on the same machine fails wi
 - Freelancers and consultants switching between several client apps
 - CI jobs and agent sandboxes that run without a Docker daemon
 
-The \`supabase stack\` commands are experimental. Their interface can change between releases. See the documentation for the full workflow and limitations.
+Running several local projects is experimental and needs CLI v2.119.0 or later. Flags and output can change between releases. See the documentation for the full workflow and limitations.
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
+    hideHero: true,
     docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
     slug: 'parallel-local-projects',
     status: {
@@ -2192,7 +2222,7 @@ The \`supabase stack\` commands are experimental. Their interface can change bet
     title: 'Native runtime for local development',
     subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
     description: `
-The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. To run there, [turn on the \`[experimental] stack\` setting](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands). Then \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. To run there, [turn on the experimental setting](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands) in CLI v2.119.0 or later. Then \`supabase start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host. See [Local development](/features/local-development) for the overview.
 
 It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
 
@@ -2205,11 +2235,12 @@ It is the same local project you get from \`supabase start\`, with the same serv
 - Coding agents running in sandboxes with no container engine
 - CI jobs on runners without a Docker daemon
 
-The native runtime supports Linux on amd64 and arm64 and macOS on Apple silicon. Windows and Intel Macs use Docker. For several local projects on one machine, Docker remains the recommended runtime. The \`supabase stack\` commands are experimental.
+The native runtime supports Linux on amd64 and arm64 with glibc 2.35 or later, and macOS 14 or later on Apple silicon. Windows and Intel Macs use Docker. For several local projects on one machine, Docker remains the recommended runtime. The native runtime is experimental.
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: '/images/features/local-development.png',
+    heroImageLight: '/images/features/local-development-light.png',
     docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
     slug: 'native-local-runtime',
     status: {

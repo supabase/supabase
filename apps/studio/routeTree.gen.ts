@@ -53,6 +53,7 @@ import { Route as NewSlugRouteImport } from './routes/new/$slug'
 import { Route as OrgChar91_Char93RouteImport } from './routes/org.[_]'
 import { Route as ProjectRefRouteImport } from './routes/project/$ref'
 import { Route as ProjectChar91_Char93RouteImport } from './routes/project.[_]'
+import { Route as SupportCsatRouteImport } from './routes/support/csat'
 import { Route as AppAccountAppsRouteImport } from './routes/_app/account/apps'
 import { Route as AppAccountAuditRouteImport } from './routes/_app/account/audit'
 import { Route as AppAccountMeRouteImport } from './routes/_app/account/me'
@@ -250,6 +251,7 @@ import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from
 import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
 import { Route as ProjectRefDatabasePipelinesIndexRouteImport } from './routes/project/$ref/database/pipelines/index'
 import { Route as ProjectRefDatabasePipelinesPipelineIdRouteImport } from './routes/project/$ref/database/pipelines/$pipelineId'
+import { Route as ProjectRefDatabasePipelinesNewRouteImport } from './routes/project/$ref/database/pipelines/new'
 import { Route as ProjectRefDatabasePublicationsIndexRouteImport } from './routes/project/$ref/database/publications/index'
 import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/project/$ref/database/publications/$id'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
@@ -555,6 +557,11 @@ const ProjectRefRoute = ProjectRefRouteImport.update({
 const ProjectChar91_Char93Route = ProjectChar91_Char93RouteImport.update({
   id: '/project/_',
   path: '/project/_',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportCsatRoute = SupportCsatRouteImport.update({
+  id: '/support/csat',
+  path: '/support/csat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppAccountAppsRoute = AppAccountAppsRouteImport.update({
@@ -1646,6 +1653,12 @@ const ProjectRefDatabasePipelinesPipelineIdRoute =
     path: '/$pipelineId',
     getParentRoute: () => ProjectRefDatabasePipelinesRoute,
   } as any)
+const ProjectRefDatabasePipelinesNewRoute =
+  ProjectRefDatabasePipelinesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => ProjectRefDatabasePipelinesRoute,
+  } as any)
 const ProjectRefDatabasePublicationsIndexRoute =
   ProjectRefDatabasePublicationsIndexRouteImport.update({
     id: '/publications/',
@@ -2194,6 +2207,7 @@ export interface FileRoutesByFullPath {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
   '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
@@ -2386,6 +2400,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -2517,6 +2532,7 @@ export interface FileRoutesByTo {
   '/new/$slug': typeof NewSlugRoute
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
   '/account/apps': typeof AppAccountAppsRoute
   '/account/audit': typeof AppAccountAuditRoute
   '/account/me': typeof AppAccountMeRoute
@@ -2696,6 +2712,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -2832,6 +2849,7 @@ export interface FileRoutesById {
   '/org/_': typeof OrgChar91_Char93RouteWithChildren
   '/project/$ref': typeof ProjectRefRouteWithChildren
   '/project/_': typeof ProjectChar91_Char93RouteWithChildren
+  '/support/csat': typeof SupportCsatRoute
   '/_app/account/apps': typeof AppAccountAppsRoute
   '/_app/account/audit': typeof AppAccountAuditRoute
   '/_app/account/me': typeof AppAccountMeRoute
@@ -3024,6 +3042,7 @@ export interface FileRoutesById {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -3159,6 +3178,7 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/support/csat'
     | '/account/apps'
     | '/account/audit'
     | '/account/me'
@@ -3351,6 +3371,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -3482,6 +3503,7 @@ export interface FileRouteTypes {
     | '/new/$slug'
     | '/org/_'
     | '/project/_'
+    | '/support/csat'
     | '/account/apps'
     | '/account/audit'
     | '/account/me'
@@ -3661,6 +3683,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -3796,6 +3819,7 @@ export interface FileRouteTypes {
     | '/org/_'
     | '/project/$ref'
     | '/project/_'
+    | '/support/csat'
     | '/_app/account/apps'
     | '/_app/account/audit'
     | '/_app/account/me'
@@ -3988,6 +4012,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -4112,6 +4137,7 @@ export interface RootRouteChildren {
   OrgChar91_Char93Route: typeof OrgChar91_Char93RouteWithChildren
   ProjectRefRoute: typeof ProjectRefRouteWithChildren
   ProjectChar91_Char93Route: typeof ProjectChar91_Char93RouteWithChildren
+  SupportCsatRoute: typeof SupportCsatRoute
   ApiAiDocsRoute: typeof ApiAiDocsRoute
   ApiContentGraphqlRoute: typeof ApiContentGraphqlRoute
   ApiEdgeFunctionsTestRoute: typeof ApiEdgeFunctionsTestRoute
@@ -4514,6 +4540,13 @@ declare module '@tanstack/react-router' {
       path: '/project/_'
       fullPath: '/project/_'
       preLoaderRoute: typeof ProjectChar91_Char93RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/csat': {
+      id: '/support/csat'
+      path: '/support/csat'
+      fullPath: '/support/csat'
+      preLoaderRoute: typeof SupportCsatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/account/apps': {
@@ -5895,6 +5928,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefDatabasePipelinesPipelineIdRouteImport
       parentRoute: typeof ProjectRefDatabasePipelinesRoute
     }
+    '/project/$ref/database/pipelines/new': {
+      id: '/project/$ref/database/pipelines/new'
+      path: '/new'
+      fullPath: '/project/$ref/database/pipelines/new'
+      preLoaderRoute: typeof ProjectRefDatabasePipelinesNewRouteImport
+      parentRoute: typeof ProjectRefDatabasePipelinesRoute
+    }
     '/project/$ref/database/publications/': {
       id: '/project/$ref/database/publications/'
       path: '/publications'
@@ -6738,6 +6778,7 @@ const ProjectRefComputeRouteWithChildren =
 
 interface ProjectRefDatabasePipelinesRouteChildren {
   ProjectRefDatabasePipelinesPipelineIdRoute: typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  ProjectRefDatabasePipelinesNewRoute: typeof ProjectRefDatabasePipelinesNewRoute
   ProjectRefDatabasePipelinesIndexRoute: typeof ProjectRefDatabasePipelinesIndexRoute
 }
 
@@ -6745,6 +6786,7 @@ const ProjectRefDatabasePipelinesRouteChildren: ProjectRefDatabasePipelinesRoute
   {
     ProjectRefDatabasePipelinesPipelineIdRoute:
       ProjectRefDatabasePipelinesPipelineIdRoute,
+    ProjectRefDatabasePipelinesNewRoute: ProjectRefDatabasePipelinesNewRoute,
     ProjectRefDatabasePipelinesIndexRoute:
       ProjectRefDatabasePipelinesIndexRoute,
   }
@@ -7255,6 +7297,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgChar91_Char93Route: OrgChar91_Char93RouteWithChildren,
   ProjectRefRoute: ProjectRefRouteWithChildren,
   ProjectChar91_Char93Route: ProjectChar91_Char93RouteWithChildren,
+  SupportCsatRoute: SupportCsatRoute,
   ApiAiDocsRoute: ApiAiDocsRoute,
   ApiContentGraphqlRoute: ApiContentGraphqlRoute,
   ApiEdgeFunctionsTestRoute: ApiEdgeFunctionsTestRoute,

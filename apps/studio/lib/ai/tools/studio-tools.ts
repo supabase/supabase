@@ -3,10 +3,13 @@ import { tool } from 'ai'
 import { z } from 'zod'
 
 import { getAuthHeaders } from './auth-headers'
+import { capReadQuery } from './cap-read-query'
 import type { ToolContext } from './types'
+import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { deployEdgeFunction } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { isOptInLevelAtLeast } from '@/lib/ai/opt-in-level'
 import {
   EDGE_FUNCTION_PROMPT,
   LOGS_PROMPT,
@@ -15,8 +18,8 @@ import {
   RLS_PROMPT,
   STORAGE_PROMPT,
 } from '@/lib/ai/prompts'
-import { isOptInLevelAtLeast, updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
-import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+import { updateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import { NO_DATA_PERMISSIONS, toModelRows } from '@/lib/ai/tools/tool-sanitizer'
 import { fixSqlBackslashEscapes } from '@/lib/ai/util'
 
 const KNOWLEDGE = {
@@ -69,20 +72,35 @@ export const getStudioTools = (ctx: ToolContext = {}) => {
         'Asks the user to execute a SQL statement and return the results. Requires user approval before executing.',
       inputSchema: executeSqlInputSchema,
       needsApproval: true,
-      execute: async ({ sql }, { abortSignal }) => {
+      execute: async ({ sql, isWriteQuery }, { abortSignal }) => {
         // The `needsApproval: true` gate on this tool means the user has
         // explicitly approved this AI-generated SQL before execute runs —
         // that approval is the user gesture that promotes untrusted to safe.
+        const approvedSql = acceptUntrustedSql(untrustedSql(sql))
+        // Push the cap into the query so the database doesn't load rows we'd throw away. The
+        // extra row lets `totalRows > DEFAULT_CELL_ROW_LIMIT` still signal a truncated result.
+        const { sql: limitedSql, isCappedInDatabase } = isWriteQuery
+          ? { sql: approvedSql, isCappedInDatabase: false }
+          : capReadQuery(approvedSql, DEFAULT_CELL_ROW_LIMIT + 1)
         const { result } = await executeSql(
-          { projectRef, connectionString, sql: acceptUntrustedSql(untrustedSql(sql)) },
+          { projectRef, connectionString, sql: limitedSql },
           abortSignal,
           authHeaders
         )
-        return { rows: Array.isArray(result) ? result : [], optInLevel: aiOptInLevel }
+        const rows = Array.isArray(result) ? result : []
+        // same row cap as the query cell, unbounded results freeze the chat and overflow the model
+        const isCapped = rows.length > DEFAULT_CELL_ROW_LIMIT
+        // When the limit ran in the database, `rows.length` stops at the cap and isn't a real total
+        const hasMoreRows = isCappedInDatabase && isCapped
+        return {
+          rows: rows.slice(0, DEFAULT_CELL_ROW_LIMIT),
+          ...(hasMoreRows ? { hasMoreRows } : { totalRows: rows.length }),
+          optInLevel: aiOptInLevel,
+        }
       },
       toModelOutput: ({ output }) => {
         return aiOptInLevel === 'schema_and_log_and_data'
-          ? { type: 'json', value: output.rows }
+          ? { type: 'json', value: toModelRows(output.rows, output) }
           : { type: 'text', value: NO_DATA_PERMISSIONS }
       },
     }),
