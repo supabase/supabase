@@ -16,6 +16,7 @@ import { ChartMeta } from './UsageSection'
 import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import { SparkBar } from '@/components/ui/SparkBar'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '@/lib/constants'
@@ -159,6 +160,22 @@ const AttributeUsage = ({
                           value={usageMeta?.usage ?? 0}
                           max={usageMeta?.pricing_free_units || 1}
                         />
+                      )}
+
+                    {(attribute.key === PricingMetric.LOG_QUERYING ||
+                      attribute.key === PricingMetric.LOG_INGESTION) &&
+                      subscription?.plan.id !== 'platform' && (
+                        <p className="text-xs text-foreground-light mt-1">
+                          We're fixing a known overreporting issue — numbers shown may be higher
+                          than expected.{' '}
+                          <Link
+                            href="https://github.com/orgs/supabase/discussions/50925"
+                            target="_blank"
+                            className="transition text-primary hover:text-primary-hover underline"
+                          >
+                            Share feedback on GitHub
+                          </Link>
+                        </p>
                       )}
 
                     <div>
