@@ -24,6 +24,11 @@ export function isNumericalColumn(type: string) {
   return NUMERICAL_TYPES.indexOf(type.toLowerCase()) > -1
 }
 
+const DECIMAL_TYPES = ['decimal', 'numeric']
+export function isDecimalColumn(type: string) {
+  return DECIMAL_TYPES.indexOf(type.toLowerCase()) > -1
+}
+
 const JSON_TYPES = ['json', 'jsonb', 'array']
 export function isJsonColumn(type: string) {
   return JSON_TYPES.indexOf(type.toLowerCase()) > -1
