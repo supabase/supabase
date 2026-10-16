@@ -26,6 +26,18 @@ describe('getReferenceZoneLabelPositions', () => {
     }
   )
 
+  it('keeps crowded labels above the metrics when there is headroom above their thresholds', () => {
+    const targets = [57, 62, 76]
+    const result = getReferenceZoneLabelPositions(targets, 10, 110)
+
+    result.forEach((position, index) => {
+      expect(position).toBeLessThanOrEqual(targets[index])
+    })
+    expect(result[1] - result[0]).toBeGreaterThanOrEqual(24)
+    expect(result[2] - result[1]).toBeGreaterThanOrEqual(24)
+    expect(result[2]).toBe(targets[2])
+  })
+
   it('uses available space when the plot cannot fit the preferred spacing', () => {
     const result = getReferenceZoneLabelPositions([15, 16, 17], 10, 40)
 

@@ -12,13 +12,13 @@ export function getReferenceZoneLabelPositions(
     .sort((a, b) => a.position - b.position)
   const placed = ordered.map(({ position }) => Math.min(maximum, Math.max(minimum, position)))
 
-  for (let index = 1; index < placed.length; index++) {
-    placed[index] = Math.max(placed[index], placed[index - 1] + spacing)
-  }
-
-  placed[placed.length - 1] = Math.min(maximum, placed[placed.length - 1])
   for (let index = placed.length - 2; index >= 0; index--) {
     placed[index] = Math.min(placed[index], placed[index + 1] - spacing)
+  }
+
+  placed[0] = Math.max(minimum, placed[0])
+  for (let index = 1; index < placed.length; index++) {
+    placed[index] = Math.max(placed[index], placed[index - 1] + spacing)
   }
 
   const result = [...positions]
