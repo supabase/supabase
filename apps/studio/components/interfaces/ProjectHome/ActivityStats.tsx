@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArchiveIcon, CpuIcon, DatabaseIcon, GitBranchIcon, GithubIcon } from 'lucide-react'
+import { ArchiveIcon, CpuIcon, DatabaseIcon, GitBranchIcon } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, Skeleton } from 'ui'
+import { cn, GithubIcon, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'

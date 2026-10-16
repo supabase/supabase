@@ -771,7 +771,7 @@
     "icons": "workspace:*",
     "js-yaml": "^3.14.1",
     "lodash": "catalog:",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "mdast": "^3.0.0",
     "mdast-jsx": "^0.1.1",
     "mermaid": "^11.12.1",

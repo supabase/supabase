@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { platformWebhooksKeys } from './keys'
 import { listWebhookDeliveries, type WebhookScopeParams } from './platform-webhooks-fetchers'
-import { toWebhookDeliverySummary } from './platform-webhooks-mappers'
+import { toWebhookDelivery } from './platform-webhooks-mappers'
 import type { WebhookDelivery } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -19,7 +19,7 @@ async function getWebhookDeliveries(
   signal?: AbortSignal
 ): Promise<WebhookDelivery[]> {
   const result = await listWebhookDeliveries(scope, endpointId, { size, after, before }, signal)
-  return (result?.data ?? []).map((delivery) => toWebhookDeliverySummary(delivery, endpointId))
+  return (result?.data ?? []).map((delivery) => toWebhookDelivery(delivery, endpointId))
 }
 
 export type WebhookDeliveriesData = Awaited<ReturnType<typeof getWebhookDeliveries>>
@@ -38,6 +38,7 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
     queryFn: ({ signal }) =>
       getWebhookDeliveries({ scope, endpointId, size, after, before }, signal),
     enabled: enabled && Boolean(endpointId),
+    refetchInterval: 5000,
     ...options,
   })
 }
