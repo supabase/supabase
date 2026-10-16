@@ -190,13 +190,10 @@ const withOrg = defineMiddleware<'orgId', void, { jwtClaims: JWTClaims }, string
 })
 
 export default {
-  fetch: pipeline(
-    [withRequiredClaims(), withOrg(), withSupabaseClient()],
-    async (_req, ctx) => {
-      const { data } = await ctx.supabase.from('projects').select().eq('org_id', ctx.orgId)
-      return Response.json(data)
-    }
-  ),
+  fetch: pipeline([withRequiredClaims(), withOrg(), withSupabaseClient()], async (_req, ctx) => {
+    const { data } = await ctx.supabase.from('projects').select().eq('org_id', ctx.orgId)
+    return Response.json(data)
+  }),
 }
 ```
 
