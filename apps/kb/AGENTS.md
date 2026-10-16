@@ -37,7 +37,7 @@ pnpm build
 
 ## Authoring content
 
-Content lives under `src/content/guides/*.{md,mdx}`. Keep it plain GitHub-Flavored Markdown:
+Content lives under `src/content/guides/*.{md,mdx}`:
 
 - No custom/JSX components in guide bodies — content is also exported as plain `.md` (see below), and a
   component wouldn't survive that export.
@@ -54,9 +54,10 @@ Each content collection renders through a matching catch-all page — e.g. `src/
 (`src/pages/topics/[topic].astro`) are generated from the `TOPICS` list in `src/lib/topics.ts`, not from
 content files, and read from every collection.
 
-Separately, `scripts/generate-markdown.mjs` runs as a `prebuild` step and exports every content file — plus
-one page per topic, listing its guides — as a plain `.md` file under the gitignored `public/markdown/`,
-mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
+Separately, `scripts/generate-markdown.mjs` runs as a `postbuild` step (after `astro build`) and converts every
+built guide, topic, and troubleshooting page in `dist/` to a plain `.md` file under `dist/markdown/` using
+`markdown-for-agents` (`extract: true`, so only main content is kept), mirroring the page's URL with a `.md`
+extension. Because it reads rendered HTML, it can't run in `prebuild`. `vercel.json` permanently redirects `<page>.md` requests to
 these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`). It also
 rewrites guide, topic, and troubleshooting page requests that send `Accept: text/markdown` to the same files
 (content negotiation), and sets `Vary: Accept` on those pages. The negotiated rewrites must stay above the generic
@@ -65,8 +66,7 @@ rewrites guide, topic, and troubleshooting page requests that send `Accept: text
 If you add a new content collection or top-level route, add a matching redirect, negotiated rewrite, and
 `Vary: Accept` header in `vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, the
 `Accept` rewrite to `/markdown/<section>/:path+.md`, and a `headers` entry for `/kb/<section>/:path+`), and
-check whether `generate-markdown.mjs` needs updating too — the content export falls out of its generic
-`src/content/**` walk automatically, but per-topic-style listing pages don't.
+add the new section to `SECTIONS` in `scripts/generate-markdown.mjs` so its pages get exported too.
 
 ## Topic-specific guidance
 

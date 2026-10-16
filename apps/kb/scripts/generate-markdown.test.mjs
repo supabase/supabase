@@ -1,42 +1,260 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import {
-  absolutizeLinks,
-  getInternalLinkBaseUrl,
-  parseFrontmatter,
-  renderMarkdown,
-  renderTopicMarkdown,
-} from './generate-markdown.mjs'
+import { getInternalLinkBaseUrl, htmlToMarkdown, toMarkdownPath } from './generate-markdown.mjs'
 
-describe('parseFrontmatter', () => {
-  it('parses title/description out of the YAML frontmatter and returns the rest as body', () => {
-    const raw = `---\ntitle: 'Sample guide'\ndescription: 'A short summary.'\n---\n\nBody text here.\n`
+const PAGE_HTML = `<!doctype html>
+<html>
+  <head>
+    <title>Sample guide | Supabase Knowledge Base</title>
+    <meta name="description" content="A short summary." />
+  </head>
+  <body>
+    <nav><a href="/kb/topics/auth">Site navigation link</a></nav>
+    <main>
+      <article>
+        <h1>Sample guide</h1>
+        <p>Body text with a <a href="/kb/guides/other-guide">related guide</a>.</p>
+      </article>
+    </main>
+    <footer>Site footer text</footer>
+  </body>
+</html>`
 
-    const { data, body } = parseFrontmatter(raw)
+// Wraps body HTML in a main element so extract: true keeps it.
+function main(bodyHtml) {
+  return `<main><article>${bodyHtml}</article></main>`
+}
 
-    expect(data.title).toBe('Sample guide')
-    expect(data.description).toBe('A short summary.')
-    // The blank line separating the closing `---` from the body is kept as-is
-    // here — renderMarkdown() is what trims it before composing the output.
-    expect(body).toBe('\nBody text here.\n')
+describe('toMarkdownPath', () => {
+  it('maps a page index.html to a sibling .md file named after its route', () => {
+    expect(toMarkdownPath('guides/sample-guide/index.html')).toBe('guides/sample-guide.md')
   })
 
-  it('parses values that would trip up a naive regex (colons and quotes in the text)', () => {
-    const raw = `---\ntitle: "Note: this has a colon"\ndescription: "Quoted 'inner' text: still one value"\n---\nBody\n`
+  it('keeps nested routes intact', () => {
+    expect(toMarkdownPath('guides/database/tables/index.html')).toBe('guides/database/tables.md')
+  })
+})
 
-    const { data } = parseFrontmatter(raw)
+// Mirrors the markup <Admonition> renders (packages/ui-patterns), with the
+// class lists and icon path trimmed to keep the fixture readable.
+function admonitionHtml(label, bodyHtml) {
+  return `<div data-slot="alert" role="alert" class="relative w-full rounded-lg border p-4" aria-label="${label}"><div class="flex items-start gap-3"><span class="inline-flex"><svg viewBox="0 0 21 20" aria-hidden="true"><path d="M0 0"></path></svg></span><div class="min-w-0 flex-1 flex flex-col"><div class="mt-0.5"><div data-slot="alert-description" class="text-sm">${bodyHtml}</div></div></div></div></div>`
+}
 
-    expect(data.title).toBe('Note: this has a colon')
-    expect(data.description).toBe("Quoted 'inner' text: still one value")
+describe('htmlToMarkdown callouts', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
   })
 
-  it('returns an empty data object and the raw text untouched when there is no frontmatter', () => {
-    const raw = 'Just a plain paragraph, no frontmatter.\n'
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
 
-    const { data, body } = parseFrontmatter(raw)
+  it('converts a Note admonition into a GitHub NOTE alert and drops the icon', () => {
+    const markdown = htmlToMarkdown(main(admonitionHtml('Note', '<p>Body of the note.</p>')))
 
-    expect(data).toEqual({})
-    expect(body).toBe(raw)
+    expect(markdown).toContain('> [!NOTE]\n> Body of the note.')
+    expect(markdown).not.toContain('<svg')
+    expect(markdown).not.toContain('aria-label')
+  })
+
+  it('keeps multi-paragraph and bulleted callout bodies inside the blockquote', () => {
+    const markdown = htmlToMarkdown(
+      main(
+        admonitionHtml(
+          'Caution',
+          '<p><strong>Heads up</strong></p><p>Second paragraph.</p><ul><li>First</li></ul>'
+        )
+      )
+    )
+
+    expect(markdown).toContain('> [!CAUTION]\n> **Heads up**\n>\n> Second paragraph.')
+    expect(markdown).toContain('> - First')
+  })
+
+  it('maps each Admonition label back to the source marker that produced it', () => {
+    const markdown = htmlToMarkdown(
+      main(
+        `${admonitionHtml('Success', '<p>Tip body.</p>')}${admonitionHtml('Warning', '<p>Important body.</p>')}${admonitionHtml('Danger', '<p>Warning body.</p>')}`
+      )
+    )
+
+    expect(markdown).toContain('> [!TIP]\n> Tip body.')
+    expect(markdown).toContain('> [!IMPORTANT]\n> Important body.')
+    expect(markdown).toContain('> [!WARNING]\n> Warning body.')
+  })
+})
+
+describe('htmlToMarkdown', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('keeps the main content and drops the surrounding site chrome', () => {
+    const markdown = htmlToMarkdown(PAGE_HTML)
+
+    expect(markdown).toContain('# Sample guide')
+    expect(markdown).toContain('Body text with a')
+    expect(markdown).not.toContain('Site navigation link')
+    expect(markdown).not.toContain('Site footer text')
+  })
+
+  it('does not prepend frontmatter from <head>', () => {
+    const markdown = htmlToMarkdown(PAGE_HTML)
+
+    expect(markdown.startsWith('# Sample guide')).toBe(true)
+    expect(markdown).not.toContain('---')
+    expect(markdown).not.toContain('description:')
+  })
+
+  it('absolutizes root-relative links in the body', () => {
+    expect(htmlToMarkdown(PAGE_HTML)).toContain(
+      '[related guide](https://supabase.com/kb/guides/other-guide)'
+    )
+  })
+
+  it('leaves already-absolute links untouched', () => {
+    expect(htmlToMarkdown(main('<a href="https://example.com/guide">the docs</a>'))).toContain(
+      '[the docs](https://example.com/guide)'
+    )
+  })
+
+  it('does not double up the base path when a link already includes it', () => {
+    expect(htmlToMarkdown(main('<a href="/kb/guides/other-guide">another guide</a>'))).toContain(
+      '[another guide](https://supabase.com/kb/guides/other-guide)'
+    )
+  })
+
+  it('keeps a link title as the markdown title', () => {
+    expect(
+      htmlToMarkdown(main('<a href="/guides/other-guide" title="Other">another guide</a>'))
+    ).toContain('[another guide](https://supabase.com/kb/guides/other-guide "Other")')
+  })
+
+  it('wraps a destination containing a space in angle brackets', () => {
+    expect(htmlToMarkdown(main('<a href="/guides/a guide">a guide</a>'))).toContain(
+      '[a guide](<https://supabase.com/kb/guides/a guide>)'
+    )
+  })
+
+  it('wraps a destination containing parentheses in angle brackets', () => {
+    expect(
+      htmlToMarkdown(main('<a href="https://en.wikipedia.org/wiki/Foo_(bar)">wiki</a>'))
+    ).toContain('[wiki](<https://en.wikipedia.org/wiki/Foo_(bar)>)')
+  })
+
+  it('escapes angle brackets and backslashes inside a wrapped destination', () => {
+    expect(htmlToMarkdown(main('<a href="https://example.com/a b\\c<d>">x</a>'))).toContain(
+      '[x](<https://example.com/a b\\\\c\\<d\\>>)'
+    )
+  })
+
+  it('escapes double quotes in a title', () => {
+    expect(htmlToMarkdown(main('<a href="/guides/x" title="Say &quot;hi&quot;">x</a>'))).toContain(
+      '[x](https://supabase.com/kb/guides/x "Say \\"hi\\"")'
+    )
+  })
+
+  it('renders /docs links against supabase.com rather than the kb base path', () => {
+    expect(
+      htmlToMarkdown(main('<a href="/docs/reference/javascript/auth-updateuser">reference</a>'))
+    ).toContain('[reference](https://supabase.com/docs/reference/javascript/auth-updateuser)')
+  })
+
+  it('renders /dashboard, /blog, and /changelog links against supabase.com', () => {
+    const markdown = htmlToMarkdown(
+      main(
+        '<a href="/dashboard/project/_?showConnect=true&amp;method=session">connect</a>' +
+          '<a href="/blog/some-post#intro">blog</a>' +
+          '<a href="/changelog">changelog</a>'
+      )
+    )
+
+    expect(markdown).toContain(
+      '[connect](https://supabase.com/dashboard/project/_?showConnect=true&method=session)'
+    )
+    expect(markdown).toContain('[blog](https://supabase.com/blog/some-post#intro)')
+    expect(markdown).toContain('[changelog](https://supabase.com/changelog)')
+  })
+
+  it('keeps site-section links on supabase.com in preview builds', () => {
+    process.env.VERCEL_ENV = 'preview'
+    process.env.VERCEL_URL = 'kb-git-fork-supabase.vercel.app'
+
+    expect(htmlToMarkdown(main('<a href="/docs/guides">docs</a>'))).toContain(
+      '[docs](https://supabase.com/docs/guides)'
+    )
+  })
+
+  it('does not treat /dashboard-old as a /dashboard link', () => {
+    expect(htmlToMarkdown(main('<a href="/dashboard-old">old</a>'))).toContain(
+      '[old](https://supabase.com/kb/dashboard-old)'
+    )
+  })
+
+  it('does not treat a path that merely starts with "docs" as a /docs link', () => {
+    expect(htmlToMarkdown(main('<a href="/docsy/page">docsy</a>'))).toContain(
+      '[docsy](https://supabase.com/kb/docsy/page)'
+    )
+  })
+
+  it('renders root-relative image sources against supabase.com under the kb base path', () => {
+    expect(htmlToMarkdown(main('<img src="/_astro/logo.webp" alt="Logo" />'))).toContain(
+      '![Logo](https://supabase.com/kb/_astro/logo.webp)'
+    )
+  })
+
+  it('leaves absolute image sources untouched', () => {
+    expect(
+      htmlToMarkdown(main('<img src="https://placehold.co/800x400" alt="Placeholder" />'))
+    ).toContain('![Placeholder](https://placehold.co/800x400)')
+  })
+
+  it('escapes brackets in image alt text and keeps a title', () => {
+    expect(
+      htmlToMarkdown(main('<img src="/_astro/a.webp" alt="Setup [step]" title="Step 1" />'))
+    ).toContain('![Setup \\[step\\]](https://supabase.com/kb/_astro/a.webp "Step 1")')
+  })
+
+  it('leaves a root-relative URL inside a code block untouched', () => {
+    const markdown = htmlToMarkdown(main('<pre><code>curl -X GET /guides/foo</code></pre>'))
+
+    expect(markdown).toContain('curl -X GET /guides/foo')
+    expect(markdown).not.toContain('supabase.com')
+  })
+
+  it('leaves the link relative (base path only, no origin) outside of Vercel', () => {
+    delete process.env.VERCEL_ENV
+    expect(htmlToMarkdown(main('<a href="/guides/other-guide">another guide</a>'))).toContain(
+      '[another guide](/kb/guides/other-guide)'
+    )
+  })
+})
+
+describe('htmlToMarkdown code blocks', () => {
+  // Mirrors the markup Astro renders for a fenced block: a <pre> with
+  // `data-language`, and one <span class="line"> per line of code.
+  const CODE_HTML =
+    '<pre class="astro-code" data-language="ts"><code><span class="line"><span>const a = 1</span></span>\n<span class="line"><span>console.log(a)</span></span></code></pre>'
+
+  it('fences the block with the language from data-language', () => {
+    expect(htmlToMarkdown(main(CODE_HTML))).toContain('```ts\nconst a = 1\nconsole.log(a)\n```')
+  })
+
+  it('leaves a block without a language as a bare fence', () => {
+    const markdown = htmlToMarkdown(
+      main('<pre><code><span class="line">npm install</span></code></pre>')
+    )
+
+    expect(markdown).toContain('```\nnpm install\n```')
   })
 })
 
@@ -71,107 +289,5 @@ describe('getInternalLinkBaseUrl', () => {
 
   it('returns empty when VERCEL_ENV is not set (local dev/CI)', () => {
     expect(getInternalLinkBaseUrl()).toBe('')
-  })
-})
-
-describe('absolutizeLinks', () => {
-  const ORIGINAL_ENV = process.env
-
-  beforeEach(() => {
-    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
-  })
-
-  afterEach(() => {
-    process.env = ORIGINAL_ENV
-  })
-
-  it('leaves already-absolute links untouched', () => {
-    expect(absolutizeLinks('See [the docs](https://example.com/guide) for more.')).toBe(
-      'See [the docs](https://example.com/guide) for more.\n'
-    )
-  })
-
-  it('rewrites a root-relative link into a full URL under the kb base path', () => {
-    expect(absolutizeLinks('See [another guide](/guides/other-guide) for more.')).toBe(
-      'See [another guide](https://supabase.com/kb/guides/other-guide) for more.\n'
-    )
-  })
-
-  it('does not double up the base path when a link already includes it', () => {
-    expect(absolutizeLinks('[another guide](/kb/guides/other-guide)')).toBe(
-      '[another guide](https://supabase.com/kb/guides/other-guide)\n'
-    )
-  })
-
-  it('leaves the link relative (base path only, no origin) outside of Vercel', () => {
-    process.env.VERCEL_ENV = undefined
-    expect(absolutizeLinks('[another guide](/guides/other-guide)')).toBe(
-      '[another guide](/kb/guides/other-guide)\n'
-    )
-  })
-
-  it('does not rewrite image URLs', () => {
-    expect(absolutizeLinks('![alt](/img.png)')).toBe('![alt](/img.png)\n')
-  })
-
-  it('skips link-like text inside fenced code blocks', () => {
-    expect(absolutizeLinks('```\n[x](/x)\n```\n\n[y](/y)')).toBe(
-      '```\n[x](/x)\n```\n\n[y](https://supabase.com/kb/y)\n'
-    )
-  })
-
-  it('leaves a root-relative URL inside a fenced code block untouched, even outside link syntax', () => {
-    const body = '```bash\ncurl -X GET /guides/foo\n```'
-    expect(absolutizeLinks(body)).toBe('```bash\ncurl -X GET /guides/foo\n```\n')
-  })
-
-  it('leaves a root-relative URL inside a fenced markdown code block untouched', () => {
-    const body = '```md\n[Guides](/guides/foo)\n```'
-    expect(absolutizeLinks(body)).toBe('```md\n[Guides](/guides/foo)\n```\n')
-  })
-
-  it('leaves a root-relative URL inside an inline code span untouched', () => {
-    expect(absolutizeLinks('Run `GET /guides/foo` to fetch it.')).toBe(
-      'Run `GET /guides/foo` to fetch it.\n'
-    )
-  })
-
-  it('round-trips GFM tables and strikethrough without mangling them', () => {
-    const body = '| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~'
-    expect(absolutizeLinks(body)).toBe('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n')
-  })
-})
-
-describe('renderMarkdown', () => {
-  it('turns the title into an h1 and the description into the paragraph beneath it', () => {
-    const data = { title: 'Sample guide', description: 'A short summary.' }
-
-    expect(renderMarkdown(data, 'Body text.')).toBe(
-      '# Sample guide\n\nA short summary.\n\nBody text.\n'
-    )
-  })
-
-  it('skips the heading/lead lines gracefully when title or description are missing', () => {
-    expect(renderMarkdown({}, 'Body text.')).toBe('Body text.\n')
-  })
-})
-
-describe('renderTopicMarkdown', () => {
-  const topic = { name: 'Tutorial', description: 'Step-by-step walkthroughs.' }
-
-  it('renders the topic as an h1/description followed by a bullet list of its guides', () => {
-    const guides = [
-      { title: 'Sample guide', url: 'https://supabase.com/kb/guides/sample-guide.md' },
-    ]
-
-    expect(renderTopicMarkdown(topic, guides)).toBe(
-      '# Tutorial\n\nStep-by-step walkthroughs.\n\n- [Sample guide](https://supabase.com/kb/guides/sample-guide.md)\n'
-    )
-  })
-
-  it('falls back to "No guides for this topic" when the list is empty', () => {
-    expect(renderTopicMarkdown(topic, [])).toBe(
-      '# Tutorial\n\nStep-by-step walkthroughs.\n\nNo guides for this topic\n'
-    )
   })
 })

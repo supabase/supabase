@@ -1,40 +1,31 @@
 #!/usr/bin/env node
-// Pre-build step: exports every src/content/**/*.{md,mdx} file as a plain
-// .md file under public/markdown/, for agents/tools that want the raw
-// content instead of the rendered page (same idea as apps/docs' guides
-// markdown export, recreated here at a much smaller scale — see
-// vercel.json for the redirect that serves it at `<page>.md`).
+// Post-build step: converts every rendered guide, topic, and troubleshooting
+// page in dist/ into a plain .md file under dist/markdown/, for agents/tools
+// that want the page's content without the site chrome. The HTML is converted
+// with markdown-for-agents (`extract: true` keeps only the main content), so
+// this has to run after `astro build` — see vercel.json for the redirect and
+// negotiated rewrites that serve these files at `<page>.md`.
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import remarkGfm from 'remark-gfm'
-import remarkParse from 'remark-parse'
-import remarkStringify from 'remark-stringify'
-import { unified } from 'unified'
-import { visit } from 'unist-util-visit'
-import YAML from 'yaml'
+import { convert, createRule } from 'markdown-for-agents'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
-import { TOPICS, topicToSlug } from '../src/lib/topics.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
-const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
-const OUTPUT_DIR = path.join(SCRIPT_DIR, '..', 'public', 'markdown')
+const DIST_DIR = path.join(SCRIPT_DIR, '..', 'dist')
+const OUTPUT_DIR = path.join(DIST_DIR, 'markdown')
+
+// One directory per route section in dist/, matching the vercel.json redirects.
+const SECTIONS = ['guides', 'topics', 'troubleshooting']
 
 // Used to turn root-relative links into full URLs so the exported file still
 // makes sense read on its own.
 const SITE_ORIGIN = 'https://supabase.com'
 
-// Single processor reused for every file: parses GFM markdown to an mdast
-// tree and serializes it back, same extensions on both ends so nothing
-// (tables, strikethrough, alert blockquotes) gets mangled in the round trip.
-// `emphasis`/`rule` match the markers content already uses (see
-// src/content/guides/sample-guide.mdx) so the round trip doesn't normalize
-// authors' `_italic_`/`---` into the serializer's own `*italic*`/`***`.
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkStringify, { bullet: '-', listItemIndent: 'one', emphasis: '_', rule: '-' })
+// Sections of supabase.com that live outside this app. Root-relative links into
+// them are rendered against SITE_ORIGIN instead of the kb base path.
+const SITE_SECTIONS = ['/docs', '/dashboard', '/blog', '/changelog']
 
 /**
  * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
@@ -54,108 +45,169 @@ export function getInternalLinkBaseUrl() {
   return ''
 }
 
-/**
- * Splits a `.md`/`.mdx` file's raw text into its YAML frontmatter (parsed
- * to a plain object) and the remaining body. The delimiters are located
- * with plain string ops, and the frontmatter itself is parsed with a real
- * YAML parser — no regex involved in extracting values.
- *
- * @param {string} raw
- */
-export function parseFrontmatter(raw) {
-  if (!raw.startsWith('---\n')) return { data: {}, body: raw }
-
-  const frontmatterEnd = raw.indexOf('\n---', 4)
-  if (frontmatterEnd === -1) return { data: {}, body: raw }
-
-  const yamlText = raw.slice(4, frontmatterEnd)
-  const bodyStart = raw.indexOf('\n', frontmatterEnd + 1)
-  const body = bodyStart === -1 ? '' : raw.slice(bodyStart + 1)
-
-  return { data: YAML.parse(yamlText) ?? {}, body }
-}
-
-/**
- * Rewrites root-relative markdown links into full, absolute URLs by parsing
- * the body to an mdast tree, visiting its `link` nodes, and serializing it
- * back — the AST equivalent of apps/docs' `addBaseUrlPrefix()`, so this file
- * still makes sense read outside of the site (no regex over the raw text).
- *
- * @param {string} body
- */
-export function absolutizeLinks(body) {
-  const tree = processor.parse(body)
-  const baseUrl = getInternalLinkBaseUrl()
-
-  visit(tree, 'link', (node) => {
-    if (!node.url.startsWith('/') || node.url.startsWith('//')) return
-    const withBase =
-      node.url === BASE_PATH || node.url.startsWith(`${BASE_PATH}/`)
-        ? node.url
-        : `${BASE_PATH}${node.url}`
-    node.url = `${baseUrl}${withBase}`
-  })
-
-  return String(processor.stringify(tree))
-}
-
-/**
- * Renders the simplified export: the frontmatter title as an h1, the
- * description as the paragraph beneath it, then the (link-absolutized)
- * body.
- *
- * @param {{ title?: string; description?: string }} data
- * @param {string} body
- */
-export function renderMarkdown(data, body) {
-  const heading = data.title ? `# ${data.title}\n\n` : ''
-  const lead = data.description ? `${data.description}\n\n` : ''
-  // absolutizeLinks() already normalizes to exactly one trailing newline
-  // (remark-stringify's doing, not ours) — no extra "\n" needed here.
-  return `${heading}${lead}${absolutizeLinks(body.trim())}`
-}
-
-/**
- * Renders a topic index: its name as an h1, its description as the
- * paragraph beneath it, then a bullet list linking to every guide tagged
- * with that topic — same data `src/pages/topics/[topic].astro` renders,
- * as a plain markdown page.
- *
- * @param {{ name: string; description: string }} topic
- * @param {{ title: string; url: string }[]} guides
- */
-export function renderTopicMarkdown(topic, guides) {
-  const list = guides.length
-    ? guides.map((guide) => `- [${guide.title}](${guide.url})`).join('\n')
-    : 'No guides for this topic'
-  return `# ${topic.name}\n\n${topic.description}\n\n${list}\n`
-}
-
-// file.mdx -> file.md, file.md -> file.md — no regex, just a suffix swap.
-function toMdExtension(fileName) {
-  if (fileName.endsWith('.mdx')) return `${fileName.slice(0, -'.mdx'.length)}.md`
-  return fileName
-}
-
-// Strips the .md/.mdx extension off a content-relative path and turns it
-// into the full, absolute URL of that page's markdown export.
-function toGuideUrl(relativePath) {
-  const posixPath = relativePath.split(path.sep).join('/')
-  const withoutExt = toMdExtension(posixPath).slice(0, -'.md'.length)
-  return `${SITE_ORIGIN}${BASE_PATH}/${withoutExt}.md`
-}
-
-async function findContentFiles(dir) {
-  const entries = await readdir(dir, { withFileTypes: true })
-  const files = await Promise.all(
-    entries.map((entry) => {
-      const fullPath = path.join(dir, entry.name)
-      if (entry.isDirectory()) return findContentFiles(fullPath)
-      if (entry.name.endsWith('.md') || entry.name.endsWith('.mdx')) return [fullPath]
-      return []
-    })
+// True when `href` is `prefix` itself or a path/query/fragment under it.
+function isUnderPath(href, prefix) {
+  return (
+    href === prefix || ['/', '?', '#'].some((separator) => href.startsWith(`${prefix}${separator}`))
   )
-  return files.flat()
+}
+
+// Root-relative (not protocol-relative) links are the ones that need resolving.
+function isRootRelative(href) {
+  return typeof href === 'string' && href.startsWith('/') && !href.startsWith('//')
+}
+
+function resolveHref(href) {
+  if (SITE_SECTIONS.some((prefix) => isUnderPath(href, prefix))) return `${SITE_ORIGIN}${href}`
+  const withBase = isUnderPath(href, BASE_PATH) ? href : `${BASE_PATH}${href}`
+  return `${getInternalLinkBaseUrl()}${withBase}`
+}
+
+// A markdown link destination ends at the first space or unbalanced ")", so a
+// destination containing one of these (or a backslash or angle bracket) goes
+// in <...>, with those characters backslash-escaped inside.
+function formatDestination(href) {
+  if (!/[\s()<>\\]/.test(href)) return href
+  return `<${href.replace(/[\\<>]/g, '\\$&')}>`
+}
+
+// Titles sit inside double quotes, so quotes and backslashes are escaped.
+function formatTitle(title) {
+  return `"${title.replace(/[\\"]/g, '\\$&')}"`
+}
+
+// Rewrites links in the page body so the exported file still works when read
+// outside the site: root-relative links get the base path (the HTML equivalent
+// of apps/docs' `addBaseUrlPrefix()`), and every destination and title is
+// escaped so the markdown link stays intact.
+const linkRule = createRule(
+  (node) => node.name === 'a' && typeof node.attribs?.href === 'string',
+  ({ convertChildren, node }) => {
+    const content = convertChildren(node).trim()
+    if (!content) return ''
+    const { href, title } = node.attribs
+    const destination = formatDestination(isRootRelative(href) ? resolveHref(href) : href)
+    return title
+      ? `[${content}](${destination} ${formatTitle(title)})`
+      : `[${content}](${destination})`
+  }
+)
+
+// Alt text sits inside square brackets, so brackets and backslashes are escaped.
+function formatAlt(alt) {
+  return alt.replace(/[\\[\]]/g, '\\$&')
+}
+
+// Images get the same root-relative resolution as links, so an exported image
+// still loads when the markdown is read outside the site.
+const imageRule = createRule(
+  (node) => node.name === 'img' && typeof node.attribs?.src === 'string',
+  ({ node }) => {
+    const { src, alt = '', title } = node.attribs
+    const source = formatDestination(isRootRelative(src) ? resolveHref(src) : src)
+    return title
+      ? `![${formatAlt(alt)}](${source} ${formatTitle(title)})`
+      : `![${formatAlt(alt)}](${source})`
+  }
+)
+
+// Admonition labels (see TYPE_LABEL in packages/ui-patterns/src/Admonition)
+// mapped back to the source marker that produced them in
+// src/lib/mdx/rehype-admonitions.ts (NOTE→note, TIP→success, IMPORTANT→warning,
+// WARNING→danger, CAUTION→caution). "Deprecated" has no source marker.
+const ALERT_TYPE_BY_LABEL = {
+  Note: 'NOTE',
+  Success: 'TIP',
+  Warning: 'IMPORTANT',
+  Danger: 'WARNING',
+  Caution: 'CAUTION',
+  Deprecated: 'WARNING',
+}
+
+function findDescendant(node, predicate) {
+  for (const child of node.children ?? []) {
+    if (predicate(child)) return child
+    const found = findDescendant(child, predicate)
+    if (found) return found
+  }
+  return undefined
+}
+
+// Rewrites the rendered <Admonition> (a `role="alert"` div carrying its label
+// in `aria-label`) as a GitHub alert blockquote, dropping the icon markup and
+// keeping only the body from its `alert-description` slot.
+const admonitionRule = createRule(
+  (node) => node.attribs?.['data-slot'] === 'alert' && node.attribs.role === 'alert',
+  ({ convertChildren, node }) => {
+    const type = ALERT_TYPE_BY_LABEL[node.attribs['aria-label']] ?? 'NOTE'
+    const description = findDescendant(
+      node,
+      (child) => child.attribs?.['data-slot'] === 'alert-description'
+    )
+    // Paragraph spacing comes out as runs of blank lines; keep one per gap.
+    const body = convertChildren(description ?? node)
+      .trim()
+      .replace(/\n\s*\n/g, '\n\n')
+    const quoted = body
+      .split('\n')
+      .map((line) => (line ? `> ${line}` : '>'))
+      .join('\n')
+    return `\n\n> [!${type}]\n${quoted}\n\n`
+  }
+)
+
+// Concatenated text of a node and its descendants.
+function textOf(node) {
+  return (node.children ?? [])
+    .map((child) => (child.type === 'text' ? child.data : textOf(child)))
+    .join('')
+}
+
+// Astro's code blocks carry their language in `data-language` rather than a
+// `language-*` class, which the package's default code block rule doesn't read.
+const codeLanguageRule = createRule(
+  (node) => node.name === 'pre' && node.attribs?.['data-language'],
+  ({ node }) =>
+    `\n\n\`\`\`${node.attribs['data-language']}\n${textOf(node).replace(/\n$/, '')}\n\`\`\`\n\n`
+)
+
+/**
+ * Converts a rendered HTML page to markdown. Only the page's main content is
+ * kept (`extract: true` drops navigation, headers, footers, and sidebars), and
+ * root-relative links in the body are absolutized.
+ *
+ * @param {string} html
+ */
+export function htmlToMarkdown(html) {
+  // The page's title and description already lead the body (as the h1 and the
+  // lead paragraph), so the <head>-derived YAML frontmatter is skipped.
+  return convert(html, {
+    extract: true,
+    frontmatter: false,
+    rules: [admonitionRule, codeLanguageRule, linkRule, imageRule],
+  }).markdown
+}
+
+/**
+ * Maps a page's built HTML path (relative to dist/) to its markdown export
+ * path, e.g. `guides/sample-guide/index.html` → `guides/sample-guide.md`.
+ *
+ * @param {string} htmlPath
+ */
+export function toMarkdownPath(htmlPath) {
+  return `${path.dirname(htmlPath)}.md`
+}
+
+async function findIndexPages(dir) {
+  try {
+    const entries = await readdir(dir, { recursive: true })
+    return entries
+      .filter((entry) => path.basename(entry) === 'index.html')
+      .map((entry) => path.join(dir, entry))
+  } catch (error) {
+    if (error.code === 'ENOENT') return []
+    throw error
+  }
 }
 
 async function writeFileEnsuringDir(outputPath, contents) {
@@ -164,35 +216,20 @@ async function writeFileEnsuringDir(outputPath, contents) {
 }
 
 async function main() {
-  const files = await findContentFiles(CONTENT_DIR)
+  const pages = (
+    await Promise.all(SECTIONS.map((section) => findIndexPages(path.join(DIST_DIR, section))))
+  ).flat()
 
-  // Only entries with a `topics` array (currently just the `guides`
-  // collection) feed the per-topic index pages below.
-  const guidesByTopic = new Map(TOPICS.map((topic) => [topic.name, []]))
-
-  await Promise.all(
-    files.map(async (file) => {
-      const raw = await readFile(file, 'utf-8')
-      const { data, body } = parseFrontmatter(raw)
-      const relativePath = path.relative(CONTENT_DIR, file)
-
-      const markdown = renderMarkdown(data, body)
-      const outputPath = path.join(OUTPUT_DIR, toMdExtension(relativePath))
-      await writeFileEnsuringDir(outputPath, markdown)
-
-      if (!Array.isArray(data.topics)) return
-      const guide = { title: data.title, url: toGuideUrl(relativePath) }
-      for (const topicName of data.topics) {
-        guidesByTopic.get(topicName)?.push(guide)
-      }
-    })
-  )
+  if (pages.length === 0) {
+    throw new Error('No rendered pages found under dist/. Run `astro build` before this script.')
+  }
 
   await Promise.all(
-    TOPICS.map((topic) => {
-      const markdown = renderTopicMarkdown(topic, guidesByTopic.get(topic.name))
-      const outputPath = path.join(OUTPUT_DIR, 'topics', `${topicToSlug(topic.name)}.md`)
-      return writeFileEnsuringDir(outputPath, markdown)
+    pages.map(async (file) => {
+      const html = await readFile(file, 'utf-8')
+      const relativePath = path.relative(DIST_DIR, file)
+      const outputPath = path.join(OUTPUT_DIR, toMarkdownPath(relativePath))
+      await writeFileEnsuringDir(outputPath, htmlToMarkdown(html))
     })
   )
 }

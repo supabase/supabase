@@ -1,9 +1,6 @@
 # build output
 dist/
 
-# generated markdown export (scripts/generate-markdown.mjs)
-public/markdown/
-
 # federated troubleshooting content (scripts/federated-content), regenerated on every prebuild
 src/content/troubleshooting/
 

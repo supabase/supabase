@@ -7,8 +7,9 @@
   },
   "scripts": {
     "dev": "astro dev --port 3008",
-    "prebuild": "pnpm run fetch:federated-content && pnpm run generate:markdown",
+    "prebuild": "pnpm run fetch:federated-content",
     "build": "astro build",
+    "postbuild": "pnpm run generate:markdown",
     "fetch:federated-content": "tsx ./scripts/federated-content/fetch-federated-content.ts",
     "generate:markdown": "tsx ./scripts/generate-markdown.mjs",
     "sync:legacy-slugs": "tsx ./scripts/federated-content/backfill-legacy-slugs.ts",
@@ -31,17 +32,12 @@
     "common": "workspace:*",
     "gray-matter": "^4.0.3",
     "lucide-react": "catalog:",
+    "markdown-for-agents": "1.4.0",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "remark-gfm": "^4.0.1",
-    "remark-parse": "^11.0.0",
-    "remark-stringify": "^11.0.0",
     "sharp": "^0.35.4",
     "ui": "workspace:*",
-    "ui-patterns": "workspace:*",
-    "unified": "^11.0.5",
-    "unist-util-visit": "^5.1.0",
-    "yaml": "^2.9.0"
+    "ui-patterns": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.2.4",
