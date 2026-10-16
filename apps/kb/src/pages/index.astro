@@ -5,11 +5,12 @@ import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideBrowser } from '../components/GuideBrowser'
 import { HomeHero } from '../components/Hero'
 import Layout from '../layouts/Layout.astro'
-import { padFeatured, toSummary, type FeaturedItem } from '../lib/guides'
+import { padFeatured, toSummary, toTroubleshootingSummary, type FeaturedItem } from '../lib/guides'
 import { TOPICS, topicToSlug } from '../lib/topics'
 
 const guides = await getCollection('guides')
 const summaries = guides.map(toSummary)
+const troubleshooting = (await getCollection('troubleshooting')).map(toTroubleshootingSummary)
 const toTopicItem = (topic: (typeof TOPICS)[number]): Omit<FeaturedItem, 'slot'> => ({
 	id: `topic-${topicToSlug(topic.name)}`,
 	title: topic.name,
@@ -29,10 +30,15 @@ const featuredGuides = padFeatured({
 ---
 
 <Layout description="In-depth guides, tutorials, troubleshooting, and explainers for best practices for Supabase">
-	<HomeHero client:load guides={summaries} />
+	<HomeHero client:load guides={[...summaries, ...troubleshooting]} />
 	<div class="flex flex-col gap-20 pb-24 pt-16 sm:gap-24 sm:pt-20">
 		<FeaturedSection client:load title="Featured topics" items={featuredTopics} />
 		<FeaturedSection client:load title="Featured guides" items={featuredGuides} />
+		{
+			troubleshooting.length > 0 ? (
+				<GuideBrowser client:load title="Troubleshooting" guides={troubleshooting} param="troubleshooting" />
+			) : null
+		}
 		<GuideBrowser client:load title="All guides" guides={summaries} />
 	</div>
 </Layout>

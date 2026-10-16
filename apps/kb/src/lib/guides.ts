@@ -45,9 +45,6 @@ export interface RelatedGuides {
   guides: GuideSummary[]
 }
 
-const FEATURED_COUNT = 3
-const RELATED_COUNT = 3
-
 export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   id: guide.id,
   title: guide.data.title,
@@ -63,7 +60,10 @@ export const toTroubleshootingSummary = (
   id: entry.id,
   title: entry.data.title,
   description: entry.data.description ?? '',
-  topics: entry.data.topics.filter(isKnownTopic),
+  // troubleshooting is a content type, so it keeps only product topics
+  topics: entry.data.topics.filter(
+    (topic): topic is Topic => isKnownTopic(topic) && !FORMAT_TOPICS.includes(topic)
+  ),
   href: `${import.meta.env.BASE_URL}/troubleshooting/${entry.id}`,
 })
 
@@ -73,7 +73,7 @@ export const filterGuides = ({ guides, topic }: FilterGuidesParams): GuideSummar
 export const padFeatured = ({
   featured,
   fallback,
-  count = FEATURED_COUNT,
+  count = 3,
 }: PadFeaturedParams): FeaturedItem[] => {
   const source = featured.length > 0 ? featured : fallback
   if (source.length === 0) return []
@@ -90,13 +90,15 @@ export const parseTopicParam = (slug: string | null): Topic | null =>
 export const withTopicParam = ({
   search,
   topic,
+  param = 'topic',
 }: {
   search: string
   topic: Topic | null
+  param?: string
 }): string => {
   const params = new URLSearchParams(search)
-  if (topic) params.set('topic', topicToSlug(topic))
-  else params.delete('topic')
+  if (topic) params.set(param, topicToSlug(topic))
+  else params.delete(param)
   const next = params.toString()
   return next ? `?${next}` : ''
 }
@@ -122,7 +124,7 @@ export const relatedGuides = ({ guide, guides }: RelatedGuidesParams): RelatedGu
     const others = guides.filter((other) => other.id !== guide.id && other.topics.includes(topic))
     if (others.length === 0) continue
     const ranked = others.toSorted((a, b) => sharedTopics(b) - sharedTopics(a))
-    return { topic, guides: ranked.slice(0, RELATED_COUNT) }
+    return { topic, guides: ranked.slice(0, 3) }
   }
   return null
 }
