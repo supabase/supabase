@@ -4,6 +4,7 @@ import { NO_REQUIRED_CHARACTERS, urlRegex } from '@/components/interfaces/Auth/A
 import { ProjectAuthConfigData } from '@/data/auth/auth-config-query'
 import { DOCS_URL } from '@/lib/constants'
 import { preprocessEmptyNumberInput } from '@/lib/forms/zod-number-input'
+import { SMS_TEMPLATE_NEWLINE_HINT } from '@/lib/sms-template'
 
 const parseBase64URL = (b64url: string) => {
   return atob(b64url.replace(/[-]/g, '+').replace(/[_]/g, '/'))
@@ -550,7 +551,7 @@ export const PROVIDER_PHONE = {
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'multiline-string',
-      description: 'To format the OTP code use `{{ .Code }}`',
+      description: SMS_TEMPLATE_NEWLINE_HINT,
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],
