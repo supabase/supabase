@@ -3054,7 +3054,7 @@ Enterprise-Managed Auth for MCP puts your company in control of MCP access to Su
 6. Built on the open MCP extension: Supabase implements the MCP Enterprise-Managed Authorization extension, so your security review covers one published standard instead of a custom integration.
 
 ## When to use Enterprise-Managed Auth for MCP
-- Only owners can authorize the connection, so your team shares personal access tokens to get Claude connected (one org-wide authorization, each member keeps their own role)
+- Each member connects Claude on their own and only owners can authorize it, so teams fall back on personal access tokens (one org-wide authorization, each member keeps their own role)
 - Your security policy says AI tool access must be granted and revoked at the identity provider (access follows SSO; revoke under Authorized Apps or by removing the member)
 - A security review of AI tool usage needs one enforced policy instead of individual grants nobody has pruned (access scoped to existing permissions)
 
