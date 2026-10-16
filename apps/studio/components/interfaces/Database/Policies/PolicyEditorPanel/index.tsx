@@ -138,6 +138,7 @@ export const PolicyEditorPanel = memo(function ({
     name: ['name', 'table', 'behavior', 'command', 'roles'],
   })
   const supportWithCheck = ['update', 'all'].includes(command)
+  const showCheckEditor = supportWithCheck && showCheckBlock
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
   const { mutate: executeMutation, isPending: isExecuting } = useExecuteSqlMutation({
@@ -196,7 +197,11 @@ export const PolicyEditorPanel = memo(function ({
     // For INSERT: editor one holds the check expression (not using)
     // For others: editor one = using, editor two = optional check
     const usingExpr = command !== 'insert' ? using : undefined
-    const checkExpr = command === 'insert' ? using : check
+    // On create the form command is the policy's command, so a hidden or unchecked
+    // check block must not contribute its leftover expression. On update the command
+    // is fixed and generateUpdatePolicyPayload gates on the stored one instead.
+    const visibleCheck = showCheckEditor ? check : undefined
+    const checkExpr = command === 'insert' ? using : visibleCheck
 
     if (selectedPolicy === undefined) {
       if (command === 'insert' && !checkExpr?.trim()) {
@@ -369,11 +374,11 @@ export const PolicyEditorPanel = memo(function ({
                     form={form}
                     onUpdateCommand={(command: string) => {
                       setFieldError(undefined)
-                      if (!['update', 'all'].includes(command)) {
-                        setShowCheckBlock(false)
-                      } else {
-                        setShowCheckBlock(true)
-                      }
+                      const commandSupportsWithCheck = ['update', 'all'].includes(command)
+                      setShowCheckBlock(commandSupportsWithCheck)
+                      // Hiding the block leaves its expression in state, which would
+                      // still reach the query for a command that cannot take one
+                      if (!commandSupportsWithCheck) setCheck(undefined)
                     }}
                     onRolesChange={(frag) => setRolesFragment(frag)}
                     authContext={authContext}
@@ -430,11 +435,9 @@ export const PolicyEditorPanel = memo(function ({
                           </p>
                         </div>
                         <p className="font-mono tracking-tighter">
-                          {showCheckBlock ? (
+                          {showCheckEditor ? (
                             <>
-                              {supportWithCheck && showCheckBlock && (
-                                <span className="text-[#ffd700]">) </span>
-                              )}
+                              <span className="text-[#ffd700]">) </span>
                               <span className="text-[#569cd6]">with check</span>{' '}
                               <span className="text-[#ffd700]">(</span>
                             </>
@@ -447,7 +450,7 @@ export const PolicyEditorPanel = memo(function ({
                       </div>
                     </div>
 
-                    {showCheckBlock && (
+                    {showCheckEditor && (
                       <>
                         <div
                           className="mt-1 min-h-[28px] relative block"
@@ -505,7 +508,7 @@ export const PolicyEditorPanel = memo(function ({
                         newName={name}
                         schema={schema}
                         table={table}
-                        lineNumber={8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)}
+                        lineNumber={8 + expOneLineCount + (showCheckEditor ? expTwoLineCount : 0)}
                       />
                     )}
 
@@ -599,13 +602,24 @@ export const PolicyEditorPanel = memo(function ({
                             form.setValue('command', value.command.toLowerCase())
                             form.setValue('roles', value.roles.join(', ') ?? '')
 
+                            const templateSupportsWithCheck = ['UPDATE', 'ALL'].includes(
+                              value.command
+                            )
+                            const templateCheck =
+                              value.check.trim().length > 0 ? value.check : undefined
+
                             setUsing(safeSql`  ${value.definition}`)
-                            if (value.check) {
-                              if (value.command === 'INSERT') {
-                                setUsing(safeSql`  ${value.check}`)
-                              } else {
-                                setCheck(safeSql`  ${value.check}`)
-                              }
+                            if (value.command === 'INSERT' && templateCheck !== undefined) {
+                              setUsing(safeSql`  ${templateCheck}`)
+                            }
+                            if (templateSupportsWithCheck && templateCheck !== undefined) {
+                              setCheck(safeSql`  ${templateCheck}`)
+                            } else if (selectedPolicy === undefined) {
+                              // Clear only when creating, where the command follows the
+                              // template, so an expression from a previously selected template
+                              // cannot linger behind a hidden editor. While editing the command
+                              // is fixed, and clearing would strand the stored check expression
+                              setCheck(undefined)
                             }
                             setRolesFragment(
                               value.roles.length === 0 ||
@@ -620,13 +634,9 @@ export const PolicyEditorPanel = memo(function ({
                             setExpTwoLineCount(1)
                             setFieldError(undefined)
 
-                            if (!['update', 'all'].includes(value.command.toLowerCase())) {
-                              setShowCheckBlock(false)
-                            } else if (value.check.length > 0) {
-                              setShowCheckBlock(true)
-                            } else {
-                              setShowCheckBlock(false)
-                            }
+                            setShowCheckBlock(
+                              templateSupportsWithCheck && templateCheck !== undefined
+                            )
                           }}
                         />
                       </ScrollArea>
