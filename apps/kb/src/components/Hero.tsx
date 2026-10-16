@@ -91,8 +91,8 @@ export const Hero = ({
     <section
       className={cn(
         // paddings are whole 26px grid rows so the copy sits inside the lattice
-        'relative isolate flex justify-center pb-71.5 pt-39',
-        'max-sm:not-in-data-[hero-kind=warp]:pb-39 max-sm:not-in-data-[hero-kind=warp]:pt-19.5',
+        'relative isolate flex justify-center pb-39 pt-39',
+        'max-sm:not-in-data-[hero-kind=warp]:pb-19.5 max-sm:not-in-data-[hero-kind=warp]:pt-19.5',
         'in-data-[hero-kind=warp]:mt-6.5 in-data-[hero-kind=warp]:pb-84.5 in-data-[hero-kind=warp]:pt-32.5',
         'overflow-hidden bg-background',
         className
