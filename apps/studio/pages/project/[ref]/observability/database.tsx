@@ -418,6 +418,7 @@ const DatabaseUsage = () => {
       <section id="database-size-report">
         <ReportWidget
           isLoading={isLoading}
+          showLoadingSpinner={false}
           params={params.largeObjects}
           title="Database Size"
           data={data.largeObjects || []}

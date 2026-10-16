@@ -25,6 +25,7 @@ export interface ReportWidgetProps<T = any> {
   params?: BaseReportParams | LogsEndpointParams
   queryType?: ReportQueryType
   isLoading: boolean
+  showLoadingSpinner?: boolean
   resolvedSql?: string
 }
 
@@ -86,7 +87,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
           )}
         </div>
 
-        <Loading active={props.isLoading}>
+        <Loading active={props.isLoading && props.showLoadingSpinner !== false}>
           {props.data === undefined
             ? null
             : props.renderer({ ...props, router, projectRef: projectRef as string })}
