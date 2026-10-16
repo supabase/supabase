@@ -295,7 +295,7 @@ You can only rate-limit `POST`, `PUT`, `PATCH`, and `DELETE` requests. `GET` and
 **Create the table:**
 
 ```sql
-create table private.rate_limits (
+create unlogged table private.rate_limits (
   ip inet,
   request_at timestamp
 );
