@@ -72,3 +72,15 @@ export function getHighestCrossedReferenceZone(
   }
   return undefined
 }
+
+export function getReferenceZoneMaximum(zones: { runs: ReferenceZoneRun[] }[]): number {
+  return zones.reduce(
+    (maximum, zone) =>
+      zone.runs.reduce(
+        (zoneMaximum, run) =>
+          Number.isFinite(run.upper) ? Math.max(zoneMaximum, run.upper) : zoneMaximum,
+        maximum
+      ),
+    0
+  )
+}

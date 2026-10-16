@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   getHighestCrossedReferenceZone,
+  getReferenceZoneMaximum,
   getReferenceZoneRuns,
   getReferenceZoneXBounds,
 } from './ComposedChartReferenceZones.utils'
@@ -147,5 +148,59 @@ describe('getHighestCrossedReferenceZone', () => {
     expect(getHighestCrossedReferenceZone([], zones, 'memory')).toBeUndefined()
     expect(getHighestCrossedReferenceZone([{ memory: 999 }], [], 'memory')).toBeUndefined()
     expect(getHighestCrossedReferenceZone([{}], zones, 'memory')).toBeUndefined()
+  })
+})
+
+describe('getReferenceZoneMaximum', () => {
+  const zones = [
+    { runs: [{ startIndex: 0, endIndex: 0, lower: 5, upper: 7.4 }] },
+    { runs: [{ startIndex: 0, endIndex: 0, lower: 7.4, upper: 8.2 }] },
+    { runs: [{ startIndex: 0, endIndex: 0, lower: 8.2, upper: 9 }] },
+  ]
+
+  it.each([3, 6])(
+    'uses full capacity even when the selected warning is absent or acknowledgment at %s',
+    (memory) => {
+      expect(getHighestCrossedReferenceZone([{ memory }], zones, 'memory')).toBe(
+        memory === 3 ? undefined : 0
+      )
+      expect(getReferenceZoneMaximum(zones)).toBe(9)
+    }
+  )
+
+  it('retains the largest capacity across historical compute changes', () => {
+    expect(
+      getReferenceZoneMaximum([
+        {
+          runs: [
+            { startIndex: 0, endIndex: 0, lower: 15.4, upper: 17 },
+            { startIndex: 1, endIndex: 1, lower: 8.2, upper: 9 },
+          ],
+        },
+      ])
+    ).toBe(17)
+  })
+
+  it('includes the extreme range upper bound when commitments exceed capacity', () => {
+    expect(
+      getReferenceZoneMaximum([
+        ...zones,
+        { runs: [{ startIndex: 0, endIndex: 0, lower: 8.2, upper: 12 }] },
+      ])
+    ).toBe(12)
+  })
+
+  it('ignores nonfinite bounds and returns zero when no capacity is known', () => {
+    expect(
+      getReferenceZoneMaximum([
+        {
+          runs: [
+            { startIndex: 0, endIndex: 0, lower: 5, upper: Infinity },
+            { startIndex: 1, endIndex: 1, lower: 5, upper: Number.NaN },
+          ],
+        },
+      ])
+    ).toBe(0)
+    expect(getReferenceZoneMaximum([])).toBe(0)
   })
 })

@@ -45,6 +45,7 @@ import {
 } from './ComposedChart.utils'
 import {
   getHighestCrossedReferenceZone,
+  getReferenceZoneMaximum,
   getReferenceZoneRuns,
   getReferenceZoneXBounds,
 } from './ComposedChartReferenceZones.utils'
@@ -406,11 +407,7 @@ export function ComposedChart({
     const selectedZone = selectedIndex === undefined ? undefined : zones[selectedIndex]
     let visibleZones = zones
     if (referenceZoneAttribute) visibleZones = selectedZone ? [selectedZone] : []
-    const maxValue = visibleZones.reduce(
-      (maximum, zone) =>
-        zone.runs.reduce((zoneMaximum, run) => Math.max(zoneMaximum, run.lower), maximum),
-      0
-    )
+    const maxValue = getReferenceZoneMaximum(zones)
     return { zones: visibleZones, maxValue, selectedZone }
   }, [data, referenceZones, referenceZoneAttribute])
 
