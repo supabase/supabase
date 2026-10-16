@@ -1060,6 +1060,12 @@ export interface AgentSetupClickedEvent {
  */
 export interface PreferredSourceClickedEvent {
   action: 'preferred_source_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
