@@ -115,6 +115,7 @@ function AiTools({
             target="_blank"
             title="Add Supabase as a preferred source on Google"
             rel="noreferrer noopener"
+            onClick={() => sendTelemetryEvent({ action: 'preferred_source_clicked' })}
             className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
           >
             <svg
