@@ -224,7 +224,10 @@ const ComposedChartHandler = ({
     return combined as DataPoint[]
   }, [data, attributeQueries, attributes, referenceZoneAttribute])
 
-  const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
+  const loading =
+    data !== undefined
+      ? isLoading
+      : isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
