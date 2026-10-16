@@ -9,6 +9,10 @@ import { createMockProject } from '@/tests/helpers'
 
 const project: Project = {
   ...createMockProject({}),
+  status: 'ACTIVE_HEALTHY',
+  inserted_at: '2026-01-01T00:00:00Z',
+  is_physical_backups_enabled: false,
+  subscription_id: 'subscription-1',
   connectionString: '',
   db_host: '',
   dbVersion: 'supabase-postgres-15.1.0',
