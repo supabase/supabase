@@ -36,7 +36,7 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'Tutorial',
+    name: 'Tutorials',
     description: 'Step-by-step walkthroughs for building with Supabase.',
     pinned: true,
     visible: true,
@@ -78,7 +78,7 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'Supabase Platform',
+    name: 'Platform',
     description: 'Project settings, billing, and infrastructure.',
     pinned: false,
     visible: true,
@@ -90,6 +90,23 @@ export type Topic = (typeof TOPICS)[number]['name']
 // zod's `enum()` needs a literal non-empty tuple of strings, which `.map()`
 // can't preserve on its own — this cast is safe because TOPICS is `as const`.
 export const TOPIC_NAMES = TOPICS.map((topic) => topic.name) as [Topic, ...Topic[]]
+
+// these say what kind of guide it is, the rest say what it's about
+export const FORMAT_TOPICS: Topic[] = [
+  'Migration',
+  'Comparison',
+  'Rundowns',
+  'Troubleshooting',
+  'Tutorials',
+]
+
+// the kind of guide picks the cover before its subject does
+export const pickCoverTopic = (topics: Topic[]): Topic | null =>
+  topics.find((topic) => FORMAT_TOPICS.includes(topic)) ?? topics[0] ?? null
+
+// federated collections tag with their own vocabulary, which may not match kb's topics
+export const isKnownTopic = (topic: string): topic is Topic =>
+  TOPIC_NAMES.some((name) => name === topic)
 
 export function getTopicDescription(topic: Topic): string {
   return TOPICS.find((t) => t.name === topic)!.description
