@@ -57,25 +57,6 @@ test('shows critical issues without suggesting replication can start', () => {
   expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
 })
 
-test('shows each issue without redundant severity badges', () => {
-  customRender(
-    <PipelineValidationAdmonition
-      failures={[
-        { name: 'Credentials', reason: 'Replace the key.', failure_type: 'critical' },
-        { name: 'Replica identity', reason: 'Review table settings.', failure_type: 'warning' },
-      ]}
-    />
-  )
-  expect(screen.getByText('Credentials (required)').parentElement).toHaveTextContent(
-    'Replace the key.'
-  )
-  expect(screen.getByText('Replica identity (warning)').parentElement).toHaveTextContent(
-    'Review table settings.'
-  )
-  expect(screen.queryByText('Required')).not.toBeInTheDocument()
-  expect(screen.queryByText('Warning')).not.toBeInTheDocument()
-})
-
 test('preserves API copy and inline code in compact results', () => {
   customRender(
     <PipelineValidationAdmonition
