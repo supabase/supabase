@@ -45,6 +45,7 @@ import {
 } from './ComposedChart.utils'
 import { getReferenceZoneRuns, getReferenceZoneXBounds } from './ComposedChartReferenceZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
+import { ReferenceZoneArea } from './ReferenceZoneArea'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
@@ -596,6 +597,7 @@ export function ComposedChart({
                   }
                   className="motion-safe:[&_.recharts-reference-area-rect]:transition-[fill-opacity] motion-safe:[&_.recharts-reference-area-rect]:duration-150"
                   stroke="none"
+                  shape={<ReferenceZoneArea />}
                 />
               )
             })
