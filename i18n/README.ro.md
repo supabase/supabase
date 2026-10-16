@@ -41,7 +41,7 @@ Pentru a vedea cum să contribui, vizitați [Getting Started](../DEVELOPERS.md)
 - [x] Alpha: Testăm Supabase cu un set închis de clienți
 - [x] Public Alpha: Oricine se poate înscrie la [supabase.com/dashboard](https://supabase.com/dashboard). Dar fiți blânzi cu noi, există câteva probleme
 - [x] Public Beta: Suficient de stabilă pentru majoritatea cazurilor de utilizare non-întreprindere
-- [ ] Public: Disponibilitate generală [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Public: Disponibilitate generală [[status](https://supabase.com/features)]
 
 În prezent, suntem în faza Public Beta. Urmăriți "releases" din acest repo pentru a fi anunțați de actualizările majore.
 

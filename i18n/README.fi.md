@@ -41,7 +41,7 @@ Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Sta
 - [x] Alpha: Testaamme Supabasea suljetulla asiakasjoukolla
 - [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [supabase.com/dashboard](https://supabase.com/dashboard). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
 - [x] Julkinen beta: Tarpeeksi vakaa useimpiin ei-yrityskäyttötapauksiin
-- [ ] Julkinen: Yleinen saatavuus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Julkinen: Yleinen saatavuus [[status](https://supabase.com/features)]
 
 Olemme tällä hetkellä Public Betassa. Seuraa tämän repon "releases" -osiota saadaksesi ilmoituksen tärkeimmistä päivityksistä.
 

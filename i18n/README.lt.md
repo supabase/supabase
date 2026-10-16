@@ -41,7 +41,7 @@ Norėdami sužinoti, kaip prisidėti, apsilankykite [Getting Started](../DEVELOP
 - [x] Alfa: Bandome "Supabase" su uždaru klientų rinkiniu
 - [x] Viešoji Alfa versija: [supabase.com/dashboard](https://supabase.com/dashboard). Tačiau neskubėkite su mumis, yra keletas trūkumų
 - [x] Viešoji beta versija: Pakankamai stabili daugeliui ne įmonių naudojimo atvejų
-- [ ] Vieša: Bendras prieinamumas [[statusas](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Vieša: Bendras prieinamumas [[statusas](https://supabase.com/features)]
 
 Šiuo metu esame viešojoje beta versijoje. Stebėkite šios repozitorijos "releases", kad gautumėte pranešimus apie svarbius atnaujinimus.
 

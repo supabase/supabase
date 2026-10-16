@@ -41,7 +41,7 @@ A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](../
 - [x] Alpha: A Supabase-t egy zárt ügyfélkörrel teszteljük
 - [x] Nyilvános alfa: Bárki regisztrálhat az [supabase.com/dashboard](https://supabase.com/dashboard) oldalon. De legyetek óvatosak velünk, van még néhány hiba
 - [x] Nyilvános béta: Elég stabil a legtöbb nem vállalati felhasználási esethez
-- [ ] Nyilvános: Általános elérhetőség [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Nyilvános: Általános elérhetőség [[status](https://supabase.com/features)]
 
 Jelenleg nyilvános béta verzióban vagyunk. Figyelje a "releases" ezen repo-t, hogy értesítést kapjon a fontosabb frissítésekről.
 

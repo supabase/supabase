@@ -41,7 +41,7 @@
 - [x] Alpha: Δοκιμάζουμε το Supabase με ένα κλειστό σύνολο πελατών
 - [x] Δημόσια Alpha: [supabase.com/dashboard](https://supabase.com/dashboard). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
 - [x] Δημόσια Beta: Αρκετά σταθερό για τις περισσότερες περιπτώσεις μη επιχειρηματικής χρήσης
-- [ ] Δημόσια: [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Δημόσια: [[status](https://supabase.com/features)]
 
 Βρισκόμαστε επί του παρόντος σε Public Beta. Παρακολουθήστε τις "κυκλοφορίες" αυτού του repo για να ειδοποιηθείτε για σημαντικές ενημερώσεις.
 

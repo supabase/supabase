@@ -41,7 +41,7 @@
 - [x] Alpha：我們正在與一组封閉的客户測試 Supabase。
 - [x] 公開 Alpha：任何人都可以在[supabase.com/dashboard](https://supabase.com/dashboard)上註冊。但請對我們寬容一些，有一些小問題。
 - [x] 公開測試版：足夠穩定，適合大多數非企業使用的情况。
-- [ ] 公開：普遍可用 [狀態](https://supabase.com/docs/guides/getting-started/features#feature-status)
+- [ ] 公開：普遍可用 [狀態](https://supabase.com/features)
 
 我們目前正處於公開測試階段。請關注此軟體的 "發布"，以獲得重大更新的通知。
 

@@ -41,7 +41,7 @@ Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 - [x] Alpha: Kami sedang menguji Supabase dengan sekumpulan pelanggan tertutup
 - [x] Alpha Publik: Siapa pun dapat mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
-- [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Publik: Ketersediaan Umum [[status](https://supabase.com/features)]
 
 Saat ini kami berada dalam versi Beta Publik. Tonton "rilis" repo ini untuk mendapatkan pemberitahuan tentang pembaruan utama.
 
