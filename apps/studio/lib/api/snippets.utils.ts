@@ -408,10 +408,14 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     throw new Error(`Snippet with id ${id} not found`)
   }
 
-  const newId = generateDeterministicUuid([
-    updates.folder_id !== undefined ? updates.folder_id : foundSnippet.folderId,
-    `${updates.name ?? foundSnippet.name}.sql`,
-  ])
+  const name = sanitizeName(updates.name ?? foundSnippet.name)
+  const folderId = updates.folder_id !== undefined ? updates.folder_id : foundSnippet.folderId
+  const targetFolder = entries.find((entry) => entry.type === 'folder' && entry.id === folderId)
+  if (folderId !== null && !targetFolder) {
+    throw new Error(`Folder with id ${folderId} not found`)
+  }
+
+  const newId = generateDeterministicUuid([folderId, `${name}.sql`])
 
   const snippetAtTargetLocation = entries.find(
     (entry) => entry.id === newId && entry.type === 'file'
@@ -423,24 +427,66 @@ export async function updateSnippet(id: string, updates: DeepPartial<Snippet>): 
     )
   }
 
-  const snippet = buildSnippet(
-    foundSnippet.name,
-    foundSnippet.content || '',
-    foundSnippet.folderId,
-    foundSnippet.createdAt
+  const sourceFolder = entries.find(
+    (entry) => entry.type === 'folder' && entry.id === foundSnippet.folderId
   )
+  const sourcePath = path.join(SNIPPETS_DIR, sourceFolder?.name ?? '', `${foundSnippet.name}.sql`)
+  const targetPath = path.join(SNIPPETS_DIR, targetFolder?.name ?? '', `${name}.sql`)
+  const content = updates.content?.sql ?? foundSnippet.content
 
-  // it's easier to delete the old file first and then recreate a new one
-  await deleteSnippet(snippet.id)
+  const temporaryPath = path.join(path.dirname(targetPath), `.snippet-${uuidv4()}.tmp`)
+  let hasPublishedTarget = false
+  try {
+    await fs.writeFile(temporaryPath, content, 'utf-8')
+    const stats = await fs.stat(temporaryPath)
+    const updatedSnippet = buildSnippet(name, content, folderId, stats.birthtime)
 
-  const updatedSnippet = await saveSnippet({
-    name: updates.name ?? snippet.name,
-    content: updates.content ?? snippet.content,
-    // folder_id can be null
-    folder_id: updates.folder_id !== undefined ? updates.folder_id : snippet.folder_id,
-  } as Snippet)
+    let isSameFile = sourcePath === targetPath
+    if (!isSameFile) {
+      try {
+        const [sourceRealPath, targetRealPath] = await Promise.all([
+          fs.realpath(sourcePath),
+          fs.realpath(targetPath),
+        ])
+        isSameFile = sourceRealPath === targetRealPath
+      } catch (error) {
+        if (!(error instanceof Error && 'code' in error && error.code === 'ENOENT')) {
+          throw error
+        }
+      }
+    }
 
-  return updatedSnippet
+    if (isSameFile) {
+      if (sourcePath === targetPath) {
+        await fs.rename(temporaryPath, targetPath)
+      } else {
+        // Change the casing before replacing the SQL, so a failed rename keeps the original.
+        await fs.rename(sourcePath, targetPath)
+        try {
+          await fs.rename(temporaryPath, targetPath)
+        } catch (error) {
+          await fs.rename(targetPath, sourcePath)
+          throw error
+        }
+      }
+    } else {
+      // Linking publishes the complete file without replacing a concurrently created destination.
+      await fs.link(temporaryPath, targetPath)
+      hasPublishedTarget = true
+      await fs.unlink(temporaryPath)
+      // A missing source means another move won; let rollback remove this destination.
+      await fs.unlink(sourcePath)
+    }
+
+    return updatedSnippet
+  } catch (error) {
+    if (hasPublishedTarget) await fs.unlink(targetPath)
+    await fs.rm(temporaryPath, { force: true })
+    if (error instanceof Error && 'code' in error && error.code === 'EEXIST') {
+      throw new Error(`Snippet named "${name}" already exists in the specified folder`)
+    }
+    throw error
+  }
 }
 
 export const getFolders = async (folderId: string | null = null): Promise<Folder[]> => {
