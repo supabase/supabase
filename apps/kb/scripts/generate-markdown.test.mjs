@@ -226,6 +226,25 @@ describe('htmlToMarkdown', () => {
   })
 })
 
+describe('htmlToMarkdown code blocks', () => {
+  // Mirrors the markup Astro renders for a fenced block: a <pre> with
+  // `data-language`, and one <span class="line"> per line of code.
+  const CODE_HTML =
+    '<pre class="astro-code" data-language="ts"><code><span class="line"><span>const a = 1</span></span>\n<span class="line"><span>console.log(a)</span></span></code></pre>'
+
+  it('fences the block with the language from data-language', () => {
+    expect(htmlToMarkdown(main(CODE_HTML))).toContain('```ts\nconst a = 1\nconsole.log(a)\n```')
+  })
+
+  it('leaves a block without a language as a bare fence', () => {
+    const markdown = htmlToMarkdown(
+      main('<pre><code><span class="line">npm install</span></code></pre>')
+    )
+
+    expect(markdown).toContain('```\nnpm install\n```')
+  })
+})
+
 describe('getInternalLinkBaseUrl', () => {
   const ORIGINAL_ENV = process.env
 

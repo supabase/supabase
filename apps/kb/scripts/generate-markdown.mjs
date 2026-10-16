@@ -138,6 +138,21 @@ const admonitionRule = createRule(
   }
 )
 
+// Concatenated text of a node and its descendants.
+function textOf(node) {
+  return (node.children ?? [])
+    .map((child) => (child.type === 'text' ? child.data : textOf(child)))
+    .join('')
+}
+
+// Astro's code blocks carry their language in `data-language` rather than a
+// `language-*` class, which the package's default code block rule doesn't read.
+const codeLanguageRule = createRule(
+  (node) => node.name === 'pre' && node.attribs?.['data-language'],
+  ({ node }) =>
+    `\n\n\`\`\`${node.attribs['data-language']}\n${textOf(node).replace(/\n$/, '')}\n\`\`\`\n\n`
+)
+
 /**
  * Converts a rendered HTML page to markdown. Only the page's main content is
  * kept (`extract: true` drops navigation, headers, footers, and sidebars), and
@@ -151,7 +166,7 @@ export function htmlToMarkdown(html) {
   return convert(html, {
     extract: true,
     frontmatter: false,
-    rules: [admonitionRule, linkRule],
+    rules: [admonitionRule, codeLanguageRule, linkRule],
   }).markdown
 }
 
