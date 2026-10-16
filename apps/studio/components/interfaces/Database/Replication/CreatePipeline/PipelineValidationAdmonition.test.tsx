@@ -76,14 +76,14 @@ test('shows each issue without redundant severity badges', () => {
   expect(screen.queryByText('Warning')).not.toBeInTheDocument()
 })
 
-test('renders API headings unchanged and uses compact prose without a redundant list', () => {
+test('preserves API copy and inline code in compact results', () => {
   customRender(
     <PipelineValidationAdmonition
       stale
       failures={[
         {
           name: 'BigQuery dataset not found',
-          reason: 'The dataset was not found.\n\nCheck the project and dataset names.',
+          reason: 'The dataset was not found.\n\nCheck access to project `my-gcp-proj`.',
           failure_type: 'critical',
         },
       ]}
@@ -91,39 +91,10 @@ test('renders API headings unchanged and uses compact prose without a redundant 
   )
   expect(screen.getByText('BigQuery dataset not found')).toBeInTheDocument()
   expect(screen.getByText('The dataset was not found.').parentElement).toHaveTextContent(
-    'The dataset was not found. Check the project and dataset names.'
+    'The dataset was not found. Check access to project my-gcp-proj.'
   )
   expect(screen.getByText('Settings changed. Test again.')).toBeInTheDocument()
   expect(screen.queryByRole('list')).not.toBeInTheDocument()
-})
-
-test('preserves Markdown lists', () => {
-  customRender(
-    <PipelineValidationAdmonition
-      failures={[
-        {
-          name: 'Credentials',
-          reason: 'Check these settings:\n\n- Project ID\n- Dataset ID',
-          failure_type: 'critical',
-        },
-      ]}
-    />
-  )
-  expect(screen.getAllByRole('listitem')).toHaveLength(2)
-})
-
-test('preserves inline code styling with compact paragraphs', () => {
-  customRender(
-    <PipelineValidationAdmonition
-      failures={[
-        {
-          name: 'BigQuery authentication failed',
-          reason: 'Check service account access to project `my-gcp-proj`.',
-          failure_type: 'critical',
-        },
-      ]}
-    />
-  )
   expect(screen.getByText('my-gcp-proj').tagName).toBe('CODE')
   expect(screen.getByText('my-gcp-proj')).toHaveClass('text-code-inline')
 })

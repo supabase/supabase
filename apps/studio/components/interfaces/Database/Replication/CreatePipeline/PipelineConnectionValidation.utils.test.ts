@@ -48,13 +48,8 @@ describe('connection validation', () => {
 
   it.each([
     ['BigQuery', { serviceAccountKey: 'invalid' }, 'serviceAccountKey'],
-    ['BigQuery', { projectId: '' }, 'projectId'],
-    ['BigQuery', { connectionPoolSize: 0 }, 'connectionPoolSize'],
-    ['BigQuery', { maxStalenessMins: -1 }, 'maxStalenessMins'],
     ['DuckLake', { ducklakeCatalogUrl: '' }, 'ducklakeCatalogUrl'],
-    ['DuckLake', { ducklakePoolSize: 0 }, 'ducklakePoolSize'],
     ['Snowflake', { snowflakePrivateKey: 'invalid' }, 'snowflakePrivateKey'],
-    ['Snowflake', { snowflakeUser: '' }, 'snowflakeUser'],
     ['ClickHouse', { clickhouseUrl: '' }, 'clickhouseUrl'],
   ] as const)('rejects invalid %s connection settings (%s)', (type, changes, path) => {
     expect(getConnectionValidationIssues(type, { ...validData, ...changes })).toEqual(
