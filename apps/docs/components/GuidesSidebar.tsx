@@ -46,17 +46,22 @@ const GuidesSidebar = ({
     const container = preferredSourceRef.current
     if (!container) return
 
-    const light = document.createElement('div')
-    light.setAttribute('google-add-preferred-source-btn', '')
-    light.dataset.theme = 'light'
-    light.className = 'dark:hidden'
+    // The dark: variant also matches elements whose own data-theme contains "dark", so the
+    // theme-visibility classes live on wrappers and data-theme stays on the button containers.
+    const createButtonWrapper = (theme: 'light' | 'dark', wrapperClassName: string) => {
+      const wrapper = document.createElement('div')
+      wrapper.className = wrapperClassName
+      const button = document.createElement('div')
+      button.setAttribute('google-add-preferred-source-btn', '')
+      button.dataset.theme = theme
+      wrapper.appendChild(button)
+      return wrapper
+    }
 
-    const dark = document.createElement('div')
-    dark.setAttribute('google-add-preferred-source-btn', '')
-    dark.dataset.theme = 'dark'
-    dark.className = 'hidden dark:block'
-
-    container.replaceChildren(light, dark)
+    container.replaceChildren(
+      createButtonWrapper('light', 'dark:hidden'),
+      createButtonWrapper('dark', 'hidden dark:block')
+    )
 
     const win = window as Window & { PREFERRED_SOURCE?: PreferredSourceQueue | unknown[] }
     const queue = (win.PREFERRED_SOURCE = win.PREFERRED_SOURCE || []) as PreferredSourceQueue
