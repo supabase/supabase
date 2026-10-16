@@ -145,7 +145,7 @@ export const getReportAttributesV2: (
       referenceZones: [
         {
           label: 'Acknowledgment',
-          color: 'var(--color-yellow-900)',
+          color: 'hsl(var(--warning-600))',
           fillOpacity: 0.12,
           tooltip:
             'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
@@ -153,7 +153,7 @@ export const getReportAttributesV2: (
         },
         {
           label: 'Be proactive',
-          color: 'var(--color-orange-900)',
+          color: 'hsl(var(--warning-600))',
           fillOpacity: 0.16,
           tooltip:
             'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
@@ -161,7 +161,7 @@ export const getReportAttributesV2: (
         },
         {
           label: 'Extreme hazard',
-          color: 'hsl(var(--destructive-default))',
+          color: 'hsl(var(--destructive-600))',
           fillOpacity: 0.16,
           tooltip:
             'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
