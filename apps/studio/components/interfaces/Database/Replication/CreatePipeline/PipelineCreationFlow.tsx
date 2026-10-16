@@ -19,6 +19,11 @@ import { PipelineDataSection } from './PipelineDataSection'
 import { PipelineDestinationReview } from './PipelineDestinationReview'
 import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
+import {
+  CONNECTION_VALIDATION_HINT,
+  PipelineValidationAdmonition,
+} from './PipelineValidationAdmonition'
+import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
@@ -47,11 +52,6 @@ export const PipelineCreationFlow = ({
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
 
-  useEffect(() => {
-    if (hasInitializedStepRef.current) return
-    hasInitializedStepRef.current = true
-    void setStep('destination', { history: 'replace' })
-  }, [setStep])
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
   const formId = useId()
@@ -77,6 +77,8 @@ export const PipelineCreationFlow = ({
     confirmOnClose()
   }
   const { ref: projectRef } = useParams()
+  const { validateConnection, isValidating, isConnectionVerified, failures } =
+    usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: publication } = useReplicationPublicationQuery({
@@ -84,7 +86,23 @@ export const PipelineCreationFlow = ({
     sourceId,
     publicationName,
   })
-  const currentStep = steps.find((item) => item.id === step) ?? steps[0]
+  const accessibleStep =
+    (step === 'data' || step === 'review') && !isConnectionVerified ? 'connection' : step
+  useEffect(() => {
+    if (!hasInitializedStepRef.current) {
+      hasInitializedStepRef.current = true
+      void setStep('destination', { history: 'replace' })
+      return
+    }
+    if (step !== accessibleStep) void setStep(accessibleStep, { history: 'replace' })
+  }, [step, accessibleStep, setStep])
+  const handleNext = async () => {
+    if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
+      return
+    const next = steps[steps.findIndex(({ id }) => id === accessibleStep) + 1]
+    if (next) void setStep(next.id)
+  }
+  const currentStep = steps.find((item) => item.id === accessibleStep) ?? steps[0]
   const canSelectDestination = availableDestinations.includes(type)
 
   useEffect(() => {
@@ -112,15 +130,22 @@ export const PipelineCreationFlow = ({
           <form id={formId} onSubmit={(event) => event.preventDefault()}>
             <SteppedFlow
               steps={steps}
-              currentStep={step}
+              currentStep={accessibleStep}
               onStepChange={setStep}
-              nextLabel="Continue"
-              nextDisabled={step === 'destination' && !canSelectDestination}
+              onNext={handleNext}
+              nextLoading={isValidating}
+              navigationDisabled={isValidating}
+              nextLabel={
+                accessibleStep === 'connection' && !isConnectionVerified
+                  ? 'Test connection'
+                  : 'Continue'
+              }
+              nextDisabled={accessibleStep === 'destination' && !canSelectDestination}
               onCancel={handleClose}
               finalAction={{ label: 'Start pipeline', disabled: true }}
             >
               <SteppedFlowHeader title={currentStep.title} />
-              {step === 'destination' && (
+              {accessibleStep === 'destination' && (
                 <div className="p-5">
                   <PipelineDestinationSelection
                     availableDestinations={availableDestinations}
@@ -133,22 +158,33 @@ export const PipelineCreationFlow = ({
                   />
                 </div>
               )}
-              {step === 'connection' && (
-                <PipelineConnectionSection type={type} form={form}>
-                  {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
-                  {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
-                  {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
-                  {type === 'ClickHouse' && <ClickHouseFields form={form} editMode={false} />}
-                </PipelineConnectionSection>
+              {accessibleStep === 'connection' && (
+                <>
+                  <PipelineValidationAdmonition
+                    failures={failures}
+                    hint={CONNECTION_VALIDATION_HINT}
+                  />
+                  {isConnectionVerified && failures.length === 0 && (
+                    <p role="status" className="px-5 py-3 text-sm text-foreground-light">
+                      Connection verified.
+                    </p>
+                  )}
+                  <PipelineConnectionSection type={type} form={form}>
+                    {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
+                    {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
+                    {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
+                    {type === 'ClickHouse' && <ClickHouseFields form={form} editMode={false} />}
+                  </PipelineConnectionSection>
+                </>
               )}
-              {step === 'data' && (
+              {accessibleStep === 'data' && (
                 <PipelineDataSection
                   type={type}
                   form={form}
                   onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
                 />
               )}
-              {step === 'review' && (
+              {accessibleStep === 'review' && (
                 <>
                   <PipelineDestinationReview type={type} control={form.control} />
                   <Separator />
