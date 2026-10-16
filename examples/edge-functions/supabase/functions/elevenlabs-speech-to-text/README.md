@@ -20,7 +20,7 @@ For a detailed tutorial, please see the [ElevenLabs Developer Docs](https://elev
 
 Next, use [the BotFather](https://t.me/BotFather) to create a new Telegram bot. Run the `/newbot` command and follow the instructions to create a new bot. At the end, you will receive your secret bot token. Note it down securely for the next step.
 
-![BotFather](/assets/images/cookbooks/scribe/telegram-bot/bot-father.png)
+![BotFather](https://supabase.com/docs/img/guides/functions/elevenlabs/bot-father.png)
 
 ### Set up the environment variables
 
