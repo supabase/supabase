@@ -50,7 +50,7 @@
     {
       "id": "create-collection",
       "name": "Create a collection",
-      "code": "```tsx\nimport { createCollection } from '@tanstack/react-db'\nimport { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'\nimport { z } from 'zod'\n\nconst todosSchema = z.object({\n  id: z.number(),\n  title: z.string(),\n  completed: z.boolean(),\n})\n\nconst todos = createCollection(\n  supabaseCollectionOptions({\n    tableName: 'todos',\n    keys: ['id'],\n    schema: todosSchema,\n    supabase,\n    realtime: true,\n  })\n)\n```"
+      "code": "```tsx\nimport { createCollection } from '@tanstack/react-db'\nimport { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'\nimport { z } from 'zod'\n\nconst todosSchema = z.object({\n  id: z.number(),\n  title: z.string(),\n  completed: z.boolean(),\n})\n\nexport const todos = createCollection(\n  supabaseCollectionOptions({\n    tableName: 'todos',\n    keys: ['id'],\n    schema: todosSchema,\n    supabase,\n    realtime: true,\n  })\n)\n```"
     }
   ]
 }
