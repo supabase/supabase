@@ -76,13 +76,13 @@ test('shows each issue without redundant severity badges', () => {
   expect(screen.queryByText('Warning')).not.toBeInTheDocument()
 })
 
-test('uses compact prose and sentence case without a redundant list', () => {
+test('renders API headings unchanged and uses compact prose without a redundant list', () => {
   customRender(
     <PipelineValidationAdmonition
       stale
       failures={[
         {
-          name: 'BigQuery Dataset Not Found',
+          name: 'BigQuery dataset not found',
           reason: 'The dataset was not found.\n\nCheck the project and dataset names.',
           failure_type: 'critical',
         },
@@ -110,4 +110,20 @@ test('preserves Markdown lists', () => {
     />
   )
   expect(screen.getAllByRole('listitem')).toHaveLength(2)
+})
+
+test('preserves inline code styling with compact paragraphs', () => {
+  customRender(
+    <PipelineValidationAdmonition
+      failures={[
+        {
+          name: 'BigQuery authentication failed',
+          reason: 'Check service account access to project `my-gcp-proj`.',
+          failure_type: 'critical',
+        },
+      ]}
+    />
+  )
+  expect(screen.getByText('my-gcp-proj').tagName).toBe('CODE')
+  expect(screen.getByText('my-gcp-proj')).toHaveClass('text-code-inline')
 })

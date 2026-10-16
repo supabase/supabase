@@ -15,9 +15,6 @@ export const DATA_VALIDATION_HINT =
 
 const GENERIC_WARNING_TITLES = new Set(['warning', 'warnings'])
 
-const formatHeading = (name: string) =>
-  name === 'BigQuery Dataset Not Found' ? 'BigQuery dataset not found' : name
-
 const InlineParagraph = ({ children }: PropsWithChildren) => <span>{children} </span>
 
 const getValidationHeading = ({
@@ -32,14 +29,12 @@ const getValidationHeading = ({
   if (title) return title
 
   if (hasCritical) {
-    return failures.length === 1 ? formatHeading(failures[0].name) : 'Configuration issues'
+    return failures.length === 1 ? failures[0].name : 'Configuration issues'
   }
 
   if (failures.length === 1) {
     const { name } = failures[0]
-    return GENERIC_WARNING_TITLES.has(name.trim().toLowerCase())
-      ? 'Review before continuing'
-      : formatHeading(name)
+    return GENERIC_WARNING_TITLES.has(name.trim().toLowerCase()) ? 'Review before continuing' : name
   }
 
   return `${failures.length} warnings to review`
@@ -78,7 +73,7 @@ export const PipelineValidationAdmonition = forwardRef<
           <div key={`${failure.name}-${index}`}>
             {failures.length > 1 ? (
               <p className="mb-0.5! font-medium text-foreground">
-                {formatHeading(failure.name)}
+                {failure.name}
                 {hasCritical && failures.some((item) => item.failure_type === 'warning')
                   ? ` (${failure.failure_type === 'critical' ? 'required' : 'warning'})`
                   : ''}
