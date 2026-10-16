@@ -780,6 +780,9 @@ importers:
       lucide-react:
         specifier: 'catalog:'
         version: 1.55.0(@types/react@19.2.14)(react@19.2.6)
+      markdown-for-agents:
+        specifier: 1.4.0
+        version: 1.4.0
       react:
         specifier: 'catalog:'
         version: 19.2.6
@@ -810,9 +813,6 @@ importers:
       unist-util-visit:
         specifier: ^5.1.0
         version: 5.1.0
-      yaml:
-        specifier: ^2.9.0
-        version: 2.9.0
     devDependencies:
       '@tailwindcss/vite':
         specifier: 4.2.4
@@ -14237,6 +14237,10 @@ packages:
   markdown-extensions@2.0.0:
     resolution: {integrity: sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q==}
     engines: {node: '>=16'}
+
+  markdown-for-agents@1.4.0:
+    resolution: {integrity: sha512-FyEC/a/rIzpt9ErvFD11gSrNLstkVoZN6GA9BC0s/nTw1QFEc8SHa6VjaryEQ2nCNu/OMj3CPaH2/KaBmLTg1A==}
+    engines: {node: '>=22'}
 
   markdown-it@14.3.2:
     resolution: {integrity: sha512-sHHjZ5fJKlgrG4qns2YwVcdNep35h5fERrfkD2YNsb9UFk0UIHarbiTaHKVMlPuWAoiilyK8Fv/jAm11slsY7Q==}
@@ -32251,6 +32255,11 @@ snapshots:
   map-cache@0.2.2: {}
 
   markdown-extensions@2.0.0: {}
+
+  markdown-for-agents@1.4.0:
+    dependencies:
+      domhandler: 5.0.3
+      htmlparser2: 10.1.0
 
   markdown-it@14.3.2:
     dependencies:
