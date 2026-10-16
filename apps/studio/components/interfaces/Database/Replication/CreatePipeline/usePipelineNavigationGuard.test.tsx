@@ -9,7 +9,7 @@ import Router from 'next/router'
 import { type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
-import { useNavigationGuard } from './useNavigationGuard'
+import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
 import { trackHistoryPositions } from '@/lib/navigation-history'
 
 const wizard = '/dashboard/project/test/database/pipelines/new'
@@ -21,10 +21,10 @@ const unload = () => {
   return event.defaultPrevented
 }
 
-describe('useNavigationGuard', () => {
+describe('usePipelineNavigationGuard', () => {
   it('reuses confirmation for explicit exits and bypasses unload only after discard', () => {
     const exit = vi.fn()
-    const { result, rerender } = renderHook(({ dirty }) => useNavigationGuard(dirty), {
+    const { result, rerender } = renderHook(({ dirty }) => usePipelineNavigationGuard(dirty), {
       initialProps: { dirty: true },
     })
     act(() => result.current.requestNavigation(exit))
@@ -62,7 +62,7 @@ describe('useNavigationGuard', () => {
       }
     }
     window.addEventListener('popstate', onPop)
-    const { result, unmount } = renderHook(() => useNavigationGuard(true))
+    const { result, unmount } = renderHook(() => usePipelineNavigationGuard(true))
     try {
       await act(async () => {
         window.history.back()
@@ -99,7 +99,7 @@ describe('useNavigationGuard', () => {
   it('blocks Next router links, allows step URLs and retries the requested destination', () => {
     window.history.replaceState({}, '', wizard)
     const push = vi.spyOn(Router, 'push').mockResolvedValue(true)
-    const { result } = renderHook(() => useNavigationGuard(true))
+    const { result } = renderHook(() => usePipelineNavigationGuard(true))
     expect(() =>
       Router.events.emit('routeChangeStart', `${wizard}?step=connection`, { shallow: true })
     ).not.toThrow()
@@ -122,7 +122,7 @@ describe('useNavigationGuard', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <RouterContextProvider router={router}>{children}</RouterContextProvider>
     )
-    const { result, unmount } = renderHook(() => useNavigationGuard(true), { wrapper })
+    const { result, unmount } = renderHook(() => usePipelineNavigationGuard(true), { wrapper })
     try {
       await act(async () => {
         history.push(`${wizard}?step=connection`)

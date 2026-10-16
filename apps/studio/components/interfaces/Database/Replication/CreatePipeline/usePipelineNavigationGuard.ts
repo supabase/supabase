@@ -3,11 +3,11 @@ import { useRouter as useTanStackRouter } from '@tanstack/react-router'
 import Router from 'next/router'
 import { useEffect, useRef } from 'react'
 
-import { useLatest } from '../misc/useLatest'
-import { useConfirmOnClose } from './useConfirmOnClose'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { getHistoryPosition } from '@/lib/navigation-history'
 
-export const useNavigationGuard = (hasChanges: boolean) => {
+export const usePipelineNavigationGuard = (hasChanges: boolean) => {
   const router = useTanStackRouter({ warn: false })
   const canLeave = useRef(false)
   const pending = useRef<(() => void) | undefined>(undefined)

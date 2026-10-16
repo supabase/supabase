@@ -26,10 +26,10 @@ import {
 } from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
+import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { useNavigationGuard } from '@/hooks/ui/useNavigationGuard'
 
 type FlowDestination = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
 const steps = [
@@ -62,7 +62,7 @@ export const PipelineCreationFlow = ({
   })
   const initialTypeRef = useRef(type)
   const { isDirty } = form.formState
-  const { requestNavigation, modalProps } = useNavigationGuard(
+  const { requestNavigation, modalProps } = usePipelineNavigationGuard(
     isDirty || type !== initialTypeRef.current
   )
   const handleClose = () => requestNavigation(onClose)
