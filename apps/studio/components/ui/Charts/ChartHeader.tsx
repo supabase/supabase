@@ -37,6 +37,7 @@ export interface ChartHeaderProps {
   data?: any[]
   xAxisKey?: string
   yAxisKey?: string
+  referenceZoneAttribute?: string
   xAxisIsDate?: boolean
   valuePrecision?: number
   shouldFormatBytes?: boolean
@@ -67,6 +68,7 @@ export const ChartHeader = ({
   data,
   xAxisKey,
   yAxisKey,
+  referenceZoneAttribute,
   xAxisIsDate = true,
   displayDateInUtc,
   customDateFormat,
@@ -123,10 +125,13 @@ export const ChartHeader = ({
       if (activeDataPoint) {
         // For stacked charts, we need to calculate the total of all attributes
         // that should be included in the total (excluding reference lines, max values, etc.)
-        let newValue = activeDataPoint[yAxisKey]
+        const isReferenceValueMissing =
+          referenceZoneAttribute !== undefined &&
+          !Number.isFinite(activeDataPoint[referenceZoneAttribute])
+        let newValue = isReferenceValueMissing ? 'Unavailable' : activeDataPoint[yAxisKey]
 
         // If this is a stacked chart with multiple attributes, calculate the total
-        if (attributes && attributes.length > 1) {
+        if (!isReferenceValueMissing && attributes && attributes.length > 1) {
           const attributesToIgnore =
             attributes
               ?.filter((a) => a.omitFromTotal || a.isMaxValue || a.provider === 'reference-line')
@@ -175,6 +180,7 @@ export const ChartHeader = ({
     data,
     xAxisKey,
     yAxisKey,
+    referenceZoneAttribute,
     xAxisIsDate,
     displayDateInUtc,
     customDateFormat,

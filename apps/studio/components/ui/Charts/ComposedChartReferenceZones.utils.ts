@@ -46,3 +46,27 @@ export function getReferenceZoneXBounds(
     x2: run.endIndex === data.length - 1 ? undefined : getValue(endIndex),
   }
 }
+
+export function getEmphasizedReferenceZones(
+  data: Datum[],
+  zones: { runs: ReferenceZoneRun[] }[],
+  attribute?: string
+): Set<number> {
+  const allZones = new Set(zones.map((_, index) => index))
+  const value = attribute ? data[data.length - 1]?.[attribute] : undefined
+  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return allZones
+
+  const thresholds: { value: number; index: number }[] = []
+  for (const [index, zone] of zones.entries()) {
+    const latest = zone.runs[zone.runs.length - 1]
+    if (latest?.endIndex !== data.length - 1 || !Number.isFinite(latest.lower)) return allZones
+    thresholds.push({ value: latest.lower, index })
+  }
+  thresholds.sort((a, b) => a.value - b.value)
+  if (thresholds.length === 0) return allZones
+
+  const next = thresholds.findIndex((threshold) => threshold.value > value)
+  if (next === 0) return new Set([thresholds[0].index])
+  if (next === -1) return new Set([thresholds[thresholds.length - 1].index])
+  return new Set([thresholds[next - 1].index, thresholds[next].index])
+}

@@ -43,7 +43,11 @@ import {
   ReferenceZone,
   resolveChartColor,
 } from './ComposedChart.utils'
-import { getReferenceZoneRuns, getReferenceZoneXBounds } from './ComposedChartReferenceZones.utils'
+import {
+  getEmphasizedReferenceZones,
+  getReferenceZoneRuns,
+  getReferenceZoneXBounds,
+} from './ComposedChartReferenceZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ReferenceZoneLabels } from './ReferenceZoneLabels'
 import { ReferenceZoneLine } from './ReferenceZoneLine'
@@ -56,6 +60,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
   attributes: MultiAttribute[]
   referenceZones?: ReferenceZone[]
+  referenceZoneAttribute?: string
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
@@ -108,6 +113,7 @@ export function ComposedChart({
   data,
   attributes,
   referenceZones,
+  referenceZoneAttribute,
   yAxisKey,
   xAxisKey,
   format,
@@ -155,6 +161,8 @@ export function ComposedChart({
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const [hiddenAttributes, setHiddenAttributes] = useState<Set<string>>(new Set())
+  const [hoveredReferenceZone, setHoveredReferenceZone] = useState<string | null>(null)
+  const [focusedReferenceZone, setFocusedReferenceZone] = useState<string | null>(null)
   const isDarkMode = resolvedTheme?.includes('dark')
 
   useEffect(() => {
@@ -255,6 +263,11 @@ export function ComposedChart({
   }
 
   function computeHighlightedValue() {
+    const activePoint = data[focusDataIndex ?? data.length - 1]
+    if (referenceZoneAttribute && !Number.isFinite(activePoint?.[referenceZoneAttribute])) {
+      return 'Unavailable'
+    }
+
     const referenceLines = attributes.filter(
       (attribute) => attribute?.provider === 'reference-line'
     )
@@ -330,9 +343,16 @@ export function ComposedChart({
     chartHighlight?.coordinates.right &&
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
+  const firstChartPoint = { ...data[0] }
+  if (referenceZoneAttribute && !(referenceZoneAttribute in firstChartPoint)) {
+    const firstMetricPoint = data.find((point) => referenceZoneAttribute in point)
+    if (firstMetricPoint)
+      firstChartPoint[referenceZoneAttribute] = firstMetricPoint[referenceZoneAttribute]
+  }
+
   const chartData =
     data && !!data[0]
-      ? Object.entries(data[0])
+      ? Object.entries(firstChartPoint)
           ?.map(([key, value]) => ({
             name: key,
             value: value,
@@ -390,8 +410,14 @@ export function ComposedChart({
         zone.runs.reduce((zoneMaximum, run) => Math.max(zoneMaximum, run.upper), maximum),
       0
     )
-    return { zones, maxValue }
-  }, [data, referenceZones])
+    const emphasizedZones = getEmphasizedReferenceZones(data, zones, referenceZoneAttribute)
+    return { zones, maxValue, emphasizedZones }
+  }, [data, referenceZones, referenceZoneAttribute])
+
+  const isReferenceZoneEmphasized = (index: number) =>
+    referenceZoneChart.emphasizedZones.has(index) ||
+    referenceZoneChart.zones[index].label === hoveredReferenceZone ||
+    referenceZoneChart.zones[index].label === focusedReferenceZone
 
   const isPercentage = format === '%'
   const isRamChart =
@@ -457,6 +483,7 @@ export function ComposedChart({
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
+        referenceZoneAttribute={referenceZoneAttribute}
         hideHighlightedValue={hideHighlightedValue}
         title={title}
         showNewBadge={showNewBadge}
@@ -579,7 +606,7 @@ export function ComposedChart({
             ))}
           </defs>
 
-          {referenceZoneChart.zones.flatMap((zone) =>
+          {referenceZoneChart.zones.flatMap((zone, zoneIndex) =>
             zone.runs.map((run) => {
               const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
               return (
@@ -589,7 +616,10 @@ export function ComposedChart({
                   y1={run.lower}
                   y2={run.upper}
                   fill="none"
-                  stroke={zone.color}
+                  stroke={
+                    isReferenceZoneEmphasized(zoneIndex) ? zone.color : 'var(--chart-reference)'
+                  }
+                  strokeOpacity={isReferenceZoneEmphasized(zoneIndex) ? 1 : 0.3}
                   shape={<ReferenceZoneLine />}
                 />
               )
@@ -673,9 +703,12 @@ export function ComposedChart({
               <ReferenceZoneLabels
                 onInteract={() => {
                   setIsActiveHoveredChart(false)
+                  setFocusDataIndex(null)
                   clearHover()
                 }}
-                labels={referenceZoneChart.zones.flatMap((zone) => {
+                onLabelHover={setHoveredReferenceZone}
+                onLabelFocus={setFocusedReferenceZone}
+                labels={referenceZoneChart.zones.flatMap((zone, zoneIndex) => {
                   const latestRun = zone.runs[zone.runs.length - 1]
                   return latestRun?.endIndex === data.length - 1
                     ? [
@@ -684,6 +717,7 @@ export function ComposedChart({
                           color: zone.color,
                           tooltip: zone.tooltip,
                           value: latestRun.lower,
+                          isEmphasized: isReferenceZoneEmphasized(zoneIndex),
                         },
                       ]
                     : []

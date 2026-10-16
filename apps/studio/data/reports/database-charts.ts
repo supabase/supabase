@@ -142,6 +142,7 @@ export const getReportAttributesV2: (
       },
       titleTooltip:
         'Risk thresholds estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.',
+      referenceZoneAttribute: 'ram_commit_used',
       referenceZones: [
         {
           label: 'Acknowledgment',
@@ -151,14 +152,14 @@ export const getReportAttributesV2: (
           getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
         },
         {
-          label: 'Be proactive',
+          label: 'Problematic',
           color: 'hsl(var(--warning-600))',
           tooltip:
             'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
           getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
         },
         {
-          label: 'Extreme hazard',
+          label: 'Severe',
           color: 'hsl(var(--destructive-600))',
           tooltip:
             'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',

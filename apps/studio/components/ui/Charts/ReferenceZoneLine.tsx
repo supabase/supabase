@@ -6,6 +6,7 @@ export const ReferenceZoneLine = ({
   width = 0,
   height = 0,
   stroke,
+  strokeOpacity,
   clipPath,
 }: RectangleProps) => (
   <line
@@ -15,6 +16,7 @@ export const ReferenceZoneLine = ({
     y1={y + height}
     y2={y + height}
     stroke={stroke}
+    strokeOpacity={strokeOpacity}
     strokeWidth={1}
     strokeDasharray="4 4"
   />

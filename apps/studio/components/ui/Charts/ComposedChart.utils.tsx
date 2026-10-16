@@ -15,6 +15,7 @@ export interface ReportAttributes {
   label: string
   attributes?: (MultiAttribute | false)[]
   referenceZones?: ReferenceZone[]
+  referenceZoneAttribute?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
   entitlement?: string

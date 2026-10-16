@@ -7,11 +7,14 @@ type ReferenceZoneLabel = {
   color: string
   tooltip: string
   value: number
+  isEmphasized: boolean
 }
 
 type ReferenceZoneLabelsProps = {
   labels: ReferenceZoneLabel[]
   onInteract?: () => void
+  onLabelHover?: (label: string | null) => void
+  onLabelFocus?: (label: string | null) => void
   offset?: { left: number; top: number; width: number; height: number }
   yAxisMap?: Record<string, { scale: (value: number) => number }>
 }
@@ -21,6 +24,8 @@ export const ReferenceZoneLabels = ({
   offset,
   yAxisMap,
   onInteract,
+  onLabelHover,
+  onLabelFocus,
 }: ReferenceZoneLabelsProps) => {
   const scale = yAxisMap?.[0]?.scale
   if (!offset || !scale || labels.length === 0 || offset.width <= 8 || offset.height < 20)
@@ -45,8 +50,8 @@ export const ReferenceZoneLabels = ({
               <path
                 d={`M ${Math.max(offset.left, labelX - 12)} ${targetPositions[index]} H ${Math.max(offset.left, labelX - 6)} V ${positions[index]} H ${labelX + labelWidth}`}
                 fill="none"
-                stroke={label.color}
-                strokeOpacity={0.6}
+                stroke={label.isEmphasized ? label.color : 'var(--chart-reference)'}
+                strokeOpacity={label.isEmphasized ? 0.6 : 0.3}
                 strokeWidth={1}
               />
             )}
@@ -55,7 +60,11 @@ export const ReferenceZoneLabels = ({
               y={positions[index] - labelHeight / 2}
               width={labelWidth}
               height={labelHeight}
-              onMouseEnter={onInteract}
+              onMouseEnter={() => {
+                onInteract?.()
+                onLabelHover?.(label.label)
+              }}
+              onMouseLeave={() => onLabelHover?.(null)}
               onMouseMove={(event) => event.stopPropagation()}
             >
               <div className="flex min-w-0 justify-end">
@@ -64,9 +73,13 @@ export const ReferenceZoneLabels = ({
                     <button
                       type="button"
                       tabIndex={0}
-                      className="min-w-0 max-w-full truncate rounded-sm bg-default px-1.5 py-0.5 text-xs leading-4 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                      style={{ color: label.color }}
-                      onFocus={onInteract}
+                      className="min-w-0 max-w-full truncate rounded-sm bg-default text-foreground-light px-1.5 py-0.5 text-xs leading-4 whitespace-nowrap focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                      style={{ color: label.isEmphasized ? label.color : undefined }}
+                      onFocus={() => {
+                        onInteract?.()
+                        onLabelFocus?.(label.label)
+                      }}
+                      onBlur={() => onLabelFocus?.(null)}
                       onMouseDown={(event) => event.stopPropagation()}
                     >
                       {label.label}

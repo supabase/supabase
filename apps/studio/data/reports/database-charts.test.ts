@@ -172,6 +172,7 @@ describe('getReportAttributesV2 memory commitment chart', () => {
       (attribute) => attribute !== false && attribute.attribute === 'ram_commit_limit'
     )
 
+    expect(chart?.referenceZoneAttribute).toBe('ram_commit_used')
     expect(chart?.showMaxValue).toBeUndefined()
     expect(chart?.YAxisProps?.domain).toBeUndefined()
     expect(commitLimit).toMatchObject({
@@ -182,8 +183,8 @@ describe('getReportAttributesV2 memory commitment chart', () => {
     expect(commitLimit).not.toHaveProperty('isMaxValue')
     expect(chart?.referenceZones?.map((zone) => zone.label)).toEqual([
       'Acknowledgment',
-      'Be proactive',
-      'Extreme hazard',
+      'Problematic',
+      'Severe',
     ])
   })
 })
