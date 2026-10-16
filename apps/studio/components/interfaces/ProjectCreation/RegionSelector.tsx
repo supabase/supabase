@@ -403,7 +403,10 @@ export const RegionSelector = ({
                               Upgrade to Pro
                             </InlineLink>{' '}
                             to choose a{' '}
-                            <InlineLink href={`${DOCS_URL}/guides/platform/regions`}>
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/platform/regions`}
+                              onClick={() => track('free_tier_general_region_docs_link_clicked')}
+                            >
                               specific region
                             </InlineLink>
                             .
