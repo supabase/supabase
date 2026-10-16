@@ -1940,6 +1940,7 @@ Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript fun
 6. Versatile use cases: Support for webhooks, third-party integrations, and custom API endpoints.
 7. Open-source and portable: Run locally or on any Deno-compatible platform.
 8. Rich ecosystem: Wide range of examples and integrations available.
+9. Middleware: \`@supabase/middleware\` lets you write per-request logic once and run it on Edge Functions and any other runtime that has fetch.
 
 ## Benefits:
 - Low-latency responses: Ideal for globally distributed applications.
@@ -1963,6 +1964,38 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     heroImage: 'https://www.youtube-nocookie.com/embed/EQ5h3NSWMbk',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Supabase Middleware',
+    subtitle: 'Write per-request logic once and run it on any runtime that has fetch.',
+    description: `
+\`@supabase/middleware\` is composable, type-safe middleware for Web Fetch handlers. You write per-request logic once, and the same middleware runs on any runtime that has fetch, or inside a framework through a short bridge you copy. It's stable, MIT, and free.
+
+## Key benefits
+1. Write once, run on any fetch runtime: Supabase Edge Functions, Vercel Functions, Cloudflare Workers, Deno, Bun, and Node 22+.
+2. Use it inside your framework: copy a short, typechecked bridge for Hono, H3, Elysia, NestJS, or TanStack Start. It adds no dependency.
+3. Typed shared context: each middleware adds one typed key to \`ctx\`, and your handler sees everything upstream, typed.
+4. Mistakes fail early: duplicate keys, and a middleware placed before the one it needs, fail to compile on TypeScript 5.4+.
+5. Stop or change a request anywhere: any middleware can return a \`Response\` and stop the chain, or change the response on the way back.
+6. Supabase middleware included: claims, Supabase and admin clients, Postgres clients (one with RLS applied, one that bypasses RLS), and \`withOAuthProtectedResource\` for your app's own MCP server, from \`@supabase/server\`. The engine also ships \`withCors\` and \`withFeatureFlag\`. The Postgres clients don't run on Cloudflare Workers, because \`pg\` needs a TCP socket.
+7. Open source and portable: it's built on the Web Fetch standard. If you leave Supabase, you keep the engine and what you wrote with it.
+
+## Supabase Middleware is valuable for:
+- Verifying the caller and scoping a database connection to them without rewriting it in every function
+- Giving your app its own MCP server that an agent calls as the signed-in user
+- Keeping CORS, auth, and flag checks the same across many functions and projects
+- Moving logic between Edge Functions and a framework like Hono without a rewrite
+- Publishing shared per-request logic as a package for other projects
+`,
+    icon: Package,
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/middleware/introduction',
+    slug: 'supabase-middleware',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
