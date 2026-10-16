@@ -69,4 +69,18 @@ const troubleshooting = defineCollection({
   }),
 })
 
-export const collections = { guides, troubleshooting }
+// Question-and-answer entries in src/content/faqs. `title` holds the question,
+// and the body holds the answer. Entries are not rendered by a page yet — this
+// collection only defines the schema so content can be authored against it.
+const faqs = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs' }),
+  // `topics` is not part of the schema, so frontmatter can't set it (zod strips
+  // unknown keys). Every entry is tagged with the FAQ topic in the background.
+  schema: z
+    .object({
+      title: z.string(),
+    })
+    .transform((data) => ({ ...data, topics: ['FAQs'] })),
+})
+
+export const collections = { guides, troubleshooting, faqs }
