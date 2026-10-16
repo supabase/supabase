@@ -45,7 +45,8 @@ import {
 } from './ComposedChart.utils'
 import { getReferenceZoneRuns, getReferenceZoneXBounds } from './ComposedChartReferenceZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { ReferenceZoneArea } from './ReferenceZoneArea'
+import { ReferenceZoneLabels } from './ReferenceZoneLabels'
+import { ReferenceZoneLine } from './ReferenceZoneLine'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
@@ -154,8 +155,6 @@ export function ComposedChart({
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
   const [isActiveHoveredChart, setIsActiveHoveredChart] = useState(false)
   const [hiddenAttributes, setHiddenAttributes] = useState<Set<string>>(new Set())
-  const [hoveredReferenceZone, setHoveredReferenceZone] = useState<string | null>(null)
-  const [focusedReferenceZone, setFocusedReferenceZone] = useState<string | null>(null)
   const isDarkMode = resolvedTheme?.includes('dark')
 
   useEffect(() => {
@@ -589,15 +588,9 @@ export function ComposedChart({
                   {...getReferenceZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
                   y1={run.lower}
                   y2={run.upper}
-                  fill={zone.color}
-                  fillOpacity={
-                    zone.label === hoveredReferenceZone || zone.label === focusedReferenceZone
-                      ? Math.min(1, zone.fillOpacity * 2)
-                      : zone.fillOpacity
-                  }
-                  className="motion-safe:[&_.recharts-reference-area-rect]:transition-[fill-opacity] motion-safe:[&_.recharts-reference-area-rect]:duration-150"
-                  stroke="none"
-                  shape={<ReferenceZoneArea />}
+                  fill="none"
+                  stroke={zone.color}
+                  shape={<ReferenceZoneLine />}
                 />
               )
             })
@@ -674,6 +667,30 @@ export function ComposedChart({
                 />
               </ReferenceLine>
             ))}
+
+          <Customized
+            component={
+              <ReferenceZoneLabels
+                onInteract={() => {
+                  setIsActiveHoveredChart(false)
+                  clearHover()
+                }}
+                labels={referenceZoneChart.zones.flatMap((zone) => {
+                  const latestRun = zone.runs[zone.runs.length - 1]
+                  return latestRun?.endIndex === data.length - 1
+                    ? [
+                        {
+                          label: zone.label,
+                          color: zone.color,
+                          tooltip: zone.tooltip,
+                          value: latestRun.lower,
+                        },
+                      ]
+                    : []
+                })}
+              />
+            }
+          />
 
           {/* Selection highlight */}
           {showHighlightActions && (
@@ -769,9 +786,6 @@ export function ComposedChart({
           <CustomLabel
             payload={[maxAttributeData, ...chartData]}
             attributes={attributes}
-            referenceZones={referenceZones}
-            onReferenceZoneHover={setHoveredReferenceZone}
-            onReferenceZoneFocus={setFocusedReferenceZone}
             showMaxValue={_showMaxValue}
             onToggleAttribute={(attribute, options) => {
               setHiddenAttributes((prev) => {

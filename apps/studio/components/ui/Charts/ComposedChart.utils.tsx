@@ -43,7 +43,6 @@ export interface ReportAttributes {
 export type ReferenceZone = {
   label: string
   color: string
-  fillOpacity: number
   tooltip: string
   getRanges: (data: Datum[]) => ([number, number] | null)[]
 }
@@ -179,7 +178,7 @@ export const calculateTotalChartAggregate = (
 
 export const CustomTooltip = ({
   active,
-  payload: rawTooltipPayload,
+  payload,
   label: _label,
   attributes,
   data,
@@ -192,7 +191,6 @@ export const CustomTooltip = ({
 }: TooltipProps) => {
   const formatDateTime = useFormatDateTime()
   const { timezone } = useTimezone()
-  const payload = rawTooltipPayload?.filter((entry) => entry.type !== 'none')
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -353,9 +351,6 @@ interface CustomLabelProps {
   onLabelHover?: (label: string | null) => void
   onToggleAttribute?: (attribute: string, options?: { exclusive?: boolean }) => void
   hiddenAttributes?: Set<string>
-  referenceZones?: ReferenceZone[]
-  onReferenceZoneHover?: (label: string | null) => void
-  onReferenceZoneFocus?: (label: string | null) => void
 }
 
 export const CustomLabel = ({
@@ -365,9 +360,6 @@ export const CustomLabel = ({
   onLabelHover,
   onToggleAttribute,
   hiddenAttributes,
-  referenceZones,
-  onReferenceZoneHover,
-  onReferenceZoneFocus,
 }: CustomLabelProps) => {
   const items = payload ?? []
   const maxValueAttribute = isMaxAttribute(attributes)
@@ -440,30 +432,6 @@ export const CustomLabel = ({
         <TooltipProvider delayDuration={800}>
           {items?.map((entry, index) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
-          ))}
-          {referenceZones?.map((zone) => (
-            <Tooltip key={zone.label}>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  tabIndex={0}
-                  className="flex items-center gap-1 p-1.5 rounded-lg"
-                  onMouseEnter={() => onReferenceZoneHover?.(zone.label)}
-                  onMouseLeave={() => onReferenceZoneHover?.(null)}
-                  onFocus={() => onReferenceZoneFocus?.(zone.label)}
-                  onBlur={() => onReferenceZoneFocus?.(null)}
-                >
-                  <span
-                    className="size-2.5 rounded-sm"
-                    style={{ backgroundColor: zone.color, opacity: 0.6 }}
-                  />
-                  <span className="text-foreground-lighter">{zone.label}</span>
-                </button>
-              </TooltipTrigger>
-              <TooltipContent sideOffset={6} side="bottom" className="max-w-xs">
-                {zone.tooltip}
-              </TooltipContent>
-            </Tooltip>
           ))}
         </TooltipProvider>
       </div>
