@@ -1,0 +1,33 @@
+---
+title = "Remove table bloat immediately"
+topics = [
+  "database",
+]
+keywords = ["bloat", "disk", "storage", "vacuum", "autovacuum", "repack", "vacuum full"] 
+
+---
+
+A plain vacuum marks dead space as reusable for future writes, but it does not compact the table.
+
+```sql
+-- dead rows will be cleared, but they will leave behind a lot of free space
+vacuum my_table;
+```
+
+To immediately return free space to the system, the table must be rewritten. `vacuum full` does this, but takes the table offline until it completes or fails:
+
+```sql
+vacuum full my_table;
+```
+
+Instead of `vacuum full`, consider the [`pg_repack` extension](/docs/guides/database/extensions/pg_repack). It achieves the same result without taking the table offline.
+
+<Admonition type="caution">
+
+Both `vacuum full` and `pg_repack` create a full copy of the table, potentially doubling the disk space the table claims for the duration of the operation. Check your [I/O and storage charts](/dashboard/project/_/observability/database) beforehand. If your system is constrained, consider modifying your [disk settings](/dashboard/project/_/settings/infrastructure) before cleanup.
+
+</Admonition>
+
+### Manage vacuum settings
+
+Review the [Autovacuum management](/docs/guides/database/postgres/autovacuum-management) docs to tune the vacuum for your workload. This can minimize bloat accumulation in the future.

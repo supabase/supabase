@@ -1,0 +1,147 @@
+---
+title = "Recovering from wraparound risk"
+topics = [ "database" ]
+keywords = [ "Postgres", "Vacuum", "Wraparound"]
+
+[[errors]]
+message = "oldest xmin is far in the past"
+---
+
+First, confirm the risk with the below wraparound query:
+
+```sql
+-- Query adapted from the Fujitsu blog on wraparound:
+-- https://www.postgresql.fastware.com/blog/how-to-fix-transaction-wraparound-in-postgresql
+select
+  heap.relnamespace::regnamespace as schema_name,
+  heap.relname as table_name,
+  greatest(age(heap.relfrozenxid), age(toast.relfrozenxid)) as transaction_ids_used,
+  (2^31 - 3000000) - greatest(age(heap.relfrozenxid), age(toast.relfrozenxid)) as remaining
+from pg_class as heap
+left join pg_class as toast on heap.reltoastrelid = toast.oid
+where heap.relkind in ('r', 'm') -- only check tables and materialized views
+order by remaining
+limit 10;
+```
+
+ If a table's `transaction_ids_used` is past 200 million and still climbing, something is likely preventing the vacuum from freezing rows. Remove potential blockers by reviewing the following checklist:
+
+1. Remove dead replication slots. These are the most common blockers:
+
+   ```sql
+   -- find dead slots
+   select * from pg_replication_slots where wal_status = 'lost';
+
+   -- drop the dead slots
+   select pg_drop_replication_slot(slot_name)
+   from pg_replication_slots
+   where wal_status = 'lost';
+   ```
+
+2. Roll back orphaned prepared transactions:
+
+   ```sql
+   -- check for old prepared transactions
+   select age(transaction), * from pg_prepared_xacts;
+
+   -- once an orphaned transaction is identified, roll it back
+   rollback prepared 'your_transaction_id';
+   ```
+
+3. Terminate long-running transactions:
+
+```sql
+-- find old transactions
+select
+    pid,
+    query,
+    datname,
+    usename,
+    state,
+    backend_xmin,
+    backend_xid,
+    now() - xact_start as time_running
+from pg_stat_activity
+where
+    (backend_xmin is not null or backend_xid is not null)
+      and
+    (now() - xact_start >= interval '5 minutes' and state <> 'idle')
+order by now() - xact_start desc
+limit 10;
+
+-- if a transaction is unusually old or referenced in the xmin warning logs, kill it
+select pg_terminate_backend(pid)
+from pg_stat_activity
+where pid = <connection_id>;
+```
+
+If the wraparound checks show a clear problem but you can't find any blockers, [contact support](/dashboard/support/new). This can be a sign of orphaned rows caused by operating system or Postgres bugs.
+
+### Control a disruptive emergency vacuum
+
+When a table's vacuum has been blocked for long enough, the eventual anti-wraparound vacuum can be very intensive. If it's too disruptive, you can terminate it manually:
+
+```sql
+-- get vacuum process IDs
+select
+  pid,
+  application_name,
+  backend_start,
+  xact_start,
+  state,
+  backend_type,
+  now() - coalesce(xact_start, backend_start) as time_running,
+  query
+from pg_stat_activity
+where backend_type like '%autovacuum worker%';
+
+-- kill the vacuum
+select pg_terminate_backend(pid)
+from pg_stat_activity
+where pid = <pid>;
+```
+
+The table still needs vacuuming, so follow up with a manual vacuum that skips index cleanup. This leaves the indexes bloated but reduces the intensity of the run:
+
+```sql
+vacuum (index_cleanup false) table_name;
+```
+
+Afterwards, you can remove the index bloat by reindexing:
+
+```sql
+-- raise the timeout so long reindexes aren't cancelled
+set statement_timeout = '10min';
+
+-- remove bloat for an individual index
+reindex index concurrently my_index;
+
+-- remove bloat for all indexes on a table (more intensive)
+reindex table concurrently my_table;
+```
+
+A failed `reindex concurrently` leaves behind invalid indexes. Check for them with:
+
+```sql
+select
+  indexrelid::regclass as idx_name,
+  indisvalid as is_valid
+from pg_index
+where 
+indisvalid = false;
+  and
+(idx_name like '%ccnew%'  or idx_name like '%_ccold%'
+
+```
+
+If you find an invalid index with the term `ccnew`, that index is unusable and should be removed:
+
+```sql
+drop index concurrently my_invalid_index;
+```
+
+Afterward, you can try to reindex again. If the index contains the term `_ccold`, then the index was successfully changed, but an invalid one was left behind as part of the process. The invalid one should just be dropped, but another reindex is not required.
+
+### Manage vacuum settings
+
+Review the [Autovacuum management](/docs/guides/database/postgres/autovacuum-management) docs to tune the vacuum for your workload. Tuning can minimize future risks of emergency vacuums. 
