@@ -4,7 +4,7 @@ import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
@@ -360,31 +360,24 @@ const DatabaseUsage = () => {
               isEntitlementLoading ||
               entitledFeatures.includes(chart.entitlement)
             return chartAvailable ? (
-              <Fragment key={chart.id}>
-                <LazyComposedChartHandler
-                  {...chart}
-                  attributes={chart.attributes as MultiAttribute[]}
-                  interval={selectedDateRange.interval}
-                  startDate={selectedDateRange?.period_start?.date}
-                  endDate={selectedDateRange?.period_end?.date}
-                  updateDateRange={updateDateRange}
-                  defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
-                  syncId="database-charts"
-                  showMaxValue={
-                    chart.id === 'client-connections' ||
-                    chart.id === 'client-connections-basic' ||
-                    chart.id === 'pgbouncer-connections'
-                      ? true
-                      : chart.showMaxValue
-                  }
-                />
-                {chart.id === 'disk-size' && canShowUndoLogSize && (
-                  <OrioleDbUndoLogSize
-                    projectRef={project.ref}
-                    connectionString={project.connectionString}
-                  />
-                )}
-              </Fragment>
+              <LazyComposedChartHandler
+                key={chart.id}
+                {...chart}
+                attributes={chart.attributes as MultiAttribute[]}
+                interval={selectedDateRange.interval}
+                startDate={selectedDateRange?.period_start?.date}
+                endDate={selectedDateRange?.period_end?.date}
+                updateDateRange={updateDateRange}
+                defaultChartStyle={chart.defaultChartStyle as 'line' | 'bar' | 'stackedAreaLine'}
+                syncId="database-charts"
+                showMaxValue={
+                  chart.id === 'client-connections' ||
+                  chart.id === 'client-connections-basic' ||
+                  chart.id === 'pgbouncer-connections'
+                    ? true
+                    : chart.showMaxValue
+                }
+              />
             ) : (
               <ReportChartUpsell
                 key={chart.id}
@@ -446,6 +439,13 @@ const DatabaseUsage = () => {
                       {currentDiskSize} GB
                     </span>
                   </div>
+
+                  {canShowUndoLogSize && (
+                    <OrioleDbUndoLogSize
+                      projectRef={project.ref}
+                      connectionString={project.connectionString}
+                    />
+                  )}
 
                   <div className="ml-auto">
                     {/* 

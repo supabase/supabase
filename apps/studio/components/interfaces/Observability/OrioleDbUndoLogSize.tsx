@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { InfoIcon } from 'lucide-react'
-import { Button, Card, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -26,8 +26,8 @@ export const OrioleDbUndoLogSize = ({ projectRef, connectionString }: OrioleDbUn
   if (data === null) return null
 
   return (
-    <Card className="flex items-center justify-between gap-4 px-card py-4">
-      <div className="flex items-center gap-2 text-sm">
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-2 text-sm text-foreground-light">
         <span>Undo log size</span>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -42,13 +42,14 @@ export const OrioleDbUndoLogSize = ({ projectRef, connectionString }: OrioleDbUn
             Current size of OrioleDB undo log files, which can differ from allocated disk space.
           </TooltipContent>
         </Tooltip>
-        <span className="text-xs text-foreground-lighter">Current</span>
       </div>
       {isPending ? (
         <ShimmeringLoader className="h-5 w-20" />
       ) : (
-        <span className="text-sm tabular-nums">{formatBytes(data, 2)}</span>
+        <span className="text-lg font-semibold text-foreground tabular-nums">
+          {formatBytes(data, 2)}
+        </span>
       )}
-    </Card>
+    </div>
   )
 }

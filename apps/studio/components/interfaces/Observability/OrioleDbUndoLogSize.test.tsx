@@ -29,7 +29,8 @@ describe('OrioleDbUndoLogSize', () => {
     customRender(<OrioleDbUndoLogSize projectRef="default" />)
 
     expect(await screen.findByText(formattedSize)).toBeInTheDocument()
-    expect(screen.getByText('Current')).toBeInTheDocument()
+    expect(screen.getByText('Undo log size')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'About undo log size' })).toBeInTheDocument()
   })
 
   test('hides the metric when the function is unavailable', async () => {
