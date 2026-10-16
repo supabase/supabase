@@ -21,7 +21,6 @@ import { PipelineDestinationReview } from './PipelineDestinationReview'
 import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
 import {
-  CONNECTION_VALIDATION_HINT,
   PipelineValidationAdmonition,
   SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
@@ -168,11 +167,7 @@ export const PipelineCreationFlow = ({
                     {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
                     {type === 'ClickHouse' && <ClickHouseFields form={form} editMode={false} />}
                   </PipelineConnectionSection>
-                  <PipelineValidationAdmonition
-                    failures={failures}
-                    stale={isResultStale}
-                    hint={CONNECTION_VALIDATION_HINT}
-                  />
+                  <PipelineValidationAdmonition failures={failures} stale={isResultStale} />
                   {isConnectionVerified && failures.length === 0 && (
                     <Admonition
                       type="success"

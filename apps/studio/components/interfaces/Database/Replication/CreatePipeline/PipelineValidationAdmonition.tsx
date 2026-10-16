@@ -7,9 +7,6 @@ import type { ValidationFailure } from '@/data/replication/validate-destination-
 export const SANDWICHED_ADMONITION_CLASS =
   'mb-0 rounded-none border-x-0 border-t border-b-0 border-default'
 
-export const CONNECTION_VALIDATION_HINT =
-  'Check the destination credentials and connection settings, including Advanced settings.'
-
 export const DATA_VALIDATION_HINT =
   'Some issues may require changes to the project’s database settings.'
 
@@ -79,17 +76,18 @@ export const PipelineValidationAdmonition = forwardRef<
                   : ''}
               </p>
             ) : null}
-            <Markdown className="text-sm text-foreground-light" components={{ p: InlineParagraph }}>
+            <Markdown
+              className="inline text-sm text-foreground-light"
+              components={{ p: InlineParagraph }}
+            >
               {failure.reason}
             </Markdown>
+            {stale && index === failures.length - 1 && (
+              <span className="text-sm text-foreground-light">Settings changed. Test again.</span>
+            )}
           </div>
         ))}
       </div>
-      {stale ? (
-        <p className="mt-2 mb-0! text-sm text-foreground-light">
-          Settings changed. Test the connection again.
-        </p>
-      ) : null}
       {hint ? <p className="mt-2 mb-0! text-sm text-foreground-light">{hint}</p> : null}
     </Admonition>
   )

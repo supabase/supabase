@@ -126,7 +126,7 @@ describe('PipelineCreationFlow', () => {
       target: { value: 'retry-project' },
     })
     expect(screen.getByText('Try again')).toBeInTheDocument()
-    expect(screen.getByText('Settings changed. Test the connection again.')).toBeInTheDocument()
+    expect(screen.getByText('Settings changed. Test again.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     expect(await screen.findByText('Check credentials')).toBeInTheDocument()
     await waitFor(() =>
@@ -144,7 +144,7 @@ describe('PipelineCreationFlow', () => {
     })
     expect(screen.getByRole('button', { name: 'Test connection' })).toBeInTheDocument()
     expect(screen.getByText('Check credentials')).toBeInTheDocument()
-    expect(screen.getByText('Settings changed. Test the connection again.')).toBeInTheDocument()
+    expect(screen.getByText('Settings changed. Test again.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'changed-during-test' },

@@ -93,7 +93,7 @@ test('renders API headings unchanged and uses compact prose without a redundant 
   expect(screen.getByText('The dataset was not found.').parentElement).toHaveTextContent(
     'The dataset was not found. Check the project and dataset names.'
   )
-  expect(screen.getByText('Settings changed. Test the connection again.')).toBeInTheDocument()
+  expect(screen.getByText('Settings changed. Test again.')).toBeInTheDocument()
   expect(screen.queryByRole('list')).not.toBeInTheDocument()
 })
 
