@@ -3,58 +3,61 @@ import { describe, expect, it } from 'vitest'
 import { computeYAxisDomain, normalizeStackedSeriesData } from './Charts.utils'
 
 const IOPS_DATA = [
-  { timestamp: 1, disk_iops_write: 1200, disk_iops_read: 24203, disk_iops_max: 25000 },
-  { timestamp: 2, disk_iops_write: 400, disk_iops_read: 3200, disk_iops_max: 25000 },
-  { timestamp: 3, disk_iops_write: 100, disk_iops_read: 900, disk_iops_max: 25000 },
+  { timestamp: 1, disk_iops_write: 40, disk_iops_read: 80, disk_iops_max: 100 },
+  { timestamp: 2, disk_iops_write: 10, disk_iops_read: 20, disk_iops_max: 100 },
+  { timestamp: 3, disk_iops_write: 5, disk_iops_read: 5, disk_iops_max: 100 },
 ]
 
 const IOPS_VISIBLE = ['disk_iops_write', 'disk_iops_read']
 
 describe('computeYAxisDomain', () => {
-  describe('reference zones', () => {
+  describe('memory commitment axis', () => {
     const GIB = 1024 ** 3
-    const zoneOptions = {
+    const memoryBelowCapacity = {
       isPercentage: false,
       showMaxValue: false,
-      yMaxFromVisible: 2.05 * GIB,
-      referenceZoneMax: 5.59 * GIB,
+      yMaxFromVisible: 2 * GIB,
+      referenceZoneMax: 8 * GIB,
       maxAttributeKey: undefined,
       showMaxLine: false,
-      data: [{ ram_commit_used: 2.05 * GIB }],
+      data: [{ ram_commit_used: 2 * GIB }],
       visibleAttributeNames: ['ram_commit_used'],
     }
 
-    it('includes the highest zone bound when stacked metrics are below the zones', () => {
-      expect(computeYAxisDomain(zoneOptions)).toEqual([0, 5.59 * GIB])
+    it('shows the full 8 GiB capacity when only 2 GiB is committed', () => {
+      expect(computeYAxisDomain(memoryBelowCapacity)).toEqual([0, 8 * GIB])
     })
 
-    it('keeps the zones visible when every metric is hidden', () => {
-      expect(computeYAxisDomain({ ...zoneOptions, visibleAttributeNames: [] })).toEqual([
+    it('keeps the full capacity visible when the committed series is hidden', () => {
+      expect(computeYAxisDomain({ ...memoryBelowCapacity, visibleAttributeNames: [] })).toEqual([
         0,
-        5.59 * GIB,
+        8 * GIB,
       ])
     })
 
-    it('includes metric totals that exceed the zones', () => {
+    it('expands beyond capacity when stacked commitments reach 10 GiB', () => {
       expect(
         computeYAxisDomain({
-          ...zoneOptions,
-          data: [{ ram_commit_used: 7 * GIB, additional_memory: GIB }],
+          ...memoryBelowCapacity,
+          data: [{ ram_commit_used: 9 * GIB, additional_memory: GIB }],
           visibleAttributeNames: ['ram_commit_used', 'additional_memory'],
         })
-      ).toEqual([0, 8 * GIB])
+      ).toEqual([0, 10 * GIB])
     })
 
     it.each([0, Number.NaN, Infinity, -1])(
-      'ignores invalid zone bounds: %s',
+      'uses automatic scaling when capacity is unavailable or invalid: %s',
       (referenceZoneMax) => {
-        expect(computeYAxisDomain({ ...zoneOptions, referenceZoneMax })).toEqual(['auto', 'auto'])
+        expect(computeYAxisDomain({ ...memoryBelowCapacity, referenceZoneMax })).toEqual([
+          'auto',
+          'auto',
+        ])
       }
     )
   })
 
-  describe('percentage charts with max line hidden', () => {
-    it('returns [0, yMaxFromVisible] to zoom in on the data', () => {
+  describe('CPU percentage axis with the maximum hidden', () => {
+    it('scales from zero to the observed 75% instead of the 100% limit', () => {
       expect(
         computeYAxisDomain({
           isPercentage: true,
@@ -68,7 +71,7 @@ describe('computeYAxisDomain', () => {
       ).toEqual([0, 75])
     })
 
-    it('still zooms in even when a maxAttributeKey is present', () => {
+    it('keeps the observed 60% scale even when the maximum series exists', () => {
       expect(
         computeYAxisDomain({
           isPercentage: true,
@@ -83,13 +86,13 @@ describe('computeYAxisDomain', () => {
     })
   })
 
-  describe('no max reference line', () => {
-    it('returns auto when maxAttributeKey is undefined', () => {
+  describe('disk operations without a visible limit', () => {
+    it('uses automatic scaling when no limit metric is configured', () => {
       expect(
         computeYAxisDomain({
           isPercentage: false,
           showMaxValue: false,
-          yMaxFromVisible: 5000,
+          yMaxFromVisible: 80,
           maxAttributeKey: undefined,
           showMaxLine: false,
           data: IOPS_DATA,
@@ -98,12 +101,12 @@ describe('computeYAxisDomain', () => {
       ).toEqual(['auto', 'auto'])
     })
 
-    it('returns auto when showMaxLine is false', () => {
+    it('uses automatic scaling when the limit line is hidden', () => {
       expect(
         computeYAxisDomain({
           isPercentage: false,
           showMaxValue: true,
-          yMaxFromVisible: 5000,
+          yMaxFromVisible: 80,
           maxAttributeKey: 'disk_iops_max',
           showMaxLine: false,
           data: IOPS_DATA,
@@ -113,14 +116,14 @@ describe('computeYAxisDomain', () => {
     })
   })
 
-  describe('max reference line not yet loaded (value is 0)', () => {
-    it('returns auto when diskConfig has not loaded and reference line value is 0', () => {
+  describe('disk operations before the limit loads', () => {
+    it('uses automatic scaling while the limit is zero', () => {
       const dataWithZeroMax = IOPS_DATA.map((p) => ({ ...p, disk_iops_max: 0 }))
       expect(
         computeYAxisDomain({
           isPercentage: false,
           showMaxValue: true,
-          yMaxFromVisible: 5000,
+          yMaxFromVisible: 80,
           maxAttributeKey: 'disk_iops_max',
           showMaxLine: true,
           data: dataWithZeroMax,
@@ -130,54 +133,39 @@ describe('computeYAxisDomain', () => {
     })
   })
 
-  describe('explicit domain with reference line', () => {
-    it('uses the reference line value when bars stay below it', () => {
-      // All stacked bar totals (1000, 500) are well below maxRefValue (25000)
+  describe('charts with a visible limit', () => {
+    it('shows the 100-operation limit when stacked reads and writes stay below it', () => {
       expect(
         computeYAxisDomain({
           isPercentage: false,
           showMaxValue: true,
-          yMaxFromVisible: 800,
+          yMaxFromVisible: 40,
           maxAttributeKey: 'disk_iops_max',
           showMaxLine: true,
           data: [
-            { disk_iops_write: 400, disk_iops_read: 600, disk_iops_max: 25000 },
-            { disk_iops_write: 200, disk_iops_read: 300, disk_iops_max: 25000 },
+            { disk_iops_write: 30, disk_iops_read: 40, disk_iops_max: 100 },
+            { disk_iops_write: 20, disk_iops_read: 30, disk_iops_max: 100 },
           ],
           visibleAttributeNames: IOPS_VISIBLE,
         })
-      ).toEqual([0, 25000])
+      ).toEqual([0, 100])
     })
 
-    it('uses the stacked bar total when it exceeds the reference line', () => {
-      // Stacked total at first point: 24203 + 1200 = 25403 > 25000
+    it('expands to 120 operations when 40 writes plus 80 reads exceed the 100-operation limit', () => {
       expect(
         computeYAxisDomain({
           isPercentage: false,
           showMaxValue: true,
-          yMaxFromVisible: 24203,
+          yMaxFromVisible: 80,
           maxAttributeKey: 'disk_iops_max',
           showMaxLine: true,
           data: IOPS_DATA,
           visibleAttributeNames: IOPS_VISIBLE,
         })
-      ).toEqual([0, 25403])
+      ).toEqual([0, 120])
     })
 
-    it('domain min is always 0', () => {
-      const [min] = computeYAxisDomain({
-        isPercentage: false,
-        showMaxValue: true,
-        yMaxFromVisible: 100,
-        maxAttributeKey: 'disk_iops_max',
-        showMaxLine: true,
-        data: IOPS_DATA,
-        visibleAttributeNames: IOPS_VISIBLE,
-      }) as [number, number]
-      expect(min).toBe(0)
-    })
-
-    it('works for database connections chart (single bar series, no stacking)', () => {
+    it('shows the 60-connection limit when one connection series peaks at 52', () => {
       const data = [
         { pg_stat_database_num_backends: 45, max_db_connections: 60 },
         { pg_stat_database_num_backends: 52, max_db_connections: 60 },
@@ -195,42 +183,43 @@ describe('computeYAxisDomain', () => {
       ).toEqual([0, 60])
     })
 
-    it('handles non-numeric values in data gracefully', () => {
+    it('ignores missing or invalid reads and writes without losing the limit', () => {
       const data = [
-        { disk_iops_write: 'bad', disk_iops_read: null, disk_iops_max: 25000 },
-        { disk_iops_write: 500, disk_iops_read: 1000, disk_iops_max: 25000 },
+        { disk_iops_write: 'bad', disk_iops_read: null, disk_iops_max: 100 },
+        { disk_iops_max: 100 },
+        { disk_iops_write: 20, disk_iops_read: 30, disk_iops_max: 100 },
       ]
       expect(
         computeYAxisDomain({
           isPercentage: false,
           showMaxValue: true,
-          yMaxFromVisible: 1000,
+          yMaxFromVisible: 30,
           maxAttributeKey: 'disk_iops_max',
           showMaxLine: true,
-          data: data as Record<string, unknown>[],
+          data,
           visibleAttributeNames: IOPS_VISIBLE,
         })
-      ).toEqual([0, 25000])
+      ).toEqual([0, 100])
     })
   })
 })
 
 describe('normalizeStackedSeriesData', () => {
-  it('normalizes each stacked point to 100%', () => {
+  it('converts a 1/1/4 CPU stack to percentages without rounding away fractional shares', () => {
     const normalized = normalizeStackedSeriesData({
-      data: [{ system: 25, user: 25, idle: 100 }],
+      data: [{ system: 1, user: 1, idle: 4 }],
       attributeNames: ['system', 'user', 'idle'],
     })
 
-    expect(normalized[0].system).toBeCloseTo(16.6666666667)
-    expect(normalized[0].user).toBeCloseTo(16.6666666667)
-    expect(normalized[0].idle).toBeCloseTo(66.6666666666)
+    expect(normalized[0].system).toBeCloseTo(100 / 6)
+    expect(normalized[0].user).toBeCloseTo(100 / 6)
+    expect(normalized[0].idle).toBeCloseTo(400 / 6)
     expect(
       Number(normalized[0].system) + Number(normalized[0].user) + Number(normalized[0].idle)
     ).toBeCloseTo(100)
   })
 
-  it('leaves empty stacks unchanged', () => {
+  it('keeps a zero-usage stack at zero instead of dividing by zero', () => {
     const empty = [{ system: 0, user: 0, idle: 0 }]
 
     expect(
@@ -241,7 +230,7 @@ describe('normalizeStackedSeriesData', () => {
     ).toEqual(empty)
   })
 
-  it('leaves data unchanged when attributeNames is empty', () => {
+  it('keeps raw values when no series are selected for normalization', () => {
     const data = [{ system: 50, user: 30, timestamp: 1000 }]
 
     expect(
@@ -252,7 +241,7 @@ describe('normalizeStackedSeriesData', () => {
     ).toEqual(data)
   })
 
-  it('preserves non-stacked keys (timestamps, metadata) unchanged', () => {
+  it('preserves timestamps while converting selected series to percentages', () => {
     const data = [{ system: 60, user: 80, period_start: '2024-01-01', timestamp: 1000 }]
     const normalized = normalizeStackedSeriesData({
       data,
