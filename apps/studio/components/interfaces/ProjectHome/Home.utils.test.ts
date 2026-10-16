@@ -4,15 +4,16 @@ import { mergeSectionOrder } from './Home.utils'
 
 describe('mergeSectionOrder', () => {
   it('returns stored order unchanged when it matches defaults', () => {
-    const stored = ['connect', 'usage', 'advisor', 'custom-report']
+    const stored = ['connect', 'usage', 'advisor', 'database-health', 'custom-report']
     expect(mergeSectionOrder(stored)).toBe(stored)
   })
 
   it('inserts missing sections at their default-relative position', () => {
-    expect(mergeSectionOrder(['usage', 'advisor', 'custom-report'])).toEqual([
+    expect(mergeSectionOrder(['usage', 'advisor', 'database-health', 'custom-report'])).toEqual([
       'connect',
       'usage',
       'advisor',
+      'database-health',
       'custom-report',
     ])
   })
@@ -22,22 +23,27 @@ describe('mergeSectionOrder', () => {
       'advisor',
       'connect',
       'usage',
+      'database-health',
       'custom-report',
     ])
   })
 
   it('strips unknown sections from stored order', () => {
-    expect(mergeSectionOrder(['usage', 'deleted-section', 'advisor', 'custom-report'])).toEqual([
-      'connect',
-      'usage',
-      'advisor',
-      'custom-report',
-    ])
+    expect(
+      mergeSectionOrder(['usage', 'deleted-section', 'advisor', 'database-health', 'custom-report'])
+    ).toEqual(['connect', 'usage', 'advisor', 'database-health', 'custom-report'])
   })
 
   it('strips legacy getting-started from stored order', () => {
     expect(
-      mergeSectionOrder(['connect', 'getting-started', 'usage', 'advisor', 'custom-report'])
-    ).toEqual(['connect', 'usage', 'advisor', 'custom-report'])
+      mergeSectionOrder([
+        'connect',
+        'getting-started',
+        'usage',
+        'advisor',
+        'database-health',
+        'custom-report',
+      ])
+    ).toEqual(['connect', 'usage', 'advisor', 'database-health', 'custom-report'])
   })
 })
