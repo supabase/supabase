@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronDown } from 'lucide-react'
-import { Fragment, useState, useSyncExternalStore } from 'react'
+import { Fragment, useId, useState, useSyncExternalStore } from 'react'
 import {
   Button,
   cn,
@@ -24,8 +24,10 @@ import {
 } from '../lib/guides'
 import { bindRevealOnce, REVEAL_GROUP_CLASS, REVEAL_ITEM_CLASS, revealStyle } from '../lib/reveal'
 import { FORMAT_TOPICS, TOPICS, type Topic } from '../lib/topics'
+import { AsciiHoverText } from './AsciiHoverText'
 
 export interface GuideBrowserProps {
+  title: string
   guides: GuideSummary[]
   className?: string
 }
@@ -89,7 +91,8 @@ const setTopicInUrl = (topic: Topic | null) => {
   window.dispatchEvent(new Event(TOPIC_CHANGE_EVENT))
 }
 
-export const GuideBrowser = ({ guides, className }: GuideBrowserProps) => {
+export const GuideBrowser = ({ title, guides, className }: GuideBrowserProps) => {
+  const headingId = useId()
   const activeTopic = useSyncExternalStore(subscribeToTopic, getTopicFromUrl, getTopicOnServer)
   const visibleGuides = filterGuides({ guides, topic: activeTopic })
   const filterKey = activeTopic ?? ''
@@ -104,9 +107,15 @@ export const GuideBrowser = ({ guides, className }: GuideBrowserProps) => {
 
   return (
     <section
-      aria-label="All guides"
-      className={cn('mx-auto flex w-full max-w-6xl flex-col gap-10 px-6', className)}
+      aria-labelledby={headingId}
+      className={cn('mx-auto flex w-full max-w-6xl flex-col gap-8 px-6', className)}
     >
+      <h2
+        id={headingId}
+        className="m-0 font-sans! text-xl font-medium! tracking-title text-foreground"
+      >
+        <AsciiHoverText text={title} glyphClassName="after:text-foreground" />
+      </h2>
       <Tabs
         value={toTabValue(activeTopic)}
         onValueChange={handleTabChange}
@@ -262,7 +271,8 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
     <ul ref={bindRevealOnce} className={cn('m-0 flex list-none flex-col p-0', REVEAL_GROUP_CLASS)}>
       {guides.map((guide, index) => (
         <li
-          key={guide.id}
+          // guide and troubleshooting slugs can be the same. hrefs are unique
+          key={guide.href}
           style={revealStyle(index % PAGE_SIZE)}
           className={cn(
             'border-b border-dashed border-muted last:border-b-0 transition-colors',
