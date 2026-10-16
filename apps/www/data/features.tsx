@@ -3040,6 +3040,45 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     },
   },
   {
+    title: 'Enterprise-Managed Auth for MCP',
+    subtitle: 'Decide which MCP clients your employees can connect to Supabase.',
+    description: `
+Enterprise-Managed Auth for MCP puts your company in control of MCP access to Supabase. An org owner or admin approves each MCP client once, and your identity provider decides which employees can use it. Employees who sign in to Claude find Supabase ready to use, with the Supabase role they already have. Nobody needs an owner role or a shared personal access token.
+
+## Key benefits
+1. Approve once for the whole organization: An org owner or admin connects Claude to Supabase once and approves it for the organization. After that, members never see a consent screen.
+2. Developers keep their own role: Developer and read-only members get working MCP access with the permissions they already hold, so nobody needs an owner role to use Claude.
+3. Stay within existing permissions: Access is always scoped to the signed-in member, so an MCP client can do nothing that person could not already do under their own account.
+4. Revoke from one place: The connection shows under Authorized Apps, where an owner or admin reviews or revokes it for the whole organization, or removes a member to cut off one person.
+5. No token to manage: Access follows your SSO sign-in and tokens expire on their own, so nobody creates, shares, or rotates a personal access token.
+6. Built on the open MCP extension: Supabase implements the MCP Enterprise-Managed Authorization extension, so your security review covers one published standard instead of a custom integration.
+
+## When to use Enterprise-Managed Auth for MCP
+- Only owners can authorize the connection, so your team shares personal access tokens to get Claude connected (one org-wide authorization, each member keeps their own role)
+- Your security policy says AI tool access must be granted and revoked at the identity provider (access follows SSO; revoke under Authorized Apps or by removing the member)
+- A security review of AI tool usage needs one enforced policy instead of individual grants nobody has pruned (access scoped to existing permissions)
+
+## How it works
+A member signs in to Claude through your existing SSO. Claude asks your identity provider for a short-lived identity assertion for Supabase. Your identity provider checks its own policy first. Supabase then exchanges that assertion for a short-lived access token bound to the member. The token cannot be refreshed, so the exchange repeats when it expires, with no reconnect step for the user.
+
+## Get started
+An organization owner or admin opens the SSO page in organization settings, expands Advanced settings, and enters the identity provider's ID-JAG Issuer URL. An owner or admin then connects Claude to Supabase once and approves it for the organization. The connection then shows up under Authorized Apps where it can be reviewed or revoked.
+
+Requires a Supabase Team or Enterprise plan with SSO configured, an identity provider that issues ID-JAGs (Okta today), and a Claude Team or Enterprise plan.
+`,
+    icon: ShieldCheck,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage:
+      '/images/blog/2026-08-24-enterprise-managed-auth-for-the-supabase-mcp-server/thumb.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authentication',
+    blogUrl: 'https://supabase.com/blog/enterprise-managed-auth-for-the-supabase-mcp-server',
+    slug: 'enterprise-managed-auth-for-mcp',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
     title: 'Declarative Schemas',
     subtitle: 'Keep your schema in SQL files and let the CLI write the migrations.',
     description: `
