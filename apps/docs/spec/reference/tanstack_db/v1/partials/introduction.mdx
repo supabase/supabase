@@ -3,20 +3,20 @@ id: introduction
 title: Introduction
 ---
 
-`@supabase-labs/tanstack-db` syncs [TanStack DB](https://tanstack.com/db) collections with Postgres through Supabase. It gives you reactive, optimistically updated client state with no manual cache invalidation: components re-render when the underlying data changes, and mutations apply to the UI immediately, rolling back if the server rejects them.
+`@supabase-labs/tanstack-db` syncs [TanStack DB](https://tanstack.com/db) collections with Postgres through Supabase. Components re-render when the underlying data changes, with no manual cache invalidation. Mutations apply to the UI immediately and roll back if the server rejects them.
 
-Collections work with an existing Supabase project and respect Row Level Security. No migrations required.
+Collections work with your Supabase project as it is and respect Row Level Security. No migration is required.
 
-See it in action in the [example Todo app](https://todomvc-supabase-tanstack-db.vercel.app/).
+To see a working app, open the [example Todo app](https://todomvc-supabase-tanstack-db.vercel.app/).
 
 <Admonition type="note">
 
-TanStack DB also supports Vue, Angular, Solid, Svelte, and vanilla JavaScript. This guide uses React. For setup in other frameworks, see the [TanStack DB docs](https://tanstack.com/db/latest/docs/framework).
+The examples in this reference use React. TanStack DB also supports Vue, Angular, Solid, Svelte, and vanilla JavaScript. For setup in those frameworks, see the [TanStack DB framework docs](https://tanstack.com/db/latest/docs/framework).
 
 </Admonition>
 
 <Admonition type="caution" title="Experimental">
 
-`@supabase-labs/tanstack-db` is early (0.x). Realtime sync is still experimental and may use more Realtime messages than expected. Test with a spend cap, or set `realtime: false` on a collection to opt out. There's no SSR support yet.
+Realtime sync can use more Realtime messages than you expect, and `@supabase-labs/tanstack-db` is a 0.x release. Test with a spend cap, or set `realtime: false` on a collection to opt out. Collections fetch on the client. Server-side rendering (SSR) isn't supported.
 
 </Admonition>
