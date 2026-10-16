@@ -150,7 +150,7 @@ export const HomeHero = ({ guides, className }: HomeHeroProps) => {
   return (
     <Hero
       title="Knowledge base"
-      description="In-depth guides, tutorials, and explainers for best practices for Supabase databases"
+      description="In-depth guides, tutorials, troubleshooting, and explainers for best practices for Supabase"
       guides={guides}
       className={className}
     >
