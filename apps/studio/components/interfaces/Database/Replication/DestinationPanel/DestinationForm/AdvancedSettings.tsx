@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useFormState, type UseFormReturn } from 'react-hook-form'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
@@ -23,10 +23,13 @@ export const AdvancedSettings = ({
 }) => {
   const [expanded, setExpanded] = useState('')
   const { errors } = useFormState({ control: form.control })
-  const hasAdvancedErrors =
-    (type === 'BigQuery' && !!(errors.connectionPoolSize || errors.maxStalenessMins)) ||
-    (type === 'DuckLake' && !!errors.ducklakePoolSize) ||
-    (type === 'Snowflake' && !!errors.snowflakeRole)
+  const advancedError =
+    (type === 'BigQuery' && (errors.connectionPoolSize || errors.maxStalenessMins)) ||
+    (type === 'DuckLake' && errors.ducklakePoolSize) ||
+    (type === 'Snowflake' && errors.snowflakeRole)
+  useEffect(() => {
+    if (revealInvalidSettings && advancedError) setExpanded('item-1')
+  }, [revealInvalidSettings, advancedError])
   const shouldShowConnection = group !== 'data'
   const shouldShowData = group !== 'connection'
   if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
@@ -40,12 +43,7 @@ export const AdvancedSettings = ({
 
   return (
     <div className={cn('w-full', group !== 'all' && 'border-t border-default')}>
-      <Accordion
-        type="single"
-        collapsible
-        value={revealInvalidSettings && hasAdvancedErrors ? 'item-1' : expanded}
-        onValueChange={setExpanded}
-      >
+      <Accordion type="single" collapsible value={expanded} onValueChange={setExpanded}>
         <AccordionItem value="item-1" className="border-none">
           <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">

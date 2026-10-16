@@ -114,6 +114,12 @@ describe('PipelineCreationFlow', () => {
     expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
     expect(requests).toHaveLength(0)
     expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    expect(
+      screen.queryByRole('spinbutton', { name: 'Connection pool size' })
+    ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
       target: { value: '5' },
     })
