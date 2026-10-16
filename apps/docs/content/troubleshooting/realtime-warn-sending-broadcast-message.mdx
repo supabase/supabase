@@ -80,7 +80,7 @@ Work through these checks before treating the warning as a partition problem:
 
 1. Look for connection errors in your project's Realtime logs, such as failures to validate a JWT signature.
 2. Join a channel with the [Realtime Inspector](/dashboard/project/_/realtime/inspector), which connects using your project's own keys. If the Inspector connects and your app does not, your app is sending a different key or a stale user session.
-3. If you rotated your JWT secret or migrated to asymmetric JWT signing keys, sessions issued before the change no longer validate. Existing clients need to sign out and re-authenticate to get a token signed with the current key.
+3. If you rotated your JWT secret or migrated to asymmetric [JWT signing keys](/docs/guides/auth/signing-keys), sessions issued before the change no longer validate. Existing clients need to sign out and re-authenticate to get a token signed with the current key.
 
 Once a client connects, the partitions are created and maintained again.
 
