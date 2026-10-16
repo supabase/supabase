@@ -4,16 +4,11 @@ import { AiTools } from '~/components/AiTools'
 import { Feedback } from '~/components/Feedback'
 import { isFeatureEnabled } from 'common'
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
 
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
-
-interface PreferredSourceQueue {
-  push: (callback: (preferredSource: { init: () => void }) => void) => void
-}
 
 interface TOCHeader {
   id?: string
@@ -37,36 +32,6 @@ const GuidesSidebar = ({
   const { toc } = useTocAnchors()
   const showFeedback = isFeatureEnabled('feedback:docs')
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
-  const preferredSourceRef = useRef<HTMLDivElement>(null)
-
-  // Google's script only renders buttons that exist when it loads, and this sidebar can be
-  // re-created after load, which wipes the rendered button. Create the buttons on mount and
-  // call init for them. React doesn't manage the children of this container, so they persist.
-  useEffect(() => {
-    const container = preferredSourceRef.current
-    if (!container) return
-
-    // The dark: variant also matches elements whose own data-theme contains "dark", so the
-    // theme-visibility classes live on wrappers and data-theme stays on the button containers.
-    const createButtonWrapper = (theme: 'light' | 'dark', wrapperClassName: string) => {
-      const wrapper = document.createElement('div')
-      wrapper.className = wrapperClassName
-      const button = document.createElement('div')
-      button.setAttribute('google-add-preferred-source-btn', '')
-      button.dataset.theme = theme
-      wrapper.appendChild(button)
-      return wrapper
-    }
-
-    container.replaceChildren(
-      createButtonWrapper('light', 'dark:hidden'),
-      createButtonWrapper('dark', 'hidden dark:block')
-    )
-
-    const win = window as Window & { PREFERRED_SOURCE?: PreferredSourceQueue | unknown[] }
-    const queue = (win.PREFERRED_SOURCE = win.PREFERRED_SOURCE || []) as PreferredSourceQueue
-    queue.push((preferredSource) => preferredSource.init())
-  }, [])
 
   return (
     <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
@@ -99,7 +64,27 @@ const GuidesSidebar = ({
             </TOCScrollArea>
           </Toc>
         )}
-        <div ref={preferredSourceRef} className="pl-5" />
+        <div className="pl-5">
+          <a
+            href="https://www.google.com/preferences/source?q=supabase.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-fit"
+          >
+            <img
+              src="/docs/img/icons/google-preferred-source-badge-light@2x.png"
+              alt="Add as preferred source on Google"
+              width={169}
+              className="dark:hidden"
+            />
+            <img
+              src="/docs/img/icons/google-preferred-source-badge-dark@2x.png"
+              alt="Add as preferred source on Google"
+              width={169}
+              className="hidden dark:block"
+            />
+          </a>
+        </div>
       </div>
     </div>
   )

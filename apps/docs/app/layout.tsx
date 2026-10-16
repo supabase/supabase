@@ -56,9 +56,6 @@ const viewport: Viewport = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`} suppressHydrationWarning>
-      <head>
-        <script async src="https://news.google.com/swg/js/v1/publisher.js"></script>
-      </head>
       <body>
         <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />
         <TelemetryTagManager />
