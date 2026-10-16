@@ -8,7 +8,7 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { convert } from 'markdown-for-agents'
+import { convert, createRule } from 'markdown-for-agents'
 import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import remarkStringify from 'remark-stringify'
@@ -27,6 +27,10 @@ const SECTIONS = ['guides', 'topics', 'troubleshooting']
 // Used to turn root-relative links into full URLs so the exported file still
 // makes sense read on its own.
 const SITE_ORIGIN = 'https://supabase.com'
+
+// Root-relative links under this path point at the docs app, so they're kept
+// as-is rather than being prefixed with the kb base path.
+const DOCS_PATH = '/docs'
 
 // Single processor reused for every file: parses GFM markdown to an mdast
 // tree and serializes it back, same extensions on both ends so nothing
@@ -59,6 +63,8 @@ export function getInternalLinkBaseUrl() {
  * the body to an mdast tree, visiting its `link` nodes, and serializing it
  * back — the AST equivalent of apps/docs' `addBaseUrlPrefix()`, so this file
  * still makes sense read outside of the site (no regex over the raw text).
+ * Links into /docs are left root-relative: that section is served from the
+ * docs app, not under this app's base path.
  *
  * @param {string} body
  */
@@ -68,6 +74,7 @@ export function absolutizeLinks(body) {
 
   visit(tree, 'link', (node) => {
     if (!node.url.startsWith('/') || node.url.startsWith('//')) return
+    if (node.url === DOCS_PATH || node.url.startsWith(`${DOCS_PATH}/`)) return
     const withBase =
       node.url === BASE_PATH || node.url.startsWith(`${BASE_PATH}/`)
         ? node.url
@@ -77,6 +84,46 @@ export function absolutizeLinks(body) {
 
   return String(processor.stringify(tree))
 }
+
+// Admonition labels (see TYPE_LABEL in packages/ui-patterns/src/Admonition)
+// mapped to the GitHub alert type that keeps the same meaning in markdown.
+const ALERT_TYPE_BY_LABEL = {
+  Note: 'NOTE',
+  Success: 'TIP',
+  Warning: 'WARNING',
+  Deprecated: 'WARNING',
+  Caution: 'CAUTION',
+  Danger: 'CAUTION',
+}
+
+function findDescendant(node, predicate) {
+  for (const child of node.children ?? []) {
+    if (predicate(child)) return child
+    const found = findDescendant(child, predicate)
+    if (found) return found
+  }
+  return undefined
+}
+
+// Rewrites the rendered <Admonition> (a `role="alert"` div carrying its label
+// in `aria-label`) as a GitHub alert blockquote, dropping the icon markup and
+// keeping only the body from its `alert-description` slot.
+const admonitionRule = createRule(
+  (node) => node.attribs?.['data-slot'] === 'alert' && node.attribs.role === 'alert',
+  ({ convertChildren, node }) => {
+    const type = ALERT_TYPE_BY_LABEL[node.attribs['aria-label']] ?? 'NOTE'
+    const description = findDescendant(
+      node,
+      (child) => child.attribs?.['data-slot'] === 'alert-description'
+    )
+    const body = convertChildren(description ?? node).trim()
+    const quoted = body
+      .split('\n')
+      .map((line) => (line ? `> ${line}` : '>'))
+      .join('\n')
+    return `\n\n> [!${type}]\n${quoted}\n\n`
+  }
+)
 
 /**
  * Splits the YAML frontmatter block that markdown-for-agents prepends (from
@@ -103,9 +150,18 @@ export function splitFrontmatter(markdown) {
  * @param {string} html
  */
 export function htmlToMarkdown(html) {
-  const { markdown } = convert(html, { extract: true })
+  const { markdown } = convert(html, { extract: true, rules: [admonitionRule] })
   const { frontmatter, body } = splitFrontmatter(markdown)
-  return `${frontmatter}${absolutizeLinks(body)}`
+  return `${frontmatter}${restoreAlertMarkers(absolutizeLinks(body))}`
+}
+
+// remark-stringify escapes the `[` in GitHub alert markers (`> [!NOTE]`),
+// which GitHub would then render as literal text, so put the marker back.
+// Only the five alert types at the start of a blockquote line are touched.
+const ESCAPED_ALERT_MARKER = /^(>\s*)\\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/gm
+
+function restoreAlertMarkers(markdown) {
+  return markdown.replace(ESCAPED_ALERT_MARKER, '$1[!$2]')
 }
 
 /**

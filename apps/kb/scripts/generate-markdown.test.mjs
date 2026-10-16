@@ -53,6 +53,53 @@ describe('toMarkdownPath', () => {
   })
 })
 
+// Mirrors the markup <Admonition> renders (packages/ui-patterns), with the
+// class lists and icon path trimmed to keep the fixture readable.
+function admonitionHtml(label, bodyHtml) {
+  return `<div data-slot="alert" role="alert" class="relative w-full rounded-lg border p-4" aria-label="${label}"><div class="flex items-start gap-3"><span class="inline-flex"><svg viewBox="0 0 21 20" aria-hidden="true"><path d="M0 0"></path></svg></span><div class="min-w-0 flex-1 flex flex-col"><div class="mt-0.5"><div data-slot="alert-description" class="text-sm">${bodyHtml}</div></div></div></div></div>`
+}
+
+describe('htmlToMarkdown callouts', () => {
+  const ORIGINAL_ENV = process.env
+
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
+  })
+
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
+  })
+
+  it('converts a Note admonition into a GitHub NOTE alert and drops the icon', () => {
+    const markdown = htmlToMarkdown(
+      `<main><article>${admonitionHtml('Note', '<p>Body of the note.</p>')}</article></main>`
+    )
+
+    expect(markdown).toContain('> [!NOTE]\n> Body of the note.')
+    expect(markdown).not.toContain('<svg')
+    expect(markdown).not.toContain('aria-label')
+  })
+
+  it('keeps multi-paragraph and bulleted callout bodies inside the blockquote', () => {
+    const markdown = htmlToMarkdown(
+      `<main><article>${admonitionHtml('Caution', '<p><strong>Heads up</strong></p><p>Second paragraph.</p><ul><li>First</li></ul>')}</article></main>`
+    )
+
+    expect(markdown).toContain('> [!CAUTION]\n> **Heads up**\n>\n> Second paragraph.')
+    expect(markdown).toContain('> - First')
+  })
+
+  it('maps the other Admonition labels onto their closest GitHub alert type', () => {
+    const markdown = htmlToMarkdown(
+      `<main><article>${admonitionHtml('Success', '<p>Tip body.</p>')}${admonitionHtml('Warning', '<p>Warn body.</p>')}${admonitionHtml('Danger', '<p>Danger body.</p>')}</article></main>`
+    )
+
+    expect(markdown).toContain('> [!TIP]\n> Tip body.')
+    expect(markdown).toContain('> [!WARNING]\n> Warn body.')
+    expect(markdown).toContain('> [!CAUTION]\n> Danger body.')
+  })
+})
+
 describe('htmlToMarkdown', () => {
   const ORIGINAL_ENV = process.env
 
@@ -147,6 +194,18 @@ describe('absolutizeLinks', () => {
   it('does not double up the base path when a link already includes it', () => {
     expect(absolutizeLinks('[another guide](/kb/guides/other-guide)')).toBe(
       '[another guide](https://supabase.com/kb/guides/other-guide)\n'
+    )
+  })
+
+  it('leaves root-relative links into /docs untouched', () => {
+    expect(absolutizeLinks('[reference](/docs/reference/javascript/auth-updateuser)')).toBe(
+      '[reference](/docs/reference/javascript/auth-updateuser)\n'
+    )
+  })
+
+  it('does not treat a path that merely starts with "docs" as a /docs link', () => {
+    expect(absolutizeLinks('[docsy](/docsy/page)')).toBe(
+      '[docsy](https://supabase.com/kb/docsy/page)\n'
     )
   })
 
