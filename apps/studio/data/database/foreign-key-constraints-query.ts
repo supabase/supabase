@@ -2,6 +2,7 @@ import { getForeignKeyConstraintsSql } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
+import { parsePostgresIdentifierArray } from './foreign-key-constraints-query.utils'
 import { databaseKeys } from './keys'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -67,8 +68,8 @@ export async function getForeignKeyConstraints(
   return (result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
     return {
       ...foreignKey,
-      source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
-      target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
+      source_columns: parsePostgresIdentifierArray(foreignKey.source_columns),
+      target_columns: parsePostgresIdentifierArray(foreignKey.target_columns),
     }
   }) as ForeignKeyConstraint[]
 }
