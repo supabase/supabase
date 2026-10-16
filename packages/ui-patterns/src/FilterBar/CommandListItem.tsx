@@ -31,7 +31,7 @@ export function CommandListItem({
         if (!item.disabled) onSelect(item)
       }}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs select-none outline-hidden',
+        'relative flex items-center justify-between gap-2 px-2 h-[28px] rounded-item text-xs select-none outline-hidden',
         item.disabled ? 'text-muted' : 'text-foreground cursor-pointer',
         isHighlighted && 'bg-overlay-hover',
         !isHighlighted && !item.disabled && 'hover:bg-surface-200'

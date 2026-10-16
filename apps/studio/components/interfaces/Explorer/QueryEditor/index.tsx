@@ -2,7 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import type { ExplorerQueryLocation } from 'common/telemetry-constants'
-import { CodeSquare, Eye, EyeOff } from 'lucide-react'
+import { CodeSquareIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
@@ -478,6 +478,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
           options={{
             minimap: { enabled: false },
             padding: { top: 8 },
+            scrollBeyondLastLine: true,
           }}
           onInputChange={(value) => onSqlChange(value ?? '')}
           onMount={(editor, monaco) => {
@@ -575,7 +576,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <Shell className={className}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
-            <CodeSquare size={16} strokeWidth={2} />
+            <CodeSquareIcon size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
           {variant === 'viewport' ? (
             <ExplorerToolbarTitle className="text-muted text-xs italic">
@@ -610,7 +611,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             )}
             <ExplorerToolbarAction
               icon={
-                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+                showQuery ? (
+                  <EyeOffIcon size={16} strokeWidth={2} />
+                ) : (
+                  <EyeIcon size={16} strokeWidth={2} />
+                )
               }
               disabled={pendingProposal !== null}
               tooltip={showQuery ? 'Hide query' : 'Show query'}

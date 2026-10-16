@@ -10,10 +10,14 @@ import type { StorageItem } from '@/components/interfaces/Storage/Storage.types'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
+  describeUploadFailure,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getReplaceableFileNames,
   getStorageExplorerUrlForItem,
+  getStorageItemPath,
   getStoragePathForItem,
+  getUploadNameConflicts,
   parseStoragePath,
   sanitizeNameForDuplicateInColumn,
   serializeStoragePath,
@@ -212,6 +216,31 @@ describe('sanitizeNameForDuplicateInColumn', () => {
     expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt' })).toBe('file.txt')
   })
 
+  describe('reservedNames', () => {
+    it('treats a reserved name as taken even though no column holds it', () => {
+      const state = makeState([[{ name: 'other.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, {
+          name: 'file.txt',
+          autofix: true,
+          reservedNames: ['file.txt'],
+        })
+      ).toBe('file (1).txt')
+    })
+
+    it('matches a reserved name case-insensitively, like a column name', () => {
+      const state = makeState([[{ name: 'other.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', reservedNames: ['FILE.TXT'] })
+      ).toBeNull()
+    })
+
+    it('leaves callers that pass none exactly as they were', () => {
+      const state = makeState([[{ name: 'file.txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'other.txt' })).toBe('other.txt')
+    })
+  })
+
   describe('columnIndex', () => {
     // Two-column state: col 0 has 'file.txt', col 1 has 'other.txt'
     const state = makeState([[{ name: 'file.txt' }], [{ name: 'other.txt' }]])
@@ -271,6 +300,19 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
         'file (2).txt'
       )
+    })
+
+    it('counts a reserved duplicate, so the suffix skips a name an archived file holds', () => {
+      // Without this the upload lands on `file (1).txt` and restores the archived file,
+      // which is exactly what picking "keep both" declined.
+      const state = makeState([[{ name: 'file.txt' }]])
+      expect(
+        sanitizeNameForDuplicateInColumn(state, {
+          name: 'file.txt',
+          autofix: true,
+          reservedNames: ['file (1).txt'],
+        })
+      ).toBe('file (2).txt')
     })
 
     it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {
@@ -450,5 +492,162 @@ describe('clipboard helpers', () => {
 
     onCopied?.()
     expect(toast.success).toHaveBeenCalledWith('Copied URL for "photo.png"')
+  })
+})
+
+describe('getStorageItemPath', () => {
+  const openedFolders = [makeFolder('images'), makeFolder('2024'), makeFolder('january')]
+
+  it('returns the bare name for an item at the bucket root', () => {
+    expect(getStorageItemPath({ openedFolders }, { name: 'avatar.png', columnIndex: 0 })).toBe(
+      'avatar.png'
+    )
+  })
+
+  it('prefixes the folders opened above the item', () => {
+    expect(getStorageItemPath({ openedFolders }, { name: 'avatar.png', columnIndex: 2 })).toBe(
+      'images/2024/avatar.png'
+    )
+  })
+
+  it('ignores folders opened below the item', () => {
+    // The user drilled into january, but the item sits in the 2024 column.
+    expect(getStorageItemPath({ openedFolders }, { name: 'notes.txt', columnIndex: 1 })).toBe(
+      'images/notes.txt'
+    )
+  })
+})
+
+describe('describeUploadFailure', () => {
+  it('names the allowed types when the bucket rejects the mime type', () => {
+    expect(
+      describeUploadFailure({
+        status: 415,
+        fallback: 'tus: unexpected response',
+        allowedMimeTypes: ['image/png', 'image/jpeg'],
+      })
+    ).toBe(
+      'that file type is not allowed in this bucket. Allowed MIME types: image/png, image/jpeg.'
+    )
+  })
+
+  it('omits the list when the bucket allows everything', () => {
+    expect(describeUploadFailure({ status: 415, fallback: 'tus: unexpected response' })).toBe(
+      'that file type is not allowed in this bucket.'
+    )
+  })
+
+  it('explains a size rejection', () => {
+    expect(describeUploadFailure({ status: 413, fallback: 'tus: unexpected response' })).toBe(
+      'the file exceeds the bucket file size limit.'
+    )
+  })
+
+  it('falls back to the raw message for anything else', () => {
+    expect(describeUploadFailure({ status: 500, fallback: 'network down' })).toBe('network down')
+    expect(describeUploadFailure({ fallback: 'network down' })).toBe('network down')
+  })
+})
+
+describe('getUploadNameConflicts', () => {
+  it('returns the names already taken in the destination', () => {
+    expect(
+      getUploadNameConflicts({
+        fileNames: ['photo.png', 'notes.txt'],
+        existingNames: ['photo.png', 'archive.zip'],
+      })
+    ).toEqual(['photo.png'])
+  })
+
+  it('matches case-insensitively, the way the rename fallback does', () => {
+    expect(
+      getUploadNameConflicts({ fileNames: ['Photo.PNG'], existingNames: ['photo.png'] })
+    ).toEqual(['Photo.PNG'])
+  })
+
+  it('returns nothing when every name is free', () => {
+    expect(
+      getUploadNameConflicts({ fileNames: ['photo.png'], existingNames: ['notes.txt'] })
+    ).toEqual([])
+    expect(getUploadNameConflicts({ fileNames: [], existingNames: ['photo.png'] })).toEqual([])
+  })
+
+  it('reports a name once even when it is uploaded twice', () => {
+    expect(
+      getUploadNameConflicts({
+        fileNames: ['photo.png', 'photo.png'],
+        existingNames: ['photo.png'],
+      })
+    ).toEqual(['photo.png'])
+  })
+})
+
+describe('getReplaceableFileNames', () => {
+  const file = (overrides: Partial<StorageItem>): StorageItem => ({
+    id: 'file-id',
+    name: 'file.txt',
+    type: STORAGE_ROW_TYPES.FILE,
+    status: STORAGE_ROW_STATUS.READY,
+    metadata: null,
+    isCorrupted: false,
+    created_at: null,
+    updated_at: null,
+    last_accessed_at: null,
+    ...overrides,
+  })
+
+  it('offers every file on an enabled bucket, where any replace keeps what it lands on', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt', is_versioned: true }), file({ name: 'b.txt' })],
+        versioningState: 'enabled',
+      })
+    ).toEqual(['a.txt', 'b.txt'])
+  })
+
+  it('offers only a pre-suspension file once the bucket is suspended', () => {
+    // Its replacement is unversioned, so the write after it retains nothing — which is why
+    // `b.txt`, written while suspended, is not worth asking about.
+    expect(
+      getReplaceableFileNames({
+        items: [
+          file({ name: 'a.txt', is_versioned: true }),
+          file({ name: 'b.txt', is_versioned: false }),
+        ],
+        versioningState: 'suspended',
+      })
+    ).toEqual(['a.txt'])
+  })
+
+  it('offers nothing on a suspended bucket when the flag is absent', () => {
+    // Nothing is promised that the write might not deliver; the upload renames instead.
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt' }), file({ name: 'b.txt', is_versioned: null })],
+        versioningState: 'suspended',
+      })
+    ).toEqual([])
+  })
+
+  it('offers nothing on a disabled bucket', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [file({ name: 'a.txt', is_versioned: true })],
+        versioningState: 'disabled',
+      })
+    ).toEqual([])
+  })
+
+  it('skips folders and rows being renamed', () => {
+    expect(
+      getReplaceableFileNames({
+        items: [
+          file({ name: 'folder', type: STORAGE_ROW_TYPES.FOLDER, id: null }),
+          file({ name: 'editing.txt', status: STORAGE_ROW_STATUS.EDITING }),
+          file({ name: 'a.txt' }),
+        ],
+        versioningState: 'enabled',
+      })
+    ).toEqual(['a.txt'])
   })
 })

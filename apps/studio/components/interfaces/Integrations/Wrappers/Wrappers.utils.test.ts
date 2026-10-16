@@ -51,7 +51,7 @@ describe('getWrapperCreationFormSchema', () => {
     expect(result.success).toEqual(false)
     // Common required field
     expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'wrapper_name'))
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'server_name'))
     ).toBeDefined()
     // Table mode specific field
     expect(
@@ -66,7 +66,7 @@ describe('getWrapperCreationFormSchema', () => {
     expect(result.success).toEqual(false)
     // Common required field
     expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'wrapper_name'))
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'server_name'))
     ).toBeDefined()
     // Schema mode specific field
     expect(
@@ -99,7 +99,7 @@ describe('getEditionFormSchema', () => {
     expect(result.success).toEqual(false)
     // Common required field
     expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'wrapper_name'))
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'server_name'))
     ).toBeDefined()
     expect(
       result.error?.issues.find((issue) => issue.path.some((p) => p === 'tables'))

@@ -116,7 +116,7 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
   )
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
     queryKey: tableRowKeys.tableRowsCount(projectRef, {

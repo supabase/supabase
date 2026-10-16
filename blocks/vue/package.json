@@ -23,10 +23,11 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "@typescript/native": "catalog:",
     "shadcn": "^4.0.0",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
-    "vite": "^7.3.2"
+    "vite": "^8.0.0"
   }
 }

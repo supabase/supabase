@@ -3,11 +3,10 @@
   "specifiers": {
     "jsr:@supabase/functions-js@2.108.2": "2.108.2",
     "npm:@modelcontextprotocol/server@2.0.0": "2.0.0",
-    "npm:@supabase/middleware@0.5.0": "0.5.0",
-    "npm:@supabase/server@1.6.0": "1.6.0_@supabase+supabase-js@2.108.2",
+    "npm:@supabase/middleware@1": "1.0.0",
+    "npm:@supabase/server@1": "1.9.0_@supabase+supabase-js@2.108.2",
     "npm:@supabase/supabase-js@2.108.2": "2.108.2",
-    "npm:openai@^4.52.5": "4.104.0_zod@4.4.3",
-    "npm:zod@4.4.3": "4.4.3"
+    "npm:openai@^4.52.5": "4.104.0"
   },
   "jsr": {
     "@supabase/functions-js@2.108.2": {
@@ -43,8 +42,8 @@
         "tslib"
       ]
     },
-    "@supabase/middleware@0.5.0": {
-      "integrity": "sha512-OjukUo+5p14zxTuylf2zVg1hZCHWKLO6VrZhtVeQQw09yrVo3GAduvFJPiFDhTAz/Du1ZfEzAR+s6aRAWD5wzQ==",
+    "@supabase/middleware@1.0.0": {
+      "integrity": "sha512-ecA+z/o5E9sB+quuupGt8d7QjrnD4BBwZr+Qthm0uj6CtL/+yvAUTDlknhGuTbUidvx5CxBHJ1R3H96UjDpgyg==",
       "dependencies": [
         "std-env"
       ]
@@ -65,8 +64,8 @@
         "tslib"
       ]
     },
-    "@supabase/server@1.6.0_@supabase+supabase-js@2.108.2": {
-      "integrity": "sha512-LtUkzUqUGip6I2+kvSmA04u3s+npwLseer2yomBnUdQ1zyJPtlgjAqbwsNuGC1DT/FHi1BvvJluI7dZVV2XdTw==",
+    "@supabase/server@1.9.0_@supabase+supabase-js@2.108.2": {
+      "integrity": "sha512-EhgfKFWjB6bCWy2UR2JdExnK+B8WBdwiG90+bLTt0GkdAuHZZSooNxOsn/fP3UlcXUNJ6xfAkYlvGzN8NUpz1w==",
       "dependencies": [
         "@supabase/middleware",
         "@supabase/supabase-js",
@@ -238,8 +237,8 @@
     "iceberg-js@0.8.1": {
       "integrity": "sha512-1dhVQZXhcHje7798IVM+xoo/1ZdVfzOMIc8/rgVSijRK38EDqOJoGula9N/8ZI5RD8QTxNQtK/Gozpr+qUqRRA=="
     },
-    "jose@6.2.10": {
-      "integrity": "sha512-iiW7J9qRFlGxvCOIBDBDxFePQSn7ZMAnrYGhrrOo6siO/MIqwfyilLR27pkfDgUk+raLuzADS8A3S/KLBisc0g=="
+    "jose@6.2.12": {
+      "integrity": "sha512-9NiFmJEex0sy2Dk58j2UGBSHgUs2ypF9eZSu4L6vjOX3Dp96Sw1F3uL+H+D1sx02jZZdzUT0HgvCy59CuvXcWw=="
     },
     "math-intrinsics@1.1.0": {
       "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g=="
@@ -266,7 +265,7 @@
         "whatwg-url"
       ]
     },
-    "openai@4.104.0_zod@4.4.3": {
+    "openai@4.104.0": {
       "integrity": "sha512-p99EFNsA/yX6UhVO93f5kJsDRLAg+CTA2RBqdHK4RtK8u5IJw32Hyb2dTGKbnnFmnuoBv5r7Z2CURI9sGZpSuA==",
       "dependencies": [
         "@types/node",
@@ -275,11 +274,7 @@
         "agentkeepalive",
         "form-data-encoder",
         "formdata-node",
-        "node-fetch",
-        "zod"
-      ],
-      "optionalPeers": [
-        "zod"
+        "node-fetch"
       ],
       "bin": true
     },
@@ -308,8 +303,8 @@
         "webidl-conversions"
       ]
     },
-    "zod@4.4.3": {
-      "integrity": "sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ=="
+    "zod@4.6.2": {
+      "integrity": "sha512-lh5RCAGFa1Cm2hjtNwLQhSs/AsqdWnTQaBER9fEwN/88pSh7KOtJavtBx/0VlkN/uFd61SwYmljLMDAsHlvzBQ=="
     }
   }
 }

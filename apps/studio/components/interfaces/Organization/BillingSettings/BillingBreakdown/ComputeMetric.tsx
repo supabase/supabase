@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
@@ -52,7 +52,7 @@ export const ComputeMetric = ({
               <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                 {metric.name}
               </p>
-              <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+              <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
             </div>
           </Link>
           <span className="text-sm">{usageLabel}</span>&nbsp;

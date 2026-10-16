@@ -44,6 +44,8 @@ Another process may be using the required ports. Check for:
 - Docker containers
 - Other development servers
 
+If the conflict comes from another Supabase project, run both projects at the same time with the experimental `supabase stack` commands. They assign each local project its own ports. Turn on the commands and remove the fixed ports from each project's `config.toml` first. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
+
 ### Deno cache issues
 
 Clear the Deno cache if you're experiencing module resolution problems:

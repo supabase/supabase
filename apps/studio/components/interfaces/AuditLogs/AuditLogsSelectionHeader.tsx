@@ -1,6 +1,6 @@
 import type { Table } from '@tanstack/react-table'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Copy, X } from 'lucide-react'
+import { CopyIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
@@ -30,7 +30,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
           animate={{ height: '40px', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 420, damping: 30, mass: 0.4 }}
-          className="px-10 flex items-center justify-between border-b bg-surface-75 w-full overflow-hidden absolute top-0 left-0 right-0 z-20"
+          className="pl-10 pr-4 flex items-center justify-between border-b bg-surface-75 w-full overflow-hidden absolute top-0 left-0 right-0 z-20"
         >
           <p className="text-xs">
             {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected
@@ -39,7 +39,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
           <div className="flex items-center justify-center gap-x-2">
             <ButtonTooltip
               size="tiny"
-              icon={<Copy size={12} />}
+              icon={<CopyIcon size={12} />}
               className="w-7"
               onClick={handleCopy}
               tooltip={{ content: { side: 'bottom', text: 'Copy selected logs' } }}
@@ -47,7 +47,7 @@ export const AuditLogsSelectionHeader = ({ table }: AuditLogsSelectionHeaderProp
             <ButtonTooltip
               size="tiny"
               variant="text"
-              icon={<X />}
+              icon={<XIcon />}
               className="px-1"
               onClick={() => table.resetRowSelection()}
               tooltip={{ content: { side: 'bottom', text: 'Clear selection' } }}

@@ -1,12 +1,12 @@
 import 'jsr:@supabase/functions-js@2.108.2/edge-runtime.d.ts'
 
 import { createMcpHandler, McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
-import { pipeline } from 'npm:@supabase/middleware@0.5.0'
+import { pipeline } from 'npm:@supabase/middleware@1'
 import {
   withOAuthProtectedResource,
   withSupabase,
   type SupabaseContext,
-} from 'npm:@supabase/server@1.6.0'
+} from 'npm:@supabase/server@1'
 
 import { registerTools, type ToolContext } from './tools/index.ts'
 
