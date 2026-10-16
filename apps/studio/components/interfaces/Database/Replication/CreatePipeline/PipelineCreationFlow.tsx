@@ -77,7 +77,7 @@ export const PipelineCreationFlow = ({
     confirmOnClose()
   }
   const { ref: projectRef } = useParams()
-  const { validateConnection, isValidating, isConnectionVerified, failures } =
+  const { validateConnection, isValidating, isConnectionVerified, failures, isResultStale } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
@@ -160,7 +160,7 @@ export const PipelineCreationFlow = ({
               )}
               {accessibleStep === 'connection' && (
                 <>
-                  <PipelineConnectionSection type={type} form={form}>
+                  <PipelineConnectionSection type={type} form={form} revealInvalidSettings>
                     {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
                     {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
                     {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
@@ -168,6 +168,7 @@ export const PipelineCreationFlow = ({
                   </PipelineConnectionSection>
                   <PipelineValidationAdmonition
                     failures={failures}
+                    stale={isResultStale}
                     hint={CONNECTION_VALIDATION_HINT}
                   />
                   {isConnectionVerified && failures.length === 0 && (

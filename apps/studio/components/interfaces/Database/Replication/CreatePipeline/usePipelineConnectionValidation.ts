@@ -25,14 +25,16 @@ export const usePipelineConnectionValidation = ({
   currentSnapshotRef.current = snapshot
   const [result, setResult] = useState<{
     snapshot: string
+    type: typeof type
     failures: ValidationFailure[]
     verified: boolean
   }>()
   const [isValidating, setIsValidating] = useState(false)
   const isValidatingRef = useRef(false)
   const { validateDestination } = useDestinationValidation({ projectRef, selectedType: type })
-  const currentResult = result?.snapshot === snapshot ? result : undefined
-  const isConnectionVerified = currentResult?.verified === true
+  const currentResult = result?.type === type ? result : undefined
+  const isResultStale = !!currentResult && currentResult.snapshot !== snapshot
+  const isConnectionVerified = !isResultStale && currentResult?.verified === true
 
   const validateConnection = async () => {
     if (isValidatingRef.current) return false
@@ -42,17 +44,7 @@ export const usePipelineConnectionValidation = ({
     if (issues.length > 0) {
       issues.forEach(({ path, message }) => form.setError(path, { type: 'validate', message }))
       form.setFocus(issues[0].path)
-      setResult({
-        snapshot,
-        verified: false,
-        failures: [
-          {
-            name: 'Check connection settings',
-            failure_type: 'critical',
-            reason: issues.map(({ message }) => message).join('\n\n'),
-          },
-        ],
-      })
+      setResult(undefined)
       return false
     }
     if (isConnectionVerified) return true
@@ -63,13 +55,14 @@ export const usePipelineConnectionValidation = ({
       const { validation_failures: failures } = await validateDestination({ data })
       if (currentSnapshotRef.current !== snapshot) return false
       const verified = !failures.some((failure) => failure.failure_type === 'critical')
-      setResult({ snapshot, failures, verified })
+      setResult({ snapshot, type, failures, verified })
       // Keep warnings visible for review; the next click acknowledges them.
       return false
     } catch (error) {
       if (currentSnapshotRef.current === snapshot) {
         setResult({
           snapshot,
+          type,
           verified: false,
           failures: [
             {
@@ -92,5 +85,6 @@ export const usePipelineConnectionValidation = ({
     isValidating,
     isConnectionVerified,
     failures: currentResult?.failures ?? [],
+    isResultStale,
   }
 }

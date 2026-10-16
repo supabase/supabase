@@ -105,13 +105,28 @@ describe('PipelineCreationFlow', () => {
       nuqs: { hasMemory: true },
     })
     next()
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+      target: { value: '-1' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
     expect(requests).toHaveLength(0)
+    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+      target: { value: '5' },
+    })
+    expect(screen.queryByText('Check connection settings')).not.toBeInTheDocument()
     fillConnection()
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
     expect(await screen.findByText('Try again')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'retry-project' },
+    })
+    expect(screen.getByText('Try again')).toBeInTheDocument()
+    expect(screen.getByText('Settings changed. Test the connection again.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     expect(await screen.findByText('Check credentials')).toBeInTheDocument()
     await waitFor(() =>
@@ -128,7 +143,8 @@ describe('PipelineCreationFlow', () => {
       target: { value: 'changed' },
     })
     expect(screen.getByRole('button', { name: 'Test connection' })).toBeInTheDocument()
-    expect(screen.queryByText('Check credentials')).not.toBeInTheDocument()
+    expect(screen.getByText('Check credentials')).toBeInTheDocument()
+    expect(screen.getByText('Settings changed. Test the connection again.')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'changed-during-test' },

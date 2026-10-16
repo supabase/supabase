@@ -1,20 +1,24 @@
-import { forwardRef, type ComponentRef } from 'react'
-import { Badge } from 'ui'
+import { forwardRef, type ComponentRef, type PropsWithChildren } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 export const SANDWICHED_ADMONITION_CLASS =
-  'mb-0 rounded-none border-x-0 border-t-0 border-b border-default'
+  'mb-0 rounded-none border-x-0 border-t border-b-0 border-default'
 
 export const CONNECTION_VALIDATION_HINT =
-  'Check destination credentials and connection settings, including Advanced settings under Destination connection.'
+  'Check the destination credentials and connection settings, including Advanced settings.'
 
 export const DATA_VALIDATION_HINT =
   'Some issues may require changes to the project’s database settings.'
 
 const GENERIC_WARNING_TITLES = new Set(['warning', 'warnings'])
+
+const formatHeading = (name: string) =>
+  name === 'BigQuery Dataset Not Found' ? 'BigQuery dataset not found' : name
+
+const InlineParagraph = ({ children }: PropsWithChildren) => <span>{children} </span>
 
 const getValidationHeading = ({
   failures,
@@ -28,12 +32,14 @@ const getValidationHeading = ({
   if (title) return title
 
   if (hasCritical) {
-    return failures.length === 1 ? failures[0].name : 'Configuration issues'
+    return failures.length === 1 ? formatHeading(failures[0].name) : 'Configuration issues'
   }
 
   if (failures.length === 1) {
     const { name } = failures[0]
-    return GENERIC_WARNING_TITLES.has(name.trim().toLowerCase()) ? 'Review before continuing' : name
+    return GENERIC_WARNING_TITLES.has(name.trim().toLowerCase())
+      ? 'Review before continuing'
+      : formatHeading(name)
   }
 
   return `${failures.length} warnings to review`
@@ -45,8 +51,9 @@ export const PipelineValidationAdmonition = forwardRef<
     failures: ValidationFailure[]
     title?: string
     hint?: string
+    stale?: boolean
   }
->(function PipelineValidationAdmonition({ failures, title, hint }, ref) {
+>(function PipelineValidationAdmonition({ failures, title, hint, stale = false }, ref) {
   if (failures.length === 0) return null
 
   const hasCritical = failures.some((failure) => failure.failure_type === 'critical')
@@ -60,27 +67,34 @@ export const PipelineValidationAdmonition = forwardRef<
       layout="responsive"
       className={SANDWICHED_ADMONITION_CLASS}
     >
-      {!hasCritical ? (
+      {!hasCritical && !stale ? (
         <p className="mb-2! text-sm text-foreground-light">
           Replication can start, but review these items before continuing. They may affect how
           changes are applied downstream.
         </p>
       ) : null}
-      <ul className="space-y-2">
+      <div className="space-y-2">
         {failures.map((failure, index) => (
-          <li key={`${failure.name}-${index}`}>
-            <Badge className="mb-1">
-              {failure.failure_type === 'critical' ? 'Required' : 'Warning'}
-            </Badge>
+          <div key={`${failure.name}-${index}`}>
             {failures.length > 1 ? (
-              <p className="mb-0.5! font-medium text-foreground">{failure.name}</p>
+              <p className="mb-0.5! font-medium text-foreground">
+                {formatHeading(failure.name)}
+                {hasCritical && failures.some((item) => item.failure_type === 'warning')
+                  ? ` (${failure.failure_type === 'critical' ? 'required' : 'warning'})`
+                  : ''}
+              </p>
             ) : null}
-            <Markdown className="text-sm text-foreground-light [&>p]:mb-0!">
+            <Markdown className="text-sm text-foreground-light" components={{ p: InlineParagraph }}>
               {failure.reason}
             </Markdown>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
+      {stale ? (
+        <p className="mt-2 mb-0! text-sm text-foreground-light">
+          Settings changed. Test the connection again.
+        </p>
+      ) : null}
       {hint ? <p className="mt-2 mb-0! text-sm text-foreground-light">{hint}</p> : null}
     </Admonition>
   )

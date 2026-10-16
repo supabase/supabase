@@ -57,7 +57,7 @@ test('shows critical issues without suggesting replication can start', () => {
   expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
 })
 
-test('distinguishes blockers and warnings in mixed results', () => {
+test('shows each issue without redundant severity badges', () => {
   customRender(
     <PipelineValidationAdmonition
       failures={[
@@ -66,6 +66,48 @@ test('distinguishes blockers and warnings in mixed results', () => {
       ]}
     />
   )
-  expect(screen.getByText('Required').closest('li')).toHaveTextContent('Replace the key.')
-  expect(screen.getByText('Warning').closest('li')).toHaveTextContent('Review table settings.')
+  expect(screen.getByText('Credentials (required)').parentElement).toHaveTextContent(
+    'Replace the key.'
+  )
+  expect(screen.getByText('Replica identity (warning)').parentElement).toHaveTextContent(
+    'Review table settings.'
+  )
+  expect(screen.queryByText('Required')).not.toBeInTheDocument()
+  expect(screen.queryByText('Warning')).not.toBeInTheDocument()
+})
+
+test('uses compact prose and sentence case without a redundant list', () => {
+  customRender(
+    <PipelineValidationAdmonition
+      stale
+      failures={[
+        {
+          name: 'BigQuery Dataset Not Found',
+          reason: 'The dataset was not found.\n\nCheck the project and dataset names.',
+          failure_type: 'critical',
+        },
+      ]}
+    />
+  )
+  expect(screen.getByText('BigQuery dataset not found')).toBeInTheDocument()
+  expect(screen.getByText('The dataset was not found.').parentElement).toHaveTextContent(
+    'The dataset was not found. Check the project and dataset names.'
+  )
+  expect(screen.getByText('Settings changed. Test the connection again.')).toBeInTheDocument()
+  expect(screen.queryByRole('list')).not.toBeInTheDocument()
+})
+
+test('preserves Markdown lists', () => {
+  customRender(
+    <PipelineValidationAdmonition
+      failures={[
+        {
+          name: 'Credentials',
+          reason: 'Check these settings:\n\n- Project ID\n- Dataset ID',
+          failure_type: 'critical',
+        },
+      ]}
+    />
+  )
+  expect(screen.getAllByRole('listitem')).toHaveLength(2)
 })
