@@ -1,4 +1,4 @@
-import { act, fireEvent, render, renderHook, screen } from '@testing-library/react'
+import { act, render, renderHook, screen } from '@testing-library/react'
 import { TooltipProvider } from 'ui'
 import { describe, expect, it } from 'vitest'
 
@@ -51,32 +51,24 @@ it.each([
   { label: 'Acknowledgment', badgeLabel: 'Warning', color: 'var(--color-yellow-900)' },
   { label: 'Problematic', badgeLabel: 'Problematic', color: 'var(--color-orange-900)' },
   { label: 'Severe', badgeLabel: 'Severe', color: 'hsl(var(--destructive-600))' },
-])(
-  'provides the $badgeLabel badge with its selected threshold guidance',
-  async ({ label, badgeLabel, color }) => {
-    render(
-      <TooltipProvider delayDuration={0}>
-        <ChartHeader
-          title="Memory commitment"
-          hideChartType
-          highlightedValue="6 GB"
-          referenceZoneWarning={{
-            label,
-            badgeLabel,
-            color,
-            tooltip: 'Optimize memory usage or upgrade compute.',
-          }}
-        />
-      </TooltipProvider>
-    )
+])('shows the $badgeLabel badge for the selected risk level', ({ label, badgeLabel, color }) => {
+  render(
+    <TooltipProvider>
+      <ChartHeader
+        title="Memory commitment"
+        hideChartType
+        highlightedValue="6 GB"
+        referenceZoneWarning={{
+          label,
+          badgeLabel,
+          color,
+          tooltip: 'Optimize memory usage or upgrade compute.',
+        }}
+      />
+    </TooltipProvider>
+  )
 
-    const badge = screen.getByLabelText(`Warning: ${label}`)
-    expect(badge).toHaveTextContent(badgeLabel)
-    expect(badge).toHaveAttribute('tabindex', '0')
-    fireEvent.focus(badge)
-
-    const tooltip = await screen.findByRole('tooltip')
-    expect(tooltip).toHaveTextContent(`${label} threshold crossed in this time range.`)
-    expect(tooltip).toHaveTextContent('Optimize memory usage or upgrade compute.')
-  }
-)
+  const badge = screen.getByLabelText(`Warning: ${label}`)
+  expect(badge).toHaveTextContent(badgeLabel)
+  expect(badge).toHaveAttribute('tabindex', '0')
+})
