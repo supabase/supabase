@@ -22,7 +22,9 @@ Read a collection reactively with `useLiveQuery()`, and mutate it optimistically
       []
     )
 
-    todos.insert({ id: 1, title: 'Buy milk', completed: false })
+    const id = 1
+
+    todos.insert({ id, title: 'Buy milk', completed: false })
 
     todos.update(id, (draft) => {
       draft.completed = true
