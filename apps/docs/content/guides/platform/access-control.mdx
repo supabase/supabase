@@ -1,5 +1,5 @@
 ---
-title: 'Access Control'
+title: 'Access control'
 description: 'Roles and permissions at the organization and project levels'
 ---
 
@@ -20,6 +20,12 @@ The **Read-only** and **No-access** roles are available only on the [Team and En
 </Admonition>
 
 When you create an account, Supabase creates a default organization and makes you its **Owner**. You're also the **Owner** of any organization you create.
+
+The rest of this guide has three parts:
+
+- [Organization scoped roles vs project scoped roles](#organization-scoped-roles-vs-project-scoped-roles) explains how a role's scope decides which projects a member can access. Read it before you invite someone.
+- [Manage organization members](#manage-organization-members) covers inviting members, listing them with the Management API, and transferring ownership.
+- [Permissions across roles](#permissions-across-roles) lists the actions each role can take.
 
 ## Organization scoped roles vs project scoped roles
 
@@ -50,7 +56,7 @@ This security measure prevents accidental invites to accounts that your enterpri
 
 </Admonition>
 
-### Viewing organization members using the Management API
+### List organization members with the Management API
 
 You can also list organization members with the Management API:
 
@@ -64,13 +70,15 @@ curl "https://api.supabase.com/v1/organizations/$ORG_ID/members" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
 ```
 
-### Transferring ownership of an organization
+### Transfer ownership of an organization
 
 Each Supabase organization must have at least one owner. If your organization has other owners, you can give up ownership and leave the organization. In your organization's [team settings](/dashboard/org/_/team), click **Leave team**.
 
 If you're the only owner, make another member an **Owner** before you leave. Either promote an existing member to **Owner**, or invite someone as **Owner** and wait for them to accept.
 
 ## Permissions across roles
+
+A role grants different actions on organization resources than on project resources, so each has its own table.
 
 ### Organization permissions across roles
 
