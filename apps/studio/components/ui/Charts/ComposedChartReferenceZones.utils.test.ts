@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
-  getEmphasizedReferenceZones,
+  getHighestCrossedReferenceZone,
   getReferenceZoneRuns,
   getReferenceZoneXBounds,
 } from './ComposedChartReferenceZones.utils'
@@ -77,7 +77,7 @@ describe('getReferenceZoneXBounds', () => {
   })
 })
 
-describe('getEmphasizedReferenceZones', () => {
+describe('getHighestCrossedReferenceZone', () => {
   const zonesForThresholds = (thresholds: number[], endIndex = 0) =>
     thresholds.map((lower) => ({
       runs: [{ startIndex: 0, endIndex, lower, upper: lower + 10 }],
@@ -85,49 +85,67 @@ describe('getEmphasizedReferenceZones', () => {
   const zones = zonesForThresholds([100, 180, 190])
 
   it.each([
-    { value: 0, expected: [0] },
-    { value: 99, expected: [0] },
-    { value: 100, expected: [0, 1] },
-    { value: 179, expected: [0, 1] },
-    { value: 180, expected: [1, 2] },
-    { value: 189, expected: [1, 2] },
-    { value: 190, expected: [2] },
-    { value: 300, expected: [2] },
-  ])('emphasizes the current and next boundaries at $value', ({ value, expected }) => {
-    expect([...getEmphasizedReferenceZones([{ memory: value }], zones, 'memory')]).toEqual(expected)
-  })
-
-  it.each([Number.NaN, Infinity, -Infinity, -1, '99'])(
-    'keeps all thresholds readable for invalid latest values: %s',
-    (memory) => {
-      expect([...getEmphasizedReferenceZones([{ memory }], zones, 'memory')]).toEqual([0, 1, 2])
+    { value: 0, expected: undefined },
+    { value: 99, expected: undefined },
+    { value: 100, expected: undefined },
+    { value: 101, expected: 0 },
+    { value: 180, expected: 0 },
+    { value: 181, expected: 1 },
+    { value: 190, expected: 1 },
+    { value: 191, expected: 2 },
+  ])(
+    'requires a strict crossing and selects only the highest boundary at $value',
+    ({ value, expected }) => {
+      expect(getHighestCrossedReferenceZone([{ memory: value }], zones, 'memory')).toBe(expected)
     }
   )
 
-  it('uses the latest metric and latest compute thresholds without stale fallback', () => {
-    const data = [{ memory: 90 }, { memory: 185 }]
-    const historicalZones = zonesForThresholds([100, 180, 190], 1)
-    historicalZones.forEach((zone) => {
-      zone.runs.unshift({ startIndex: 0, endIndex: 0, lower: zone.runs[0].lower * 2, upper: 500 })
-    })
-
-    expect([...getEmphasizedReferenceZones(data, historicalZones, 'memory')]).toEqual([1, 2])
-    expect([
-      ...getEmphasizedReferenceZones([{ memory: 90 }, {}], historicalZones, 'memory'),
-    ]).toEqual([0, 1, 2])
+  it('keeps the highest historical crossing when the latest sample has recovered', () => {
+    const data = [{ memory: 205 }, { memory: 90 }]
+    expect(
+      getHighestCrossedReferenceZone(data, zonesForThresholds([100, 180, 190], 1), 'memory')
+    ).toBe(2)
   })
 
-  it('keeps every threshold readable if the latest capacity is missing', () => {
-    expect([
-      ...getEmphasizedReferenceZones([{ memory: 90 }, { memory: 90 }], zones, 'memory'),
-    ]).toEqual([0, 1, 2])
+  it('compares each metric sample to its own compute capacity', () => {
+    const historicalZones = [100, 180, 190].map((lower) => ({
+      runs: [
+        { startIndex: 0, endIndex: 0, lower, upper: 500 },
+        { startIndex: 1, endIndex: 1, lower: lower * 2, upper: 500 },
+      ],
+    }))
+    expect(
+      getHighestCrossedReferenceZone([{ memory: 95 }, { memory: 250 }], historicalZones, 'memory')
+    ).toBe(0)
   })
 
-  it('leaves generic charts fully emphasized unless they opt in to a metric', () => {
-    expect([...getEmphasizedReferenceZones([{ memory: 0 }], zones)]).toEqual([0, 1, 2])
+  it('ignores missing capacity at a sample instead of applying an earlier threshold', () => {
+    expect(
+      getHighestCrossedReferenceZone([{ memory: 90 }, { memory: 999 }], zones, 'memory')
+    ).toBeUndefined()
   })
 
-  it('returns no emphasis entries for no zones', () => {
-    expect([...getEmphasizedReferenceZones([{ memory: 100 }], [], 'memory')]).toEqual([])
+  it('retains a valid historical crossing when the latest metric is missing', () => {
+    expect(
+      getHighestCrossedReferenceZone(
+        [{ memory: 205 }, {}],
+        zonesForThresholds([100, 180, 190], 1),
+        'memory'
+      )
+    ).toBe(2)
+  })
+
+  it.each([Number.NaN, Infinity, -Infinity, -1, '999'])(
+    'ignores invalid metric readings: %s',
+    (memory) => {
+      expect(getHighestCrossedReferenceZone([{ memory }], zones, 'memory')).toBeUndefined()
+    }
+  )
+
+  it('selects no threshold without a metric opt-in or without data', () => {
+    expect(getHighestCrossedReferenceZone([{ memory: 999 }], zones)).toBeUndefined()
+    expect(getHighestCrossedReferenceZone([], zones, 'memory')).toBeUndefined()
+    expect(getHighestCrossedReferenceZone([{ memory: 999 }], [], 'memory')).toBeUndefined()
+    expect(getHighestCrossedReferenceZone([{}], zones, 'memory')).toBeUndefined()
   })
 })

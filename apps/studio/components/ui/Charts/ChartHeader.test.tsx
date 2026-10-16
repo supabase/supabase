@@ -1,4 +1,5 @@
-import { act, render, renderHook, screen } from '@testing-library/react'
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react'
+import { TooltipProvider } from 'ui'
 import { describe, expect, it } from 'vitest'
 
 import { ChartHeader } from './ChartHeader'
@@ -44,4 +45,29 @@ describe('ChartHeader missing risk metric', () => {
       act(() => hover.result.current.clearHover())
     }
   })
+})
+
+it('provides the selected range warning and guidance from a keyboard-focusable badge', async () => {
+  render(
+    <TooltipProvider delayDuration={0}>
+      <ChartHeader
+        title="Memory commitment"
+        hideChartType
+        highlightedValue="6 GB"
+        referenceZoneWarning={{
+          label: 'Problematic',
+          color: 'var(--color-orange-900)',
+          tooltip: 'Optimize memory usage or upgrade compute.',
+        }}
+      />
+    </TooltipProvider>
+  )
+
+  const badge = screen.getByLabelText('Warning: Problematic')
+  expect(badge).toHaveAttribute('tabindex', '0')
+  fireEvent.focus(badge)
+
+  const tooltip = await screen.findByRole('tooltip')
+  expect(tooltip).toHaveTextContent('Problematic threshold crossed in this time range.')
+  expect(tooltip).toHaveTextContent('Optimize memory usage or upgrade compute.')
 })

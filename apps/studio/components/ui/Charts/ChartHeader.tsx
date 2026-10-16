@@ -38,6 +38,7 @@ export interface ChartHeaderProps {
   xAxisKey?: string
   yAxisKey?: string
   referenceZoneAttribute?: string
+  referenceZoneWarning?: { label: string; color: string; textColor?: string; tooltip: string }
   xAxisIsDate?: boolean
   valuePrecision?: number
   shouldFormatBytes?: boolean
@@ -69,6 +70,7 @@ export const ChartHeader = ({
   xAxisKey,
   yAxisKey,
   referenceZoneAttribute,
+  referenceZoneWarning,
   xAxisIsDate = true,
   displayDateInUtc,
   customDateFormat,
@@ -300,6 +302,30 @@ export const ChartHeader = ({
           </ButtonTooltip>
         ) : null}
 
+        {referenceZoneWarning && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Badge
+                tabIndex={0}
+                className="cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Warning: ${referenceZoneWarning.label}`}
+                style={{
+                  color: referenceZoneWarning.textColor ?? referenceZoneWarning.color,
+                  borderColor: referenceZoneWarning.color,
+                  backgroundColor: `color-mix(in srgb, ${referenceZoneWarning.color} 10%, transparent)`,
+                }}
+              >
+                Warning
+              </Badge>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs" side="top">
+              <p className="font-medium">
+                {referenceZoneWarning.label} threshold crossed in this time range.
+              </p>
+              <p>{referenceZoneWarning.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
             className="px-1.5"

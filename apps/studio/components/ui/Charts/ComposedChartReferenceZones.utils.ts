@@ -47,26 +47,28 @@ export function getReferenceZoneXBounds(
   }
 }
 
-export function getEmphasizedReferenceZones(
+export function getHighestCrossedReferenceZone(
   data: Datum[],
   zones: { runs: ReferenceZoneRun[] }[],
   attribute?: string
-): Set<number> {
-  const allZones = new Set(zones.map((_, index) => index))
-  const value = attribute ? data[data.length - 1]?.[attribute] : undefined
-  if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) return allZones
+): number | undefined {
+  if (!attribute) return undefined
 
-  const thresholds: { value: number; index: number }[] = []
-  for (const [index, zone] of zones.entries()) {
-    const latest = zone.runs[zone.runs.length - 1]
-    if (latest?.endIndex !== data.length - 1 || !Number.isFinite(latest.lower)) return allZones
-    thresholds.push({ value: latest.lower, index })
+  for (let zoneIndex = zones.length - 1; zoneIndex >= 0; zoneIndex--) {
+    for (const run of zones[zoneIndex].runs) {
+      if (!Number.isFinite(run.lower)) continue
+      for (let sampleIndex = run.startIndex; sampleIndex <= run.endIndex; sampleIndex++) {
+        const value = data[sampleIndex]?.[attribute]
+        if (
+          typeof value === 'number' &&
+          Number.isFinite(value) &&
+          value >= 0 &&
+          value > run.lower
+        ) {
+          return zoneIndex
+        }
+      }
+    }
   }
-  thresholds.sort((a, b) => a.value - b.value)
-  if (thresholds.length === 0) return allZones
-
-  const next = thresholds.findIndex((threshold) => threshold.value > value)
-  if (next === 0) return new Set([thresholds[0].index])
-  if (next === -1) return new Set([thresholds[thresholds.length - 1].index])
-  return new Set([thresholds[next - 1].index, thresholds[next].index])
+  return undefined
 }

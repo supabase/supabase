@@ -44,6 +44,7 @@ export interface ReportAttributes {
 export type ReferenceZone = {
   label: string
   color: string
+  textColor?: string
   tooltip: string
   getRanges: (data: Datum[]) => ([number, number] | null)[]
 }

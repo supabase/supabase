@@ -146,14 +146,16 @@ export const getReportAttributesV2: (
       referenceZones: [
         {
           label: 'Acknowledgment',
-          color: 'hsl(var(--warning-600))',
+          color: 'var(--color-yellow-900)',
+          textColor: 'var(--color-yellow-1100)',
           tooltip:
             'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
           getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
         },
         {
           label: 'Problematic',
-          color: 'hsl(var(--warning-600))',
+          color: 'var(--color-orange-900)',
+          textColor: 'var(--color-orange-1100)',
           tooltip:
             'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
           getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
