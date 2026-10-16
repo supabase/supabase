@@ -291,6 +291,51 @@ test.describe('Storage', () => {
     await deleteBucketViaApi(bucketName)
   })
 
+  test('navigates folders and files with the keyboard', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_keyboard`
+    const folderName = 'keyboard_folder'
+    const fileName = 'test-file.txt'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createBucketViaApi(bucketName, false)
+      },
+      async () => {
+        await deleteBucketViaApi(bucketName)
+      }
+    )
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Creating a folder drills into it, so the upload lands inside the folder
+    await createFolder(page, folderName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Start from the bucket root, with the folder as the only row
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Down from outside the list moves focus into it, onto the first row — the folder,
+    // which opens on its own once the cursor settles there
+    await page.keyboard.press('ArrowDown')
+    const bucketColumn = page.getByRole('listbox', { name: `Contents of ${bucketName}` })
+    await expect(bucketColumn, 'Arrow key should move focus into the file list').toBeFocused()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+    await expect(page.getByTitle(fileName), 'Folder contents should be listed').toBeVisible()
+
+    // Right moves into the folder, onto its first row, which previews the file in it
+    await page.keyboard.press('ArrowRight')
+    const folderColumn = page.getByRole('listbox', { name: `Contents of ${folderName}` })
+    await expect(folderColumn).toBeFocused()
+    await expect(page).toHaveURL((url) => url.searchParams.get('preview') === fileName)
+
+    // Left moves back out onto the folder, which stays open behind the cursor
+    await page.keyboard.press('ArrowLeft')
+    await expect(bucketColumn).toBeFocused()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+  })
+
   test('can rename a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_rename_file`
     const fileName = 'test-file.txt'
