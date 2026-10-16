@@ -2565,9 +2565,6 @@ importers:
 
   packages/docs-search:
     dependencies:
-      '@supabase/supabase-js':
-        specifier: 'catalog:'
-        version: 2.117.3(@opentelemetry/api@1.9.1)
       fast-glob:
         specifier: ^3.3.3
         version: 3.3.3
@@ -2587,6 +2584,9 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
     devDependencies:
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.117.3(@opentelemetry/api@1.9.1)
       '@types/mdast':
         specifier: ^3.0.0
         version: 3.0.15

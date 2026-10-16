@@ -1,19 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
-import { createSearchClient } from 'docs-search'
+import { supabaseSearchV2 } from '~/scripts/search_v2/client'
 import { type NextRequest } from 'next/server'
 
 import { corsHeaders } from './cors'
 
 export const runtime = 'edge'
-
-let client: ReturnType<typeof createSearchClient> | undefined
-function supabaseSearchV2() {
-  client ??= createSearchClient(
-    `https://${process.env.SEARCH_V2_SUPABASE_PROJECT_ID}.supabase.co`,
-    process.env.SEARCH_V2_SUPABASE_SECRET_KEY!
-  )
-  return client
-}
 
 export async function OPTIONS() {
   return new Response(null, { headers: corsHeaders })

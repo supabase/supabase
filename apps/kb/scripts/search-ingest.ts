@@ -1,28 +1,24 @@
 import './utils/dotenv.js'
 
 import path from 'node:path'
-import { createSearchClient } from 'docs-search'
-import { ingestMarkdown } from 'docs-search/src/ingest'
+import { createClient } from '@supabase/supabase-js'
+import { ingestMarkdown } from 'docs-search/ingest'
 
-function requireEnv(name: string): string {
-  const value = process.env[name]
-  if (!value) throw new Error(`Missing ${name}. Set it in .env.local.`)
-  return value
+const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env
+if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  console.error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Set them in .env.local.')
+  process.exit(1)
 }
 
-async function main() {
-  await ingestMarkdown({
-    supabase: createSearchClient(
-      requireEnv('KB_SEARCH_SUPABASE_URL'),
-      requireEnv('KB_SEARCH_SUPABASE_SECRET_KEY')
-    ),
-    contentRoot: path.resolve(process.cwd(), 'public/markdown'),
-    include: ['troubleshooting/**/*.md'],
-    slugPrefix: 'kb/',
-  })
-}
-
-main().catch((err) => {
+ingestMarkdown({
+  supabase: createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  }),
+  table: 'kb_search_sections',
+  contentRoot: path.resolve(process.cwd(), 'public/markdown'),
+  include: ['troubleshooting/**/*.md'],
+  slugPrefix: 'kb/',
+}).catch((err) => {
   console.error(err instanceof Error ? err.message : err)
   process.exit(1)
 })

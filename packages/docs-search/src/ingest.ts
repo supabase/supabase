@@ -1,23 +1,11 @@
 import { readFile } from 'node:fs/promises'
-import type { SupabaseClient } from '@supabase/supabase-js'
 import fg from 'fast-glob'
 
-import { TABLE_NAME } from './client.js'
 import { filePathToSlug } from './routes.js'
 import { buildRows } from './rows.js'
+import type { IngestOptions } from './types.js'
 
 const INSERT_BATCH_SIZE = 200
-
-export interface IngestOptions {
-  supabase: SupabaseClient
-  /** Folder that holds the markdown files. Searched recursively. */
-  contentRoot: string
-  /** Glob patterns (relative to contentRoot) for the files to ingest. */
-  include?: string[]
-  /** Glob patterns (relative to contentRoot) for files/folders to skip. */
-  ignore?: string[]
-  slugPrefix?: string
-}
 
 function chunk<T>(items: T[], size: number): T[][] {
   const out: T[][] = []
@@ -30,6 +18,7 @@ export async function ingestMarkdown({
   contentRoot,
   include = ['**/*.md', '**/*.mdx'],
   ignore = [],
+  table,
   slugPrefix = '',
 }: IngestOptions): Promise<number> {
   const files = await fg(include, { cwd: contentRoot, absolute: true, onlyFiles: true, ignore })
@@ -46,12 +35,11 @@ export async function ingestMarkdown({
     const rows = buildRows(markdown, file, contentRoot, slugPrefix)
     const slug = rows[0]?.slug ?? slugPrefix + filePathToSlug(file, contentRoot)
 
-    // Replace everything previously ingested for this page.
-    const { error: deleteError } = await supabase.from(TABLE_NAME).delete().eq('slug', slug)
+    const { error: deleteError } = await supabase.from(table).delete().eq('slug', slug)
     if (deleteError) throw new Error(`Failed to clear "${slug}": ${deleteError.message}`)
 
     for (const batch of chunk(rows, INSERT_BATCH_SIZE)) {
-      const { error: insertError } = await supabase.from(TABLE_NAME).insert(batch)
+      const { error: insertError } = await supabase.from(table).insert(batch)
       if (insertError) throw new Error(`Failed to insert "${slug}": ${insertError.message}`)
     }
 

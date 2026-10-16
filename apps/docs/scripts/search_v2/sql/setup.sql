@@ -20,6 +20,7 @@ create table if not exists public.docs_sections (
   --   B = H2
   --   C = H3
   --   D = H4+ headings and all body text
+  -- ts_rank_cd() weights these A > B > C > D by default ({0.1, 0.2, 0.4, 1.0} for D, C, B, A).
   fts tsvector generated always as (
     setweight(to_tsvector('english', coalesce(page_title, '')), 'A')
     || setweight(
@@ -43,9 +44,8 @@ create policy "docs_sections are publicly readable"
   using (true);
 
 -- Search RPC: called from the server as supabase.rpc('search_docs', { query_text, match_limit }).
--- Matches sections containing any query term. Each term is weighted by its rarity (idf) and doubled
--- when it appears in an H1/H2, so rare terms dominate. Score is the share of the query's total weight a
--- section covers, scaled to an integer 0..1000; sections below 300 are dropped as noise.
+-- Score is ts_rank_cd normalised to 0..1 (normalization flag 32 => rank / (rank + 1)) and scaled to an
+-- integer 0..1000 so the API can return a plain integer.
 drop function if exists public.search_docs(text, int);
 
 create or replace function public.search_docs(query_text text, match_limit int default 10)
@@ -61,21 +61,8 @@ returns table (
 language sql
 stable
 as $$
-  with terms as (
-    select distinct
-      to_tsquery('simple', quote_literal(lexeme)) as anywhere,
-      to_tsquery('simple', quote_literal(lexeme) || ':AB') as in_title
-    from unnest(tsvector_to_array(to_tsvector('english', query_text))) as lexeme
-  ),
-  weighted_terms as (
-    select
-      t.anywhere,
-      t.in_title,
-      greatest(0, ln(
-        (select count(*) from public.docs_sections)::float
-        / (1 + (select count(*) from public.docs_sections d where d.fts @@ t.anywhere))
-      )) as idf
-    from terms t
+  with q as (
+    select websearch_to_tsquery('english', query_text) as tsq
   ),
   ranked as (
     select
@@ -85,20 +72,15 @@ as $$
       d.heading_level,
       d.heading_path,
       d.excerpt,
-      round(
-        1000 * sum(w.idf * case when d.fts @@ w.in_title then 2 else 1 end)
-        / nullif((select 2 * sum(idf) from weighted_terms), 0)
-      )::int as score
-    from public.docs_sections d
-    join weighted_terms w on d.fts @@ w.anywhere
-    group by d.id
+      round(ts_rank_cd(d.fts, q.tsq, 32) * 1000)::int as score
+    from public.docs_sections d, q
+    where d.fts @@ q.tsq
   ),
   -- A page can have several matching sections; keep only its best-scoring one so the
   -- same route doesn't take up multiple slots in the results.
   best_per_page as (
     select distinct on (r.slug) r.*
     from ranked r
-    where r.score >= 300
     order by r.slug, r.score desc, r.heading_level asc
   )
   select b.slug, b.page_title, b.heading, b.heading_level, b.heading_path, b.excerpt, b.score

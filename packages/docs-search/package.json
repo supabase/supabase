@@ -1,10 +1,7 @@
 {
   "name": "docs-search",
   "version": "0.0.0",
-  "main": "./index.ts",
-  "types": "./index.ts",
   "license": "MIT",
-  "sideEffects": false,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
@@ -12,7 +9,6 @@
     "test": "vitest --run"
   },
   "dependencies": {
-    "@supabase/supabase-js": "catalog:",
     "fast-glob": "^3.3.3",
     "mdast-util-to-string": "^3.1.1",
     "remark-frontmatter": "^5.0.0",
@@ -26,6 +22,10 @@
     "@typescript/native": "catalog:",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "catalog:",
+    "@supabase/supabase-js": "catalog:"
+  },
+  "exports": {
+    "./ingest": "./src/ingest.ts"
   }
 }

@@ -14,11 +14,6 @@ import { ReferenceManagementApiModel } from '../reference/referenceManagementApi
 import { ReferenceSDKFunctionModel, SDKLanguageValues } from '../reference/referenceSDKModel'
 import { TroubleshootingModel } from '../troubleshooting/troubleshootingModel'
 import { SearchResultInterface } from './globalSearchInterface'
-import {
-  interleave,
-  searchKbTroubleshooting,
-  USE_KB_TROUBLESHOOTING_SEARCH,
-} from './kbTroubleshootingSearch'
 
 type SearchFunction = 'search_content' | 'search_content_nimbus'
 type SearchHybridFunction = 'search_content_hybrid' | 'search_content_hybrid_nimbus'
@@ -62,10 +57,6 @@ export abstract class SearchResultModel {
   ): Promise<Result<SearchResultModel[], ApiErrorGeneric>> {
     const query = args.query.trim()
     const includeFullContent = requestedFields.includes('content')
-    const limit = args.limit ?? 30
-    const kbSearch = USE_KB_TROUBLESHOOTING_SEARCH
-      ? searchKbTroubleshooting(query, limit, includeFullContent)
-      : undefined
     const embeddingResult = await openAI().createContentEmbedding(query)
 
     const useAltSearchIndex = !isFeatureEnabled('search:fullIndex')
@@ -73,13 +64,13 @@ export abstract class SearchResultModel {
       ? 'search_content_hybrid_nimbus'
       : 'search_content_hybrid'
 
-    const docsResult = await embeddingResult.flatMapAsync(async ({ embedding }) => {
+    return embeddingResult.flatMapAsync(async ({ embedding }) => {
       const matchResult = new Result(
         await supabase().rpc(searchFunction, {
           query_text: query,
           query_embedding: embedding,
           include_full_content: includeFullContent,
-          max_result: limit,
+          max_result: args.limit ?? 30,
         })
       )
         .map((matches) =>
@@ -91,15 +82,6 @@ export abstract class SearchResultModel {
 
       return matchResult
     })
-
-    if (!kbSearch) return docsResult
-    const kbResults = await kbSearch
-    return docsResult.map((items) =>
-      interleave(
-        items.filter((item) => !(item instanceof TroubleshootingModel)),
-        kbResults
-      ).slice(0, limit)
-    )
   }
 }
 

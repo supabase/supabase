@@ -2,19 +2,8 @@ import path from 'node:path'
 
 import { parsePage } from './markdown.js'
 import { filePathToSlug } from './routes.js'
+import type { SectionRow } from './types.js'
 
-export interface SectionRow {
-  slug: string
-  file_path: string
-  page_title: string
-  heading: string
-  heading_level: number
-  heading_path: string[]
-  content: string
-  excerpt: string
-}
-
-/** Build the DB rows for a single markdown file. Pure: no I/O. */
 export function buildRows(
   markdown: string,
   filePath: string,
