@@ -135,3 +135,15 @@ correctly-branded OTEL query — read it before writing a new one.
 - [ ] `timestamp` is normalized to micros for any row consumed by the table/cursor.
 - [ ] There is a unit test asserting the generated SQL string (see
       `Logs.utils.otel.test.ts` and `safe-analytics-sql.test.ts` for the pattern).
+- [ ] The query is composed with `safeSql`, never a plain template literal. A
+      template literal turns a `SafeLogSqlFragment` into a `string` and drops the
+      brand, so the query can no longer go through `executeAnalyticsSql`.
+- [ ] Lookups by `id` pass a tight time range around the row's timestamp when it's
+      known (see the `±1 minute` window in
+      `apps/studio/data/logs/unified-log-inspection-query.ts`).
+- [ ] Polling queries start their range at the newest row already loaded, not at
+      the start of the view's range.
+- [ ] Map keys are in the `SELECT` of a limited query rather than in `WHERE` or
+      `GROUP BY` where possible. See "What a logs query costs" in `SKILL.md`.
+- [ ] Performance claims were measured the way
+      [performance.md](performance.md) describes.
