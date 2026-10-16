@@ -110,6 +110,7 @@ const supabase = createClient(Deno.env.get('SUPABASE_URL')!, SUPABASE_SECRET_KEY
 Deno.serve(async (req) => {
   const { roomId, message } = await req.json()
 
+  // Verify the caller is allowed to post to this room before sending
   const channel = supabase.channel(`room:${roomId}`)
   try {
     await channel.httpSend('new-message', { message })
