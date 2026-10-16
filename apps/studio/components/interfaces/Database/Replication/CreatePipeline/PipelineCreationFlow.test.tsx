@@ -303,8 +303,9 @@ describe('PipelineCreationFlow', () => {
   })
 
   it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
+    const onUrlUpdate = vi.fn()
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
-      nuqs: { hasMemory: true },
+      nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
     })
     next()
     fillConnection()
@@ -313,6 +314,9 @@ describe('PipelineCreationFlow', () => {
     next()
     expect(await screen.findByText('Select an available publication.')).toBeInTheDocument()
     await selectPublication()
+    await waitFor(() =>
+      expect(screen.queryByText('Select an available publication.')).not.toBeInTheDocument()
+    )
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
       target: { value: '-1' },
@@ -345,7 +349,13 @@ describe('PipelineCreationFlow', () => {
     shouldFail = false
     next()
     await waitFor(() => expect(screen.getByText(/Step 4 of 4/)).toBeInTheDocument())
-    back()
+    // Wait for the URL write, not just the optimistic step render, before going back.
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=review' })
+      )
+    )
+    await act(async () => back())
     fireEvent.click(await screen.findByRole('button', { name: /Advanced settings/ }))
     expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
   })
