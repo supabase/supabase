@@ -25,7 +25,10 @@ export const usePipelineDataValidation = ({
   const [verifiedSnapshot, setVerifiedSnapshot] = useState<string>()
   const [isValidatingData, setIsValidatingData] = useState(false)
   const isValidatingRef = useRef(false)
-  const [dataError, setDataError] = useState<string>()
+  const [dataErrorState, setDataErrorState] = useState<{ snapshot: string; message: string }>()
+  const setDataError = (message?: string) =>
+    setDataErrorState(message ? { snapshot, message } : undefined)
+  const dataError = dataErrorState?.snapshot === snapshot ? dataErrorState.message : undefined
   const names = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const publication = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
   const isDataVerified =

@@ -67,7 +67,7 @@ describe('getDataValidationIssues', () => {
       tableOptions: [{ tableId: 1, partitionBy: { kind: 'time_column' as const, column: '' } }],
     }
     expect(getDataValidationIssues(invalidLayout, 'BigQuery', publication)).toEqual([
-      expect.objectContaining({ path: 'tableOptions' }),
+      expect.objectContaining({ path: 'tableOptions.0.partitionBy.column' }),
     ])
     expect(getDataValidationIssues(invalidLayout, 'Snowflake', publication)).toEqual([])
   })
