@@ -2,7 +2,7 @@ import { X } from 'lucide-react'
 import { type KeyboardEvent } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
 
-import { NAV_MENUS, SIGN_IN_URL, SIGN_UP_URL } from '../lib/nav'
+import { NAV_MENUS, SIGN_UP_URL } from '../lib/nav'
 import { revealStyle } from '../lib/reveal'
 import { Logo } from './Logo'
 
@@ -102,11 +102,6 @@ export const MobileMenu = ({ id, onClose, className }: MobileMenuProps) => {
         </Accordion>
       </div>
       <div className="flex shrink-0 items-stretch gap-4 bg-alternative p-4">
-        <Button block asChild>
-          <a href={SIGN_IN_URL} className="h-10 py-4">
-            Sign in
-          </a>
-        </Button>
         <Button variant="primary" block asChild>
           <a href={SIGN_UP_URL} className="h-10 py-4">
             Start your project

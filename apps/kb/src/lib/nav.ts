@@ -10,7 +10,6 @@ export interface NavMenu {
   links: NavLink[]
 }
 
-export const SIGN_IN_URL = 'https://supabase.com/dashboard'
 export const SIGN_UP_URL = 'https://supabase.com/dashboard/sign-up'
 
 export const NAV_MENUS: NavMenu[] = [

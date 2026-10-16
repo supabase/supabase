@@ -2,7 +2,7 @@ import { Menu } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button } from 'ui'
 
-import { SIGN_IN_URL, SIGN_UP_URL } from '../lib/nav'
+import { SIGN_UP_URL } from '../lib/nav'
 import { Logo } from './Logo'
 import { MobileMenu } from './MobileMenu'
 import { Nav } from './Nav'
@@ -34,9 +34,6 @@ export const Header = () => {
             <Nav className="hidden lg:flex" />
           </div>
           <div className="flex items-center gap-2">
-            <Button asChild className="hidden lg:inline-flex">
-              <a href={SIGN_IN_URL}>Sign in</a>
-            </Button>
             <Button variant="primary" asChild className="hidden lg:inline-flex">
               <a href={SIGN_UP_URL}>Start your project</a>
             </Button>
