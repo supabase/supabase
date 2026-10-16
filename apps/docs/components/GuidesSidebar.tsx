@@ -52,6 +52,7 @@ const GuidesSidebar = ({
             pageType="guide"
             articleId="sb-docs-guide-main-article"
             showAgentSetup
+            showPreferredSource
           />
         </div>
         {!hideToc && toc.length !== 0 && (
@@ -64,27 +65,6 @@ const GuidesSidebar = ({
             </TOCScrollArea>
           </Toc>
         )}
-        <div className="pl-5">
-          <a
-            href="https://www.google.com/preferences/source?q=supabase.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-fit"
-          >
-            <img
-              src="/docs/img/icons/google-preferred-source-badge-light@2x.png"
-              alt="Add as preferred source on Google"
-              width={169}
-              className="dark:hidden"
-            />
-            <img
-              src="/docs/img/icons/google-preferred-source-badge-dark@2x.png"
-              alt="Add as preferred source on Google"
-              width={169}
-              className="hidden dark:block"
-            />
-          </a>
-        </div>
       </div>
     </div>
   )
