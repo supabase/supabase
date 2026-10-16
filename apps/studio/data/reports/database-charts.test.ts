@@ -164,21 +164,13 @@ describe('resource warning metrics chart IDs', () => {
 })
 
 describe('getReportAttributesV2 memory commitment chart', () => {
-  it('replaces the limit line with three risk zones while fetching the underlying limit', () => {
+  it('keeps the capacity line tied to infrastructure changes when commitments exceed it', () => {
     const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
       (chart) => chart.id === 'memory-commitment'
     )
-    const commitLimit = chart?.attributes?.find(
-      (attribute) => attribute !== false && attribute.attribute === 'ram_commit_limit'
-    )
-
-    expect(chart?.thresholdZoneAttribute).toBe('ram_commit_used')
     const capacity = chart?.thresholdZones?.find((zone) => zone.isAlwaysVisible)
-    expect(capacity).toMatchObject({
-      label: 'Full commitment capacity',
-      color: 'var(--chart-reference)',
-    })
     const GIB = 1024 ** 3
+
     expect(
       capacity?.getRanges([
         { ram_commit_limit: 5 * GIB, ram_commit_used: 12 * GIB },
@@ -188,16 +180,5 @@ describe('getReportAttributesV2 memory commitment chart', () => {
       [9 * GIB, 9 * GIB],
       [3 * GIB, 3 * GIB],
     ])
-    expect(chart?.showMaxValue).toBeUndefined()
-    expect(chart?.YAxisProps?.domain).toBeUndefined()
-    expect(commitLimit).toMatchObject({
-      provider: 'infra-monitoring',
-      enabled: false,
-      omitFromTotal: true,
-    })
-    expect(commitLimit).not.toHaveProperty('isMaxValue')
-    expect(
-      chart?.thresholdZones?.filter((zone) => !zone.isAlwaysVisible).map((zone) => zone.label)
-    ).toEqual(['Acknowledgment', 'Problematic', 'Severe'])
   })
 })

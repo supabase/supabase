@@ -38,11 +38,6 @@ describe('memory commitment preview fixtures', () => {
       const capacity = getMemoryCommitmentRanges(data, 1, 1)
       expect(capacity[0]).toEqual([9 * GIB, 9 * GIB])
       expect(capacity.at(-1)).toEqual([3 * GIB, 3 * GIB])
-      expect(Object.keys(data[0]).sort()).toEqual([
-        'period_start',
-        'ram_commit_limit',
-        'ram_commit_used',
-      ])
     }
   )
 

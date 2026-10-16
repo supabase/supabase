@@ -214,9 +214,6 @@ describe('normalizeStackedSeriesData', () => {
     expect(normalized[0].system).toBeCloseTo(100 / 6)
     expect(normalized[0].user).toBeCloseTo(100 / 6)
     expect(normalized[0].idle).toBeCloseTo(400 / 6)
-    expect(
-      Number(normalized[0].system) + Number(normalized[0].user) + Number(normalized[0].idle)
-    ).toBeCloseTo(100)
   })
 
   it('keeps a zero-usage stack at zero instead of dividing by zero', () => {

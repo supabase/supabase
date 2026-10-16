@@ -1,9 +1,9 @@
-import { act, render, renderHook, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterAll, expect, it, vi } from 'vitest'
 
 import { MetricsTab } from './MetricsTab'
-import { setMemoryCommitmentPreview, useMemoryCommitmentPreview } from '@/state/metrics-preview'
+import { setMemoryCommitmentPreview } from '@/state/metrics-preview'
 
 vi.hoisted(() => {
   vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'local')
@@ -13,7 +13,6 @@ afterAll(() => vi.unstubAllEnvs())
 
 it('keeps the preview across toolbar remounts and restores real data with Default', async () => {
   const user = userEvent.setup()
-  const preview = renderHook(() => useMemoryCommitmentPreview('default'))
   const first = render(<MetricsTab />)
 
   try {
@@ -22,7 +21,6 @@ it('keeps the preview across toolbar remounts and restores real data with Defaul
     )
     await user.click(screen.getByRole('combobox', { name: 'Memory commitment' }))
     await user.click(screen.getByRole('option', { name: 'Warn' }))
-    expect(preview.result.current).toBe('warn')
     expect(screen.getByText('Simulated data is active for this project.')).toBeInTheDocument()
 
     first.unmount()
@@ -30,7 +28,9 @@ it('keeps the preview across toolbar remounts and restores real data with Defaul
     expect(screen.getByRole('combobox', { name: 'Memory commitment' })).toHaveTextContent('Warn')
     await user.click(screen.getByRole('combobox', { name: 'Memory commitment' }))
     await user.click(screen.getByRole('option', { name: 'Default (real data)' }))
-    expect(preview.result.current).toBe('default')
+    expect(screen.getByRole('combobox', { name: 'Memory commitment' })).toHaveTextContent(
+      'Default (real data)'
+    )
     expect(screen.queryByText('Simulated data is active for this project.')).not.toBeInTheDocument()
   } finally {
     act(() => setMemoryCommitmentPreview('default', 'default'))

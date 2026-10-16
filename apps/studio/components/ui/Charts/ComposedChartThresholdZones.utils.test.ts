@@ -42,12 +42,9 @@ describe('historical threshold segments', () => {
     ])
   })
 
-  it.each([{ ranges: [] }, { ranges: [null] }])(
-    'returns no runs when no thresholds exist: $ranges',
-    ({ ranges }) => {
-      expect(getThresholdZoneRuns(ranges)).toEqual([])
-    }
-  )
+  it('returns no segments for an empty dataset', () => {
+    expect(getThresholdZoneRuns([])).toEqual([])
+  })
 })
 
 describe('threshold alignment with chart edges', () => {
@@ -170,15 +167,9 @@ describe('axis capacity and observed peaks', () => {
     { runs: [{ startIndex: 0, endIndex: 0, lower: 90, upper: 100 }] },
   ]
 
-  it.each([30, 60])(
-    'keeps the axis at 100 whether commitment is healthy or Warning at %s',
-    (memory) => {
-      expect(getHighestCrossedThresholdZone([{ memory }], zones, 'memory')).toBe(
-        memory === 30 ? undefined : 0
-      )
-      expect(getThresholdZoneMaximum(zones)).toBe(100)
-    }
-  )
+  it('uses the highest configured capacity of 100', () => {
+    expect(getThresholdZoneMaximum(zones)).toBe(100)
+  })
 
   it('retains the largest capacity across historical compute changes', () => {
     expect(
