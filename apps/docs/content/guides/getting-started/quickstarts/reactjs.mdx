@@ -73,19 +73,19 @@ function App() {
   const [instruments, setInstruments] = useState([])
 
   useEffect(() => {
-    getInstruments()
-  }, [])
+    async function getInstruments() {
+      const { data, error } = await supabase.from('instruments').select()
 
-  async function getInstruments() {
-    const { data, error } = await supabase.from('instruments').select()
+      if (error) {
+        console.error(error)
+        return
+      }
 
-    if (error) {
-      console.error(error)
-      return
+      setInstruments(data)
     }
 
-    setInstruments(data)
-  }
+    getInstruments()
+  }, [])
 
   return (
     <ul>
