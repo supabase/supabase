@@ -252,13 +252,15 @@ type PrefetchOptions = {
 export function useRouter() {
   const router = useTanStackRouter()
   const location = useLocation()
-  const matches = useMatches()
+  // Match objects change while a navigation loads. Only the leaf route ID
+  // affects Next's pathname; subscribing to all matches changes this router
+  // object and can restart effects that are already redirecting the page.
+  const leafRouteId = useMatches({ select: (matches) => matches[matches.length - 1]?.routeId })
   const params = useParams({ strict: false })
   const search = useSearch({ strict: false })
 
   return useMemo(() => {
-    const leafRouteId = matches[matches.length - 1]?.routeId ?? location.pathname
-    const pathPattern = toNextPathPattern(leafRouteId)
+    const pathPattern = toNextPathPattern(leafRouteId ?? location.pathname)
 
     // Both push and replace accept Next's (url, as?, options?) signature.
     // `as` is the legacy alias path (mostly obsolete in modern Next; ignored
@@ -397,7 +399,7 @@ export function useRouter() {
       // ---- events ----
       events: getRouterEventsProxy(router),
     }
-  }, [router, location.href, location.pathname, matches, params, search])
+  }, [router, location.href, location.pathname, leafRouteId, params, search])
 }
 
 // Normalise an optional-catch-all route's params across both frameworks.
