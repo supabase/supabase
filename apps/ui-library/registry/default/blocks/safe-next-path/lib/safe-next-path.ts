@@ -5,7 +5,11 @@ export const safeNextPath = (path: unknown, fallback = '/', origin?: string) => 
 
   try {
     const url = new URL(path, currentOrigin)
-    return url.origin === currentOrigin ? `${url.pathname}${url.search}${url.hash}` : fallback
+    if (url.origin !== currentOrigin) return fallback
+
+    const next = `${url.pathname}${url.search}${url.hash}`
+    // "/.//example.com" normalizes to "//example.com", which a browser reads as another site
+    return next.startsWith('//') ? fallback : next
   } catch {
     return fallback
   }
