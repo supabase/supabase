@@ -2101,6 +2101,14 @@ export const storage: NavMenuConstant = {
           url: '/guides/storage/buckets/creating-buckets' as `/${string}`,
         },
         {
+          name: 'Object Versioning',
+          url: '/guides/storage/buckets/object-versioning' as `/${string}`,
+        },
+        {
+          name: 'Lifecycle Policies',
+          url: '/guides/storage/buckets/lifecycle-policies' as `/${string}`,
+        },
+        {
           name: 'Security',
           url: '/guides/storage/security',
           items: [
