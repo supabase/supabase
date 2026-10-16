@@ -3,29 +3,44 @@ import { TooltipProvider } from 'ui'
 import { expect, it } from 'vitest'
 
 import { ChartHeader } from './ChartHeader'
+import type { Project } from '@/data/projects/project-detail-query'
+import { getReportAttributesV2 } from '@/data/reports/database-charts'
+import { createMockProject } from '@/tests/helpers'
 
-it.each([
-  { label: 'Acknowledgment', badgeLabel: 'Warning', color: 'var(--color-yellow-900)' },
-  { label: 'Problematic', badgeLabel: 'Problematic', color: 'var(--color-orange-900)' },
-  { label: 'Severe', badgeLabel: 'Severe', color: 'hsl(var(--destructive-600))' },
-])('shows the $badgeLabel badge for the selected risk level', ({ label, badgeLabel, color }) => {
-  render(
-    <TooltipProvider>
-      <ChartHeader
-        title="Memory commitment"
-        hideChartType
-        highlightedValue="6 GB"
-        thresholdZoneWarning={{
-          label,
-          badgeLabel,
-          color,
-          tooltip: 'Optimize memory usage or upgrade compute.',
-        }}
-      />
-    </TooltipProvider>
-  )
+const project: Project = {
+  ...createMockProject({}),
+  connectionString: '',
+  db_host: '',
+  dbVersion: 'supabase-postgres-15.1.0',
+  high_availability: false,
+  infra_compute_size: 'micro',
+  integration_source: null,
+  restUrl: '',
+  updated_at: '2026-01-01T00:00:00Z',
+}
+const thresholds = getReportAttributesV2(['database'], project).find(
+  (chart) => chart.id === 'memory-commitment'
+)?.thresholdZones
 
-  const badge = screen.getByLabelText(`Warning: ${label}`)
-  expect(badge).toHaveTextContent(badgeLabel)
-  expect(badge).toHaveAttribute('tabindex', '0')
-})
+it.each(['Warning', 'Problematic', 'Severe'])(
+  'shows the %s badge from the memory commitment report',
+  (expectedLabel) => {
+    const threshold = thresholds?.find((zone) => zone.badgeLabel === expectedLabel)
+    if (!threshold) throw new Error(`Missing memory commitment threshold: ${expectedLabel}`)
+
+    render(
+      <TooltipProvider>
+        <ChartHeader
+          title="Memory commitment"
+          hideChartType
+          highlightedValue="6 GB"
+          thresholdZoneWarning={threshold}
+        />
+      </TooltipProvider>
+    )
+
+    const badge = screen.getByLabelText(`Warning: ${threshold.label}`)
+    expect(badge).toHaveTextContent(expectedLabel)
+    expect(badge).toHaveAttribute('tabindex', '0')
+  }
+)
