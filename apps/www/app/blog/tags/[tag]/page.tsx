@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 
 import TagClient from './TagClient'
+import { canonicalAlternates } from '@/lib/canonical'
 import { startCase } from '@/lib/helpers'
 import { getAllTags, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
@@ -29,6 +30,7 @@ export async function generateMetadata({
   return {
     title: `Blog | ${tagLabel}`,
     description: `Blog posts tagged ${tagLabel}.`,
+    alternates: canonicalAlternates(`/blog/tags/${params.tag}`),
   }
 }
 

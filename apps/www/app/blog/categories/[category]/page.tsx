@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 
 import CategoryClient from './CategoryClient'
+import { canonicalAlternates } from '@/lib/canonical'
 import { startCase } from '@/lib/helpers'
 import { getAllCategories, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
@@ -21,6 +22,7 @@ export async function generateMetadata({
   return {
     title: `Blog | ${categoryLabel}`,
     description: `Blog posts in ${categoryLabel}.`,
+    alternates: canonicalAlternates(`/blog/categories/${params.category}`),
   }
 }
 

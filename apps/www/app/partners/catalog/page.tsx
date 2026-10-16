@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 
 import IntegrationsContent from './IntegrationsContent'
+import { canonicalAlternates } from '@/lib/canonical'
 
 export const revalidate = 1800 // 30 minutes
 
@@ -11,6 +12,7 @@ const META_DESCRIPTION =
   'Browse companies that build on Supabase, integrate with Supabase, or both.'
 
 export const metadata: Metadata = {
+  alternates: canonicalAlternates('/partners/catalog'),
   title: META_TITLE,
   description: META_DESCRIPTION,
   openGraph: {
