@@ -206,9 +206,22 @@ describe('htmlToMarkdown', () => {
     )
   })
 
-  it('does not rewrite image URLs', () => {
-    expect(htmlToMarkdown(main('<img src="/img.png" alt="alt" />'))).toContain('/img.png')
-    expect(htmlToMarkdown(main('<img src="/img.png" alt="alt" />'))).not.toContain('supabase.com')
+  it('renders root-relative image sources against supabase.com under the kb base path', () => {
+    expect(htmlToMarkdown(main('<img src="/_astro/logo.webp" alt="Logo" />'))).toContain(
+      '![Logo](https://supabase.com/kb/_astro/logo.webp)'
+    )
+  })
+
+  it('leaves absolute image sources untouched', () => {
+    expect(
+      htmlToMarkdown(main('<img src="https://placehold.co/800x400" alt="Placeholder" />'))
+    ).toContain('![Placeholder](https://placehold.co/800x400)')
+  })
+
+  it('escapes brackets in image alt text and keeps a title', () => {
+    expect(
+      htmlToMarkdown(main('<img src="/_astro/a.webp" alt="Setup [step]" title="Step 1" />'))
+    ).toContain('![Setup \\[step\\]](https://supabase.com/kb/_astro/a.webp "Step 1")')
   })
 
   it('leaves a root-relative URL inside a code block untouched', () => {

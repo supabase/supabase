@@ -93,6 +93,24 @@ const linkRule = createRule(
   }
 )
 
+// Alt text sits inside square brackets, so brackets and backslashes are escaped.
+function formatAlt(alt) {
+  return alt.replace(/[\\[\]]/g, '\\$&')
+}
+
+// Images get the same root-relative resolution as links, so an exported image
+// still loads when the markdown is read outside the site.
+const imageRule = createRule(
+  (node) => node.name === 'img' && typeof node.attribs?.src === 'string',
+  ({ node }) => {
+    const { src, alt = '', title } = node.attribs
+    const source = formatDestination(isRootRelative(src) ? resolveHref(src) : src)
+    return title
+      ? `![${formatAlt(alt)}](${source} ${formatTitle(title)})`
+      : `![${formatAlt(alt)}](${source})`
+  }
+)
+
 // Admonition labels (see TYPE_LABEL in packages/ui-patterns/src/Admonition)
 // mapped back to the source marker that produced them in
 // src/lib/mdx/rehype-admonitions.ts (NOTE→note, TIP→success, IMPORTANT→warning,
@@ -166,7 +184,7 @@ export function htmlToMarkdown(html) {
   return convert(html, {
     extract: true,
     frontmatter: false,
-    rules: [admonitionRule, codeLanguageRule, linkRule],
+    rules: [admonitionRule, codeLanguageRule, linkRule, imageRule],
   }).markdown
 }
 
