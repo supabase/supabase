@@ -6,8 +6,12 @@ import {
   gateLogTypeOptions,
   getComputeLogsAvailability,
   getEventMessageDisplay,
+  getLogRowClassName,
   getRawLogData,
+  getUniqueLogRows,
+  loadUnifiedLogsSearchParams,
   parseMultigresEventMessage,
+  toQuerySearchParams,
   wrapIlikePattern,
 } from './UnifiedLogs.utils'
 
@@ -200,6 +204,60 @@ describe('gateLogTypeFilters', () => {
   it('preserves absent filter values', () => {
     expect(gateLogTypeFilters(undefined, { compute: false })).toBeUndefined()
     expect(gateLogTypeFilters(null, { compute: false })).toBeNull()
+  })
+})
+
+describe('toQuerySearchParams', () => {
+  it('drops view-only and empty params and keeps defaults', () => {
+    const search = toQuerySearchParams(
+      loadUnifiedLogsSearchParams(new URLSearchParams('filter=level:eq:error&id=log-1&live=true'))
+    )
+
+    expect(search.filter).toEqual(['level:eq:error'])
+    expect(search.size).toBe(40)
+    expect(search).not.toHaveProperty('id')
+    expect(search).not.toHaveProperty('live')
+    expect(search).not.toHaveProperty('date')
+  })
+})
+
+describe('getUniqueLogRows', () => {
+  it('flattens pages and keeps the first row for each id', () => {
+    const rows = getUniqueLogRows([
+      {
+        data: [
+          { id: 'a', page: 1 },
+          { id: 'b', page: 1 },
+        ],
+      },
+      {
+        data: [
+          { id: 'b', page: 2 },
+          { id: 'c', page: 2 },
+        ],
+      },
+      {},
+    ])
+
+    expect(rows).toEqual([
+      { id: 'a', page: 1 },
+      { id: 'b', page: 1 },
+      { id: 'c', page: 2 },
+    ])
+  })
+
+  it('returns no rows before the first page loads', () => {
+    expect(getUniqueLogRows(undefined)).toEqual([])
+  })
+})
+
+describe('getLogRowClassName', () => {
+  it('tints by level and dims rows older than the live mode anchor', () => {
+    const errorRow = { level: 'error' as const, timestamp: 1000 }
+
+    expect(getLogRowClassName(errorRow)).toContain('bg-destructive/5')
+    expect(getLogRowClassName(errorRow)).toContain('opacity-100')
+    expect(getLogRowClassName(errorRow, 2000)).toContain('opacity-50')
   })
 })
 

@@ -1,9 +1,11 @@
 import { type Table as TTable } from '@tanstack/react-table'
+import { createLoader } from 'nuqs'
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
+import { LOG_TYPES_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { ColumnSchema, FacetMetadataSchema } from './UnifiedLogs.schema'
+import type { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 
@@ -27,6 +29,55 @@ export function getComputeLogsAvailability({
   }
 }
 
+/** Reads unified logs URL params, applying the same defaults as the Logs page. */
+export const loadUnifiedLogsSearchParams = createLoader(SEARCH_PARAMS_PARSER)
+
+/**
+ * Turns URL search state into the search every unified logs query takes. Drops view-only params
+ * (`id`, `live`) and empty values so they don't churn query keys.
+ */
+export function toQuerySearchParams(search: SearchParamsType): QuerySearchParamsType {
+  return Object.entries(search).reduce(
+    (acc, [key, value]) => {
+      if (!['id', 'live'].includes(key) && value !== null && value !== undefined) {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, unknown>
+  ) as QuerySearchParamsType
+}
+
+/**
+ * Flattens infinite query pages into rows, keeping the first of any duplicate ids. Pages can
+ * overlap because the cursor is a timestamp (see unified-logs-infinite-query).
+ */
+export function getUniqueLogRows<T extends { id: string }>(
+  pages: { data?: T[] }[] | undefined
+): T[] {
+  const seenIds = new Set<string>()
+  return (pages ?? [])
+    .flatMap((page) => page.data ?? [])
+    .filter((row) => {
+      if (seenIds.has(row.id)) return false
+      seenIds.add(row.id)
+      return true
+    })
+}
+
+/** Row styling for the logs list; rows older than the live mode anchor are dimmed. */
+export function getLogRowClassName(
+  row: Pick<ColumnSchema, 'level' | 'timestamp'>,
+  liveTimestamp?: number
+): string {
+  const isPast = row.timestamp <= (liveTimestamp || -1)
+  return cn(getLevelRowClassName(row.level), isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
+}
+
+/** Serializes a time range into the unified logs `date` URL param. */
+export const formatUnifiedLogsDateParam = (start: string | Date, end: string | Date) =>
+  `${new Date(start).valueOf()}-${new Date(end).valueOf()}`
+
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,
@@ -44,9 +95,7 @@ export const buildUnifiedLogsUrl = ({
   const params = new URLSearchParams()
   if (logType) params.append('filter', `log_type:eq:${logType}`)
   if (user) params.set('user', user)
-  if (start && end) {
-    params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
-  }
+  if (start && end) params.set('date', formatUnifiedLogsDateParam(start, end))
   return `/project/${projectRef}/logs?${params.toString()}`
 }
 
