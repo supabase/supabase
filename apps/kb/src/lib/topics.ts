@@ -100,6 +100,10 @@ export const FORMAT_TOPICS: Topic[] = [
   'Tutorials',
 ]
 
+// the kind of guide picks the cover before its subject does
+export const pickCoverTopic = (topics: Topic[]): Topic | null =>
+  topics.find((topic) => FORMAT_TOPICS.includes(topic)) ?? topics[0] ?? null
+
 // federated collections tag with their own vocabulary, which may not match kb's topics
 export const isKnownTopic = (topic: string): topic is Topic =>
   TOPIC_NAMES.some((name) => name === topic)

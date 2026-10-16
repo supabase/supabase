@@ -79,14 +79,7 @@ const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
         description={item.description}
         topics={item.topics}
         date={hasDates ? (item.date ?? '') : undefined}
-        className={cn(
-          'cover-notch',
-          hasDates ? 'h-115.5' : 'h-107.5',
-          // tint layer instead of a bg swap: the canvas paints the card bg into its cutouts
-          "before:pointer-events-none before:absolute before:inset-0 before:z-10 before:content-['']",
-          'before:rounded-lg before:bg-surface-200 before:opacity-0',
-          'group-hover/cover:before:opacity-100 group-focus-visible/cover:before:opacity-100'
-        )}
+        className={cn('cover-notch', hasDates ? 'h-115.5' : 'h-107.5')}
       />
     </div>
     <svg
@@ -98,10 +91,6 @@ const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
       className="pointer-events-none absolute right-0 bottom-0 z-20 overflow-visible"
     >
       <path d={getNotchOutline(NOTCH_WIDTH)} className="stroke-(--background-surface-75)" />
-      <path
-        d={getNotchOutline(NOTCH_WIDTH)}
-        className="stroke-(--background-surface-200) opacity-0 group-hover/cover:opacity-100 group-focus-visible/cover:opacity-100"
-      />
       <path d={getNotchOutline(NOTCH_WIDTH)} className="stroke-border" />
     </svg>
     <span
