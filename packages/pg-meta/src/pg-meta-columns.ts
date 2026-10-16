@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
 import { ident, keyword, literal, rawSql, safeSql, type SafeSqlFragment } from './pg-format'
-import { COLUMNS_SQL } from './sql/columns'
+import { COLUMNS_SQL, getColumnsSql } from './sql/columns'
 
 const pgColumnZod = z.object({
   id: z.string(),
@@ -99,10 +99,36 @@ function getIdentifierWhereClause(identifier: ColumnIdentifier): SafeSqlFragment
   throw new Error('Must provide either id or schema, name and table')
 }
 
-function retrieve(identifier: ColumnIdentifier): {
+function retrieve(identifier: ColumnIdentifier & { scoped?: boolean }): {
   sql: SafeSqlFragment
   zod: typeof pgColumnOptionalZod
 } {
+  // Scoped path: resolve the target table's OID once and push it
+  // into the columns scan via getColumnsSql's filter, so the query
+  // introspects only the requested relation instead of the entire catalog.
+  // Output rows are identical -- the outer identifier filter already
+  // restricted the result to a single column.
+  if (identifier.scoped) {
+    let targetOid: SafeSqlFragment
+    if ('id' in identifier && identifier.id) {
+      // Column ids are "<table_oid>.<attnum>".
+      targetOid = safeSql`${literal(identifier.id.split('.')[0])}::oid`
+    } else if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
+      targetOid = safeSql`(select tc.oid from pg_class tc join pg_namespace tn on tn.oid = tc.relnamespace where tc.relname = ${literal(identifier.table)} and tn.nspname = ${literal(identifier.schema)})`
+    } else {
+      throw new Error('Must provide either id or schema, name and table')
+    }
+    const sql = safeSql`WITH columns AS (${getColumnsSql({
+      filter: { column: 'oid', predicate: safeSql`= ${targetOid}` },
+    })}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
+    return {
+      sql,
+      zod: pgColumnOptionalZod,
+    }
+  }
+
+  // Deprecated legacy path (scoped: false): full-catalog introspection with an
+  // outer filter. Kept for compatibility; will be removed.
   const sql = safeSql`WITH columns AS (${COLUMNS_SQL}) SELECT * FROM columns WHERE ${getIdentifierWhereClause(identifier)};`
   return {
     sql,

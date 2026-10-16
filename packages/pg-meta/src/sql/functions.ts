@@ -1,6 +1,30 @@
-import { safeSql } from '../pg-format'
+import { safeSql, type SafeSqlFragment } from '../pg-format'
 
-export const FUNCTIONS_SQL = /* SQL */ safeSql`
+/**
+ * Builder for the functions introspection query.
+ *
+ * `targetOid`, when provided, is a scalar SQL fragment yielding the single OID
+ * of the routine to introspect -- either a literal (`123`) or an uncorrelated
+ * scalar subquery (`(select q.oid from pg_proc q join ... )`). It is compared
+ * with `=` so the planner evaluates it once as an initplan constant and drives
+ * an INDEX scan on the base pg_proc scan, instead of running the per-row
+ * deparse calls (pg_get_functiondef, pg_get_function_arguments,
+ * pg_get_function_identity_arguments, pg_get_function_result) for EVERY
+ * function in the catalog. The config_params and args subqueries read from the
+ * (now single-row) `functions` CTE, so they are scoped automatically. Output
+ * rows are identical -- the caller's outer filter already restricted the
+ * result to this routine.
+ *
+ * When `targetOid` is omitted the injected fragment is empty and the rendered
+ * SQL is the full-catalog query used by existing consumers (e.g. list() and
+ * the update() existence check).
+ */
+export const getFunctionsSql = (targetOid?: SafeSqlFragment) => {
+  // Scoped path only: restrict the base pg_proc scan to the target routine so
+  // the expensive per-row deparse calls run once instead of per catalog row.
+  const fnScope = targetOid ? safeSql`and p.oid = ${targetOid}` : safeSql``
+
+  return /* SQL */ safeSql`
 -- CTE with sane arg_modes, arg_names, and arg_types.
 -- All three are always of the same length.
 -- All three include all args, including OUT and TABLE args.
@@ -26,6 +50,7 @@ with functions as (
     pg_proc as p
   where
     p.prokind in ('f', 'p')
+    ${fnScope}
 )
 select
   f.oid as id,
@@ -119,3 +144,8 @@ from
       t1.oid
   ) f_args on f_args.oid = f.oid
 `
+}
+
+// Full-catalog rendering used by existing consumers (e.g. list() and the
+// update() existence check). retrieve() renders getFunctionsSql(targetOid).
+export const FUNCTIONS_SQL = getFunctionsSql()
