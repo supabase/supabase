@@ -38,7 +38,7 @@ After gathering all this data, a unique URL is generated containing the session 
 
 With your identity confirmed, the CLI sends the provided session data to our management API, requesting its magic.
 
-The [Management API](https://supabase.com/features/management-api) generates a new access token for your account, creates its pair of ECDH keys, and encrypts the token using your public key and the server's private key. This encrypted token, alongside the server's public key, your session ID, and expiration date, is then stored in our database.
+The [Management API](/docs/reference/api/introduction) generates a new access token for your account, creates its pair of ECDH keys, and encrypts the token using your public key and the server's private key. This encrypted token, alongside the server's public key, your session ID, and expiration date, is then stored in our database.
 
 To send it back to your CLI it needs to be stored in a database.
 

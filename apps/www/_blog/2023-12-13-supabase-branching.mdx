@@ -49,7 +49,7 @@ Branching is a natural extension of this, but instead of experimenting with just
 
 Each Git branch has a corresponding Supabase Preview, which automatically updates whenever you push an update. The rest of the workflow should feel familiar: when you merge a Pull Request into your main Git branch, Supabase will run your database migrations inside your Production database.
 
-Your project's Preview Branches are designed with safety in mind. They are isolated instances, each with a distinct set of API keys and passwords. Each instance contains every Supabase feature: a Postgres database, Auth, File Storage, [Realtime](/docs/guides/realtime), [Edge Functions](/docs/guides/functions), and Data APIs.
+Your project's Preview Branches are designed with safety in mind. They are isolated instances, each with a distinct set of API keys and passwords. Each instance contains every Supabase feature: a [Postgres database](/database), [Auth](/auth), [File Storage](/storage, [Realtime](/realtime), [Edge Functions](/edge-functions), and [Data APIs](https://supabase.com/docs/guides/api.
 
 <Img
   alt="Every Supabase Preview is a dedicated instance, with a full suite of Supabase services."
