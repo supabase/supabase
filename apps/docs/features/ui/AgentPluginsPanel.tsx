@@ -103,19 +103,17 @@ function PluginInstructions({ client }: { client: PluginClient }) {
     return (
       <div className="space-y-3">
         <p className="text-sm text-foreground-light">
-          In the Antigravity App, click <strong>Customizations</strong> in the left sidebar and
-          select <strong>Plugins</strong>. Click <strong>+ Install from URL</strong> and paste the
-          following URL.
+          Install the Supabase plugin with the Antigravity CLI by running the following command in
+          your terminal.
         </p>
         <CodeBlock
-          value="https://github.com/supabase-community/supabase-plugin"
+          value="agy plugin install https://github.com/supabase-community/supabase-plugin"
           language="bash"
           focusable={false}
           className="block"
         />
         <p className="text-xs text-foreground-lighter">
-          You can also manage plugins with the <code>/plugin</code> slash command or the{' '}
-          <code>agy plugin</code> CLI. See the{' '}
+          To manage installed plugins, use the <code>/plugin</code> slash command. See the{' '}
           <a
             href="https://antigravity.google/docs/plugins/#managing-plugins-by-surface"
             target="_blank"
