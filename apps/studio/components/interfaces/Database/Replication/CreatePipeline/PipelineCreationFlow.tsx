@@ -3,6 +3,7 @@ import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Form, Separator } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
@@ -22,6 +23,7 @@ import { PipelineReviewCosts } from './PipelineReviewCosts'
 import {
   CONNECTION_VALIDATION_HINT,
   PipelineValidationAdmonition,
+  SANDWICHED_ADMONITION_CLASS,
 } from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -172,9 +174,13 @@ export const PipelineCreationFlow = ({
                     hint={CONNECTION_VALIDATION_HINT}
                   />
                   {isConnectionVerified && failures.length === 0 && (
-                    <p role="status" className="px-5 py-3 text-sm text-foreground-light">
-                      Connection verified.
-                    </p>
+                    <Admonition
+                      type="success"
+                      title="Ready to continue"
+                      className={SANDWICHED_ADMONITION_CLASS}
+                    >
+                      Supabase can connect to this destination.
+                    </Admonition>
                   )}
                 </>
               )}
