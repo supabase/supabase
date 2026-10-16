@@ -1,12 +1,12 @@
 ---
 id: 'logs-field-reference'
 title: 'Log sources and fields'
-description: 'Log sources, ClickHouse fields, and event capture limits'
+description: 'Log sources, fields, and event capture limits'
 ---
 
-Each event is a row in the ClickHouse `logs` table. Filter the `source` column to select a service. The tables below list its fields; a field is not necessarily populated on every event.
+Each event is a row in the `logs` table. Filter the `source` column to select a service. The tables below list its fields; a field is not necessarily populated on every event.
 
-`id`, `timestamp`, `event_message`, `severity_text`, and `source` are top-level columns. Service fields are string values in `log_attributes`, even when the original event contains a number or boolean. Use the **ClickHouse query field** column directly. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) for casting and field discovery.
+`id`, `timestamp`, `event_message`, `severity_text`, and `source` are top-level columns. Service fields are string values in `log_attributes`, even when the original event contains a number or boolean. See [Query logs with SQL](/docs/guides/observability/advanced-log-filtering) for casting and field discovery.
 
 ## Sources
 
@@ -72,53 +72,48 @@ Response headers:
 ## Fields by source
 
 <SharedData data="logConstants">
-  {(logConstants) => (
-    <Tabs scrollable size="small" type="underlined" defaultActiveId="edge_logs" queryGroup="source">
-      {logConstants.schemas.map((schema) => (
-        <TabPanel id={schema.reference} key={schema.reference} label={schema.name}>
-          <p>
-            Source: <code>{schema.reference}</code>
-          </p>
-          <div className="border rounded-md divide-y overflow-hidden">
-            {schema.fields
-              .sort((a, b) => a.path.localeCompare(b.path))
-              .map((field) => {
-                const shortName = field.path.replace(/^metadata\./, '')
-                const isTopLevel = field.queryField === field.path
-                return (
-                  <div key={field.path} className="px-4 py-3">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <code className="text-sm">{shortName}</code>
-                      <span className="text-xs font-mono text-foreground-lighter bg-surface-200 px-1.5 py-0.5 rounded">
-                        {field.type}
-                      </span>
-                    </div>
-                    {!isTopLevel && (
-                      <div className="mt-2 flex flex-col gap-1">
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-[10px] font-medium uppercase tracking-wide text-foreground-lighter border rounded px-1.5 py-px shrink-0">
-                            schema
-                          </span>
-                          <code className="text-xs text-foreground-lighter break-all">
-                            {field.path}
-                          </code>
-                        </div>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-[10px] font-medium uppercase tracking-wide text-foreground-lighter border rounded px-1.5 py-px shrink-0">
-                            clickhouse
-                          </span>
-                          <code className="text-xs text-foreground-lighter break-all">
-                            {field.queryField}
-                          </code>
-                        </div>
-                      </div>
-                    )}
+  {(logConstants) =>
+    logConstants.schemas.map((schema) => (
+      <div key={schema.reference} className="mt-12 first:mt-0">
+        <h3 id={schema.reference} className="scroll-mt-24">
+          {schema.name}
+        </h3>
+        <p className="text-sm text-foreground-lighter">
+          Source: <code>{schema.reference}</code>
+        </p>
+        <div className="mt-4 flex flex-col">
+          {schema.fields
+            .sort((a, b) => a.path.localeCompare(b.path))
+            .map((field) => {
+              const shortName = field.path.replace(/^metadata\./, '')
+              const isTopLevel = field.queryField === field.path
+              return (
+                <div key={field.path} className="border-t last:border-b py-4 flex flex-col gap-2">
+                  <div className="flex gap-3 items-center flex-wrap">
+                    <span className="text-sm text-foreground font-mono font-medium">
+                      {shortName}
+                    </span>
+                    <Badge variant="default">{field.type}</Badge>
+                    {field.containsPii && <Badge variant="warning">PII</Badge>}
                   </div>
-                )
-              })}
-          </div>
-        </TabPanel>
-      ))}
-    </Tabs>
-  )}
+                  {field.description && (
+                    <p className="text-sm text-foreground-lighter m-0">{field.description}</p>
+                  )}
+                  {!isTopLevel && (
+                    <p className="text-[10px] text-foreground-muted font-mono m-0 break-all">
+                      select {field.queryField} from logs
+                    </p>
+                  )}
+                  {field.example && (
+                    <p className="text-xs text-foreground-muted m-0 break-all">
+                      Example: <code>{field.example}</code>
+                    </p>
+                  )}
+                </div>
+              )
+            })}
+        </div>
+      </div>
+    ))
+  }
 </SharedData>
