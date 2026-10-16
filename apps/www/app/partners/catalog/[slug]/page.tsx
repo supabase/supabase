@@ -9,6 +9,7 @@ import { cache, Suspense } from 'react'
 import remarkGfm from 'remark-gfm'
 
 import PartnerCatalogDetail from './PartnerCatalogDetail'
+import { canonicalAlternates } from '@/lib/canonical'
 
 export const revalidate = 1800
 
@@ -29,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: `${partner.title} | Works With Supabase`,
     description: partner.description,
+    alternates: canonicalAlternates(`/partners/catalog/${partner.slug}`),
     openGraph: {
       title: `${partner.title} | Works With Supabase`,
       description: partner.description,

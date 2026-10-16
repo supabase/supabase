@@ -121,8 +121,9 @@ describe('markdown alternate drift', () => {
     }
     const source = await fs.readFile(appPagePath, 'utf-8')
     const wiring = 'alternates: mdAlternates(`' + urlPrefix + '/${slug}`)'
+    const spreadWiring = '...mdAlternates(`' + urlPrefix + '/${slug}`)'
     expect(
-      source.includes(wiring),
+      source.includes(wiring) || source.includes(spreadWiring),
       `app/${urlPrefix}/[slug]/page.tsx must contain "${wiring}" in its generateMetadata`
     ).toBe(true)
   })

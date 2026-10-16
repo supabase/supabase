@@ -10,6 +10,7 @@ import {
   toAbsoluteBlogImageUrl,
 } from '@/lib/blog-images'
 import { breadcrumbs } from '@/lib/breadcrumbs'
+import { canonicalAlternates } from '@/lib/canonical'
 import { SITE_ORIGIN } from '@/lib/constants'
 import { parseFrontmatter } from '@/lib/frontmatter.mjs'
 import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
@@ -71,7 +72,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {
       title: blogPost.title,
       description: blogPost.description,
-      alternates: mdAlternates(`blog/${slug}`),
+      alternates: {
+        ...canonicalAlternates(`/blog/${slug}`),
+        ...mdAlternates(`blog/${slug}`),
+      },
       openGraph: {
         title: blogPost.title,
         description: blogPost.description,
