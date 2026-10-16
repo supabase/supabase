@@ -3,39 +3,41 @@ title: 'Access Control'
 description: 'Roles and permissions at the organization and project levels'
 ---
 
-Supabase provides granular access controls to manage permissions across your organizations and projects.
+Supabase provides granular access controls for your organizations and projects.
 
 For each organization and project, a member can have one of the following roles:
 
 - **Owner**: full access to everything in organization and project resources.
 - **Administrator**: full access to everything in organization and project resources **except** updating organization settings, transferring projects outside of the organization, and adding new owners.
 - **Developer**: read-only access to organization resources and content access to project resources but cannot change any project settings.
-- **Read-Only**: read-only access to organization and project resources.
-- **No-access**: no access to any organization or project resources by default. Use this for members who should only see the specific projects they're granted a [project-scoped role](#organization-scoped-roles-vs-project-scoped-roles) on.
+- **Read-only**: read-only access to organization and project resources.
+- **No-access**: no access to any organization or project resources by default. Use it for members who need to see only the projects where they have a [project-scoped role](#organization-scoped-roles-vs-project-scoped-roles).
 
 <Admonition type="note">
 
-Read-Only and No-access roles are only available on the [Team and Enterprise plans](/pricing).
+The **Read-only** and **No-access** roles are available only on the [Team and Enterprise plans](/pricing).
 
 </Admonition>
 
-When you first create an account, a default organization is created for you and you'll be assigned as the **Owner**. Any organizations you create will assign you as **Owner** as well.
+When you create an account, Supabase creates a default organization and makes you its **Owner**. You're also the **Owner** of any organization you create.
 
 ## Manage organization members
 
-To invite others to collaborate, visit your organization's team [settings](/dashboard/org/_/team) to send an invite link to another user's email. The invite is valid for 24 hours. For project scoped roles, you may only assign a role to a single project for the user when sending the invite. You can assign roles to multiple projects after the user accepts the invite.
+To invite someone, go to your organization's [team settings](/dashboard/org/_/team) and send an invite link to their email address. The invite is valid for 24 hours.
+
+An invite with a project-scoped role can assign that role on only one project. After the person accepts, you can assign roles on more projects.
 
 <Admonition type="note">
 
-Invites sent from a SAML SSO account can only be accepted by another SAML SSO account from the same identity provider.
+Only a SAML SSO account from the same identity provider can accept an invite sent from a SAML SSO account.
 
-This is a security measure to prevent accidental invites to accounts not managed by your enterprise's identity provider.
+This security measure prevents accidental invites to accounts that your enterprise's identity provider doesn't manage.
 
 </Admonition>
 
 ### Viewing organization members using the Management API
 
-You can also view organization members using the Management API:
+You can also list organization members with the Management API:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
@@ -49,32 +51,30 @@ curl "https://api.supabase.com/v1/organizations/$ORG_ID/members" \
 
 ### Transferring ownership of an organization
 
-Each Supabase organization must have at least one owner. If your organization has other owners then you can relinquish ownership and leave the organization by clicking **Leave team** in your organization's team [settings](/dashboard/org/_/team).
+Each Supabase organization must have at least one owner. If your organization has other owners, you can give up ownership and leave the organization. In your organization's [team settings](/dashboard/org/_/team), click **Leave team**.
 
-Otherwise, you'll need to invite a user as **Owner**, and they need to accept the invitation, or promote an existing organization member to **Owner** before you can leave the organization.
+If you're the only owner, make another member an **Owner** before you leave. Either promote an existing member to **Owner**, or invite someone as **Owner** and wait for them to accept.
 
 ### Organization scoped roles vs project scoped roles
 
 <Admonition type="note">
 
-Project scoped roles are only available on the [Team and Enterprise plans](/pricing).
+Project-scoped roles are available only on the [Team and Enterprise plans](/pricing).
 
 </Admonition>
 
-Each member in the organization can be assigned a role that is scoped either to the entire organization or to specific projects.
+You can give each member a role scoped to the entire organization or to specific projects.
 
-- If a member has an organization-level role, they will have the corresponding permissions across all current and future projects within that organization.
-- If a member is assigned a project-scoped role, they will only have access to the specific projects they've been assigned to. They will not be able to view, access, or even see other projects within the organization on the Supabase Dashboard.
+- If a member has an organization-level role, they have its permissions in all current and future projects in the organization.
+- If a member has a project-scoped role, they can access only the projects they're assigned to. In the Supabase Dashboard, they can't see the organization's other projects.
 
-This allows for more granular control, ensuring that users only have visibility and access to the projects relevant to their role.
-
-To default a member to zero project access and grant access on a per-project basis, assign them the organization-level **No access** role, then grant project-scoped roles for the specific projects they need. The **No-access** role is omitted from the permission tables below since it has none of the listed permissions by default.
+To give a member no project access by default and grant access project by project, assign them the organization-level **No-access** role. Then grant project-scoped roles on the projects they need. The permission tables leave out **No-access**, because it has none of the listed permissions by default.
 
 ### Organization permissions across roles
 
-The table below shows the actions each role can take on the resources belonging to the organization.
+The following table shows the actions each role can take on organization resources.
 
-| Resource                                                                                                    | Action     |                  Owner                  |              Administrator              |                Developer                |              Read-Only[^1]              |
+| Resource                                                                                                    | Action     |                  Owner                  |              Administrator              |                Developer                |              Read-only[^1]              |
 | ----------------------------------------------------------------------------------------------------------- | ---------- | :-------------------------------------: | :-------------------------------------: | :-------------------------------------: | :-------------------------------------: |
 | <a href="#org-permissions" id="org-permissions">**Organization**</a>                                        |            |                                         |                                         |                                         |                                         |
 | Organization Management                                                                                     | Update     | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |           <IconX size={14} />           |           <IconX size={14} />           |
@@ -134,9 +134,9 @@ The table below shows the actions each role can take on the resources belonging 
 
 ### Project permissions across roles
 
-The table below shows the actions each role can take on the resources belonging to the project.
+The following table shows the actions each role can take on project resources.
 
-| Resource                                                                                               | Action                 |                  Owner                  |                  Admin                  |                Developer                |                        Read-Only[^4][^6]                        |
+| Resource                                                                                               | Action                 |                  Owner                  |                  Admin                  |                Developer                |                        Read-only[^1][^6]                        |
 | ------------------------------------------------------------------------------------------------------ | ---------------------- | :-------------------------------------: | :-------------------------------------: | :-------------------------------------: | :-------------------------------------------------------------: |
 | <a href="#project-permissions" id="project-permissions">**Project**</a>                                |                        |                                         |                                         |                                         |                                                                 |
 | Project Management                                                                                     | Transfer               | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |           <IconX size={14} />           |                       <IconX size={14} />                       |
@@ -271,18 +271,16 @@ The table below shows the actions each role can take on the resources belonging 
 |                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 |                                                                                                        | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 
-[^1]: Available on the Team and Enterprise Plans.
+[^1]: Available on the Team and Enterprise plans.
 
-[^2]: Sending anonymous data to OpenAI is opt in and can improve Studio AI Assistant's responses.
+[^2]: Sending anonymous data to OpenAI is opt-in and can improve Studio AI Assistant's responses.
 
-[^3]: Invites sent from a SSO account can only be accepted by another SSO account coming from the same identity provider. This is a security measure that prevents accidental invites to accounts not managed by your company's enterprise systems.
+[^3]: Only an SSO account from the same identity provider can accept an invite sent from an SSO account. This security measure prevents accidental invites to accounts that your company's enterprise systems don't manage.
 
-[^4]: Available on the Team and Enterprise Plans.
-
-[^5]: Read-Only role is able to access secrets.
+[^5]: The **Read-only** role can access secrets.
 
 [^6]: Listed permissions are for the API and Dashboard.
 
-[^7]: Limited to executing SELECT queries. SQL Query Snippets run by the Read-Only role are run against the database using the **supabase_read_only_user**. This role has the [predefined Postgres role pg_read_all_data](https://www.postgresql.org/docs/current/predefined-roles.html).
+[^7]: Limited to running `select` queries. SQL snippets that the **Read-only** role runs use the `supabase_read_only_user` database role. This role has the `pg_read_all_data` role. For more information, see the Postgres documentation on [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html).
 
-[^8]: When using dashboard branching without a GitHub integration, the first branch creation also registers the project's production branch — a one-time step that requires Owner or Administrator. See [Branching via the dashboard](/docs/guides/deployment/branching/dashboard) for details. Developers can create, update, and delete branches normally after that.
+[^8]: When using dashboard branching without a GitHub integration, the first branch creation also registers the project's production branch. This one-time step requires the **Owner** or **Administrator** role. After that, Developers can create, update, and delete branches. For more information, see [Branching via the dashboard](/docs/guides/deployment/branching/dashboard).
