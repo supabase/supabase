@@ -59,6 +59,24 @@ describe('StorageSettings.utils: convertFromBytes', () => {
     const output3 = convertFromBytes(mockInput3, StorageSizeUnits.KB)
     expect(output3).toStrictEqual({ value: 5242880, unit: StorageSizeUnits.KB })
   })
+  test('should convert sub-1-byte input to bytes without a negative index', () => {
+    const mockInput = 0.5
+    const output = convertFromBytes(mockInput)
+    expect(output).toStrictEqual({ value: 0.5, unit: StorageSizeUnits.BYTES })
+  })
+  test('should convert NaN to just 0', () => {
+    const mockInput = NaN
+    const output = convertFromBytes(mockInput)
+    expect(output).toStrictEqual({ value: 0, unit: StorageSizeUnits.BYTES })
+  })
+  test('should convert undefined to just 0', () => {
+    const output = convertFromBytes(undefined as any)
+    expect(output).toStrictEqual({ value: 0, unit: StorageSizeUnits.BYTES })
+  })
+  test('should preserve byte boundary behavior for 1 and 1023.9', () => {
+    expect(convertFromBytes(1)).toStrictEqual({ value: 1, unit: StorageSizeUnits.BYTES })
+    expect(convertFromBytes(1023.9)).toStrictEqual({ value: 1023.9, unit: StorageSizeUnits.BYTES })
+  })
 })
 
 describe('StorageSettings.utils: convertToBytes', () => {
