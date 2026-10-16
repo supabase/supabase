@@ -67,6 +67,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import {
@@ -119,7 +120,16 @@ export const ProjectCreationForm = ({
   const { profile } = useProfile()
   const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
-  const defaultProvider = useDefaultProvider()
+  const defaultProviderFromHook = useDefaultProvider()
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+  // On staging, ~50% of new projects default to v3 (AWS_K8S). Rolled once per mount; the
+  // internal-only "Cloud provider" selector can still override it.
+  const [defaultProvider] = useState<CloudProvider>(() => {
+    const canDefaultToV3 =
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' &&
+      (validCloudProviders?.includes('AWS_K8S') ?? true)
+    return canDefaultToV3 && Math.random() < 0.5 ? 'AWS_K8S' : PROVIDERS[defaultProviderFromHook].id
+  })
 
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
@@ -172,7 +182,7 @@ export const ProjectCreationForm = ({
       instanceType: '',
       kubernetesClusterId: '',
       kubernetesClusterForce: false,
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: defaultProvider,
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
