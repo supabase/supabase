@@ -8,6 +8,7 @@ import { cn } from 'ui'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -28,7 +29,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const currentPath = router.pathname
 
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const showOAuthApps = useFlag('OauthAppScopedGrants')
+  const showOAuthApps = useFlag('OauthAppScopedGrants') && USE_MOCKS
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
