@@ -99,9 +99,7 @@ if (error instanceof FunctionsHttpError) {
 
 ## Sending Realtime messages
 
-To send a [Broadcast](/docs/guides/realtime/broadcast) message from an Edge Function, use `httpSend()` and don't subscribe to the channel. Each worker that subscribes opens its own WebSocket connection and keeps it until the worker shuts down. Under load, a function can run many workers at once. Every connection counts toward [Realtime Peak Connections](/docs/guides/platform/manage-your-usage/realtime-peak-connections), and every subscribed worker counts as a recipient of each message on the channel, which adds to [Realtime Messages](/docs/guides/platform/manage-your-usage/realtime-messages).
-
-`httpSend()` sends the message with a single HTTP request, so no connection stays open:
+To send a [Broadcast](/docs/guides/realtime/broadcast) message from an Edge Function, call `httpSend()` without subscribing to the channel. `httpSend()` sends the message in a single HTTP request, so no connection stays open:
 
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
@@ -113,14 +111,26 @@ Deno.serve(async (req) => {
   const { roomId, message } = await req.json()
 
   const channel = supabase.channel(`room:${roomId}`)
-  await channel.httpSend('new-message', { message })
-  supabase.removeChannel(channel)
+  try {
+    await channel.httpSend('new-message', { message })
+  } finally {
+    await supabase.removeChannel(channel)
+  }
 
   return new Response(null, { status: 204 })
 })
 ```
 
-`httpSend()` requires `supabase-js` 2.107.0 or later. For other languages, call the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) directly.
+`httpSend()` requires `supabase-js` 2.76.0 or later. For other languages, call the [Broadcast REST API](/docs/guides/realtime/broadcast#broadcast-using-the-rest-api) directly.
+
+### Why not subscribe to the channel
+
+Subscribing from an Edge Function opens more connections than you might expect, and you're billed for each one:
+
+- Each worker that subscribes opens its own WebSocket connection and keeps it until the worker shuts down.
+- Under load, a function can run many workers at once.
+- Every connection counts toward [Realtime Peak Connections](/docs/guides/platform/manage-your-usage/realtime-peak-connections).
+- Every subscribed worker counts as a recipient of each message on the channel, which adds to [Realtime Messages](/docs/guides/platform/manage-your-usage/realtime-messages).
 
 ## Database Functions vs Edge Functions
 
