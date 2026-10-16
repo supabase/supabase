@@ -192,7 +192,7 @@ export const Addons = () => {
               queryParams={{
                 projectRef,
                 category: SupportCategories.SALES_ENQUIRY,
-                subject: 'Project too old old for PITR',
+                subject: 'Project too old for PITR',
               }}
             >
               Contact support
