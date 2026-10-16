@@ -25,6 +25,8 @@ interface Props {
 
 const { title, description, topics = [], github_url, viewGitHubLink, date, toc = [], related } = Astro.props
 const pagePath = Astro.url.pathname.replace(/\/$/, '')
+// the `<page>.md` redirect only exists on vercel (vercel.json), so fetch the generated file directly
+const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta.env.BASE_URL}/markdown`)}.md`
 ---
 
 <Layout title={title} description={description}>
@@ -97,7 +99,7 @@ const pagePath = Astro.url.pathname.replace(/\/$/, '')
 				client:load
 				items={toc}
 				pageUrl={new URL(pagePath, Astro.site).href}
-				markdownUrl={`${pagePath}.md`}
+				markdownUrl={markdownUrl}
 			/>
 		</aside>
 	</div>

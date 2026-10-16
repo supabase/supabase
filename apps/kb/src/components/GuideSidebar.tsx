@@ -17,6 +17,7 @@ export const GuideSidebar = ({ items, pageUrl, markdownUrl, className }: GuideSi
       <AiTools
         pageUrl={pageUrl}
         markdownUrl={markdownUrl}
+        markdownFallback={getArticleHtml}
         agentSetupHref="https://supabase.com/docs/guides/ai-tools"
         className="pl-5"
       />
@@ -24,3 +25,5 @@ export const GuideSidebar = ({ items, pageUrl, markdownUrl, className }: GuideSi
     </div>
   </AnchorProvider>
 )
+
+const getArticleHtml = () => document.querySelector('article')?.innerHTML ?? ''
