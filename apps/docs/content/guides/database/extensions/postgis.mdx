@@ -512,6 +512,8 @@ If `PostGIS` was installed in the `public` schema, the [Security Advisor](/dashb
 
 This is expected, not a data exposure risk: `spatial_ref_sys` is `PostGIS`'s built-in lookup table of coordinate system definitions, and it never holds your data. The actual problem is that `PostGIS` is installed in `public`, a schema the Data API exposes by default. Enabling RLS on the table isn't possible for your `postgres` role, and it isn't the fix. Follow the steps below to move `PostGIS` out of `public` yourself. They include a backup, since the default path drops and recreates the extension. To avoid the rebuild, contact Supabase Support instead.
 
+For the full list of findings, how to check your project, and what to do before and after the move, see [Security Advisor flags spatial_ref_sys and other PostGIS objects in the public schema](/docs/guides/troubleshooting/security-advisor-flags-spatial_ref_sys-and-other-postgis-objects-in-the-public-schema-f9d408).
+
 ### Moving `PostGIS` to a different schema
 
 As of PostGIS 2.3 or newer, the PostGIS extension is no longer relocatable from one schema to another. If you need to move it from one schema to another for any reason (e.g. from the public schema to the extensions schema for security reasons), you would normally run a ALTER EXTENSION to relocate the schema. However, you will now to do the following steps:
