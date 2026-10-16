@@ -189,6 +189,33 @@ describe('tabs removal', () => {
     expect(store.activeTab).toBe('sql-a')
   })
 
+  it('activates the adjacent tab when the active first tab is removed', () => {
+    const store = createTabsState('default')
+
+    addSqlTab(store, 'a')
+    addSqlTab(store, 'b')
+    addSqlTab(store, 'c')
+    store.activeTab = 'sql-a'
+
+    store.removeTab('sql-a')
+
+    expect(store.openTabs).toEqual(['sql-b', 'sql-c'])
+    expect(store.activeTab).toBe('sql-b')
+  })
+
+  it('activates the remaining tab when the active first of two tabs is removed', () => {
+    const store = createTabsState('default')
+
+    addSqlTab(store, 'a')
+    addSqlTab(store, 'b')
+    store.activeTab = 'sql-a'
+
+    store.removeTab('sql-a')
+
+    expect(store.openTabs).toEqual(['sql-b'])
+    expect(store.activeTab).toBe('sql-b')
+  })
+
   it('clears the active tab when the last tab is removed', () => {
     const store = createTabsState('default')
 

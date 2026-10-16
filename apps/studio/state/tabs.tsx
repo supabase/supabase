@@ -374,9 +374,10 @@ export function createTabsState(projectRef: string) {
         store.previewTabId = undefined
       }
 
-      // Update active tab if the removed tab was active
+      // Update active tab if the removed tab was active. `idx` is the position in
+      // the pre-filter array, so after removal the next tab has shifted into `idx`.
       if (id === store.activeTab) {
-        store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null
+        store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx] || null
       }
     },
 
