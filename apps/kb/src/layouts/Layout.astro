@@ -2,6 +2,7 @@
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
+import { getNavTopics } from '../lib/topic-entries'
 import '../styles/globals.css'
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props
+const navTopics = (await getNavTopics()).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 ---
 
@@ -46,7 +48,7 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 		<title>{title} | Supabase Knowledge Base</title>
 	</head>
 	<body>
-		<Header client:load />
+		<Header client:load topics={navTopics} />
 		<main>
 			<slot />
 		</main>

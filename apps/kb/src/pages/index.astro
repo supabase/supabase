@@ -4,10 +4,11 @@ import { getCollection } from 'astro:content'
 import Card from '../components/Card.astro'
 import { Hero } from '../components/Hero'
 import Layout from '../layouts/Layout.astro'
-import { TOPICS, topicToSlug } from '../lib/topics'
+import { getNavTopics } from '../lib/topic-entries'
+import { topicToSlug } from '../lib/topics'
 
 const guides = await getCollection('guides')
-const visibleTopics = TOPICS.filter((topic) => topic.visible)
+const visibleTopics = await getNavTopics()
 const pinnedTopics = visibleTopics.filter((topic) => topic.pinned)
 const featuredGuides = guides.filter((guide) => guide.data.pinned)
 ---
