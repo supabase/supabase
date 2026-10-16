@@ -26,10 +26,10 @@ import {
 } from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
+import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 type FlowDestination = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
 const steps = [
@@ -60,23 +60,12 @@ export const PipelineCreationFlow = ({
     defaultValues: generateDefaultValues({ catalogToken: '', editMode: false }),
     shouldUnregister: false,
   })
-  const canLeaveRef = useRef(false)
-  const pendingHrefRef = useRef<string | undefined>(undefined)
   const initialTypeRef = useRef(type)
   const { isDirty } = form.formState
-  const hasUnsavedChanges = isDirty || type !== initialTypeRef.current
-  const { confirmOnClose, modalProps } = useConfirmOnClose({
-    checkIsDirty: () => hasUnsavedChanges,
-    onClose: () => {
-      canLeaveRef.current = true
-      if (pendingHrefRef.current) window.location.assign(pendingHrefRef.current)
-      else onClose()
-    },
-  })
-  const handleClose = () => {
-    pendingHrefRef.current = undefined
-    confirmOnClose()
-  }
+  const { requestNavigation, modalProps } = usePipelineNavigationGuard(
+    isDirty || type !== initialTypeRef.current
+  )
+  const handleClose = () => requestNavigation(onClose)
   const { ref: projectRef } = useParams()
   const { validateConnection, isValidating, isConnectionVerified, failures, isResultStale } =
     usePipelineConnectionValidation({ projectRef, type, form })
@@ -106,24 +95,12 @@ export const PipelineCreationFlow = ({
   const currentStep = steps.find((item) => item.id === accessibleStep) ?? steps[0]
   const canSelectDestination = availableDestinations.includes(type)
 
-  useEffect(() => {
-    if (!hasUnsavedChanges) return
-    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-      if (canLeaveRef.current) return
-      event.preventDefault()
-      event.returnValue = ''
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [hasUnsavedChanges])
-
   return (
     <div className="flex min-h-screen flex-col bg-dash-sidebar">
       <PipelineCreationHeader
         onClose={handleClose}
         onNavigate={(href) => {
-          pendingHrefRef.current = href
-          confirmOnClose()
+          requestNavigation(() => window.location.assign(href))
         }}
       />
       <main className="flex-1">
