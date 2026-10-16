@@ -16,21 +16,28 @@ Read a collection reactively with `useLiveQuery()`, and mutate it optimistically
 
     ```tsx
     import { useLiveQuery, eq } from '@tanstack/react-db'
+    // import the todos collection you defined
+    import { todos } from './collections'
 
     const { data, isLoading } = useLiveQuery(
       (q) => q.from({ todo: todos }).where(({ todo }) => eq(todo.completed, false)),
       []
     )
 
-    const id = data[0].id
+    const insertTodo = (title: string = 'Buy milk') => {
+      todos.insert({ id, title: title, completed: false })
+    }
 
-    todos.insert({ id, title: 'Buy milk', completed: false })
+    const updateTodo = (id: string) => {
+      todos.update(id, (draft) => {
+        draft.completed = true
+      })
+    }
 
-    todos.update(id, (draft) => {
-      draft.completed = true
-    })
-
-    todos.delete(id)
+    const deleteTodo = (id: string) => {
+      todos.delete(id)
+    }
+    ...
     ```
 
   </RefSubLayout.Examples>
