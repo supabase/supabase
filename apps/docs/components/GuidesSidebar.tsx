@@ -4,11 +4,16 @@ import { AiTools } from '~/components/AiTools'
 import { Feedback } from '~/components/Feedback'
 import { isFeatureEnabled } from 'common'
 import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
 
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
+
+interface PreferredSourceQueue {
+  push: (callback: (preferredSource: { init: () => void }) => void) => void
+}
 
 interface TOCHeader {
   id?: string
@@ -32,6 +37,31 @@ const GuidesSidebar = ({
   const { toc } = useTocAnchors()
   const showFeedback = isFeatureEnabled('feedback:docs')
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
+  const preferredSourceRef = useRef<HTMLDivElement>(null)
+
+  // Google's script only renders buttons that exist when it loads, and this sidebar can be
+  // re-created after load, which wipes the rendered button. Create the buttons on mount and
+  // call init for them. React doesn't manage the children of this container, so they persist.
+  useEffect(() => {
+    const container = preferredSourceRef.current
+    if (!container) return
+
+    const light = document.createElement('div')
+    light.setAttribute('google-add-preferred-source-btn', '')
+    light.dataset.theme = 'light'
+    light.className = 'dark:hidden'
+
+    const dark = document.createElement('div')
+    dark.setAttribute('google-add-preferred-source-btn', '')
+    dark.dataset.theme = 'dark'
+    dark.className = 'hidden dark:block'
+
+    container.replaceChildren(light, dark)
+
+    const win = window as Window & { PREFERRED_SOURCE?: PreferredSourceQueue | unknown[] }
+    const queue = (win.PREFERRED_SOURCE = win.PREFERRED_SOURCE || []) as PreferredSourceQueue
+    queue.push((preferredSource) => preferredSource.init())
+  }, [])
 
   return (
     <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
@@ -64,11 +94,7 @@ const GuidesSidebar = ({
             </TOCScrollArea>
           </Toc>
         )}
-        <div className="pl-5">
-          {/* Google's publisher.js renders the button into these divs; the dark: variant swaps which one is visible */}
-          <div google-add-preferred-source-btn="" data-theme="light" className="dark:hidden" />
-          <div google-add-preferred-source-btn="" data-theme="dark" className="hidden dark:block" />
-        </div>
+        <div ref={preferredSourceRef} className="pl-5" />
       </div>
     </div>
   )
