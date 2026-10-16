@@ -46,6 +46,7 @@ export type ReferenceZone = {
   color: string
   textColor?: string
   badgeLabel?: string
+  tooltipLabel?: string
   isAlwaysVisible?: boolean
   tooltip: string
   getRanges: (data: Datum[]) => ([number, number] | null)[]
@@ -211,7 +212,7 @@ export const CustomTooltip = ({
       ? referenceZones?.flatMap((zone) => {
           const range = zone.getRanges([rawDataPoint])[0]
           return range && Number.isFinite(range[0])
-            ? [{ label: zone.label, color: zone.color, value: range[0] }]
+            ? [{ label: zone.tooltipLabel ?? zone.label, color: zone.color, value: range[0] }]
             : []
         })
       : []

@@ -129,6 +129,7 @@ describe('CustomTooltip full commitment capacity', () => {
       const problematic: ReferenceZone = {
         ...warning,
         label: 'Problematic',
+        tooltipLabel: '80% threshold',
         color: 'var(--color-orange-900)',
         getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
       }
@@ -169,7 +170,7 @@ describe('CustomTooltip full commitment capacity', () => {
         })
       )
 
-      const thresholdRow = screen.getByText('Problematic').parentElement
+      const thresholdRow = screen.getByText('80% threshold').parentElement
       expect(thresholdRow).toHaveTextContent(expectedThreshold)
       expect(thresholdRow?.querySelector('line')).toHaveAttribute('stroke-dasharray')
       expect(thresholdRow?.querySelector('line')).toHaveAttribute('stroke', problematic.color)
@@ -178,6 +179,7 @@ describe('CustomTooltip full commitment capacity', () => {
       )
       expect(screen.queryByText('Acknowledgment')).not.toBeInTheDocument()
       expect(screen.queryByText('Severe')).not.toBeInTheDocument()
+      expect(screen.queryByText('Problematic')).not.toBeInTheDocument()
       expect(screen.getAllByText(index === 0 ? '7.5 GB' : '1.5 GB')).toHaveLength(2)
     }
   )

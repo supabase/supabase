@@ -147,6 +147,7 @@ export const getReportAttributesV2: (
         {
           label: 'Acknowledgment',
           badgeLabel: 'Warning',
+          tooltipLabel: '50% threshold',
           color: 'var(--color-yellow-900)',
           textColor: 'var(--color-yellow-1100)',
           tooltip:
@@ -156,6 +157,7 @@ export const getReportAttributesV2: (
         {
           label: 'Problematic',
           badgeLabel: 'Problematic',
+          tooltipLabel: '80% threshold',
           color: 'var(--color-orange-900)',
           textColor: 'var(--color-orange-1100)',
           tooltip:
@@ -165,6 +167,7 @@ export const getReportAttributesV2: (
         {
           label: 'Severe',
           badgeLabel: 'Severe',
+          tooltipLabel: '90% threshold',
           color: 'hsl(var(--destructive-600))',
           tooltip:
             'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
