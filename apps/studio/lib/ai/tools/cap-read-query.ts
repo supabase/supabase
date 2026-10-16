@@ -4,7 +4,7 @@ import { applyAutoLimit, trimTrailingSemicolons } from '@/data/sql/utils'
 
 const WRAPPABLE_START = /^\s*(\(|select\b|with\b|values\b|table\b)/i
 // Statements that can't live inside a subquery (or that write), so they're left untouched
-// applyAutoLimit doesn't recognise `LIMIT ALL` and would append a second LIMIT
+// An existing LIMIT ALL must be wrapped to enforce the cap, not left unchanged
 const HAS_LIMIT_ALL = /\blimit\s+all\b/i
 const UNWRAPPABLE = /\b(insert|update|delete|merge|into|for\s+(no\s+key\s+)?(update|share))\b/i
 

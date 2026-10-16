@@ -68,6 +68,7 @@ export function applyAutoLimit(
     !cleanedSql.toLowerCase().match(/fetch\s+(first|next)/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
+    !cleanedSql.match(/\blimit\s+(?:all|null)(?:\s+offset\s+\d+)?\s*;?$/i) &&
     !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
     !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
 

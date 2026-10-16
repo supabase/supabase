@@ -118,6 +118,21 @@ describe('applyAutoLimit', () => {
     const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
+  test.each([
+    safeSql`select 1 limit all;`,
+    safeSql`select 1 limit null;`,
+    safeSql`select 1 limit all offset 2;`,
+    safeSql`SELECT 1 LIMIT NULL OFFSET 2;`,
+  ])('does not add a second limit to %s', (sql) => {
+    expect(applyAutoLimit(sql, 100)).toEqual({ sql, appendAutoLimit: false })
+  })
+  test('still limits queries containing the words limit all in a string literal', () => {
+    const sql = safeSql`select 'limit all' as label;`
+    expect(applyAutoLimit(sql, 100)).toEqual({
+      sql: "select 'limit all' as label limit 100;",
+      appendAutoLimit: true,
+    })
+  })
   test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
     const sql = safeSql`SELECT * FROM countries LIMIT 10;`
     const limit = 100
