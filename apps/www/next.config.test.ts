@@ -14,7 +14,7 @@ describe('next.config.mjs', () => {
     expect(headers).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          source: '/(docs|blog)/:path*',
+          source: '/(docs|blog|kb)/:path*',
           headers: [{ key: 'X-Robots-Tag', value: 'all' }],
         }),
         expect.objectContaining({
