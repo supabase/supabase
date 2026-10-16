@@ -17,6 +17,7 @@ export const LOCAL_STORAGE_KEYS = {
   INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   STATUS_BANNER_DISMISSED_KEYS: 'status-banner-dismissed-keys',
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
+  HOME_CHART_INTERVAL: (ref: string) => `home-chart-interval-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
   UI_TIMEZONE: 'supabase-ui-timezone',

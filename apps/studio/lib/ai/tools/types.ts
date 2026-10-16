@@ -27,6 +27,11 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
    * its own result. Return the output unchanged only if all of it is safe at every level.
    */
   toModelOutput(output: TOutput, optInLevel: AiOptInLevel): JSONValue
+  /**
+   * What history replay shows the model when a persisted output doesn't match `outputSchema`.
+   * Omit it to drop the output.
+   */
+  outputOnInvalid?: JSONValue
 }
 
 export type ToolContractInput<C extends ToolContract> = z.infer<C['inputSchema']>

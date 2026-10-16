@@ -30,7 +30,6 @@ import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
-import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { createNavigationHandler } from '@/lib/navigation'
@@ -170,9 +169,6 @@ export const PlatformWebhooksEndpointList = ({
             </TableHeader>
             <TableBody>
               {sortedEndpoints.map((endpoint) => {
-                const hasName = endpoint.name.trim().length > 0
-                const displayName = getWebhookEndpointDisplayName(endpoint)
-
                 return (
                   <TableRow
                     key={endpoint.id}
@@ -197,12 +193,7 @@ export const PlatformWebhooksEndpointList = ({
                       </Badge>
                     </TableCell>
                     <TableCell className="max-w-[420px]">
-                      <p className="truncate">{displayName}</p>
-                      {hasName && (
-                        <p className="text-xs text-foreground-lighter truncate mt-0.5">
-                          {endpoint.url}
-                        </p>
-                      )}
+                      <p className="truncate">{endpoint.url}</p>
                     </TableCell>
                     <TableCell className="max-w-[280px] truncate">
                       {formatEventCount(endpoint.eventTypes)}
