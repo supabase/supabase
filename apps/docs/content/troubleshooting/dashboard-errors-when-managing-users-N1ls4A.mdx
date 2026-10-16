@@ -10,46 +10,17 @@ database_id = "c5d8260b-c17a-4f6c-ab20-801f953f6c94"
 sdk = [ "auth-signup" ]
 
 [[errors]]
-message = "Failed to send magic link: failed to make magiclink request: Error sending magic link"
-
-[[errors]]
 http_status_code = 500
 code = "unexpected_failure"
 message = "Database error saving new user"
 
-[[errors]]
-http_status_code = 500
-code = "unexpected_failure"
-message = "Failed to create user"
+---
 
-[[errors]]
-http_status_code = 500
-code = "unexpected_failure"
-message = "Database error creating new user"
-
-[[errors]]
-http_status_code = 500
-code = "unexpected_failure"
-message = "Failed to delete user"
-
-[[errors]]
-http_status_code = 500
-code = "unexpected_failure"
-message = "Database error deleting user"
-
-[[errors]]
-http_status_code = 500
-code = "unexpected_failure"
-message = "Error updating user"
-
-[[errors]]
-http_status_code = 500
-code = "unexpected_failure"
-message = "Database error updating user"
+This is a practical guide for diagnosing authentication errors in Supabase when saving, deleting, or updating users.
 
 ---
 
-These error are normal a side effect of issues in your custom user management logic. This can cause errors that return HTTP `500` status codes with a of code `unexpected_failure` and one of the following error messages
+These errors are a common side effect of issues in your custom user management logic. This can cause errors that return HTTP `500` status codes and one of the following error messages
 
 - Failed to create user: Database error creating new user
 - Failed to update user: Error updating user
@@ -57,20 +28,35 @@ These error are normal a side effect of issues in your custom user management lo
 - Database error updating user
 - Database error saving new user
 
-## Debugging this error
-
-- [Auth logs](/dashboard/project/_/logs/auth-logs): as the error relates to [Auth](/docs/guides/auth) users
-- [Postgres logs](/dashboard/project/_/logs/postgres-logs): for raw error logs related to database
-
-## Common causes of this error:
+**Common causes of these errors:**
 
 - Trigger/trigger function setup on the `auth.users` table
 - A constraint on the `auth.users` table which isn't being met
 - You are using Prisma and it has broken all the permissions on the `auth.users` table
 
+## Debugging this error
+
+**Step 1: Check the Auth logs**
+
+When the error can't be reproduced in a browser or you need more context than the client shows, the [Auth logs explorer](/dashboard/project/_/logs/auth-logs) in your project dashboard can help to identify the issue. The logs surface the specific error message and give you the most direct signal about what went wrong.
+
+Two things to keep in mind before you start:
+
+- **Logs are batched.** New entries can take up to **5 minutes** to appear, so a very recent error may not show up immediately.
+- **Set an appropriate time range.** The Log Explorer defaults to a narrow window. Widen the range to cover when the error occurred, or your query will return nothing.
+
+**Step 2: Check the Postgres logs**
+
+If the Auth logs point to a database-level issue, open the [Postgres logs explorer](/dashboard/project/_/logs/postgres-logs) to look for corresponding errors.
+
+
+Once the specific error has been identified, you can use one of the relevant solutions below.
+
+---
+
 ## Example error messages
 
-Use the hints provided in the error message to fix issues in your custom user management logic.
+Hints provided in the error messages can be used to help fix issues in your custom user management logic.
 
 **Trigger/trigger function related error messages** - [Solution for trigger related issues](/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-trigger-related-issues)
 
@@ -85,10 +71,17 @@ ERROR:  23503: update or delete on table "users" violates foreign key constraint
 DETAIL:  Key (id)=(7428a53c-75b7-4531-9ae9-1567d9c4ac0a) is still referenced from table "profiles".
 ```
 
-**Missing column**
+**Missing column** - [Solution for missing column issue](/docs/guides/troubleshooting/dashboard-errors-when-managing-users-N1ls4A#solution-for-missing-column-issue)
 
 ```
 ERROR: column \"updated_at\" of relation \"profiles\" does not exist (SQLSTATE 42703)
+```
+
+**NULL values in auth columns** - [Solution for auth schema related issues](/docs/guides/troubleshooting/auth-error-500-database-error-querying-schema-eb6b44)
+
+```
+500: Database error querying schema
+error finding user: sql: Scan error on column index 8, name "confirmation_token": converting NULL to string is unsupported
 ```
 
 **Broken search path / incorrect name** - [42P01 related solution](/docs/guides/troubleshooting/resolving-42p01-relation-does-not-exist-error-W4_9-V)
@@ -104,6 +97,33 @@ failed to close prepared statement: ERROR: current transaction is aborted, comma
 - Check for foreign/primary key relationship between the `auth.users` table and another table
 - Then ALTER the [behavior](https://stackoverflow.com/questions/5383612/setting-up-table-relations-what-do-cascade-set-null-and-restrict-do) of the relationship and recreate it with a less [restrictive constraint](https://stackoverflow.com/questions/3359329/how-to-change-the-foreign-key-referential-action-behavior).
 - If this is related to deleting records, review the [Cascade Deletes doc](/docs/guides/database/postgres/cascade-deletes) for possible approaches (e.g. using `CASCADE` / `SET NULL`)
+
+---
+
+## Solution for missing column issue
+
+**Example Auth log error:**
+
+```
+failed to close prepared statement: ERROR: current transaction is aborted, commands ignored until end of transaction block (SQLSTATE 25P02): ERROR: relation "profiles" does not exist (SQLSTATE 42P01)
+```
+
+**Example Postgres log error:**
+
+```
+event_message: "relation "profiles" does not exist"
+context: "PL/pgSQL function public.handle_new_user() line 3 at SQL statement"
+```
+
+**Cause:**
+
+A trigger on `auth.users` is calling a function (in this case `handle_new_user`) that tries to insert into a table that does not exist. This is common when a `profiles` table is referenced in a trigger function but was never created, or was accidentally dropped.
+
+**Fix:**
+
+1. Check whether the missing table should exist in your `public` schema. If it should, create the table for the trigger to succeed and the error should resolve.
+
+2. If the table is not needed, review the function definition and update or remove the reference. You can view and edit your database functions from the [Database Functions](/dashboard/project/_/database/functions) page in the dashboard.
 
 ---
 
