@@ -154,7 +154,7 @@ At this stage you have a fully functional application!
 
 ## Add a server route (SolidStart)
 
-The example above is client-only. If you migrate the app to [SolidStart](https://start.solidjs.com/) for [server-side rendering](/docs/guides/auth/server-side) and API routes, you can add protected server endpoints with [`@supabase/server`](https://supabase.github.io/server/).
+The example above is client-only. If you migrate the app to [SolidStart](https://start.solidjs.com/) for server-side rendering and API routes, you can add protected server endpoints with [`@supabase/server`](https://supabase.github.io/server/).
 
 `createSupabaseContext` validates the incoming request's JWT locally (using your project's asymmetric signing keys, no round-trip to the Auth server), scopes a Supabase client to the authenticated user via RLS, and exposes the user's claims, all from a single call inside your SolidStart API route handler.
 
