@@ -106,3 +106,28 @@ export function getReferenceZoneChart(
   const maxValue = getReferenceZoneMaximum(zones)
   return { zones: visibleZones, maxValue, selectedZone }
 }
+
+type ReferenceZoneValue = {
+  label: string
+  color: string
+  value: number
+}
+
+export function getReferenceZoneValues(
+  point: Datum | undefined,
+  zones: ReferenceZone[] | undefined
+): ReferenceZoneValue[] {
+  if (!point || !zones) return []
+
+  const values: ReferenceZoneValue[] = []
+  for (const zone of zones) {
+    const range = zone.getRanges([point])[0]
+    if (!range) continue
+
+    const [value] = range
+    if (!Number.isFinite(value)) continue
+
+    values.push({ label: zone.tooltipLabel ?? zone.label, color: zone.color, value })
+  }
+  return values
+}

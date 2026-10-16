@@ -6,6 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import type { Datum } from './Charts.types'
 import { formatPercentage, numberFormatter } from './Charts.utils'
+import { getReferenceZoneValues } from './ComposedChartReferenceZones.utils'
 import { useFormatDateTime, useTimezone } from '@/lib/datetime'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
@@ -208,14 +209,7 @@ export const CustomTooltip = ({
     const rawDataPoint = data?.find(
       (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
     )
-    const referenceValues = rawDataPoint
-      ? referenceZones?.flatMap((zone) => {
-          const range = zone.getRanges([rawDataPoint])[0]
-          return range && Number.isFinite(range[0])
-            ? [{ label: zone.tooltipLabel ?? zone.label, color: zone.color, value: range[0] }]
-            : []
-        })
-      : []
+    const referenceValues = getReferenceZoneValues(rawDataPoint, referenceZones)
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValue =
       maxValueAttribute && rawDataPoint

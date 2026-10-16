@@ -6,6 +6,7 @@ import {
   getReferenceZoneChart,
   getReferenceZoneMaximum,
   getReferenceZoneRuns,
+  getReferenceZoneValues,
   getReferenceZoneXBounds,
 } from './ComposedChartReferenceZones.utils'
 
@@ -241,5 +242,50 @@ describe('getReferenceZoneChart', () => {
     expect(chart.zones.map((zone) => zone.label)).toEqual(zones.map((zone) => zone.label))
     expect(chart.selectedZone).toBeUndefined()
     expect(chart.maxValue).toBe(100)
+  })
+})
+
+describe('getReferenceZoneValues', () => {
+  const threshold: ReferenceZone = {
+    label: 'Problematic',
+    tooltipLabel: '80% threshold',
+    color: 'var(--color-orange-900)',
+    tooltip: '',
+    getRanges: (data) =>
+      data.map((point) => [Number(point.capacity) * 0.8, Number(point.capacity)]),
+  }
+  const capacity: ReferenceZone = {
+    label: 'Full commitment capacity',
+    color: 'var(--chart-reference)',
+    tooltip: '',
+    getRanges: (data) => data.map((point) => [Number(point.capacity), Number(point.capacity)]),
+  }
+
+  it.each([100, 200])(
+    'uses the supplied sample capacity of %s and preserves labels and colors',
+    (value) => {
+      expect(getReferenceZoneValues({ capacity: value }, [threshold, capacity])).toEqual([
+        { label: '80% threshold', color: threshold.color, value: value * 0.8 },
+        { label: 'Full commitment capacity', color: capacity.color, value },
+      ])
+    }
+  )
+
+  it('omits unavailable or nonfinite bounds while retaining a real zero', () => {
+    const zones: ReferenceZone[] = [
+      { ...threshold, getRanges: () => [null] },
+      { ...threshold, getRanges: () => [[Infinity, 100]] },
+      { ...threshold, getRanges: () => [[Number.NaN, 100]] },
+      { ...threshold, getRanges: () => [[0, 100]] },
+    ]
+    expect(getReferenceZoneValues({ capacity: 100 }, zones)).toEqual([
+      { label: '80% threshold', color: threshold.color, value: 0 },
+    ])
+  })
+
+  it('returns no values without a sample or reference configuration', () => {
+    expect(getReferenceZoneValues(undefined, [threshold])).toEqual([])
+    expect(getReferenceZoneValues({ capacity: 100 }, undefined)).toEqual([])
+    expect(getReferenceZoneValues({ capacity: 100 }, [])).toEqual([])
   })
 })
