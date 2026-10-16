@@ -1,12 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import {
-  absolutizeLinks,
-  getInternalLinkBaseUrl,
-  htmlToMarkdown,
-  splitFrontmatter,
-  toMarkdownPath,
-} from './generate-markdown.mjs'
+import { getInternalLinkBaseUrl, htmlToMarkdown, toMarkdownPath } from './generate-markdown.mjs'
 
 const PAGE_HTML = `<!doctype html>
 <html>
@@ -26,22 +20,10 @@ const PAGE_HTML = `<!doctype html>
   </body>
 </html>`
 
-describe('splitFrontmatter', () => {
-  it('separates the leading YAML block from the body', () => {
-    const markdown = '---\ntitle: "Sample"\n---\n# Sample\n\nBody.\n'
-
-    expect(splitFrontmatter(markdown)).toEqual({
-      frontmatter: '---\ntitle: "Sample"\n---\n',
-      body: '# Sample\n\nBody.\n',
-    })
-  })
-
-  it('returns an empty frontmatter and the whole input when there is none', () => {
-    const markdown = '# Sample\n\nBody.\n'
-
-    expect(splitFrontmatter(markdown)).toEqual({ frontmatter: '', body: markdown })
-  })
-})
+// Wraps body HTML in a main element so extract: true keeps it.
+function main(bodyHtml) {
+  return `<main><article>${bodyHtml}</article></main>`
+}
 
 describe('toMarkdownPath', () => {
   it('maps a page index.html to a sibling .md file named after its route', () => {
@@ -71,9 +53,7 @@ describe('htmlToMarkdown callouts', () => {
   })
 
   it('converts a Note admonition into a GitHub NOTE alert and drops the icon', () => {
-    const markdown = htmlToMarkdown(
-      `<main><article>${admonitionHtml('Note', '<p>Body of the note.</p>')}</article></main>`
-    )
+    const markdown = htmlToMarkdown(main(admonitionHtml('Note', '<p>Body of the note.</p>')))
 
     expect(markdown).toContain('> [!NOTE]\n> Body of the note.')
     expect(markdown).not.toContain('<svg')
@@ -82,7 +62,12 @@ describe('htmlToMarkdown callouts', () => {
 
   it('keeps multi-paragraph and bulleted callout bodies inside the blockquote', () => {
     const markdown = htmlToMarkdown(
-      `<main><article>${admonitionHtml('Caution', '<p><strong>Heads up</strong></p><p>Second paragraph.</p><ul><li>First</li></ul>')}</article></main>`
+      main(
+        admonitionHtml(
+          'Caution',
+          '<p><strong>Heads up</strong></p><p>Second paragraph.</p><ul><li>First</li></ul>'
+        )
+      )
     )
 
     expect(markdown).toContain('> [!CAUTION]\n> **Heads up**\n>\n> Second paragraph.')
@@ -91,7 +76,9 @@ describe('htmlToMarkdown callouts', () => {
 
   it('maps the other Admonition labels onto their closest GitHub alert type', () => {
     const markdown = htmlToMarkdown(
-      `<main><article>${admonitionHtml('Success', '<p>Tip body.</p>')}${admonitionHtml('Warning', '<p>Warn body.</p>')}${admonitionHtml('Danger', '<p>Danger body.</p>')}</article></main>`
+      main(
+        `${admonitionHtml('Success', '<p>Tip body.</p>')}${admonitionHtml('Warning', '<p>Warn body.</p>')}${admonitionHtml('Danger', '<p>Danger body.</p>')}`
+      )
     )
 
     expect(markdown).toContain('> [!TIP]\n> Tip body.')
@@ -132,6 +119,55 @@ describe('htmlToMarkdown', () => {
       '[related guide](https://supabase.com/kb/guides/other-guide)'
     )
   })
+
+  it('leaves already-absolute links untouched', () => {
+    expect(htmlToMarkdown(main('<a href="https://example.com/guide">the docs</a>'))).toContain(
+      '[the docs](https://example.com/guide)'
+    )
+  })
+
+  it('does not double up the base path when a link already includes it', () => {
+    expect(htmlToMarkdown(main('<a href="/kb/guides/other-guide">another guide</a>'))).toContain(
+      '[another guide](https://supabase.com/kb/guides/other-guide)'
+    )
+  })
+
+  it('keeps a link title as the markdown title', () => {
+    expect(
+      htmlToMarkdown(main('<a href="/guides/other-guide" title="Other">another guide</a>'))
+    ).toContain('[another guide](https://supabase.com/kb/guides/other-guide "Other")')
+  })
+
+  it('leaves root-relative links into /docs untouched', () => {
+    expect(
+      htmlToMarkdown(main('<a href="/docs/reference/javascript/auth-updateuser">reference</a>'))
+    ).toContain('[reference](/docs/reference/javascript/auth-updateuser)')
+  })
+
+  it('does not treat a path that merely starts with "docs" as a /docs link', () => {
+    expect(htmlToMarkdown(main('<a href="/docsy/page">docsy</a>'))).toContain(
+      '[docsy](https://supabase.com/kb/docsy/page)'
+    )
+  })
+
+  it('does not rewrite image URLs', () => {
+    expect(htmlToMarkdown(main('<img src="/img.png" alt="alt" />'))).toContain('/img.png')
+    expect(htmlToMarkdown(main('<img src="/img.png" alt="alt" />'))).not.toContain('supabase.com')
+  })
+
+  it('leaves a root-relative URL inside a code block untouched', () => {
+    const markdown = htmlToMarkdown(main('<pre><code>curl -X GET /guides/foo</code></pre>'))
+
+    expect(markdown).toContain('curl -X GET /guides/foo')
+    expect(markdown).not.toContain('supabase.com')
+  })
+
+  it('leaves the link relative (base path only, no origin) outside of Vercel', () => {
+    delete process.env.VERCEL_ENV
+    expect(htmlToMarkdown(main('<a href="/guides/other-guide">another guide</a>'))).toContain(
+      '[another guide](/kb/guides/other-guide)'
+    )
+  })
 })
 
 describe('getInternalLinkBaseUrl', () => {
@@ -165,85 +201,5 @@ describe('getInternalLinkBaseUrl', () => {
 
   it('returns empty when VERCEL_ENV is not set (local dev/CI)', () => {
     expect(getInternalLinkBaseUrl()).toBe('')
-  })
-})
-
-describe('absolutizeLinks', () => {
-  const ORIGINAL_ENV = process.env
-
-  beforeEach(() => {
-    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
-  })
-
-  afterEach(() => {
-    process.env = ORIGINAL_ENV
-  })
-
-  it('leaves already-absolute links untouched', () => {
-    expect(absolutizeLinks('See [the docs](https://example.com/guide) for more.')).toBe(
-      'See [the docs](https://example.com/guide) for more.\n'
-    )
-  })
-
-  it('rewrites a root-relative link into a full URL under the kb base path', () => {
-    expect(absolutizeLinks('See [another guide](/guides/other-guide) for more.')).toBe(
-      'See [another guide](https://supabase.com/kb/guides/other-guide) for more.\n'
-    )
-  })
-
-  it('does not double up the base path when a link already includes it', () => {
-    expect(absolutizeLinks('[another guide](/kb/guides/other-guide)')).toBe(
-      '[another guide](https://supabase.com/kb/guides/other-guide)\n'
-    )
-  })
-
-  it('leaves root-relative links into /docs untouched', () => {
-    expect(absolutizeLinks('[reference](/docs/reference/javascript/auth-updateuser)')).toBe(
-      '[reference](/docs/reference/javascript/auth-updateuser)\n'
-    )
-  })
-
-  it('does not treat a path that merely starts with "docs" as a /docs link', () => {
-    expect(absolutizeLinks('[docsy](/docsy/page)')).toBe(
-      '[docsy](https://supabase.com/kb/docsy/page)\n'
-    )
-  })
-
-  it('leaves the link relative (base path only, no origin) outside of Vercel', () => {
-    delete process.env.VERCEL_ENV
-    expect(absolutizeLinks('[another guide](/guides/other-guide)')).toBe(
-      '[another guide](/kb/guides/other-guide)\n'
-    )
-  })
-
-  it('does not rewrite image URLs', () => {
-    expect(absolutizeLinks('![alt](/img.png)')).toBe('![alt](/img.png)\n')
-  })
-
-  it('skips link-like text inside fenced code blocks', () => {
-    expect(absolutizeLinks('```\n[x](/x)\n```\n\n[y](/y)')).toBe(
-      '```\n[x](/x)\n```\n\n[y](https://supabase.com/kb/y)\n'
-    )
-  })
-
-  it('leaves a root-relative URL inside a fenced code block untouched, even outside link syntax', () => {
-    const body = '```bash\ncurl -X GET /guides/foo\n```'
-    expect(absolutizeLinks(body)).toBe('```bash\ncurl -X GET /guides/foo\n```\n')
-  })
-
-  it('leaves a root-relative URL inside a fenced markdown code block untouched', () => {
-    const body = '```md\n[Guides](/guides/foo)\n```'
-    expect(absolutizeLinks(body)).toBe('```md\n[Guides](/guides/foo)\n```\n')
-  })
-
-  it('leaves a root-relative URL inside an inline code span untouched', () => {
-    expect(absolutizeLinks('Run `GET /guides/foo` to fetch it.')).toBe(
-      'Run `GET /guides/foo` to fetch it.\n'
-    )
-  })
-
-  it('round-trips GFM tables and strikethrough without mangling them', () => {
-    const body = '| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~'
-    expect(absolutizeLinks(body)).toBe('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n')
   })
 })

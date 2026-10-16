@@ -9,11 +9,6 @@ import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { convert, createRule } from 'markdown-for-agents'
-import remarkGfm from 'remark-gfm'
-import remarkParse from 'remark-parse'
-import remarkStringify from 'remark-stringify'
-import { unified } from 'unified'
-import { visit } from 'unist-util-visit'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
 
@@ -31,14 +26,6 @@ const SITE_ORIGIN = 'https://supabase.com'
 // Root-relative links under this path point at the docs app, so they're kept
 // as-is rather than being prefixed with the kb base path.
 const DOCS_PATH = '/docs'
-
-// Single processor reused for every file: parses GFM markdown to an mdast
-// tree and serializes it back, same extensions on both ends so nothing
-// (tables, strikethrough, alert blockquotes) gets mangled in the round trip.
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkStringify, { bullet: '-', listItemIndent: 'one', emphasis: '_', rule: '-' })
 
 /**
  * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
@@ -58,32 +45,32 @@ export function getInternalLinkBaseUrl() {
   return ''
 }
 
-/**
- * Rewrites root-relative markdown links into full, absolute URLs by parsing
- * the body to an mdast tree, visiting its `link` nodes, and serializing it
- * back — the AST equivalent of apps/docs' `addBaseUrlPrefix()`, so this file
- * still makes sense read outside of the site (no regex over the raw text).
- * Links into /docs are left root-relative: that section is served from the
- * docs app, not under this app's base path.
- *
- * @param {string} body
- */
-export function absolutizeLinks(body) {
-  const tree = processor.parse(body)
-  const baseUrl = getInternalLinkBaseUrl()
-
-  visit(tree, 'link', (node) => {
-    if (!node.url.startsWith('/') || node.url.startsWith('//')) return
-    if (node.url === DOCS_PATH || node.url.startsWith(`${DOCS_PATH}/`)) return
-    const withBase =
-      node.url === BASE_PATH || node.url.startsWith(`${BASE_PATH}/`)
-        ? node.url
-        : `${BASE_PATH}${node.url}`
-    node.url = `${baseUrl}${withBase}`
-  })
-
-  return String(processor.stringify(tree))
+// True for links to this app's own pages that need the base path (and origin)
+// added. Protocol-relative and /docs links are left to the default conversion.
+function isLocalRootRelative(href) {
+  if (typeof href !== 'string' || !href.startsWith('/') || href.startsWith('//')) return false
+  return href !== DOCS_PATH && !href.startsWith(`${DOCS_PATH}/`)
 }
+
+function absolutizeHref(href) {
+  const withBase =
+    href === BASE_PATH || href.startsWith(`${BASE_PATH}/`) ? href : `${BASE_PATH}${href}`
+  return `${getInternalLinkBaseUrl()}${withBase}`
+}
+
+// Rewrites root-relative links in the page body so the exported file still
+// works when read outside the site — the HTML equivalent of apps/docs'
+// `addBaseUrlPrefix()`.
+const linkRule = createRule(
+  (node) => node.name === 'a' && isLocalRootRelative(node.attribs?.href),
+  ({ convertChildren, node }) => {
+    const content = convertChildren(node).trim()
+    if (!content) return ''
+    const href = absolutizeHref(node.attribs.href)
+    const title = node.attribs.title
+    return title ? `[${content}](${href} "${title}")` : `[${content}](${href})`
+  }
+)
 
 // Admonition labels (see TYPE_LABEL in packages/ui-patterns/src/Admonition)
 // mapped to the GitHub alert type that keeps the same meaning in markdown.
@@ -116,7 +103,10 @@ const admonitionRule = createRule(
       node,
       (child) => child.attribs?.['data-slot'] === 'alert-description'
     )
-    const body = convertChildren(description ?? node).trim()
+    // Paragraph spacing comes out as runs of blank lines; keep one per gap.
+    const body = convertChildren(description ?? node)
+      .trim()
+      .replace(/\n\s*\n/g, '\n\n')
     const quoted = body
       .split('\n')
       .map((line) => (line ? `> ${line}` : '>'))
@@ -126,23 +116,6 @@ const admonitionRule = createRule(
 )
 
 /**
- * Splits the YAML frontmatter block that markdown-for-agents prepends (from
- * the page's `<head>`) off the body, so the frontmatter isn't handed to the
- * markdown parser, which would read it as a thematic break and paragraphs.
- *
- * @param {string} markdown
- */
-export function splitFrontmatter(markdown) {
-  if (!markdown.startsWith('---\n')) return { frontmatter: '', body: markdown }
-
-  const closingIndex = markdown.indexOf('\n---\n', 4)
-  if (closingIndex === -1) return { frontmatter: '', body: markdown }
-
-  const end = closingIndex + '\n---\n'.length
-  return { frontmatter: markdown.slice(0, end), body: markdown.slice(end) }
-}
-
-/**
  * Converts a rendered HTML page to markdown. Only the page's main content is
  * kept (`extract: true` drops navigation, headers, footers, and sidebars), and
  * root-relative links in the body are absolutized.
@@ -150,18 +123,7 @@ export function splitFrontmatter(markdown) {
  * @param {string} html
  */
 export function htmlToMarkdown(html) {
-  const { markdown } = convert(html, { extract: true, rules: [admonitionRule] })
-  const { frontmatter, body } = splitFrontmatter(markdown)
-  return `${frontmatter}${restoreAlertMarkers(absolutizeLinks(body))}`
-}
-
-// remark-stringify escapes the `[` in GitHub alert markers (`> [!NOTE]`),
-// which GitHub would then render as literal text, so put the marker back.
-// Only the five alert types at the start of a blockquote line are touched.
-const ESCAPED_ALERT_MARKER = /^(>\s*)\\\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/gm
-
-function restoreAlertMarkers(markdown) {
-  return markdown.replace(ESCAPED_ALERT_MARKER, '$1[!$2]')
+  return convert(html, { extract: true, rules: [admonitionRule, linkRule] }).markdown
 }
 
 /**
@@ -175,23 +137,15 @@ export function toMarkdownPath(htmlPath) {
 }
 
 async function findIndexPages(dir) {
-  let entries
   try {
-    entries = await readdir(dir, { withFileTypes: true })
+    const entries = await readdir(dir, { recursive: true })
+    return entries
+      .filter((entry) => path.basename(entry) === 'index.html')
+      .map((entry) => path.join(dir, entry))
   } catch (error) {
     if (error.code === 'ENOENT') return []
     throw error
   }
-
-  const files = await Promise.all(
-    entries.map((entry) => {
-      const fullPath = path.join(dir, entry.name)
-      if (entry.isDirectory()) return findIndexPages(fullPath)
-      if (entry.name === 'index.html') return [fullPath]
-      return []
-    })
-  )
-  return files.flat()
 }
 
 async function writeFileEnsuringDir(outputPath, contents) {
