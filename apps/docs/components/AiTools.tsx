@@ -119,7 +119,7 @@ function AiTools({
             className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
           >
             <Google size={14} aria-hidden />
-            Add as preferred
+            Prefer on Google
           </a>
         )}
       </div>
