@@ -53,7 +53,7 @@ export const FeaturedSection = ({ title, items, className }: FeaturedSectionProp
       <ul
         ref={bindRevealOnce}
         className={cn(
-          'mx-auto grid w-full max-w-6xl list-none gap-6 px-6 sm:grid-cols-2 lg:grid-cols-3',
+          'mx-auto grid w-full max-w-6xl list-none gap-6 px-6 sm:grid-cols-[repeat(auto-fit,minmax(18rem,1fr))]',
           REVEAL_GROUP_CLASS
         )}
       >
@@ -79,14 +79,7 @@ const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
         description={item.description}
         topics={item.topics}
         date={hasDates ? (item.date ?? '') : undefined}
-        className={cn(
-          'cover-notch',
-          hasDates ? 'h-115.5' : 'h-107.5',
-          // tint layer instead of a bg swap: the canvas paints the card bg into its cutouts
-          "before:pointer-events-none before:absolute before:inset-0 before:z-10 before:content-['']",
-          'before:rounded-lg before:bg-surface-200 before:opacity-0',
-          'group-hover/cover:before:opacity-100 group-focus-visible/cover:before:opacity-100'
-        )}
+        className={cn('cover-notch', hasDates ? 'h-115.5' : 'h-107.5')}
       />
     </div>
     <svg
@@ -98,23 +91,18 @@ const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
       className="pointer-events-none absolute right-0 bottom-0 z-20 overflow-visible"
     >
       <path d={getNotchOutline(NOTCH_WIDTH)} className="stroke-(--background-surface-75)" />
-      <path
-        d={getNotchOutline(NOTCH_WIDTH)}
-        className="stroke-(--background-surface-200) opacity-0 group-hover/cover:opacity-100 group-focus-visible/cover:opacity-100"
-      />
       <path d={getNotchOutline(NOTCH_WIDTH)} className="stroke-border" />
     </svg>
     <span
       aria-hidden
-      className="pointer-events-none absolute right-0 bottom-0 z-20 flex h-8 w-(--notch-width) items-center justify-center"
+      className="pointer-events-none absolute right-0 bottom-0 z-20 flex h-8 w-(--notch-width) items-center justify-center overflow-hidden"
     >
       <ArrowRight
         strokeWidth={2.25}
         className={cn(
-          'size-3.5 -translate-x-1 text-foreground-light opacity-0',
-          'transition-[opacity,translate] duration-200 ease-out-strong motion-reduce:transition-none',
-          'group-hover/cover:translate-x-px group-hover/cover:opacity-100',
-          'group-focus-visible/cover:translate-x-px group-focus-visible/cover:opacity-100'
+          'size-3.5 -translate-x-7 text-foreground-light',
+          'transition-transform duration-200 ease-out-strong motion-reduce:transition-none',
+          'group-hover/cover:translate-x-px group-focus-visible/cover:translate-x-px'
         )}
       />
     </span>

@@ -47,6 +47,12 @@ interface HeroFieldParams {
   seed: number
 }
 
+interface BeamParams {
+  col: number
+  row: number
+  now?: number
+}
+
 export const RAMP = [' ', '·', '░', '▒', '▓'] as const
 export const BLOCK_GLYPHS = ['▓', '▒', '░'] as const
 
@@ -55,8 +61,19 @@ export const CELL_HEIGHT = 26
 export const GLYPH_PITCH = 12
 
 const ENERGY_EPSILON = 0.01
-const GLYPH_JITTER = 0.3
 const MIN_COLUMN = 60
+export const BEAM_ALPHA = 0.7
+
+export const hash = (a: number, b: number) => {
+  const n = Math.sin(a * 127.1 + b * 311.7) * 43758.5453
+  return n - Math.floor(n)
+}
+
+export const rampGlyph = (density: number) =>
+  RAMP[Math.min(RAMP.length - 1, Math.floor(density * RAMP.length))]
+
+export const isBeamAt = ({ col, row, now = 0 }: BeamParams) =>
+  hash(col + row * 31, Math.floor(now / 600 + hash(row, col))) < 0.04
 
 export const createRng = (seed: number): (() => number) => {
   let state = seed >>> 0
@@ -88,16 +105,6 @@ export const alignedEdges = ({ size, start, end, target }: AlignedEdgesParams): 
 export const fitEdges = ({ size, target }: { size: number; target: number }): number[] => {
   const count = size > 0 ? Math.max(1, Math.round(size / target)) : 0
   return Array.from({ length: count + 1 }, (_, i) => roundEdge((i * size) / count || 0))
-}
-
-export const splitEdges = ({ edges, target }: { edges: number[]; target: number }): number[] => {
-  const slots = [edges[0] ?? 0]
-  for (let i = 0; i < edges.length - 1; i++) {
-    const width = edges[i + 1] - edges[i]
-    const count = Math.max(1, Math.floor(width / target))
-    for (let k = 1; k <= count; k++) slots.push(roundEdge(edges[i] + (k * width) / count))
-  }
-  return slots
 }
 
 export const latticeSize = ({ xs, ys }: Lattice) => ({
@@ -166,14 +173,13 @@ export const buildMask = ({ lattice, rects, margin = 1 }: BuildMaskParams): Uint
   return mask
 }
 
-const glyphFor = (density: number): string =>
-  RAMP[clamp(Math.ceil(density * (RAMP.length - 1)), 0, RAMP.length - 1)]
-
 export const glyphRun = ({ density, capacity, rand }: GlyphRunParams): string => {
   if (density <= 0 || capacity <= 0) return ''
   const length = clamp(Math.round(capacity * density), 1, capacity)
-  return Array.from({ length }, () =>
-    glyphFor(clamp(density + (rand() - 0.5) * GLYPH_JITTER, ENERGY_EPSILON, 1))
+  return Array.from(
+    { length },
+    () =>
+      RAMP[Math.ceil(clamp(density + (rand() - 0.5) * 0.3, ENERGY_EPSILON, 1) * (RAMP.length - 1))]
   ).join('')
 }
 

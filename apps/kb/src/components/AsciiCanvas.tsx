@@ -23,7 +23,7 @@ export interface CanvasSize {
   height: number
 }
 
-export interface FieldParams {
+interface FieldParams {
   lattice: Lattice
   seed: number
   mask: Uint8Array
@@ -31,12 +31,10 @@ export interface FieldParams {
 
 export interface AsciiCanvasProps {
   getLattice: (size: CanvasSize) => Lattice
-  getGridLattice?: (size: CanvasSize) => Lattice
   getField: (params: FieldParams) => Float32Array
   keepOutRefs?: RefObject<HTMLElement | null>[]
   keepOutMargin?: number
   words?: string[]
-  isInteractive?: boolean
   decay?: number
   isActive?: boolean
   revealDuration?: number
@@ -134,12 +132,10 @@ const relativeRect = (element: HTMLElement, origin: DOMRect): PixelRect => {
 
 export const AsciiCanvas = ({
   getLattice,
-  getGridLattice,
   getField,
   keepOutRefs = [],
   keepOutMargin = 1,
   words = [],
-  isInteractive = true,
   decay = DECAY,
   isActive = true,
   revealDuration = 0,
@@ -158,7 +154,6 @@ export const AsciiCanvas = ({
     const grain = createGrainPattern(ctx)
     let palette = readPalette(probeRoot, host)
     let lattice: Lattice = { xs: [0], ys: [0] }
-    let grid: Lattice = lattice
     let base: Float32Array = new Float32Array(0)
     let energy: Float32Array = new Float32Array(0)
     let mask: Uint8Array = new Uint8Array(0)
@@ -183,7 +178,7 @@ export const AsciiCanvas = ({
 
     // snap from 1px above the keep-out so its top grid line never lands under an opaque edge
     const keepOutCell = (rect: PixelRect, margin: number) =>
-      snapRect({ lattice: grid, rect: { ...rect, top: rect.top - 1 }, margin })
+      snapRect({ lattice, rect: { ...rect, top: rect.top - 1 }, margin })
 
     const capacityAt = (c: number) =>
       Math.max(1, Math.floor((lattice.xs[c + 1] - lattice.xs[c] - CELL_PADDING * 2) / GLYPH_PITCH))
@@ -215,13 +210,13 @@ export const AsciiCanvas = ({
       ctx.strokeStyle = palette.grid
       ctx.lineWidth = 1
       ctx.beginPath()
-      for (let i = 1; i < grid.xs.length - 1; i++) {
-        ctx.moveTo(Math.round(grid.xs[i]) + 0.5, 0)
-        ctx.lineTo(Math.round(grid.xs[i]) + 0.5, height * down)
+      for (let i = 1; i < lattice.xs.length - 1; i++) {
+        ctx.moveTo(Math.round(lattice.xs[i]) + 0.5, 0)
+        ctx.lineTo(Math.round(lattice.xs[i]) + 0.5, height * down)
       }
-      for (let i = 1; i < grid.ys.length - 1; i++) {
-        ctx.moveTo(0, Math.round(grid.ys[i]) + 0.5)
-        ctx.lineTo(width * across, Math.round(grid.ys[i]) + 0.5)
+      for (let i = 1; i < lattice.ys.length - 1; i++) {
+        ctx.moveTo(0, Math.round(lattice.ys[i]) + 0.5)
+        ctx.lineTo(width * across, Math.round(lattice.ys[i]) + 0.5)
       }
       ctx.stroke()
       if (grain) {
@@ -322,7 +317,6 @@ export const AsciiCanvas = ({
       canvas.height = Math.round(height * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       lattice = getLattice({ width, height })
-      grid = getGridLattice?.({ width, height }) ?? lattice
       cutouts = nextCutouts
       runs.clear()
       ingested.clear()
@@ -378,7 +372,7 @@ export const AsciiCanvas = ({
     const activeObserver = new MutationObserver(wake)
     activeObserver.observe(canvas, { attributes: true, attributeFilter: ['data-active'] })
 
-    if (isInteractive) host.addEventListener('pointerdown', typeWordAt)
+    host.addEventListener('pointerdown', typeWordAt)
     document.addEventListener('visibilitychange', wake)
     document.fonts?.ready.then(measure)
     if (revealDuration > 0 && !isReducedMotion) {

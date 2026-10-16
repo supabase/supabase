@@ -1,18 +1,9 @@
 import { useRef } from 'react'
 import { cn } from 'ui'
 
-import { coverField, pickCoverTopic } from '../lib/ascii/cover-shapes'
-import {
-  CELL_HEIGHT,
-  CELL_WIDTH,
-  fitEdges,
-  GLYPH_PITCH,
-  splitEdges,
-  uniformEdges,
-  type Lattice,
-} from '../lib/ascii/field'
-import type { Topic } from '../lib/topics'
-import { AsciiCanvas, type CanvasSize, type FieldParams } from './AsciiCanvas'
+import { FALLBACK_COMPOSITION, ISO_COMPOSITIONS } from '../lib/cover-compositions'
+import { pickCoverTopic, type Topic } from '../lib/topics'
+import { CoverCanvas } from './CoverCanvas'
 
 export interface TopicCoverProps {
   title: string
@@ -22,19 +13,10 @@ export interface TopicCoverProps {
   className?: string
 }
 
-const getCoverGrid = ({ width, height }: CanvasSize): Lattice => ({
-  xs: fitEdges({ size: width, target: CELL_WIDTH }),
-  ys: uniformEdges({ size: height, step: CELL_HEIGHT }),
-})
-
-const getCoverLattice = (size: CanvasSize): Lattice => {
-  const grid = getCoverGrid(size)
-  return { xs: splitEdges({ edges: grid.xs, target: GLYPH_PITCH }), ys: grid.ys }
-}
-
 export const TopicCover = ({ title, description, topics, date, className }: TopicCoverProps) => {
   const textRef = useRef<HTMLDivElement>(null)
-  const getField = (params: FieldParams) => coverField({ ...params, topic: pickCoverTopic(topics) })
+  const topic = pickCoverTopic(topics)
+  const composition = topic ? ISO_COMPOSITIONS[topic] : FALLBACK_COMPOSITION
 
   return (
     <article
@@ -44,12 +26,14 @@ export const TopicCover = ({ title, description, topics, date, className }: Topi
         className
       )}
     >
-      <AsciiCanvas
-        getLattice={getCoverLattice}
-        getGridLattice={getCoverGrid}
-        getField={getField}
-        keepOutRefs={[textRef]}
-        isInteractive={false}
+      <CoverCanvas
+        boxes={composition.boxes}
+        view={composition.view}
+        rings={composition.rings}
+        fillBoxes={composition.fillBoxes}
+        nudgeY={composition.nudgeY}
+        zoom={composition.zoom}
+        keepOutRef={textRef}
       />
       <div
         ref={textRef}
