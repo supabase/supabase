@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
@@ -22,7 +22,9 @@ export const usePipelineConnectionValidation = ({
   const values = useWatch({ control: form.control, name: names })
   const snapshot = JSON.stringify([type, ...values])
   const currentSnapshotRef = useRef(snapshot)
-  currentSnapshotRef.current = snapshot
+  useLayoutEffect(() => {
+    currentSnapshotRef.current = snapshot
+  }, [snapshot])
   const [result, setResult] = useState<{
     snapshot: string
     type: typeof type
