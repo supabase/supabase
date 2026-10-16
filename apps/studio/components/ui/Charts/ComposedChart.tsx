@@ -43,6 +43,7 @@ import {
   ReferenceZone,
   resolveChartColor,
 } from './ComposedChart.utils'
+import { getReferenceZoneRuns, getReferenceZoneXBounds } from './ComposedChartReferenceZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
@@ -377,22 +378,18 @@ export function ComposedChart({
   )
 
   const referenceZoneChart = useMemo(() => {
-    if (!referenceZones?.length) return { data: displayData, maxValue: 0 }
-
-    const ranges = referenceZones.map((zone) => zone.getRanges(data))
-    const maxValue = ranges.reduce(
-      (maximum, zoneRanges) =>
-        zoneRanges.reduce((zoneMaximum, range) => Math.max(zoneMaximum, range?.[1] ?? 0), maximum),
+    const zones =
+      referenceZones?.map((zone) => ({
+        ...zone,
+        runs: getReferenceZoneRuns(zone.getRanges(data)),
+      })) ?? []
+    const maxValue = zones.reduce(
+      (maximum, zone) =>
+        zone.runs.reduce((zoneMaximum, run) => Math.max(zoneMaximum, run.upper), maximum),
       0
     )
-    const zoneData = displayData.map((point, index) => ({
-      ...point,
-      ...Object.fromEntries(
-        ranges.map((zoneRanges, zoneIndex) => [`reference-zone-${zoneIndex}`, zoneRanges[index]])
-      ),
-    }))
-    return { data: zoneData, maxValue }
-  }, [data, displayData, referenceZones])
+    return { zones, maxValue }
+  }, [data, referenceZones])
 
   const isPercentage = format === '%'
   const isRamChart =
@@ -490,7 +487,7 @@ export function ComposedChart({
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={referenceZoneChart.data}
+          data={displayData}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
           onMouseMove={({ activeLabel, activeTooltipIndex }) => {
@@ -580,21 +577,22 @@ export function ComposedChart({
             ))}
           </defs>
 
-          {referenceZones?.map((zone, index) => (
-            <Area
-              key={zone.label}
-              type="stepAfter"
-              dataKey={`reference-zone-${index}`}
-              fill={zone.color}
-              fillOpacity={zone.fillOpacity}
-              stroke="none"
-              dot={false}
-              activeDot={false}
-              isAnimationActive={false}
-              tooltipType="none"
-              legendType="none"
-            />
-          ))}
+          {referenceZoneChart.zones.flatMap((zone) =>
+            zone.runs.map((run) => {
+              const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
+              return (
+                <ReferenceArea
+                  key={`${zone.label}-${run.startIndex}`}
+                  {...getReferenceZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
+                  y1={run.lower}
+                  y2={run.upper}
+                  fill={zone.color}
+                  fillOpacity={zone.fillOpacity}
+                  stroke="none"
+                />
+              )
+            })
+          )}
 
           {chartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
