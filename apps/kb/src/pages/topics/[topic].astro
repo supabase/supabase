@@ -9,9 +9,8 @@ import { toSummary, toTroubleshootingSummary } from '../../lib/guides'
 import { TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
-	const guides = await getCollection('guides')
-	const troubleshooting = await getCollection('troubleshooting')
-	const summaries = [...guides.map(toSummary), ...troubleshooting.map(toTroubleshootingSummary)]
+	const guides = (await getCollection('guides')).map(toSummary)
+	const troubleshooting = (await getCollection('troubleshooting')).map(toTroubleshootingSummary)
 
 	// One page per topic in TOPICS — not just topics a guide already uses —
 	// so every link on the "Topics" nav resolves instead of 404ing.
@@ -20,16 +19,20 @@ export async function getStaticPaths() {
 		props: {
 			topic: topic.name,
 			description: topic.description,
-			guides: summaries.filter((summary) => summary.topics.includes(topic.name)),
+			guides: guides.filter((guide) => guide.topics.includes(topic.name)),
+			troubleshooting:
+				topic.name === 'Troubleshooting'
+					? troubleshooting
+					: troubleshooting.filter((entry) => entry.topics.includes(topic.name)),
 		},
 	}))
 }
 
-const { topic, description, guides } = Astro.props
+const { topic, description, guides, troubleshooting } = Astro.props
 ---
 
 <Layout title={topic} description={description}>
-	<Hero client:load title={topic} description={description} guides={guides}>
+	<Hero client:load title={topic} description={description} guides={[...guides, ...troubleshooting]}>
 		<Breadcrumb slot="breadcrumb">
 			<BreadcrumbList>
 				<BreadcrumbItem>
@@ -38,13 +41,17 @@ const { topic, description, guides } = Astro.props
 			</BreadcrumbList>
 		</Breadcrumb>
 	</Hero>
-	<div class="pb-24 pt-16 sm:pt-20">
+	<div class="flex flex-col gap-20 pb-24 pt-16 sm:gap-24 sm:pt-20">
 		{
-			guides.length === 0 ? (
+			guides.length === 0 && troubleshooting.length === 0 ? (
 				<p class="mx-auto max-w-6xl px-6 text-sm text-foreground-light">No guides for this topic yet.</p>
-			) : (
-				<GuideBrowser client:load title="Guides" guides={guides} />
-			)
+			) : null
+		}
+		{guides.length > 0 ? <GuideBrowser client:load title="Guides" guides={guides} /> : null}
+		{
+			troubleshooting.length > 0 ? (
+				<GuideBrowser client:load title="Troubleshooting" guides={troubleshooting} param="troubleshooting" />
+			) : null
 		}
 	</div>
 </Layout>

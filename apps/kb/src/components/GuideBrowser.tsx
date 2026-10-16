@@ -29,6 +29,8 @@ import { AsciiHoverText } from './AsciiHoverText'
 export interface GuideBrowserProps {
   title: string
   guides: GuideSummary[]
+  // url search param for the active topic. each browser on a page needs its own
+  param?: string
   className?: string
 }
 
@@ -80,19 +82,12 @@ const subscribeToTopic = (onChange: () => void) => {
   }
 }
 
-const getTopicFromUrl = () =>
-  parseTopicParam(new URLSearchParams(window.location.search).get('topic'))
-
 const getTopicOnServer = () => null
 
-const setTopicInUrl = (topic: Topic | null) => {
-  const { pathname, search, hash } = window.location
-  window.history.replaceState(null, '', `${pathname}${withTopicParam({ search, topic })}${hash}`)
-  window.dispatchEvent(new Event(TOPIC_CHANGE_EVENT))
-}
-
-export const GuideBrowser = ({ title, guides, className }: GuideBrowserProps) => {
+export const GuideBrowser = ({ title, guides, param = 'topic', className }: GuideBrowserProps) => {
   const headingId = useId()
+  const getTopicFromUrl = () =>
+    parseTopicParam(new URLSearchParams(window.location.search).get(param))
   const activeTopic = useSyncExternalStore(subscribeToTopic, getTopicFromUrl, getTopicOnServer)
   const visibleGuides = filterGuides({ guides, topic: activeTopic })
   const filterKey = activeTopic ?? ''
@@ -101,6 +96,12 @@ export const GuideBrowser = ({ title, guides, className }: GuideBrowserProps) =>
   const shownGuides = visibleGuides.slice(0, shownCount)
   const hasMore = visibleGuides.length > shownCount
 
+  const setTopicInUrl = (topic: Topic | null) => {
+    const { pathname, search, hash } = window.location
+    const nextSearch = withTopicParam({ search, topic, param })
+    window.history.replaceState(null, '', `${pathname}${nextSearch}${hash}`)
+    window.dispatchEvent(new Event(TOPIC_CHANGE_EVENT))
+  }
   const handleTabChange = (value: string) => setTopicInUrl(fromTabValue(value))
   const handleLoadMore = () => setPaging({ filterKey, count: shownCount + PAGE_SIZE })
   const handleTopicClear = () => setTopicInUrl(null)

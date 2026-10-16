@@ -63,7 +63,10 @@ export const toTroubleshootingSummary = (
   id: entry.id,
   title: entry.data.title,
   description: entry.data.description ?? '',
-  topics: entry.data.topics.filter(isKnownTopic),
+  // troubleshooting is a content type, so it keeps only product topics
+  topics: entry.data.topics.filter(
+    (topic): topic is Topic => isKnownTopic(topic) && !FORMAT_TOPICS.includes(topic)
+  ),
   href: `${import.meta.env.BASE_URL}/troubleshooting/${entry.id}`,
 })
 
@@ -90,13 +93,15 @@ export const parseTopicParam = (slug: string | null): Topic | null =>
 export const withTopicParam = ({
   search,
   topic,
+  param = 'topic',
 }: {
   search: string
   topic: Topic | null
+  param?: string
 }): string => {
   const params = new URLSearchParams(search)
-  if (topic) params.set('topic', topicToSlug(topic))
-  else params.delete('topic')
+  if (topic) params.set(param, topicToSlug(topic))
+  else params.delete(param)
   const next = params.toString()
   return next ? `?${next}` : ''
 }
