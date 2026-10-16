@@ -1993,7 +1993,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
 `,
     icon: Package,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/kL4M0auf4UU',
     docsUrl: 'https://supabase.com/docs/reference/middleware/introduction',
     slug: 'supabase-middleware',
     status: {
