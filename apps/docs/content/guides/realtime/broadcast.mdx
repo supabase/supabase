@@ -17,10 +17,10 @@ The way Broadcast works changes based on the channel you are using:
 
 <Admonition type="note">
 
-The `private` flag (the last argument in `realtime.send(payload, event, topic, private)`) only affects who can subscribe to the topic not who can read messages from the database.
+The `private` argument of `realtime.send()` controls who can subscribe to the topic. It doesn't control who can read messages from the database.
 
+- Private (`true`, the default) → Only authenticated clients can subscribe to that topic
 - Public (`false`) → Anyone can subscribe to that topic without authentication
-- Private (`true`) → Only authenticated clients can subscribe to that topic
 
 Regardless if it's public or private, the Realtime service connects to your database as the authenticated Supabase Admin role.
 
@@ -508,8 +508,8 @@ You can send messages directly from your database using the `realtime.send()` fu
 select
   realtime.send(
     payload => jsonb_build_object('hello', 'world'),
-    event   => 'event',
-    topic   => 'topic',
+    event => 'event',
+    topic => 'topic',
     private => true -- true = private channel (default), false = public channel
   );
 ```
@@ -529,8 +529,8 @@ To broadcast a binary payload from your database, use the `realtime.send_binary(
 select
   realtime.send_binary(
     payload => '\x012345'::bytea,
-    event   => 'event',
-    topic   => 'topic',
+    event => 'event',
+    topic => 'topic',
     private => true -- true = private channel (default), false = public channel
   );
 ```
@@ -1038,8 +1038,8 @@ The `realtime.send()` function provides the most flexibility by allowing you to 
 select
   realtime.send(
     payload => '{}'::jsonb,
-    event   => 'event',
-    topic   => 'topic',
+    event => 'event',
+    topic => 'topic',
     private => true -- true = private channel (default), false = public channel
   );
 ```
