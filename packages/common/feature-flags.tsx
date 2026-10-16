@@ -320,3 +320,29 @@ export function useFlag<T = boolean>(name: string) {
 
   return store[name] as T
 }
+
+/**
+ * Returns whether an organization is opted into a ConfigCat flag whose value is a stringified JSON
+ * array of organization slugs, e.g. `["org-a", "org-b"]`. The slug `all` opts in every
+ * organization. A missing, unparseable, or malformed value opts in none.
+ */
+export function useIsOrgOptedIntoFlag({ name, slug }: { name: string; slug?: string }): boolean {
+  const flagValue = useFlag<string | boolean>(name)
+
+  if (!slug || typeof flagValue !== 'string') return false
+
+  let allowedSlugs: unknown
+  try {
+    allowedSlugs = JSON.parse(flagValue)
+  } catch {
+    console.error(`Flag "${name}" is not valid JSON`)
+    return false
+  }
+
+  if (!Array.isArray(allowedSlugs) || !allowedSlugs.every((x) => typeof x === 'string')) {
+    console.error(`Flag "${name}" must be a JSON array of strings`)
+    return false
+  }
+
+  return allowedSlugs.includes('all') || allowedSlugs.includes(slug)
+}
