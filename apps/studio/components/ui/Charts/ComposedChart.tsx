@@ -43,12 +43,7 @@ import {
   ReferenceZone,
   resolveChartColor,
 } from './ComposedChart.utils'
-import {
-  getHighestCrossedReferenceZone,
-  getReferenceZoneMaximum,
-  getReferenceZoneRuns,
-  getReferenceZoneXBounds,
-} from './ComposedChartReferenceZones.utils'
+import { getReferenceZoneChart, getReferenceZoneXBounds } from './ComposedChartReferenceZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ReferenceZoneLine } from './ReferenceZoneLine'
 import { ChartHighlight } from './useChartHighlight'
@@ -397,21 +392,10 @@ export function ComposedChart({
     [data, normalizeVisibleStackToPercent, visibleAttributes]
   )
 
-  const referenceZoneChart = useMemo(() => {
-    const zones =
-      referenceZones?.map((zone) => ({
-        ...zone,
-        runs: getReferenceZoneRuns(zone.getRanges(data)),
-      })) ?? []
-    const selectedIndex = getHighestCrossedReferenceZone(data, zones, referenceZoneAttribute)
-    const selectedZone = selectedIndex === undefined ? undefined : zones[selectedIndex]
-    let visibleZones = zones
-    if (referenceZoneAttribute) {
-      visibleZones = zones.filter((zone) => zone.isAlwaysVisible || zone === selectedZone)
-    }
-    const maxValue = getReferenceZoneMaximum(zones)
-    return { zones: visibleZones, maxValue, selectedZone }
-  }, [data, referenceZones, referenceZoneAttribute])
+  const referenceZoneChart = useMemo(
+    () => getReferenceZoneChart(data, referenceZones, referenceZoneAttribute),
+    [data, referenceZones, referenceZoneAttribute]
+  )
 
   const isPercentage = format === '%'
   const isRamChart =

@@ -1,6 +1,7 @@
 import type { DataKey } from 'recharts/types/util/types'
 
 import type { Datum } from './Charts.types'
+import type { ReferenceZone } from './ComposedChart.utils'
 
 export type ReferenceZoneRun = {
   startIndex: number
@@ -84,4 +85,24 @@ export function getReferenceZoneMaximum(zones: { runs: ReferenceZoneRun[] }[]): 
       ),
     0
   )
+}
+
+export function getReferenceZoneChart(
+  data: Datum[],
+  referenceZones?: ReferenceZone[],
+  referenceZoneAttribute?: string
+) {
+  const zones =
+    referenceZones?.map((zone) => ({
+      ...zone,
+      runs: getReferenceZoneRuns(zone.getRanges(data)),
+    })) ?? []
+  const selectedIndex = getHighestCrossedReferenceZone(data, zones, referenceZoneAttribute)
+  const selectedZone = selectedIndex === undefined ? undefined : zones[selectedIndex]
+  let visibleZones = zones
+  if (referenceZoneAttribute) {
+    visibleZones = zones.filter((zone) => zone.isAlwaysVisible || zone === selectedZone)
+  }
+  const maxValue = getReferenceZoneMaximum(zones)
+  return { zones: visibleZones, maxValue, selectedZone }
 }

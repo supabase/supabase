@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import type { ReferenceZone } from './ComposedChart.utils'
 import {
   getHighestCrossedReferenceZone,
+  getReferenceZoneChart,
   getReferenceZoneMaximum,
   getReferenceZoneRuns,
   getReferenceZoneXBounds,
@@ -213,4 +215,31 @@ it('excludes the always-visible capacity line from warning selection even when c
 
   expect(getHighestCrossedReferenceZone([{ memory: 250 }], zones, 'memory')).toBe(2)
   expect(getHighestCrossedReferenceZone([{ memory: 250 }], [zones[3]], 'memory')).toBeUndefined()
+})
+
+describe('getReferenceZoneChart', () => {
+  const data = [{ memory: 60 }]
+  const zones: ReferenceZone[] = [50, 80, 90, 100].map((threshold) => ({
+    label: `${threshold}% threshold`,
+    color: 'var(--chart-reference)',
+    tooltip: '',
+    isAlwaysVisible: threshold === 100,
+    getRanges: () => [[threshold, threshold]],
+  }))
+
+  it('shows only the crossed threshold and capacity while keeping the full axis range', () => {
+    const chart = getReferenceZoneChart(data, zones, 'memory')
+
+    expect(chart.zones.map((zone) => zone.label)).toEqual(['50% threshold', '100% threshold'])
+    expect(chart.selectedZone?.label).toBe('50% threshold')
+    expect(chart.maxValue).toBe(100)
+  })
+
+  it('keeps all configured reference lines when risk selection is not requested', () => {
+    const chart = getReferenceZoneChart(data, zones)
+
+    expect(chart.zones.map((zone) => zone.label)).toEqual(zones.map((zone) => zone.label))
+    expect(chart.selectedZone).toBeUndefined()
+    expect(chart.maxValue).toBe(100)
+  })
 })
