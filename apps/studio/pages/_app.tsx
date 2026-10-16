@@ -1,3 +1,5 @@
+import { trackHistoryPositions } from '@/lib/navigation-history'
+
 import '@/styles/code.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
@@ -148,6 +150,7 @@ configureMonacoLoader()
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  useEffect(trackHistoryPositions, [])
   const queryClient = useRootQueryClient()
   const { appTitle } = useCustomContent(['app:title'])
   const [isCLI, setIsCLI] = useState(false)
