@@ -56,3 +56,26 @@ describe('getMemoryCommitmentRanges', () => {
     expect(getMemoryCommitmentRanges([], 0.5, 0.8)).toEqual([])
   })
 })
+
+describe('memory commitment capacity reference', () => {
+  it('shows the infrastructure capacity at each timestamp even above-capacity commitments are observed', () => {
+    expect(getMemoryCommitmentRanges([pointForMemory(8, 12), pointForMemory(2, 6)], 1, 1)).toEqual([
+      [9 * GIB, 9 * GIB],
+      [3 * GIB, 3 * GIB],
+    ])
+  })
+
+  it('keeps gaps where historical capacity is unknown', () => {
+    expect(
+      getMemoryCommitmentRanges(
+        [
+          pointForMemory(8),
+          { ram_commit_limit: GIB, ram_commit_used: 12 * GIB },
+          pointForMemory(2),
+        ],
+        1,
+        1
+      )
+    ).toEqual([[9 * GIB, 9 * GIB], null, [3 * GIB, 3 * GIB]])
+  })
+})

@@ -173,6 +173,21 @@ describe('getReportAttributesV2 memory commitment chart', () => {
     )
 
     expect(chart?.referenceZoneAttribute).toBe('ram_commit_used')
+    const capacity = chart?.referenceZones?.find((zone) => zone.isAlwaysVisible)
+    expect(capacity).toMatchObject({
+      label: 'Estimated capacity',
+      color: 'var(--chart-reference)',
+    })
+    const GIB = 1024 ** 3
+    expect(
+      capacity?.getRanges([
+        { ram_commit_limit: 5 * GIB, ram_commit_used: 12 * GIB },
+        { ram_commit_limit: 2 * GIB, ram_commit_used: 6 * GIB },
+      ])
+    ).toEqual([
+      [9 * GIB, 9 * GIB],
+      [3 * GIB, 3 * GIB],
+    ])
     expect(chart?.showMaxValue).toBeUndefined()
     expect(chart?.YAxisProps?.domain).toBeUndefined()
     expect(commitLimit).toMatchObject({
@@ -181,10 +196,8 @@ describe('getReportAttributesV2 memory commitment chart', () => {
       omitFromTotal: true,
     })
     expect(commitLimit).not.toHaveProperty('isMaxValue')
-    expect(chart?.referenceZones?.map((zone) => zone.label)).toEqual([
-      'Acknowledgment',
-      'Problematic',
-      'Severe',
-    ])
+    expect(
+      chart?.referenceZones?.filter((zone) => !zone.isAlwaysVisible).map((zone) => zone.label)
+    ).toEqual(['Acknowledgment', 'Problematic', 'Severe'])
   })
 })

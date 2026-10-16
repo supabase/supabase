@@ -45,6 +45,7 @@ export type ReferenceZone = {
   label: string
   color: string
   textColor?: string
+  isAlwaysVisible?: boolean
   tooltip: string
   getRanges: (data: Datum[]) => ([number, number] | null)[]
 }

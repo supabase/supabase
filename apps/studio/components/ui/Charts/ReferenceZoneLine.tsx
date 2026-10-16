@@ -8,7 +8,8 @@ export const ReferenceZoneLine = ({
   stroke,
   strokeOpacity,
   clipPath,
-}: RectangleProps) => (
+  label,
+}: RectangleProps & { label?: string }) => (
   <line
     clipPath={clipPath}
     x1={x}
@@ -19,5 +20,7 @@ export const ReferenceZoneLine = ({
     strokeOpacity={strokeOpacity}
     strokeWidth={1}
     strokeDasharray="4 4"
-  />
+  >
+    {label && <title>{label}</title>}
+  </line>
 )

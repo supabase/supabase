@@ -49,12 +49,13 @@ export function getReferenceZoneXBounds(
 
 export function getHighestCrossedReferenceZone(
   data: Datum[],
-  zones: { runs: ReferenceZoneRun[] }[],
+  zones: { runs: ReferenceZoneRun[]; isAlwaysVisible?: boolean }[],
   attribute?: string
 ): number | undefined {
   if (!attribute) return undefined
 
   for (let zoneIndex = zones.length - 1; zoneIndex >= 0; zoneIndex--) {
+    if (zones[zoneIndex].isAlwaysVisible) continue
     for (const run of zones[zoneIndex].runs) {
       if (!Number.isFinite(run.lower)) continue
       for (let sampleIndex = run.startIndex; sampleIndex <= run.endIndex; sampleIndex++) {

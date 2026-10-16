@@ -204,3 +204,13 @@ describe('getReferenceZoneMaximum', () => {
     expect(getReferenceZoneMaximum([])).toBe(0)
   })
 })
+
+it('excludes the always-visible capacity line from warning selection even when commitments exceed it', () => {
+  const zones = [100, 180, 190, 200].map((lower, index) => ({
+    runs: [{ startIndex: 0, endIndex: 0, lower, upper: lower }],
+    isAlwaysVisible: index === 3,
+  }))
+
+  expect(getHighestCrossedReferenceZone([{ memory: 250 }], zones, 'memory')).toBe(2)
+  expect(getHighestCrossedReferenceZone([{ memory: 250 }], [zones[3]], 'memory')).toBeUndefined()
+})

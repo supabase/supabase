@@ -406,7 +406,9 @@ export function ComposedChart({
     const selectedIndex = getHighestCrossedReferenceZone(data, zones, referenceZoneAttribute)
     const selectedZone = selectedIndex === undefined ? undefined : zones[selectedIndex]
     let visibleZones = zones
-    if (referenceZoneAttribute) visibleZones = selectedZone ? [selectedZone] : []
+    if (referenceZoneAttribute) {
+      visibleZones = zones.filter((zone) => zone.isAlwaysVisible || zone === selectedZone)
+    }
     const maxValue = getReferenceZoneMaximum(zones)
     return { zones: visibleZones, maxValue, selectedZone }
   }, [data, referenceZones, referenceZoneAttribute])
@@ -610,7 +612,9 @@ export function ComposedChart({
                   y2={run.lower}
                   fill="none"
                   stroke={zone.color}
-                  shape={<ReferenceZoneLine />}
+                  shape={
+                    <ReferenceZoneLine label={zone.isAlwaysVisible ? zone.label : undefined} />
+                  }
                 />
               )
             })

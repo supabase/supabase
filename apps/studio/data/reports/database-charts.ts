@@ -167,6 +167,14 @@ export const getReportAttributesV2: (
             'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
           getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
         },
+        {
+          label: 'Estimated capacity',
+          color: 'var(--chart-reference)',
+          isAlwaysVisible: true,
+          tooltip:
+            'Estimated physical RAM plus 1 GiB of swap, based on the infrastructure capacity at each timestamp.',
+          getRanges: (data) => getMemoryCommitmentRanges(data, 1, 1),
+        },
       ],
       attributes: [
         {
