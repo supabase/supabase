@@ -3,7 +3,7 @@
     "introduction",
     "installing",
     "supabase-collection-options",
-    "use-live-query",
-    "query-once"
+    "query-once",
+    "use-live-query"
   ]
 }
