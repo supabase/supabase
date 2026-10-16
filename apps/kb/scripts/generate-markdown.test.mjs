@@ -74,16 +74,16 @@ describe('htmlToMarkdown callouts', () => {
     expect(markdown).toContain('> - First')
   })
 
-  it('maps the other Admonition labels onto their closest GitHub alert type', () => {
+  it('maps each Admonition label back to the source marker that produced it', () => {
     const markdown = htmlToMarkdown(
       main(
-        `${admonitionHtml('Success', '<p>Tip body.</p>')}${admonitionHtml('Warning', '<p>Warn body.</p>')}${admonitionHtml('Danger', '<p>Danger body.</p>')}`
+        `${admonitionHtml('Success', '<p>Tip body.</p>')}${admonitionHtml('Warning', '<p>Important body.</p>')}${admonitionHtml('Danger', '<p>Warning body.</p>')}`
       )
     )
 
     expect(markdown).toContain('> [!TIP]\n> Tip body.')
-    expect(markdown).toContain('> [!WARNING]\n> Warn body.')
-    expect(markdown).toContain('> [!CAUTION]\n> Danger body.')
+    expect(markdown).toContain('> [!IMPORTANT]\n> Important body.')
+    expect(markdown).toContain('> [!WARNING]\n> Warning body.')
   })
 })
 
@@ -107,11 +107,12 @@ describe('htmlToMarkdown', () => {
     expect(markdown).not.toContain('Site footer text')
   })
 
-  it('prepends the page metadata from <head> as frontmatter', () => {
+  it('does not prepend frontmatter from <head>', () => {
     const markdown = htmlToMarkdown(PAGE_HTML)
 
-    expect(markdown.startsWith('---\n')).toBe(true)
-    expect(markdown).toContain('description: A short summary.')
+    expect(markdown.startsWith('# Sample guide')).toBe(true)
+    expect(markdown).not.toContain('---')
+    expect(markdown).not.toContain('description:')
   })
 
   it('absolutizes root-relative links in the body', () => {
@@ -138,10 +139,65 @@ describe('htmlToMarkdown', () => {
     ).toContain('[another guide](https://supabase.com/kb/guides/other-guide "Other")')
   })
 
-  it('leaves root-relative links into /docs untouched', () => {
+  it('wraps a destination containing a space in angle brackets', () => {
+    expect(htmlToMarkdown(main('<a href="/guides/a guide">a guide</a>'))).toContain(
+      '[a guide](<https://supabase.com/kb/guides/a guide>)'
+    )
+  })
+
+  it('wraps a destination containing parentheses in angle brackets', () => {
+    expect(
+      htmlToMarkdown(main('<a href="https://en.wikipedia.org/wiki/Foo_(bar)">wiki</a>'))
+    ).toContain('[wiki](<https://en.wikipedia.org/wiki/Foo_(bar)>)')
+  })
+
+  it('escapes angle brackets and backslashes inside a wrapped destination', () => {
+    expect(htmlToMarkdown(main('<a href="https://example.com/a b\\c<d>">x</a>'))).toContain(
+      '[x](<https://example.com/a b\\\\c\\<d\\>>)'
+    )
+  })
+
+  it('escapes double quotes in a title', () => {
+    expect(htmlToMarkdown(main('<a href="/guides/x" title="Say &quot;hi&quot;">x</a>'))).toContain(
+      '[x](https://supabase.com/kb/guides/x "Say \\"hi\\"")'
+    )
+  })
+
+  it('renders /docs links against supabase.com rather than the kb base path', () => {
     expect(
       htmlToMarkdown(main('<a href="/docs/reference/javascript/auth-updateuser">reference</a>'))
-    ).toContain('[reference](/docs/reference/javascript/auth-updateuser)')
+    ).toContain('[reference](https://supabase.com/docs/reference/javascript/auth-updateuser)')
+  })
+
+  it('renders /dashboard, /blog, and /changelog links against supabase.com', () => {
+    const markdown = htmlToMarkdown(
+      main(
+        '<a href="/dashboard/project/_?showConnect=true&amp;method=session">connect</a>' +
+          '<a href="/blog/some-post#intro">blog</a>' +
+          '<a href="/changelog">changelog</a>'
+      )
+    )
+
+    expect(markdown).toContain(
+      '[connect](https://supabase.com/dashboard/project/_?showConnect=true&method=session)'
+    )
+    expect(markdown).toContain('[blog](https://supabase.com/blog/some-post#intro)')
+    expect(markdown).toContain('[changelog](https://supabase.com/changelog)')
+  })
+
+  it('keeps site-section links on supabase.com in preview builds', () => {
+    process.env.VERCEL_ENV = 'preview'
+    process.env.VERCEL_URL = 'kb-git-fork-supabase.vercel.app'
+
+    expect(htmlToMarkdown(main('<a href="/docs/guides">docs</a>'))).toContain(
+      '[docs](https://supabase.com/docs/guides)'
+    )
+  })
+
+  it('does not treat /dashboard-old as a /dashboard link', () => {
+    expect(htmlToMarkdown(main('<a href="/dashboard-old">old</a>'))).toContain(
+      '[old](https://supabase.com/kb/dashboard-old)'
+    )
   })
 
   it('does not treat a path that merely starts with "docs" as a /docs link', () => {

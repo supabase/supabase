@@ -23,9 +23,9 @@ const SECTIONS = ['guides', 'topics', 'troubleshooting']
 // makes sense read on its own.
 const SITE_ORIGIN = 'https://supabase.com'
 
-// Root-relative links under this path point at the docs app, so they're kept
-// as-is rather than being prefixed with the kb base path.
-const DOCS_PATH = '/docs'
+// Sections of supabase.com that live outside this app. Root-relative links into
+// them are rendered against SITE_ORIGIN instead of the kb base path.
+const SITE_SECTIONS = ['/docs', '/dashboard', '/blog', '/changelog']
 
 /**
  * Absolute base URL to prepend to root-relative links, mirroring apps/docs'
@@ -45,42 +45,65 @@ export function getInternalLinkBaseUrl() {
   return ''
 }
 
-// True for links to this app's own pages that need the base path (and origin)
-// added. Protocol-relative and /docs links are left to the default conversion.
-function isLocalRootRelative(href) {
-  if (typeof href !== 'string' || !href.startsWith('/') || href.startsWith('//')) return false
-  return href !== DOCS_PATH && !href.startsWith(`${DOCS_PATH}/`)
+// True when `href` is `prefix` itself or a path/query/fragment under it.
+function isUnderPath(href, prefix) {
+  return (
+    href === prefix || ['/', '?', '#'].some((separator) => href.startsWith(`${prefix}${separator}`))
+  )
 }
 
-function absolutizeHref(href) {
-  const withBase =
-    href === BASE_PATH || href.startsWith(`${BASE_PATH}/`) ? href : `${BASE_PATH}${href}`
+// Root-relative (not protocol-relative) links are the ones that need resolving.
+function isRootRelative(href) {
+  return typeof href === 'string' && href.startsWith('/') && !href.startsWith('//')
+}
+
+function resolveHref(href) {
+  if (SITE_SECTIONS.some((prefix) => isUnderPath(href, prefix))) return `${SITE_ORIGIN}${href}`
+  const withBase = isUnderPath(href, BASE_PATH) ? href : `${BASE_PATH}${href}`
   return `${getInternalLinkBaseUrl()}${withBase}`
 }
 
-// Rewrites root-relative links in the page body so the exported file still
-// works when read outside the site — the HTML equivalent of apps/docs'
-// `addBaseUrlPrefix()`.
+// A markdown link destination ends at the first space or unbalanced ")", so a
+// destination containing one of these (or a backslash or angle bracket) goes
+// in <...>, with those characters backslash-escaped inside.
+function formatDestination(href) {
+  if (!/[\s()<>\\]/.test(href)) return href
+  return `<${href.replace(/[\\<>]/g, '\\$&')}>`
+}
+
+// Titles sit inside double quotes, so quotes and backslashes are escaped.
+function formatTitle(title) {
+  return `"${title.replace(/[\\"]/g, '\\$&')}"`
+}
+
+// Rewrites links in the page body so the exported file still works when read
+// outside the site: root-relative links get the base path (the HTML equivalent
+// of apps/docs' `addBaseUrlPrefix()`), and every destination and title is
+// escaped so the markdown link stays intact.
 const linkRule = createRule(
-  (node) => node.name === 'a' && isLocalRootRelative(node.attribs?.href),
+  (node) => node.name === 'a' && typeof node.attribs?.href === 'string',
   ({ convertChildren, node }) => {
     const content = convertChildren(node).trim()
     if (!content) return ''
-    const href = absolutizeHref(node.attribs.href)
-    const title = node.attribs.title
-    return title ? `[${content}](${href} "${title}")` : `[${content}](${href})`
+    const { href, title } = node.attribs
+    const destination = formatDestination(isRootRelative(href) ? resolveHref(href) : href)
+    return title
+      ? `[${content}](${destination} ${formatTitle(title)})`
+      : `[${content}](${destination})`
   }
 )
 
 // Admonition labels (see TYPE_LABEL in packages/ui-patterns/src/Admonition)
-// mapped to the GitHub alert type that keeps the same meaning in markdown.
+// mapped back to the source marker that produced them in
+// src/lib/mdx/rehype-admonitions.ts (NOTE→note, TIP→success, IMPORTANT→warning,
+// WARNING→danger, CAUTION→caution). "Deprecated" has no source marker.
 const ALERT_TYPE_BY_LABEL = {
   Note: 'NOTE',
   Success: 'TIP',
-  Warning: 'WARNING',
-  Deprecated: 'WARNING',
+  Warning: 'IMPORTANT',
+  Danger: 'WARNING',
   Caution: 'CAUTION',
-  Danger: 'CAUTION',
+  Deprecated: 'WARNING',
 }
 
 function findDescendant(node, predicate) {
@@ -123,7 +146,13 @@ const admonitionRule = createRule(
  * @param {string} html
  */
 export function htmlToMarkdown(html) {
-  return convert(html, { extract: true, rules: [admonitionRule, linkRule] }).markdown
+  // The page's title and description already lead the body (as the h1 and the
+  // lead paragraph), so the <head>-derived YAML frontmatter is skipped.
+  return convert(html, {
+    extract: true,
+    frontmatter: false,
+    rules: [admonitionRule, linkRule],
+  }).markdown
 }
 
 /**
