@@ -14,6 +14,38 @@ import { pgColumnArrayZod } from './pg-meta-columns'
 import { COLUMNS_SQL, getColumnsSql } from './sql/columns'
 import { getTablesSql, TABLES_SQL } from './sql/tables'
 
+// Pick a `$$…$$` delimiter for a `DO` block that is absent from every
+// string in `values`. PostgreSQL's dollar-quote parser treats the first
+// `$$` (or `$tag$`, etc.) after the opening `DO $$` as the closing
+// delimiter, so if any text that flows into the body contains `$$` the
+// body is parsed as truncated and the statement fails with a syntax
+// error. The values flowing into the body are usually already-quoted
+// `ident()` outputs of `old.schema` / `old.name` / `old.table` /
+// `old.column`, so a literal `$$` inside any of those names — e.g. the
+// table `weird$$name` — would otherwise break the statement.
+//
+// The implementation is a strict superset of the corresponding helper
+// in `pg-meta-table-privileges.ts` / `pg-meta-column-privileges.ts` /
+// `pg-meta-roles.ts` / `pg-meta-foreign-tables.ts` /
+// `pg-meta-publications.ts`: try the base delimiter `$pg_meta$`, then
+// `$pg_meta_1$`, `$pg_meta_2$`, … until one is collision-free. The
+// collision check uses the rendered SafeSqlFragment text, which is the
+// text PostgreSQL will actually see (i.e. the already-quoted
+// representation, so embedded `$$` is detectable).
+function getDoBlockDelimiter(values: string[]): SafeSqlFragment {
+  let suffix = 0
+  while (true) {
+    const delimiter =
+      suffix === 0
+        ? (safeSql`$pg_meta$` as SafeSqlFragment)
+        : (safeSql`$pg_meta_${literal(suffix)}$` as SafeSqlFragment)
+    if (values.every((value) => !value.includes(delimiter))) {
+      return delimiter
+    }
+    suffix += 1
+  }
+}
+
 const pgTablePrimaryKeyZod = z.object({
   table_id: z.number(),
   name: z.string(),
@@ -265,8 +297,17 @@ function update(
   if (primary_keys === undefined) {
     // skip
   } else {
+    // The body of this DO block embeds `old.schema` and `old.name` via
+    // `ident()` (which quotes the name as `"weird$$name"` rather than
+    // silently changing the meaning) inside a string passed to EXECUTE.
+    // PostgreSQL's dollar-quote parser treats the first `$$` after the
+    // opening `DO $$` as the closing delimiter, so if either name
+    // contains the literal sequence `$$` the body is parsed as
+    // truncated and the statement fails with a syntax error. Pick a
+    // delimiter that is absent from the names that flow into the body.
+    const doBlockDelimiter = getDoBlockDelimiter([old.schema, old.name])
     primaryKeysSql = safeSql`${primaryKeysSql}
-DO $$
+DO ${doBlockDelimiter}
 DECLARE
   r record;
 BEGIN
@@ -278,7 +319,7 @@ BEGIN
     EXECUTE ${literal(`${alter} DROP CONSTRAINT `)} || quote_ident(r.conname);
   END IF;
 END
-$$;
+${doBlockDelimiter};
 `
 
     if (primary_keys.length === 0) {
