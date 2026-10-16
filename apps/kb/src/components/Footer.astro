@@ -2,8 +2,6 @@
 import { CheckCircle, FlaskConical, LifeBuoy } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
-import { ThemeToggle } from './ThemeToggle'
-
 const primaryLinks = [
 	{
 		Icon: LifeBuoy,
@@ -76,7 +74,6 @@ const secondaryLinks = [
 				<span class="sr-only">Youtube</span>
 				<IconYoutubeSolid size={14} />
 			</a>
-			<ThemeToggle client:only="react" />
 		</div>
 	</div>
 </footer>

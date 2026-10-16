@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { Button } from 'ui'
 
 import { SIGN_UP_URL } from '../lib/nav'
+import { HeaderMenu } from './HeaderMenu'
 import { Logo } from './Logo'
 import { MobileMenu } from './MobileMenu'
 import { Nav } from './Nav'
@@ -37,6 +38,7 @@ export const Header = () => {
             <Button variant="primary" asChild className="hidden lg:inline-flex">
               <a href={SIGN_UP_URL}>Start your project</a>
             </Button>
+            <HeaderMenu className="hidden lg:inline-flex" />
             <button
               ref={menuButtonRef}
               type="button"

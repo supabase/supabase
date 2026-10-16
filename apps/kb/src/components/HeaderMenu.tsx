@@ -1,16 +1,22 @@
-import { Moon, Sun } from 'lucide-react'
+import { House, LifeBuoy, Menu } from 'lucide-react'
 import { useState } from 'react'
 import {
+  buttonVariants,
   cn,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  GithubIcon,
   singleThemes,
 } from 'ui'
 
-export interface ThemeToggleProps {
+export interface HeaderMenuProps {
   className?: string
 }
 
@@ -48,9 +54,8 @@ const applyTheme = (choice: ThemeChoice) => {
   }
 }
 
-// same menu as ui-patterns/ThemeToggle (used in www's footer), without next-themes.
-// render with client:only since the current choice lives in localStorage
-export const ThemeToggle = ({ className }: ThemeToggleProps) => {
+// same menu as apps/docs' TopNavDropdown, without next-themes
+export const HeaderMenu = ({ className }: HeaderMenuProps) => {
   const [choice, setChoice] = useState(readStoredChoice)
 
   const handleChoiceChange = (value: string) => {
@@ -65,24 +70,43 @@ export const ThemeToggle = ({ className }: ThemeToggleProps) => {
         <button
           type="button"
           className={cn(
-            'flex size-7 items-center justify-center rounded-md text-foreground-light hover:text-foreground focus-ring',
+            buttonVariants({ variant: 'default' }),
+            'size-[30px] min-w-[30px] space-x-0 border-default bg-transparent px-0 text-foreground-light',
+            'hover:border-strong hover:bg-overlay-hover/50! data-open:border-stronger data-open:bg-overlay-hover/30',
             className
           )}
         >
-          <Moon aria-hidden className="hidden size-5 dark:block" />
-          <Sun aria-hidden className="block size-5 dark:hidden" />
-          <span className="sr-only">Toggle theme</span>
+          <Menu aria-hidden className="size-[18px]" strokeWidth={1} />
+          <span className="sr-only">Open menu</span>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-60">
-        <DropdownMenuRadioGroup value={choice} onValueChange={handleChoiceChange}>
-          {singleThemes.map((theme) => (
-            <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-              {theme.name}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
+      <DropdownMenuContent side="bottom" align="end" className="w-52">
+        {MENU_LINKS.map(({ label, href, Icon }) => (
+          <DropdownMenuItem key={href} asChild className="gap-2">
+            <a href={href} target="_blank" rel="noreferrer noopener">
+              <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+              {label}
+            </a>
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Theme</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={choice} onValueChange={handleChoiceChange}>
+            {singleThemes.map((theme) => (
+              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                {theme.name}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   )
 }
+
+const MENU_LINKS = [
+  { label: 'Supabase.com', href: 'https://supabase.com', Icon: House },
+  { label: 'GitHub', href: 'https://github.com/supabase/supabase', Icon: GithubIcon },
+  { label: 'Support', href: 'https://supabase.com/support', Icon: LifeBuoy },
+]

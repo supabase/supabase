@@ -23,7 +23,7 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 		<script is:inline>
 			// Set data-theme on <html> before first paint, so the page doesn't flash
 			// the wrong theme while this loads. Defaults to dark, and "system" follows the
-			// OS preference, including changes mid-session (choices come from components/ThemeToggle.tsx).
+			// OS preference, including changes mid-session (choices come from components/HeaderMenu.tsx).
 			;(function () {
 				var systemDark = window.matchMedia('(prefers-color-scheme: dark)')
 				var applyTheme = function () {
