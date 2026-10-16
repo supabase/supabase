@@ -20,6 +20,18 @@ describe('TOOL_CATEGORY_MAP', () => {
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
     expect(TOOL_CATEGORY_MAP['list_notebooks']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
+
+  // The two lists are the tool registry, and they have to agree. A tool missing from
+  // TOOL_CATEGORY_MAP is silently dropped by filterToolsByOptInLevel rather than
+  // erroring, so it disappears from the assistant with no failing build and no log
+  // line. Assert both directions so adding a tool to one list and not the other fails
+  // here instead of in production.
+  it('agrees with the tool name enum in both directions', () => {
+    const enumNames = [...toolSetValidationSchema.keySchema.options].sort()
+    const categorizedNames = Object.keys(TOOL_CATEGORY_MAP).sort()
+
+    expect(categorizedNames).toEqual(enumNames)
+  })
 })
 
 describe('tools with a contract', () => {
