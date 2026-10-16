@@ -10,7 +10,7 @@ export const getUpdateIdentitySequenceSQL = ({
   column: string
 }): SafeSqlFragment => {
   return safeSql`WITH sequence_reference AS (
-  SELECT pg_get_serial_sequence(${literal(`${schema}.${table}`)}, ${literal(column)}) AS sequence_name
+  SELECT pg_get_serial_sequence(${literal(`${ident(schema)}.${ident(table)}`)}, ${literal(column)}) AS sequence_name
 )
 SELECT setval(
   sequence_reference.sequence_name,
