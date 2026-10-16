@@ -2,10 +2,10 @@
 import { getCollection } from 'astro:content'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from 'ui'
 
-import { FeaturedSection } from '../../components/FeaturedSection'
+import { GuideBrowser } from '../../components/GuideBrowser'
 import { Hero } from '../../components/Hero'
 import Layout from '../../layouts/Layout.astro'
-import { toSummary, toTroubleshootingSummary, type FeaturedItem } from '../../lib/guides'
+import { toSummary, toTroubleshootingSummary } from '../../lib/guides'
 import { TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
@@ -26,8 +26,6 @@ export async function getStaticPaths() {
 }
 
 const { topic, description, guides } = Astro.props
-// guide and troubleshooting slugs can collide, hrefs can't
-const items: FeaturedItem[] = guides.map((summary) => ({ ...summary, slot: summary.href }))
 ---
 
 <Layout title={topic} description={description}>
@@ -42,10 +40,10 @@ const items: FeaturedItem[] = guides.map((summary) => ({ ...summary, slot: summa
 	</Hero>
 	<div class="pb-24 pt-16 sm:pt-20">
 		{
-			items.length === 0 ? (
+			guides.length === 0 ? (
 				<p class="mx-auto max-w-6xl px-6 text-sm text-foreground-light">No guides for this topic yet.</p>
 			) : (
-				<FeaturedSection client:load title="Guides" items={items} />
+				<GuideBrowser client:load title="Guides" guides={guides} />
 			)
 		}
 	</div>
