@@ -19531,6 +19531,24 @@
           "logical_decoding_work_mem": {
             "type": "string"
           },
+          "pg_stat_statements.max": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 45000
+          },
+          "pg_net.batch_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "autovacuum_max_workers": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 262143
+          },
+          "autovacuum_work_mem": {
+            "type": "string"
+          },
           "cron.log_statement": {
             "type": "boolean"
           },
@@ -19679,6 +19697,24 @@
             "type": "string"
           },
           "logical_decoding_work_mem": {
+            "type": "string"
+          },
+          "pg_stat_statements.max": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 45000
+          },
+          "pg_net.batch_size": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 32767
+          },
+          "autovacuum_max_workers": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 262143
+          },
+          "autovacuum_work_mem": {
             "type": "string"
           },
           "cron.log_statement": {
