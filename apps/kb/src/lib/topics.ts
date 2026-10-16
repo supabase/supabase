@@ -84,7 +84,7 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'FAQ',
+    name: 'FAQs',
     description: 'Frequently asked questions and their answers.',
     pinned: false,
     visible: true,

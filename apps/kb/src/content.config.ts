@@ -80,7 +80,7 @@ const faqs = defineCollection({
     .object({
       title: z.string(),
     })
-    .transform((data) => ({ ...data, topics: ['FAQ'] })),
+    .transform((data) => ({ ...data, topics: ['FAQs'] })),
 })
 
 export const collections = { guides, troubleshooting, faqs }
