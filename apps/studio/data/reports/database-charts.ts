@@ -142,8 +142,8 @@ export const getReportAttributesV2: (
       },
       titleTooltip:
         'Risk thresholds estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.',
-      referenceZoneAttribute: 'ram_commit_used',
-      referenceZones: [
+      thresholdZoneAttribute: 'ram_commit_used',
+      thresholdZones: [
         {
           label: 'Acknowledgment',
           badgeLabel: 'Warning',

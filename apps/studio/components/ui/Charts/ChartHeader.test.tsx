@@ -21,7 +21,7 @@ describe('ChartHeader missing risk metric', () => {
         xAxisIsDate={false}
         xAxisKey="period_start"
         yAxisKey="ram_commit_used"
-        referenceZoneAttribute="ram_commit_used"
+        thresholdZoneAttribute="ram_commit_used"
         data={[
           { period_start: 1, ram_commit_limit: 5 * GIB },
           { period_start: 2, ram_commit_used: 4 * GIB, ram_commit_limit: 5 * GIB },
@@ -58,7 +58,7 @@ it.each([
         title="Memory commitment"
         hideChartType
         highlightedValue="6 GB"
-        referenceZoneWarning={{
+        thresholdZoneWarning={{
           label,
           badgeLabel,
           color,

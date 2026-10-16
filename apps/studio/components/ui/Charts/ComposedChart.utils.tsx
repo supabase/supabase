@@ -6,7 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import type { Datum } from './Charts.types'
 import { formatPercentage, numberFormatter } from './Charts.utils'
-import { getReferenceZoneValues } from './ComposedChartReferenceZones.utils'
+import { getThresholdZoneValues } from './ComposedChartThresholdZones.utils'
 import { useFormatDateTime, useTimezone } from '@/lib/datetime'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
@@ -15,8 +15,8 @@ export interface ReportAttributes {
   titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
-  referenceZones?: ReferenceZone[]
-  referenceZoneAttribute?: string
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
   entitlement?: string
@@ -42,7 +42,7 @@ export interface ReportAttributes {
   hideHighlightedValue?: boolean
 }
 
-export type ReferenceZone = {
+export type ThresholdZone = {
   label: string
   color: string
   textColor?: string
@@ -138,7 +138,7 @@ interface TooltipProps {
   label?: string | number
   attributes?: MultiAttribute[]
   data?: Datum[]
-  referenceZones?: ReferenceZone[]
+  thresholdZones?: ThresholdZone[]
   xAxisKey?: string
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
@@ -189,7 +189,7 @@ export const CustomTooltip = ({
   label: _label,
   attributes,
   data,
-  referenceZones,
+  thresholdZones,
   xAxisKey = 'period_start',
   isPercentage,
   format,
@@ -209,7 +209,7 @@ export const CustomTooltip = ({
     const rawDataPoint = data?.find(
       (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
     )
-    const referenceValues = getReferenceZoneValues(rawDataPoint, referenceZones)
+    const thresholdValues = getThresholdZoneValues(rawDataPoint, thresholdZones)
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValue =
       maxValueAttribute && rawDataPoint
@@ -322,13 +322,13 @@ export const CustomTooltip = ({
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
           ))}
-          {referenceValues?.map((reference) => (
-            <div key={reference.label} className="flex items-center w-full">
-              <MaxConnectionsIcon color={reference.color} />
+          {thresholdValues?.map((threshold) => (
+            <div key={threshold.label} className="flex items-center w-full">
+              <MaxConnectionsIcon color={threshold.color} />
               <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
-                {reference.label}
+                {threshold.label}
               </span>
-              <span className="ml-3.5">{formatNumeric(reference.value)}</span>
+              <span className="ml-3.5">{formatNumeric(threshold.value)}</span>
             </div>
           ))}
           {active && showTotal && (

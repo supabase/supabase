@@ -40,12 +40,12 @@ import {
   CustomTooltip,
   getStackId,
   MultiAttribute,
-  ReferenceZone,
   resolveChartColor,
+  ThresholdZone,
 } from './ComposedChart.utils'
-import { getReferenceZoneChart, getReferenceZoneXBounds } from './ComposedChartReferenceZones.utils'
+import { getThresholdZoneChart, getThresholdZoneXBounds } from './ComposedChartThresholdZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
-import { ReferenceZoneLine } from './ReferenceZoneLine'
+import { ThresholdZoneLine } from './ThresholdZoneLine'
 import { ChartHighlight } from './useChartHighlight'
 import { useChartHoverState } from './useChartHoverState'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
@@ -54,8 +54,8 @@ import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   chartId?: string
   attributes: MultiAttribute[]
-  referenceZones?: ReferenceZone[]
-  referenceZoneAttribute?: string
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
@@ -107,8 +107,8 @@ export function ComposedChart({
   chartId,
   data,
   attributes,
-  referenceZones,
-  referenceZoneAttribute,
+  thresholdZones,
+  thresholdZoneAttribute,
   yAxisKey,
   xAxisKey,
   format,
@@ -257,7 +257,7 @@ export function ComposedChart({
 
   function computeHighlightedValue() {
     const activePoint = data[focusDataIndex ?? data.length - 1]
-    if (referenceZoneAttribute && !Number.isFinite(activePoint?.[referenceZoneAttribute])) {
+    if (thresholdZoneAttribute && !Number.isFinite(activePoint?.[thresholdZoneAttribute])) {
       return 'Unavailable'
     }
 
@@ -337,10 +337,10 @@ export function ComposedChart({
     chartHighlight?.coordinates.left !== chartHighlight?.coordinates.right
 
   const firstChartPoint = { ...data[0] }
-  if (referenceZoneAttribute && !(referenceZoneAttribute in firstChartPoint)) {
-    const firstMetricPoint = data.find((point) => referenceZoneAttribute in point)
+  if (thresholdZoneAttribute && !(thresholdZoneAttribute in firstChartPoint)) {
+    const firstMetricPoint = data.find((point) => thresholdZoneAttribute in point)
     if (firstMetricPoint)
-      firstChartPoint[referenceZoneAttribute] = firstMetricPoint[referenceZoneAttribute]
+      firstChartPoint[thresholdZoneAttribute] = firstMetricPoint[thresholdZoneAttribute]
   }
 
   const chartData =
@@ -392,9 +392,9 @@ export function ComposedChart({
     [data, normalizeVisibleStackToPercent, visibleAttributes]
   )
 
-  const referenceZoneChart = useMemo(
-    () => getReferenceZoneChart(data, referenceZones, referenceZoneAttribute),
-    [data, referenceZones, referenceZoneAttribute]
+  const thresholdZoneChart = useMemo(
+    () => getThresholdZoneChart(data, thresholdZones, thresholdZoneAttribute),
+    [data, thresholdZones, thresholdZoneAttribute]
   )
 
   const isPercentage = format === '%'
@@ -424,7 +424,7 @@ export function ComposedChart({
         isPercentage,
         showMaxValue,
         yMaxFromVisible,
-        referenceZoneMax: referenceZoneChart.maxValue,
+        thresholdZoneMax: thresholdZoneChart.maxValue,
         maxAttributeKey: maxAttribute?.attribute,
         showMaxLine: _showMaxValue,
         data,
@@ -434,7 +434,7 @@ export function ComposedChart({
       isPercentage,
       showMaxValue,
       yMaxFromVisible,
-      referenceZoneChart.maxValue,
+      thresholdZoneChart.maxValue,
       maxAttribute,
       _showMaxValue,
       data,
@@ -461,8 +461,8 @@ export function ComposedChart({
   return (
     <div className={cn('flex flex-col gap-y-3', className)}>
       <ChartHeader
-        referenceZoneAttribute={referenceZoneAttribute}
-        referenceZoneWarning={referenceZoneChart.selectedZone}
+        thresholdZoneAttribute={thresholdZoneAttribute}
+        thresholdZoneWarning={thresholdZoneChart.selectedZone}
         hideHighlightedValue={hideHighlightedValue}
         title={title}
         showNewBadge={showNewBadge}
@@ -619,19 +619,19 @@ export function ComposedChart({
                   activeDot={false}
                 />
               ))}
-          {referenceZoneChart.zones.flatMap((zone) =>
+          {thresholdZoneChart.zones.flatMap((zone) =>
             zone.runs.map((run) => {
               const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
               return (
                 <ReferenceArea
                   key={`${zone.label}-${run.startIndex}`}
-                  {...getReferenceZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
+                  {...getThresholdZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
                   y1={run.lower}
                   y2={run.lower}
                   fill="none"
                   stroke={zone.color}
                   shape={
-                    <ReferenceZoneLine label={zone.isAlwaysVisible ? zone.label : undefined} />
+                    <ThresholdZoneLine label={zone.isAlwaysVisible ? zone.label : undefined} />
                   }
                 />
               )
@@ -693,7 +693,7 @@ export function ComposedChart({
                 <CustomTooltip
                   {...props}
                   data={data}
-                  referenceZones={referenceZoneChart.zones}
+                  thresholdZones={thresholdZoneChart.zones}
                   format={format}
                   isPercentage={isPercentage}
                   label={resolvedHighlightedLabel}

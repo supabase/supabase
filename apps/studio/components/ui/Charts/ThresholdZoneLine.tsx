@@ -1,6 +1,6 @@
 import type { Props as RectangleProps } from 'recharts/types/shape/Rectangle'
 
-export const ReferenceZoneLine = ({
+export const ThresholdZoneLine = ({
   x = 0,
   y = 0,
   width = 0,

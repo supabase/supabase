@@ -17,7 +17,7 @@ describe('computeYAxisDomain', () => {
       isPercentage: false,
       showMaxValue: false,
       yMaxFromVisible: 2 * GIB,
-      referenceZoneMax: 8 * GIB,
+      thresholdZoneMax: 8 * GIB,
       maxAttributeKey: undefined,
       showMaxLine: false,
       data: [{ ram_commit_used: 2 * GIB }],
@@ -47,8 +47,8 @@ describe('computeYAxisDomain', () => {
 
     it.each([0, Number.NaN, Infinity, -1])(
       'uses automatic scaling when capacity is unavailable or invalid: %s',
-      (referenceZoneMax) => {
-        expect(computeYAxisDomain({ ...memoryBelowCapacity, referenceZoneMax })).toEqual([
+      (thresholdZoneMax) => {
+        expect(computeYAxisDomain({ ...memoryBelowCapacity, thresholdZoneMax })).toEqual([
           'auto',
           'auto',
         ])

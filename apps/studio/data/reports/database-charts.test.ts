@@ -172,8 +172,8 @@ describe('getReportAttributesV2 memory commitment chart', () => {
       (attribute) => attribute !== false && attribute.attribute === 'ram_commit_limit'
     )
 
-    expect(chart?.referenceZoneAttribute).toBe('ram_commit_used')
-    const capacity = chart?.referenceZones?.find((zone) => zone.isAlwaysVisible)
+    expect(chart?.thresholdZoneAttribute).toBe('ram_commit_used')
+    const capacity = chart?.thresholdZones?.find((zone) => zone.isAlwaysVisible)
     expect(capacity).toMatchObject({
       label: 'Full commitment capacity',
       color: 'var(--chart-reference)',
@@ -197,7 +197,7 @@ describe('getReportAttributesV2 memory commitment chart', () => {
     })
     expect(commitLimit).not.toHaveProperty('isMaxValue')
     expect(
-      chart?.referenceZones?.filter((zone) => !zone.isAlwaysVisible).map((zone) => zone.label)
+      chart?.thresholdZones?.filter((zone) => !zone.isAlwaysVisible).map((zone) => zone.label)
     ).toEqual(['Acknowledgment', 'Problematic', 'Severe'])
   })
 })

@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
-  getHighestCrossedReferenceZone,
-  getReferenceZoneRuns,
-} from '@/components/ui/Charts/ComposedChartReferenceZones.utils'
+  getHighestCrossedThresholdZone,
+  getThresholdZoneRuns,
+} from '@/components/ui/Charts/ComposedChartThresholdZones.utils'
 import { getMemoryCommitmentRanges } from '@/data/reports/database-charts.utils'
 
 beforeEach(() => vi.resetModules())
@@ -28,11 +28,11 @@ describe('memory commitment preview fixtures', () => {
       if (!data) throw new Error('Expected fixture data')
 
       const zones = [
-        { runs: getReferenceZoneRuns(getMemoryCommitmentRanges(data, 0.5, 0.8)) },
-        { runs: getReferenceZoneRuns(getMemoryCommitmentRanges(data, 0.8, 0.9)) },
-        { runs: getReferenceZoneRuns(getMemoryCommitmentRanges(data, 0.9)) },
+        { runs: getThresholdZoneRuns(getMemoryCommitmentRanges(data, 0.5, 0.8)) },
+        { runs: getThresholdZoneRuns(getMemoryCommitmentRanges(data, 0.8, 0.9)) },
+        { runs: getThresholdZoneRuns(getMemoryCommitmentRanges(data, 0.9)) },
       ]
-      expect(getHighestCrossedReferenceZone(data, zones, 'ram_commit_used')).toBe(selectedIndex)
+      expect(getHighestCrossedThresholdZone(data, zones, 'ram_commit_used')).toBe(selectedIndex)
       expect(data[0].period_start).toBe(new Date(START).toISOString())
       expect(data.at(-1)?.period_start).toBe(new Date(END).toISOString())
       const capacity = getMemoryCommitmentRanges(data, 1, 1)

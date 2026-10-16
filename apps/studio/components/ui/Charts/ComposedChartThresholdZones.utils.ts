@@ -1,17 +1,17 @@
 import type { DataKey } from 'recharts/types/util/types'
 
 import type { Datum } from './Charts.types'
-import type { ReferenceZone } from './ComposedChart.utils'
+import type { ThresholdZone } from './ComposedChart.utils'
 
-export type ReferenceZoneRun = {
+export type ThresholdZoneRun = {
   startIndex: number
   endIndex: number
   lower: number
   upper: number
 }
 
-export function getReferenceZoneRuns(ranges: ([number, number] | null)[]): ReferenceZoneRun[] {
-  return ranges.reduce<ReferenceZoneRun[]>((runs, range, index) => {
+export function getThresholdZoneRuns(ranges: ([number, number] | null)[]): ThresholdZoneRun[] {
+  return ranges.reduce<ThresholdZoneRun[]>((runs, range, index) => {
     if (!range) return runs
 
     const previous = runs[runs.length - 1]
@@ -29,8 +29,8 @@ export function getReferenceZoneRuns(ranges: ([number, number] | null)[]): Refer
   }, [])
 }
 
-export function getReferenceZoneXBounds(
-  run: ReferenceZoneRun,
+export function getThresholdZoneXBounds(
+  run: ThresholdZoneRun,
   data: Datum[],
   hasVisibleBars: boolean,
   dataKey?: DataKey<Datum>
@@ -48,9 +48,9 @@ export function getReferenceZoneXBounds(
   }
 }
 
-export function getHighestCrossedReferenceZone(
+export function getHighestCrossedThresholdZone(
   data: Datum[],
-  zones: { runs: ReferenceZoneRun[]; isAlwaysVisible?: boolean }[],
+  zones: { runs: ThresholdZoneRun[]; isAlwaysVisible?: boolean }[],
   attribute?: string
 ): number | undefined {
   if (!attribute) return undefined
@@ -75,7 +75,7 @@ export function getHighestCrossedReferenceZone(
   return undefined
 }
 
-export function getReferenceZoneMaximum(zones: { runs: ReferenceZoneRun[] }[]): number {
+export function getThresholdZoneMaximum(zones: { runs: ThresholdZoneRun[] }[]): number {
   return zones.reduce(
     (maximum, zone) =>
       zone.runs.reduce(
@@ -87,39 +87,39 @@ export function getReferenceZoneMaximum(zones: { runs: ReferenceZoneRun[] }[]): 
   )
 }
 
-export function getReferenceZoneChart(
+export function getThresholdZoneChart(
   data: Datum[],
-  referenceZones?: ReferenceZone[],
-  referenceZoneAttribute?: string
+  thresholdZones?: ThresholdZone[],
+  thresholdZoneAttribute?: string
 ) {
   const zones =
-    referenceZones?.map((zone) => ({
+    thresholdZones?.map((zone) => ({
       ...zone,
-      runs: getReferenceZoneRuns(zone.getRanges(data)),
+      runs: getThresholdZoneRuns(zone.getRanges(data)),
     })) ?? []
-  const selectedIndex = getHighestCrossedReferenceZone(data, zones, referenceZoneAttribute)
+  const selectedIndex = getHighestCrossedThresholdZone(data, zones, thresholdZoneAttribute)
   const selectedZone = selectedIndex === undefined ? undefined : zones[selectedIndex]
   let visibleZones = zones
-  if (referenceZoneAttribute) {
+  if (thresholdZoneAttribute) {
     visibleZones = zones.filter((zone) => zone.isAlwaysVisible || zone === selectedZone)
   }
-  const maxValue = getReferenceZoneMaximum(zones)
+  const maxValue = getThresholdZoneMaximum(zones)
   return { zones: visibleZones, maxValue, selectedZone }
 }
 
-type ReferenceZoneValue = {
+type ThresholdZoneValue = {
   label: string
   color: string
   value: number
 }
 
-export function getReferenceZoneValues(
+export function getThresholdZoneValues(
   point: Datum | undefined,
-  zones: ReferenceZone[] | undefined
-): ReferenceZoneValue[] {
+  zones: ThresholdZone[] | undefined
+): ThresholdZoneValue[] {
   if (!point || !zones) return []
 
-  const values: ReferenceZoneValue[] = []
+  const values: ThresholdZoneValue[] = []
   for (const zone of zones) {
     const range = zone.getRanges([point])[0]
     if (!range) continue
