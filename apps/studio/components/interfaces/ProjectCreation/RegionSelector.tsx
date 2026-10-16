@@ -1,4 +1,4 @@
-import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useFeatureFlags, useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -31,11 +31,7 @@ import {
   getHighAvailabilityRegionCode,
 } from './ProjectCreation.utils'
 import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
-import {
-  getRegionRestrictionCopy,
-  regionMatches,
-  SELECT_DIFFERENT_REGION,
-} from './RegionSelector.utils'
+import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -43,7 +39,6 @@ import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -93,13 +88,9 @@ export const RegionSelector = ({
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
-  const isStatusPageEnabled = useFlag('incidentIoStatusPage') === true
   const isSpecificRegionsLinkEnabled = isFreePlan && !hideSpecificRegions
 
   const { getRegionRestriction } = useRegionRestriction()
-
-  const { data: statusData } = useIncidentStatusQuery({ enabled: !isStatusPageEnabled })
-  const { incidents = [] } = statusData ?? {}
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
@@ -228,15 +219,6 @@ export const RegionSelector = ({
               ? getRegionRestrictionCopy(selectedRestriction)
               : undefined
           const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
-
-          const affectingIncidents = incidents.filter((incident) => {
-            const affectedRegions = incident.cache?.affected_regions ?? []
-            if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
-
-            return affectedRegions.some((affectedRegion) =>
-              regionMatches(selectedRegion.code, affectedRegion)
-            )
-          })
 
           return (
             <>
@@ -428,29 +410,7 @@ export const RegionSelector = ({
                 </div>
               </FormItemLayout>
 
-              {isStatusPageEnabled ? (
-                <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
-              ) : (
-                affectingIncidents.length > 0 && (
-                  <FormItemLayout layout="horizontal">
-                    <Admonition
-                      type="warning"
-                      title="Incident in progress for this region"
-                      description={
-                        <>
-                          We're currently investigating an issue that may impact projects in this
-                          region. Follow updates on{' '}
-                          <InlineLink href="https://status.supabase.com">
-                            status.supabase.com
-                          </InlineLink>
-                          .
-                        </>
-                      }
-                      className="mt-3"
-                    />
-                  </FormItemLayout>
-                )
-              )}
+              <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
 
               {selectedRestrictionCopy !== undefined && (
                 <FormItemLayout layout="horizontal" isReactForm={false}>

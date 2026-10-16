@@ -265,12 +265,6 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
-    // @ts-expect-error - raw-fetch Next.js API route, not in the generated paths type
-    path: '/incident-status',
-    response: () => HttpResponse.json([]),
-  })
-  addAPIMock({
-    method: 'get',
     path: '/platform/integrations/github/repositories',
     response: () =>
       HttpResponse.json<GitHubRepositoriesResponse>(
