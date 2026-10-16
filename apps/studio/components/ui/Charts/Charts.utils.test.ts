@@ -11,6 +11,48 @@ const IOPS_DATA = [
 const IOPS_VISIBLE = ['disk_iops_write', 'disk_iops_read']
 
 describe('computeYAxisDomain', () => {
+  describe('reference zones', () => {
+    const GIB = 1024 ** 3
+    const zoneOptions = {
+      isPercentage: false,
+      showMaxValue: false,
+      yMaxFromVisible: 2.05 * GIB,
+      referenceZoneMax: 5.59 * GIB,
+      maxAttributeKey: undefined,
+      showMaxLine: false,
+      data: [{ ram_commit_used: 2.05 * GIB }],
+      visibleAttributeNames: ['ram_commit_used'],
+    }
+
+    it('includes the highest zone bound when stacked metrics are below the zones', () => {
+      expect(computeYAxisDomain(zoneOptions)).toEqual([0, 5.59 * GIB])
+    })
+
+    it('keeps the zones visible when every metric is hidden', () => {
+      expect(computeYAxisDomain({ ...zoneOptions, visibleAttributeNames: [] })).toEqual([
+        0,
+        5.59 * GIB,
+      ])
+    })
+
+    it('includes metric totals that exceed the zones', () => {
+      expect(
+        computeYAxisDomain({
+          ...zoneOptions,
+          data: [{ ram_commit_used: 7 * GIB, additional_memory: GIB }],
+          visibleAttributeNames: ['ram_commit_used', 'additional_memory'],
+        })
+      ).toEqual([0, 8 * GIB])
+    })
+
+    it.each([0, Number.NaN, Infinity, -1])(
+      'ignores invalid zone bounds: %s',
+      (referenceZoneMax) => {
+        expect(computeYAxisDomain({ ...zoneOptions, referenceZoneMax })).toEqual(['auto', 'auto'])
+      }
+    )
+  })
+
   describe('percentage charts with max line hidden', () => {
     it('returns [0, yMaxFromVisible] to zoom in on the data', () => {
       expect(

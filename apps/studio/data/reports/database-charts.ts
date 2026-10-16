@@ -138,7 +138,6 @@ export const getReportAttributesV2: (
       valuePrecision: 2,
       YAxisProps: {
         width: 75,
-        domain: [0, 'auto'],
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
       titleTooltip:

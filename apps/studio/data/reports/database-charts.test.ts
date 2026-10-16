@@ -173,6 +173,7 @@ describe('getReportAttributesV2 memory commitment chart', () => {
     )
 
     expect(chart?.showMaxValue).toBeUndefined()
+    expect(chart?.YAxisProps?.domain).toBeUndefined()
     expect(commitLimit).toMatchObject({
       provider: 'infra-monitoring',
       enabled: false,

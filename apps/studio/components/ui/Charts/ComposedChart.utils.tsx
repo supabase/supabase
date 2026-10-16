@@ -440,7 +440,11 @@ export const CustomLabel = ({
           {referenceZones?.map((zone) => (
             <Tooltip key={zone.label}>
               <TooltipTrigger asChild>
-                <button type="button" className="flex items-center gap-1 p-1.5 rounded-lg">
+                <button
+                  type="button"
+                  tabIndex={0}
+                  className="flex items-center gap-1 p-1.5 rounded-lg"
+                >
                   <span
                     className="size-2.5 rounded-sm"
                     style={{ backgroundColor: zone.color, opacity: 0.6 }}

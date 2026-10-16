@@ -376,16 +376,22 @@ export function ComposedChart({
     [data, normalizeVisibleStackToPercent, visibleAttributes]
   )
 
-  const referenceZoneData = useMemo(() => {
-    if (!referenceZones?.length) return displayData
+  const referenceZoneChart = useMemo(() => {
+    if (!referenceZones?.length) return { data: displayData, maxValue: 0 }
 
     const ranges = referenceZones.map((zone) => zone.getRanges(data))
-    return displayData.map((point, index) => ({
+    const maxValue = ranges.reduce(
+      (maximum, zoneRanges) =>
+        zoneRanges.reduce((zoneMaximum, range) => Math.max(zoneMaximum, range?.[1] ?? 0), maximum),
+      0
+    )
+    const zoneData = displayData.map((point, index) => ({
       ...point,
       ...Object.fromEntries(
         ranges.map((zoneRanges, zoneIndex) => [`reference-zone-${zoneIndex}`, zoneRanges[index]])
       ),
     }))
+    return { data: zoneData, maxValue }
   }, [data, displayData, referenceZones])
 
   const isPercentage = format === '%'
@@ -415,6 +421,7 @@ export function ComposedChart({
         isPercentage,
         showMaxValue,
         yMaxFromVisible,
+        referenceZoneMax: referenceZoneChart.maxValue,
         maxAttributeKey: maxAttribute?.attribute,
         showMaxLine: _showMaxValue,
         data,
@@ -424,6 +431,7 @@ export function ComposedChart({
       isPercentage,
       showMaxValue,
       yMaxFromVisible,
+      referenceZoneChart.maxValue,
       maxAttribute,
       _showMaxValue,
       data,
@@ -482,7 +490,7 @@ export function ComposedChart({
       />
       <Container className="relative z-10">
         <RechartComposedChart
-          data={referenceZoneData}
+          data={referenceZoneChart.data}
           syncId={syncId}
           style={{ cursor: 'crosshair' }}
           onMouseMove={({ activeLabel, activeTooltipIndex }) => {
