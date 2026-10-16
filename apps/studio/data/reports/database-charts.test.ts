@@ -162,3 +162,23 @@ describe('resource warning metrics chart IDs', () => {
     expect(missingChartIds).toEqual([])
   })
 })
+
+describe('getReportAttributesV2 memory commitment chart', () => {
+  it('keeps capacity tied to compute size so overcommitment cannot raise the reference', () => {
+    const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
+      (chart) => chart.id === 'memory-commitment'
+    )
+    const capacity = chart?.thresholdZones?.find((zone) => zone.isAlwaysVisible)
+    const GIB = 1024 ** 3
+
+    expect(
+      capacity?.getRanges([
+        { ram_commit_limit: 5 * GIB, ram_commit_used: 12 * GIB },
+        { ram_commit_limit: 2 * GIB, ram_commit_used: 6 * GIB },
+      ])
+    ).toEqual([
+      [9 * GIB, 9 * GIB],
+      [3 * GIB, 3 * GIB],
+    ])
+  })
+})
