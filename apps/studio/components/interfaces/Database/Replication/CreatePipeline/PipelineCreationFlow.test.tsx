@@ -109,7 +109,32 @@ const selectPublication = async () => {
 const back = () => fireEvent.click(screen.getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
-  it('requires valid fields, recovers from request and critical failures, and reviews warnings before continuing', async () => {
+  it('requires connection fields and reveals invalid advanced settings', async () => {
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+      target: { value: '-1' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+    expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
+    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    expect(
+      screen.queryByRole('spinbutton', { name: 'Connection pool size' })
+    ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+      target: { value: '5' },
+    })
+    expect(screen.queryByText('Check connection settings')).not.toBeInTheDocument()
+  })
+
+  it('recovers from request and critical failures and reviews warnings before continuing', async () => {
     let attempt = 0
     const requests: unknown[] = []
     addAPIMock({
@@ -136,25 +161,6 @@ describe('PipelineCreationFlow', () => {
       nuqs: { hasMemory: true },
     })
     next()
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
-      target: { value: '-1' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
-    expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
-    expect(requests).toHaveLength(0)
-    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    expect(
-      screen.queryByRole('spinbutton', { name: 'Connection pool size' })
-    ).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
-    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
-      target: { value: '5' },
-    })
-    expect(screen.queryByText('Check connection settings')).not.toBeInTheDocument()
     fillConnection()
     fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
     expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
@@ -174,8 +180,27 @@ describe('PipelineCreationFlow', () => {
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
     expect(requests[2]).not.toHaveProperty('pipeline_config')
     expect(requests[2]).not.toHaveProperty('source_id')
+  })
+
+  it('invalidates connection verification after edits and ignores stale responses', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async () => {
+        await delay(10)
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [
+            { name: 'Credentials', reason: 'Check credentials', failure_type: 'warning' },
+          ],
+        })
+      },
+    })
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
     next()
-    back()
+    fillConnection()
+    await testConnection()
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'changed' },
     })
@@ -326,9 +351,11 @@ describe('PipelineCreationFlow', () => {
     await waitFor(() =>
       expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toBeVisible()
     )
+    expect(screen.getByText('Check data settings')).toBeInTheDocument()
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
       target: { value: '750' },
     })
+    expect(screen.queryByText('Check data settings')).not.toBeInTheDocument()
     let shouldFail = true
     addAPIMock({
       method: 'get',

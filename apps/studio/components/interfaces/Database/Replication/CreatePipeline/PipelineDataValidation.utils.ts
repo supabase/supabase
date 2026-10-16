@@ -1,3 +1,5 @@
+import type { FieldPath } from 'react-hook-form'
+
 import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
@@ -31,7 +33,7 @@ export const getDataValidationIssues = (
   const issues = result.success
     ? []
     : result.error.issues.map((issue) => ({
-        path: String(issue.path[0]),
+        path: issue.path.join('.'),
         message: issue.message,
       }))
   if (!publication || publication.name !== data.publicationName) {
@@ -60,7 +62,7 @@ export const getDataValidationIssues = (
     }
   }
   return issues.filter(
-    (issue): issue is { path: keyof DestinationPanelSchemaType; message: string } =>
-      issue.path in DestinationPanelFormSchema.shape
+    (issue): issue is { path: FieldPath<DestinationPanelSchemaType>; message: string } =>
+      issue.path.split('.')[0] in DestinationPanelFormSchema.shape
   )
 }
