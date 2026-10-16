@@ -83,18 +83,29 @@ export const MobileMenu = ({ id, onClose, className }: MobileMenuProps) => {
                 {menu.label}
               </AccordionTrigger>
               <AccordionContent className="p-0">
-                <ul className="flex flex-col gap-3 px-3 pb-4">
-                  {menu.links.map((link) => (
-                    <li key={link.href}>
-                      <a
-                        href={link.href}
-                        className="rounded-sm text-sm text-foreground-light hover:text-foreground focus-ring"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
+                <div className="flex flex-col gap-5 px-3 pb-4">
+                  {menu.groups.map((group) => (
+                    <div key={group.label} className="flex flex-col gap-3">
+                      {menu.groups.length > 1 ? (
+                        <span className="font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+                          {group.label}
+                        </span>
+                      ) : null}
+                      <ul className="flex flex-col gap-3">
+                        {group.links.map((link) => (
+                          <li key={link.href}>
+                            <a
+                              href={link.href}
+                              className="rounded-sm text-sm text-foreground-light hover:text-foreground focus-ring"
+                            >
+                              {link.label}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               </AccordionContent>
             </AccordionItem>
           ))}

@@ -1,5 +1,5 @@
 import { ArrowRight, ChevronDown } from 'lucide-react'
-import { useState, useSyncExternalStore } from 'react'
+import { Fragment, useState, useSyncExternalStore } from 'react'
 import {
   Button,
   cn,
@@ -23,7 +23,7 @@ import {
   type GuideSummary,
 } from '../lib/guides'
 import { bindRevealOnce, REVEAL_GROUP_CLASS, REVEAL_ITEM_CLASS, revealStyle } from '../lib/reveal'
-import { TOPICS, type Topic } from '../lib/topics'
+import { FORMAT_TOPICS, TOPICS, type Topic } from '../lib/topics'
 
 export interface GuideBrowserProps {
   guides: GuideSummary[]
@@ -167,6 +167,9 @@ const TopicTabs = ({ topics, activeTopic, onTopicSelect, className }: TopicTabsP
   const moreTopics = topics.slice(INLINE_TOPIC_COUNT)
   const activeMoreTopic = moreTopics.find((topic) => topic === activeTopic) ?? null
   const tabTopics = [null, ...inlineTopics, ...(activeMoreTopic ? [activeMoreTopic] : [])]
+  const firstProductIndex = tabTopics.findIndex(
+    (topic) => topic !== null && !FORMAT_TOPICS.includes(topic)
+  )
   const handleMoreSelect = (value: string) =>
     onTopicSelect(moreTopics.find((topic) => topic === value) ?? null)
 
@@ -179,8 +182,13 @@ const TopicTabs = ({ topics, activeTopic, onTopicSelect, className }: TopicTabsP
         className
       )}
     >
-      {tabTopics.map((topic) => (
-        <TopicTab key={toTabValue(topic)} topic={topic} />
+      {tabTopics.map((topic, index) => (
+        <Fragment key={toTabValue(topic)}>
+          {index === firstProductIndex && index > 1 ? (
+            <span aria-hidden className="mx-1 h-4 w-px shrink-0 self-center bg-border" />
+          ) : null}
+          <TopicTab topic={topic} />
+        </Fragment>
       ))}
       {moreTopics.length > 0 ? (
         <DropdownMenu>

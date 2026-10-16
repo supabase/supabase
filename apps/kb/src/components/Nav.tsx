@@ -23,14 +23,12 @@ interface MenuPanelProps {
 }
 
 const MENU_LABELS = NAV_MENUS.map((menu) => menu.label)
-const TWO_COLUMN_MIN_LINKS = 7
 
 export const Nav = ({ className }: NavProps) => {
   const [activeMenu, setActiveMenu] = useState('')
   const [visibleMenu, setVisibleMenu] = useState('')
   const [isSwitching, setIsSwitching] = useState(false)
 
-  // the card only animates its size when moving between two open menus
   const handleMenuChange = (value: string) => {
     setIsSwitching(value !== '' && activeMenu !== '')
     setActiveMenu(value)
@@ -102,38 +100,37 @@ export const Nav = ({ className }: NavProps) => {
 }
 
 const MenuPanel = ({ menu }: MenuPanelProps) => (
-  <div className="flex flex-col gap-6 px-6 py-5">
-    <span className="font-mono text-xs uppercase tracking-widest text-foreground-lighter">
-      {menu.label}
-    </span>
-    <ul
-      className={cn(
-        'grid gap-x-10 gap-y-4',
-        menu.links.length >= TWO_COLUMN_MIN_LINKS ? 'w-md grid-cols-2' : 'w-48'
-      )}
-    >
-      {menu.links.map((link) => (
-        <li key={link.href}>
-          <NavigationMenuLink asChild>
-            <a
-              href={link.href}
-              className={cn(
-                'group flex items-center gap-2 rounded-sm text-sm text-foreground-light',
-                'hover:text-foreground focus-ring focus-visible:text-foreground'
-              )}
-            >
-              {link.label}
-              <ChevronRight
-                strokeWidth={2}
-                className={cn(
-                  '-ml-1 w-3 -translate-x-1 opacity-0 transition-all',
-                  'group-hover:translate-x-0 group-hover:opacity-100'
-                )}
-              />
-            </a>
-          </NavigationMenuLink>
-        </li>
-      ))}
-    </ul>
+  <div className="flex gap-12 px-6 py-5">
+    {menu.groups.map((group) => (
+      <div key={group.label} className="flex w-44 flex-col gap-6">
+        <span className="font-mono text-xs uppercase tracking-widest text-foreground-lighter">
+          {group.label}
+        </span>
+        <ul className="flex flex-col gap-4">
+          {group.links.map((link) => (
+            <li key={link.href}>
+              <NavigationMenuLink asChild>
+                <a
+                  href={link.href}
+                  className={cn(
+                    'group flex items-center gap-2 rounded-sm text-sm text-foreground-light',
+                    'hover:text-foreground focus-ring focus-visible:text-foreground'
+                  )}
+                >
+                  {link.label}
+                  <ChevronRight
+                    strokeWidth={2}
+                    className={cn(
+                      '-ml-1 w-3 -translate-x-1 opacity-0 transition-all',
+                      'group-hover:translate-x-0 group-hover:opacity-100'
+                    )}
+                  />
+                </a>
+              </NavigationMenuLink>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
   </div>
 )
