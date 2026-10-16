@@ -456,13 +456,6 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * Org's arm in the projectCreationSpecificRegionsLink experiment at submission time.
-     * Omitted when the org isn't in the eligible population (paid plan, or smart regions
-     * disabled for the selected cloud provider) — the link can never show for them regardless
-     * of the ConfigCat flag.
-     */
-    specificRegionsLinkExperiment?: 'control' | 'test'
-    /**
      * How the submitted region was arrived at. 'auto' = the user never touched the region field
      * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
      * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
@@ -1018,6 +1011,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'troubleshooting'
 
 /**
  * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.

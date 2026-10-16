@@ -1,9 +1,10 @@
-import { Github } from 'lucide-react'
-import Link from 'next/link'
-import { cn } from 'ui'
+import { AiTools } from '~/components/AiTools'
 import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import Link from 'next/link'
+import { cn, GithubIcon } from 'ui'
+
 import { MDXRemoteBase } from './MdxBase'
 import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
@@ -34,7 +35,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
           )}
           <hr className="my-7" aria-hidden />
           <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr_250px]">
-            <div className="min-w-0">
+            <div id="sb-docs-troubleshooting-article-body" className="min-w-0">
               <MDXRemoteBase source={entry.content} />
             </div>
             <aside aria-labelledby="heading--metadata" className="not-prose mt-5">
@@ -99,6 +100,11 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                   <hr className="my-6" aria-hidden />
                 </>
               )}
+              <AiTools
+                pageType="troubleshooting"
+                articleId="sb-docs-troubleshooting-article-body"
+              />
+              <hr className="my-6" aria-hidden />
               <Feedback className="px-0 mb-6 lg:mb-8" />
               {entry.data.github_url && (
                 <>
@@ -108,7 +114,7 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                     href={entry.data.github_url}
                     className="flex items-center gap-2 text-sm text-foreground-lighter"
                   >
-                    <Github size={14} />
+                    <GithubIcon size={14} />
                     View discussion on GitHub
                   </Link>
                 </>

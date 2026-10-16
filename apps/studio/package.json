@@ -126,7 +126,7 @@
     "libpg-query": "17.6.0",
     "lodash": "catalog:",
     "lodash-es": "catalog:",
-    "lucide-react": "^0.436.0",
+    "lucide-react": "catalog:",
     "markdown-table": "^3.0.3",
     "mime-db": "^1.53.0",
     "monaco-editor": "catalog:",
