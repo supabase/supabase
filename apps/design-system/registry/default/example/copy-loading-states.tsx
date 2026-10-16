@@ -4,7 +4,7 @@ import { Button } from 'ui'
 
 export default function CopyLoadingStates() {
   return (
-    <div className="flex flex-row gap-16">
+    <div className="flex flex-row flex-wrap gap-8 sm:gap-16">
       <div className="flex flex-col gap-4">
         <span className="text-xs text-foreground-muted">Bad Example</span>
         <div className="flex flex-col gap-4">

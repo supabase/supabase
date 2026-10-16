@@ -69,7 +69,7 @@ export function ComponentPreview({
         <div
           className={cn(
             'preview flex min-h-[256px] w-full justify-center',
-            padded && 'p-10',
+            padded && 'p-4 sm:p-10',
             {
               'items-center': align === 'center',
               'items-start': align === 'start',
