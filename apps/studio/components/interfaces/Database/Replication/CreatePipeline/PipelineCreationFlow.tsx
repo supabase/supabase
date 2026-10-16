@@ -160,6 +160,12 @@ export const PipelineCreationFlow = ({
               )}
               {accessibleStep === 'connection' && (
                 <>
+                  <PipelineConnectionSection type={type} form={form}>
+                    {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
+                    {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
+                    {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
+                    {type === 'ClickHouse' && <ClickHouseFields form={form} editMode={false} />}
+                  </PipelineConnectionSection>
                   <PipelineValidationAdmonition
                     failures={failures}
                     hint={CONNECTION_VALIDATION_HINT}
@@ -169,12 +175,6 @@ export const PipelineCreationFlow = ({
                       Connection verified.
                     </p>
                   )}
-                  <PipelineConnectionSection type={type} form={form}>
-                    {type === 'BigQuery' && <BigQueryFields form={form} editMode={false} />}
-                    {type === 'DuckLake' && <DuckLakeFields form={form} editMode={false} />}
-                    {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
-                    {type === 'ClickHouse' && <ClickHouseFields form={form} editMode={false} />}
-                  </PipelineConnectionSection>
                 </>
               )}
               {accessibleStep === 'data' && (
