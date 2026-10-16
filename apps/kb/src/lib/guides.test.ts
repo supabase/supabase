@@ -26,7 +26,7 @@ const GUIDES = [
   guide('firestore', 'Migrate from Firebase Firestore to Supabase', ['Migration', 'Database']),
   guide('heroku', 'Migrate from Heroku to Supabase', ['Migration', 'Database']),
   guide('mysql', 'Migrate from MySQL to Supabase', ['Migration', 'Database']),
-  guide('sample', 'Markdown elements sample', ['Tutorial', 'Database']),
+  guide('sample', 'Markdown elements sample', ['Tutorials', 'Database']),
 ]
 
 const ids = (guides: GuideSummary[]) => guides.map((g) => g.id)
@@ -88,8 +88,8 @@ describe('topic url param', () => {
   })
 
   it('sets and clears the topic while keeping other params', () => {
-    expect(withTopicParam({ search: '?ref=x', topic: 'Supabase Platform' })).toBe(
-      '?ref=x&topic=supabase-platform'
+    expect(withTopicParam({ search: '?ref=x', topic: 'Edge Functions' })).toBe(
+      '?ref=x&topic=edge-functions'
     )
     expect(withTopicParam({ search: '?topic=auth&ref=x', topic: null })).toBe('?ref=x')
     expect(withTopicParam({ search: '?topic=auth', topic: null })).toBe('')

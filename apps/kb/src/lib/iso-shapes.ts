@@ -168,11 +168,11 @@ export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
       { ...cube(-0.1, 0.1, 1.6, 1), h: 0.8 },
     ],
   },
-  Tutorial: {
+  Tutorials: {
     titleAt: 'top',
     boxes: [0, 1, 2, 3].map((i) => ({ x: i * 0.8, y: 0, z: 0, w: 0.8, d: 1.2, h: (i + 1) * 0.45 })),
   },
-  'Supabase Platform': {
+  Platform: {
     titleAt: 'top',
     boxes: [0, 1, 2].map((i) => ({ x: 0, y: 0, z: i * 0.55, w: 2.2, d: 2.2, h: 0.18 })),
   },
