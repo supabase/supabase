@@ -1973,7 +1973,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     title: 'Supabase Middleware',
     subtitle: 'Write per-request logic once and run it on any runtime that has fetch.',
     description: `
-\`@supabase/middleware\` is composable, type-safe middleware for Web Fetch handlers. You write per-request logic once, and the same middleware runs on any runtime that has fetch, or inside a framework through a short bridge you copy. It's stable, MIT, and free.
+\`@supabase/middleware\` is composable, type-safe middleware for Web Fetch handlers. You write per-request logic once, and the same middleware runs on any runtime that has fetch, or inside a framework through a short bridge you copy. Available now.
 
 ## Key benefits
 1. Write once, run on any fetch runtime: Supabase Edge Functions, Vercel Functions, Cloudflare Workers, Deno, Bun, and Node 22+.
