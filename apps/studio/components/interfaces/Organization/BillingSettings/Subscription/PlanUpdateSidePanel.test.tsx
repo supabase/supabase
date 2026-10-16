@@ -211,7 +211,7 @@ describe('PlanUpdateSidePanel', () => {
     it('renders the full-screen shell', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/ })).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
     })
 
@@ -222,6 +222,16 @@ describe('PlanUpdateSidePanel', () => {
         screen.getByText('Perfect for passion projects & simple websites.')
       ).toBeInTheDocument()
       expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
+    })
+
+    it('offers AWS Marketplace as a separate purchasing route', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByText('Prefer purchasing through AWS Marketplace?')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View options' })).toHaveAttribute(
+        'href',
+        'https://supabase.com/aws-marketplace'
+      )
     })
 
     it('does not render gap rows', () => {

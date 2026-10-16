@@ -3,6 +3,7 @@ import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { MarkdownActions } from '~/components/MarkdownActions'
 import PricingAddons from '~/components/Pricing/PricingAddons'
+import PricingAwsMarketplaceSection from '~/components/Pricing/PricingAwsMarketplaceSection'
 import PricingComputeSection from '~/components/Pricing/PricingComputeSection'
 import PricingDiskSection from '~/components/Pricing/PricingDiskSection'
 import PricingFAQs from '~/components/Pricing/PricingFAQs'
@@ -95,6 +96,13 @@ export default function PricingContent() {
       </div>
 
       <PricingComparisonSection />
+
+      <div
+        id="aws-marketplace"
+        className="border-t container relative mx-auto px-4 lg:px-12 pt-16 md:pt-24 lg:pt-32 lg:pb-16"
+      >
+        <PricingAwsMarketplaceSection />
+      </div>
 
       <div id="faq" className="border-t">
         <PricingFAQs />

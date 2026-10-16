@@ -160,7 +160,7 @@ export const InitiateCancellationFlowButton = (props: InitiateCancellationFlowBu
           setVisible(true)
         }}
       >
-        {props.children ?? 'Cancel Subscription'}
+        {props.children ?? 'Cancel subscription'}
       </ButtonTooltip>
 
       <CancellationFlow
