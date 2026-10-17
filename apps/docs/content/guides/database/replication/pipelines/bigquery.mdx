@@ -14,6 +14,8 @@ Replicate Postgres tables to [BigQuery](https://cloud.google.com/bigquery) for a
 
 Each source table needs a primary key of at most 16 columns, all included in the publication. Pipelines declares it as a BigQuery `NOT ENFORCED` primary key so CDC can match upserts and deletes. Keep source keys unique and non-null.
 
+Source primary keys must be `NOT DEFERRABLE`; `DEFERRABLE` keys are unsupported.
+
 Check [replica identity and complete update rows](#replica-identity), especially for tables with large text or JSON values.
 
 ## Prepare GCP resources
@@ -59,9 +61,15 @@ Pipelines creates current-state BigQuery tables using destination-compatible nam
 
 Query the generated view for each source table. Its name combines the source schema and table with an underscore, doubling any existing underscores: `public.orders` becomes `public_orders`, and `my_schema.orders` becomes `my__schema_orders`.
 
-Pipelines manages versioned physical tables behind the view. Their names append an underscore and a version suffix, such as `public_orders_<version>`. Newly created tables use a random UUID encoded as 25 lowercase base-36 characters: `0`–`9` and `a`–`z`. Treat this suffix as an opaque identifier. Existing tables with numeric suffixes, such as `public_orders_1`, remain supported.
+A schema or table name that starts or ends with `_` uses a length-prefixed name: `public._orders` becomes `_0607_public__orders`.
 
-When a source truncate or table restart replaces the physical table, Pipelines assigns a fresh suffix and updates the view to point to the replacement. The view name stays the same. Queries tied directly to a physical table version can become stale or fail when that version is removed.
+Pipelines manages a physical table behind each view. Physical tables use generated names such as `supabase_etl_<pipeline_id>_<table_oid>_<suffix>`. Query the view rather than relying on a physical table name.
+
+A source truncate creates a fresh physical table and atomically points the same view to it. Pipelines then deletes the replaced table; a failed deletion is logged and can leave an unused table behind.
+
+A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) removes the view and attempts to delete its physical table before creating replacements. The view is unavailable during recreation. Select the table for **Initial sync** to copy its current source rows again. Queries tied directly to a physical table can become stale or fail when that table is removed.
+
+If a truncate's view replacement fails, the view still selects the previous table, and Pipelines must retry before applying later changes. If a timeout or lost response leaves the outcome unknown, wait for the reported BigQuery job to finish or confirm its cancellation before restarting replication.
 
 ## Destination settings
 
@@ -139,6 +147,7 @@ Pipelines supports:
 
 - Adding columns: scalar columns are nullable, and arrays are repeated fields
 - Removing or renaming columns, provided the primary key stays unchanged
+- Renaming tables within the same schema: the view is recreated under the new name; the physical table keeps its name. Reapply view-specific permissions. Case-only renames are rejected in case-insensitive datasets.
 - Dropping `NOT NULL` from an existing scalar column
 - Adding, replacing, or removing supported literal defaults
 - Adding or removing published columns on tracked tables, provided the primary key stays unchanged and no existing array column is newly included
@@ -163,7 +172,7 @@ Column-list changes for tracked tables follow the [schema rules](#schema-change-
 
 - **Row size**: Each serialized row must fit within the Storage Write API's [20 MB append-request limit](https://cloud.google.com/bigquery/quotas#write-api-limits), including request metadata and encoding overhead.
 - **Columns**: BigQuery CDC supports at most 2,000 top-level columns
-- **Schema and table names**: Source schema and table names can't start or end with `_` or contain `"` or `;` when replicating to BigQuery
+- **Schema and table names**: Source names can't contain `"` or `;`. Leading or trailing underscores are supported when both names contain only ASCII letters, digits, and underscores.
 - **Arrays**: Arrays can't contain `NULL` elements.
 - **Numeric and JSON values**: BigQuery applies its destination [data-type limits](https://cloud.google.com/bigquery/docs/reference/standard-sql/data-types). Values can be rounded or rejected when they exceed the supported precision or range; Postgres values are not guaranteed to retain their exact representation.
 - **BigQuery CDC tables**: While CDC is active, BigQuery doesn't support mutating DML such as `UPDATE`, `DELETE`, or `MERGE`, wildcard table queries, or search indexes on the destination table. See [BigQuery CDC limitations](https://cloud.google.com/bigquery/docs/change-data-capture#limitations) for the complete list.

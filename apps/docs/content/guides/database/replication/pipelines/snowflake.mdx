@@ -151,7 +151,9 @@ Pipelines combines each Postgres schema and table name into one Snowflake table 
 | `public.orders`        | `PUBLIC_ORDERS`          |
 | `sales_eu.order_items` | `SALES__EU_ORDER__ITEMS` |
 
-Postgres schema and table names cannot start or end with `_` or contain `"` or `;`. Names that differ only in case map to the same Snowflake name. Use lowercase Postgres names to avoid collisions. Source column names are preserved as quoted identifiers, except for the [reserved metadata names](#append-only-change-history).
+A schema or table name that starts or ends with `_` uses a length-prefixed name: `public._orders` becomes `_0607_PUBLIC__ORDERS`.
+
+Postgres schema and table names cannot contain `"` or `;`. Leading or trailing underscores require both names to contain only ASCII letters, digits, and underscores. Use lowercase Postgres names to avoid case collisions. Source column names are preserved as quoted identifiers, except for the [reserved metadata names](#append-only-change-history).
 
 ### Append-only change history
 
@@ -304,6 +306,7 @@ Pipelines maintains the replicated history table, but does not update your view 
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Source `TRUNCATE`                        | A direct query or view reads the truncated history. Check that the dynamic table completes a refresh before relying on its contents.                                                               |
 | Pipeline table reset                     | Wait for the new initial sync. Reapply table-specific read grants and change tracking to the recreated history table. Check dependent objects and recreate the dynamic table if it cannot refresh. |
+| Renamed source table                     | Update queries, views, and dynamic tables that reference the old history table name.                                                                                                               |
 | Added, renamed, or dropped source column | Review the explicit column list. Add new columns to your definition when needed. Update or recreate derived objects that reference renamed or dropped columns.                                     |
 
 Recreating a dynamic table initializes its contents again and uses compute. See Snowflake's [dynamic table modification guide](https://docs.snowflake.com/en/user-guide/dynamic-tables/modify) for changes that require reinitialization.
@@ -338,6 +341,7 @@ Additional limits apply:
 Pipelines supports:
 
 - Adding, renaming, or dropping columns
+- Renaming tables within the same schema; a rename that changes only letter case keeps the same uppercase table
 - Adding or removing published columns on tracked tables
 
 Replicated columns remain nullable in Snowflake, and changes to existing column defaults are not propagated. When a table is first created, Pipelines can copy compatible literal defaults. It can also copy string, numeric, or boolean literal defaults for columns added later in Postgres. Other defaults are omitted, although Postgres still supplies the source values through replication.

@@ -62,7 +62,7 @@ Prepare the following resources:
 2. An S3-compatible bucket and a dedicated prefix for this DuckLake.
 3. Object-storage credentials that can list, read, write, and delete objects under that prefix. Delete access is required for managed file cleanup.
 
-Choose an unused metadata schema name and a new data prefix for each destination. Pipelines creates the schema and its tables. Initialising a DuckLake catalog in that schema beforehand triggers a validation warning; reusing its schema or prefix can mix metadata or files from different DuckLakes.
+Choose an unused metadata schema name and a new data prefix for each destination. Pipelines creates the schema and its tables. Initializing a DuckLake catalog in that schema beforehand triggers a validation warning; reusing its schema or prefix can mix metadata or files from different DuckLakes.
 
 Select **Enter connection details** under **Configuration method**, then configure these fields:
 
@@ -83,7 +83,7 @@ The catalog URL and storage credentials are stored as secrets and aren't returne
 
 Pipelines creates current-state tables, copies rows according to the [initial sync selection](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy), then applies published changes and supported schema changes.
 
-Source schema and table names are preserved, while ASCII uppercase letters in column names are converted to lowercase. DuckDB compares schema, table, and column identifiers without ASCII case distinctions, so don't publish names that differ only by ASCII case. Use distinct lowercase column names. Source column names matching the generated `supabase_etl_ducklake_dropped_<ordinal>_<hash>` shape are reserved for schema-change recovery.
+Pipelines preserves source schema and table spelling and lowercases ASCII column names. DuckDB treats ASCII case variants as the same identifier, so avoid names that differ only by ASCII case and use distinct lowercase column names. Column names matching `supabase_etl_ducklake_dropped_<ordinal>_<hash>` are reserved for schema-change recovery.
 
 A source `TRUNCATE` truncates the DuckLake table. A [table restart](/docs/guides/database/replication/pipelines-monitoring#restarting-tables) drops and recreates it. [Removing a table from the publication](/docs/guides/database/replication/pipelines#removing-tables-from-replication) leaves its destination data in place.
 
@@ -147,6 +147,7 @@ Numeric arrays use `varchar[]`, even when their declared precision and scale wou
 Pipelines supports:
 
 - Adding, renaming, or dropping columns
+- Renaming tables within the same schema; a rename that changes only ASCII letter case keeps the same physical table
 - Dropping `NOT NULL` from an existing column
 - Adding, changing, or removing supported column defaults
 - Adding or removing published columns on tracked tables

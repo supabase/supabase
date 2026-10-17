@@ -48,13 +48,13 @@ Support differs by destination. Wait until affected tables are **Live**, then ru
 
 ## Can initial sync affect my application's queries?
 
-Your application can keep reading and writing, but a large copy can slow queries by using database resources. A schema migration waiting for the copy can also make application queries wait. Schedule migrations after initial sync.
+Yes. A large copy uses database resources and can slow queries. A waiting schema migration can also block application queries, so schedule migrations after initial sync.
 
 Before starting a large copy, review [initial sync planning](/docs/guides/database/replication/pipelines#plan-for-initial-sync). If queries are blocked, follow [lock conflict recovery](/docs/guides/database/replication/pipelines-monitoring#lock-conflicts-during-initial-sync).
 
 ## Does stopping a pipeline stop WAL buildup?
 
-No. Replication slots continue retaining database changes while the pipeline is stopped. Monitor source disk usage and slot status during downtime. See [WAL retention during initial sync](/docs/guides/database/replication/pipelines-monitoring#wal-retention-during-initial-sync) for storage considerations and recovery.
+No. Replication slots retain WAL while the pipeline is stopped. Monitor source disk usage and slot status. For storage planning and recovery, see [WAL retention during initial sync](/docs/guides/database/replication/pipelines-monitoring#wal-retention-during-initial-sync).
 
 ## Can data be processed more than once?
 
@@ -93,7 +93,7 @@ Required WAL is gone, so replication cannot continue from that slot. Follow [slo
 
 ## What happens if a table is deleted at the destination?
 
-Deleting or modifying managed objects can stop replication and require a new initial sync. To remove a destination table, first follow the [steps to remove the table from replication](/docs/guides/database/replication/pipelines#removing-tables-from-replication). Delete the destination table only after the pipeline has applied the removal.
+Deleting or modifying managed objects can stop replication and require a new initial sync. Follow the [removal procedure](/docs/guides/database/replication/pipelines#removing-tables-from-replication) before deleting a destination table.
 
 ## What happens when a project becomes inactive or moves to the Free Plan?
 

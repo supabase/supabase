@@ -122,34 +122,34 @@ If a table-sync slot is lost during copying, fix the retention or throughput iss
 
 ### Tune copy throughput
 
-The pipeline and destination have separate concurrency settings. More **Table sync workers** helps copy several tables at once; more **Initial sync connections per table** can speed up one large table. Increasing table workers alone does not give a single table more copy connections.
+Increase **Table sync workers** to copy more tables at once, or **Initial sync connections per table** to speed up one large table. More table workers do not give a single table more copy connections.
 
-Higher concurrency uses more source connections, and additional table workers need more replication slots. Increase it only while the source, network, and destination have spare capacity. See [setting defaults and limits](/docs/guides/database/replication/pipelines#advanced-settings).
+Higher concurrency uses more source connections, and additional table workers need more replication slots. Increase it only when the source, network, and destination have spare capacity. See [setting defaults and limits](/docs/guides/database/replication/pipelines#advanced-settings).
 
-Destination-specific settings can further improve performance. Review the available settings for your destination alongside these pipeline controls.
+Review your destination guide for additional performance settings.
 
-Change one setting at a time and monitor copy progress and resource usage. Plan changes before a large initial sync where possible: applying pipeline changes restarts it, and unfinished copies can [start again from scratch](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery).
+Change one setting at a time and monitor progress and resource usage. Tune settings before a large copy when possible: applying changes restarts the pipeline, and unfinished copies can [start again from scratch](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery).
 
 ### WAL retention during initial sync
 
-Postgres keeps change history in its write-ahead log (WAL) so Pipelines can catch up after copying. Each table-sync slot retains the history its table needs until it makes progress through catch-up. A large table can therefore keep WAL on disk even when the main pipeline slot reports **Caught up**.
+Each table-sync slot retains write-ahead log (WAL) history until its table progresses through catch-up. A large table can keep WAL on disk even when the main slot reports **Caught up**.
 
-Retained WAL includes database activity outside the copied tables. Plan storage using the database's overall WAL generation rate and expected copy duration, with extra capacity for catch-up and retries. A small publication on a busy database can still retain substantial WAL.
+Retained WAL includes activity outside the copied tables. Plan storage using the whole database's WAL generation rate and expected copy duration, with room for catch-up and retries.
 
-Long copies also delay cleanup of old row versions needed by the copy. This can increase table storage separately from WAL. Normal vacuum cleanup can continue, but it cannot remove versions the copy still needs. Leave disk space for both kinds of growth.
+Long copies also prevent vacuum from removing row versions the copy still needs. Leave disk space for this table growth as well as WAL.
 
 During a large initial sync:
 
-1. Monitor each table's progress, **WAL retention remaining**, **Slot status**, and available database disk space. A main slot reporting **Caught up** does not mean every table has finished copying.
-2. If copying slows or stops, check destination errors, throughput, and source resource usage. Reduce avoidable bulk writes or add capacity where needed. Catch-up must process changes faster than new work arrives to clear the backlog.
-3. Increase concurrency only when the source and destination have spare capacity. Fewer workers reduce immediate load but can extend the copy and its storage requirements.
-4. Increase WAL retention only when there is enough disk space and the required WAL is still available. A larger limit gives the pipeline more time; it does not fix a stalled copy.
+1. Monitor every table's progress, **WAL retention remaining**, **Slot status**, and available database disk space.
+2. If copying slows or stops, check destination errors, throughput, and source resource usage. Reduce bulk writes or add capacity where needed; catch-up must outpace incoming changes.
+3. [Tune concurrency](#tune-copy-throughput) to available capacity. Fewer workers reduce load but can extend the copy and its storage needs.
+4. Increase WAL retention only if disk space permits and the required WAL is still available. A larger limit buys time but does not fix a stalled copy.
 
-The `max_slot_wal_keep_size` setting limits slot retention at Postgres checkpoints. It is not a hard cap on disk use and does not limit old row versions. A value of `-1` allows unlimited WAL retention. Monitor disk space separately from **WAL retention remaining**.
+`max_slot_wal_keep_size` limits WAL retention at Postgres checkpoints; `-1` allows unlimited retention. It caps neither total disk use nor old row versions, so monitor disk space separately from **WAL retention remaining**.
 
-If Postgres removes history that the pipeline still needs, increasing retention afterward cannot recover it. Fix the cause, then follow the [slot recovery steps](#respond-based-on-the-slot-status). Copying data again incurs [additional charges](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
+If required WAL is removed, increasing retention cannot recover it. Fix the cause, then follow the [slot recovery steps](#respond-based-on-the-slot-status). Copying data again incurs [additional charges](/docs/guides/platform/manage-your-usage/pipelines#how-data-processed-is-measured).
 
-Stopping a pipeline releases its active copy after shutdown, but its replication slots continue retaining WAL. Keep monitoring storage while it is stopped. Repeated restarts can repeat unfinished copies and extend the time needed to catch up; use the [recovery guidance](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) before restarting.
+Stopping a pipeline ends active copies after shutdown, but its slots continue retaining WAL. Keep monitoring storage while stopped. Repeated restarts can repeat unfinished copies and delay catch-up; review the [recovery guidance](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) before restarting.
 
 ### Lock conflicts during initial sync
 
@@ -161,7 +161,7 @@ If application queries are blocked:
 2. When safe, cancel that operation and roll back its transaction.
 3. Reschedule it after the affected tables are **Live**.
 
-Canceling the waiting operation can let application queries continue while copying proceeds. Pipelines does not automatically stop the copy to unblock queries. In your migration tool, set a short lock timeout with `lock_timeout` to limit how long migrations wait.
+Canceling the waiting operation can unblock application queries without stopping the copy. Pipelines does not stop the copy automatically. Set a short `lock_timeout` in your migration tool to limit how long migrations wait.
 
 A lock conflict can also cause Pipelines to retry a table copy from the beginning. If retries are exhausted, resolve the conflict and follow [Table errors](#table-errors) for recovery.
 
