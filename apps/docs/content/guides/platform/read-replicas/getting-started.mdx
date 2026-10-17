@@ -98,7 +98,7 @@ We bring these two methods together to achieve quick, stable, and reliable repli
 
 We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, Read Replicas connect to the Primary and stream the WAL directly.
 
-### Restart or compute add-on change behaviour
+### Restart or compute add-on change behavior
 
 When you restart a project that uses Read Replicas, or change the compute add-on size, the Primary database gets restarted first. During this period, the Read Replicas remain available.
 
