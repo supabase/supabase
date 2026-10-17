@@ -9,17 +9,18 @@ import {
   FormControl,
   FormDescription,
   FormField,
+  FormInputGroupInput,
   FormItem,
   FormLabel,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
   Popover,
   PopoverContent,
   PopoverTrigger,
   Switch,
 } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { RealtimeConfig } from './useRealtimeMessages'
@@ -131,42 +132,46 @@ export const ChooseChannelPopover = ({
                     name="channel"
                     control={form.control}
                     render={({ field }) => (
-                      <FormItem className="flex flex-col gap-y-2">
+                      <FormItemLayout
+                        layout="vertical"
+                        label="Name of channel"
+                        description={
+                          <p className="text-xs text-foreground-lighter">
+                            The channel you initialize with the Supabase Realtime client. Learn more
+                            in{' '}
+                            <a
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline hover:text-foreground transition"
+                              href={`${DOCS_URL}/guides/realtime/concepts#channels`}
+                            >
+                              our docs
+                            </a>
+                          </p>
+                        }
+                      >
                         <div className="flex flex-col gap-y-1">
-                          <label className="text-foreground text-xs">Name of channel</label>
-                          <InputGroup>
-                            <FormControl>
-                              <InputGroupInput
+                          <FormControl>
+                            <InputGroup>
+                              <FormInputGroupInput
                                 {...field}
                                 autoComplete="off"
                                 className="rounded-r-none text-xs px-2.5 py-1 h-auto"
                                 placeholder="Enter a channel name"
                               />
-                            </FormControl>
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupButton
-                                variant="primary"
-                                disabled={form.getValues().channel.length === 0}
-                                onClick={() => onSubmit()}
-                              >
-                                Listen to channel
-                              </InputGroupButton>
-                            </InputGroupAddon>
-                          </InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupButton
+                                  variant="primary"
+                                  disabled={form.getValues().channel.length === 0}
+                                  type="submit"
+                                >
+                                  Listen to channel
+                                </InputGroupButton>
+                              </InputGroupAddon>
+                            </InputGroup>
+                          </FormControl>
                         </div>
-                        <FormDescription className="text-xs text-foreground-lighter">
-                          The channel you initialize with the Supabase Realtime client. Learn more
-                          in{' '}
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            className="underline hover:text-foreground transition"
-                            href={`${DOCS_URL}/guides/realtime/concepts#channels`}
-                          >
-                            our docs
-                          </a>
-                        </FormDescription>
-                      </FormItem>
+                      </FormItemLayout>
                     )}
                   />
 
