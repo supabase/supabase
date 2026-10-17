@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   appVersionAtLeast,
   compareAppVersions,
+  isOrioleDbVersion,
   isOrioleDbVersionAtLeast,
   parseAppVersionKey,
 } from './useSelectedProject.utils'
@@ -83,7 +84,37 @@ describe('appVersionAtLeast', () => {
   })
 })
 
+describe('isOrioleDbVersion', () => {
+  it('recognizes standard and suffixed OrioleDB images', () => {
+    expect(isOrioleDbVersion('supabase-postgres-17.11.0.001-orioledb')).toBe(true)
+    expect(isOrioleDbVersion('supabase-postgres-17.11.0.001-orioledb-bench-1')).toBe(true)
+    expect(isOrioleDbVersion('supabase-postgres-arm64-17.11.0.001-orioledb-bench-1')).toBe(true)
+  })
+
+  it('rejects missing versions, Postgres images, and partial engine names', () => {
+    expect(isOrioleDbVersion(undefined)).toBe(false)
+    expect(isOrioleDbVersion('')).toBe(false)
+    expect(isOrioleDbVersion('supabase-postgres-17.11.0.001')).toBe(false)
+    expect(isOrioleDbVersion('supabase-postgres-17.11.0.001-orioledbother')).toBe(false)
+  })
+})
+
 describe('isOrioleDbVersionAtLeast', () => {
+  it('compares suffixed OrioleDB images against the release threshold', () => {
+    expect(
+      isOrioleDbVersionAtLeast(
+        'supabase-postgres-17.11.0.001-orioledb-bench-1',
+        'supabase-postgres-17.11.0.001-orioledb'
+      )
+    ).toBe(true)
+    expect(
+      isOrioleDbVersionAtLeast(
+        'supabase-postgres-17.9.0.019-orioledb-bench-1',
+        'supabase-postgres-17.11.0.001-orioledb'
+      )
+    ).toBe(false)
+  })
+
   it('returns true when the engine version is above the threshold', () => {
     expect(
       isOrioleDbVersionAtLeast(

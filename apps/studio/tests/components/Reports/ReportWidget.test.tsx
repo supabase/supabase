@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { test } from 'vitest'
+import { expect, test } from 'vitest'
 
 import { render } from '../../helpers'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
@@ -30,4 +30,19 @@ test('append', async () => {
     />
   )
   await screen.findByText(/some text/)
+})
+
+test('keeps renderer loading state when the overlay spinner is disabled', () => {
+  render(
+    <ReportWidget
+      title="Database Size"
+      isLoading
+      showLoadingSpinner={false}
+      data={[]}
+      renderer={({ isLoading }) => <span>{isLoading ? 'Loading data' : 'No data'}</span>}
+    />
+  )
+
+  expect(screen.getByText('Loading data')).toBeInTheDocument()
+  expect(screen.queryByText('No data')).not.toBeInTheDocument()
 })
