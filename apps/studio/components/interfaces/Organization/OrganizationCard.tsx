@@ -1,5 +1,5 @@
 import { useIsMFAEnabled } from 'common'
-import { Boxes, Lock, Plus } from 'lucide-react'
+import { BoxesIcon, LockIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -41,7 +41,7 @@ export const OrganizationCard = ({
         'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
         className
       )}
-      icon={<Boxes size={18} strokeWidth={1} className="text-foreground" />}
+      icon={<BoxesIcon size={18} strokeWidth={1} className="text-foreground" />}
       title={organization.name}
       onClick={onClick}
       description={
@@ -63,7 +63,7 @@ export const OrganizationCard = ({
               {isMfaRequired && (
                 <Tooltip>
                   <TooltipTrigger className="cursor-default">
-                    <Lock size={12} />
+                    <LockIcon size={12} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className={!isUserMFAEnabled ? 'w-80' : ''}>
                     MFA enforced
@@ -109,7 +109,7 @@ export const CreateOrganizationCard = ({
         'flex items-center min-h-[70px] [&>div]:w-full [&>div]:items-center max-h-min',
         'border-dashed shadow-none transition-colors group-hover:border-default group-hover:bg-surface-200'
       )}
-      icon={<Plus size={18} strokeWidth={1} className="text-foreground" />}
+      icon={<PlusIcon size={18} strokeWidth={1} className="text-foreground" />}
       title={label}
     />
   )

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes } from 'lodash'
-import { Edit3, MoreVertical, Trash } from 'lucide-react'
+import { Edit3Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { parseAsString, useQueryState } from 'nuqs'
 import {
@@ -105,7 +105,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                         <DropdownMenuTrigger asChild>
                           <Button
                             className="px-1"
-                            icon={<MoreVertical />}
+                            icon={<MoreVerticalIcon />}
                             aria-label={`${x.name} actions`}
                             // Tooltip repeats the label; screen readers would read it twice
                             aria-describedby={undefined}
@@ -121,7 +121,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                           className="space-x-2"
                           onClick={() => setSelectedHookIdToEdit(x.id.toString())}
                         >
-                          <Edit3 size="14" />
+                          <Edit3Icon size="14" />
                           <p>Edit hook</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -129,7 +129,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                           className="space-x-2"
                           onClick={() => setSelectedHookIdToDelete(x.id.toString())}
                         >
-                          <Trash stroke="red" size="14" />
+                          <TrashIcon stroke="red" size="14" />
                           <p>Delete hook</p>
                         </DropdownMenuItem>
                       </>
@@ -139,7 +139,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                   <ButtonTooltip
                     disabled
                     className="px-1"
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     tooltip={{
                       content: {
                         side: 'bottom',

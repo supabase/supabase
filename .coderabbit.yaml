@@ -10,6 +10,7 @@ issue_enrichment:
     enabled: true
 
 reviews:
+  high_level_summary: false
   # Skip machine-generated / vendored files (mirrors .prettierignore). Keeps
   # reviews focused on hand-written code and preserves rate-limit budget on
   # large codegen diffs.

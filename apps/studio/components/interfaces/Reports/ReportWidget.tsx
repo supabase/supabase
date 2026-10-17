@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ExternalLink, HelpCircle } from 'lucide-react'
+import { ExternalLinkIcon, HelpCircleIcon } from 'lucide-react'
 import { NextRouter, useRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { Button, cn, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -48,7 +48,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
               {props?.tooltip && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <HelpCircle className="text-foreground-light" size={14} strokeWidth={1.5} />
+                    <HelpCircleIcon className="text-foreground-light" size={14} strokeWidth={1.5} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom">{props.tooltip}</TooltipContent>
                 </Tooltip>
@@ -60,7 +60,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  icon={<ExternalLink />}
+                  icon={<ExternalLinkIcon />}
                   className="px-1"
                   onClick={() => {
                     const isDbQueryType = props.queryType === 'db'

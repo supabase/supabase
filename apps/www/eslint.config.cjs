@@ -1,6 +1,8 @@
 const { defineConfig } = require('eslint/config')
 const supabaseConfig = require('eslint-config-supabase/next')
 
+const noCrossZoneLink = require('./eslint-rules/no-cross-zone-link.cjs')
+
 module.exports = defineConfig([
   supabaseConfig,
   {
@@ -18,5 +20,10 @@ module.exports = defineConfig([
       'react/display-name': 'warn',
       'react/no-children-prop': 'warn',
     },
+  },
+  {
+    files: ['**/*.{jsx,tsx}'],
+    plugins: { www: { rules: { 'no-cross-zone-link': noCrossZoneLink } } },
+    rules: { 'www/no-cross-zone-link': 'error' },
   },
 ])

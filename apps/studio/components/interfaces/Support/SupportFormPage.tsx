@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { Loader2, Wrench } from 'lucide-react'
+import { Loader2Icon, WrenchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useReducer, type Dispatch, type PropsWithChildren } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
@@ -143,7 +143,7 @@ function SupportFormHeader() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        <Button asChild icon={<Wrench />}>
+        <Button asChild icon={<WrenchIcon />}>
           <Link
             href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
@@ -158,7 +158,7 @@ function SupportFormHeader() {
               asChild
               icon={
                 isLoading ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2Icon className="animate-spin" />
                 ) : (
                   <div
                     className={cn(

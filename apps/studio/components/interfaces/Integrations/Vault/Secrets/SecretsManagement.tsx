@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
@@ -68,7 +68,8 @@ export const SecretsManagement = () => {
         ? allSecrets.filter(
             (secret) =>
               (secret?.name ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
-              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
+              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
+              (secret?.key_id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
           )
         : allSecrets
 
@@ -111,7 +112,7 @@ export const SecretsManagement = () => {
                 size="tiny"
                 className="w-52"
                 placeholder="Search by name or key ID"
-                icon={<Search />}
+                icon={<SearchIcon />}
                 value={searchValue ?? ''}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
@@ -123,7 +124,7 @@ export const SecretsManagement = () => {
                           key="clear"
                           size="tiny"
                           variant="text"
-                          icon={<X />}
+                          icon={<XIcon />}
                           onClick={() => setSearchValue('')}
                           className="p-0 h-5 w-5"
                           aria-label="Clear search"
@@ -155,7 +156,7 @@ export const SecretsManagement = () => {
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
+              <Button icon={<RefreshCwIcon />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />

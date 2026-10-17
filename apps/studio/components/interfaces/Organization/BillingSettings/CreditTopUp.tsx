@@ -5,7 +5,7 @@ import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { AlertCircle, Info } from 'lucide-react'
+import { AlertCircleIcon, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
@@ -355,7 +355,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
               {paymentIntentConfirmation && paymentIntentConfirmation.error && (
                 <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircleIcon className="h-4 w-4" />
                   <AlertTitle>Error confirming payment</AlertTitle>
                   <AlertDescription>{paymentIntentConfirmation.error.message}</AlertDescription>
                 </Alert>
@@ -364,7 +364,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               {paymentIntentConfirmation?.paymentIntent &&
                 paymentIntentConfirmation.paymentIntent.status === 'processing' && (
                   <Alert variant="default">
-                    <Info className="h-4 w-4" />
+                    <InfoIcon className="h-4 w-4" />
                     <AlertTitle>Payment processing</AlertTitle>
                     <AlertDescription>
                       Your payment is processing and we are waiting for a confirmation from your
@@ -376,7 +376,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
               {errorInitiatingTopUp && (
                 <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircleIcon className="h-4 w-4" />
                   <AlertTitle>Error topping up balance</AlertTitle>
                   <AlertDescription>{errorInitiatingTopUp.message}</AlertDescription>
                 </Alert>

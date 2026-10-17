@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ExternalLink, Info } from 'lucide-react'
+import { ExternalLinkIcon, InfoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
-import { Alert, AlertDescription, AlertTitle, Button, InfoIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, InfoIcon as StatusInfoIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -141,7 +141,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
                           {reportsAll && (
                             <div className="col-span-2 mt-4">
-                              <Button asChild iconRight={<ExternalLink size={14} />}>
+                              <Button asChild iconRight={<ExternalLinkIcon size={14} />}>
                                 <Link
                                   href={`/project/${projectRef}/reports/database#database-size-report`}
                                 >
@@ -154,7 +154,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
                         <div className="col-span-8">
                           <Alert>
-                            <Info size={16} />
+                            <InfoIcon size={16} />
                             <AlertTitle>Importing a lot of data?</AlertTitle>
                             <AlertDescription>
                               <Markdown
@@ -179,7 +179,7 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
             </div>
           ) : (
             <Alert>
-              <InfoIcon />
+              <StatusInfoIcon />
               <AlertTitle>
                 {hasAccessToDiskSizeConfig === false
                   ? 'Disk size configuration is not available for projects on the Free Plan'

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { AlertCircle, Book, Check } from 'lucide-react'
+import { AlertCircleIcon, BookIcon, CheckIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -302,7 +302,7 @@ const NewFunctionPage = () => {
                 role="combobox"
                 aria-expanded={open}
                 aria-controls={templatesListboxId}
-                icon={<Book size={14} />}
+                icon={<BookIcon size={14} />}
               >
                 Templates
               </Button>
@@ -324,7 +324,7 @@ const NewFunctionPage = () => {
                       >
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center">
-                            <Check
+                            <CheckIcon
                               className={cn(
                                 'mr-2 h-4 w-4',
                                 files.some((f) => f.content === template.content)
@@ -390,7 +390,7 @@ const NewFunctionPage = () => {
                     {form.formState.errors.functionName && (
                       <Tooltip>
                         <TooltipTrigger>
-                          <AlertCircle className="w-4 h-4 text-destructive ml-2" />
+                          <AlertCircleIcon className="w-4 h-4 text-destructive ml-2" />
                         </TooltipTrigger>
                         <TooltipContent>
                           {form.formState.errors.functionName.message}

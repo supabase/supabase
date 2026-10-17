@@ -1,4 +1,4 @@
-import { Check, Copy, MousePointerClick, X } from 'lucide-react'
+import { CheckIcon, CopyIcon, MousePointerClickIcon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, cn, copyToClipboard, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -110,7 +110,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
                     text: isLoading ? 'Loading log...' : 'Copy as JSON',
                   },
                 }}
-                icon={showCopied ? <Check /> : <Copy />}
+                icon={showCopied ? <CheckIcon /> : <CopyIcon />}
                 onClick={() => {
                   setShowCopied(true)
                   copyToClipboard(JSON.stringify(log, null, 2))
@@ -118,7 +118,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
               />
 
               <Button variant="text" onClick={onClose}>
-                <X size={14} strokeWidth={2} />
+                <XIcon size={14} strokeWidth={2} />
               </Button>
             </div>
           </TabsList>
@@ -173,7 +173,7 @@ function LogDetailEmptyState({
         <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
-            <MousePointerClick size="24" strokeWidth={1} />
+            <MousePointerClickIcon size="24" strokeWidth={1} />
           </div>
         </div>
         <div className="flex flex-col gap-1">

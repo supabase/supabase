@@ -1,6 +1,6 @@
 import { useDndMonitor } from '@dnd-kit/core'
 import { useSortable } from '@dnd-kit/sortable'
-import { GripVertical } from 'lucide-react'
+import { GripVerticalIcon } from 'lucide-react'
 import type { CSSProperties, PropsWithChildren, ReactNode } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Button, cn, DropdownMenu, DropdownMenuTrigger } from 'ui'
@@ -100,7 +100,7 @@ export const SortableSection = ({
               {...attributes}
               {...listeners}
               tabIndex={0}
-              icon={<GripVertical />}
+              icon={<GripVerticalIcon />}
             />
           </DropdownMenuTrigger>
           {gripDropdownContent}

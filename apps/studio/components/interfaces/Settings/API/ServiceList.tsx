@@ -1,4 +1,4 @@
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { Alert, AlertTitle } from 'ui'
 
 import { PostgrestConfig } from './PostgrestConfig'
@@ -13,7 +13,7 @@ export const ServiceList = () => {
     <ScaffoldSection isFullWidth id="api-settings" className="gap-6 py-0!">
       {!isLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <Alert variant="destructive">
-          <AlertCircle size={16} />
+          <AlertCircleIcon size={16} />
           <AlertTitle>API settings are unavailable as the project is not active</AlertTitle>
         </Alert>
       ) : (

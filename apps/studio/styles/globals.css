@@ -148,27 +148,8 @@
 }
 
 :root {
-  --sidebar-background: var(--background-dash-sidebar);
-  --sidebar-foreground: var(--foreground-default);
-  --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: var(--warning);
-  --sidebar-accent: var(--background-selection);
-  --sidebar-accent-foreground: var(--foreground-default);
-  --sidebar-border: var(--border-default);
-  --sidebar-ring: var(--ring);
+  /* --sidebar-* aliases live in packages/ui compat.css (shared with other apps). */
   --header-height: 3rem;
-}
-
-[data-theme='dark'],
-.dark {
-  --sidebar-background: var(--background-dash-sidebar);
-  --sidebar-foreground: var(--foreground-default);
-  --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: var(--warning);
-  --sidebar-accent: var(--background-selection);
-  --sidebar-accent-foreground: var(--foreground-default);
-  --sidebar-border: var(--border-default);
-  --sidebar-ring: var(--ring);
 }
 
 @layer base {
