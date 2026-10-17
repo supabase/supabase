@@ -150,6 +150,42 @@ Projects planning to upgrade from Postgres 15 to Postgres 17 need to first disab
 
 Existing projects on lower versions of Postgres are not impacted, and the extensions will continue to be supported on projects using Postgres 15, until the end of life of Postgres 15 on the Supabase platform.
 
+#### Check whether your project uses `pgjwt`
+
+`pgjwt` installs `sign`, `verify`, `algorithm_sign`, `url_encode`, `url_decode`, and `try_cast_double` into the `extensions` schema by default. Run both queries below in the [SQL Editor](/dashboard/project/_/sql/new). If neither returns rows, nothing in your database calls the extension.
+
+Postgres records a dependency when a view, materialized view, column default, constraint, or index calls one of those functions:
+
+```sql
+select distinct pg_describe_object(d.classid, d.objid, d.objsubid) as object
+from pg_depend d
+where
+  d.refobjid in (
+    select objid
+    from pg_depend
+    where
+      refclassid = 'pg_extension'::regclass
+      and classid = 'pg_proc'::regclass
+      and refobjid = (select oid from pg_extension where extname = 'pgjwt')
+  )
+  and d.deptype = 'n'
+order by 1;
+```
+
+Calls from inside a function body don't create a dependency, so search the bodies by name:
+
+```sql
+select n.nspname || '.' || p.proname as routine
+from pg_proc p
+join pg_namespace n on n.oid = p.pronamespace
+where
+  n.nspname not in ('pg_catalog', 'information_schema', 'extensions')
+  and p.prosrc ~* '\y(sign|verify|algorithm_sign|url_encode|url_decode)\s*\('
+order by 1;
+```
+
+The second query matches on name alone, so read its results before acting on them. A function of your own named `sign()` matches too.
+
 ### `pg_cron` usage
 
 [pg_cron](https://github.com/citusdata/pg_cron#viewing-job-run-details) does not automatically clean up historical records. This can lead to extremely large `cron.job_run_details` tables if the records are not regularly pruned; you should clean unnecessary records from this table before an upgrade.
