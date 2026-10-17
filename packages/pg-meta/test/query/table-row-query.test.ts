@@ -1888,3 +1888,26 @@ describe('Table Row Query', () => {
     expect(queryResultWithFilter[0].collation).toBe('value2')
   })
 })
+
+describe('getTableRowsSql column metadata', () => {
+  test('does not mutate the order of table.columns', () => {
+    // Columns intentionally out of ordinal_position order, as they can arrive
+    // from cached metadata
+    const table = {
+      name: 'test_table',
+      schema: 'public',
+      primary_keys: [],
+      live_rows_estimate: 0,
+      columns: [
+        { name: 'b_col', data_type: 'text', format: 'text', ordinal_position: 2 },
+        { name: 'a_col', data_type: 'text', format: 'text', ordinal_position: 1 },
+      ],
+    } as any
+
+    const before = table.columns.map((c: any) => c.name)
+    getTableRowsSql({ table, page: 1, limit: 10 })
+    const after = table.columns.map((c: any) => c.name)
+
+    expect(after).toEqual(before)
+  })
+})
