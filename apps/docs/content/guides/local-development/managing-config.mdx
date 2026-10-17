@@ -57,6 +57,10 @@ secret = "env(GITHUB_SECRET)"
 redirect_uri = "" # Overrides the default auth redirectUrl.
 ```
 
+The CLI also reads a `.env` file inside the `supabase` directory. It doesn't read `supabase/functions/.env`, which only holds secrets for your [Edge Functions](/docs/guides/functions/secrets). If `env()` names a variable the CLI can't find, the stack still starts, but the setting gets the literal `env(...)` text instead of your value.
+
+The CLI reads these values when the stack starts. After you change one, run `supabase stop` and then `supabase start` to apply it.
+
 ### Going further
 
 For more advanced secrets management workflows, including:
