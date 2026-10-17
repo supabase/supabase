@@ -15,16 +15,17 @@ interface Props {
 	github_url?: string
 	viewGitHubLink?: string
 	date?: string
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description, topics = [], github_url, viewGitHubLink, date } = Astro.props
+const { title, description, topics = [], github_url, viewGitHubLink, date, jsonLd } = Astro.props
 
 function isKnownTopic(topic: string): topic is Topic {
 	return (TOPIC_NAMES as readonly string[]).includes(topic)
 }
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} jsonLd={jsonLd}>
 	<article class="prose max-w-3xl mx-auto px-6 py-16">
 		<h1>{title}</h1>
 		{date && <p class="text-sm pb-4">{date}</p>}
