@@ -8,6 +8,7 @@ on:
       - '.github/workflows/docs-search-v2-ingest.yml'
       - 'apps/docs/content/**/*.mdx'
       - 'apps/docs/scripts/search_v2/**'
+      - 'packages/docs-search/**'
   workflow_dispatch:
 
 concurrency:
