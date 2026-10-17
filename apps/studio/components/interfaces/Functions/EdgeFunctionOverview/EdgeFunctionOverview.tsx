@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -10,6 +10,7 @@ import {
   getBucketedTimeRange,
   getExecutionMetrics,
   getInvocationChartData,
+  getInvocationChartNavigationUrl,
   getInvocationTotals,
   getInvocationUpdateAnnotation,
   getRollingTimeRange,
@@ -130,10 +131,7 @@ export const EdgeFunctionOverview = () => {
   const invocationUpdateAnnotation = useMemo(
     () =>
       getInvocationUpdateAnnotation({
-        updatedAt:
-          selectedFunction?.updated_at === undefined
-            ? undefined
-            : String(selectedFunction.updated_at),
+        updatedAt: selectedFunction?.updated_at,
         invocationChartData,
         windowStart: selectedWindowStart,
         windowEnd: selectedWindowEnd,
@@ -148,7 +146,7 @@ export const EdgeFunctionOverview = () => {
         href: `/project/${projectRef}/functions/${functionSlug}/${
           isUnifiedLogsEnabled ? 'logs' : 'invocations'
         }`,
-        icon: <ExternalLink size={12} />,
+        icon: <ExternalLinkIcon size={12} />,
       },
     ],
     [functionSlug, isUnifiedLogsEnabled, projectRef]
@@ -204,11 +202,18 @@ export const EdgeFunctionOverview = () => {
         isErrorChart={isErrorCombinedStats}
         chartErrorMessage={combinedStatsError?.message ?? 'Unknown error'}
         chartData={invocationChartData}
-        onChartClick={() => {
+        onChartClick={(timestamp) => {
+          if (!projectRef || !functionSlug) return
+
           router.push(
-            `/project/${projectRef}/functions/${functionSlug}/${
-              isUnifiedLogsEnabled ? 'logs' : 'invocations'
-            }${isUnifiedLogsEnabled ? '' : `?its=${startDate.toISOString()}`}`
+            getInvocationChartNavigationUrl({
+              projectRef,
+              functionSlug,
+              isUnifiedLogsEnabled,
+              rangeStart: startDate.toISOString(),
+              rangeEnd: endDate.toISOString(),
+              clickedTimestamp: timestamp,
+            })
           )
         }}
         updateAnnotation={invocationUpdateAnnotation}

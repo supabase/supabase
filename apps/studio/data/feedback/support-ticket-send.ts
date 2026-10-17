@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 // End of third-party imports
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
+import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { handleError, post } from '@/data/fetchers'
 import { ResponseError } from '@/types'
 import type { UseCustomMutationOptions } from '@/types'
@@ -24,6 +25,9 @@ export type sendSupportTicketVariables = {
   dashboardSentryIssueId?: string
   dashboardLogs?: string
   dashboardStudioVersion?: string
+  // Stable Front thread_ref so the AI support chat can later be appended to the
+  // same Front conversation that this submission creates.
+  threadRef?: string
 }
 
 const RATE_LIMIT_FALLBACK_SECONDS = 60
@@ -44,6 +48,7 @@ export async function sendSupportTicket({
   dashboardSentryIssueId,
   dashboardLogs,
   dashboardStudioVersion,
+  threadRef,
 }: sendSupportTicketVariables) {
   const { data, error, response } = await post('/platform/feedback/send', {
     body: {
@@ -51,8 +56,9 @@ export async function sendSupportTicket({
       message,
       category,
       severity,
-      projectRef,
-      organizationSlug,
+      // Skip `NO_PROJECT_MARKER` values so we don't need to have special handling for it's value in API validation.
+      projectRef: projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+      organizationSlug: organizationSlug === NO_ORG_MARKER ? undefined : organizationSlug,
       library,
       verified: true,
       tags: ['dashboard-support-form'],
@@ -64,6 +70,7 @@ export async function sendSupportTicket({
       dashboardSentryIssueId,
       dashboardLogs,
       dashboardStudioVersion,
+      threadRef,
     },
   })
 

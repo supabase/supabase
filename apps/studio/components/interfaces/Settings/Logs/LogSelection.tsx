@@ -1,14 +1,6 @@
-import { Check, Copy, MousePointerClick, X } from 'lucide-react'
+import { CheckIcon, CopyIcon, MousePointerClickIcon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  cn,
-  copyToClipboard,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, copyToClipboard, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -99,14 +91,14 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
   return (
     <div className="relative flex h-full grow flex-col overflow-y-scroll bg-surface-100 border-t">
       <div className="relative grow flex flex-col h-full">
-        <Tabs_Shadcn_ defaultValue="details" className="flex flex-col h-full">
-          <TabsList_Shadcn_ className="px-2 pt-2 relative">
-            <TabsTrigger_Shadcn_ className="px-3" value="details">
+        <Tabs defaultValue="details" className="flex flex-col h-full">
+          <TabsList className="px-2 pt-2 sticky top-0 z-10 bg-surface-100">
+            <TabsTrigger className="px-3" value="details">
               Details
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ disabled={!log} className="px-3" value="raw">
+            </TabsTrigger>
+            <TabsTrigger disabled={!log} className="px-3" value="raw">
               Raw
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
 
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
@@ -118,7 +110,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
                     text: isLoading ? 'Loading log...' : 'Copy as JSON',
                   },
                 }}
-                icon={showCopied ? <Check /> : <Copy />}
+                icon={showCopied ? <CheckIcon /> : <CopyIcon />}
                 onClick={() => {
                   setShowCopied(true)
                   copyToClipboard(JSON.stringify(log, null, 2))
@@ -126,10 +118,10 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
               />
 
               <Button variant="text" onClick={onClose}>
-                <X size={14} strokeWidth={2} />
+                <XIcon size={14} strokeWidth={2} />
               </Button>
             </div>
-          </TabsList_Shadcn_>
+          </TabsList>
           <div className="flex-1 h-full">
             {isLoading ? (
               <div className="p-4">
@@ -137,10 +129,10 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
               </div>
             ) : (
               <>
-                <TabsContent_Shadcn_ className="space-y-6 h-full" value="details">
+                <TabsContent className="space-y-6 h-full" value="details">
                   <LogDetails />
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ value="raw">
+                </TabsContent>
+                <TabsContent value="raw">
                   <CodeBlock
                     hideLineNumbers
                     language="json"
@@ -148,11 +140,11 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
                   >
                     {JSON.stringify(log, null, 2)}
                   </CodeBlock>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               </>
             )}
           </div>
-        </Tabs_Shadcn_>
+        </Tabs>
       </div>
     </div>
   )
@@ -181,7 +173,7 @@ function LogDetailEmptyState({
         <div className="relative flex h-4 w-32 items-center rounded-sm border border-control px-2">
           <div className="h-0.5 w-2/3 rounded-full bg-surface-300"></div>
           <div className="absolute right-1 -bottom-4">
-            <MousePointerClick size="24" strokeWidth={1} />
+            <MousePointerClickIcon size="24" strokeWidth={1} />
           </div>
         </div>
         <div className="flex flex-col gap-1">

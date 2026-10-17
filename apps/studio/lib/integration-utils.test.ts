@@ -1,6 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { readdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
+  FRAMEWORK_ICON_SLUGS,
+  getFrameworkIconUrl,
   getInitialMigrationSQLFromGitHubRepo,
   getIntegrationConfigurationUrl,
 } from './integration-utils'
@@ -10,16 +14,13 @@ import type {
   VercelAccount,
   VercelTeamAccount,
 } from '@/data/integrations/integrations.types'
+import { BASE_PATH } from '@/lib/constants'
 
 vi.mock('@/data/fetchers', () => ({
   fetchHandler: vi.fn(),
 }))
 
 describe('integration-utils', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('getInitialMigrationSQLFromGitHubRepo', () => {
     it('should return null when no externalId is provided', async () => {
       const result = await getInitialMigrationSQLFromGitHubRepo()
@@ -257,6 +258,25 @@ describe('integration-utils', () => {
 
       const result = getIntegrationConfigurationUrl(unknownIntegration)
       expect(result).toBe('')
+    })
+  })
+
+  describe('getFrameworkIconUrl', () => {
+    it('returns undefined for missing or unshipped frameworks and a URL for shipped ones', () => {
+      expect(getFrameworkIconUrl('not-a-framework')).toBeUndefined()
+      expect(getFrameworkIconUrl(null)).toBeUndefined()
+      expect(getFrameworkIconUrl(undefined)).toBeUndefined()
+      expect(getFrameworkIconUrl('')).toBeUndefined()
+      expect(getFrameworkIconUrl('nextjs')).toBe(`${BASE_PATH}/img/icons/frameworks/nextjs.svg`)
+    })
+
+    it('stays in sync with public/img/icons/frameworks/*.svg', () => {
+      const slugsOnDisk = readdirSync(join(__dirname, '../public/img/icons/frameworks'))
+        .filter((file) => file.endsWith('.svg'))
+        .map((file) => file.replace(/\.svg$/, ''))
+        .sort()
+
+      expect([...FRAMEWORK_ICON_SLUGS].sort()).toEqual(slugsOnDisk)
     })
   })
 })

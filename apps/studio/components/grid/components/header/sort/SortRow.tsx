@@ -1,8 +1,8 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, X } from 'lucide-react'
+import { GripVerticalIcon, XIcon } from 'lucide-react'
 import { memo } from 'react'
-import { Button, Switch } from 'ui'
+import { Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import type { Sort } from '@/components/grid/types'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
@@ -40,8 +40,9 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
         {...listeners}
         className="opacity-50 hover:opacity-100 transition cursor-grab text-foreground"
         type="button"
+        tabIndex={0}
       >
-        <GripVertical size={16} strokeWidth={1.5} />
+        <GripVerticalIcon size={16} strokeWidth={1.5} />
       </button>
       <div className="grow">
         <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
@@ -52,19 +53,26 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
         </span>
       </div>
       <div className="flex items-center gap-x-1.5">
-        <label className="text-xs text-foreground-lighter">ascending:</label>
+        <span className="text-xs text-foreground-lighter">ascending:</span>
         <Switch
           defaultChecked={sort.ascending}
           onCheckedChange={(e: boolean) => onToggle(columnName, e)}
+          aria-label={`Sort ${column.name} in ascending order`}
         />
       </div>
-      <Button
-        icon={<X strokeWidth={1.5} />}
-        size="tiny"
-        variant="text"
-        className="w-7"
-        onClick={() => onDelete(columnName)}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            icon={<XIcon strokeWidth={1.5} />}
+            size="tiny"
+            variant="text"
+            className="w-7"
+            onClick={() => onDelete(columnName)}
+            aria-label={`Remove sort for ${column.name}`}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Remove sort</TooltipContent>
+      </Tooltip>
     </div>
   )
 }

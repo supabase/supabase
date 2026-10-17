@@ -1,4 +1,4 @@
-import { BarChart2 } from 'lucide-react'
+import { BarChart2Icon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { ChartHeader } from './ChartHeader'
@@ -15,6 +15,7 @@ interface NoDataPlaceholderProps {
   isFullHeight?: boolean
   titleTooltip?: string
   hideTotalPlaceholder?: boolean
+  docsUrl?: string
 }
 const NoDataPlaceholder = ({
   attribute,
@@ -26,6 +27,7 @@ const NoDataPlaceholder = ({
   isFullHeight = false,
   titleTooltip,
   hideTotalPlaceholder = false,
+  docsUrl,
 }: NoDataPlaceholderProps) => {
   const { minHeight } = useChartSize(size)
 
@@ -37,6 +39,7 @@ const NoDataPlaceholder = ({
           format={format}
           highlightedValue={hideTotalPlaceholder ? undefined : 0}
           titleTooltip={titleTooltip}
+          docsUrl={docsUrl}
         />
       )}
       <div
@@ -48,7 +51,7 @@ const NoDataPlaceholder = ({
         // extra 20 px for the x ticks
         style={{ minHeight: minHeight + 20 }}
       >
-        <BarChart2 size={20} className="text-border-stronger" />
+        <BarChart2Icon size={20} className="text-border-stronger" />
         <div className="px-1">
           <p className="text-foreground-light text-xs">{message}</p>
           {description && <p className="text-foreground-lighter text-xs">{description}</p>}

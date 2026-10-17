@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon, TerminalIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -37,10 +37,6 @@ export const TerminalInstructions = forwardRef<
 
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  // get the .co or .net TLD from the restUrl
-  const restUrl = `https://${endpoint}`
-  const restUrlTld = !!endpoint ? new URL(restUrl).hostname.split('.').pop() : 'co'
-
   const commands: Commands[] = [
     {
       command: 'supabase functions new hello-world',
@@ -68,7 +64,7 @@ export const TerminalInstructions = forwardRef<
       comment: 'Deploy your function',
     },
     {
-      command: `curl -L -X POST 'https://${projectRef}.supabase.${restUrlTld}/functions/v1/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
+      command: `curl -L -X POST '${functionsEndpoint}/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
         return (
@@ -95,16 +91,16 @@ export const TerminalInstructions = forwardRef<
       <CollapsibleTrigger className="flex w-full justify-between" disabled={!closable}>
         <div className="flex items-center gap-x-3">
           <div className="flex items-center justify-center w-8 h-8 p-2 border rounded-sm bg-alternative">
-            <Terminal strokeWidth={2} />
+            <TerminalIcon strokeWidth={2} />
           </div>
           <h4>Create your first Edge Function via the CLI</h4>
         </div>
         {closable && (
           <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
             {showInstructions ? (
-              <Minimize2 size={16} strokeWidth={1.5} />
+              <Minimize2Icon size={16} strokeWidth={1.5} />
             ) : (
-              <Maximize2 size={16} strokeWidth={1.5} />
+              <Maximize2Icon size={16} strokeWidth={1.5} />
             )}
           </div>
         )}
@@ -119,9 +115,7 @@ export const TerminalInstructions = forwardRef<
                 You can create a secure access token in your account section
               </p>
             </div>
-            <Button variant="default" onClick={() => router.push('/account/tokens')}>
-              Access tokens
-            </Button>
+            <Button onClick={() => router.push('/account/tokens')}>Access tokens</Button>
           </div>
         ) : (
           <div className="py-4 space-y-3 border-t">
@@ -133,7 +127,7 @@ export const TerminalInstructions = forwardRef<
             </div>
             <div className="flex gap-2">
               <DocsButton href={`${DOCS_URL}/guides/functions`} />
-              <Button asChild variant="default" icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a
                   target="_blank"
                   rel="noreferrer"

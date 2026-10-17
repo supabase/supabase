@@ -1,10 +1,10 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink, RefreshCw, Search, X } from 'lucide-react'
+import { ExternalLinkIcon, RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import React, { useMemo, useRef } from 'react'
-import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import React, { useMemo, useRef, type PropsWithChildren } from 'react'
+import { Button, Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -35,6 +35,7 @@ import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFu
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
@@ -136,7 +137,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                             <Input
                               ref={searchInputRef}
                               placeholder="Search function names"
-                              icon={<Search />}
+                              icon={<SearchIcon />}
                               size="tiny"
                               className="w-32 md:w-64"
                               value={search}
@@ -145,10 +146,11 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                               actions={[
                                 search && (
                                   <Button
+                                    aria-label="Clear search"
                                     key="clear"
                                     size="tiny"
                                     variant="text"
-                                    icon={<X />}
+                                    icon={<XIcon />}
                                     onClick={() => setSearch('')}
                                     className="p-0 h-5 w-5"
                                   />
@@ -166,8 +168,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                         side="bottom"
                       >
                         <Button
-                          variant="default"
-                          icon={<RefreshCw />}
+                          icon={<RefreshCwIcon />}
                           loading={isFetching}
                           onClick={() => refetch()}
                         >
@@ -205,14 +206,10 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                                 <EdgeFunctionsListItem key={item.id} function={item} />
                               ))
                             ) : (
-                              <TableRow>
-                                <TableCell colSpan={showLastHourStats ? 8 : 6}>
-                                  <p className="text-sm text-foreground">No results found</p>
-                                  <p className="text-sm text-foreground-light">
-                                    Your search for "{search}" did not return any results
-                                  </p>
-                                </TableCell>
-                              </TableRow>
+                              <TableRowNoResults
+                                colSpan={showLastHourStats ? 8 : 6}
+                                search={search}
+                              />
                             )}
                           </>
                         </TableBody>
@@ -231,41 +228,45 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
-  return (
-    <DefaultLayout>
-      <EdgeFunctionsLayout title="Edge Functions">
-        <div className="w-full min-h-full flex flex-col items-stretch">
-          <PageHeader size="large">
-            <PageHeaderMeta>
-              <PageHeaderSummary>
-                <PageHeaderTitle>Edge Functions</PageHeaderTitle>
-                <PageHeaderDescription>
-                  Run server-side logic close to your users
-                </PageHeaderDescription>
-              </PageHeaderSummary>
-              <PageHeaderAside>
-                <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Button asChild variant="default" icon={<ExternalLink />}>
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                  >
-                    Examples
-                  </a>
-                </Button>
-                {IS_PLATFORM && <DeployEdgeFunctionButton />}
-              </PageHeaderAside>
-            </PageHeaderMeta>
-          </PageHeader>
+// Hoisted out of `getLayout` so the TanStack route can import it
+// directly. Same body — accepts the page content as `children`.
+export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) => (
+  <>
+    <div className="w-full min-h-full flex flex-col items-stretch">
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+            <PageHeaderDescription>Run server-side logic close to your users</PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/functions`} />
+            <Button asChild icon={<ExternalLinkIcon />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+              >
+                Examples
+              </a>
+            </Button>
+            {IS_PLATFORM && <DeployEdgeFunctionButton />}
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
 
-          {page}
-        </div>
-      </EdgeFunctionsLayout>
-      <TerminalInstructionsDialog />
-    </DefaultLayout>
-  )
-}
+      {children}
+    </div>
+    <TerminalInstructionsDialog />
+  </>
+)
+
+EdgeFunctionsPage.getLayout = (page: React.ReactElement) => (
+  <DefaultLayout>
+    <EdgeFunctionsLayout title="Edge Functions">
+      <EdgeFunctionsIndexPageWrapper>{page}</EdgeFunctionsIndexPageWrapper>
+    </EdgeFunctionsLayout>
+  </DefaultLayout>
+)
 
 export default EdgeFunctionsPage

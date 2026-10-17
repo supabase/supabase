@@ -1,15 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Alert, AlertTitle, Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
-import SpendCapSidePanel from './SpendCapSidePanel'
+import { SpendCapSidePanel } from './SpendCapSidePanel'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -27,20 +27,19 @@ import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
-export interface CostControlProps {}
-
-const CostControl = ({}: CostControlProps) => {
+export const CostControl = () => {
   const { slug } = useParams()
   const { resolvedTheme } = useTheme()
+  const snap = useOrgSettingsPageStateSnapshot()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
     PermissionAction.BILLING_READ,
     'stripe.subscriptions'
   )
 
-  const snap = useOrgSettingsPageStateSnapshot()
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const {
     data: subscription,
     error,
@@ -79,7 +78,7 @@ const CostControl = ({}: CostControlProps) => {
                 >
                   <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                     <p className="text-sm m-0">Spend cap</p>
-                    <ExternalLink size={16} strokeWidth={1.5} />
+                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
                   </div>
                 </Link>
               </div>
@@ -184,7 +183,6 @@ const CostControl = ({}: CostControlProps) => {
                       </p>
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
-                          variant="default"
                           className="mt-4 pointer-events-auto"
                           disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('costControl')}
@@ -204,5 +202,3 @@ const CostControl = ({}: CostControlProps) => {
     </>
   )
 }
-
-export default CostControl

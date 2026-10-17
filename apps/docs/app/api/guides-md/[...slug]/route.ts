@@ -18,6 +18,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
       headers: {
         'Content-Type': 'text/markdown; charset=utf-8',
         'Cache-Control': 'public, max-age=86400, stale-while-revalidate=3600',
+        Vary: 'Accept',
       },
     })
   } catch {

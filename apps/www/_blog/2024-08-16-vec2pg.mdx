@@ -48,7 +48,7 @@ Throughput when migrating workloads is measured in records-per-second and is dep
 - vector dimensionality
 - metadata size
 
-When throughput is mentioned, we assume a [Small](https://supabase.com/docs/guides/platform/compute-add-ons) Supabase Instance, a 300 Mbps network, 1024 dimensional vectors, and reasonable geographic colocation of the developer machine, the cloud hosted source DB, and the Postgres instance.
+When throughput is mentioned, we assume a [Small](https://supabase.com/docs/guides/platform/compute-and-disk) Supabase Instance, a 300 Mbps network, 1024 dimensional vectors, and reasonable geographic colocation of the developer machine, the cloud hosted source DB, and the Postgres instance.
 
 ### Pinecone
 
@@ -100,7 +100,7 @@ Since `vector` is just another column type in Postgres, you can write policies t
 
 ### **Performance**
 
-pgvector has world class performance in terms of raw throughput and dominates in performance per dollar. Check out some of our prior blog posts for more information on functionality and performance:
+[pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) has world class performance in terms of raw throughput and dominates in performance per dollar. Check out some of our prior blog posts for more information on functionality and performance:
 
 - [**What's new in pgvector v0.7.0**](https://supabase.com/blog/pgvector-0-7-0)
 - [**pgvector 0.6.0: 30x faster with parallel index builds**](https://supabase.com/blog/pgvector-fast-builds)

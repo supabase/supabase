@@ -1,0 +1,23 @@
+import { BookOpenIcon } from 'lucide-react'
+import type { PropsWithChildren } from 'react'
+
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { useIsRealtimeUnavailable } from '@/hooks/misc/useHighAvailability'
+
+export const PublicationsAvailability = ({ children }: PropsWithChildren) => {
+  const { isRealtimeUnavailable } = useIsRealtimeUnavailable()
+
+  if (isRealtimeUnavailable) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-6">
+        <HighAvailabilityDisabledEmptyState
+          icon={BookOpenIcon}
+          title="Publications unavailable on High Availability projects"
+          description="We're working to bring publications to High Availability projects. Contact support if this is blocking your work."
+        />
+      </div>
+    )
+  }
+
+  return children
+}

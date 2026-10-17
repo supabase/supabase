@@ -36,34 +36,27 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       })
     }
 
-    // Remove any undefined or null values from custom headers
-    const sanitizedCustomHeaders = Object.entries(customHeaders || {}).reduce(
-      (acc, [key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          acc[key] = value as string
-        }
-        return acc
-      },
-      {} as Record<string, string>
+    // Forward the supplied headers as given, dropping empty values. Header names are case
+    // insensitive, so they are merged on their lowercased name: a supplied `content-type` replaces
+    // the default rather than sitting beside it and being comma joined by `fetch`.
+    const suppliedHeaders = new Map<string, { name: string; value: string }>([
+      ['content-type', { name: 'Content-Type', value: 'application/json' }],
+    ])
+
+    Object.entries(customHeaders || {}).forEach(([key, value]) => {
+      const name = key.trim()
+      if (name.length === 0 || value === undefined || value === null || value === '') return
+      suppliedHeaders.set(name.toLowerCase(), { name, value: value as string })
+    })
+
+    const requestHeaders: Record<string, string> = Object.fromEntries(
+      [...suppliedHeaders.values()].map(({ name, value }) => [name, value])
     )
-
-    // Only use custom headers and ensure Content-Type is set
-    const requestHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...sanitizedCustomHeaders,
-    }
-
-    // Use the test authorization header if provided
-    if (sanitizedCustomHeaders['x-test-authorization']) {
-      requestHeaders['Authorization'] = sanitizedCustomHeaders['x-test-authorization']
-      // Remove the x-test-authorization header as we've moved it to Authorization
-      delete requestHeaders['x-test-authorization']
-    }
 
     // Prepare the request body based on method and Content-Type
     let finalBody = undefined
     if (method !== 'GET' && method !== 'HEAD') {
-      if (requestHeaders['Content-Type'] === 'application/json') {
+      if (suppliedHeaders.get('content-type')?.value === 'application/json') {
         finalBody = typeof requestBody === 'string' ? requestBody : JSON.stringify(requestBody)
       } else {
         finalBody = requestBody
@@ -77,42 +70,21 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       redirect: 'manual', // don't follow the redirect and return response as is
     })
 
-    // Handle non-JSON responses
-    let responseBody: string
-    const contentType = response.headers.get('content-type')
-    if (contentType?.includes('application/json')) {
-      // If JSON, parse and stringify to ensure it's valid JSON
-      const jsonBody = await response.json()
-      responseBody = JSON.stringify(jsonBody)
-    } else {
-      // For non-JSON responses, get raw text
-      responseBody = await response.text()
-    }
+    const responseBody = await response.text()
 
-    if (!response.ok) {
-      // Try to parse error response if it's JSON
-      try {
-        const errorBody = JSON.parse(responseBody)
-
-        return res.status(response.status).json({
-          status: response.status,
-          error: { message: errorBody?.error || 'Edge function returned an error' },
-        })
-      } catch (parseError) {
-        // If not JSON, return the raw error
-        return res.status(response.status).json({
-          status: response.status,
-          error: { message: responseBody || 'Edge function returned an error' },
-        })
-      }
-    }
-
-    const responseHeaders: Record<string, string> = {}
+    const responseHeaders: Record<string, string | string[]> = {}
     response.headers.forEach((value, key) => {
-      responseHeaders[key] = value
+      const existing = responseHeaders[key]
+      if (existing === undefined) {
+        responseHeaders[key] = value
+      } else if (Array.isArray(existing)) {
+        existing.push(value)
+      } else {
+        responseHeaders[key] = [existing, value]
+      }
     })
 
-    return res.status(response.status).json({
+    return res.status(200).json({
       status: response.status,
       headers: responseHeaders,
       body: responseBody,

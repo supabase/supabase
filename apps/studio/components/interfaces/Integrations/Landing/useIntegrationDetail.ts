@@ -157,6 +157,7 @@ export const useIntegrationDetail = () => {
     isAvailableLoading,
     isInstalledLoading,
     isIntegrationStatusLoading,
+    oauthIntegrationData: projectData,
     Component,
   }
 }

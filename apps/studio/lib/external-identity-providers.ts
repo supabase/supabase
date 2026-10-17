@@ -40,9 +40,22 @@ export const GITHUB_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
   showInAccountPreferences: false,
 }
 
+export const CHATGPT_IDENTITY_PROVIDER: ExternalIdentityProviderConfig = {
+  id: 'chatgpt',
+  authProvider: 'custom:openai',
+  displayName: 'ChatGPT',
+  iconPath: '/img/icons/openai-icon.svg',
+  showOnSignIn: true,
+  showOnSignUp: true,
+  showInAccountPreferences: false,
+}
+
 // Registry of every known provider, independent of which are currently enabled. Used for config and
 // display lookups (e.g. resolving the provider that a mid-flow interstitial was reached with).
-const IDENTITY_PROVIDERS: ExternalIdentityProviderConfig[] = [GITHUB_IDENTITY_PROVIDER]
+const IDENTITY_PROVIDERS: ExternalIdentityProviderConfig[] = [
+  GITHUB_IDENTITY_PROVIDER,
+  CHATGPT_IDENTITY_PROVIDER,
+]
 
 export function normalizeIconPath(iconPath: string): string {
   if (
@@ -54,6 +67,24 @@ export function normalizeIconPath(iconPath: string): string {
   }
 
   return `${BASE_PATH}/${iconPath}`
+}
+
+const CUSTOM_PROVIDER_PREFIX = 'custom:'
+
+/**
+ * Derives a human-readable name from a `custom:*` provider id, e.g. `custom:acme` -> "Acme" and
+ * `custom:my_provider` -> "My Provider". Returns undefined for non-custom providers.
+ */
+function getCustomProviderName(provider: string): string | undefined {
+  if (!provider.toLowerCase().startsWith(CUSTOM_PROVIDER_PREFIX)) return undefined
+
+  return provider
+    .slice(CUSTOM_PROVIDER_PREFIX.length)
+    .replaceAll('_', ' ')
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
 }
 
 export function getProviderDisplay(provider: string): IdentityProviderDisplay {
@@ -74,6 +105,17 @@ export function getProviderDisplay(provider: string): IdentityProviderDisplay {
     return {
       id: provider,
       displayName: 'SSO',
+      iconPath: `${BASE_PATH}/img/icons/saml-icon.svg`,
+    }
+  }
+
+  // Unregistered `custom:*` providers (e.g. white-label deployments' own OAuth providers) fall
+  // back to a title-cased name derived from the id: `custom:acme` -> "Acme".
+  const customProviderName = getCustomProviderName(provider)
+  if (customProviderName) {
+    return {
+      id: provider,
+      displayName: customProviderName,
       iconPath: `${BASE_PATH}/img/icons/saml-icon.svg`,
     }
   }

@@ -1,9 +1,12 @@
 import { useFeatureFlags, useParams } from 'common'
+import { Loader2Icon } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
   cn,
+  FormControl,
   FormField,
   Select,
   SelectContent,
@@ -16,42 +19,45 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  useWatch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
-import { getAvailableRegions } from './ProjectCreation.utils'
+import {
+  filterHighAvailabilityRegions,
+  getAvailableRegions,
+  getHighAvailabilityRegionCode,
+} from './ProjectCreation.utils'
+import { ProjectCreationStatusAdmonition } from './ProjectCreationStatusAdmonition'
+import { getRegionRestrictionCopy, SELECT_DIFFERENT_REGION } from './RegionSelector.utils'
+import { useRegionRestriction } from './useRegionRestriction'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
+import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
+import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
-import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
-import { BASE_PATH } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  hasSelectedOrganization: boolean
   instanceSize?: DesiredInstanceSize
   layout?: 'vertical' | 'horizontal'
+  /** Hides specific regions and shows an upgrade prompt in their place */
+  showGeneralRegionsOnly?: boolean
+  isLoading?: boolean
+  /** Specific regions collapse behind the "Need a specific region?" link only for free-plan orgs */
+  isFreePlan: boolean
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
-
-// Maps smart region group codes to the specific-region code prefixes they contain.
-// Used to check whether an incident affecting specific regions also affects a smart region selection.
-const SMART_REGION_PREFIXES: Record<string, Array<string>> = {
-  americas: ['us-', 'ca-', 'sa-'],
-  emea: ['eu-', 'me-', 'af-'],
-  apac: ['ap-'],
-}
-
-function smartRegionMatchesSpecific(smartCode: string, specificCode: string): boolean {
-  return (SMART_REGION_PREFIXES[smartCode] ?? []).some((prefix) => specificCode.startsWith(prefix))
-}
 
 // Map backend region names to user-friendly display names
 const getDisplayNameForSmartRegion = (name: string): string => {
@@ -61,19 +67,30 @@ const getDisplayNameForSmartRegion = (name: string): string => {
   return name
 }
 
+const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+
 export const RegionSelector = ({
   form,
+  hasSelectedOrganization,
   instanceSize,
   layout = 'horizontal',
+  showGeneralRegionsOnly = false,
+  isLoading: isParentLoading = false,
+  isFreePlan,
 }: RegionSelectorProps) => {
   const { slug } = useParams()
+  const track = useTrack()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
+  const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const dbRegion = useWatch({ control: form.control, name: 'dbRegion' })
+  const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
+  const hideSpecificRegions = showGeneralRegionsOnly && !highAvailability
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+  const isSpecificRegionsLinkEnabled = isFreePlan && !hideSpecificRegions
 
-  const { data: statusData } = useIncidentStatusQuery()
-  const { incidents = [] } = statusData ?? {}
+  const { getRegionRestriction } = useRegionRestriction()
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
@@ -86,16 +103,23 @@ export const RegionSelector = ({
     isError: isErrorAvailableRegions,
     error: errorAvailableRegions,
   } = useOrganizationAvailableRegionsQuery(
-    { slug, cloudProvider, desiredInstanceSize: instanceSize },
-    { enabled: smartRegionEnabled, staleTime: 1000 * 60 * 5 } // 5 minutes
+    { slug, cloudProvider, desiredInstanceSize: instanceSize, highAvailability },
+    {
+      enabled: smartRegionEnabled && hasSelectedOrganization,
+      staleTime: 1000 * 60 * 5,
+    }
   )
 
-  const smartRegions = availableRegionsData?.all.smartGroup ?? []
+  const allSmartRegions = availableRegionsData?.all.smartGroup ?? []
   const allRegions = availableRegionsData?.all.specific ?? []
+  const restrictHighAvailabilityRegion =
+    highAvailability && !isLocal && highAvailabilityRegionCode !== undefined
+  const smartRegions = highAvailability ? [] : allSmartRegions
 
   const recommendedSmartRegions = new Set(
     [availableRegionsData?.recommendations.smartGroup.code].filter(Boolean)
   )
+
   const recommendedSpecificRegions = new Set(
     availableRegionsData?.recommendations.specific.map((region) => region.code)
   )
@@ -110,14 +134,65 @@ export const RegionSelector = ({
     }
   })
 
-  const regionOptions = smartRegionEnabled ? allRegions : regionsArray
-  const isLoading = smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion
+  const unfilteredRegionOptions = smartRegionEnabled ? allRegions : regionsArray
+  const regionOptions = filterHighAvailabilityRegions(
+    [...unfilteredRegionOptions],
+    highAvailability
+  )
+  const regionOptionsWithRestriction = regionOptions.map((region) => ({
+    ...region,
+    restriction: getRegionRestriction(region),
+  }))
+  const isLoading =
+    isParentLoading || (smartRegionEnabled ? isLoadingAvailableRegions : isLoadingDefaultRegion)
 
-  const showNonProdFields =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+  const isLocalEnvironment = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
+  const showNonProdFields = isLocalEnvironment || process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const allSelectableRegions = [...smartRegions, ...regionOptions]
+
+  // react-hook-form intermittently drops this field's value when its Controller
+  // remounts (e.g. a sibling section mounting/unmounting in the same update, such as
+  // toggling high availability), so a one-shot effect isn't enough. Instead this effect
+  // re-asserts off the watched value: a region present in the current list is kept (and
+  // remembered in lastValidRegionRef), and when it's missing or cleared out from under us
+  // it restores the last valid region. allSelectableRegions is intentionally omitted from
+  // deps — it's a new array every render, and comparing it by reference would defeat the
+  // point of reacting to genuine content changes on every render where they occur.
+  const lastValidRegionRef = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    if (allSelectableRegions.length === 0) return
+    const isRegionAvailable = (name: string | undefined) =>
+      !!name && allSelectableRegions.some((region) => region.name === name)
+
+    if (isRegionAvailable(dbRegion)) {
+      lastValidRegionRef.current = dbRegion
+      return
+    }
+
+    const lastValidRegion = lastValidRegionRef.current
+    if (lastValidRegion !== undefined && isRegionAvailable(lastValidRegion)) {
+      form.setValue('dbRegion', lastValidRegion)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbRegion, form])
+
+  const hasGeneralRegions = smartRegionEnabled && !highAvailability
+  const isSpecificRegionSelected = regionOptions.some((region) => region.name === dbRegion)
+  const [isOpen, setIsOpen] = useState(false)
+  const [hasRevealedSpecificRegions, setHasRevealedSpecificRegions] = useState(false)
+  const isSpecificRegionsCollapsedBehindLink =
+    isSpecificRegionsLinkEnabled &&
+    hasGeneralRegions &&
+    !hasRevealedSpecificRegions &&
+    !isSpecificRegionSelected
+  const showSpecificRegions = !isSpecificRegionsCollapsedBehindLink && !hideSpecificRegions
+
+  const handleRevealSpecificRegions = () => {
+    track('project_creation_specific_region_link_clicked')
+    setHasRevealedSpecificRegions(true)
+    setIsOpen(true)
+  }
 
   if (isErrorAvailableRegions) {
     return <AlertError subject="Error loading available regions" error={errorAvailableRegions} />
@@ -130,179 +205,222 @@ export const RegionSelector = ({
         name="dbRegion"
         render={({ field }) => {
           const selectedRegion = allSelectableRegions.find((region) => {
-            return !!region.name && region.name === field.value
+            return !!region.name && region.name === dbRegion
           })
 
-          const affectingIncidents = incidents.filter((incident) => {
-            const affectedRegions = incident.cache?.affected_regions ?? []
-            if (affectedRegions.length === 0 || selectedRegion?.code === undefined) return false
-
-            // Specific region: direct code match
-            if (affectedRegions.includes(selectedRegion.code)) return true
-
-            // Smart region: match if any affected region falls within the smart group
-            return affectedRegions.some((specificCode) =>
-              smartRegionMatchesSpecific(selectedRegion.code, specificCode)
-            )
-          })
+          const selectedRegionLabel = selectedRegion?.name
+            ? getDisplayNameForSmartRegion(selectedRegion.name)
+            : dbRegion
+          const selectedRestriction = regionOptionsWithRestriction.find(
+            (region) => region.name === dbRegion
+          )?.restriction
+          const selectedRestrictionCopy =
+            selectedRestriction !== undefined
+              ? getRegionRestrictionCopy(selectedRestriction)
+              : undefined
+          const triggerLabel = isLoading ? 'Loading available regions...' : selectedRegionLabel
 
           return (
             <>
               <FormItemLayout
+                id="region"
                 layout={layout}
                 label="Region"
                 description={
-                  <>
-                    <p>Select the region closest to your users for the best performance.</p>
-                    {showNonProdFields && (
-                      <div className="mt-2 text-warning">
-                        <p>Only these regions are supported for local/staging projects:</p>
-                        <ul className="list-disc list-inside mt-1">
-                          <li>East US (North Virginia)</li>
-                          <li>Central EU (Frankfurt)</li>
-                          <li>Southeast Asia (Singapore)</li>
-                        </ul>
-                      </div>
-                    )}
-                  </>
+                  restrictHighAvailabilityRegion ? (
+                    <div className="text-warning">
+                      High Availability projects are currently limited to{' '}
+                      {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
+                    </div>
+                  ) : showNonProdFields ? (
+                    <div className="text-warning">
+                      <p>Only these regions are supported for local/staging projects:</p>
+                      <ul className="list-disc list-inside mt-1">
+                        <li>East US (North Virginia)</li>
+                        <li>Central EU (Frankfurt)</li>
+                        <li>Southeast Asia (Singapore)</li>
+                      </ul>
+                      {isLocalEnvironment && (
+                        <p className="mt-1">
+                          Use Central EU (Frankfurt) unless you're on a personal dev stack.
+                        </p>
+                      )}
+                    </div>
+                  ) : undefined
                 }
               >
-                <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
-                  <SelectTrigger className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-                    <SelectValue
-                      placeholder={
-                        isLoading
-                          ? 'Loading available regions...'
-                          : 'Select a region for your project..'
-                      }
+                <div className="flex flex-col items-start gap-y-1">
+                  <FormControl>
+                    <Select
+                      open={isSpecificRegionsLinkEnabled ? isOpen : undefined}
+                      onOpenChange={isSpecificRegionsLinkEnabled ? setIsOpen : undefined}
+                      value={dbRegion}
+                      onValueChange={(value) => {
+                        if (value === '') return
+                        field.onChange(value)
+                      }}
+                      disabled={isLoading}
                     >
-                      {field.value !== undefined && (
-                        <div className="flex items-center gap-x-3">
-                          {selectedRegion?.code && (
-                            <img
-                              alt="region icon"
-                              className="w-5 rounded-xs"
-                              src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
-                            />
+                      <SelectTrigger
+                        ref={field.ref}
+                        id="region"
+                        className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
+                      >
+                        <SelectValue
+                          placeholder={
+                            isLoading
+                              ? 'Loading available regions...'
+                              : 'Select a region for your project..'
+                          }
+                        >
+                          {!!dbRegion && (
+                            <div className="flex items-center gap-x-3">
+                              {isLoading && <Loader2Icon size={14} className="animate-spin" />}
+                              {selectedRegion?.code && (
+                                <RegionFlag className="w-5" region={selectedRegion.code} />
+                              )}
+                              <span className="text-foreground">{triggerLabel}</span>
+                            </div>
                           )}
-                          <span className="text-foreground">
-                            {selectedRegion?.name
-                              ? getDisplayNameForSmartRegion(selectedRegion.name)
-                              : field.value}
-                          </span>
-                        </div>
-                      )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {smartRegionEnabled && (
-                      <>
-                        <SelectGroup>
-                          <SelectLabel>General regions</SelectLabel>
-                          {smartRegions.map((value) => {
-                            return (
-                              <SelectItem
-                                key={value.code}
-                                value={value.name}
-                                className="w-full [&>:nth-child(2)]:w-full"
-                              >
-                                <div className="flex flex-row items-center justify-between w-full">
-                                  <div className="flex items-center gap-x-3">
-                                    <img
-                                      alt="region icon"
-                                      className="w-5 rounded-xs"
-                                      src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                    />
-                                    <span className="text-foreground">
-                                      {getDisplayNameForSmartRegion(value.name)}
-                                    </span>
-                                  </div>
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hasGeneralRegions && (
+                          <>
+                            <SelectGroup>
+                              <SelectLabel>General regions</SelectLabel>
+                              {smartRegions.map((value) => {
+                                return (
+                                  <SelectItem
+                                    key={value.code}
+                                    value={value.name}
+                                    className="w-full [&>:nth-child(2)]:w-full"
+                                  >
+                                    <div className="flex flex-row items-center justify-between w-full">
+                                      <div className="flex items-center gap-x-3">
+                                        <RegionFlag className="w-5" region={value.code} />
+                                        <span className="text-foreground">
+                                          {getDisplayNameForSmartRegion(value.name)}
+                                        </span>
+                                      </div>
 
-                                  <div>
-                                    {recommendedSmartRegions.has(value.code) && (
+                                      <div>
+                                        {recommendedSmartRegions.has(value.code) && (
+                                          <Badge variant="success" className="mr-1">
+                                            Recommended
+                                          </Badge>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </SelectItem>
+                                )
+                              })}
+                            </SelectGroup>
+                            {showSpecificRegions && <SelectSeparator />}
+                          </>
+                        )}
+
+                        {showSpecificRegions && (
+                          <SelectGroup>
+                            <SelectLabel>
+                              {highAvailability ? 'High Availability Regions' : 'Specific regions'}
+                            </SelectLabel>
+                            {regionOptionsWithRestriction.map((value) => {
+                              const restrictionCopy =
+                                value.restriction !== undefined
+                                  ? getRegionRestrictionCopy(value.restriction)
+                                  : undefined
+                              return (
+                                <SelectItem
+                                  key={value.code}
+                                  value={value.name}
+                                  className={cn(
+                                    'w-full [&>:nth-child(2)]:w-full',
+                                    restrictionCopy !== undefined && 'pointer-events-auto!'
+                                  )}
+                                >
+                                  <div className="flex flex-row items-center justify-between w-full gap-x-2">
+                                    <div className="flex items-center gap-x-3">
+                                      <RegionFlag className="w-5" region={value.code} />
+                                      <div className="flex items-center gap-x-2">
+                                        <span className="text-foreground">{value.name}</span>
+                                        <span className="text-xs text-foreground-lighter font-mono">
+                                          {value.code}
+                                        </span>
+                                      </div>
+                                    </div>
+
+                                    {recommendedSpecificRegions.has(value.code) && (
                                       <Badge variant="success" className="mr-1">
                                         Recommended
                                       </Badge>
                                     )}
+
+                                    {restrictionCopy !== undefined && (
+                                      <Tooltip>
+                                        <TooltipTrigger>
+                                          <Badge variant="warning" className="mr-1">
+                                            {restrictionCopy.badge}
+                                          </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent>{restrictionCopy.tooltip}</TooltipContent>
+                                      </Tooltip>
+                                    )}
                                   </div>
-                                </div>
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectGroup>
-                        <SelectSeparator />
-                      </>
-                    )}
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectGroup>
+                        )}
 
-                    <SelectGroup>
-                      <SelectLabel>Specific regions</SelectLabel>
-                      {regionOptions.map((value) => {
-                        return (
-                          <SelectItem
-                            key={value.code}
-                            value={value.name}
-                            className={cn(
-                              'w-full [&>:nth-child(2)]:w-full',
-                              value.status !== undefined && 'pointer-events-auto!'
-                            )}
-                            disabled={value.status !== undefined}
+                        {hideSpecificRegions && (
+                          <div
+                            className="border-t px-3 py-2.5 text-xs text-foreground-light"
+                            onPointerDown={(e) => e.stopPropagation()}
                           >
-                            <div className="flex flex-row items-center justify-between w-full gap-x-2">
-                              <div className="flex items-center gap-x-3">
-                                <img
-                                  alt="region icon"
-                                  className="w-5 rounded-xs"
-                                  src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                />
-                                <div className="flex items-center gap-x-2">
-                                  <span className="text-foreground">{value.name}</span>
-                                  <span className="text-xs text-foreground-lighter font-mono">
-                                    {value.code}
-                                  </span>
-                                </div>
-                              </div>
+                            <InlineLink
+                              href={`/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`}
+                              onClick={() => track('free_tier_general_region_upgrade_clicked')}
+                            >
+                              Upgrade to Pro
+                            </InlineLink>{' '}
+                            to choose a{' '}
+                            <InlineLink
+                              href={`${DOCS_URL}/guides/platform/regions`}
+                              onClick={() => track('free_tier_general_region_docs_link_clicked')}
+                            >
+                              specific region
+                            </InlineLink>
+                            .
+                          </div>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
 
-                              {recommendedSpecificRegions.has(value.code) && (
-                                <Badge variant="success" className="mr-1">
-                                  Recommended
-                                </Badge>
-                              )}
-                              {value.status !== undefined && value.status === 'capacity' && (
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant="warning" className="mr-1">
-                                      Unavailable
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    Temporarily unavailable due to this region being at capacity.
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                            </div>
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  {isSpecificRegionsCollapsedBehindLink && (
+                    <p className="text-sm text-foreground-lighter">
+                      <button
+                        type="button"
+                        tabIndex={0}
+                        className={InlineLinkClassName}
+                        onClick={handleRevealSpecificRegions}
+                      >
+                        Need a specific region?
+                      </button>
+                    </p>
+                  )}
+                </div>
               </FormItemLayout>
 
-              {affectingIncidents.length > 0 && (
-                <FormItemLayout layout="horizontal">
+              <ProjectCreationStatusAdmonition selectedRegionCode={selectedRegion?.code} />
+
+              {selectedRestrictionCopy !== undefined && (
+                <FormItemLayout layout="horizontal" isReactForm={false}>
                   <Admonition
                     type="warning"
-                    title="Incident in progress for this region"
-                    description={
-                      <>
-                        We're currently investigating an issue that may impact projects in this
-                        region. Follow updates on{' '}
-                        <InlineLink href="https://status.supabase.com">
-                          status.supabase.com
-                        </InlineLink>
-                        .
-                      </>
-                    }
+                    title={selectedRestrictionCopy.title}
+                    description={`${selectedRestrictionCopy.notice} ${SELECT_DIFFERENT_REGION}`}
                     className="mt-3"
                   />
                 </FormItemLayout>

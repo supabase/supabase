@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { VectorBucket as VectorBucketIcon } from 'icons'
-import { ChevronRight, Search } from 'lucide-react'
+import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -16,6 +16,7 @@ import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 import { VectorBucketsErrorState } from './VectorBucketsErrorState'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
 import { createNavigationHandler } from '@/lib/navigation'
 
@@ -80,7 +81,7 @@ export const VectorsBuckets = () => {
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}
-                        icon={<Search />}
+                        icon={<SearchIcon />}
                       />
 
                       <CreateBucketButton onClick={() => setVisible(true)} />
@@ -107,14 +108,11 @@ export const VectorsBuckets = () => {
                           </TableHeader>
                           <TableBody>
                             {filteredBuckets.length === 0 && filterString.length > 0 && (
-                              <TableRow className="[&>td]:hover:bg-inherit">
-                                <TableCell colSpan={3}>
-                                  <p className="text-sm text-foreground">No results found</p>
-                                  <p className="text-sm text-foreground-lighter">
-                                    Your search for "{filterString}" did not return any results
-                                  </p>
-                                </TableCell>
-                              </TableRow>
+                              <TableRowNoResults
+                                className="[&>td]:hover:bg-inherit"
+                                colSpan={3}
+                                search={filterString}
+                              />
                             )}
                             {filteredBuckets.map((bucket, idx: number) => {
                               const id = `bucket-${idx}`
@@ -130,7 +128,7 @@ export const VectorsBuckets = () => {
                               return (
                                 <TableRow
                                   key={id}
-                                  className="relative cursor-pointer h-16 inset-focus"
+                                  className="relative cursor-pointer h-16 focus-inset"
                                   onClick={handleBucketNavigation}
                                   onAuxClick={handleBucketNavigation}
                                   onKeyDown={handleBucketNavigation}
@@ -154,7 +152,7 @@ export const VectorsBuckets = () => {
                                   </TableCell>
                                   <TableCell>
                                     <div className="flex justify-end items-center h-full">
-                                      <ChevronRight
+                                      <ChevronRightIcon
                                         size={14}
                                         className="text-foreground-muted/60"
                                       />

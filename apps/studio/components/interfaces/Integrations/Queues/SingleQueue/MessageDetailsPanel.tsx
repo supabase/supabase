@@ -2,16 +2,19 @@ import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { isNil } from 'lodash'
-import { Archive, Clock12, Trash2, X } from 'lucide-react'
+import { ArchiveIcon, Clock12Icon, Trash2Icon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
   ResizablePanel,
   Separator,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
@@ -88,29 +91,37 @@ export const MessageDetailsPanel = ({
       }}
       className="bg-studio border-t pointer-events-auto"
     >
-      <Button
-        variant="text"
-        className="absolute top-3 right-3 px-1"
-        icon={<X />}
-        onClick={() => setSelectedMessage(null)}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="text"
+            className="absolute top-3 right-3 z-10 px-1"
+            icon={<XIcon />}
+            onClick={() => setSelectedMessage(null)}
+            aria-label="Close panel"
+            // Tooltip repeats the label; screen readers would read it twice
+            aria-describedby={undefined}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Close panel</TooltipContent>
+      </Tooltip>
 
-      <Tabs_Shadcn_
+      <Tabs
         value={view}
         className="flex flex-col h-full"
         onValueChange={(value: any) => {
           setView(value)
         }}
       >
-        <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
-          <TabsTrigger_Shadcn_
+        <TabsList className="px-5 flex gap-x-4 min-h-[46px]">
+          <TabsTrigger
             value="details"
             className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
           >
             Overview
-          </TabsTrigger_Shadcn_>
-        </TabsList_Shadcn_>
-        <TabsContent_Shadcn_ value="details" className="w-full mt-0 overflow-y-auto grow">
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="details" className="w-full mt-0 overflow-y-auto grow">
           <div className="flex flex-col px-4 py-4 text-sm">
             <RowData property="Message ID" value={`${selectedMessage.msg_id}`} />
             <RowData
@@ -143,7 +154,7 @@ export const MessageDetailsPanel = ({
                   title="Postpone message"
                   description="The message will be postponed and won't show up in reads for 60 seconds."
                   button={{
-                    icon: <Clock12 />,
+                    icon: <Clock12Icon />,
                     text: 'Postpone',
                     isLoading: isLoadingRead,
                     onClick: () => {
@@ -169,7 +180,7 @@ export const MessageDetailsPanel = ({
                   title="Archive message"
                   description="The message will be marked as archived and hidden from future reads by consumers. You can still access the message later."
                   button={{
-                    icon: <Archive />,
+                    icon: <ArchiveIcon />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
                     variant: 'warning',
@@ -195,7 +206,7 @@ export const MessageDetailsPanel = ({
                   title="Delete message"
                   description="The message cannot be recovered afterwards."
                   button={{
-                    icon: <Trash2 />,
+                    icon: <Trash2Icon />,
                     text: 'Delete',
                     variant: 'danger',
                     isLoading: isLoadingDelete,
@@ -220,8 +231,8 @@ export const MessageDetailsPanel = ({
               </>
             ) : null}
           </div>
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
+        </TabsContent>
+      </Tabs>
     </ResizablePanel>
   )
 }

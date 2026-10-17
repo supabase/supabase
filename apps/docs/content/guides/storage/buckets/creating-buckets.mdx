@@ -3,6 +3,7 @@ id: 'storage-creating-buckets'
 title: 'Creating Buckets'
 description: 'Learn how to create Supabase Storage buckets.'
 sidebar_label: 'Buckets'
+tocVideo: ch2UGHMreB0
 ---
 
 You can create a bucket using the Supabase Dashboard. Since storage is interoperable with your Postgres database, you can also use SQL or our client libraries.
@@ -29,7 +30,7 @@ const { data, error } = await supabase.storage.createBucket('avatars', {
 })
 ```
 
-[Reference.](/docs/reference/javascript/storage-createbucket)
+[Reference.](/docs/reference/javascript/file-buckets-createbucket)
 
 </TabPanel>
 
@@ -94,6 +95,17 @@ supabase.storage.create_bucket(
 ```
 
 [Reference.](/docs/reference/python/storage-createbucket)
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var bucket = await supabase.Storage.CreateBucket("avatars", new BucketUpsertOptions { Public = true });
+```
+
+[Reference.](/docs/reference/csharp/create-bucket)
 
 </TabPanel>
 </$Show>

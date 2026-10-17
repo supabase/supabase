@@ -9,7 +9,7 @@ export type UpcomingInvoiceVariables = {
   orgSlug?: string
 }
 
-export type UpcomingInvoiceResponse = components['schemas']['UpcomingInvoice']
+export type UpcomingInvoiceResponse = components['schemas']['UpcomingInvoice_Output']
 
 export async function getUpcomingInvoice(
   { orgSlug }: UpcomingInvoiceVariables,

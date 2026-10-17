@@ -64,15 +64,6 @@ export interface VSCodeMcpConfig {
   }
 }
 
-export interface WindsurfMcpConfig {
-  mcpServers: {
-    supabase: {
-      command: 'npx'
-      args: ['-y', 'mcp-remote', string]
-    }
-  }
-}
-
 export interface ClaudeCodeMcpConfig extends McpClientBaseConfig {
   mcpServers: {
     supabase: {
@@ -136,6 +127,19 @@ export interface CodexMcpConfig {
 }
 
 /**
+ * Configuration format for Grok CLI MCP client.
+ * Grok reads a TOML config (`~/.grok/config.toml`) and, like Codex, keys
+ * servers under a `mcp_servers` table. HTTP transport is inferred from the URL.
+ */
+export interface GrokMcpConfig {
+  mcp_servers: {
+    supabase: {
+      url: string
+    }
+  }
+}
+
+/**
  * Configuration format for Gemini CLI MCP client.
  * Uses httpUrl instead of url to match Gemini CLI's expected format.
  */
@@ -158,6 +162,20 @@ export interface OpenCodeMcpConfig {
   }
 }
 
+/**
+ * Configuration format for the fx MCP client.
+ * fx also keys servers under `mcp`, but reads them from its own profile
+ * (`~/.fx/mcp.json`) and names the transport `http` rather than `remote`.
+ */
+export interface FxMcpConfig {
+  mcp: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
 export interface AntigravityMcpConfig {
   mcpServers: {
     supabase: {
@@ -175,6 +193,32 @@ export interface CopilotMcpConfig extends McpClientBaseConfig {
   }
 }
 
+/**
+ * Configuration format for Kimi Code CLI MCP client.
+ * Kimi keys the server transport with `transport` (not `type`).
+ */
+export interface KimiMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      transport: 'http'
+      url: string
+    }
+  }
+}
+/**
+ * Configuration format for the omp CLI MCP client.
+ * omp keys servers under `mcpServers` and requires an explicit `type: "http"`:
+ * an entry with a `url` but no `type` is validated as stdio and rejected.
+ */
+export interface OmpMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
+
 // Union of all possible config types
 export type McpClientConfig =
   | AntigravityMcpConfig
@@ -184,13 +228,16 @@ export type McpClientConfig =
   | CodexMcpConfig
   | CursorMcpConfig
   | FactoryMcpConfig
+  | FxMcpConfig
   | GeminiMcpConfig
   | GooseMcpConfig
+  | GrokMcpConfig
+  | KimiMcpConfig
   | McpClientBaseConfig
+  | OmpMcpConfig
   | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
-  | WindsurfMcpConfig
 
 // Type guards
 export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {
@@ -215,6 +262,10 @@ export function isGeminiMcpConfig(config: McpClientConfig): config is GeminiMcpC
 
 export function isOpenCodeMcpConfig(config: McpClientConfig): config is OpenCodeMcpConfig {
   return '$schema' in config && 'mcp' in config && 'supabase' in config.mcp
+}
+
+export function isFxMcpConfig(config: McpClientConfig): config is FxMcpConfig {
+  return 'mcp' in config && 'supabase' in config.mcp && config.mcp.supabase.type === 'http'
 }
 
 export function isAntigravityMcpConfig(config: McpClientConfig): config is AntigravityMcpConfig {
@@ -246,6 +297,9 @@ export function getMcpUrl(config: McpClientConfig): string {
     return config.mcpServers.supabase.httpUrl
   }
   if (isOpenCodeMcpConfig(config)) {
+    return config.mcp.supabase.url
+  }
+  if (isFxMcpConfig(config)) {
     return config.mcp.supabase.url
   }
   if (isAntigravityMcpConfig(config)) {

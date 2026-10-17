@@ -1,6 +1,6 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Download, MoreVertical, Trash } from 'lucide-react'
+import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
@@ -90,7 +91,7 @@ export const PauseFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
-              <Button asChild variant="default">
+              <Button asChild>
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -102,8 +103,7 @@ export const PauseFailedState = () => {
                 </SupportLink>
               </Button>
               <ButtonTooltip
-                variant="default"
-                icon={<Download />}
+                icon={<DownloadIcon />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
                 tooltip={{
@@ -117,8 +117,8 @@ export const PauseFailedState = () => {
                 Download backup
               </ButtonTooltip>
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
+                <DropdownMenuTrigger asChild>
+                  <Button className="px-1.5" icon={<MoreVerticalIcon />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -135,7 +135,7 @@ export const PauseFailedState = () => {
                     }}
                   >
                     <div className="translate-y-0.5">
-                      <Trash size={14} />
+                      <TrashIcon size={14} />
                     </div>
                     <div className="">
                       <p>Delete project</p>
@@ -152,10 +152,13 @@ export const PauseFailedState = () => {
       </div>
 
       <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
-        <DialogContent size="medium">
+        <DialogContent size="medium" onOpenAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
-            <DialogTitle>Back up your database</DialogTitle>
+            <DialogTitle>Back up your database with the Supabase CLI</DialogTitle>
           </DialogHeader>
+
+          <DialogSectionSeparator />
+
           <DialogSection>
             <LogicalBackupCliInstructions showResetPassword={false} />
           </DialogSection>

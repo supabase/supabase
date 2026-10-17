@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Save } from 'lucide-react'
+import { SaveIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Loading } from 'ui'
 
@@ -44,14 +44,18 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               </>
             }
             body={saved.map((item) => (
-              <SavedQueriesItem key={item.id} item={item} />
+              <Table.tr key={item.id}>
+                <Table.td colSpan={5} className="p-0!">
+                  <SavedQueriesItem item={item} />
+                </Table.td>
+              </Table.tr>
             ))}
           />
         </div>
       )}
       {saved.length === 0 && (
         <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
-          <Save className="animate-bounce" />
+          <SaveIcon className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
           <p className="text-sm text-foreground-lighter">
             Saved queries will appear here. Queries can be saved from the{' '}

@@ -1,6 +1,5 @@
 import { XCircle } from 'lucide-react'
 import { FC, PropsWithChildren, useState } from 'react'
-
 import { Badge } from 'ui'
 
 interface IOptions {
@@ -18,6 +17,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
   return (
     <div className="mt-0">
       <button
+        tabIndex={0}
         className={[
           'px-5 py-1',
           'border-t border-l border-r border-default',

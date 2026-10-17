@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
 // eslint-disable-next-line import/no-anonymous-default-export

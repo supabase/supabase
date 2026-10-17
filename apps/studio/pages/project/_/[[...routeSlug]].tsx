@@ -15,6 +15,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { parseCatchAllRoute } from '@/compat/next/router'
 import {
   Header,
   LoadingCardView,
@@ -35,7 +36,10 @@ import { withAuth } from '@/hooks/misc/withAuth'
 const GenericProjectPage: NextPage = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { routeSlug, ...queryParams } = router.query
+  // Normalise the catch-all path across Next (`routeSlug: string[]`) and
+  // TanStack (`_splat: string`) so downstream URL building
+  // (urlRewriterFactory) keeps working — see parseCatchAllRoute.
+  const { segments: routeSlug, queryParams } = parseCatchAllRoute(router.query, 'routeSlug')
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 

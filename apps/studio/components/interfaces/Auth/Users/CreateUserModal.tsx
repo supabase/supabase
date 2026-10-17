@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Lock, Mail } from 'lucide-react'
+import { LockIcon, MailIcon } from 'lucide-react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -82,7 +82,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                   <FormLabel>Email address</FormLabel>
                   <FormControl>
                     <div className="items-center relative">
-                      <Mail
+                      <MailIcon
                         size={18}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
@@ -112,7 +112,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                   <FormLabel>User Password</FormLabel>
                   <FormControl>
                     <div className="items-center relative">
-                      <Lock
+                      <LockIcon
                         size={18}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2"
                         strokeWidth={1.5}
@@ -156,6 +156,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
             </FormLabel>
 
             <Button
+              variant="primary"
               block
               size="small"
               type="submit"

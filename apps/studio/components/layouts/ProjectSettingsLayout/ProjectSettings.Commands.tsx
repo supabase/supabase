@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
@@ -7,12 +7,14 @@ import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { IS_PLATFORM } from '@/lib/constants'
 
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   const router = useRouter()
   const setIsOpen = useSetCommandMenuOpen()
   let { ref, slug } = useParams()
   const platformWebhooksEnabled = useIsPlatformWebhooksEnabled()
+  const showConfigDrift = useFlag('ConfigDrift')
   ref ||= '_'
   const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
@@ -43,19 +45,29 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       },
       {
         id: 'nav-project-settings-general',
-        name: 'General Settings',
+        name: 'General settings',
         route: `/project/${ref}/settings/general`,
         defaultHidden: true,
       },
+      ...(IS_PLATFORM && showConfigDrift
+        ? [
+            {
+              id: 'nav-project-settings-code-configuration',
+              name: 'Code configuration',
+              route: `/project/${ref}/settings/code-configuration`,
+              defaultHidden: true,
+            } as IRouteCommand,
+          ]
+        : []),
       {
         id: 'nav-project-settings-database',
-        name: 'Database Settings',
+        name: 'Database settings',
         route: `/project/${ref}/database/settings`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-auth',
-        name: 'Auth Settings',
+        name: 'Auth settings',
         route: authenticationSignInProviders
           ? `/project/${ref}/auth/providers`
           : `/project/${ref}/database/policies`,
@@ -65,7 +77,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-project-settings-webhooks',
-              name: 'Project Webhooks',
+              name: 'Project webhooks',
               route: `/project/${ref}/settings/webhooks`,
               defaultHidden: true,
             } as IRouteCommand,
@@ -83,13 +95,19 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         : []),
       {
         id: 'nav-project-settings-api',
-        name: 'API Settings',
+        name: 'API settings',
         route: `/project/${ref}/integrations/data_api/settings`,
         defaultHidden: true,
       },
       {
+        id: 'nav-project-settings-integration',
+        name: 'Project Integrations',
+        value: 'Branch integration, Vercel integration, GitHub integration, AWS PrivateLink',
+        route: `/project/${ref}/settings/integrations`,
+      },
+      {
         id: 'nav-project-settings-storage',
-        name: 'Storage Settings',
+        name: 'Storage settings',
         route: `/project/${ref}/storage/settings`,
         defaultHidden: true,
       },
@@ -97,7 +115,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-project-settings-custom-domains',
-              name: 'Custom Domains',
+              name: 'Custom domains',
               route: `/project/${ref}/settings/general#custom-domains`,
               defaultHidden: true,
             } as IRouteCommand,
@@ -191,6 +209,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [platformWebhooksEnabled, showLogDrains, ref, slug] }
+    { ...options, deps: [platformWebhooksEnabled, showLogDrains, showConfigDrift, ref, slug] }
   )
 }

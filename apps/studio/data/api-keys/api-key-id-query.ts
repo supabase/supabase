@@ -16,7 +16,7 @@ export async function getAPIKeysById(
   const { data, error } = await get('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: projectRef, id },
-      query: { reveal },
+      query: { reveal: reveal ? 'true' : 'false' },
     },
     signal,
   })

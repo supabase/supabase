@@ -116,20 +116,14 @@ const MOCK_THREAD = [
 ]
 
 describe('getThreadPartsFromThread', () => {
-  it('parses a sanitized Braintrust trace.getThread payload', () => {
+  it('parses a sanitized Braintrust trace.getThread payload, computing both tool-input variants', () => {
     expect(getThreadPartsFromThread(MOCK_THREAD)).toEqual({
-      projectContext: "The user's current project is Acme Analytics.",
+      currentUserInput: 'Can you create that orders table now?',
       priorConversation:
         '[user]\nWhat did we decide earlier?\n\n[assistant]\nWe decided to add an orders table with RLS policies before generating sample data.',
-      currentUserInput: 'Can you create that orders table now?',
       lastAssistantTurn:
         '[assistant]\n[called rename_chat]\n\n[assistant]\n[called load_knowledge]\n[called execute_sql]\n\n[assistant]\nI created the public.orders table. You should add RLS policies before exposing it to users.',
-    })
-  })
-
-  it('can include tool call inputs in serialized assistant turns', () => {
-    expect(getThreadPartsFromThread(MOCK_THREAD, { includeToolCallInputs: true })).toMatchObject({
-      lastAssistantTurn: `\
+      lastAssistantTurnWithToolInputs: `\
 [assistant]
 [called rename_chat]
 {
@@ -151,21 +145,24 @@ I created the public.orders table. You should add RLS policies before exposing i
     })
   })
 
-  it('uses the most recent project context message', () => {
-    expect(
-      getThreadPartsFromThread([
-        {
-          role: 'assistant',
-          content: "The user's current project is Old Project.",
-        },
-        ...MOCK_THREAD,
-      ])
-    ).toMatchObject({
-      projectContext: "The user's current project is Acme Analytics.",
-    })
+  it('filters out project-context messages so they never leak into prior conversation', () => {
+    const threadWithExtraProjectContext = [
+      {
+        role: 'assistant',
+        content: "The user's current project is Old Project.",
+      },
+      ...MOCK_THREAD,
+    ]
+
+    expect(getThreadPartsFromThread(threadWithExtraProjectContext)).toEqual(
+      getThreadPartsFromThread(MOCK_THREAD)
+    )
+    expect(getThreadPartsFromThread(threadWithExtraProjectContext).priorConversation).not.toContain(
+      'Old Project'
+    )
   })
 
-  it('returns prior conversation without current turn parts when there is no user message', () => {
+  it('treats all messages as prior conversation when there is no user message', () => {
     expect(
       getThreadPartsFromThread([
         {
@@ -174,10 +171,10 @@ I created the public.orders table. You should add RLS policies before exposing i
         },
       ])
     ).toEqual({
-      projectContext: null,
+      currentUserInput: '',
       priorConversation: '[assistant]\nI can help with your Supabase project.',
-      currentUserInput: null,
       lastAssistantTurn: null,
+      lastAssistantTurnWithToolInputs: null,
     })
   })
 })

@@ -1,4 +1,4 @@
-import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { CheckIcon, CopyIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
@@ -10,8 +10,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  GithubIcon,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -72,7 +76,7 @@ export const ProjectTableRow = ({
   return (
     <>
       <TableRow
-        className="cursor-pointer hover:bg-surface-200 inset-focus"
+        className="cursor-pointer hover:bg-surface-200 focus-inset"
         onClick={handleNavigation}
         onAuxClick={handleNavigation}
         onKeyDown={handleNavigation}
@@ -81,29 +85,34 @@ export const ProjectTableRow = ({
         <TableCell>
           <div className="flex flex-col gap-y-2">
             <div>
-              <h5 className="text-sm">{name}</h5>
-              <button
-                tabIndex={0}
-                onClick={handleCopyProjectRef}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    handleCopyProjectRef(e)
-                  }
-                }}
-                className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
-              >
-                {projectRef}
-                {isCopied ? (
-                  <Check size={12} strokeWidth={1.25} className="text-brand" />
-                ) : (
-                  <Copy
-                    size={12}
-                    strokeWidth={1.25}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                  />
-                )}
-              </button>
+              <h2 className="text-sm">{name}</h2>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    tabIndex={0}
+                    onClick={handleCopyProjectRef}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleCopyProjectRef(e)
+                      }
+                    }}
+                    className="inline-flex items-center gap-x-1 cursor-pointer border border-transparent border-dashed rounded-sm transition-colors hover:bg-surface-100 hover:border hover:border-strong group font-mono text-xs text-foreground-lighter hover:text-foreground-light px-1 -ml-1"
+                  >
+                    {projectRef}
+                    {isCopied ? (
+                      <CheckIcon size={12} strokeWidth={1.25} className="text-primary" />
+                    ) : (
+                      <CopyIcon
+                        size={12}
+                        strokeWidth={1.25}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      />
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Copy project reference</TooltipContent>
+              </Tooltip>
             </div>
             {(isGithubIntegrated || isVercelIntegrated || hasPartnerIcon) && (
               <div className="flex items-center gap-x-1.5">
@@ -120,7 +129,7 @@ export const ProjectTableRow = ({
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
                     <div className="w-5 h-5 p-1 flex items-center">
-                      <Github size={12} strokeWidth={1.5} />
+                      <GithubIcon size={12} strokeWidth={1.5} />
                     </div>
                     {githubRepository && (
                       <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
@@ -154,9 +163,7 @@ export const ProjectTableRow = ({
           </div>
         </TableCell>
         <TableCell>
-          <span className="lowercase text-sm text-foreground-light">
-            {project.cloud_provider} | {project.region || 'N/A'}
-          </span>
+          <span className="lowercase text-sm text-foreground-light">{project.region || 'N/A'}</span>
         </TableCell>
         <TableCell>
           {project.inserted_at ? (
@@ -173,9 +180,8 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
-                  icon={<MoreVertical />}
-                  aria-label="More actions"
+                  icon={<MoreVerticalIcon />}
+                  aria-label={`Project ${name} actions`}
                   className="w-7"
                   onClick={(e) => e.stopPropagation()}
                 />
@@ -188,7 +194,7 @@ export const ProjectTableRow = ({
                     router.push(`/project/${projectRef}/settings/general`)
                   }}
                 >
-                  <Settings size={14} />
+                  <SettingsIcon size={14} />
                   <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

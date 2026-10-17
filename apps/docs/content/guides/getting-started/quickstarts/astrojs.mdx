@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add sample data, and query fr
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<AiPrompt id="astrojs" />
+
 <$Partial path="quickstart_db_setup.mdx" />
 
 ## 3. Create an Astro app
@@ -15,7 +17,11 @@ npm create astro@latest my-app
 cd my-app
 ```
 
-## 4. Install Supabase client library and Node adapter
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
+
+## 5. Install Supabase client library and Node adapter
 
 Install the `supabase-js` client library and the `@astrojs/node` adapter to enable server-side rendering.
 
@@ -23,7 +29,7 @@ Install the `supabase-js` client library and the `@astrojs/node` adapter to enab
 npm install @supabase/supabase-js @astrojs/node
 ```
 
-## 5. Configure Astro for SSR
+## 6. Configure Astro for SSR
 
 Update your `astro.config.mjs`.
 
@@ -39,22 +45,24 @@ export default defineConfig({
 })
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
+## 7. Declare Supabase environment variables
 
-## 6. Declare Supabase environment variables
+Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&connectTab=frameworks):
 
-Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&tab=frameworks):
-
-<$CodeTabs>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=astro">
+    Open Connect panel
+  </a>
+</Button>
 
 ```text name=.env.local
 PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-</$CodeTabs>
+<$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
 
-## 7. Create a Supabase client helper
+## 8. Create a Supabase client helper
 
 Create a utility file to initialize the Supabase client:
 
@@ -69,9 +77,7 @@ export function createServerClient() {
 }
 ```
 
-## 8. Query Supabase data from Astro
-
-<$Partial path="uiLibCta.mdx" />
+## 9. Query Supabase data from Astro
 
 Create a new file at `src/pages/instruments.astro` and populate with the following.
 
@@ -82,7 +88,7 @@ This queries all rows from the `instruments` table you created earlier and rende
 import { createServerClient } from "../lib/supabase";
 
 const supabase = createServerClient();
-const { data: instruments } = await supabase.from("instruments").select();
+const { data: instruments, error } = await supabase.from("instruments").select();
 ---
 
 <html>
@@ -90,22 +96,28 @@ const { data: instruments } = await supabase.from("instruments").select();
     <title>Instruments</title>
   </head>
   <body>
-    <ul>
-      {instruments?.map((instrument) => (
-        <li>{instrument.name}</li>
-      ))}
-    </ul>
+    {error ? (
+      <p>Error loading instruments: {error.message}</p>
+    ) : (
+      <ul>
+        {instruments?.map((instrument) => (
+          <li>{instrument.name}</li>
+        ))}
+      </ul>
+    )}
   </body>
 </html>
 ```
 
-## 9. Start the app
+## 10. Start the app
 
 Run the development server, go to http://localhost:4321/instruments in your browser of choice to check the list of instruments.
 
 ```bash
 npm run dev
 ```
+
+<$Partial path="quickstart_going_to_production.mdx" />
 
 ## Next steps
 

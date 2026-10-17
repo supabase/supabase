@@ -1,7 +1,6 @@
-import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { ArrowUpRightIcon, BookOpenIcon, GaugeIcon, SettingsIcon } from 'lucide-react'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
@@ -17,7 +16,6 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 export const centeredContentClass = 'mx-auto w-full max-w-6xl px-6 xl:px-10'
 
 export const MarketplaceDetail = () => {
-  const router = useRouter()
   const {
     ref,
     activeRoute,
@@ -32,10 +30,10 @@ export const MarketplaceDetail = () => {
     integrationStatus,
     isInstalled,
     installActionType,
-    wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
     isIntegrationStatusLoading,
+    oauthIntegrationData,
     Component,
   } = useIntegrationDetail()
 
@@ -75,16 +73,15 @@ export const MarketplaceDetail = () => {
   const renderInstallAction = () => {
     switch (installActionType) {
       case 'oauth':
-        return <InstallOAuthIntegrationButton integration={integration} />
-      case 'add-wrapper':
         return (
-          <AddWrapperButton
-            variant="primary"
-            onClick={() => {
-              if (wrappersTabHref) router.push(`${wrappersTabHref}?new=true`)
-            }}
+          <InstallOAuthIntegrationButton
+            integration={integration}
+            data={oauthIntegrationData}
+            isLoading={isIntegrationStatusLoading}
           />
         )
+      case 'add-wrapper':
+        return <AddWrapperButton variant="primary" />
       case 'installed':
         return (
           <Button variant="outline" disabled>
@@ -112,8 +109,8 @@ export const MarketplaceDetail = () => {
               <Button
                 variant="text"
                 size="tiny"
-                icon={<Gauge size={13} />}
-                iconRight={<ArrowUpRight size={13} />}
+                icon={<GaugeIcon size={13} />}
+                iconRight={<ArrowUpRightIcon size={13} />}
                 asChild
               >
                 <a
@@ -129,8 +126,8 @@ export const MarketplaceDetail = () => {
               <Button
                 variant="text"
                 size="tiny"
-                icon={<Settings size={13} />}
-                iconRight={<ArrowUpRight size={13} />}
+                icon={<SettingsIcon size={13} />}
+                iconRight={<ArrowUpRightIcon size={13} />}
                 asChild
               >
                 <a href={integrationStatus.partner_links.manage} target="_blank" rel="noreferrer">
@@ -142,8 +139,8 @@ export const MarketplaceDetail = () => {
               <Button
                 variant="text"
                 size="tiny"
-                icon={<BookOpen size={13} />}
-                iconRight={<ArrowUpRight size={13} />}
+                icon={<BookOpenIcon size={13} />}
+                iconRight={<ArrowUpRightIcon size={13} />}
                 asChild
               >
                 <a href={integration.docsUrl} target="_blank" rel="noreferrer">

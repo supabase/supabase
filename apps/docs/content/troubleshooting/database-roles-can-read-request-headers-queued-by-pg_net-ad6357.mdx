@@ -1,0 +1,38 @@
+---
+title = "Database roles can read request headers queued by pg_net"
+topics = [ "database" ]
+keywords = [ "pg_net", "net", "http_request_queue", "_http_response", "http_post", "headers", "Authorization", "bearer token", "secret key", "service_role", "Vault", "credentials", "Row Level Security" ]
+---
+
+When you call `net.http_get`, `net.http_post`, or `net.http_delete`, pg_net stores the request as a row in `net.http_request_queue`. The row holds the URL, headers, and body until the pg_net worker sends the request. Any role that can use pg_net can read the row while it waits, including an `Authorization` or `apikey` header. For which roles can use pg_net, see [Revoking access to pg_net objects has no effect](/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16#which-roles-can-use-pg_net).
+
+## Check what your requests expose
+
+To see the requests waiting to be sent, run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+
+```sql
+select id, url, headers
+from net.http_request_queue
+order by id;
+```
+
+The worker deletes a row from the queue when it picks up the request, so most rows exist for a short time. Rows stay in the queue for longer when the worker falls behind or stops.
+
+To see the stored responses, run:
+
+```sql
+select id, status_code, headers, content, created
+from net._http_response
+order by created desc
+limit 20;
+```
+
+`net._http_response` keeps the status code, response headers, and response body for at least the time set by `pg_net.ttl`, which is 6 hours by default. The worker deletes expired responses while it processes requests, so responses can stay longer when no requests are being sent. It doesn't store request headers. Check the response bodies too, because an API can return sensitive data of its own.
+
+## Credentials in request headers
+
+Treat any credential you send through pg_net as readable by every role that can connect to your database. Reading a credential from [Vault](/docs/guides/database/vault) keeps it encrypted at rest, but the decrypted value is written to the `headers` column like any other header.
+
+## Row Level Security on the queue
+
+You can't add Row Level Security policies to `net.http_request_queue` or `net._http_response`. The `supabase_admin` role owns both tables, and only a table's owner can enable Row Level Security on it. Supabase doesn't support changing the grants or policies on these tables for individual projects, so treat them as a platform constraint.

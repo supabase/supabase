@@ -1,4 +1,4 @@
-import { Copy, RotateCcw } from 'lucide-react'
+import { CopyIcon, RotateCcwIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -11,10 +11,10 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -151,7 +151,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                       >
                         <Button
                           variant="text"
-                          icon={<Copy size={14} />}
+                          icon={<CopyIcon size={14} />}
                           onClick={() => onCopy(deliveryEventPayload, 'event payload')}
                         >
                           Copy
@@ -194,7 +194,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                       >
                         <Button
                           variant="text"
-                          icon={<Copy size={14} />}
+                          icon={<CopyIcon size={14} />}
                           onClick={() => onCopy(deliveryResponsePayload, 'response payload')}
                         >
                           Copy
@@ -220,8 +220,7 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
               onTrigger={() => onRetryDelivery(retryableDelivery.id)}
             >
               <Button
-                variant="default"
-                icon={<RotateCcw />}
+                icon={<RotateCcwIcon />}
                 onClick={() => onRetryDelivery(retryableDelivery.id)}
               >
                 Retry delivery

@@ -7,9 +7,23 @@ export type Category = {
   slug: string
 }
 
+export type ListingDetail = {
+  slug: string
+  label: string
+  content: string
+  publishedInMarketplace: boolean
+  installUrl: string | null
+  dashboardUrl?: string | null
+  docsUrl: string | null
+  images: string[]
+  youtubeId: string | null
+}
+
 export type Partner = {
   categories: Category[]
   featured: boolean
+  publishedInCatalog: boolean
+  publishedInMarketplace?: boolean
   type: 'technology' | 'expert'
   slug: string
   title: string
@@ -22,6 +36,7 @@ export type Partner = {
   logo: string
   images: string[]
   youtubeId: string | null
+  listings?: ListingDetail[]
 }
 
 export function toPartner(dbPartner: DbPartner): Partner {
@@ -44,6 +59,8 @@ export function toPartner(dbPartner: DbPartner): Partner {
   return {
     categories: [{ name: category, slug: category.toLowerCase() }],
     featured: featured ?? false,
+    publishedInCatalog: false, // has at least one listing shown on the partner catalog page
+    publishedInMarketplace: false, // has at least one one-click-installable listing in the dashboard
     type,
     slug,
     title,

@@ -1,20 +1,29 @@
 import type { CloudProvider, Region } from 'shared-data'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import { AWS_REGIONS } from 'shared-data'
 import { SMART_REGION_TO_EXACT_REGION_MAP } from 'shared-data/regions'
 
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import type { OrganizationAvailableRegionsData } from '@/data/organizations/organization-available-regions-query'
+import {
+  DesiredInstanceSize,
+  instanceSizeSpecs,
+  PostgresEngine,
+  ReleaseChannel,
+} from '@/data/projects/new-project.constants'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
   return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
 }
 
-export function getAvailableRegions(cloudProvider: CloudProvider): Region {
+export function getAvailableRegions(
+  cloudProvider: CloudProvider,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+): Region {
   switch (cloudProvider) {
     case 'AWS':
     case 'AWS_K8S':
       return AWS_REGIONS
     case 'AWS_NIMBUS':
-      if (process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') {
+      if (environment !== 'prod') {
         // Only allow Southeast Asia for Nimbus (local/staging)
         return {
           SOUTHEAST_ASIA: AWS_REGIONS.SOUTHEAST_ASIA,
@@ -25,11 +34,44 @@ export function getAvailableRegions(cloudProvider: CloudProvider): Region {
       return {
         EAST_US: AWS_REGIONS.EAST_US,
       }
-    case 'FLY':
-      return FLY_REGIONS
     default:
       throw new Error('Invalid cloud provider')
   }
+}
+
+type ResolveDefaultDbRegionArgs = {
+  cloudProvider: CloudProvider
+  isHighAvailabilityRestricted: boolean
+  highAvailabilityRegionName: string | undefined
+  isSmartRegionEnabled: boolean
+  recommendedSmartRegion: string | undefined
+  autoDefaultRegion: string | undefined
+  fixedDefaultRegion: string
+  environment?: string
+}
+
+export function resolveDefaultDbRegion({
+  cloudProvider,
+  isHighAvailabilityRestricted,
+  highAvailabilityRegionName,
+  isSmartRegionEnabled,
+  recommendedSmartRegion,
+  autoDefaultRegion,
+  fixedDefaultRegion,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT,
+}: ResolveDefaultDbRegionArgs): string | undefined {
+  if (isHighAvailabilityRestricted) return highAvailabilityRegionName
+  if (isSmartRegionEnabled) return recommendedSmartRegion
+
+  // The geolocated default is only usable if the provider actually offers that region
+  // (e.g. AWS_NIMBUS is restricted to a single region)
+  const isAutoDefaultRegionAvailable = Object.entries(
+    getAvailableRegions(cloudProvider, environment)
+  ).some(([, region]) => region.displayName === autoDefaultRegion)
+
+  return isAutoDefaultRegionAvailable && autoDefaultRegion !== undefined
+    ? autoDefaultRegion
+    : fixedDefaultRegion
 }
 
 /**
@@ -44,4 +86,126 @@ export const monthlyInstancePrice = (instance: string | undefined): number => {
 
 export const instanceLabel = (instance: string | undefined): string => {
   return instanceSizeSpecs[instance as DesiredInstanceSize]?.label || 'Micro'
+}
+
+export const getHighAvailabilityRegionCode = (
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  // Local dev stacks can run in any of the supported regions, so they're left unrestricted
+  if (environment === 'prod') return 'us-east-1'
+  if (environment === 'staging') return 'us-east-1'
+  if (environment === 'local') return 'eu-central-1'
+  return undefined
+}
+
+export const filterHighAvailabilityRegions = <T extends { code: string }>(
+  regions: T[],
+  highAvailability: boolean,
+  environment = process.env.NEXT_PUBLIC_ENVIRONMENT
+) => {
+  const isLocal = environment === 'local'
+  const regionCode = getHighAvailabilityRegionCode(environment)
+  return highAvailability && !isLocal && regionCode !== undefined
+    ? regions.filter((region) => region.code === regionCode)
+    : regions
+}
+
+export type FreeTierGeneralRegionExperimentVariant = 'test' | 'control'
+
+type GetFreeTierGeneralRegionExperimentVariantArgs = {
+  isFreePlan: boolean
+  smartRegionEnabled: boolean
+  enrollmentFlag: boolean
+  selectionFlag: boolean
+}
+
+/**
+ * Org's arm in the freeTierGeneralRegionExperiment. The test arm only sees general regions.
+ * Returns undefined when the org isn't enrolled.
+ */
+export function getFreeTierGeneralRegionExperimentVariant({
+  isFreePlan,
+  smartRegionEnabled,
+  enrollmentFlag,
+  selectionFlag,
+}: GetFreeTierGeneralRegionExperimentVariantArgs):
+  | FreeTierGeneralRegionExperimentVariant
+  | undefined {
+  const isInExperiment = isFreePlan && smartRegionEnabled && enrollmentFlag === true
+  if (!isInExperiment) return undefined
+  return selectionFlag === true ? 'test' : 'control'
+}
+
+export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['all']
+
+type GetRegionSelectionTypeArgs = {
+  dbRegion: string | undefined
+  availableRegions: AvailableRegions | undefined
+  /** Whether the user ever touched the region field. Defaults to true for untracked callers. */
+  isDbRegionDirty?: boolean
+}
+
+/**
+ * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
+ * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
+ * by the user (e.g. us-east-1, 'specific'). Returns undefined if dbRegion matches neither list,
+ * regardless of whether the field was touched.
+ */
+export function getRegionSelectionType({
+  dbRegion,
+  availableRegions,
+  isDbRegionDirty = true,
+}: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
+  if (!dbRegion || !availableRegions) return undefined
+  const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
+  const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
+  if (!isGeneral && !isSpecific) return undefined
+  if (!isDbRegionDirty) return 'auto'
+  return isGeneral ? 'general' : 'specific'
+}
+
+export interface PostgresVersionDetails {
+  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
+  releaseChannel?: ReleaseChannel
+}
+
+export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
+  if (!value) {
+    return { postgresEngine: undefined, releaseChannel: undefined }
+  }
+
+  const [postgresEngine, releaseChannel] = value.split('|')
+  return { postgresEngine, releaseChannel } as PostgresVersionDetails
+}
+
+/**
+ * Picks the engine + release channel to submit on project creation. The selector's value is used
+ * only when it matches the selected Postgres Type in Advanced Config. Otherwise, OrioleDB falls
+ * back to the available OrioleDB image, and Postgres falls back to the API default
+ */
+export function resolvePostgresVersion({
+  postgresVersionSelection,
+  useOrioleDb,
+  availableOrioleVersion,
+}: {
+  postgresVersionSelection: string
+  useOrioleDb: boolean
+  availableOrioleVersion?: {
+    postgres_engine: Exclude<PostgresEngine, '13' | '14'>
+    release_channel: ReleaseChannel
+  }
+}): PostgresVersionDetails {
+  const selection = extractPostgresVersionDetails(postgresVersionSelection)
+  const isSelectionOriole = !!selection.postgresEngine?.endsWith('oriole')
+
+  if (useOrioleDb) {
+    if (isSelectionOriole) return selection
+    return {
+      postgresEngine: availableOrioleVersion?.postgres_engine,
+      releaseChannel: availableOrioleVersion?.release_channel,
+    }
+  }
+
+  if (isSelectionOriole) return {}
+  return selection
 }

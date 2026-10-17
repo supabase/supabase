@@ -3,7 +3,7 @@ import { compact } from 'lodash'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import {
   deleteSnippet,
   getSnippets,

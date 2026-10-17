@@ -68,7 +68,7 @@ export const StoragePolicies = () => {
   } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: 'storage',
+    schemas: ['storage'],
   })
 
   const isLoading = isLoadingBuckets || isLoadingPolicies

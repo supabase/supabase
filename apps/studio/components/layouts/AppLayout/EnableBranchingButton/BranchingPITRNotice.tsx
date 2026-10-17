@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -21,7 +21,7 @@ export const BranchingPITRNotice = () => {
     <div className="flex flex-row gap-4">
       <div>
         <figure className="w-10 h-10 rounded-md border flex items-center justify-center">
-          <Clock className="text-warning-700" size={20} strokeWidth={2} />
+          <ClockIcon className="text-warning-700" size={20} strokeWidth={2} />
         </figure>
       </div>
       <div className="flex grow items-center justify-between gap-4">
@@ -36,7 +36,6 @@ export const BranchingPITRNotice = () => {
           <ButtonTooltip
             disabled
             size="tiny"
-            variant="default"
             tooltip={{
               content: {
                 side: 'bottom',
@@ -47,7 +46,7 @@ export const BranchingPITRNotice = () => {
             Enable PITR add-on
           </ButtonTooltip>
         ) : (
-          <Button size="tiny" variant="default" asChild>
+          <Button size="tiny" asChild>
             <Link
               href={`/project/${ref}/settings/addons?panel=pitr`}
               onClick={() => snap.setShowCreateBranchModal(false)}

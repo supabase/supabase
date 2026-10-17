@@ -1,279 +1,72 @@
-import type { ChangeEvent } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Badge,
-  FormControl,
-  FormField,
-  FormInputGroupInput,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from 'ui'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { BigQueryConnectionFields } from './BigQuery/ConnectionFields'
+import { TableOptions } from './BigQuery/TableOptions'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+import { DuckLakeConnectionFields } from './DuckLake/ConnectionFields'
+import { ReplicationFields } from './ReplicationFields'
+import { SnowflakeConnectionFields } from './Snowflake/ConnectionFields'
 
 export const AdvancedSettings = ({
   type,
   form,
+  group = 'all',
 }: {
+  group?: 'all' | 'connection' | 'data'
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
-  const handleNumberChange =
-    (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
-      const val = e.target.value
-      field.onChange(val === '' ? undefined : Number(val))
-    }
+  const shouldShowConnection = group !== 'data'
+  const shouldShowData = group !== 'connection'
+  if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
+    return null
+
+  let description = 'Customize how the pipeline syncs and replicates data.'
+  if (type === 'DuckLake' && group === 'all')
+    description = 'Adjust catalog connections and replication settings.'
+  if (group === 'connection') description = `Adjust how data is written to ${type}.`
+  if (group === 'data') description = 'Adjust initial sync and replication slot behavior.'
 
   return (
-    <div className="px-5">
+    <div className={cn('w-full', group !== 'all' && 'border-t border-default')}>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1" className="border-none">
-          <AccordionTrigger className="font-normal gap-2 justify-between text-sm py-3 hover:no-underline">
+          <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
-              <span className="text-sm text-foreground-lighter font-normal">
-                Optional settings to control the pipeline in more depth
-              </span>
+              <span className="text-sm text-foreground-lighter font-normal">{description}</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
-            {/* Batch wait time - applies to all destinations */}
-            <FormField
-              control={form.control}
-              name="maxFillMs"
-              render={({ field }) => (
-                <FormItemLayout
-                  layout="horizontal"
-                  label="Batch wait time"
-                  description={
-                    <>
-                      <p>
-                        Maximum time pipeline waits to collect additional changes before flushing a
-                        batch.
-                      </p>
-                      <p>
-                        Lower values reduce replication latency, higher values improve batching
-                        efficiency.
-                      </p>
-                    </>
-                  }
-                >
-                  <FormControl>
-                    <InputGroup>
-                      <FormInputGroupInput
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="Default: 10000"
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>milliseconds</InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
+          <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4 [&>div]:px-5">
+            {shouldShowConnection && type === 'DuckLake' && (
+              <DuckLakeConnectionFields control={form.control} />
+            )}
 
-            <FormField
-              control={form.control}
-              name="maxTableSyncWorkers"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Table sync workers"
-                  layout="horizontal"
-                  description={
-                    <>
-                      <p>Number of tables copied in parallel during the initial snapshot phase.</p>
-                      <p>
-                        Each worker uses one replication slot (up to N + 1 total while syncing).
-                      </p>
-                    </>
-                  }
-                >
-                  <FormControl>
-                    <InputGroup>
-                      <FormInputGroupInput
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="Default: 4"
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>workers</InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="maxCopyConnectionsPerTable"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Copy connections per table"
-                  layout="horizontal"
-                  description={
-                    <>
-                      <p>
-                        Number of parallel connections each table copy can use during initial sync.
-                      </p>
-                      <p>
-                        More connections speed up large table copies, but use more database
-                        connections.
-                      </p>
-                    </>
-                  }
-                >
-                  <FormControl>
-                    <InputGroup>
-                      <FormInputGroupInput
-                        {...field}
-                        type="number"
-                        value={field.value ?? ''}
-                        onChange={handleNumberChange(field)}
-                        placeholder="Default: 2"
-                      />
-                      <InputGroupAddon align="inline-end">
-                        <InputGroupText>connections</InputGroupText>
-                      </InputGroupAddon>
-                    </InputGroup>
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="invalidatedSlotBehavior"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Invalidated slot behavior"
-                  layout="horizontal"
-                  description="Behavior of the pipeline's replication slot when invalidated."
-                >
-                  <FormControl>
-                    <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
-                      <SelectTrigger className="capitalize">{field.value ?? 'error'}</SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="error" className="[&>span]:top-2.5">
-                          <p>Error</p>
-                          <p className="text-foreground-lighter">
-                            Blocks startup for manual recovery.
-                          </p>
-                        </SelectItem>
-                        <SelectItem value="recreate" className="[&>span]:top-2.5">
-                          <p>Recreate</p>
-                          <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch.
-                          </p>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
+            {shouldShowData && <ReplicationFields control={form.control} />}
 
             {type === 'BigQuery' && (
               <>
-                <FormField
-                  control={form.control}
-                  name="connectionPoolSize"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Connection pool size</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
-                      layout="horizontal"
-                      description={
-                        <>
-                          <p>Size of the BigQuery Storage Write API connection pool.</p>
-                          <p>
-                            More connections allow more parallel writes, but consume more resources.
-                          </p>
-                        </>
-                      }
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder="Default: 4"
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>connections</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                {shouldShowConnection && <BigQueryConnectionFields control={form.control} />}
 
-                <FormField
-                  control={form.control}
-                  name="maxStalenessMins"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <div className="flex flex-col gap-y-2">
-                          <span>Maximum staleness</span>
-                          <Badge className="w-min">BigQuery only</Badge>
-                        </div>
-                      }
-                      layout="horizontal"
-                      description={
-                        <>
-                          <p>
-                            Maximum allowed age for BigQuery cached metadata before reading base
-                            tables.
-                          </p>
-                          <p>
-                            Lower values improve freshness, higher values can reduce query cost and
-                            latency.
-                          </p>
-                        </>
-                      }
-                    >
-                      <FormControl>
-                        <InputGroup>
-                          <FormInputGroupInput
-                            {...field}
-                            type="number"
-                            value={field.value ?? ''}
-                            onChange={handleNumberChange(field)}
-                            placeholder="Default: None (No staleness limit)"
-                          />
-                          <InputGroupAddon align="inline-end">
-                            <InputGroupText>minutes</InputGroupText>
-                          </InputGroupAddon>
-                        </InputGroup>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                {shouldShowData && (
+                  <div className="flex flex-col gap-y-3">
+                    <div className="flex flex-col gap-y-1">
+                      <span className="text-sm text-foreground">Table layout</span>
+                      <p className="text-sm text-foreground-lighter">
+                        Partitioning and clustering for each BigQuery table. Applied when a
+                        destination table is first created or reset.
+                      </p>
+                    </div>
+                    <TableOptions control={form.control} />
+                  </div>
+                )}
               </>
+            )}
+
+            {shouldShowConnection && type === 'Snowflake' && (
+              <SnowflakeConnectionFields control={form.control} />
             )}
           </AccordionContent>
         </AccordionItem>

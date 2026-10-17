@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 
@@ -46,7 +46,7 @@ export const AuthAlert = ({
             </AlertTitle>
             <AlertDescription className="flex flex-col gap-y-3">
               <p>The SMS hook will be used in place of the SMS provider configured</p>
-              <Button asChild variant="default" className="w-min" icon={<ExternalLink />}>
+              <Button asChild className="w-min" icon={<ExternalLinkIcon />}>
                 <Link href={`/project/${ref}/auth/hooks`}>View auth hooks</Link>
               </Button>
             </AlertDescription>

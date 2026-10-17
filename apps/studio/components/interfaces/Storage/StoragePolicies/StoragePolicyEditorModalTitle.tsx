@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { ChevronLeft, X } from 'lucide-react'
+import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from 'ui'
 
@@ -29,13 +29,14 @@ export const StoragePolicyEditorModalTitle = ({
       <div>
         <div className="flex items-center space-x-3">
           <button
+            tabIndex={0}
             onClick={onSelectBackFromTemplates}
             className={cn(
-              'cursor-pointer rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+              'cursor-pointer rounded-xs opacity-20 hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
               'hit-area-6'
             )}
           >
-            <ChevronLeft strokeWidth={2} size={14} />
+            <ChevronLeftIcon strokeWidth={2} size={14} />
             <span className="sr-only">Back</span>
           </button>
           <span>Select a template to use for your new policy</span>
@@ -50,11 +51,11 @@ export const StoragePolicyEditorModalTitle = ({
       <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-policies`} />
       <DialogPrimitive.Close
         className={cn(
-          'absolute p-0.5 right-3.5 top-4.5 rounded-xs opacity-20 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+          'absolute p-0.5 right-3.5 top-4.5 rounded-xs opacity-20 hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
           'hit-area-6'
         )}
       >
-        <X size={16} />
+        <XIcon size={16} />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </div>

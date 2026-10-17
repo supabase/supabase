@@ -52,13 +52,13 @@ function createBucketFilePickerState({
 
 export type BucketFilePickerState = ReturnType<typeof createBucketFilePickerState>
 
-const DEFAULT_STATE_CONFIG = {
+const createDefaultStateConfig = () => ({
   bucket: {} as Bucket,
   maxFiles: 1 as const,
-}
+})
 
 const BucketFilePickerStateContext = createContext<BucketFilePickerState>(
-  createBucketFilePickerState(DEFAULT_STATE_CONFIG)
+  createBucketFilePickerState(createDefaultStateConfig())
 )
 
 export const BucketFilePickerStateContextProvider = ({

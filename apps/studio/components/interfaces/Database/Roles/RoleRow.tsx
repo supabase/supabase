@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ChevronUp, MoreVertical, Trash } from 'lucide-react'
+import { ChevronUpIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,17 +11,20 @@ import {
   CollapsibleTrigger,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
   FormControl,
   FormField,
   Switch,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { ROLE_PERMISSIONS } from './Roles.constants'
+import { ROLE_PERMISSIONS, SYSTEM_ROLES } from './Roles.constants'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useDatabaseRoleUpdateMutation } from '@/data/database-roles/database-role-update-mutation'
 import type { PgRole } from '@/data/database-roles/database-roles-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -44,6 +47,7 @@ const formSchema = z.object(
 )
 
 export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
+  const isSystemRole = SYSTEM_ROLES.some((name) => name === role.name)
   const { data: project } = useSelectedProjectQuery()
   const [isExpanded, setIsExpanded] = useState(false)
   const { mutate: updateDatabaseRole, isPending: isUpdating } = useDatabaseRoleUpdateMutation()
@@ -114,6 +118,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           <button
             id={`collapsible-trigger-${role.id}`}
             type="button"
+            tabIndex={0}
             className="group flex w-full items-center justify-between rounded-sm py-3 px-card text-foreground"
             onClick={(event) => {
               event.preventDefault()
@@ -122,7 +127,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             }}
           >
             <div className="flex items-start space-x-3">
-              <ChevronUp
+              <ChevronUpIcon
                 className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                 strokeWidth={2}
                 width={14}
@@ -136,8 +141,8 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
               {role.activeConnections > 0 && (
                 <div className="relative h-2 w-2">
                   <span className="flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand opacity-75"></span>
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-default opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-default opacity-75"></span>
                   </span>
                 </div>
               )}
@@ -154,25 +159,36 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         </CollapsibleTrigger>
         {!disabled && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="default"
-                className="px-1"
-                icon={<MoreVertical />}
-                aria-label={`${role.name} actions`}
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    className="px-1"
+                    icon={<MoreVerticalIcon />}
+                    aria-label={`${role.name} actions`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
-              <DropdownMenuItem
+              <DropdownMenuItemTooltip
                 className="space-x-2"
+                disabled={isSystemRole}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: `The ${role.name} role is a system role and cannot be deleted`,
+                  },
+                }}
                 onClick={(event) => {
                   event.stopPropagation()
                   onSelectDelete(role.id.toString())
                 }}
               >
-                <Trash className="text-red-800" size="14" strokeWidth={2} />
+                <TrashIcon className="text-red-800" size="14" strokeWidth={2} />
                 <p>Delete</p>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
@@ -214,7 +230,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             </div>
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
-                <Button variant="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
+                <Button disabled={!isDirty || isUpdating} onClick={() => reset()}>
                   Cancel
                 </Button>
                 <Button

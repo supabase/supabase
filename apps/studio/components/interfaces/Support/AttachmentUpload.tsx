@@ -1,7 +1,7 @@
 // End of third-party imports
 
 import { compact } from 'lodash'
-import { FileCode, Plus, X } from 'lucide-react'
+import { FileCodeIcon, PlusIcon, XIcon } from 'lucide-react'
 import {
   useCallback,
   useEffect,
@@ -21,6 +21,19 @@ import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
+
+const removeAttachmentButtonClassName = cn(
+  'absolute -top-1 -right-1 size-4 shrink-0 rounded-full bg-red-900 p-0 cursor-pointer',
+  'focus-ring'
+)
+
+const RemoveAttachmentIcon = () => (
+  <XIcon
+    aria-hidden="true"
+    strokeWidth={3}
+    className="pointer-events-none absolute left-1/2 top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 text-contrast"
+  />
+)
 
 const uploadAttachments = async ({ userId, files }: { userId: string; files: File[] }) => {
   const supportSupabaseClient = createSupportStorageClient()
@@ -198,7 +211,7 @@ export function AttachmentUploadDisplay({
                 <Tooltip>
                   <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
                     <div className="flex flex-col items-center justify-center gap-y-1">
-                      <FileCode className="text-foreground-light" size={16} />
+                      <FileCodeIcon className="text-foreground-light" size={16} />
                       <p className="text-[10px] font-mono text-foreground-light tracking-wide leading-none">
                         HAR
                       </p>
@@ -209,14 +222,12 @@ export function AttachmentUploadDisplay({
 
                 <button
                   type="button"
+                  tabIndex={0}
                   aria-label="Remove attachment"
-                  className={cn(
-                    'flex h-4 w-4 items-center justify-center rounded-full bg-red-900',
-                    'absolute -top-1 -right-1 cursor-pointer'
-                  )}
+                  className={removeAttachmentButtonClassName}
                   onClick={() => removeFileUpload(idx)}
                 >
-                  <X aria-hidden="true" size={10} strokeWidth={3} className="text-contrast" />
+                  <RemoveAttachmentIcon />
                 </button>
               </div>
             )
@@ -229,14 +240,12 @@ export function AttachmentUploadDisplay({
               >
                 <button
                   type="button"
+                  tabIndex={0}
                   aria-label="Remove attachment"
-                  className={cn(
-                    'flex h-4 w-4 items-center justify-center rounded-full bg-red-900',
-                    'absolute -top-1 -right-1 cursor-pointer'
-                  )}
+                  className={removeAttachmentButtonClassName}
                   onClick={() => removeFileUpload(idx)}
                 >
-                  <X aria-hidden="true" size={10} strokeWidth={3} className="text-contrast" />
+                  <RemoveAttachmentIcon />
                 </button>
               </div>
             )
@@ -245,13 +254,16 @@ export function AttachmentUploadDisplay({
         {!isFull && (
           <button
             type="button"
+            tabIndex={0}
+            aria-label="Add attachment"
             className={cn(
-              'border border-stronger opacity-50 transition hover:opacity-100',
-              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm'
+              'border border-stronger opacity-50 hover:opacity-100',
+              'group flex h-14 w-14 cursor-pointer items-center justify-center rounded-sm',
+              'focus-visible:opacity-100 focus-ring'
             )}
             onClick={addFile}
           >
-            <Plus strokeWidth={2} size={20} />
+            <PlusIcon strokeWidth={2} size={20} />
           </button>
         )}
       </div>

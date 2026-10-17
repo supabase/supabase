@@ -1,9 +1,9 @@
 export type DestinationType =
-  | 'Read Replica'
   | 'BigQuery'
   | 'Analytics Bucket'
   | 'DuckLake'
   | 'Snowflake'
+  | 'ClickHouse'
 
 export type ExistingDestination = {
   sourceId?: number

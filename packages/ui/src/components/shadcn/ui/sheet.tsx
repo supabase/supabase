@@ -1,15 +1,26 @@
 'use client'
 
-import { Dialog as SheetPrimitive } from 'radix-ui'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { X } from 'lucide-react'
+import { Dialog as SheetPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const Sheet = SheetPrimitive.Root
 
-const SheetTrigger = SheetPrimitive.Trigger
+const SheetTrigger = React.forwardRef<
+  React.ElementRef<typeof SheetPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <SheetPrimitive.Trigger ref={ref} {...props} disabled={disabled} tabIndex={computedTabIndex} />
+  )
+})
+SheetTrigger.displayName = SheetPrimitive.Trigger.displayName
 
 const SheetClose = SheetPrimitive.Close
 
@@ -163,13 +174,14 @@ const SheetContent = React.forwardRef<
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side, size }), className)}
+      tabIndex={undefined}
       {...props}
     >
       {children}
       {showClose ? (
         <SheetPrimitive.Close
           className={cn(
-            'absolute right-4 top-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary',
+            'absolute right-4 top-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-secondary',
             'hit-area-6'
           )}
         >
@@ -184,7 +196,7 @@ SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('px-5 py-4 text-center sm:text-left border-b bg-dash-sidebar', className)}
+    className={cn('px-5 py-4 text-center sm:text-left border-b bg-popover', className)}
     {...props}
   />
 )

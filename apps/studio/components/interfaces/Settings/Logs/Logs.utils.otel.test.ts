@@ -493,6 +493,14 @@ describe('genChartQueryOtel', () => {
     `)
   })
 
+  it('does not throw and falls back to minute buckets for an unparseable time range', () => {
+    const badParams = { iso_timestamp_start: 'not-a-date', iso_timestamp_end: 'also-bad' }
+    expect(() => genChartQueryOtel(LogsTableName.EDGE, badParams, {})).not.toThrow()
+    expect(fmt(genChartQueryOtel(LogsTableName.EDGE, badParams, {}))).toContain(
+      'toStartOfMinute (timestamp)'
+    )
+  })
+
   it('defaults the chart bucket to minute when no time range is given', () => {
     expect(fmt(genChartQueryOtel(LogsTableName.EDGE, {}, {}))).toMatchInlineSnapshot(`
       "-- Logs Chart Query (otel) ['edge_logs']

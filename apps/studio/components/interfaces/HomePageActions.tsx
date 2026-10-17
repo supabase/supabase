@@ -1,12 +1,12 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Grid, List, Loader2, Plus, Search, X } from 'lucide-react'
+import { GridIcon, ListIcon, Loader2Icon, PlusIcon, SearchIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
-import { Button, ToggleGroup, ToggleGroupItem } from 'ui'
+import { Button, ToggleGroup, ToggleGroupItem, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { FilterPopover } from '../ui/FilterPopover'
@@ -83,7 +83,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
         <Input
           ref={searchInputRef}
           placeholder="Search for a project"
-          icon={<Search />}
+          icon={<SearchIcon />}
           size="tiny"
           className="w-full sm:w-32 md:w-64"
           value={search}
@@ -95,9 +95,10 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
                 key="clear"
                 size="tiny"
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 onClick={() => setSearch('')}
                 className="p-0 h-5 w-5"
+                aria-label="Clear"
               />
             ),
           ]}
@@ -107,10 +108,12 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           <FilterPopover
             name="Status"
             title="Filter projects by status"
-            options={[
-              { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
-              { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
-            ]}
+            options={
+              [
+                { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+                { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
+              ] as { key: string; label: string }[]
+            }
             activeOptions={filterStatus}
             valueKey="key"
             labelKey="label"
@@ -126,7 +129,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
             setValue={(val) => setSortStorage(val as ProjectListSort)}
           />
 
-          {isFetchingProjects && <Loader2 className="animate-spin" size={14} />}
+          {isFetchingProjects && <Loader2Icon className="animate-spin" size={14} />}
         </div>
       </div>
 
@@ -138,12 +141,28 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
             value={viewMode}
             onValueChange={(value) => value && setViewMode(value as 'grid' | 'table')}
           >
-            <ToggleGroupItem value="grid" size="sm" className="h-[26px] w-[26px] p-0">
-              <Grid size={14} strokeWidth={1.5} />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="table" size="sm" className="h-[26px] w-[26px] p-0">
-              <List size={14} strokeWidth={1.5} />
-            </ToggleGroupItem>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ToggleGroupItem value="grid" className="h-[26px] w-[26px] p-0">
+                  <GridIcon size={14} strokeWidth={1.5} />
+                  <span className="sr-only">Toggle grid view</span>
+                </ToggleGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Toggle grid view</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ToggleGroupItem value="table" className="h-[26px] w-[26px] p-0">
+                  <ListIcon size={14} strokeWidth={1.5} />
+                  <span className="sr-only">Toggle list view</span>
+                </ToggleGroupItem>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                <p>Toggle list view</p>
+              </TooltipContent>
+            </Tooltip>
           </ToggleGroup>
         )}
 
@@ -155,7 +174,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
             }}
             side="bottom"
           >
-            <Button asChild icon={<Plus />} variant="primary" size="tiny">
+            <Button asChild icon={<PlusIcon />} variant="primary" size="tiny">
               <Link href={`/new/${slug}`}>New project</Link>
             </Button>
           </Shortcut>

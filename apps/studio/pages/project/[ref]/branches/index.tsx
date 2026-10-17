@@ -1,23 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { Button } from 'ui'
+import { useState, type PropsWithChildren } from 'react'
 
+import { CreateBranchButton } from '@/components/interfaces/BranchManagement/CreateBranchButton'
+import { DeleteBranchModal } from '@/components/interfaces/BranchManagement/DeleteBranchModal'
 import { Overview } from '@/components/interfaces/BranchManagement/Overview'
 import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
-import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -71,20 +67,11 @@ const BranchesPage: NextPageWithLayout = () => {
   )
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
 
-  const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
-
-  const isGithubConnected = githubConnection !== undefined
-
-  const { mutate: deleteBranch, isPending: isDeleting } = useBranchDeleteMutation({
-    onSuccess: () => {
-      toast.success('Successfully deleted branch')
-      setSelectedBranchToDelete(undefined)
-    },
-  })
 
   const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
@@ -92,33 +79,6 @@ const BranchesPage: NextPageWithLayout = () => {
     return branch !== undefined
       ? `https://github.com/${githubConnection.repository.name}/compare/${mainBranch?.git_branch}...${branch}`
       : `https://github.com/${githubConnection.repository.name}/compare`
-  }
-
-  const onConfirmDeleteBranch = () => {
-    if (selectedBranchToDelete === undefined) return console.error('No branch selected')
-    const {
-      project_ref: branchRef,
-      parent_project_ref: projectRef,
-      persistent,
-    } = selectedBranchToDelete
-    deleteBranch(
-      { branchRef, projectRef },
-      {
-        onSuccess: () => {
-          if (branchRef === ref) {
-            router.push(`/project/${projectRef}/branches`)
-          }
-          track(
-            'branch_delete_button_clicked',
-            {
-              branchType: persistent ? 'persistent' : 'preview',
-              origin: 'branches_page',
-            },
-            { project: projectRef }
-          )
-        },
-      }
-    )
   }
 
   return (
@@ -145,19 +105,17 @@ const BranchesPage: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isError && (
-                    <Overview
-                      isGithubConnected={isGithubConnected}
-                      isLoading={isLoading}
-                      isSuccess={isSuccess}
-                      repo={repo}
-                      mainBranch={mainBranch}
-                      previewBranches={previewBranches}
-                      onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
-                      onSelectDeleteBranch={setSelectedBranchToDelete}
-                      generateCreatePullRequestURL={generateCreatePullRequestURL}
-                    />
-                  )}
+                  <Overview
+                    isGithubConnected={isGithubConnected}
+                    isLoading={isLoading}
+                    isSuccess={isSuccess}
+                    repo={repo}
+                    mainBranch={mainBranch}
+                    previewBranches={previewBranches}
+                    onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  />
                 </>
               )}
             </div>
@@ -165,97 +123,50 @@ const BranchesPage: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <TextConfirmModal
-        variant="warning"
-        visible={selectedBranchToDelete !== undefined}
-        onCancel={() => setSelectedBranchToDelete(undefined)}
-        onConfirm={() => onConfirmDeleteBranch()}
-        loading={isDeleting}
-        title="Delete branch"
-        confirmLabel="Delete branch"
-        confirmPlaceholder="Type in name of branch"
-        confirmString={selectedBranchToDelete?.name ?? ''}
-        alert={{
-          title: 'You cannot recover this branch once deleted',
+      <DeleteBranchModal
+        branch={selectedBranchToDelete}
+        open={!!selectedBranchToDelete}
+        onClose={() => setSelectedBranchToDelete(undefined)}
+        onSuccess={() => {
+          if (selectedBranchToDelete?.project_ref === ref) {
+            router.push(`/project/${projectRef}/branches`)
+          }
+          track(
+            'branch_delete_button_clicked',
+            {
+              branchType: selectedBranchToDelete?.persistent ? 'persistent' : 'preview',
+              origin: 'branches_page',
+            },
+            { project: projectRef }
+          )
         }}
-        text={
-          <>
-            This will delete your database preview branch{' '}
-            <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
-          </>
-        }
       />
     </>
   )
 }
 
-BranchesPage.getLayout = (page) => {
-  const BranchesPageWrapper = () => {
-    const snap = useAppStateSnapshot()
-    const { can: canCreateBranches } = useAsyncCheckPermissions(
-      PermissionAction.CREATE,
-      'preview_branches',
-      {
-        resource: { is_default: false },
-      }
-    )
-
-    const primaryActions = (
-      <ButtonTooltip
-        variant="primary"
-        disabled={!canCreateBranches}
-        onClick={() => snap.setShowCreateBranchModal(true)}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: !canCreateBranches
-              ? 'You need additional permissions to create branches'
-              : undefined,
-          },
-        }}
-      >
-        Create branch
-      </ButtonTooltip>
-    )
-
-    const secondaryActions = (
-      <div className="flex items-center gap-x-2">
-        <Button
-          asChild
-          variant="text"
-          icon={<MessageCircle className="text-muted" strokeWidth={1} />}
-        >
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/orgs/supabase/discussions/18937"
-          >
-            Branching feedback
-          </a>
-        </Button>
-        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-      </div>
-    )
-
-    return (
-      <PageLayout
-        title="Branches"
-        subtitle="Manage your database preview branches and deployments"
-        primaryActions={primaryActions}
-        secondaryActions={secondaryActions}
-      >
-        {page}
-      </PageLayout>
-    )
-  }
-
+// Hoisted out of `getLayout` so the TanStack route can import it
+// directly. Same shape and identical body as before — accepts the page
+// content as `children` instead of capturing it from a closure.
+export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
   return (
-    <DefaultLayout>
-      <BranchLayout>
-        <BranchesPageWrapper />
-      </BranchLayout>
-    </DefaultLayout>
+    <PageLayout
+      title="Branches"
+      subtitle="Manage your database preview branches and deployments"
+      primaryActions={<CreateBranchButton />}
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
+    >
+      {children}
+    </PageLayout>
   )
 }
+
+BranchesPage.getLayout = (page) => (
+  <DefaultLayout>
+    <BranchLayout>
+      <BranchesPageWrapper>{page}</BranchesPageWrapper>
+    </BranchLayout>
+  </DefaultLayout>
+)
 
 export default BranchesPage

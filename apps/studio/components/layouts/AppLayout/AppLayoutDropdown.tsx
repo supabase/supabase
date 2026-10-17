@@ -1,4 +1,4 @@
-import { AlertCircle, ChevronsUpDown } from 'lucide-react'
+import { AlertCircleIcon, ChevronsUpDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, type ReactNode } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
@@ -10,7 +10,7 @@ interface AppLayoutDropdownErrorProps {
 export function AppLayoutDropdownError({ message }: AppLayoutDropdownErrorProps) {
   return (
     <div className="flex items-center space-x-2 text-amber-900">
-      <AlertCircle size={16} strokeWidth={1.5} />
+      <AlertCircleIcon size={16} strokeWidth={1.5} />
       <p className="text-sm">{message}</p>
     </div>
   )
@@ -28,7 +28,7 @@ export const AppLayoutDropdownTriggerButton = forwardRef<
     ref={ref}
     size="tiny"
     className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1', className)}
-    iconRight={<ChevronsUpDown strokeWidth={1.5} />}
+    iconRight={<ChevronsUpDownIcon strokeWidth={1.5} />}
     {...props}
     variant="text"
   />
@@ -42,7 +42,7 @@ export interface AppLayoutDropdownWithPopoverProps {
   commandContent: ReactNode
   open: boolean
   onOpenChange: (open: boolean) => void
-  triggerButtonClassName?: string
+  triggerButton?: ReactNode
 }
 
 export function AppLayoutDropdownWithPopover({
@@ -52,7 +52,7 @@ export function AppLayoutDropdownWithPopover({
   commandContent,
   open,
   onOpenChange,
-  triggerButtonClassName,
+  triggerButton,
 }: AppLayoutDropdownWithPopoverProps) {
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={false}>
@@ -60,9 +60,7 @@ export function AppLayoutDropdownWithPopover({
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>
-        <PopoverTrigger asChild>
-          <AppLayoutDropdownTriggerButton className={triggerButtonClassName} />
-        </PopoverTrigger>
+        <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
       </div>
       <PopoverContent className="p-0" side="bottom" align="start">
         {commandContent}

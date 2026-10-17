@@ -365,13 +365,20 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSq
   return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]} ${joins} ${where}`
 }
 
+// Falls back to now for missing or unparseable params so an Invalid Date can't
+// reach .toISOString() downstream and throw RangeError (Sentry 7580074952).
+export const resolveLogTimestamp = (value?: string): Dayjs => {
+  const parsed = dayjs(value)
+  return value && parsed.isValid() ? parsed : dayjs()
+}
+
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 const calcChartStart = (
   params: Partial<LogsEndpointParams>
 ): [Dayjs, 'minute' | 'hour' | 'day'] => {
-  const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+  const ite = resolveLogTimestamp(params.iso_timestamp_end)
   // todo @TzeYiing needs typing
-  const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+  const its: any = resolveLogTimestamp(params.iso_timestamp_start)
 
   let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
@@ -449,14 +456,12 @@ export const ensureNoTimestampConflict = (
   [nextStart, nextEnd]: TsPair
 ): TsPair => {
   if (initialStart && initialEnd && nextEnd && !nextStart) {
-    const resolvedDiff = dayjs(nextEnd).diff(dayjs(initialStart))
-    let start = dayjs(initialStart)
+    const end = resolveLogTimestamp(nextEnd)
+    let start = resolveLogTimestamp(initialStart)
 
-    if (resolvedDiff <= 0) {
-      // start ts is definitely before end ts
-      const currDiff = Math.abs(dayjs(initialEnd).diff(start, 'minute'))
-      // shift start ts backwards by the current ts difference
-      start = dayjs(nextEnd).subtract(currDiff, 'minute')
+    if (end.diff(start) <= 0) {
+      const currDiff = Math.abs(resolveLogTimestamp(initialEnd).diff(start, 'minute'))
+      start = end.subtract(currDiff, 'minute')
     }
     return [start.toISOString(), nextEnd]
   } else if (!nextEnd && nextStart) {
@@ -576,11 +581,20 @@ export const fillTimeseries = (
     })
   }
 
-  if (timeseriesData.length <= 1 && !(min && max)) return timeseriesData
-  const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
+  if (timeseriesData.length === 1 && !(min && max)) {
+    const timestamp = timeseriesData[0][timestampKey]
+    timeseriesData[0][timestampKey] = isUnixMicro(timestamp)
+      ? unixMicroToIsoTimestamp(timestamp)
+      : dayjs.utc(timestamp).toISOString()
+    return timeseriesData
+  }
+  const dates = timeseriesData.map((datum) => {
+    const timestamp = datum[timestampKey]
+    return dayjs.utc(isUnixMicro(timestamp) ? unixMicroToIsoTimestamp(timestamp) : timestamp)
+  })
 
-  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max.apply(null, dates as number[]))
-  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min.apply(null, dates as number[]))
+  const maxDate = max ? dayjs.utc(max) : dayjs.utc(Math.max(...dates.map((date) => date.valueOf())))
+  const minDate = min ? dayjs.utc(min) : dayjs.utc(Math.min(...dates.map((date) => date.valueOf())))
 
   // When no data exists but min/max are provided, we need to determine truncation from the time range
   const truncationSamples = timeseriesData.length > 0 ? dates : [minDate, maxDate]
@@ -596,10 +610,10 @@ export const fillTimeseries = (
       truncation = unitMap[unitChar]
     } else {
       // Fallback for invalid format
-      truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+      truncation = getTimestampTruncation(truncationSamples)
     }
   } else {
-    truncation = getTimestampTruncation(truncationSamples as Dayjs[])
+    truncation = getTimestampTruncation(truncationSamples)
   }
 
   // If no data exists and no interval specified, default to minute precision
@@ -607,11 +621,8 @@ export const fillTimeseries = (
     truncation = 'minute'
   }
 
-  const newData = timeseriesData.map((datum) => {
-    const timestamp = datum[timestampKey]
-    const iso = isUnixMicro(timestamp)
-      ? unixMicroToIsoTimestamp(timestamp)
-      : dayjs.utc(timestamp).toISOString()
+  const newData = timeseriesData.map((datum, index) => {
+    const iso = dates[index].toISOString()
 
     if (Array.isArray(valueKey) && valueKey.length === 0) {
       return { [timestampKey]: iso }
@@ -623,8 +634,7 @@ export const fillTimeseries = (
 
   let currentDate = minDate
   while (currentDate.isBefore(maxDate) || currentDate.isSame(maxDate)) {
-    const found = dates.find((d) => {
-      const d_date = d as Dayjs
+    const found = dates.find((d_date) => {
       return (
         d_date.year() === currentDate.year() &&
         d_date.month() === currentDate.month() &&
@@ -706,6 +716,13 @@ export function checkForILIKEClause(query: string) {
 
   const ilikeClauseRegex = /\b(ILIKE)\b(?=(?:[^']*'[^']*')*[^']*$)/i
   return ilikeClauseRegex.test(queryWithoutComments)
+}
+
+export function checkForLimitClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const limitClauseRegex = /\b(LIMIT)\b\s+\d+(?=(?:[^']*'[^']*')*[^']*$)/i
+  return limitClauseRegex.test(queryWithoutComments)
 }
 
 export function checkForWildcard(query: string) {
@@ -842,7 +859,11 @@ export function role(metadata: any) {
   return payload.role
 }
 
-export function formatLogsAsJson(rows: LogData[]): string {
+type LogExportData = Pick<LogData, 'id' | 'event_message'> & {
+  timestamp: string | number
+} & Record<string, unknown>
+
+export function formatLogsAsJson(rows: LogExportData[]): string {
   return JSON.stringify(rows, null, 2)
 }
 
@@ -850,7 +871,7 @@ export function formatLogsAsCsv(rows: LogData[]): string {
   return convertResultsToCSV(rows as unknown as Record<string, unknown>[]) ?? ''
 }
 
-export function formatLogsAsMarkdown(rows: LogData[]): string {
+export function formatLogsAsMarkdown(rows: LogExportData[]): string {
   return rows
     .map((row, i) => {
       const lines: string[] = [`## Log ${i + 1}`]
@@ -870,7 +891,7 @@ export function formatLogsAsMarkdown(rows: LogData[]): string {
       if (row.event_message) {
         lines.push(`**Message:** ${row.event_message}`)
       }
-      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row as any
+      const { id: _id, timestamp: _ts, event_message: _msg, ...rest } = row
       if (Object.keys(rest).length > 0) {
         lines.push('', '**Details:**', '```json', JSON.stringify(rest, null, 2), '```')
       }
@@ -930,7 +951,11 @@ function extractServiceLabelFromSql(sql: string): string | null {
   return tableName && isLogsTableName(tableName) ? LOG_TABLE_TO_SERVICE_LABEL[tableName] : null
 }
 
-export function buildLogsPrompt(rows: LogData[], queryType?: string, sqlQuery?: string): string {
+export function buildLogsPrompt(
+  rows: LogExportData[],
+  queryType?: string,
+  sqlQuery?: string
+): string {
   const serviceLabel =
     (queryType && isQueryType(queryType) ? QUERY_TYPE_LABELS[queryType] : null) ??
     (sqlQuery ? extractServiceLabelFromSql(sqlQuery) : null)

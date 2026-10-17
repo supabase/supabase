@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, MoreVertical, Trash } from 'lucide-react'
+import { Edit2Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -55,24 +55,25 @@ export const ObservabilityMenuItem = ({
   )
 
   const menuItem = (
-    <Menu.Item active={item.key === pageKey}>
+    <Menu.Item active={item.key === pageKey} className="pr-2.5">
       <div className="flex w-full items-center justify-between gap-1">
-        <span className="truncate">{item.name}</span>
+        <p className="truncate w-full">{item.name}</p>
 
         {canUpdateCustomReport && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
+                aria-label="More actions"
                 variant="text"
-                className="px-1 opacity-50 hover:opacity-100"
-                icon={<MoreVertical size={12} strokeWidth={2} />}
+                className="px-0.5 h-[20px] opacity-50 hover:opacity-100"
+                icon={<MoreVerticalIcon size={12} strokeWidth={2} />}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
                 }}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-32 *:gap-x-2">
+            <DropdownMenuContent align="start" className="w-44 *:gap-x-2">
               <DropdownMenuItem
                 onClick={(e) => {
                   e.preventDefault()
@@ -81,7 +82,7 @@ export const ObservabilityMenuItem = ({
                   onSelectEdit()
                 }}
               >
-                <Edit2 size={12} />
+                <Edit2Icon size={12} />
                 <div>Rename report</div>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -93,7 +94,7 @@ export const ObservabilityMenuItem = ({
                   onSelectDelete()
                 }}
               >
-                <Trash size={12} />
+                <TrashIcon size={12} />
                 <div>Delete report</div>
               </DropdownMenuItem>
             </DropdownMenuContent>

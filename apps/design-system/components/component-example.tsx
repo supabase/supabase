@@ -1,13 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  cn,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import {
   // CopyButton,
@@ -32,11 +26,11 @@ export function ComponentExample({
 }: ComponentExampleProps) {
   const [Example, Code, ...Children] = React.Children.toArray(children) as React.ReactElement<{
     children: React.ReactNode
-    'data-rehype-pretty-code-fragment'?: unknown
+    'data-rehype-pretty-code-figure'?: unknown
   }>[]
 
   const codeString = React.useMemo(() => {
-    if (typeof Code?.props['data-rehype-pretty-code-fragment'] !== 'undefined') {
+    if (typeof Code?.props['data-rehype-pretty-code-figure'] !== 'undefined') {
       const [, Button] = React.Children.toArray(Code.props.children) as React.ReactElement<{
         value?: string
         __rawString__?: string

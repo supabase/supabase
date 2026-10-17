@@ -4,10 +4,10 @@ import {
   CardContent,
   cn,
   SheetSection,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
@@ -76,26 +76,26 @@ export const InstallationOverview = ({
 
       <Card>
         <CardContent className="px-0 pt-1.5 pb-0">
-          <Tabs_Shadcn_ defaultValue="extensions">
-            <TabsList_Shadcn_ className="px-4 space-x-4">
+          <Tabs defaultValue="extensions">
+            <TabsList className="px-4 space-x-4">
               {involvesExtensions && (
                 <>
-                  <TabsTrigger_Shadcn_ value="extensions" className="font-mono uppercase text-xs">
+                  <TabsTrigger value="extensions" className="font-mono uppercase text-xs">
                     Extensions
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ value="sql" className="font-mono uppercase text-xs">
+                  </TabsTrigger>
+                  <TabsTrigger value="sql" className="font-mono uppercase text-xs">
                     SQL
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 </>
               )}
               {involvesEdgeFunctions && (
-                <TabsTrigger_Shadcn_ value="edge_functions" className="font-mono uppercase text-xs">
+                <TabsTrigger value="edge_functions" className="font-mono uppercase text-xs">
                   Edge Functions
-                </TabsTrigger_Shadcn_>
+                </TabsTrigger>
               )}
-            </TabsList_Shadcn_>
+            </TabsList>
 
-            <TabsContent_Shadcn_ value="extensions" className="mt-0 divide-y">
+            <TabsContent value="extensions" className="mt-0 divide-y">
               {requiredExtensionNames.map((extName) => {
                 const ext = extensions.find((x) => x.name === extName)
                 return (
@@ -111,8 +111,8 @@ export const InstallationOverview = ({
                   </div>
                 )
               })}
-            </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_ value="sql" className="mt-0">
+            </TabsContent>
+            <TabsContent value="sql" className="mt-0">
               <CodeBlock
                 hideCopy
                 hideLineNumbers
@@ -121,11 +121,11 @@ export const InstallationOverview = ({
                 wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
                 className="border-0 rounded-none [&_code]:text-[12px] [&_code]:text-foreground max-h-80"
               />
-            </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_ value="edge_functions" className="mt-0">
+            </TabsContent>
+            <TabsContent value="edge_functions" className="mt-0">
               TBD
-            </TabsContent_Shadcn_>
-          </Tabs_Shadcn_>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </SheetSection>

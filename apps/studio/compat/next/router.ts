@@ -4,10 +4,12 @@ import {
   useParams,
   useSearch,
   useRouter as useTanStackRouter,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
 import { getRouterEventsProxy } from './_router-events'
+import { splitInternalUrl } from '@/lib/internal-url'
 
 // Next's pages-router exposes `router.pathname` as the route *pattern*
 // (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's
@@ -107,6 +109,45 @@ function interpolatePathname(
   return { pathname: interpolated, query: rest }
 }
 
+// TanStack resolves a `?`- or `#`-only relative `to` by *appending* it to the
+// current path, injecting a trailing slash: navigating to `?preset=x` from
+// `/advisors/security` lands on `/advisors/security/?preset=x`. Next resolved
+// these against the current pathname. Prefix it explicitly (trailing slash
+// stripped; root stays `/`) so `push({ query })` with no pathname stays on
+// the exact current path.
+// Exported for unit tests (see router.test.ts) — not part of the Next surface.
+export function resolveSearchOrHashOnlyTarget(to: string, currentPathname: string): string {
+  if (!to.startsWith('?') && !to.startsWith('#')) return to
+  let base = currentPathname || '/'
+  if (base.length > 1 && base.endsWith('/')) base = base.slice(0, -1)
+  return `${base}${to}`
+}
+
+// Next resolves a pathname-less UrlObject against the *current route
+// pattern*, re-consuming dynamic params from `query` into the path — e.g.
+// `push({ query: { ...router.query, preset } })` on `/project/[ref]/advisors`
+// stays on `/project/<ref>/advisors?preset=…`. Because the shim's
+// `router.query` merges path params in (Next shape), skipping this would leak
+// `ref`/`id` into the query string. Params the caller didn't include are
+// backfilled from the current route's params (minus TanStack's `_splat`,
+// which no bracket segment can consume) so partial `{ query }` pushes stay
+// on-page instead of producing empty path segments.
+// Exported for unit tests (see router.test.ts) — not part of the Next surface.
+export function withDefaultPathname(
+  url: string | UrlObject,
+  currentPathPattern: string,
+  currentParams: Record<string, QueryValue>
+): string | UrlObject {
+  if (typeof url === 'string' || url.pathname != null) return url
+  if (!url.query || typeof url.query !== 'object') return url
+  const { _splat, ...paramsWithoutSplat } = currentParams
+  return {
+    ...url,
+    pathname: currentPathPattern,
+    query: { ...paramsWithoutSplat, ...url.query },
+  }
+}
+
 // Exported for unit tests (see router.test.ts) — not part of the Next surface.
 export function resolveUrl(url: string | UrlObject): string {
   if (typeof url === 'string') return url
@@ -135,8 +176,8 @@ export function resolveUrl(url: string | UrlObject): string {
 // `basepath: '/dashboard'` and `to: '/foo'`, it produces `/dashboard/foo`.
 // So we strip the origin AND the basePath when present; otherwise
 // `router.push('/dashboard/...')` would double-prefix to
-// `/dashboard/dashboard/...`. Mirrors the equivalent logic in the
-// next/link shim's `splitInternalUrl`. Cross-origin URLs pass through
+// `/dashboard/dashboard/...`. Mirrors the equivalent logic in
+// `splitInternalUrl` (@/lib/internal-url). Cross-origin URLs pass through
 // untouched so TanStack hands them to the browser as external.
 const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -231,9 +272,33 @@ export function useRouter() {
       // It's intentionally not part of Next's public TransitionOptions.
       options?: TransitionOptions & { _replace?: boolean }
     ): Promise<boolean> => {
-      const to = toRelativeSameOrigin(resolveUrl(url))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await router.navigate({ to: to as any, replace: options?._replace })
+      // `location.pathname` is already basepath-stripped by TanStack, so the
+      // prefixed target stays basepath-relative like every other `to`.
+      const target = resolveSearchOrHashOnlyTarget(
+        // `useParams({ strict: false })` types as possibly-undefined; treat
+        // "no params" as an empty record for backfilling.
+        toRelativeSameOrigin(resolveUrl(withDefaultPathname(url, pathPattern, params ?? {}))),
+        location.pathname
+      )
+      // Never embed `?query`/`#hash` inside TanStack's `to` — router-core
+      // runs the whole string through path interpolation, which percent-
+      // decodes it and strips control characters (dropping `%0A` newlines
+      // from values like the Logs Explorer's `s` SQL param). Split into
+      // { to, search, hash } instead; the target is already relative and
+      // basepath-stripped, so splitInternalUrl's own origin/basePath
+      // normalisation is a no-op here. `search: {}` clears the query,
+      // matching Next's push-without-query semantics; same for `hash: ''`.
+      //
+      // The `<AnyRouter, string>` type arguments opt out of the registered
+      // route tree's strict typing: Next-style hrefs are free-form strings
+      // that can't satisfy the route-path union at compile time.
+      const { to, search, hash } = splitInternalUrl(target)
+      await router.navigate<AnyRouter, string>({
+        to,
+        search: search ?? {},
+        hash: hash ?? '',
+        replace: options?._replace,
+      })
       return true
     }
 
@@ -308,8 +373,16 @@ export function useRouter() {
         _options?: PrefetchOptions
       ): Promise<void> => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await router.preloadRoute({ to: url as any })
+          // Split like navigate() above so a query string in the href
+          // preloads the real target instead of a path-mangled one.
+          // `<string, string>` (TFrom, TTo) loosens `to` to a plain string
+          // for the same free-form-href reason as `navigate` above.
+          const { to, search, hash } = splitInternalUrl(toRelativeSameOrigin(url))
+          await router.preloadRoute<string, string>({
+            to,
+            search: search ?? {},
+            hash: hash ?? '',
+          })
         } catch {
           // Next's prefetch is fire-and-forget; swallow resolution errors
           // (e.g. unknown route) so callers don't have to guard.

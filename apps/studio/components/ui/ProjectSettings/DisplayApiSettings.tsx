@@ -1,15 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { useFlag, useParams } from 'common'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { AlertCircleIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
-import { getLastUsedAPIKeys, useLastUsedAPIKeysLogQuery } from './DisplayApiSettings.utils'
+import { getLastUsedAPIKeys } from './DisplayApiSettings.utils'
 import Panel from '@/components/ui/Panel'
+import { useApiKeysLastUsedQuery } from '@/data/analytics/api-keys-last-used-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -51,19 +52,23 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
-  const { isLoading: isLoadingLastUsed, logData: lastUsedLogData } = useLastUsedAPIKeysLogQuery({
-    projectRef: projectRef ?? '',
-    enabled: showApiKeyLastUsed,
-  })
+  const now = useRef(new Date()).current
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+  const {
+    isLoading: isLoadingLastUsed,
+    isError: isLastUsedError,
+    data: lastUsedLogData,
+  } = useApiKeysLastUsedQuery(
+    {
+      projectRef,
+      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: now.toISOString(),
+    },
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
+  )
 
   const lastUsedAPIKeys = useMemo(() => {
-    if (
-      apiKeys.length < 1 ||
-      !lastUsedLogData ||
-      lastUsedLogData.length < 1 ||
-      !showApiKeyLastUsed
-    ) {
+    if (apiKeys.length < 1 || !lastUsedLogData || lastUsedLogData.length < 1) {
       return {}
     }
 
@@ -74,7 +79,7 @@ export const DisplayApiSettings = ({
       console.error(e)
       return {}
     }
-  }, [lastUsedLogData, apiKeys, showApiKeyLastUsed])
+  }, [lastUsedLogData, apiKeys])
 
   return (
     <Panel
@@ -95,12 +100,12 @@ export const DisplayApiSettings = ({
     >
       {isLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader2Icon className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">Retrieving API keys</p>
         </div>
       ) : !canReadAPIKeys ? (
         <div className="flex items-center py-8 px-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             You don't have permission to view API keys. These keys restricted to users with higher
             access levels.
@@ -108,14 +113,14 @@ export const DisplayApiSettings = ({
         </div>
       ) : isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader2Icon className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'
@@ -142,7 +147,7 @@ export const DisplayApiSettings = ({
                   ))}
                   {x.tags === 'service_role' && (
                     <>
-                      <code className="text-code-inline bg-destructive! text-white! border-destructive!">
+                      <code className="text-code-inline bg-destructive! text-destructive-foreground! border-destructive!">
                         secret
                       </code>
                     </>
@@ -206,14 +211,16 @@ export const DisplayApiSettings = ({
               />
             </FormLayout>
 
-            {showApiKeyLastUsed && (
+            {IS_PLATFORM && showApiKeysLastUsed && (
               <div
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}
               >
-                {lastUsedAPIKeys[x.api_key]
-                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                  : 'No requests in the past 24 hours.'}
+                {isLastUsedError
+                  ? 'Unable to load requests from the past 24 hours.'
+                  : lastUsedAPIKeys[x.api_key]
+                    ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                    : 'No requests in the past 24 hours.'}
               </div>
             )}
           </Panel.Content>

@@ -9,6 +9,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.animated path {
+    animation: none;
+  }
+}
+
 .map-path {
   animation: dash 8s linear infinite;
 }

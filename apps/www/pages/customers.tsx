@@ -4,7 +4,7 @@ import { getSortedPosts } from '~/lib/posts'
 import { generateRss } from '~/lib/rss'
 import styles from '~/styles/customers.module.css'
 import type PostTypes from '~/types/post'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -159,13 +159,7 @@ function CustomerStoriesPage(props: any) {
                           },
                         }}
                       >
-                        <GlassPanel
-                          {...caseStudy}
-                          background={true}
-                          showIconBg={true}
-                          showLink={true}
-                          hasLightIcon
-                        >
+                        <GlassPanel {...caseStudy} showIconBg={true} showLink={true} hasLightIcon>
                           {caseStudy.description}
                         </GlassPanel>
                       </motion.a>

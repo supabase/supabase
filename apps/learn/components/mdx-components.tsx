@@ -1,10 +1,10 @@
-import { useMDXComponent } from 'next-contentlayer2/hooks'
 import Link from 'next/link'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { Callout } from './callout'
 import { CopyButton } from './copy-button'
 import TanStackBeta from './tanstack-beta'
+import { useMDXComponent } from '@/lib/use-mdx-component'
 
 const components = {
   Accordion,
@@ -44,7 +44,7 @@ const components = {
   a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
     <a
       className={cn(
-        'text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-brand hover:decoration-2',
+        'text-foreground underline decoration-1 decoration-foreground-muted underline-offset-4 transition-colors hover:decoration-primary hover:decoration-2',
         className
       )}
       {...props}

@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import {
-  Activity,
+  ActivityIcon,
   BarChartIcon,
   GitCommitHorizontalIcon,
   InfoIcon,
-  SquareTerminal,
+  SquareTerminalIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -195,7 +195,7 @@ export const ChartHeader = ({
             <TooltipTrigger asChild>
               <InfoIcon className="w-4 h-4 text-foreground-lighter" />
             </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs">
+            <TooltipContent side="bottom" className="max-w-xs">
               {titleTooltip}
               {docsUrl && (
                 <>
@@ -279,7 +279,6 @@ export const ChartHeader = ({
       <div className="flex items-center gap-2">
         {sql ? (
           <ButtonTooltip
-            variant="default"
             className="px-1.5"
             asChild
             tooltip={{
@@ -290,16 +289,15 @@ export const ChartHeader = ({
             }}
           >
             <Link href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`}>
-              <SquareTerminal className="w-4 h-4 text-foreground-lighter" />
+              <SquareTerminalIcon className="w-4 h-4 text-foreground-lighter" />
             </Link>
           </ButtonTooltip>
         ) : null}
 
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
-            variant="default"
             className="px-1.5"
-            icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+            icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
             tooltip={{
               content: {

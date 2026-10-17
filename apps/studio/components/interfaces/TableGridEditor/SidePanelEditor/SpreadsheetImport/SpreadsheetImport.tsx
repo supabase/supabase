@@ -2,13 +2,7 @@ import type { PGTable } from '@supabase/pg-meta'
 import { noop } from 'lodash'
 import { useCallback, type ChangeEvent, type DragEvent } from 'react'
 import { toast } from 'sonner'
-import {
-  SidePanel,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+import { SidePanel, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import type { ImportContent } from '../TableEditor/TableEditor.types'

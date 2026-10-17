@@ -61,6 +61,12 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 MetricCard.displayName = 'MetricCard'
 
 interface MetricCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Renders the chevron affordance as a link. Omit the href (while keeping
+   * linkTooltip) when the card is already wrapped in a link — nesting an
+   * anchor within an anchor is invalid HTML, and clicks on the chevron will
+   * fall through to the wrapping link instead.
+   */
   href?: string
   children: React.ReactNode
   linkTooltip?: string
@@ -78,7 +84,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
         {...props}
       >
         <div className="flex flex-row items-center gap-2">{children}</div>
-        {href ? (
+        {href || linkTooltip ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -87,10 +93,17 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
                 className="px-1 text-foreground-lighter group-hover:text-foreground absolute right-3 transition-colors"
                 asChild
               >
-                <Link href={href}>
-                  <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
-                  <span className="sr-only">More information</span>
-                </Link>
+                {href ? (
+                  <Link href={href}>
+                    <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
+                    <span className="sr-only">More information</span>
+                  </Link>
+                ) : (
+                  <span>
+                    <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
+                    <span className="sr-only">More information</span>
+                  </span>
+                )}
               </Button>
             </TooltipTrigger>
             {linkTooltip ? <TooltipContent>{linkTooltip}</TooltipContent> : null}
@@ -129,7 +142,7 @@ const MetricCardIcon = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
 MetricCardIcon.displayName = 'MetricCardIcon'
 
 interface MetricCardLabelProps extends React.HTMLAttributes<HTMLDivElement> {
-  tooltip?: string
+  tooltip?: React.ReactNode
   children: React.ReactNode
 }
 
@@ -144,7 +157,7 @@ const MetricCardLabel = React.forwardRef<HTMLDivElement, MetricCardLabelProps>(
         <span>{children}</span>
         {tooltip && (
           <Tooltip>
-            <TooltipTrigger asChild>
+            <TooltipTrigger aria-label="More information">
               <HelpCircle size={14} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">{tooltip}</TooltipContent>
@@ -189,7 +202,7 @@ const MetricCardDifferential = React.forwardRef<HTMLDivElement, MetricCardDiffer
         ref={ref}
         className={cn(
           variant === 'positive'
-            ? 'text-brand'
+            ? 'text-primary'
             : variant === 'negative'
               ? 'text-destructive'
               : 'text-foreground-light',
@@ -250,8 +263,8 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
           <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--primary-bright)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--primary-bright)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <RechartsTooltip content={<SparklineTooltip />} />
@@ -260,7 +273,7 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
               dataKey={dataKey || 'value'}
               fill="url(#sparklineGradient)"
               fillOpacity={0.1}
-              stroke="hsl(var(--brand-default))"
+              stroke="var(--primary-bright)"
               strokeWidth={1.5}
             />
           </AreaChart>

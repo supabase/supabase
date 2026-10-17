@@ -58,12 +58,7 @@ export const ActionBar = ({
       {children}
 
       <div className="flex items-center gap-3 ml-auto">
-        <Button
-          variant="default"
-          type="button"
-          onClick={closePanel}
-          disabled={isRunning || loading}
-        >
+        <Button type="button" onClick={closePanel} disabled={isRunning || loading}>
           {backButtonLabel}
         </Button>
 

@@ -17,7 +17,7 @@ import {
   Switch,
 } from 'ui'
 
-import { Admonition } from '../admonition'
+import { Admonition } from '../Admonition'
 
 interface PrivacySettingsProps {
   className?: string
@@ -94,7 +94,9 @@ export const PrivacySettings = ({
         </DialogSection>
         <DialogFooter>
           <Button onClick={() => setIsOpen(false)}>Cancel</Button>
-          <Button onClick={handleConfirmPreferences}>Confirm</Button>
+          <Button variant="primary" onClick={handleConfirmPreferences}>
+            Confirm
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

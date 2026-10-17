@@ -1,7 +1,7 @@
 import type { components } from 'api-types'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -21,7 +21,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type EdgeFunctionsResponse = components['schemas']['FunctionResponse']
+type EdgeFunctionsResponse = components['schemas']['FunctionResponse_Output']
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const slugParam = req.query.slug

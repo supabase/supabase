@@ -15,16 +15,19 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     steps:
-      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
-          ref: master
+          ref: ${{ github.ref }}
+          # The PAT tables generator imports the shared catalog and its base tsconfig.
           sparse-checkout: |
             apps/docs
             patches
             packages/generator
+            packages/shared-data
+            packages/tsconfig
 
-      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         name: Install pnpm
         with:
           run_install: false
@@ -38,9 +41,9 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
-      - name: Change to apps/docs/spec directory and run make command
+      - name: Refresh Management API docs
         working-directory: apps/docs/spec
-        run: make download.api.v1 dereference.api.v1 generate.sections.api.v1 format
+        run: make download.api.v1 download.mcp-tools-permissions dereference.api.v1 generate.sections.api.v1 generate.partials.access-control format
 
       - name: Generate token
         id: app-token
@@ -57,6 +60,16 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           commit-message: 'feat: update mgmt api docs'
           title: 'feat: update mgmt api docs'
-          body: 'This PR updates mgmt api docs automatically.'
+          body: |
+            This PR updates Management API docs automatically.
+
+            This regenerates:
+
+            - Management API specs and sections
+            - Personal Access Tokens permission-to-endpoint table
+            - Personal Access Tokens MCP tool permissions table
+
+            Sources include the live Management API specs, MCP permission map,
+            and Studio's shared permission catalog.
           branch: 'gha/auto-update-mgmt-api-docs'
           base: 'master'

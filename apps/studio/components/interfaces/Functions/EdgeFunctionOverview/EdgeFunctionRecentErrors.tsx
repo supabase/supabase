@@ -1,4 +1,4 @@
-import { BookOpen, Check, ExternalLink, Eye } from 'lucide-react'
+import { BookOpenIcon, CheckIcon, ExternalLinkIcon, EyeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Fragment, useMemo } from 'react'
 import {
@@ -87,16 +87,16 @@ export const EdgeFunctionRecentErrors = ({
     logData: recentErrorInvocations,
     isLoading: isLoadingRecentErrorInvocations,
     error: recentErrorInvocationsError,
-  } = useLogsQuery(
-    projectRef as string,
-    {
+  } = useLogsQuery({
+    projectRef: projectRef!,
+    initialParams: {
       sql: recentErrorInvocationsSql,
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    isQueryEnabled,
-    { useOtel: true }
-  )
+    enabled: isQueryEnabled,
+    options: { useOtel: true },
+  })
 
   const recentErrorGroupsBase = useMemo(
     () => getRecentErrorGroupsBase(recentErrorInvocations),
@@ -106,16 +106,16 @@ export const EdgeFunctionRecentErrors = ({
     logData: sinceLastDeployInvocationCountRows,
     isLoading: isLoadingSinceLastDeployInvocationCount,
     error: sinceLastDeployInvocationCountError,
-  } = useLogsQuery(
-    projectRef as string,
-    {
+  } = useLogsQuery({
+    projectRef: projectRef!,
+    initialParams: {
       sql: sinceLastDeployInvocationCountSql,
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart),
-    { useOtel: true }
-  )
+    enabled: Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart),
+    options: { useOtel: true },
+  })
 
   const relatedExecutionIds = useMemo(
     () => getRelatedExecutionIds(recentErrorGroupsBase),
@@ -131,16 +131,16 @@ export const EdgeFunctionRecentErrors = ({
     logData: functionRuntimeLogs,
     isLoading: isLoadingFunctionRuntimeLogs,
     error: functionRuntimeLogsError,
-  } = useLogsQuery(
-    projectRef as string,
-    {
+  } = useLogsQuery({
+    projectRef: projectRef!,
+    initialParams: {
       sql: functionRuntimeLogsSql,
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart),
-    { useOtel: true }
-  )
+    enabled: Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart),
+    options: { useOtel: true },
+  })
   const queryError =
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 
@@ -173,14 +173,14 @@ export const EdgeFunctionRecentErrors = ({
   const emptyStateIcon =
     isoTimestampStart && !sinceLastDeployInvocationCountError ? (
       sinceLastDeployInvocationCount > 0 ? (
-        <Check
+        <CheckIcon
           size={16}
           strokeWidth={1.5}
-          className="mt-0.5 shrink-0 text-brand"
+          className="mt-0.5 shrink-0 text-primary"
           aria-hidden="true"
         />
       ) : (
-        <Eye
+        <EyeIcon
           size={16}
           strokeWidth={1.5}
           className="mt-0.5 shrink-0 text-foreground-muted"
@@ -204,13 +204,12 @@ export const EdgeFunctionRecentErrors = ({
           <div className="flex flex-col gap-6">
             <PageSectionMeta>
               <PageSectionSummary>
-                <PageSectionTitle>Errors since last deploy</PageSectionTitle>
+                <PageSectionTitle>Errors in the last 24h</PageSectionTitle>
               </PageSectionSummary>
               <PageSectionAside>
                 <Button
-                  variant="default"
                   size="tiny"
-                  icon={<ExternalLink size={14} />}
+                  icon={<ExternalLinkIcon size={14} />}
                   onClick={() =>
                     router.push(`/project/${projectRef}/functions/${functionSlug}/logs`)
                   }
@@ -302,7 +301,7 @@ export const EdgeFunctionRecentErrors = ({
                                   additionalDropdownItems={[
                                     {
                                       label: 'View troubleshooting guide',
-                                      icon: <BookOpen size={14} />,
+                                      icon: <BookOpenIcon size={14} />,
                                       onClick: () =>
                                         window.open(docsUrl, '_blank', 'noopener,noreferrer'),
                                     },

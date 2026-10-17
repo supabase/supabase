@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ComponentProps, useState } from 'react'
+import React, { useState } from 'react'
 import {
   AccordionContent,
   AccordionTrigger,
@@ -12,16 +12,13 @@ import {
 type Type = 'default' | 'bordered'
 type Align = 'left' | 'right'
 
-type BaseAccordionProps = ComponentProps<typeof Accordion>
-
 export interface AccordionProps {
   children?: React.ReactNode
   className?: string
   defaultActiveId?: (string | number)[]
   onChange?: (item: string | string[]) => void
-  openBehaviour: 'single' | 'multiple'
   type?: Type
-  defaultValue?: string | string[] | undefined
+  defaultValue?: string[] | undefined
   justified?: Boolean
   chevronAlign?: Align
 }
@@ -30,17 +27,15 @@ export function Accordion({
   children,
   className,
   onChange,
-  openBehaviour = 'multiple',
   defaultValue = undefined,
   // All props below are ignored but kept to avoid impacting all docs pages
-  type = 'default',
-  justified = false,
-  chevronAlign = 'right',
+  // type = 'default',
+  // justified = false,
+  // chevronAlign = 'right',
 }: AccordionProps) {
   return (
-    // @ts-expect-error: This is because the Radix component has 2 interfaces discriminated by its type prop. Safe to ignore
     <BaseAccordion
-      type={openBehaviour}
+      type="multiple"
       onValueChange={onChange}
       defaultValue={defaultValue}
       className={className}

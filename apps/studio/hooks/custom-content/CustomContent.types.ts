@@ -5,6 +5,10 @@ export type CustomContentTypes = {
 
   dashboardAuthCustomProvider: string
 
+  dashboardAuthCustomProviders: string[]
+
+  dashboardAuthLogoLinkUrl: string
+
   docsRowLevelSecurityGuidePath: string
 
   organizationLegalDocuments: {
@@ -35,4 +39,6 @@ export type CustomContentTypes = {
   infraAwsNimbusLabel: string
 
   sslCertificateUrl: string
+
+  statusPageVisibilityFieldIds: Array<string>
 }

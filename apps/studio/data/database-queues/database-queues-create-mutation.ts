@@ -8,7 +8,7 @@ import {
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { tableKeys } from '@/data/tables/keys'
+import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueCreateVariables = {
@@ -75,9 +75,15 @@ export const useDatabaseQueueCreateMutation = ({
   return useMutation<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>({
     mutationFn: (vars) => createDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
-      queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, 'pgmq') })
+      const { projectRef, name } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) }),
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: 'pgmq',
+          tableName: pgmqQueueTable(name),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -20,11 +20,11 @@
   --code-token-keyword: #6b35dc;
   --code-foreground: oklch(from var(--foreground-light) l c h / 1);
   --code-token-constant: #15593b;
-  --code-token-string: #f1a10d;
+  --code-token-string: #c46a0a;
   --code-token-comment: #7e7e7e;
   --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
   --code-token-function: #15593b;
-  --code-token-string-expression: #f1a10d;
+  --code-token-string-expression: #c46a0a;
   --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
   --code-token-link: oklch(from var(--foreground-light) l c h / 1);
   --code-token-number: oklch(from var(--foreground-light) l c h / 1);
