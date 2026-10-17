@@ -11,11 +11,9 @@ hideToc: true
 
 You should connect to your database using SSL wherever possible, to prevent snooping and man-in-the-middle attacks.
 
-You can obtain your connection info and Server root certificate from your application's dashboard:
+To download the server root certificate, go to [Database Settings](/dashboard/project/_/database/settings) in the dashboard, find the **SSL Configuration** section, and select **Download certificate**. Save it as `/path/to/prod-supabase.cer`.
 
 ![Connection Info and Certificate.](/docs/img/database/database-settings-ssl.png)
-
-Download your [SSL certificate](#connecting-with-ssl) to `/path/to/prod-supabase.cer`.
 
 Find your connection settings. Go to the project [**Connect** panel](/dashboard/project/_?showConnect=true&method=session) and copy the URL from the `Session pooler` section, and copy the parameters into the connection string:
 
