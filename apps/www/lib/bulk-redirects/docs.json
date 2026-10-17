@@ -1,0 +1,17 @@
+[
+  {
+    "permanent": true,
+    "source": "/docs/guides/api/api-keys",
+    "destination": "/docs/guides/getting-started/api-keys"
+  },
+  {
+    "permanent": true,
+    "source": "/docs/reference/javascript/delete-user",
+    "destination": "/docs/reference/javascript/auth-api-deleteuser"
+  },
+  {
+    "permanent": false,
+    "source": "/docs/library/authentication",
+    "destination": "/docs/guides/auth"
+  }
+]

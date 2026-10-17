@@ -1,0 +1,7 @@
+[
+  {
+    "permanent": true,
+    "source": "/blog/pricing",
+    "destination": "/pricing"
+  }
+]

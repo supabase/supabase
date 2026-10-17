@@ -33,6 +33,24 @@ generators, a stub compiler, and a fake AWS CLI.
 - **Compress images**: All new images should be compressed before committing. Use tools like Clop or ImageOptim to reduce file size without noticeable quality loss.
 - **Image locations**: Store blog post images in `apps/www/public/images/blog/`. Event images go in `apps/www/public/images/events/`. Customer logos go in `apps/www/public/images/customers/logos/on-light/` and `on-dark/` (see Customer Stories below).
 
+### Redirects
+
+Supabase.com uses two complementary redirect systems depending on the redirect type:
+
+**Static, 1-to-1 redirects** → `apps/www/lib/bulk-redirects/` (Vercel edge layer via `vercel.json`)
+
+- Simple fixed-path-to-path mappings (e.g., `/docs/guides/old-page` → `/docs/guides/new-page`)
+- Fast, low-overhead
+- See `apps/www/lib/bulk-redirects/README.md` for details
+
+**Dynamic, pattern-based redirects** → `apps/www/lib/redirects.js` (Next.js `redirects()` function)
+
+- Path variables and pattern matching (e.g., `/images/customers/logos/:slug*`)
+- Conditional logic
+- Used when static 1-to-1 mapping isn't sufficient
+
+See the bulk redirects README for decision guidance: if your redirect has no variables or complex matching, use bulk redirects. Otherwise, use `lib/redirects.js`.
+
 ### OG image generation
 
 Open Graph (OG) images for social sharing are handled differently across content types:

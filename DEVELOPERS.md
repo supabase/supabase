@@ -175,7 +175,22 @@ We review PRs in the order of their submission. We try to accept the earliest on
 
 ### Add a redirect
 
-Create a new entry in the [`redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js) file in our main site.
+Supabase.com uses two complementary redirect systems:
+
+**For static, 1-to-1 redirects** (simple `/old → /new` mappings):
+
+- Add to [`apps/www/lib/bulk-redirects/`](https://github.com/supabase/supabase/tree/master/apps/www/lib/bulk-redirects)
+- Served by Vercel's edge layer via `vercel.json`
+- Fast and low-overhead
+- See [`apps/www/lib/bulk-redirects/README.md`](https://github.com/supabase/supabase/blob/master/apps/www/lib/bulk-redirects/README.md) for examples and structure
+
+**For dynamic, pattern-based redirects** (path variables, conditional logic):
+
+- Create a new entry in [`apps/www/lib/redirects.js`](https://github.com/supabase/supabase/blob/master/apps/www/lib/redirects.js)
+- Handled by Next.js's `redirects()` function
+- Use when static 1-to-1 mapping isn't sufficient (e.g., paths with `:path*`, `:slug`, regex patterns)
+
+**Decision rule:** If your redirect has no variables or complex matching, use bulk redirects. Otherwise, use `lib/redirects.js`.
 
 ---
 
