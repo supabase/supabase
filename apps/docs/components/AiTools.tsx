@@ -3,7 +3,7 @@
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { askAiUrls, useCopyMarkdownFromUrl } from 'common'
 import { type MarkdownAffordancePageType } from 'common/telemetry-constants'
-import { Chatgpt, Claude } from 'icons'
+import { Chatgpt, Claude, Google } from 'icons'
 import { Check, Copy, Sparkles } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -13,11 +13,13 @@ function AiTools({
   pageType,
   articleId,
   showAgentSetup = false,
+  showPreferredSource = false,
   className,
 }: {
   pageType: MarkdownAffordancePageType
   articleId: string
   showAgentSetup?: boolean
+  showPreferredSource?: boolean
   className?: string
 }) {
   const path = usePathname()
@@ -107,6 +109,21 @@ function AiTools({
           <Claude size={14} aria-hidden />
           Ask Claude
         </a>
+        {showPreferredSource && (
+          <a
+            href="https://www.google.com/preferences/source?q=supabase.com"
+            target="_blank"
+            title="Add Supabase as a preferred source on Google"
+            rel="noreferrer noopener"
+            onClick={() =>
+              sendTelemetryEvent({ action: 'preferred_source_clicked', properties: { pageType } })
+            }
+            className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+          >
+            <Google size={14} aria-hidden />
+            Prefer on Google
+          </a>
+        )}
       </div>
     </section>
   )

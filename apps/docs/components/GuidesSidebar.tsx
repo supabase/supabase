@@ -52,6 +52,7 @@ const GuidesSidebar = ({
             pageType="guide"
             articleId="sb-docs-guide-main-article"
             showAgentSetup
+            showPreferredSource
           />
         </div>
         {!hideToc && toc.length !== 0 && (
