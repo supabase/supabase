@@ -1002,6 +1002,17 @@ You can now use any Supabase feature from your client or server code.
 </TabPanel>
 </Tabs>
 
+## Handle the auth callback
+
+`createBrowserClient` and `createServerClient` always use the [PKCE flow](/docs/guides/auth/sessions/pkce-flow). Sign-in methods that send the user away and back, such as OAuth, magic links, email confirmation, and password reset, return a one-time parameter in the URL instead of a session. Your app needs a route that exchanges it for a session and writes the auth cookies. This is the `/auth/callback` or `/auth/confirm` route you see in the Supabase starter templates.
+
+Which route you need depends on how the user returns to your app:
+
+- Provider redirects, such as OAuth, arrive with a `code` parameter, which you exchange with `exchangeCodeForSession`. See [Social login](/docs/guides/auth/social-login) for the route code for each framework.
+- Email links arrive with a `token_hash` parameter, which you verify with `verifyOtp`, once you update your email templates to send one. See [Password-based Auth](/docs/guides/auth/passwords) and [Passwordless email sign-in](/docs/guides/auth/auth-email-passwordless).
+
+Add every callback route to your [redirect allow list](/docs/guides/auth/redirect-urls).
+
 ## Choosing an auth method
 
 <$Partial path="auth_methods.mdx" />
