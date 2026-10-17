@@ -49,7 +49,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "config": "workspace:*",
-    "dotenv": "^16.5.0",
+    "dotenv": "^18.0.7",
     "lodash-es": "catalog:",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
