@@ -147,7 +147,7 @@ const user = useSupabaseUser()
 const { data } = await supabase
   .from('profiles')
   .select(`username, website, avatar_url`)
-  .eq('id', user.value.id)
+  .eq('id', user.value.sub)
   .single()
 
 if (data) {
@@ -164,7 +164,7 @@ async function updateProfile() {
     const user = useSupabaseUser()
 
     const updates = {
-      id: user.value.id,
+      id: user.value.sub,
       username: username.value,
       website: website.value,
       avatar_url: avatar_path.value,
