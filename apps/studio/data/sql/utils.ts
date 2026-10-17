@@ -30,6 +30,71 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
   return sql.replace(/;+\s*$/, '') as SafeSqlFragment
 }
 
+// Recognize an outer LIMIT ALL/NULL without interpreting the rest of the SQL.
+// OFFSET accepts expressions, so a suffix regex cannot reliably identify these
+// clauses. Ignore quoted text, comments, and parenthesized subqueries while
+// looking for the two keywords; leave all other auto-limit rules unchanged.
+function hasOuterUnlimitedLimit(sql: string): boolean {
+  let depth = 0
+  let previousWord = ''
+
+  for (let i = 0; i < sql.length; ) {
+    const char = sql[i]
+    const next = sql[i + 1]
+    const dollarQuote = char === '$' ? /^\$(?:[a-zA-Z_]\w*)?\$/.exec(sql.slice(i)) : null
+
+    if (char === '-' && next === '-') {
+      const end = sql.indexOf('\n', i + 2)
+      i = end < 0 ? sql.length : end + 1
+    } else if (char === '/' && next === '*') {
+      let commentDepth = 1
+      i += 2
+      while (i < sql.length && commentDepth > 0) {
+        if (sql.startsWith('/*', i)) {
+          commentDepth++
+          i += 2
+        } else if (sql.startsWith('*/', i)) {
+          commentDepth--
+          i += 2
+        } else {
+          i++
+        }
+      }
+    } else if (char === "'" || char === '"') {
+      const quote = char
+      const escapeString =
+        quote === "'" && /[eE]/.test(sql[i - 1] ?? '') && !/[\w$]/.test(sql[i - 2] ?? '')
+      previousWord = ''
+      i++
+      while (i < sql.length) {
+        if (escapeString && sql[i] === '\\') i += 2
+        else if (sql[i] === quote && sql[i + 1] === quote) i += 2
+        else if (sql[i++] === quote) break
+      }
+    } else if (dollarQuote) {
+      const delimiter = dollarQuote[0]
+      const end = sql.indexOf(delimiter, i + delimiter.length)
+      previousWord = ''
+      i = end < 0 ? sql.length : end + delimiter.length
+    } else if (/[a-zA-Z_]/.test(char)) {
+      const start = i
+      while (i < sql.length && /[\w$]/.test(sql[i])) i++
+      const word = sql.slice(start, i).toLowerCase()
+      if (depth === 0 && previousWord === 'limit' && (word === 'all' || word === 'null')) {
+        return true
+      }
+      previousWord = depth === 0 ? word : ''
+    } else {
+      if (char === '(') depth++
+      if (char === ')') depth--
+      if (!/\s/.test(char)) previousWord = ''
+      i++
+    }
+  }
+
+  return false
+}
+
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
 // This is to prevent dashboard from accidentally appending limit to the end of a query
 // thats not supposed to have any, since there's too many cases to cover.
@@ -68,6 +133,7 @@ export function applyAutoLimit(
     !cleanedSql.toLowerCase().match(/fetch\s+(first|next)/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
+    !hasOuterUnlimitedLimit(sql) &&
     !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
     !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
 

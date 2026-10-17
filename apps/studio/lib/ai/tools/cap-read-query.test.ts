@@ -30,6 +30,15 @@ describe('capReadQuery', () => {
     )
   })
 
+  it.each([safeSql`select 1 limit all offset (2);`, safeSql`select 1 limit null offset (2);`])(
+    'applies an outer database cap to %s',
+    (query) => {
+      const { sql, isCappedInDatabase } = capReadQuery(query, 101)
+      expect(isCappedInDatabase).toBe(true)
+      expect(sql).toBe(`select * from (\n${query.slice(0, -1)}\n) as capped_result limit 101;`)
+    }
+  )
+
   it('wraps FETCH FIRST and CTE queries', () => {
     expect(
       capReadQuery(safeSql`select * from users fetch first 5000 rows only`, 101).isCappedInDatabase
