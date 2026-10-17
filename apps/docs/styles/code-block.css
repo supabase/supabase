@@ -12,7 +12,7 @@
 }
 
 /* Code blocks need margin applied when in content container */
-.prose :where(.shiki:not(.shiki-wrapper *), .shiki-wrapper) {
+.prose :where(.shiki, .shiki-wrapper):where(:not(.shiki-wrapper *)) {
   margin-block: 2rem;
 }
 
@@ -35,9 +35,11 @@
   --code-highlight-color: #232323;
   --shadow-codeblock:
     0 0 0 0 var(--border-default), 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --drop-shadow-codeblock: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }
 [data-theme='light'],
 .light {
+  --shadow-codeblock: 0 0 #0000;
   --code-token-keyword: #5f2fc4;
   --code-foreground: oklch(from var(--foreground-light) l c h / 1);
   --code-token-constant: #15593b;
@@ -110,4 +112,29 @@
 
 .shadow-codeblock {
   box-shadow: var(--shadow-codeblock, none);
+}
+
+.shiki-wrapper {
+  --tab-flare-ring:
+    transparent 6.75px, var(--border-color-default) 7.25px, var(--border-color-default) 7.75px,
+    transparent 8.25px;
+  --tab-flare-fill: transparent 6.75px, var(--background-color-200) 7.25px;
+  --tab-flare-left:
+    radial-gradient(circle at 0 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 0 0, var(--tab-flare-fill));
+  --tab-flare-right:
+    radial-gradient(circle at 100% 0, var(--tab-flare-ring)),
+    radial-gradient(circle at 100% 0, var(--tab-flare-fill));
+}
+
+.codeblock-drop-shadow {
+  filter: var(--drop-shadow-codeblock, none);
+}
+
+.code-sample-source :is(.shiki, .code-sample-surface) {
+  mask:
+    linear-gradient(#000 0 0),
+    var(--source-notch-mask) right -2px bottom -2px / var(--source-notch-mask-width) 42px no-repeat;
+  mask-composite: exclude;
+  mask-clip: no-clip;
 }

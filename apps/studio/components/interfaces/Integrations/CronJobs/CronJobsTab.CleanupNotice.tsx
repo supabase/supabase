@@ -1,5 +1,5 @@
 import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2Icon, XCircleIcon } from 'lucide-react'
 import {
   Button,
   Dialog,
@@ -240,8 +240,8 @@ interface DeletionSuccessProps {
 }
 
 const DeletionSuccess = ({ totalRowsDeleted }: DeletionSuccessProps) => (
-  <div className="flex items-center gap-2 text-brand">
-    <CheckCircle2 size={16} />
+  <div className="flex items-center gap-2 text-primary">
+    <CheckCircle2Icon size={16} />
     <span className="text-sm">Successfully deleted {totalRowsDeleted.toLocaleString()} rows.</span>
   </div>
 )
@@ -254,7 +254,7 @@ interface DeletionErrorProps {
 const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
   <div className="space-y-2">
     <div className="flex items-center gap-2 text-destructive">
-      <XCircle size={16} />
+      <XCircleIcon size={16} />
       <span className="text-sm">Deletion failed: {error}</span>
     </div>
     <Button size="small" onClick={onRetry}>
@@ -265,8 +265,8 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
 
 const ScheduleSuccess = () => (
   <div className="space-y-2">
-    <div className="flex items-center gap-2 text-brand">
-      <CheckCircle2 size={16} />
+    <div className="flex items-center gap-2 text-primary">
+      <CheckCircle2Icon size={16} />
       <span className="text-sm">Daily cleanup job scheduled successfully.</span>
     </div>
     <div className="flex items-center gap-2">

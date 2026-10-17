@@ -5,7 +5,7 @@ import { TOOLTIP_UNDERLINE_CLASS_NAME } from './DetailSubtext'
 import { getPipelineDisplayState, getStatusName } from './Pipeline.utils'
 import type { PipelineDisplayType } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import { StateDot, type StateDotVariant } from './StateDot'
+import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 import type { ResponseError } from '@/types'
@@ -56,7 +56,7 @@ export const PipelineStatePill = ({
     return (
       <span className="inline-flex" aria-live="polite" aria-atomic="true">
         <span className="sr-only">Loading pipeline status</span>
-        <ShimmeringLoader className="w-20" />
+        <ShimmeringLoader className="h-5 w-20 py-0" />
       </span>
     )
   }
@@ -81,7 +81,7 @@ export const PipelineStatePill = ({
             {shouldShowError ? 'Unknown' : label}
           </StateDot>
         </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-xs">
+        <TooltipContent side="bottom" className="max-w-64">
           {tooltipMessage}
           {isError && isRequestPending && ` Unable to refresh status: ${error?.message}.`}
         </TooltipContent>

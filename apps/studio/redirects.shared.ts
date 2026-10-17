@@ -41,6 +41,30 @@ export const SELF_HOSTED_REDIRECTS: StudioRedirect[] = [
 ]
 
 export const SHARED_REDIRECTS: StudioRedirect[] = [
+  { source: '/project', destination: '/organizations', permanent: true },
+  { source: '/account', destination: '/account/me', permanent: true },
+  { source: '/org/:slug/projects', destination: '/org/:slug', permanent: true },
+  {
+    source: '/project/:ref/database/backups',
+    destination: '/project/:ref/database/backups/scheduled',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/auth/emails',
+    destination: '/project/:ref/auth/templates',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/logs/edge-functions',
+    destination: '/project/:ref/logs/edge-functions-logs',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/settings/vault',
+    destination: '/project/:ref/integrations/vault/secrets',
+    permanent: true,
+  },
+  { source: '/project/:ref/settings/billing', destination: '/org/_/billing', permanent: true },
   { source: '/project/:ref/auth', destination: '/project/:ref/auth/users', permanent: true },
   {
     source: '/project/:ref/auth/advanced',
@@ -122,6 +146,16 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   {
     source: '/project/:ref/database/replication/replica/:replicaId',
     destination: '/project/:ref/settings/infrastructure/replica/:replicaId',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication',
+    destination: '/project/:ref/database/pipelines',
+    permanent: true,
+  },
+  {
+    source: '/project/:ref/database/replication/:pipelineId',
+    destination: '/project/:ref/database/pipelines/:pipelineId',
     permanent: true,
   },
   {

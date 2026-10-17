@@ -78,6 +78,21 @@ See the [React client](/library/docs/react/client).
     expect(output).toMatch(/https:\/\/supabase\.com\/library\/docs\/react\/client\.md/)
   })
 
+  it('resolves a relative link from an index document within its own directory', () => {
+    const output = transformLibraryMdx(
+      `---
+title: Foo
+description: Foo
+---
+
+See the [child page](./child).
+`,
+      { documentSlugs: new Set(['foo', 'foo/child']), documentBasePath: 'foo/index' }
+    )
+
+    expect(output).toMatch(/https:\/\/supabase\.com\/library\/docs\/foo\/child\.md/)
+  })
+
   it('rewrites documentation links nested inside components', () => {
     const output = transformLibraryMdx(`---
 title: Auth

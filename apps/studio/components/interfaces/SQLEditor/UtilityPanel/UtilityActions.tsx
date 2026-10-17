@@ -1,6 +1,13 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { AlignLeft, Check, ChevronDown, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import {
+  AlignLeftIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  HeartIcon,
+  KeyboardIcon,
+  MoreVerticalIcon,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -117,7 +124,7 @@ export const UtilityActions = ({
                 aria-label="More actions"
                 data-testid="sql-editor-utility-actions"
                 className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
-                icon={<MoreVertical className="text-foreground-light" />}
+                icon={<MoreVerticalIcon className="text-foreground-light" />}
               />
             </DropdownMenuTrigger>
           </TooltipTrigger>
@@ -126,20 +133,22 @@ export const UtilityActions = ({
         <DropdownMenuContent className="w-48">
           <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
             <span className="flex items-center gap-x-2">
-              <Keyboard size={14} className="text-foreground-light" />
+              <KeyboardIcon size={14} className="text-foreground-light" />
               Intellisense enabled
             </span>
-            {intellisenseEnabled && <Check className="text-brand" size={16} />}
+            {intellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
           </DropdownMenuItem>
           {IS_PLATFORM && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="gap-x-2" onClick={() => saveFavorite(id, !isFavorite)}>
-                <Heart
+                <HeartIcon
                   size={14}
                   strokeWidth={2}
                   className={
-                    isFavorite ? 'fill-brand stroke-none' : 'fill-none stroke-foreground-light'
+                    isFavorite
+                      ? 'fill-primary-bright stroke-none'
+                      : 'fill-none stroke-foreground-light'
                   }
                 />
                 {isFavorite ? 'Remove from' : 'Add to'} favorites
@@ -158,7 +167,7 @@ export const UtilityActions = ({
             }}
           >
             <span className="flex items-center gap-x-2">
-              <AlignLeft size={14} strokeWidth={2} className="text-foreground-light" />
+              <AlignLeftIcon size={14} strokeWidth={2} className="text-foreground-light" />
               Prettify SQL
             </span>
             {formatKeys && <KeyboardShortcut keys={formatKeys} />}
@@ -174,7 +183,7 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   className="px-1"
-                  icon={<Keyboard className="text-foreground-light" />}
+                  icon={<KeyboardIcon className="text-foreground-light" />}
                   aria-label="Enable Intellisense"
                 />
               </DropdownMenuTrigger>
@@ -184,7 +193,7 @@ export const UtilityActions = ({
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
               Intellisense enabled
-              {intellisenseEnabled && <Check className="text-brand" size={16} />}
+              {intellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -198,7 +207,7 @@ export const UtilityActions = ({
                   size="tiny"
                   onClick={() => saveFavorite(id, false)}
                   className="px-1"
-                  icon={<Heart className="fill-brand stroke-none" />}
+                  icon={<HeartIcon className="fill-primary-bright stroke-none" />}
                   aria-label="Remove from favorites"
                 />
               ) : (
@@ -207,7 +216,7 @@ export const UtilityActions = ({
                   size="tiny"
                   onClick={() => saveFavorite(id, true)}
                   className="px-1"
-                  icon={<Heart className="fill-none stroke-foreground-light" />}
+                  icon={<HeartIcon className="fill-none stroke-foreground-light" />}
                   aria-label="Add to favorites"
                 />
               )}
@@ -223,7 +232,7 @@ export const UtilityActions = ({
           onClick={prettifyQuery}
           disabled={isLogs}
           className="px-1"
-          icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
+          icon={<AlignLeftIcon strokeWidth={2} className="text-foreground-light" />}
           aria-label="Prettify SQL"
           tooltip={{
             content: {
@@ -268,7 +277,7 @@ export const UtilityActions = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button iconRight={<ChevronDown size={14} className="text-foreground-light" />}>
+                <Button iconRight={<ChevronDownIcon size={14} className="text-foreground-light" />}>
                   <span className="text-foreground-light">Limit</span>{' '}
                   {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
                 </Button>

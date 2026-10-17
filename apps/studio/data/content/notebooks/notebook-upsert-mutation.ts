@@ -69,17 +69,17 @@ export async function upsertNotebook(
 
 export type UpdateNotebookData = Awaited<ReturnType<typeof upsertNotebook>>
 
-export const useUpsertNotebookMutation = ({
+export const useUpsertNotebookMutation = <TContext = unknown>({
   onError,
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdateNotebookData, ResponseError, UpsertNotebookVariables>,
+  UseCustomMutationOptions<UpdateNotebookData, ResponseError, UpsertNotebookVariables, TContext>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateNotebookData, ResponseError, UpsertNotebookVariables>({
+  return useMutation<UpdateNotebookData, ResponseError, UpsertNotebookVariables, TContext>({
     mutationFn: (args) => upsertNotebook(args),
     async onSuccess(data, variables, context) {
       const { projectRef, id } = variables

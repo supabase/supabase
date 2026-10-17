@@ -64,4 +64,41 @@ describe('useDashboardHistory', () => {
       expect(result.current.history.editor).toBe('table-1')
     })
   })
+
+  describe('setLastVisitedExplorerTab', () => {
+    it('stores the last visited Explorer tab', async () => {
+      const { result } = await renderDashboardHistory()
+
+      act(() => result.current.setLastVisitedExplorerTab({ type: 'notebook', id: 'notebook-1' }))
+
+      await waitFor(() =>
+        expect(result.current.history.explorer).toEqual({ type: 'notebook', id: 'notebook-1' })
+      )
+    })
+
+    it('clears the last visited Explorer tab when called with undefined', async () => {
+      const { result } = await renderDashboardHistory()
+
+      act(() => result.current.setLastVisitedExplorerTab({ type: 'chat', id: 'chat-1' }))
+      await waitFor(() => expect(result.current.history.explorer).toBeDefined())
+
+      act(() => result.current.setLastVisitedExplorerTab(undefined))
+
+      await waitFor(() => expect(result.current.history.explorer).toBeUndefined())
+    })
+
+    it('does not touch the SQL or table editor history', async () => {
+      const { result } = await renderDashboardHistory()
+
+      act(() => result.current.setLastVisitedSnippet('snippet-a'))
+      await waitFor(() => expect(result.current.history.sql).toBe('snippet-a'))
+
+      act(() => result.current.setLastVisitedExplorerTab({ type: 'query', id: 'query-1' }))
+
+      await waitFor(() =>
+        expect(result.current.history.explorer).toEqual({ type: 'query', id: 'query-1' })
+      )
+      expect(result.current.history.sql).toBe('snippet-a')
+    })
+  })
 })

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { BookText } from 'lucide-react'
+import { BookTextIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   InnerSideMenuCollapsible,
@@ -51,7 +51,7 @@ export function ReferenceSnippetsSection() {
               href={`/project/${ref}/sql/${pageId}`}
               className="capitalize"
             >
-              <BookText size={16} className="text-foreground-muted" />
+              <BookTextIcon size={16} className="text-foreground-muted" />
               {pageId}
             </InnerSideMenuDataItem>
           )

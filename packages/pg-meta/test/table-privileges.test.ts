@@ -453,3 +453,111 @@ withTestDatabase(
     )
   }
 )
+
+// Reads grants through `information_schema` instead of snapshotting the whole privilege list, so
+// the assertions don't depend on which privileges a Postgres version adds (e.g. `MAINTAIN`).
+const tableGrants = async (
+  executeQuery: <T = any>(query: string) => Promise<T>,
+  schema: string,
+  table: string,
+  grantees: string[]
+) => {
+  const rows = await executeQuery<
+    { grantee: string; privilege_type: string; is_grantable: string }[]
+  >(`
+    select grantee, privilege_type, is_grantable
+    from information_schema.table_privileges
+    where table_schema = '${schema.replaceAll("'", "''")}'
+      and table_name = '${table.replaceAll("'", "''")}'
+      and grantee in (${grantees.map((g) => `'${g.replaceAll("'", "''")}'`).join(', ')})
+    order by grantee, privilege_type
+  `)
+  return rows.map((r) => `${r.grantee}:${r.privilege_type}:${r.is_grantable}`)
+}
+
+withTestDatabase(
+  'grant & revoke table privileges in a schema and table that need quoting',
+  async ({ executeQuery }) => {
+    const role = `tp_quoted_${Date.now()}`
+    await executeQuery(
+      `create role ${role}; create schema "My Schema"; create table "My Schema"."Weird Table"();`
+    )
+    try {
+      const { sql: listSql, zod: listZod } = await pgMeta.tablePrivileges.list()
+      const { relation_id } = listZod
+        .parse(await executeQuery(listSql))
+        .find(({ schema, name }) => schema === 'My Schema' && name === 'Weird Table')!
+
+      // `isGrantable`, a role grantee and the `public` pseudo-role (any casing) in one call.
+      await executeQuery(
+        pgMeta.tablePrivileges.grant([
+          { relationId: relation_id, grantee: role, privilegeType: 'SELECT' },
+          { relationId: relation_id, grantee: role, privilegeType: 'INSERT', isGrantable: true },
+          { relationId: relation_id, grantee: 'PUBLIC', privilegeType: 'UPDATE' },
+        ]).sql
+      )
+      expect(await tableGrants(executeQuery, 'My Schema', 'Weird Table', [role, 'PUBLIC'])).toEqual(
+        [`PUBLIC:UPDATE:NO`, `${role}:INSERT:YES`, `${role}:SELECT:NO`]
+      )
+
+      await executeQuery(
+        pgMeta.tablePrivileges.revoke([
+          { relationId: relation_id, grantee: role, privilegeType: 'INSERT' },
+          { relationId: relation_id, grantee: 'public', privilegeType: 'UPDATE' },
+        ]).sql
+      )
+      expect(await tableGrants(executeQuery, 'My Schema', 'Weird Table', [role, 'PUBLIC'])).toEqual(
+        [`${role}:SELECT:NO`]
+      )
+    } finally {
+      await executeQuery(`drop owned by ${role}; drop role ${role};`)
+    }
+  }
+)
+
+withTestDatabase(
+  'grant & revoke table privileges for a role whose name has quotes',
+  async ({ executeQuery }) => {
+    const role = `it's a "role" ${Date.now()}`
+    const quotedRole = `"${role.replaceAll('"', '""')}"`
+    await executeQuery(`create role ${quotedRole};`)
+    try {
+      const { sql: listSql, zod: listZod } = await pgMeta.tablePrivileges.list()
+      const { relation_id } = listZod
+        .parse(await executeQuery(listSql))
+        .find(({ schema, name }) => schema === 'public' && name === 'todos')!
+
+      await executeQuery(
+        pgMeta.tablePrivileges.grant([
+          { relationId: relation_id, grantee: role, privilegeType: 'SELECT', isGrantable: true },
+        ]).sql
+      )
+      expect(await tableGrants(executeQuery, 'public', 'todos', [role])).toEqual([
+        `${role}:SELECT:YES`,
+      ])
+
+      await executeQuery(
+        pgMeta.tablePrivileges.revoke([
+          { relationId: relation_id, grantee: role, privilegeType: 'SELECT' },
+        ]).sql
+      )
+      expect(await tableGrants(executeQuery, 'public', 'todos', [role])).toEqual([])
+    } finally {
+      await executeQuery(`drop owned by ${quotedRole}; drop role ${quotedRole};`)
+    }
+  }
+)
+
+withTestDatabase(
+  'grant table privileges for a table that does not exist',
+  async ({ executeQuery }) => {
+    // A dropped table leaves the subselects with no row, which `%I` rejects.
+    await expect(
+      executeQuery(
+        pgMeta.tablePrivileges.grant([
+          { relationId: 2147483000, grantee: 'postgres', privilegeType: 'SELECT' },
+        ]).sql
+      )
+    ).rejects.toThrow()
+  }
+)

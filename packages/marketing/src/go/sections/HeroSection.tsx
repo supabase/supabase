@@ -33,7 +33,7 @@ export default function HeroSection({
       >
         <div className={cn(hasMedia ? 'flex flex-col gap-4 sm:gap-6' : 'contents')}>
           {section.subtitle && (
-            <p className="text-sm text-brand-link uppercase font-mono tracking-wider">
+            <p className="text-sm text-primary uppercase font-mono tracking-wider">
               {section.subtitle}
             </p>
           )}
@@ -43,7 +43,7 @@ export default function HeroSection({
           {section.description && (
             <p
               className={cn(
-                'text-lg leading-relaxed text-foreground-light text-pretty',
+                'text-lg leading-relaxed text-foreground-light text-pretty whitespace-pre-line',
                 !hasMedia && 'md:text-xl md:text-foreground max-w-2xl'
               )}
             >

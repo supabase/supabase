@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { PGTrigger } from '@supabase/pg-meta'
-import { Terminal } from 'lucide-react'
+import { TerminalIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -432,7 +432,7 @@ export const TriggerSheet = ({
                                 onClick={() => setShowFunctionSelector(true)}
                               >
                                 <FormBoxEmpty
-                                  icon={<Terminal size={14} strokeWidth={2} />}
+                                  icon={<TerminalIcon size={14} strokeWidth={2} />}
                                   text="Choose a function to trigger"
                                 />
                               </button>
@@ -446,7 +446,7 @@ export const TriggerSheet = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-foreground text-background focus-within:bg-foreground/10">
-                                    <Terminal size="18" strokeWidth={2} width={14} />
+                                    <TerminalIcon size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>
                                     <span className="text-sm text-foreground-light">

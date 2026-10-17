@@ -48,7 +48,7 @@ export default function ComposedChartBasic() {
   const chartConfig = {
     standard_score: {
       label: 'Standard Score',
-      color: 'hsl(var(--brand-default))',
+      color: 'var(--primary-bright)',
     },
     performance: {
       label: 'Performance',

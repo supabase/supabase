@@ -172,6 +172,12 @@ describe('applyAutoLimit', () => {
     const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
+  test('Should return false if query uses `FETCH NEXT` instead of limit ', () => {
+    const sql = safeSql`select * from countries offset 5 rows FETCH NEXT 5 rows only`
+    const { sql: result, appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+    expect(result).toBe(sql)
+  })
   test('Should return false if query is not a select statement', () => {
     const sql = safeSql`create table test (id int8 primary key, name varchar);`
     const limit = 100

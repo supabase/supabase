@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { configKeys } from '../config/keys'
 import { databaseKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
@@ -58,7 +59,10 @@ export const usePgbouncerConfigurationUpdateMutation = ({
     mutationFn: (vars) => updatePgbouncerConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { ref } = variables
-      await queryClient.invalidateQueries({ queryKey: databaseKeys.pgbouncerConfig(ref) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseKeys.pgbouncerConfig(ref) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(ref) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { TableEditor } from 'icons'
-import { MoreVertical, RotateCcw } from 'lucide-react'
+import { MoreVerticalIcon, RotateCcwIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -13,10 +13,10 @@ import {
 } from 'ui'
 
 import { ErroredTableDetails } from '../ErroredTableDetails'
-import { StateDot } from '../StateDot'
 import { SlotLagMetrics as SlotLagMetricsType, TableState } from './ReplicationPipelineStatus.types'
 import { getStatusConfig, getTableSyncLagLabel } from './ReplicationPipelineStatus.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { StateDot } from '@/components/ui/StateDot'
 import { ReplicationPipelineTableStatus } from '@/data/replication/pipeline-replication-status-query'
 
 interface TableReplicationRowProps {
@@ -62,7 +62,10 @@ export const TableReplicationRow = ({
 
   return (
     <TableRow>
-      <TableCell>{tableName}</TableCell>
+      <TableCell>
+        <span className="text-foreground-lighter">{table.schema}.</span>
+        <span className="text-foreground">{table.name}</span>
+      </TableCell>
 
       <TableCell>
         {isRestarting ? (
@@ -112,7 +115,7 @@ export const TableReplicationRow = ({
                 variant="default"
                 className="px-1.25 hit-area-2"
                 aria-label={`Options for ${tableName}`}
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-44">
@@ -127,7 +130,7 @@ export const TableReplicationRow = ({
                   },
                 }}
               >
-                <RotateCcw size={14} />
+                <RotateCcwIcon size={14} />
                 <span>Reset table</span>
               </DropdownMenuItemTooltip>
               <DropdownMenuItem className="gap-x-2" asChild>

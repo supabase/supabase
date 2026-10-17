@@ -168,6 +168,26 @@ const nextConfig = {
 
       // Redirect old managed pipeline slugs in dev/preview envs
       {
+        source: '/guides/database/replication/bigquery',
+        destination: '/guides/database/replication/pipelines/bigquery',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/clickhouse',
+        destination: '/guides/database/replication/pipelines/clickhouse',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/ducklake',
+        destination: '/guides/database/replication/pipelines/ducklake',
+        permanent: true,
+      },
+      {
+        source: '/guides/database/replication/snowflake',
+        destination: '/guides/database/replication/pipelines/snowflake',
+        permanent: true,
+      },
+      {
         source: '/guides/database/replication/external-replication-setup',
         destination: '/guides/database/replication/pipelines',
         permanent: true,

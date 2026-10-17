@@ -5,7 +5,7 @@ import { InvoicesSection } from '../InvoicesSettings/InvoicesSection'
 import BillingBreakdown from './BillingBreakdown/BillingBreakdown'
 import { BillingCustomerData } from './BillingCustomerData/BillingCustomerData'
 import BillingEmail from './BillingEmail'
-import CostControl from './CostControl/CostControl'
+import { CostControl } from './CostControl/CostControl'
 import CreditBalance from './CreditBalance'
 import Subscription from './Subscription/Subscription'
 import {

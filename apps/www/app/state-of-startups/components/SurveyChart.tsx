@@ -1,7 +1,7 @@
 'use client'
 
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
@@ -25,8 +25,8 @@ interface SurveyChartProps {
   maxBars?: number
 }
 
-const accentBarFg = 'bg-brand'
-const accentBarText = 'text-brand-link dark:text-brand'
+const accentBarFg = 'bg-brand-default'
+const accentBarText = 'text-primary'
 
 export function SurveyChart({
   title,

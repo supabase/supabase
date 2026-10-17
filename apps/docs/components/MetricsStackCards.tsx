@@ -35,7 +35,7 @@ export function MetricsStackCards() {
                   className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
                     badge.variant === 'community'
                       ? 'border-warning/40 text-warning'
-                      : 'border-brand-500/50 text-brand'
+                      : 'border-brand-500/50 text-primary'
                   }`}
                 >
                   {badge.label}
