@@ -324,7 +324,7 @@ Uppy has integrations with different frameworks:
 
 ## Presigned uploads
 
-Resumable uploads also supports using signed upload tokens to created time-limited URLs that you can share to your users by invoking the `createSignedUploadUrl` method on the SDK and including the returned token in the `x-signature` header of the resumable upload.
+Resumable uploads also support signed upload tokens for creating time-limited URLs that you can share with your users. Invoke the `createSignedUploadUrl` method on the SDK, then include the returned token in the `x-signature` header when using the signed resumable upload endpoint: `/storage/v1/upload/resumable/sign`.
 
 <Tabs
   scrollable
@@ -337,12 +337,21 @@ Resumable uploads also supports using signed upload tokens to created time-limit
 
 ```typescript
 // Create a signed upload URL
-const { data } = await supabase.storage.from('bucket_name').createSignedUploadUrl('file_path', {
-  upsert: true, // Optional: allow overwriting existing files
-})
+const { data } = await supabase.storage
+  .from('bucket_name')
+  .createSignedUploadUrl('file_path', {
+    upsert: true, // Optional: allow overwriting existing files
+  })
 
-// Use the signed URL token in resumable upload headers
+// Use the signed upload token with the signed resumable upload endpoint:
+// /storage/v1/upload/resumable/sign
 // Include data.token in the x-signature header
+const upload = new tus.Upload(file, {
+  endpoint: `${projectUrl}/storage/v1/upload/resumable/sign`,
+  headers: {
+    'x-signature': data.token,
+  },
+})
 ```
 
 </TabPanel>
@@ -356,8 +365,11 @@ response = supabase.storage.from_('bucket_name').create_signed_upload_url(
     options={'upsert': 'true'}  # Optional: allow overwriting existing files
 )
 
-# Use the signed URL token in resumable upload headers
-# Include response.token in the x-signature header
+# Use the signed upload token with the signed resumable upload endpoint
+endpoint = f"{project_url}/storage/v1/upload/resumable/sign"
+headers = {
+    "x-signature": response.token,
+}
 ```
 
 </TabPanel>
@@ -367,10 +379,16 @@ response = supabase.storage.from_('bucket_name').create_signed_upload_url(
 
 ```c#
 // Create a signed upload URL
-var signedUrl = await supabase.Storage.From("bucket_name").CreateUploadSignedUrl("file_path");
+var signedUrl = await supabase.Storage
+    .From("bucket_name")
+    .CreateUploadSignedUrl("file_path");
 
-// Use the signed URL token in resumable upload headers
-// Include signedUrl.Token in the x-signature header
+// Use the signed upload token with the signed resumable upload endpoint
+var endpoint = $"{projectUrl}/storage/v1/upload/resumable/sign";
+var headers = new Dictionary<string, string>
+{
+    { "x-signature", signedUrl.Token }
+};
 ```
 
 </TabPanel>
