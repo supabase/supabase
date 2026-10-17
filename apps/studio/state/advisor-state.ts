@@ -11,7 +11,7 @@ export type AdvisorItemSource = 'lint' | 'notification' | 'signal'
 const createInitialState = () => ({
   // An empty selection means every category is shown, matching the severity filter
   categoryFilters: [] as AdvisorCategory[],
-  severityFilters: ['critical', 'warning'] as AdvisorSeverity[],
+  severityFilters: ['critical', 'warning', 'info'] as AdvisorSeverity[],
   selectedItemId: undefined as string | undefined,
   selectedItemSource: undefined as AdvisorItemSource | undefined,
   // Notification filters

@@ -3,7 +3,7 @@ import { EyeOffIcon, GlobeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import type { AdvisorSignalItem } from './AdvisorPanel.types'
+import type { AdvisorBannedIPSignalItem } from './AdvisorPanel.types'
 import { useAdvisorSignals } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -13,10 +13,10 @@ import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AdvisorSignalDetailProps {
-  item: AdvisorSignalItem
+  item: AdvisorBannedIPSignalItem
 }
 
-const buildSignalAssistantPrompt = (item: AdvisorSignalItem) => {
+const buildSignalAssistantPrompt = (item: AdvisorBannedIPSignalItem) => {
   return [
     `I'm reviewing an Advisor signal for a banned IP address: ${item.sourceData.ip}.`,
     item.description ?? item.summary,

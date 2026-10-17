@@ -12,6 +12,7 @@ import {
 } from './AdvisorPanel.utils'
 import { AdvisorPanelBody } from './AdvisorPanelBody'
 import { AdvisorPanelHeader } from './AdvisorPanelHeader'
+import { useAccountRecoveryAdvice } from './useAccountRecoveryAdvice'
 import { useAdvisorSignals } from './useAdvisorSignals'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
@@ -80,6 +81,9 @@ export const AdvisorPanel = () => {
   const { data: signalItems } = useAdvisorSignals({
     projectRef: project?.ref,
     enabled: shouldLoadSignals,
+  })
+  const accountRecoveryAdvice = useAccountRecoveryAdvice({
+    enabled: isSidebarOpen && isCategorySelected('security'),
   })
 
   // Notifications should always load when sidebar is open (shown in both 'all' and 'messages' tabs)
@@ -152,13 +156,18 @@ export const AdvisorPanel = () => {
   }, [notifications])
 
   const combinedItems = useMemo<AdvisorItem[]>(() => {
-    return sortAdvisorItems([...lintItems, ...signalItems, ...notificationItems])
-  }, [lintItems, signalItems, notificationItems])
+    return sortAdvisorItems([
+      ...lintItems,
+      ...signalItems,
+      ...notificationItems,
+      ...accountRecoveryAdvice,
+    ])
+  }, [lintItems, signalItems, notificationItems, accountRecoveryAdvice])
 
   const itemsFilteredByCategory = useMemo<AdvisorItem[]>(() => {
     return combinedItems.filter((item) => {
-      // Notifications are the only items that exist without a project
-      if (!hasProjectRef && item.source !== 'notification') return false
+      const isAccountSignal = item.source === 'signal' && item.scope === 'account'
+      if (!hasProjectRef && item.source !== 'notification' && !isAccountSignal) return false
 
       return categoryFilters.length === 0 || categoryFilters.includes(item.category)
     })
@@ -215,12 +224,9 @@ export const AdvisorPanel = () => {
     }
 
     const advisorCategory = getAdvisorItemTelemetryCategory(item)
-    const advisorType =
-      item.source === 'signal'
-        ? item.type
-        : item.source === 'lint'
-          ? item.original.name
-          : item.title
+    let advisorType = item.title
+    if (item.source === 'signal') advisorType = item.type
+    if (item.source === 'lint') advisorType = item.original.name
     const advisorLevel = item.source === 'lint' ? item.original.level : undefined
 
     track('advisor_detail_opened', {

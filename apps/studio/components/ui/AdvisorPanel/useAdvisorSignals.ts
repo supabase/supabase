@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react'
 
-import type { AdvisorSignalItem } from './AdvisorPanel.types'
+import type { AdvisorBannedIPSignalItem } from './AdvisorPanel.types'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import type { IPData } from '@/data/banned-ips/banned-ips-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -15,7 +15,7 @@ const createBannedIPSignalItems = ({
 }: {
   projectRef?: string
   bannedIPsData?: IPData
-}): AdvisorSignalItem[] => {
+}): AdvisorBannedIPSignalItem[] => {
   if (!projectRef) return []
 
   const bannedIPs = bannedIPsData?.banned_ipv4_addresses ?? []
@@ -24,6 +24,7 @@ const createBannedIPSignalItems = ({
     id: createBannedIPDismissalKey(ip),
     dismissalKey: createBannedIPDismissalKey(ip),
     source: 'signal' as const,
+    scope: 'project' as const,
     type: 'banned-ip' as const,
     severity: 'warning' as const,
     category: 'security' as const,

@@ -3170,7 +3170,7 @@ type AdvisorCategory =
 type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
 
 /**
- * User opened an advisor detail page to view a specific advisor (lint, notification, or signal).
+ * User opened an advisor detail page to view a specific advisor.
  * This tracks when users engage with advisor recommendations.
  *
  * @group Events
