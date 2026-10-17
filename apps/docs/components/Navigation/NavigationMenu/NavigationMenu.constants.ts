@@ -1068,6 +1068,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/joins-and-nesting' as `/${string}`,
         },
         { name: 'JSON and unstructured data', url: '/guides/database/json' },
+        {
+          name: 'Storing large values (TOAST)',
+          url: '/guides/database/storing-large-values' as `/${string}`,
+        },
       ],
     },
     {
