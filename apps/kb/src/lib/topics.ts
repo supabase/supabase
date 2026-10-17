@@ -54,6 +54,12 @@ export const TOPICS = [
     visible: true,
   },
   {
+    name: 'FAQ',
+    description: 'Frequently asked questions',
+    pinned: true,
+    visible: true,
+  },
+  {
     name: 'Database',
     description: 'Postgres schemas, queries, and performance.',
     pinned: true,
