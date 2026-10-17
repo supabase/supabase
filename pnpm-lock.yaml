@@ -153,7 +153,7 @@ importers:
     dependencies:
       '@supabase/server':
         specifier: ^1.2.0
-        version: 1.2.0(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))(hono@4.12.25)
+        version: 1.2.0(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))(hono@4.13.7)
     devDependencies:
       '@aws-sdk/client-secrets-manager':
         specifier: ^3.1041.0
@@ -25496,12 +25496,12 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/server@1.2.0(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))(hono@4.12.25)':
+  '@supabase/server@1.2.0(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))(hono@4.13.7)':
     dependencies:
       '@supabase/supabase-js': 2.117.3(@opentelemetry/api@1.9.1)
       jose: 6.2.3
     optionalDependencies:
-      hono: 4.12.25
+      hono: 4.13.7
 
   '@supabase/shared-types@0.1.96': {}
 
