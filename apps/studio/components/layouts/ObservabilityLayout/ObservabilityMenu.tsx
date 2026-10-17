@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -21,7 +21,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ProductMenu } from '@/components/ui/ProductMenu'
 import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
-import { Content } from '@/data/content/content-query'
+import { ContentOfType } from '@/data/content/content-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfile } from '@/lib/profile'
@@ -57,8 +57,8 @@ export const ObservabilityMenu = () => {
     'newReport',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
-  const [selectedReportToDelete, setSelectedReportToDelete] = useState<Content>()
-  const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<Content>()
+  const [selectedReportToDelete, setSelectedReportToDelete] = useState<ContentOfType<'report'>>()
+  const [selectedReportToUpdate, setSelectedReportToUpdate] = useState<ContentOfType<'report'>>()
 
   const onConfirmDeleteReport = () => {
     if (ref === undefined) return console.error('Project ref is required')
@@ -103,7 +103,7 @@ export const ObservabilityMenu = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : (
-        <div className="flex flex-col gap-y-6">
+        <div className="flex flex-col">
           <ProductMenu
             page={pageKey}
             menu={menuItems.map((item) => ({
@@ -115,7 +115,7 @@ export const ObservabilityMenu = () => {
           {IS_PLATFORM && (
             <>
               <div className="h-px w-full bg-border-overlay" />
-              <div className="mx-2">
+              <div className="mx-2 my-4">
                 <Menu type="pills">
                   <Menu.Group
                     title={
@@ -123,9 +123,8 @@ export const ObservabilityMenu = () => {
                         <span className="uppercase font-mono">Custom Reports</span>
                         {customReportItems.length > 0 && (
                           <ButtonTooltip
-                            variant="default"
                             size="tiny"
-                            icon={<Plus />}
+                            icon={<PlusIcon />}
                             disabled={!canCreateCustomReport}
                             className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
                             onClick={() => {
@@ -167,8 +166,7 @@ export const ObservabilityMenu = () => {
                       description="Create and save custom reports to track your project metrics"
                       actions={
                         <ButtonTooltip
-                          variant="default"
-                          icon={<Plus />}
+                          icon={<PlusIcon />}
                           disabled={!canCreateCustomReport}
                           onClick={() => {
                             setShowNewReportModal(true)

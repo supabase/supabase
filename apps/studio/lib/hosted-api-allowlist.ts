@@ -21,12 +21,11 @@ export const HOSTED_SUPPORTED_API_URLS = [
   '/edge-functions/test',
   '/edge-functions/body',
   '/generate-attachment-url',
-  '/incident-status',
-  '/incident-banner',
-  '/status-override',
+  '/status-page',
   '/api/integrations/stripe-sync',
   '/content/graphql',
   '/parse-query',
+  '/scoped-access-token-permissions',
 ]
 
 // `pathname` must be basePath-relative — Next's `nextUrl.pathname` already is,

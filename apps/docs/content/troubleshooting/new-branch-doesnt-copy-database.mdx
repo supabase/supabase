@@ -7,7 +7,7 @@ database_id = "c5dae428-8dd0-4879-b312-df7f7da25986"
 
 Branching in Supabase (Branching 2.0) relies on the current migration files in your project—**not** a schema dump—when creating environments from `main`. This means if your `main` branch lacks migration history, branching will not fully capture your schema. This is a known limitation highlighted in the [Branching 2.0 documentation](/blog/branching-2-0#current-limitations). Follow the steps below to generate, synchronize, and repair your migration history for smooth branching.
 
-#### 1. Prerequisites: Prepare local Supabase environment
+## 1. Prerequisites: Prepare local Supabase environment
 
 - If you do not have a local environment set up already, follow the Supabase local development getting started guide:
   - [Running Supabase Locally](/docs/guides/local-development/cli/getting-started).
@@ -21,7 +21,7 @@ supabase start
 
 ---
 
-#### 2. Pull remote schema into migrations
+## 2. Pull remote schema into migrations
 
 With your project linked, run:
 
@@ -33,7 +33,7 @@ This command generates a migration file in your `supabase/migrations` folder whi
 
 ---
 
-#### 3. Sync remote migration history
+## 3. Sync remote migration history
 
 Upon running the above command, the Supabase CLI will typically prompt with:
 
@@ -54,12 +54,12 @@ Run the exact repair command provided, replacing the timestamp as instructed (ex
 
 ---
 
-#### 4. Proceed with Branching
+## 4. Proceed with Branching
 
 Once your migration history is up to date, continue to use branching features as normal. Each new branch will now inherit the correct migrations from your `main` branch.
 
 ---
 
-#### Additional tips
+## Additional tips
 
 If further issues arise (such as schema drift or migration mismatches), review the [troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues), and consider manual repair with [`supabase migration repair`](/docs/reference/cli/supabase-migration-repair).

@@ -1,6 +1,7 @@
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import Link from 'next/link'
 import { Button } from 'ui'
+
+import { StartYourProjectButton } from '@/components/StartYourProjectButton'
 
 export function Hero() {
   return (
@@ -12,16 +13,14 @@ export function Hero() {
             <span className="text-foreground-lighter block">without the hassle</span>
           </h1>
           <p className="text-foreground-lighter text-sm lg:text-base">
-            Every Supabase project is a dedicated Postgres database. 100% portable with no vendor
-            lock-in.
+            Every Supabase project is a dedicated Postgres database. Use it on its own, or with the
+            rest of the Supabase platform. 100% portable with no vendor lock-in.
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <StartYourProjectButton />
           <Button asChild size="medium">
-            <Link href="https://supabase.com/dashboard">Start your project</Link>
-          </Button>
-          <Button asChild size="medium" variant="default">
-            <Link href="/docs/guides/database/overview">Documentation</Link>
+            <a href="/docs/guides/database/overview">Documentation</a>
           </Button>
         </div>
       </div>

@@ -1,9 +1,10 @@
-import { useIsLoggedIn } from 'common'
+import { useFlag, useIsLoggedIn } from 'common'
 
 import { useStorageGotoCommands } from '../interfaces/Storage/Storage.Commands'
 import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useBillingGotoCommands } from './BillingLayout/Billing.Commands'
+import { useComputeGotoCommands } from './ComputeLayout/Compute.Commands'
 import { useDatabaseGotoCommands } from './DatabaseLayout/Database.Commands'
 import { useFunctionsGotoCommands } from './EdgeFunctionsLayout/EdgeFunctions.Commands'
 import { useIntegrationsGotoCommands } from './IntegrationsLayout/Integrations.Commands'
@@ -16,6 +17,7 @@ import { useApiDocsGotoCommands } from '@/components/interfaces/ProjectAPIDocs/P
 
 export function useLayoutNavCommands() {
   const isLoggedIn = useIsLoggedIn()
+  const computeEnabled = useFlag('compute')
 
   useTableEditorGotoCommands({ enabled: isLoggedIn })
   useSqlEditorGotoCommands({ enabled: isLoggedIn })
@@ -24,6 +26,7 @@ export function useLayoutNavCommands() {
   useAdvisorsGoToCommands({ enabled: isLoggedIn })
   useStorageGotoCommands({ enabled: isLoggedIn })
   useFunctionsGotoCommands({ enabled: isLoggedIn })
+  useComputeGotoCommands({ enabled: isLoggedIn && computeEnabled })
   useLogsGotoCommands({ enabled: isLoggedIn })
   useReportsGotoCommands({ enabled: isLoggedIn })
   useApiDocsGotoCommands({ enabled: isLoggedIn })

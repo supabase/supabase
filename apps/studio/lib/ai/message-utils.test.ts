@@ -1,16 +1,21 @@
 import type { DynamicToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
-import { getParallelApprovalIdsToReject, prepareMessagesForAPI } from './message-utils'
+import {
+  getParallelApprovalIdsToReject,
+  isManualApprovalRequested,
+  prepareMessagesForAPI,
+} from './message-utils'
 
-const makeApprovalPart = (id: string): DynamicToolUIPart => ({
-  type: 'dynamic-tool',
-  toolName: 'test_tool',
-  toolCallId: id,
-  state: 'approval-requested',
-  input: {},
-  approval: { id },
-})
+const makeApprovalPart = (id: string, isAutomatic = false): DynamicToolUIPart =>
+  ({
+    type: 'dynamic-tool',
+    toolName: 'test_tool',
+    toolCallId: id,
+    state: 'approval-requested',
+    input: {},
+    approval: { id, ...(isAutomatic ? { isAutomatic: true } : {}) },
+  }) as DynamicToolUIPart
 
 const makeResultPart = (id: string): DynamicToolUIPart => ({
   type: 'dynamic-tool',
@@ -19,6 +24,24 @@ const makeResultPart = (id: string): DynamicToolUIPart => ({
   state: 'output-available',
   input: {},
   output: {},
+})
+
+describe('isManualApprovalRequested', () => {
+  it('returns true for a human approval-requested tool part', () => {
+    expect(isManualApprovalRequested(makeApprovalPart('a1'))).toBe(true)
+  })
+
+  it('returns false for an automatic approval', () => {
+    expect(isManualApprovalRequested(makeApprovalPart('a1', true))).toBe(false)
+  })
+
+  it('returns false for a tool result part', () => {
+    expect(isManualApprovalRequested(makeResultPart('r1'))).toBe(false)
+  })
+
+  it('returns false for a content part with no state or approval', () => {
+    expect(isManualApprovalRequested({ type: 'text', text: 'hello' })).toBe(false)
+  })
 })
 
 describe('getParallelApprovalIdsToReject', () => {
@@ -74,6 +97,21 @@ describe('getParallelApprovalIdsToReject', () => {
       },
     ]
     expect(getParallelApprovalIdsToReject(messages)).toEqual(['a2'])
+  })
+
+  it('ignores automatic approvals when picking extras to reject', () => {
+    const messages: UIMessage[] = [
+      {
+        id: '1',
+        role: 'assistant',
+        parts: [
+          makeApprovalPart('auto', true),
+          makeApprovalPart('manual-1'),
+          makeApprovalPart('manual-2'),
+        ],
+      },
+    ]
+    expect(getParallelApprovalIdsToReject(messages)).toEqual(['manual-2'])
   })
 })
 

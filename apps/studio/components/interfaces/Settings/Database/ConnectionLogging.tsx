@@ -131,7 +131,6 @@ export const ConnectionLogging = () => {
                 <CardFooter className="gap-x-2 justify-end">
                   <Button
                     type="button"
-                    variant="default"
                     disabled={!hasChanges || isSaving}
                     onClick={() => form.reset(defaultValues)}
                   >

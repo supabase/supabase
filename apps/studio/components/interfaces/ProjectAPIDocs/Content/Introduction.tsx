@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Copy } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -61,8 +61,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    variant="default"
-                    icon={<Copy />}
+                    icon={<CopyIcon />}
                     onClick={() => {
                       setCopied('anon')
                       copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
@@ -102,8 +101,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    variant="default"
-                    icon={<Copy />}
+                    icon={<CopyIcon />}
                     onClick={() => {
                       setCopied('service')
                       copyToClipboard(serviceApiKey)

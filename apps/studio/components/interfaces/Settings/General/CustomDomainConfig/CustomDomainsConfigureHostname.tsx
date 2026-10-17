@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
   Card,
@@ -71,7 +71,7 @@ export const CustomDomainsConfigureHostname = () => {
     )
   }
 
-  const domain = form.watch('domain')
+  const domain = useWatch({ control: form.control, name: 'domain' })
   const trimmedDomain = domain.trim()
   const isSubmitting = isCheckingRecord || isCreating
 
@@ -145,11 +145,7 @@ export const CustomDomainsConfigureHostname = () => {
 
           <CardFooter className="justify-end space-x-2">
             {form.formState.isDirty && (
-              <Button
-                variant="default"
-                disabled={isSubmitting}
-                onClick={() => form.reset({ domain: '' })}
-              >
+              <Button disabled={isSubmitting} onClick={() => form.reset({ domain: '' })}>
                 Cancel
               </Button>
             )}

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { UseFormReturn } from 'react-hook-form'
+import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
   FormControl,
   FormField,
@@ -17,16 +17,20 @@ import { useDiskAutoscaleCustomConfigQuery } from '@/data/config/disk-autoscale-
 
 type AutoScaleFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
+  disableInput?: boolean
 }
 
-export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
+export const AutoScaleFields = ({ form, disableInput = false }: AutoScaleFieldProps) => {
   const { ref: projectRef } = useParams()
   const {
     control,
     setValue,
     formState: { errors },
   } = form
-  const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
+  const [totalSize, growthPercent, maxSizeGb, minIncrementGb] = useWatch({
+    control,
+    name: ['totalSize', 'growthPercent', 'maxSizeGb', 'minIncrementGb'],
+  })
 
   const { isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
@@ -70,9 +74,10 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue(
                         'growthPercent',
@@ -116,9 +121,10 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue(
                         'minIncrementGb',
@@ -157,9 +163,10 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                 <InputGroup>
                   <FormInputGroupInput
                     {...field}
+                    id={field.name}
                     type="number"
                     value={field.value ?? undefined}
-                    disabled={isError}
+                    disabled={disableInput || isError}
                     onChange={(e) => {
                       setValue('maxSizeGb', e.target.value === '' ? null : e.target.valueAsNumber, {
                         shouldDirty: true,

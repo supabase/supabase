@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { CirclePause } from 'lucide-react'
+import { CirclePauseIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -20,7 +20,11 @@ import { useProjectPauseMutation } from '@/data/projects/project-pause-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsHighAvailability,
+  useIsProjectActive,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const PauseProjectButton = () => {
@@ -30,6 +34,7 @@ export const PauseProjectButton = () => {
   const { setProjectStatus } = useSetProjectStatus()
 
   const isProjectActive = useIsProjectActive()
+  const isHighAvailability = useIsHighAvailability()
   const isProjectUnhealthy = project?.status === PROJECT_STATUS.ACTIVE_UNHEALTHY
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -68,11 +73,14 @@ export const PauseProjectButton = () => {
     project === undefined ||
     isPaused ||
     !canPauseProject ||
-    !isProjectActive
+    !isProjectActive ||
+    isHighAvailability
 
   function getTooltipText() {
     if (isPaused) {
       return `Your ${entityLabel} is already paused`
+    } else if (isHighAvailability) {
+      return 'Pausing is unavailable on High Availability projects'
     } else if (!canPauseProject) {
       return `You need additional permissions to pause this ${entityLabel}`
     } else if (isProjectUnhealthy) {
@@ -89,8 +97,7 @@ export const PauseProjectButton = () => {
   return (
     <>
       <ButtonTooltip
-        variant="default"
-        icon={<CirclePause />}
+        icon={<CirclePauseIcon />}
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}
         disabled={buttonDisabled}

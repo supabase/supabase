@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
 import { useMemo } from 'react'
 
 import { useEnabledIdentityProviders } from './useEnabledIdentityProviders'
@@ -33,15 +33,9 @@ export type InboundBranding = {
  * screen.
  */
 export function useInboundBranding(flow: 'sign-in' | 'sign-up' = 'sign-in'): InboundBranding {
-  const router = useRouter()
   const enabledProviders = useEnabledIdentityProviders()
 
-  const destinationId =
-    router.isReady && typeof router.query.destination === 'string'
-      ? router.query.destination
-      : undefined
-  const focusId =
-    router.isReady && typeof router.query.method === 'string' ? router.query.method : undefined
+  const { destination: destinationId, method: focusId } = useParams()
 
   const focusProvider = useMemo(
     () =>

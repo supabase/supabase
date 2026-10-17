@@ -36,6 +36,11 @@ SERVICE_ROLE_KEY=$(grep '^SERVICE_ROLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 SUPABASE_SECRET_KEY=$(grep '^SUPABASE_SECRET_KEY=' .env | cut -d= -f2-)
 
+# Prefer the running container's value: .env can be quoted or edited without
+# recreating the functions service. Fall back to .env without Docker access.
+FUNCTIONS_VERIFY_JWT=$(docker exec supabase-edge-functions printenv VERIFY_JWT 2>/dev/null \
+    || grep '^FUNCTIONS_VERIFY_JWT=' .env | cut -d= -f2-)
+
 pass=0
 fail=0
 
@@ -58,6 +63,36 @@ http_status() {
     shift
     curl -s -o /dev/null -w "%{http_code}" "$@" "$url"
 }
+
+# Like http_status, but identifies whether a 401 came from the main service
+# (sb-error-code) or the function SDK (x-supabase-server-error).
+fn_status() {
+    url="$1"
+    shift
+    out=$(curl -s -o /dev/null -D - -w '\n%{http_code}' "$@" "$url")
+    code=$(printf '%s\n' "$out" | tail -n 1)
+    if printf '%s\n' "$out" | grep -qi '^sb-error-code: UNAUTHORIZED_'; then
+        echo "$code runtime"
+    elif printf '%s\n' "$out" | grep -qi '^x-supabase-server-error:'; then
+        echo "$code sdk"
+    else
+        echo "$code"
+    fi
+}
+
+# Detect which gateway is running so gateway-specific assertions can be gated.
+detect_gateway() {
+    command -v docker >/dev/null 2>&1 || { echo unknown; return; }
+    running=$(docker ps --format '{{.Names}}' 2>/dev/null)
+    if printf '%s\n' "$running" | grep -q '^supabase-envoy$'; then
+        echo envoy
+    elif printf '%s\n' "$running" | grep -q '^supabase-kong$'; then
+        echo kong
+    else
+        echo unknown
+    fi
+}
+GATEWAY=$(detect_gateway)
 
 echo ""
 echo "=== Testing against $BASE_URL ==="
@@ -109,7 +144,7 @@ check "Legacy ANON_KEY" "200" \
     "$(http_status "$BASE_URL/storage/v1/bucket" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")"
 
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
-    # With opaque key, Kong translates to asymmetric JWT in Authorization
+    # With opaque key, the API gateway translates to asymmetric JWT in Authorization
     check "New PUBLISHABLE_KEY" "200" \
         "$(http_status "$BASE_URL/storage/v1/bucket" -H "apikey: $SUPABASE_PUBLISHABLE_KEY")"
 fi
@@ -163,6 +198,50 @@ check "/api/openapi blocked -> 403" "403" \
     "$(http_status "$BASE_URL/realtime/v1/api/openapi" -H "apikey: $ANON_KEY")"
 
 echo ""
+echo "--- Edge Functions (/functions/v1/) ---"
+
+# hello uses withSupabase({ auth: ["publishable", "secret"] }), which requires
+# an sb_ key in the apikey header. "401 sdk" means the gateway passed the
+# request through and the function rejected it. With JWT verification enabled,
+# the main service rejects requests without a bearer JWT before calling hello.
+if [ "$FUNCTIONS_VERIFY_JWT" = "true" ]; then
+    unauthenticated_fn_status="401 runtime"
+else
+    unauthenticated_fn_status="401 sdk"
+fi
+check "No auth -> rejected by Functions" "$unauthenticated_fn_status" \
+    "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -d '{}')"
+
+# Non-sb_ values (legacy JWT, typo, third-party JWT) are not validated at the gateway.
+check "Legacy ANON_KEY as apikey -> rejected by Functions" "$unauthenticated_fn_status" \
+    "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $ANON_KEY" -d '{}')"
+check "Non-sb_ invalid apikey -> rejected by Functions" "$unauthenticated_fn_status" \
+    "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: invalid-key" -d '{}')"
+
+if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
+    check "PUBLISHABLE_KEY -> hello reachable" "200" \
+        "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    check "SECRET_KEY -> hello reachable" "200" \
+        "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -d '{}')"
+    # sb_ in Authorization only: the gateway translates it and passes it through,
+    # but the SDK only accepts sb_ keys in the apikey header.
+    check "sb_ in Authorization only -> passed to function, rejected by SDK" "401 sdk" \
+        "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+
+    # Invalid sb_-prefixed key and apikey/bearer sb_ conflict are rejected at the
+    # gateway - but only by Envoy. Kong is permissive and passes them through.
+    if [ "$GATEWAY" = "envoy" ]; then
+        check "Invalid sb_ apikey -> 401 at gateway (Envoy)" "401" \
+            "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
+        check "Conflicting sb_ keys -> 401 at gateway (Envoy)" "401" \
+            "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: $SUPABASE_SECRET_KEY" -H "Authorization: Bearer $SUPABASE_PUBLISHABLE_KEY" -d '{}')"
+    else
+        check "Invalid sb_ apikey -> rejected by Functions (Kong)" "$unauthenticated_fn_status" \
+            "$(fn_status "$BASE_URL/functions/v1/hello" -X POST -H "apikey: sb_publishable_0000000000000000000000_00000000" -d '{}')"
+    fi
+fi
+
+echo ""
 echo "--- supabase-js style requests (apikey + Authorization) ---"
 # supabase-js sends both apikey header AND Authorization: Bearer <apikey>
 if [ -n "$SUPABASE_PUBLISHABLE_KEY" ]; then
@@ -208,10 +287,26 @@ jwks_has_oct=$(echo "$jwks_content" | jq -r '[.keys[] | .kty] | if any(. == "oct
 check "JWKS contains EC public key" "true" "$jwks_has_ec"
 check "JWKS does NOT contain symmetric key" "false" "$jwks_has_oct"
 
-#echo ""
-#echo "--- OAuth metadata endpoint ---"
-#check "well-known oauth (no auth)" "200" \
-#    "$(http_status "$BASE_URL/.well-known/oauth-authorization-server")"
+echo ""
+echo "--- OAuth and OIDC discovery ---"
+check "OIDC discovery (no auth)" "200" \
+    "$(http_status "$BASE_URL/auth/v1/.well-known/openid-configuration")"
+
+# Auth returns 404 feature_disabled while its OAuth server is off (the default),
+# so either the metadata or that error shows the request reached Auth.
+oauth_metadata_reached() {
+    if curl -s "$BASE_URL$1" | grep -qE '"issuer"|"feature_disabled"'; then
+        echo "true"
+    else
+        echo "false"
+    fi
+}
+check "OAuth metadata at RFC 8414 path (no auth)" "true" \
+    "$(oauth_metadata_reached /.well-known/oauth-authorization-server/auth/v1)"
+check "OAuth metadata under /auth/v1 (no auth)" "true" \
+    "$(oauth_metadata_reached /auth/v1/.well-known/oauth-authorization-server)"
+check "OAuth metadata at bare root path not routed to Auth" "false" \
+    "$(oauth_metadata_reached /.well-known/oauth-authorization-server)"
 
 echo ""
 echo "--- Realtime WebSocket upgrade ---"
@@ -319,6 +414,13 @@ if [ -n "$access_token" ]; then
             "$(http_status "$BASE_URL/auth/v1/user" \
                 -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
                 -H "Authorization: Bearer $access_token")"
+        # Functions leaves Authorization (the user JWT) untouched and adds the
+        # translated sb-api-key alongside it; the request must reach the worker.
+        check "Opaque apikey + user JWT -> Functions reachable" "200" \
+            "$(http_status "$BASE_URL/functions/v1/hello" -X POST \
+                -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+                -H "Authorization: Bearer $access_token" \
+                -d '{}')"
     fi
 else
     check "Sign in test user" "true" "false"

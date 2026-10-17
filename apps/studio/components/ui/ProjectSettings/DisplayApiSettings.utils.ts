@@ -18,11 +18,11 @@ export function getLastUsedAPIKeys(
   return apiKeys.reduce(
     (a, i) => {
       const entry = logData?.find(
-        ({ role, signature_prefix }) =>
+        ({ role, signaturePrefix }) =>
           role &&
-          signature_prefix &&
+          signaturePrefix &&
           i.tags.indexOf(role) >= 0 &&
-          i.api_key.split('.')[2]?.startsWith(signature_prefix)
+          i.api_key.split('.')[2]?.startsWith(signaturePrefix)
       )?.timestamp
 
       if (entry) {

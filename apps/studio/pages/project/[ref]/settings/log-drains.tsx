@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { cloneElement, useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
 import {
@@ -215,7 +215,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     disabled={!hasAccessToLogDrains || !canManageLogDrains}
                     onClick={handleAddDestinationClick}
                     variant="primary"
-                    className="rounded-r-none px-3"
+                    className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   >
                     Add destination
                   </Button>
@@ -224,9 +224,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="primary"
-                      title="Choose token scope"
-                      className="rounded-l-none px-[4px] py-[5px]"
-                      icon={<ChevronDown />}
+                      aria-label="Choose destination type"
+                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                      icon={<ChevronDownIcon />}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">

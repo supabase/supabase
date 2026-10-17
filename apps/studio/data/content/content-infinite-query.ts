@@ -17,7 +17,8 @@ interface GetContentVariables {
 
 export async function getContent(
   { projectRef, type, name, limit = 10, sort, cursor }: GetContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headers?: HeadersInit
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getContent')
@@ -34,6 +35,7 @@ export async function getContent(
         cursor,
       },
     },
+    headers,
     signal,
   })
 

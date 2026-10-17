@@ -4,10 +4,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { getProjectSettings } from '@/lib/api/self-hosted/settings'
 
-type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {
+type ProjectAppConfig = components['schemas']['ProjectSettingsResponse_Output']['app_config'] & {
   protocol?: string
 }
-export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
+export type ProjectSettings = components['schemas']['ProjectSettingsResponse_Output'] & {
   app_config?: ProjectAppConfig
 }
 

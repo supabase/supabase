@@ -1,7 +1,7 @@
 import { ident, literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { Loader } from 'lucide-react'
+import { LoaderIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ExpandingTextArea } from 'ui'
@@ -99,7 +99,6 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         } ${animateCss}`}
       >
         <Button
-          variant="default"
           disabled={!hasChanged}
           onClick={() => {
             setValue(contentText)
@@ -108,9 +107,9 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         >
           Cancel
         </Button>
-        <Button disabled={!hasChanged} onClick={updateDescription}>
+        <Button variant="primary" disabled={!hasChanged} onClick={updateDescription}>
           {isUpdating ? (
-            <Loader className="mx-auto animate-spin" size={14} strokeWidth={2} />
+            <LoaderIcon className="mx-auto animate-spin" size={14} strokeWidth={2} />
           ) : (
             <span>Save</span>
           )}

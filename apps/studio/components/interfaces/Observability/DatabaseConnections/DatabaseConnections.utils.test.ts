@@ -1,7 +1,21 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getConnectionMetrics } from './DatabaseConnections.utils'
+import {
+  filterActivities,
+  getBlockChain,
+  getBlockingChain,
+  getConnectionMetrics,
+  type ActivityFilters,
+} from './DatabaseConnections.utils'
 import { type DatabaseActivity } from '@/data/database/activity-query'
+
+const EMPTY_FILTERS: ActivityFilters = {
+  search: '',
+  states: [],
+  applications: [],
+  roles: [],
+  view: '',
+}
 
 const NOW = '2024-01-15T12:00:00Z'
 
@@ -31,6 +45,7 @@ const activity = (overrides: ActivityOverrides = {}): DatabaseActivity => ({
   application_name: 'test',
   blocked_by: [],
   query: 'select 1',
+  backend_start: NOW,
   query_start: null,
   transaction_start: null,
   state_change: null,
@@ -193,6 +208,34 @@ describe('getConnectionMetrics', () => {
 
       const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
       expect(queryBlockingTheMostQueries?.activity.pid).toBe(1)
+      expect(queryBlockingTheMostQueries?.count).toBe(4)
+    })
+
+    it('counts transitively - a longer block chain outweighs several short ones', () => {
+      const activities = [
+        activity({ pid: 1, blocked_by: [2] }),
+        activity({ pid: 2, blocked_by: [3] }),
+        activity({ pid: 3, blocked_by: [] }),
+        activity({ pid: 4, blocked_by: [5] }),
+        activity({ pid: 5, blocked_by: [] }),
+      ]
+
+      const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
+      expect(queryBlockingTheMostQueries?.activity.pid).toBe(3)
+      expect(queryBlockingTheMostQueries?.count).toBe(2)
+    })
+
+    it('counts a diamond-shaped block pattern once, not per incoming path', () => {
+      // root blocks both p1 and p2 directly, and both p1 and p2 block w - w must only count once
+      const activities = [
+        activity({ pid: 0, blocked_by: [] }),
+        activity({ pid: 1, blocked_by: [0] }),
+        activity({ pid: 2, blocked_by: [0] }),
+        activity({ pid: 3, blocked_by: [1, 2] }),
+      ]
+
+      const { queryBlockingTheMostQueries } = getConnectionMetrics(activities)
+      expect(queryBlockingTheMostQueries?.activity.pid).toBe(0)
       expect(queryBlockingTheMostQueries?.count).toBe(3)
     })
 
@@ -215,5 +258,174 @@ describe('getConnectionMetrics', () => {
 
       expect(getConnectionMetrics(activities).warnTopBlocker).toBe(true)
     })
+  })
+})
+
+describe('getBlockChain', () => {
+  it('returns just the pid when it is not blocked', () => {
+    const activities = [activity({ pid: 1, blocked_by: [] })]
+
+    expect(getBlockChain(1, activities)).toEqual([1])
+  })
+
+  it('walks blocked_by up to the root, nearest first', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2] }),
+      activity({ pid: 2, blocked_by: [3] }),
+      activity({ pid: 3, blocked_by: [] }),
+    ]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 2, 3])
+  })
+
+  it('only follows the first blocker when blocked by multiple pids', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2, 3] }),
+      activity({ pid: 2, blocked_by: [] }),
+      activity({ pid: 3, blocked_by: [] }),
+    ]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 2])
+  })
+
+  it('stops rather than looping on a cycle', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2] }),
+      activity({ pid: 2, blocked_by: [1] }),
+    ]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 2])
+  })
+
+  it('includes a blocker pid even if its own activity record is missing', () => {
+    const activities = [activity({ pid: 1, blocked_by: [99] })]
+
+    expect(getBlockChain(1, activities)).toEqual([1, 99])
+  })
+})
+
+describe('getBlockingChain', () => {
+  it('returns an empty chain when nothing is blocked by the root', () => {
+    const activities = [activity({ pid: 1, blocked_by: [] })]
+
+    expect(getBlockingChain(1, activities)).toEqual([])
+  })
+
+  it('walks forward from the root, nearest waiter first', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [2] }),
+      activity({ pid: 2, blocked_by: [3] }),
+      activity({ pid: 3, blocked_by: [] }),
+    ]
+
+    expect(getBlockingChain(3, activities)).toEqual([2, 1])
+  })
+
+  it('does not require the root pid to have its own activity record', () => {
+    const activities = [activity({ pid: 2, blocked_by: [1] })]
+
+    expect(getBlockingChain(1, activities)).toEqual([2])
+  })
+
+  it('stops rather than looping on a cycle', () => {
+    const activities = [
+      activity({ pid: 2, blocked_by: [1] }),
+      activity({ pid: 3, blocked_by: [2] }),
+      activity({ pid: 1, blocked_by: [3] }), // would cycle back to the root
+    ]
+
+    expect(getBlockingChain(1, activities)).toEqual([2, 3])
+  })
+
+  it('only follows one branch when the root has multiple direct waiters', () => {
+    const activities = [
+      activity({ pid: 2, blocked_by: [1] }),
+      activity({ pid: 3, blocked_by: [1] }),
+    ]
+
+    expect(getBlockingChain(1, activities)).toEqual([2])
+  })
+})
+
+describe('filterActivities', () => {
+  it('returns everything when no filters are applied', () => {
+    const activities = [activity({ pid: 1 }), activity({ pid: 2 })]
+
+    expect(filterActivities(activities, EMPTY_FILTERS)).toHaveLength(2)
+  })
+
+  it('filters by role', () => {
+    const activities = [
+      activity({ pid: 1, role_name: 'anon' }),
+      activity({ pid: 2, role_name: 'postgres' }),
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, roles: ['anon'] })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
+  })
+
+  it('filters by state', () => {
+    const activities = [activity({ pid: 1, state: 'active' }), activity({ pid: 2, state: 'idle' })]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, states: ['idle'] })
+
+    expect(result.map((x) => x.pid)).toEqual([2])
+  })
+
+  it('filters by application', () => {
+    const activities = [
+      activity({ pid: 1, application_name: 'studio' }),
+      activity({ pid: 2, application_name: 'psql' }),
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, applications: ['psql'] })
+
+    expect(result.map((x) => x.pid)).toEqual([2])
+  })
+
+  it('filters by search matching the query text, case-insensitively', () => {
+    const activities = [
+      activity({ pid: 1, query: 'select * from users' }),
+      activity({ pid: 2, query: 'select * from orders' }),
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, search: 'USERS' })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
+  })
+
+  it('excludes activities with a null query from a search filter', () => {
+    const activities = [activity({ pid: 1, query: null })]
+
+    expect(filterActivities(activities, { ...EMPTY_FILTERS, search: 'anything' })).toEqual([])
+  })
+
+  it('in blockers view, only keeps root blockers - excludes leaf/idle activities', () => {
+    const activities = [
+      activity({ pid: 1, blocked_by: [] }), // blocks pid 2, not itself blocked - root blocker
+      activity({ pid: 2, blocked_by: [1] }), // itself blocked - not a root blocker
+      activity({ pid: 3, blocked_by: [] }), // not blocked, and blocks nobody
+    ]
+
+    const result = filterActivities(activities, { ...EMPTY_FILTERS, view: 'blockers' })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
+  })
+
+  it('combines multiple filters with AND semantics', () => {
+    const activities = [
+      activity({ pid: 1, role_name: 'anon', state: 'active' }),
+      activity({ pid: 2, role_name: 'anon', state: 'idle' }),
+      activity({ pid: 3, role_name: 'postgres', state: 'active' }),
+    ]
+
+    const result = filterActivities(activities, {
+      ...EMPTY_FILTERS,
+      roles: ['anon'],
+      states: ['active'],
+    })
+
+    expect(result.map((x) => x.pid)).toEqual([1])
   })
 })

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -45,10 +45,9 @@ export const Entities = ({ language }: ContentProps) => {
         <div className="flex items-center gap-x-2 px-4 mt-3">
           <DocsButton href={`${DOCS_URL}/guides/database/api/generating-types`} />
           <Button
-            variant="default"
             disabled={isGeneratingTypes}
             loading={isGeneratingTypes}
-            icon={<Download strokeWidth={1.5} />}
+            icon={<DownloadIcon strokeWidth={1.5} />}
             onClick={onClickGenerateTypes}
           >
             Generate and download types

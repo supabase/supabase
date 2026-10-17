@@ -16,11 +16,6 @@ const sections = [
         type: 'document' as const,
       },
       {
-        label: 'Data Processing Addendum',
-        href: '/legal/customer-resources/data-processing-addendum',
-        type: 'document' as const,
-      },
-      {
         label: 'Support Policy',
         href: '/support-policy',
         type: 'document' as const,
@@ -28,6 +23,27 @@ const sections = [
       {
         label: 'Service Level Agreement',
         href: '/sla',
+        type: 'document' as const,
+      },
+    ],
+  },
+  {
+    id: 'privacy-resources',
+    title: 'Privacy Resources',
+    links: [
+      {
+        label: 'Data Processing Addendum',
+        href: '/legal/customer-resources/data-processing-addendum',
+        type: 'document' as const,
+      },
+      {
+        label: 'Subprocessor List',
+        href: '/legal/customer-resources/subprocessor-list',
+        type: 'document' as const,
+      },
+      {
+        label: 'Data Residency and Transfers FAQ',
+        href: '/legal/privacy-resources/data-residency-and-transfers-faq',
         type: 'document' as const,
       },
     ],

@@ -24,9 +24,12 @@ export function usePrettifyQuery({ id, isDiffOpen }: { id: string; isDiffOpen: b
     const state = getSqlEditorV2StateSnapshot()
     const snippet = state.snippets[id]
 
+    // pg formatting can mangle ClickHouse syntax (backtick identifiers), so
+    // Prettify is a no-op for logs snippets — the UI also hides the affordance.
+    if (snippet?.snippet.type === 'log_sql') return
+
     if (editor.isReady() && project) {
-      const fallback =
-        snippet?.snippet.type === 'log_sql' ? undefined : snippet?.snippet.content?.unchecked_sql
+      const fallback = snippet?.snippet.content?.unchecked_sql
       const sql = editor.getSql(fallback)
       if (sql === undefined) return
 

@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Globe, Trash } from 'lucide-react'
+import { GlobeIcon, TrashIcon } from 'lucide-react'
 import { Button, Checkbox } from 'ui'
 
 import { ValueContainer } from './ValueContainer'
@@ -68,11 +68,8 @@ export const RedirectUrlList = ({
       <ValueContainer className="py-3 flex items-center justify-end">
         {selectedUrls.length > 0 ? (
           <div className="flex items-center gap-x-2">
-            <Button variant="default" onClick={() => onSelectClearSelection()}>
-              Clear selection
-            </Button>
+            <Button onClick={() => onSelectClearSelection()}>Clear selection</Button>
             <ButtonTooltip
-              variant="default"
               disabled={!canUpdateConfig}
               tooltip={{
                 content: {
@@ -82,7 +79,7 @@ export const RedirectUrlList = ({
                     : undefined,
                 },
               }}
-              icon={<Trash />}
+              icon={<TrashIcon />}
               onClick={() => (selectedUrls.length > 0 ? onSelectRemoveURLs() : null)}
             >
               Remove ({selectedUrls.length})
@@ -97,6 +94,7 @@ export const RedirectUrlList = ({
             side="bottom"
           >
             <ButtonTooltip
+              variant="primary"
               disabled={!canUpdateConfig}
               onClick={() => onSelectAddURL()}
               tooltip={{
@@ -123,7 +121,7 @@ export const RedirectUrlList = ({
                   <div className="w-5 h-5 flex items-center justify-center">
                     <Checkbox checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
-                  <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
+                  <GlobeIcon strokeWidth={2} size={14} className="text-foreground-lighter" />
                   <span className="text-sm grow">{url}</span>
                 </div>
               </ValueContainer>

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { CustomOAuthProvider } from '@supabase/auth-js'
 import { useParams } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -250,12 +250,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
 
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
-      <SheetContent
-        size="lg"
-        showClose={false}
-        className="flex flex-col gap-0"
-        tabIndex={undefined}
-      >
+      <SheetContent size="lg" showClose={false} className="flex flex-col gap-0">
         <SheetHeader>
           <div className="flex flex-row gap-3 items-center">
             <SheetClose
@@ -264,7 +259,7 @@ export const CreateOrUpdateCustomProviderSheet = ({
                 'disabled:pointer-events-none data-[state=open]:bg-secondary'
               )}
             >
-              <X className="h-3 w-3" />
+              <XIcon className="h-3 w-3" />
               <span className="sr-only">Close</span>
             </SheetClose>
             <SheetTitle className="truncate">
@@ -516,10 +511,8 @@ export const CreateOrUpdateCustomProviderSheet = ({
           </form>
         </Form>
         <SheetFooter>
-          <Button variant="default" onClick={confirmOnClose}>
-            Cancel
-          </Button>
-          <Button type="submit" form={FORM_ID} loading={isCreating || isUpdating}>
+          <Button onClick={confirmOnClose}>Cancel</Button>
+          <Button variant="primary" type="submit" form={FORM_ID} loading={isCreating || isUpdating}>
             {isEditMode ? 'Update provider' : 'Create and enable provider'}
           </Button>
         </SheetFooter>

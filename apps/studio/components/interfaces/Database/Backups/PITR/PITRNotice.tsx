@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Calendar } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import Link from 'next/link'
 
 import { getPITRRetentionDuration } from './PITR.utils'
@@ -30,7 +30,6 @@ export const PITRNotice = () => {
           <ButtonTooltip
             asChild
             disabled={!canUpdateSubscription}
-            variant="default"
             tooltip={{
               content: {
                 side: 'bottom',
@@ -49,14 +48,14 @@ export const PITRNotice = () => {
     >
       <div className="flex p-6 space-x-6">
         <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-border-strong">
-          <Calendar strokeWidth={2} />
+          <CalendarIcon strokeWidth={2} />
         </div>
         <div className="space-y-2">
           <p className="text-sm">Recovery retention period</p>
           <p className="text-sm text-foreground-light">
             Database changes are logged every <span className="text-foreground">2 minutes</span>,
             with a total recovery period of up to{' '}
-            <span className="text-brand">{retentionPeriod} days</span>.
+            <span className="text-primary">{retentionPeriod} days</span>.
           </p>
         </div>
       </div>

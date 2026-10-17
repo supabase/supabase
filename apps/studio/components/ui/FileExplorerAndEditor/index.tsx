@@ -1,6 +1,6 @@
 import { IS_PLATFORM } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, flattenTree, INodeRendererProps, TreeView } from 'ui'
@@ -398,7 +398,7 @@ export const FileExplorerAndEditor = ({
             Files
           </h3>
           {IS_PLATFORM && (
-            <Button size="tiny" variant="default" icon={<Plus size={14} />} onClick={addNewFile}>
+            <Button size="tiny" icon={<PlusIcon size={14} />} onClick={addNewFile}>
               Add File
             </Button>
           )}

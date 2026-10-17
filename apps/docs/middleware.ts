@@ -43,7 +43,7 @@ export function middleware(request: NextRequest) {
     let [, lib, maybeVersion, ...slug] = pathname.replace(REFERENCE_PATH, '').split('/')
 
     if (clientSdkIds.includes(lib)) {
-      const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
+      const version = /^v\d+$/.test(maybeVersion) ? maybeVersion : undefined
       if (!version) {
         slug = [maybeVersion, ...slug]
       }
@@ -63,7 +63,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
 
-  if (lib === 'api') {
+  // Spike (DOCS-1268): only the bare /reference/api needs normalizing now.
+  // /reference/api/<slug> has its own statically generated page — don't
+  // collapse it back to the monolith.
+  if (lib === 'api' && !maybeVersion) {
     const rewritePath = [REFERENCE_PATH, 'api'].join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }
@@ -74,7 +77,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (clientSdkIds.includes(lib)) {
-    const version = /v\d+/.test(maybeVersion) ? maybeVersion : null
+    const version = /^v\d+$/.test(maybeVersion) ? maybeVersion : null
     const rewritePath = [REFERENCE_PATH, lib, version].filter(Boolean).join('/')
     return NextResponse.rewrite(new URL(rewritePath, request.url))
   }

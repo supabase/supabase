@@ -5,23 +5,37 @@ description: 'Authentication patterns for Supabase Edge Functions.'
 subtitle: 'Authentication patterns for Edge Functions'
 ---
 
-The `withSupabase` wrapper from [`@supabase/server`](https://github.com/supabase/server) verifies the caller's credentials against a declared `auth` mode and hands you a pre-configured Supabase client on `ctx`. The sections below show how to use it for each common auth scenario.
+Secure an Edge Function by declaring which credentials it accepts. The `withSupabase` wrapper from the [`@supabase/server` package](https://github.com/supabase/server) on GitHub checks each caller against the `auth` mode you set. Your handler receives a preconfigured Supabase client on `ctx`.
 
-For how authorization headers and the `verify_jwt` platform check work under the hood, see [Authorization headers](/docs/guides/functions/auth-headers).
+- [Choose an auth mode](#choose-an-auth-mode) compares the four modes. Start here if you aren't sure which one your function needs.
+- [Secure your function](#secure-your-function) has an example for each mode, plus how to combine modes and shape your own error response.
+- [Environment variables](#environment-variables) lists what `@supabase/server` reads from the environment.
+
+## Choose an auth mode
+
+Each mode names the credential a caller must present. `withSupabase` accepts four:
 
 | Mode            | Accepts                                    |
 | --------------- | ------------------------------------------ |
 | `'user'`        | A valid user JWT on `Authorization`        |
-| `'secret'`      | A secret key on `apikey`                   |
-| `'publishable'` | A publishable key on `apikey`              |
+| `'secret'`      | The `default` secret key on `apikey`       |
+| `'publishable'` | The `default` publishable key on `apikey`  |
 | `'none'`        | Any caller, no check (for signed webhooks) |
 
-## Authenticated user calls
+For how authorization headers and the `verify_jwt` platform check work, see [Authorization headers](/docs/guides/functions/auth-headers).
 
-Functions called by signed-in users — typically through `supabase.functions.invoke` from the client — send the user's session JWT on the `Authorization` header. Keep `verify_jwt = true` (the default) so the platform validates the JWT before your handler runs, then use `auth: 'user'` to get `ctx.supabase` already scoped to the caller's RLS policies.
+## Secure your function
+
+Each of the following sections covers one mode, then how to combine modes and shape your own error response. Every example wraps the handler in `withSupabase` and reads its Supabase client from `ctx`.
+
+### Authenticated user calls
+
+When a signed-in user calls a function, the request carries the user's session JWT on the `Authorization` header. Your app usually makes that call through `supabase.functions.invoke`. Use `auth: 'user'` to get a `ctx.supabase` scoped to the caller's Row Level Security (RLS) policies.
+
+The default is `verify_jwt = true`, so the platform validates the JWT before your handler runs. Leave it on for user-facing functions. Turning it off to clear a 401 during development removes the platform's check, leaving `withSupabase` as the only thing that verifies the caller.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'user' }, async (_req, ctx) => {
@@ -38,12 +52,20 @@ export default {
 }
 ```
 
-## Service-to-service calls
+Reach for `ctx.supabase` when the handler serves the signed-in caller. It applies their RLS policies to every query. Use `ctx.supabaseAdmin` only for work that has to cross those policies.
 
-Cron jobs, workers, `pg_net`, or another Edge Function make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'` to validate the key against any secret key from your [dashboard](/dashboard/project/_/settings/api-keys). You get `ctx.supabaseAdmin` for privileged work.
+<Admonition type="danger">
+
+A handler that queries a shared table through `ctx.supabaseAdmin` without filtering by the caller's ID returns every user's rows. `ctx.supabaseAdmin` bypasses Row Level Security, so filter by the caller's ID from `ctx.userClaims`, or use `ctx.supabase` instead.
+
+</Admonition>
+
+### Service-to-service calls
+
+Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {
@@ -55,15 +77,15 @@ export default {
 
 <Admonition type="note">
 
-To accept only one specific key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` only accepts the secret key you named "automations" in the [**Settings > API keys**](/dashboard/project/_/settings/api-keys) section of the Dashboard. The same syntax works for publishable keys (`auth: 'publishable:<name>'`).
+`auth: 'secret'` accepts only the key named `default`. To accept a different key, use `auth: 'secret:<name>'`. For example, `auth: 'secret:automations'` accepts only the secret key named `automations`. To accept any secret key on the project, use `auth: 'secret:*'`. Every project starts with a secret key named `default`, and you can add more. To name a new key, open [**Settings > API keys**](/dashboard/project/_/settings/api-keys) in the Supabase Dashboard. The same syntax works for publishable keys: `auth: 'publishable:<name>'` and `auth: 'publishable:*'`.
 
-![A secret key named "automations" listed under Secret keys in the Supabase dashboard.](/docs/img/guides/functions/secret-keys-automations.png)
+![The Secret keys section of the Supabase Dashboard. A table with Name and API key columns lists two keys, "default" and "automations". Each row shows a masked sb_secret_ value with reveal and copy buttons.](/docs/img/guides/functions/secret-keys-automations.png)
 
 </Admonition>
 
-## Public functions
+### Public functions
 
-For a genuinely public function, like a health check, use `auth: 'none'` with `verify_jwt = false` so anonymous callers can reach the handler.
+For a genuinely public function, such as a health check, use `auth: 'none'` with `verify_jwt = false` so anonymous callers can reach the handler.
 
 ```toml
 [functions.health]
@@ -71,7 +93,7 @@ verify_jwt = false
 ```
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async () => {
@@ -81,17 +103,22 @@ export default {
 }
 ```
 
-`auth: 'none'` skips every credential check — see the caution under [External webhooks](#external-webhooks) before using it on anything that reads or writes sensitive data.
+`auth: 'none'` accepts every caller. For a function that authenticates callers itself, see the [External webhooks](#external-webhooks) section of this page.
 
-## External webhooks
+### External webhooks
 
-External providers like Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Use `auth: 'none'` to skip the SDK's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
+External providers such as Stripe or GitHub don't send Supabase credentials. They sign the request body with their own shared secret. Use `auth: 'none'` to skip the wrapper's credential check, then verify the provider's signature inside the handler. Keep `verify_jwt = false`.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 import Stripe from 'npm:stripe'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!)
+
+// Deno has no synchronous Node crypto, so signature verification must go through
+// Stripe's SubtleCryptoProvider. The synchronous `constructEvent()` throws
+// "SubtleCryptoProvider cannot be used in a synchronous context" on this runtime.
+const cryptoProvider = Stripe.createSubtleCryptoProvider()
 
 export default {
   fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
@@ -99,29 +126,37 @@ export default {
     const body = await req.text()
 
     try {
-      stripe.webhooks.constructEvent(body, signature, Deno.env.get('STRIPE_WEBHOOK_SECRET')!)
-    } catch {
+      await stripe.webhooks.constructEventAsync(
+        body,
+        signature,
+        Deno.env.get('STRIPE_WEBHOOK_SECRET')!,
+        undefined,
+        cryptoProvider
+      )
+    } catch (err) {
+      // Log the reason so a configuration error isn't mistaken for a forged payload.
+      console.error('Stripe signature verification failed:', err)
       return new Response('bad signature', { status: 400 })
     }
 
-    // your business logic. ctx.supabaseAdmin available for db work
+    // your business logic. ctx.supabaseAdmin available for database work
     return Response.json({ received: true })
   }),
 }
 ```
 
-<Admonition type="caution">
+<Admonition type="danger">
 
-`auth: 'none'` disables every credential check. Your handler is fully responsible for authenticating the caller. Never use it on an endpoint that reads or writes sensitive data without verifying the caller some other way.
+`auth: 'none'` disables every credential check, so your handler is fully responsible for authenticating the caller. When the function reads or writes sensitive data, verify the caller yourself inside the handler.
 
 </Admonition>
 
-## Combining modes
+### Combining modes
 
-Functions that answer both users and internal callers take an array on `auth`. Modes are tried in order. The first match wins, and `ctx.authMode` tells you which matched.
+Functions that answer both users and internal callers take an array on `auth`. The wrapper tries each mode in order and uses the first one that matches. `ctx.authMode` tells you which mode matched.
 
 ```ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: ['user', 'secret'] }, async (req, ctx) => {
@@ -136,12 +171,12 @@ export default {
 }
 ```
 
-## Custom error responses
+### Custom error responses
 
-To shape the 401 response yourself, use `createSupabaseContext` instead of `withSupabase`. It returns a `{ data, error }` tuple so you stay in control.
+To shape the 401 response yourself, use `createSupabaseContext` instead of `withSupabase`. It returns a `{ data, error }` tuple instead of rejecting the request for you.
 
 ```ts
-import { createSupabaseContext } from 'npm:@supabase/server'
+import { createSupabaseContext } from 'npm:@supabase/server@1'
 
 export default {
   fetch: async (req: Request) => {
@@ -156,7 +191,7 @@ export default {
 
 ## Environment variables
 
-`@supabase/server` reads its configuration from a standard set of environment variables. On the Supabase platform and in local development with the CLI, these are auto-provisioned.
+`@supabase/server` reads its configuration from a standard set of environment variables, which the Supabase Platform and the Supabase CLI provision for you.
 
 | Variable                    | What it is                                |
 | --------------------------- | ----------------------------------------- |
@@ -165,10 +200,10 @@ export default {
 | `SUPABASE_SECRET_KEYS`      | Named secret keys as a JSON object        |
 | `SUPABASE_JWKS`             | JSON Web Key Set used to verify user JWTs |
 
-Local development with the CLI uses a single-key setup, which the SDK also accepts as a fallback: `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY`.
+Local development with the CLI uses a single-key setup. `@supabase/server` also accepts `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` as a fallback.
 
 <Admonition type="note">
 
-The same zero-config experience is available on other runtimes. Install [`@supabase/server`](https://github.com/supabase/server) in your Node.js, Bun, Cloudflare Workers, or self-hosted Deno app and set the environment variables above. See the package's [environment variables guide](https://github.com/supabase/server/blob/main/docs/environment-variables.md) for the full reference.
+`@supabase/server` configures itself the same way on other runtimes. Install it in your Node.js, Bun, Cloudflare Workers, or self-hosted Deno app, then set the same variables. For the full reference, see the [environment variables guide](https://github.com/supabase/server/blob/main/docs/environment-variables.md) in the `@supabase/server` repository.
 
 </Admonition>
