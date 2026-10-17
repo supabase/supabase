@@ -10894,10 +10894,10 @@ export interface components {
          */
         active: boolean
         /**
-         * @description Bytes between the current WAL location and the confirmed flush LSN.
+         * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
          * @example 2048
          */
-        confirmed_flush_lsn_bytes: number
+        confirmed_flush_lsn_bytes?: number | null
         /**
          * @description Flush lag expressed in milliseconds.
          * @example 1200
@@ -10909,10 +10909,10 @@ export interface components {
          */
         reply_time_lag?: number | null
         /**
-         * @description Bytes between the current WAL location and the slot restart LSN.
+         * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
          * @example 1024
          */
-        restart_lsn_bytes: number
+        restart_lsn_bytes?: number | null
         /**
          * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
@@ -10923,7 +10923,7 @@ export interface components {
          * @example reserved
          * @enum {string|null}
          */
-        wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
+        wal_status?: 'extended' | 'lost' | null | 'reserved' | 'unknown' | 'unreserved'
         /**
          * @description Write lag expressed in milliseconds.
          * @example 1500
@@ -11014,10 +11014,10 @@ export interface components {
            */
           active: boolean
           /**
-           * @description Bytes between the current WAL location and the confirmed flush LSN.
+           * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
            * @example 2048
            */
-          confirmed_flush_lsn_bytes: number
+          confirmed_flush_lsn_bytes?: number | null
           /**
            * @description Flush lag expressed in milliseconds.
            * @example 1200
@@ -11029,10 +11029,10 @@ export interface components {
            */
           reply_time_lag?: number | null
           /**
-           * @description Bytes between the current WAL location and the slot restart LSN.
+           * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
            * @example 1024
            */
-          restart_lsn_bytes: number
+          restart_lsn_bytes?: number | null
           /**
            * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
@@ -11043,7 +11043,7 @@ export interface components {
            * @example reserved
            * @enum {string|null}
            */
-          wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
+          wal_status?: 'extended' | 'lost' | null | 'reserved' | 'unknown' | 'unreserved'
           /**
            * @description Write lag expressed in milliseconds.
            * @example 1500

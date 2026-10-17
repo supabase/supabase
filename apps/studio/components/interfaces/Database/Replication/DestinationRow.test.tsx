@@ -107,7 +107,7 @@ const addPipelineStatusMock = (statusName: ReplicationPipelineStatusResponse['st
   })
 
 const addReplicationStatusMock = (
-  confirmedFlushLsnBytes: number,
+  confirmedFlushLsnBytes: number | null,
   tableStatuses: ReplicationPipelineReplicationStatusResponse['table_statuses'] = []
 ) =>
   addAPIMock({
@@ -359,6 +359,20 @@ describe('DestinationRow', () => {
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     expect(await screen.findByText('2 KB')).toHaveClass('text-foreground-light')
+  })
+
+  test('shows unavailable lag instead of caught up when the distance is null', async () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('started')
+    addReplicationStatusMock(null)
+    addVersionMock()
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    expect(await screen.findByText('Unavailable')).toBeInTheDocument()
+    expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
   })
 
   test('shows initial sync with the same lag text treatment', async () => {
