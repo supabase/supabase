@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState, type PropsWithChildren } from 'react'
-import { AnchorProvider } from 'ui-patterns/Toc'
+import { AnchorProvider, TocDisclosure } from 'ui-patterns/Toc'
 
-import { TocAnchorsContext, useSubscribeTocRerender } from './GuidesMdx.state'
+import { TocAnchorsContext, useSubscribeTocRerender, useTocAnchors } from './GuidesMdx.state'
 
 interface TOCHeader {
   id?: string
@@ -64,4 +64,10 @@ const TocAnchorsProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-export { TocAnchorsProvider }
+// the guide template is a server component, so the headings collected in the browser reach it through here
+const GuideTocDisclosure = ({ className }: { className?: string }) => {
+  const { toc } = useTocAnchors()
+  return <TocDisclosure items={toc} className={className} />
+}
+
+export { GuideTocDisclosure, TocAnchorsProvider }
