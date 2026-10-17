@@ -1,7 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
+import {
+  Edit3Icon,
+  EyeIcon,
+  EyeOffIcon,
+  KeyIcon,
+  LoaderIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -10,6 +18,9 @@ import {
   DropdownMenuContent,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -54,9 +65,22 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
     return (
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button title="Manage Secret" variant="text" className="px-1" icon={<MoreVertical />} />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  title="Manage Secret"
+                  variant="text"
+                  className="px-1"
+                  icon={<MoreVerticalIcon />}
+                  aria-label="Manage secret"
+                  // Tooltip repeats the label; screen readers would read it twice
+                  aria-describedby={undefined}
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Manage secret</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuItemTooltip
               className="gap-x-2"
@@ -66,7 +90,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
                 content: { side: 'left', text: 'You need additional permissions to edit secrets' },
               }}
             >
-              <Edit3 size={12} />
+              <Edit3Icon size={12} />
               <p>Edit</p>
             </DropdownMenuItemTooltip>
 
@@ -83,7 +107,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
                 },
               }}
             >
-              <Trash size={12} />
+              <TrashIcon size={12} />
               <p className="text-foreground-light">Delete</p>
             </DropdownMenuItemTooltip>
           </DropdownMenuContent>
@@ -95,20 +119,30 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   if (col.id === 'secret_value') {
     return (
       <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
-        <Button
-          variant="text"
-          className="px-1.5"
-          icon={
-            isFetching && revealedValue === undefined ? (
-              <Loader className="animate-spin" size={16} strokeWidth={1.5} />
-            ) : !revealSecret ? (
-              <Eye size={16} strokeWidth={1.5} />
-            ) : (
-              <EyeOff size={16} strokeWidth={1.5} />
-            )
-          }
-          onClick={() => setRevealSecret(!revealSecret)}
-        />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="text"
+              className="px-1.5"
+              icon={
+                isFetching && revealedValue === undefined ? (
+                  <LoaderIcon className="animate-spin" size={16} strokeWidth={1.5} />
+                ) : !revealSecret ? (
+                  <EyeIcon size={16} strokeWidth={1.5} />
+                ) : (
+                  <EyeOffIcon size={16} strokeWidth={1.5} />
+                )
+              }
+              onClick={() => setRevealSecret(!revealSecret)}
+              aria-label={revealSecret ? 'Hide secret value' : 'Show secret value'}
+              // Tooltip repeats the label; screen readers would read it twice
+              aria-describedby={undefined}
+            />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {revealSecret ? 'Hide secret value' : 'Show secret value'}
+          </TooltipContent>
+        </Tooltip>
         <div className="grow min-w-0">
           {revealSecret && revealedValue !== undefined ? (
             <Input copy readOnly size="tiny" className="font-mono" value={revealedValue} />
@@ -134,7 +168,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
   if (col.id === 'id') {
     return (
       <div className="w-full flex items-center">
-        <Key size={12} strokeWidth={2} className="text-foreground-light mr-2" />
+        <KeyIcon size={12} strokeWidth={2} className="text-foreground-light mr-2" />
         <p className="text-foreground-light text-xs font-mono truncate" title={row.id}>
           {row.id}
         </p>

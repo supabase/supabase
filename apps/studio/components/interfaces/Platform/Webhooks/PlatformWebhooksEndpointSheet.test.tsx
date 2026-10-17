@@ -1,29 +1,16 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointSheet, toEndpointPayload } from './PlatformWebhooksEndpointSheet'
 import { customRender } from '@/tests/lib/custom-render'
 
-const { generateWebhookEndpointNameMock } = vi.hoisted(() => ({
-  generateWebhookEndpointNameMock: vi.fn(() => 'winged-envelope'),
-}))
-
-vi.mock(import('./PlatformWebhooks.utils'), async (importOriginal) => {
-  const actual = await importOriginal()
-  return {
-    ...actual,
-    generateWebhookEndpointName: generateWebhookEndpointNameMock,
-  }
-})
-
 const PROJECT_EVENT_TYPES = ['project.updated', 'project.paused']
 
 const createEndpoint = (overrides?: Partial<WebhookEndpoint>): WebhookEndpoint => ({
   id: '3c9b7e21-8d54-4f63-b2a1-6e7d8c9f0a12',
-  name: 'Billing events',
   url: 'https://hooks.example.com/billing',
   description: 'Invoices and receipts',
   enabled: true,
@@ -65,46 +52,14 @@ const findEventTypeCheckbox = (eventType: string) =>
     name: new RegExp(eventType.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')),
   })
 describe('PlatformWebhooksEndpointSheet', () => {
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
-  it('prefills the name field when creating an endpoint', async () => {
-    renderEndpointSheet()
-
-    expect(await screen.findByDisplayValue('winged-envelope')).toBeInTheDocument()
-  })
-
-  it('loads the existing name and description in edit mode', async () => {
+  it('loads the existing url and description in edit mode', async () => {
     renderEndpointSheet({
       mode: 'edit',
       endpoint: createEndpoint(),
     })
 
-    expect(await screen.findByDisplayValue('Billing events')).toBeInTheDocument()
+    expect(await screen.findByDisplayValue('https://hooks.example.com/billing')).toBeInTheDocument()
     expect(screen.getByDisplayValue('Invoices and receipts')).toBeInTheDocument()
-  })
-
-  it('submits an empty name when an existing name is cleared', async () => {
-    const user = userEvent.setup()
-    const { onSubmit } = renderEndpointSheet({
-      mode: 'edit',
-      endpoint: createEndpoint(),
-    })
-
-    const nameInput = await screen.findByDisplayValue('Billing events')
-    await user.clear(nameInput)
-    submitForm()
-
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: '',
-        url: 'https://hooks.example.com/billing',
-        description: 'Invoices and receipts',
-      }),
-      expect.anything()
-    )
   })
 
   it('blocks submit when the endpoint URL is empty', async () => {
@@ -252,7 +207,6 @@ describe('PlatformWebhooksEndpointSheet', () => {
   it('strips fully empty custom header rows from the payload', () => {
     expect(
       toEndpointPayload({
-        name: 'Billing events',
         url: 'https://hooks.example.com/billing',
         description: '',
         enabled: true,
@@ -262,6 +216,7 @@ describe('PlatformWebhooksEndpointSheet', () => {
           { key: 'X-Webhook-Secret', value: 'super-secret' },
           { key: '', value: '' },
         ],
+        signingSecret: 'whsec_example',
       })
     ).toEqual(
       expect.objectContaining({

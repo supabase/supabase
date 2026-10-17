@@ -1,10 +1,16 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { ChartConfig } from './ChartConfig'
-import { UtilityActions } from './UtilityActions'
-import { UtilityTabExplain } from './UtilityTabExplain'
 import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
@@ -16,14 +22,8 @@ import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
-  isExplainExecuting?: boolean
   isDebugging?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
-  prettifyQuery: () => void
-  executeQuery: () => void
-  executeExplainQuery: () => void
-  showExplainTab?: boolean
   onDebug: () => void
   buildDebugPrompt: () => string
   activeTab?: string
@@ -42,14 +42,8 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
 export const UtilityPanel = ({
   id,
   isExecuting,
-  isExplainExecuting,
   isDebugging,
   isDisabled,
-  hasSelection,
-  prettifyQuery,
-  executeQuery,
-  executeExplainQuery,
-  showExplainTab = true,
   onDebug,
   buildDebugPrompt,
   activeTab = 'results',
@@ -62,14 +56,6 @@ export const UtilityPanel = ({
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = sessionSnap.results[id]?.[0]
-
-  const handleTabChange = (tab: string) => {
-    // When switching to the explain tab, trigger the explain query
-    if (tab === 'explain') {
-      executeExplainQuery()
-    }
-    onActiveTabChange?.(tab)
-  }
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -130,20 +116,47 @@ export const UtilityPanel = ({
   }
 
   return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full h-full flex flex-col">
+    <Tabs
+      value={activeTab}
+      onValueChange={onActiveTabChange}
+      className="w-full h-full flex flex-col"
+    >
       <TabsList className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger className="py-3 text-xs" value="results">
             <span className="translate-y-px">Results</span>
           </TabsTrigger>
-          {showExplainTab && (
-            <TabsTrigger className="py-3 text-xs" value="explain">
-              <span className="translate-y-px">Explain</span>
-            </TabsTrigger>
-          )}
           <TabsTrigger className="py-3 text-xs" value="chart">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {result?.rows !== undefined && !isExecuting && (
+            <Tooltip>
+              <TooltipTrigger>
+                <p className="text-xs">
+                  <span className="text-foreground">
+                    {result.rows.length} row{result.rows.length === 1 ? '' : 's'}
+                  </span>
+                  <span className="text-foreground-lighter ml-1">
+                    {result.autoLimit !== undefined && `(Limited to only ${result.autoLimit} rows)`}
+                  </span>
+                </p>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="flex flex-col gap-y-1">
+                  <span>
+                    Results are automatically limited to preserve browser performance, in particular
+                    if your query returns an exceptionally large number of rows.
+                  </span>
+                  <span className="text-foreground-light">
+                    You may change or remove this limit from the toolbar above.
+                  </span>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           {result?.rows && (
             <DownloadResultsButton
@@ -157,15 +170,6 @@ export const UtilityPanel = ({
             />
           )}
         </div>
-
-        <UtilityActions
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          hasSelection={hasSelection}
-          prettifyQuery={prettifyQuery}
-          executeQuery={executeQuery}
-        />
       </TabsList>
 
       <TabsContent asChild value="results" className="mt-0 grow">
@@ -178,12 +182,6 @@ export const UtilityPanel = ({
           isDebugging={isDebugging}
         />
       </TabsContent>
-
-      {showExplainTab && (
-        <TabsContent asChild value="explain" className="mt-0 grow">
-          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-        </TabsContent>
-      )}
 
       <TabsContent asChild value="chart" className="mt-0 grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />

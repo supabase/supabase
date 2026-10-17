@@ -27,8 +27,26 @@ vi.mock('next/router', () => ({
 
 vi.mock('shared-data/plans', () => ({
   plans: [
-    { id: 'tier_free', planId: 'free', name: 'Free', costUnit: '/ month', features: [] },
-    { id: 'tier_pro', planId: 'pro', name: 'Pro', costUnit: '/ month', features: [] },
+    {
+      id: 'tier_free',
+      planId: 'free',
+      name: 'Free',
+      costUnit: '/ month',
+      features: ['Unlimited API requests'],
+      description: 'Perfect for passion projects & simple websites.',
+      preface: 'Get started with:',
+      footer: 'Free projects are paused after 1 week of inactivity. Limit of 2 active projects.',
+    },
+    {
+      id: 'tier_pro',
+      planId: 'pro',
+      name: 'Pro',
+      nameBadge: 'Most Popular',
+      costUnit: '/ month',
+      features: ['Email support'],
+      description: 'For production applications with the power to scale.',
+      preface: 'Everything in the Free Plan, plus:',
+    },
   ],
 }))
 
@@ -119,7 +137,6 @@ vi.mock('./SubscriptionPlanUpdateDialog', () => ({
 
 describe('PlanUpdateSidePanel', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockSelectedOrganization.mockReturnValue(
       createMockOrganization({
         slug: 'stripe-org',
@@ -182,5 +199,36 @@ describe('PlanUpdateSidePanel', () => {
     render(<PlanUpdateSidePanel />)
 
     expect(screen.getByTestId('partner-managed-resource')).toBeInTheDocument()
+  })
+
+  describe('plan presentation', () => {
+    beforeEach(() => {
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({ slug: 'test-org', billing_partner: null })
+      )
+    })
+
+    it('renders the full-screen shell', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
+    })
+
+    it('renders pricing-page style cards with description and preface', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(
+        screen.getByText('Perfect for passion projects & simple websites.')
+      ).toBeInTheDocument()
+      expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
+    })
+
+    it('does not render gap rows', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.queryByText('Not included')).not.toBeInTheDocument()
+      expect(screen.queryByText('Plan limits')).not.toBeInTheDocument()
+    })
   })
 })

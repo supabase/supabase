@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Compute',
+        url: '/compute',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },
@@ -93,8 +97,8 @@ const footerData = [
         url: '/partners',
       },
       {
-        text: 'Integrations',
-        url: '/partners/integrations',
+        text: 'Partner Catalog',
+        url: '/partners/catalog',
       },
       {
         text: 'Brand Assets',
@@ -105,8 +109,8 @@ const footerData = [
         url: '/security',
       },
       {
-        text: 'DPA',
-        url: '/legal/dpa',
+        text: 'Regions',
+        url: '/regions',
       },
       {
         text: 'SOC2',
@@ -126,8 +130,8 @@ const footerData = [
         url: '/docs',
       },
       {
-        text: 'Supabase UI',
-        url: 'https://supabase.com/ui',
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
       },
       {
         text: 'Changelog',

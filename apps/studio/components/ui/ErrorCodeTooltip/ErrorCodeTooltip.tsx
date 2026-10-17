@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import { useState } from 'react'
@@ -102,7 +102,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
                   height={14}
                   width={72}
                 />
-                <span className="font-mono text-[11px] font-semibold text-brand tracking-wide">
+                <span className="font-mono text-[11px] font-semibold text-primary tracking-wide">
                   DOCS
                 </span>
               </div>
@@ -117,7 +117,7 @@ export const ErrorCodeTooltip = ({ errorCode, service, children }: ErrorCodeTool
               additionalDropdownItems={[
                 {
                   label: 'Go to Docs',
-                  icon: <ExternalLink size={14} />,
+                  icon: <ExternalLinkIcon size={14} />,
                   href: docsUrl,
                 },
               ]}

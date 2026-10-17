@@ -133,6 +133,24 @@ describe('parseCronJobCommand', () => {
     })
   })
 
+  it('should fall back to the pg_net default timeout when timeout_milliseconds is missing', () => {
+    const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), body:='' );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toMatchObject({
+      type: 'edge_function',
+      timeoutMs: 5000,
+    })
+  })
+
+  it('should fall back to the pg_net default timeout for http requests without timeout_milliseconds', () => {
+    const command = `select net.http_get( url:='https://example.com/api' );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toMatchObject({
+      type: 'http_request',
+      method: 'GET',
+      endpoint: 'https://example.com/api',
+      timeoutMs: 5000,
+    })
+  })
+
   it('should return a edge function config when the body is missing', () => {
     const command = `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
     expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
@@ -148,6 +166,24 @@ describe('parseCronJobCommand', () => {
       timeoutMs: 5000,
       type: 'edge_function',
       snippet: command,
+    })
+  })
+
+  it('should return an edge function config for a self-hosted function URL', () => {
+    const command = `select net.http_post( url:='http://kong:8000/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'default', undefined, false)).toMatchObject({
+      edgeFunctionName: 'http://kong:8000/functions/v1/_',
+      type: 'edge_function',
+    })
+  })
+
+  it('should return an edge function config for a self-hosted public function URL', () => {
+    const command = `select net.http_post( url:='https://default.supabase.localhost/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer something'), timeout_milliseconds:=5000 );`
+    expect(
+      parseCronJobCommand(command, 'default', 'https://default.supabase.localhost/rest/v1/', false)
+    ).toMatchObject({
+      edgeFunctionName: 'https://default.supabase.localhost/functions/v1/_',
+      type: 'edge_function',
     })
   })
 

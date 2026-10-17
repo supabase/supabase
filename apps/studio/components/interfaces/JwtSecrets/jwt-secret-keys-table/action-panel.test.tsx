@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ActionPanel } from './action-panel'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -14,10 +14,6 @@ vi.mock('@/components/ui/Shortcut', () => ({
 }))
 
 describe('ActionPanel', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('wraps the action button with a shortcut when one is provided', async () => {
     const user = userEvent.setup()
     const onClick = vi.fn()

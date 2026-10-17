@@ -7,7 +7,7 @@ import {
   Position,
   useReactFlow,
 } from '@xyflow/react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { memo, useCallback, useState } from 'react'
 import { Badge, cn } from 'ui'
 
@@ -52,7 +52,9 @@ const DefaultEdgeComponent = ({
       <BaseEdge
         id={id}
         path={edgePath}
-        className={cn(selected ? 'stroke-brand!' : isDownloading ? 'stroke-black!' : undefined)}
+        className={cn(
+          selected ? 'stroke-primary-bright!' : isDownloading ? 'stroke-black!' : undefined
+        )}
         stroke="#000000"
         {...props}
       />
@@ -141,7 +143,7 @@ const EdgeRelationInfo = ({
       <Badge
         ref={checkIfShouldBeDisplayed}
         className={cn(
-          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-brand',
+          'absolute pointer-events-auto z-50 p-1 rounded-[4px] gap-1 outline outline-1 outline-primary-bright',
           show ? 'opacity-100' : 'opacity-0'
         )}
         style={{
@@ -157,7 +159,7 @@ const EdgeRelationInfo = ({
                 table={data.sourceName}
                 column={data.sourceColumnName}
               />
-              <ArrowRight size={12} />
+              <ArrowRightIcon size={12} />
               <EdgeNodeData
                 schema={data.targetSchemaName}
                 table={data.targetName}
@@ -171,7 +173,7 @@ const EdgeRelationInfo = ({
                 table={data.targetName}
                 column={data.targetColumnName}
               />
-              <ArrowLeft size={12} />
+              <ArrowLeftIcon size={12} />
               <EdgeNodeData
                 schema={data.sourceSchemaName}
                 table={data.sourceName}

@@ -1,6 +1,11 @@
 const { defineConfig } = require('eslint/config')
+const { fixupPluginRules } = require('@eslint/compat')
 const barrelFiles = require('eslint-plugin-barrel-files')
-const jsxA11y = require('eslint-plugin-jsx-a11y')
+const valtio = require('eslint-plugin-valtio')
+// eslint-plugin-react-hook-form@0.3.1 (latest) still calls the ESLint 8
+// `context.getScope()`, which ESLint 9 removed. fixupPluginRules shims the
+// deprecated context methods so the rules run under flat config.
+const reactHookForm = require('eslint-plugin-react-hook-form')
 const supabaseConfig = require('eslint-config-supabase/next')
 
 // Analytics SQL wire boundary — see the block below for context. Shared so the
@@ -34,13 +39,58 @@ const NO_MODULE_SCOPE_CREATE_CLIENT = {
     'Do not construct a Supabase client at module scope in API route files — the TanStack server evaluates every route module at boot, so a missing env var (e.g. SUPABASE_URL on platform) crashes every route. Construct it lazily inside the handler (see lib/api/self-hosted-admin.ts).',
 }
 
+const LUCIDE_ICON_IMPORT_PATTERNS = [
+  {
+    group: ['lucide-react'],
+    importNamePattern: '^(?!.*Icon$)(?!Lucide)(?!icons$)(?!create)',
+    message:
+      'Import Lucide icons with the Icon suffix (e.g. `CheckIcon`, not `Check` or `Check as CheckIcon`).',
+  },
+]
+
+const BASE_RESTRICTED_IMPORT_PATHS = [
+  {
+    name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
+    message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
+  },
+]
+
+const APPROVAL_GATE_MESSAGE =
+  'Promote untrusted SQL through the `gate` that approvalGatedToolFromContract passes to execute.'
+const TOOL_MODULE_RESTRICTED_IMPORT_PATHS = [
+  {
+    name: '@supabase/pg-meta',
+    importNames: ['acceptUntrustedSql'],
+    message: APPROVAL_GATE_MESSAGE,
+  },
+  {
+    name: '@/data/logs/safe-analytics-sql',
+    importNames: ['acceptUntrustedLogsSql'],
+    message: APPROVAL_GATE_MESSAGE,
+  },
+]
+// The gate itself is also off limits: only `approvalGatedToolFromContract` may hand it out.
+const TOOL_MODULE_RESTRICTED_IMPORT_PATTERNS = [
+  {
+    group: ['**/approval-gate', './approval-gate'],
+    importNames: ['approvalGate'],
+    message: APPROVAL_GATE_MESSAGE,
+  },
+]
+
 module.exports = defineConfig([
   { files: ['**/*.ts', '**/*.tsx'] },
   supabaseConfig,
   {
+    files: ['components/ui/PartnerIcon.tsx'],
+    rules: { 'shadcn/no-raw-colors': 'off' },
+  },
+  {
+    files: ['**/*.{js,jsx,mjs,ts,tsx,mts,cts}'],
     plugins: {
       'barrel-files': barrelFiles,
-      'jsx-a11y': jsxA11y,
+      valtio,
+      'react-hook-form': fixupPluginRules(reactHookForm),
     },
     rules: {
       '@next/next/no-img-element': 'off',
@@ -51,44 +101,61 @@ module.exports = defineConfig([
       'no-restricted-imports': [
         'error',
         {
-          paths: [
-            {
-              name: 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader',
-              message: 'Use TanStackTableHeadSort from ui-patterns/Table instead.',
-            },
-          ],
+          paths: BASE_RESTRICTED_IMPORT_PATHS,
+          patterns: LUCIDE_ICON_IMPORT_PATTERNS,
         },
       ],
       'barrel-files/avoid-re-export-all': 'error',
       'jsx-a11y/alt-text': 'warn',
       'jsx-a11y/role-has-required-aria-props': 'error',
-      'jsx-a11y/aria-props': 'warn',
-      'jsx-a11y/aria-proptypes': 'warn',
-      'jsx-a11y/role-supports-aria-props': 'warn',
-      'jsx-a11y/anchor-has-content': 'warn',
-      'jsx-a11y/control-has-associated-label': ['warn', { controlComponents: ['Button', 'Switch'] }],
+      'jsx-a11y/aria-props': 'error',
+      'jsx-a11y/aria-proptypes': 'error',
+      'jsx-a11y/role-supports-aria-props': 'error',
+      'jsx-a11y/anchor-has-content': 'error',
+      'jsx-a11y/control-has-associated-label': [
+        'warn',
+        { controlComponents: ['Button', 'Switch'] },
+      ],
       'jsx-a11y/label-has-associated-control': [
         'warn',
         { labelComponents: ['Label'], controlComponents: ['Input', 'Switch'] },
       ],
-      'jsx-a11y/aria-role': 'warn',
+      'jsx-a11y/aria-role': 'error',
       'jsx-a11y/no-redundant-roles': 'warn',
-      'jsx-a11y/no-aria-hidden-on-focusable': 'warn',
-      'jsx-a11y/tabindex-no-positive': 'warn',
+      'jsx-a11y/no-aria-hidden-on-focusable': 'error',
+      'jsx-a11y/tabindex-no-positive': 'error',
       'jsx-a11y/anchor-is-valid': 'warn',
       'jsx-a11y/heading-has-content': 'warn',
-      'jsx-a11y/no-distracting-elements': 'warn',
+      'jsx-a11y/no-distracting-elements': 'error',
+      'valtio/state-snapshot-rule': 'warn',
+      'valtio/avoid-this-in-proxy': 'error',
+      'react-hook-form/destructuring-formstate': 'error',
+      'react-hook-form/no-access-control': 'error',
+      'react-hook-form/no-nested-object-setvalue': 'error',
+      'react-hook-form/no-use-watch': 'error',
     },
   },
   // Analytics SQL wire boundary: every call to a SQL-bearing analytics
   // endpoint (`logs.all` / `logs.all.otel`) must go through
   // `executeAnalyticsSql` so the `SafeLogSqlFragment` brand is enforced at the
-  // type level. See .claude/skills/safe-sql-execution/SKILL.md.
+  // type level. See .agents/skills/safe-sql-execution/SKILL.md.
   {
     files: ['**/*.ts', '**/*.tsx'],
     ignores: ['data/logs/execute-analytics-sql.ts'],
     rules: {
       'no-restricted-syntax': ['error', ...ANALYTICS_SQL_RESTRICTED_SYNTAX],
+    },
+  },
+  {
+    files: ['lib/ai/tools/*.server.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [...BASE_RESTRICTED_IMPORT_PATHS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATHS],
+          patterns: [...LUCIDE_ICON_IMPORT_PATTERNS, ...TOOL_MODULE_RESTRICTED_IMPORT_PATTERNS],
+        },
+      ],
     },
   },
   // API route modules are eagerly imported by the TanStack server at boot, so

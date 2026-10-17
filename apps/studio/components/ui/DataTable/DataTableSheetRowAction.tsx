@@ -1,18 +1,19 @@
 import { Table } from '@tanstack/react-table'
 import { endOfDay, endOfHour, startOfDay, startOfHour } from 'date-fns'
 import {
-  CalendarClock,
-  CalendarDays,
-  CalendarSearch,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Equal,
-  Filter,
+  CalendarClockIcon,
+  CalendarDaysIcon,
+  CalendarSearchIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CopyIcon,
+  EqualIcon,
+  FilterIcon,
 } from 'lucide-react'
 import { ComponentPropsWithRef, useEffect, useState } from 'react'
 import {
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
@@ -25,9 +26,7 @@ import {
   isLogsFilterColumnValue,
   type LogsColumnFilterValue,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
-import CopyButton from '@/components/ui/CopyButton'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
-import { useCopyToClipboard } from '@/hooks/ui/useCopyToClipboard'
 
 interface DataTableSheetRowActionProps<
   TData,
@@ -36,8 +35,9 @@ interface DataTableSheetRowActionProps<
   fieldValue?: TFields['value']
   filterFields: TFields[]
   value: string | number
-  table: Table<TData>
+  table?: Table<TData>
   label?: string
+  alignOffset?: number
 }
 
 export function DataTableSheetRowAction<TData, TFields extends DataTableFilterField<TData>>({
@@ -48,10 +48,10 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   className,
   table,
   label,
+  alignOffset = 8,
   onKeyDown,
   ...props
 }: DataTableSheetRowActionProps<TData, TFields>) {
-  const { copy } = useCopyToClipboard()
   const [open, setOpen] = useState(false)
 
   /**
@@ -72,7 +72,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
   const field = !!fieldValue ? filterFields.find((f) => f.value === fieldValue) : undefined
   const column =
     !!fieldValue && !!field
-      ? table.getAllColumns().find((c) => c.id === fieldValue.toString())
+      ? table?.getAllColumns().find((c) => c.id === fieldValue.toString())
       : undefined
 
   function renderOptions() {
@@ -95,8 +95,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             }}
             className="flex items-center gap-2"
           >
-            <Filter size={12} />
-            Add as filter for {column?.id}
+            <FilterIcon size={12} />
+            Add filter
           </DropdownMenuItem>
         )
       case 'input':
@@ -110,8 +110,8 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
             }
             className="flex items-center gap-2"
           >
-            <Filter size={12} />
-            Add as filter for {column?.id}
+            <FilterIcon size={12} />
+            Add filter
           </DropdownMenuItem>
         )
       case 'slider':
@@ -122,7 +122,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               className="flex items-center gap-2"
             >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronLeft size={12} />
+              <ChevronLeftIcon size={12} />
               Less or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -130,14 +130,14 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               className="flex items-center gap-2"
             >
               {/* FIXME: change icon as it is not clear */}
-              <ChevronRight size={12} />
+              <ChevronRightIcon size={12} />
               Greater or equal than
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => column?.setFilterValue([value])}
               className="flex items-center gap-2"
             >
-              <Equal size={12} />
+              <EqualIcon size={12} />
               Equal to
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -150,7 +150,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               onClick={() => column?.setFilterValue([date])}
               className="flex items-center gap-2"
             >
-              <CalendarSearch size={12} />
+              <CalendarSearchIcon size={12} />
               Exact timestamp
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -161,7 +161,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               }}
               className="flex items-center gap-2"
             >
-              <CalendarClock size={12} />
+              <CalendarClockIcon size={12} />
               Same hour
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -172,7 +172,7 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
               }}
               className="flex items-center gap-2"
             >
-              <CalendarDays size={12} />
+              <CalendarDaysIcon size={12} />
               Same day
             </DropdownMenuItem>
           </DropdownMenuGroup>
@@ -182,47 +182,41 @@ export function DataTableSheetRowAction<TData, TFields extends DataTableFilterFi
     }
   }
 
-  if (!!field && !!column) {
-    return (
-      <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger
-          asChild
-          className={cn(
-            'rounded-md ring-offset-background',
-            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            'relative py-0',
-            className
-          )}
-          onKeyDown={(e) => {
-            if (e.key === 'ArrowDown') {
-              // REMINDER: default behavior is to open the dropdown menu
-              // But because we use it to navigate between rows, we need to prevent it
-              // and only use "Enter" to select the option
-              e.preventDefault()
-            }
-            onKeyDown?.(e)
-          }}
-          {...props}
+  return (
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <DropdownMenuTrigger
+        asChild
+        className={cn('focus-ring relative', className)}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowDown') {
+            // REMINDER: default behavior is to open the dropdown menu
+            // But because we use it to navigate between rows, we need to prevent it
+            // and only use "Enter" to select the option
+            e.preventDefault()
+          }
+          onKeyDown?.(e)
+        }}
+        {...props}
+      >
+        {children}
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="start" alignOffset={alignOffset} side="bottom" className="w-56">
+        {!!field && !!column && (
+          <>
+            {renderOptions()}
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        <DropdownMenuItem
+          onSelect={() => copyToClipboard(String(value))}
+          className="flex items-center gap-2"
         >
-          {children}
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent align="end" side="bottom" className="w-56">
-          {renderOptions()}
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            onClick={() => copy(String(value), { timeout: 1000 })}
-            className="flex items-center gap-2"
-          >
-            <Copy size={12} />
-            Copy {label}
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  }
-
-  return <CopyButton iconOnly variant="text" text={String(value)} className="px-1" />
+          <CopyIcon size={12} />
+          Copy {label}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
 }

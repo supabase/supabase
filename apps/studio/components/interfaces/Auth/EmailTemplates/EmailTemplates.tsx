@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -173,7 +173,7 @@ export const EmailTemplates = () => {
                 }
                 layout="horizontal"
                 actions={
-                  <Button asChild variant="default">
+                  <Button asChild>
                     <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
                   </Button>
                 }
@@ -205,7 +205,7 @@ export const EmailTemplates = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                          <ChevronRight size={16} className="text-foreground-muted" />
+                          <ChevronRightIcon size={16} className="text-foreground-muted" />
                         </div>
                       </Link>
                     </CardContent>
@@ -267,7 +267,7 @@ export const EmailTemplates = () => {
                                 href={`/project/${projectRef}/auth/templates/${templateSlug}`}
                                 className="py-6 pr-6"
                               >
-                                <ChevronRight size={16} className="text-foreground-muted" />
+                                <ChevronRightIcon size={16} className="text-foreground-muted" />
                               </Link>
                             </div>
                           </CardContent>
@@ -276,9 +276,7 @@ export const EmailTemplates = () => {
                     )}
                     <CardFooter className="justify-end space-x-2">
                       {notificationsForm.formState.isDirty && (
-                        <Button variant="default" onClick={() => notificationsForm.reset()}>
-                          Cancel
-                        </Button>
+                        <Button onClick={() => notificationsForm.reset()}>Cancel</Button>
                       )}
                       <Button
                         variant="primary"

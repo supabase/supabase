@@ -41,7 +41,12 @@ export const PasswordStrengthBar = ({
           ? passwordStrengthMessage
           : 'This is the password to your Postgres database, so it must be strong and hard to guess.') +
           ' '}
-        <button type="button" className={InlineLinkClassName} onClick={generateStrongPassword}>
+        <button
+          type="button"
+          tabIndex={0}
+          className={InlineLinkClassName}
+          onClick={generateStrongPassword}
+        >
           Generate a password
         </button>
         .

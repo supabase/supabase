@@ -5,10 +5,10 @@ import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { AlertCircle, Info } from 'lucide-react'
+import { AlertCircleIcon, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Alert,
@@ -104,7 +104,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const debouncedAddress = useDebounce(billingAddress, 1000)
   const debouncedTaxId = useDebounce(billingTaxId, 1000)
 
-  const watchedAmount = form.watch('amount')
+  const watchedAmount = useWatch({ control: form.control, name: 'amount' })
   const debouncedAmount = useDebounce(watchedAmount, 1000)
   const parsedAmount = Number(debouncedAmount)
   const validAmount =
@@ -259,7 +259,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     <Dialog open={topUpModalVisible} onOpenChange={(open) => onTopUpDialogVisibilityChange(open)}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          variant="default"
           className="pointer-events-auto"
           disabled={!canTopUpCredits || !isPermissionsLoaded}
           tooltip={{
@@ -301,8 +300,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           <DialogDescription className="space-y-2">
             <p className="prose text-sm">
               On successful payment, an invoice will be issued and you'll be granted credits equal
-              to the pre-tax amount. Credits will be applied to future invoices only and are not
-              refundable. The topped up credits do not expire.
+              to the pre-tax amount. Credits will be applied to future invoices only. They cannot be
+              used to pay or adjust outstanding invoices. Credits are non-refundable and do not
+              expire.
             </p>
             <p className="prose text-sm">
               For larger discounted credit packages, please reach out to us via{' '}
@@ -355,7 +355,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
               {paymentIntentConfirmation && paymentIntentConfirmation.error && (
                 <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircleIcon className="h-4 w-4" />
                   <AlertTitle>Error confirming payment</AlertTitle>
                   <AlertDescription>{paymentIntentConfirmation.error.message}</AlertDescription>
                 </Alert>
@@ -364,7 +364,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               {paymentIntentConfirmation?.paymentIntent &&
                 paymentIntentConfirmation.paymentIntent.status === 'processing' && (
                   <Alert variant="default">
-                    <Info className="h-4 w-4" />
+                    <InfoIcon className="h-4 w-4" />
                     <AlertTitle>Payment processing</AlertTitle>
                     <AlertDescription>
                       Your payment is processing and we are waiting for a confirmation from your
@@ -376,7 +376,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
               {errorInitiatingTopUp && (
                 <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
+                  <AlertCircleIcon className="h-4 w-4" />
                   <AlertTitle>Error topping up balance</AlertTitle>
                   <AlertDescription>{errorInitiatingTopUp.message}</AlertDescription>
                 </Alert>

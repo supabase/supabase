@@ -3,18 +3,17 @@ import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
-  AlertCircle,
-  Check,
-  CheckCircle,
-  Circle,
-  Loader,
-  Maximize2,
-  Minimize2,
-  Settings,
+  AlertCircleIcon,
+  CheckCircleIcon,
+  CircleIcon,
+  LoaderIcon,
+  Maximize2Icon,
+  Minimize2Icon,
+  SettingsIcon,
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, SuccessCheck, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -80,7 +79,7 @@ export const UpgradingState = () => {
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <CheckCircle className="text-brand" size={40} strokeWidth={1.5} />
+                  <CheckCircleIcon className="text-primary" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
@@ -90,7 +89,12 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="mx-auto">
-                  <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
+                  <Button
+                    variant="primary"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={refetchProjectDetails}
+                  >
                     Return to project
                   </Button>
                 </div>
@@ -98,7 +102,7 @@ export const UpgradingState = () => {
             ) : isFailed ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <AlertCircle className="text-amber-900" size={40} strokeWidth={1.5} />
+                  <AlertCircleIcon className="text-amber-900" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
@@ -108,7 +112,7 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Button asChild variant="default">
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -120,7 +124,12 @@ export const UpgradingState = () => {
                       Contact support
                     </SupportLink>
                   </Button>
-                  <Button loading={loading} disabled={loading} onClick={refetchProjectDetails}>
+                  <Button
+                    variant="primary"
+                    loading={loading}
+                    disabled={loading}
+                    onClick={refetchProjectDetails}
+                  >
                     Return to project
                   </Button>
                 </div>
@@ -129,9 +138,9 @@ export const UpgradingState = () => {
               <div className="grid w-[480px] gap-4">
                 <div className="relative mx-auto max-w-[300px]">
                   <div className="absolute flex items-center justify-center w-full h-full">
-                    <Settings className="animate-spin" size={20} strokeWidth={2} />
+                    <SettingsIcon className="animate-spin" size={20} strokeWidth={2} />
                   </div>
-                  <Circle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
+                  <CircleIcon className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   {isPerformingFullPhysicalBackup ? (
@@ -160,14 +169,14 @@ export const UpgradingState = () => {
                     style={{ maxHeight: isExpanded ? '500px' : '110px' }}
                   >
                     {isExpanded ? (
-                      <Minimize2
+                      <Minimize2Icon
                         size={14}
                         strokeWidth={2}
                         className="absolute z-10 cursor-pointer top-3 right-3"
                         onClick={() => setIsExpanded(false)}
                       />
                     ) : (
-                      <Maximize2
+                      <Maximize2Icon
                         size={14}
                         strokeWidth={2}
                         className="absolute z-10 cursor-pointer top-3 right-3"
@@ -195,16 +204,14 @@ export const UpgradingState = () => {
                           <div key={message.key} className="flex items-center space-x-4">
                             {isCurrent ? (
                               <div className="flex items-center justify-center w-5 h-5 rounded-full">
-                                <Loader
+                                <LoaderIcon
                                   size={20}
                                   className="animate-spin text-foreground-light"
                                   strokeWidth={2}
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
-                                <Check size={12} className="text-white" strokeWidth={3} />
-                              </div>
+                              <SuccessCheck />
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}

@@ -48,8 +48,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
   const { table } = useDataTable()
   const chartHighlight = useChartHighlight()
 
-  const showHighlight =
-    chartHighlight?.left && chartHighlight?.right && chartHighlight?.left !== chartHighlight?.right
+  const showHighlight = !!chartHighlight?.left && !!chartHighlight?.right
 
   // REMINDER: date has to be a string for tooltip label to work - don't ask me why
   const chart = useMemo(
@@ -69,6 +68,11 @@ export function TimelineChart<TChart extends BaseChartSchema>({
     return { interval, period: calculatePeriod(interval) }
   }, [data])
 
+  const bucketWidthMs = useMemo(
+    () => (data.length > 1 ? Math.abs(data[1].timestamp - data[0].timestamp) : 0),
+    [data]
+  )
+
   const highlightActions: ChartHighlightAction[] = useMemo(
     () => [
       {
@@ -76,7 +80,9 @@ export function TimelineChart<TChart extends BaseChartSchema>({
         label: 'Filter logs to selected range',
         icon: <SearchIcon className="text-foreground-lighter" size={12} />,
         onSelect: ({ start, end, clear }) => {
-          const [left, right] = [start, end].sort(
+          const resolvedEnd =
+            start === end ? new Date(new Date(start).getTime() + bucketWidthMs).toString() : end
+          const [left, right] = [start, resolvedEnd].sort(
             (a, b) => new Date(a).getTime() - new Date(b).getTime()
           )
           table.getColumn(resolvedFilterColumnId)?.setFilterValue([new Date(left), new Date(right)])
@@ -101,13 +107,23 @@ export function TimelineChart<TChart extends BaseChartSchema>({
         <BarChart
           data={chart}
           margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
-          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
+          onMouseDown={({ activeLabel, activeTooltipIndex, chartX, chartY }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
-            chartHighlight.handleMouseDown({ activeLabel, coordinates: activeLabel })
+            chartHighlight.handleMouseDown({
+              activeLabel,
+              coordinates: activeLabel,
+              chartX,
+              chartY,
+            })
           }}
-          onMouseMove={({ activeLabel, activeTooltipIndex }) => {
+          onMouseMove={({ activeLabel, activeTooltipIndex, chartX, chartY }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
-            chartHighlight.handleMouseMove({ activeLabel, coordinates: activeLabel })
+            chartHighlight.handleMouseMove({
+              activeLabel,
+              coordinates: activeLabel,
+              chartX,
+              chartY,
+            })
           }}
           onMouseUp={chartHighlight.handleMouseUp}
           style={{ cursor: 'crosshair' }}
@@ -131,26 +147,37 @@ export function TimelineChart<TChart extends BaseChartSchema>({
               return format(date, 'LLL dd, y')
             }}
           />
-          {!chartHighlight.popoverPosition && (
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  labelFormatter={(value) => {
-                    const date = new Date(value)
-                    if (isNaN(date.getTime())) return 'N/A'
-                    if (timerange.period === '10m') {
-                      return format(date, 'LLL dd, HH:mm:ss')
-                    }
-                    return format(date, 'LLL dd, y HH:mm')
-                  }}
-                />
-              }
-            />
-          )}
+          <ChartTooltip
+            active={
+              chartHighlight.popoverPosition || chartHighlight.isSelecting ? false : undefined
+            }
+            content={
+              <ChartTooltipContent
+                labelFormatter={(value) => {
+                  const date = new Date(value)
+                  if (isNaN(date.getTime())) return 'N/A'
+                  if (timerange.period === '10m') {
+                    return format(date, 'LLL dd, HH:mm:ss')
+                  }
+                  return format(date, 'LLL dd, y HH:mm')
+                }}
+              />
+            }
+          />
           {/* TODO: we could use the `{timestamp, ...rest} = data[0]` to dynamically create the bars but that would mean the order can be very much random */}
-          <Bar dataKey="error" stackId="a" fill="var(--color-error)" />
-          <Bar dataKey="warning" stackId="a" fill="var(--color-warning)" />
-          <Bar dataKey="success" stackId="a" fill="var(--color-success)" />
+          <Bar dataKey="error" stackId="a" fill="var(--color-error)" isAnimationActive={false} />
+          <Bar
+            dataKey="warning"
+            stackId="a"
+            fill="var(--color-warning)"
+            isAnimationActive={false}
+          />
+          <Bar
+            dataKey="success"
+            stackId="a"
+            fill="var(--color-success)"
+            isAnimationActive={false}
+          />
           {showHighlight && (
             <ReferenceArea
               x1={chartHighlight.left}

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition, type AdmonitionLayout } from 'ui-patterns/Admonition'
 
 import { DocsButton } from './DocsButton'
 import { UpgradePlanButton } from './UpgradePlanButton'
@@ -19,7 +19,7 @@ interface UpgradeToProProps {
   source?: string
   disabled?: boolean
   fullWidth?: boolean
-  layout?: 'vertical' | 'horizontal'
+  layout?: AdmonitionLayout
   variant?: 'default' | 'primary'
   className?: string
   docsUrl?: string

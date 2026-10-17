@@ -10,6 +10,14 @@ import { customRenderHook } from '@/tests/lib/custom-render'
 
 vi.mock('next/router', () => import('next-router-mock'))
 
+// The global mock in vitestSetup.ts stubs `useParams` to always return `{ ref: 'default' }`, which
+// doesn't reflect the `method`/`destination` query params this hook relies on — restore the real
+// implementation here so it reads them from the mocked router.
+vi.mock('common', async (importOriginal) => {
+  const actual = (await importOriginal()) as object
+  return { ...actual }
+})
+
 const mockEnabledProviders = vi.hoisted(() => vi.fn<() => ExternalIdentityProviderConfig[]>())
 
 vi.mock('../useEnabledIdentityProviders', () => ({

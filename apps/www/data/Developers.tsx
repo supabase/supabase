@@ -1,4 +1,4 @@
-import { Calendar, Pencil, ScrollText } from 'lucide-react'
+import { Calendar, Pencil, ScrollText, Store } from 'lucide-react'
 import {
   IconBriefcase2,
   IconDocumentation,
@@ -19,13 +19,14 @@ export const data = {
           icon: IconDocumentation,
         },
         {
-          text: 'Integrations',
-          url: '/partners/integrations',
-          icon: IconIntegrations,
+          text: 'Contribute',
+          description: 'How to contribute to Supabase.',
+          url: '/contribute',
+          icon: () => <Pencil className="w-4 h-4" />,
         },
         {
-          text: 'Supabase UI',
-          url: 'https://supabase.com/ui',
+          text: 'Supabase Library',
+          url: 'https://supabase.com/library',
           icon: (props: any) => (
             <svg
               width="17"
@@ -76,15 +77,14 @@ export const data = {
           icon: IconGitHubSolid,
         },
         {
-          text: 'Contribute',
-          description: 'How to contribute to Supabase.',
-          url: '/contribute',
-          icon: () => <Pencil className="w-4 h-4" />,
-        },
-        {
           text: 'Become a Partner',
           url: '/partners',
           icon: IconPartners,
+        },
+        {
+          text: 'Partner Catalog',
+          url: '/partners/catalog',
+          icon: IconIntegrations,
         },
         {
           text: 'Careers',

@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import {
@@ -20,10 +20,12 @@ import { UserOverview } from './UserOverview'
 import { PANEL_PADDING } from './Users.constants'
 import { useUserQuery } from '@/data/auth/user-query'
 import { User } from '@/data/auth/users-infinite-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
+  const showLogs = useIsFeatureEnabled('logs:all')
 
   const [selectedId, setSelectedId] = useQueryState(
     'show',
@@ -60,9 +62,10 @@ export const UserPanel = () => {
       <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
         <Button
           variant="text"
-          className="absolute top-3 right-3 px-1"
-          icon={<X />}
+          className="absolute top-3 right-3 z-10 px-1"
+          icon={<XIcon />}
           onClick={() => setSelectedId(null)}
+          aria-label="Close panel"
         />
         <Tabs
           value={view}
@@ -85,12 +88,14 @@ export const UserPanel = () => {
                 >
                   Overview
                 </TabsTrigger>
-                <TabsTrigger
-                  value="logs"
-                  className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Logs
-                </TabsTrigger>
+                {showLogs && (
+                  <TabsTrigger
+                    value="logs"
+                    className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
+                  >
+                    Logs
+                  </TabsTrigger>
+                )}
                 <TabsTrigger
                   value="raw"
                   className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
@@ -104,9 +109,11 @@ export const UserPanel = () => {
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
               </TabsContent>
-              <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                {selectedUser && <UserLogs user={selectedUser} />}
-              </TabsContent>
+              {showLogs && (
+                <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
+                  {selectedUser && <UserLogs user={selectedUser} />}
+                </TabsContent>
+              )}
               <TabsContent
                 value="raw"
                 className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}

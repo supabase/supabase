@@ -22,7 +22,12 @@ export function troubleshootingSlug(sourceFile: string): string {
   return `troubleshooting/${path.basename(sourceFile, '.mdx')}`
 }
 
-export async function collectMarkdownSources(): Promise<MarkdownSource[]> {
+export interface MarkdownSources {
+  guides: MarkdownSource[]
+  troubleshooting: MarkdownSource[]
+}
+
+export async function collectMarkdownSources(): Promise<MarkdownSources> {
   const [guideFiles, troubleshootingFiles] = await Promise.all([
     globby([GUIDES_GLOB]),
     globby([TROUBLESHOOTING_GLOB]),
@@ -38,5 +43,5 @@ export async function collectMarkdownSources(): Promise<MarkdownSource[]> {
     return { sourceFile, slug, outPath: `${OUTPUT_ROOT}/${slug}.md`, frontmatter: 'toml' }
   })
 
-  return [...guides, ...troubleshooting]
+  return { guides, troubleshooting }
 }

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
-import { Edit3, List } from 'lucide-react'
+import { Edit3Icon, ListIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -54,7 +54,7 @@ export const CronJobPage = () => {
   const { data: edgeFunctions = [] } = useEdgeFunctionsQuery({ projectRef: project?.ref })
 
   // Parse the cron job command to check if it's an edge function
-  const cronJobValues = parseCronJobCommand(job?.command || '', project?.ref!)
+  const cronJobValues = parseCronJobCommand(job?.command || '', project?.ref!, project?.restUrl)
   const edgeFunction =
     cronJobValues.type === 'edge_function' ? cronJobValues.edgeFunctionName : undefined
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
@@ -115,12 +115,17 @@ export const CronJobPage = () => {
     <Button
       key="edit"
       variant="outline"
-      icon={<Edit3 strokeWidth={1.5} size="14" />}
+      icon={<Edit3Icon strokeWidth={1.5} size="14" />}
       onClick={() => setIsEditSheetOpen(true)}
     >
       Edit
     </Button>,
-    <Button key="view-logs" asChild variant="outline" icon={<List strokeWidth={1.5} size="14" />}>
+    <Button
+      key="view-logs"
+      asChild
+      variant="outline"
+      icon={<ListIcon strokeWidth={1.5} size="14" />}
+    >
       <Link
         target="_blank"
         rel="noopener noreferrer"

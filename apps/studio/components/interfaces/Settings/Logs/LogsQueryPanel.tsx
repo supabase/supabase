@@ -1,5 +1,12 @@
 import { useFlag, useParams } from 'common'
-import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink } from 'lucide-react'
+import {
+  BookOpenIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronsUpDownIcon,
+  CopyIcon,
+  ExternalLinkIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
@@ -136,9 +143,7 @@ export const LogsQueryPanel = ({
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" iconRight={<ChevronDown />}>
-                  Insert source
-                </Button>
+                <Button iconRight={<ChevronDownIcon />}>Insert source</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 side="bottom"
@@ -161,9 +166,7 @@ export const LogsQueryPanel = ({
             {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" iconRight={<ChevronDown />}>
-                    Templates
-                  </Button>
+                  <Button iconRight={<ChevronDownIcon />}>Templates</Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="bottom" align="start">
                   {templates
@@ -240,7 +243,7 @@ export const LogsQueryPanel = ({
 
             <Sheet open={showReference} onOpenChange={setShowReference}>
               <SheetTrigger asChild>
-                <Button variant="text" icon={<BookOpen />} className="px-2">
+                <Button variant="text" icon={<BookOpenIcon />} className="px-2">
                   <span>Field Reference</span>
                 </Button>
               </SheetTrigger>
@@ -267,10 +270,10 @@ export const LogsQueryPanel = ({
                         href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-brand"
+                        className="text-primary"
                       >
                         unnesting joins
-                        <ExternalLink
+                        <ExternalLinkIcon
                           size="14"
                           className="ml-1 inline translate-y-[-2px]"
                           strokeWidth={1.5}
@@ -284,12 +287,13 @@ export const LogsQueryPanel = ({
                   <Popover open={open} onOpenChange={setOpen}>
                     <PopoverTrigger asChild>
                       <Button
-                        variant="default"
                         role="combobox"
                         size={'small'}
                         aria-expanded={open}
                         className="w-full justify-between"
-                        iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                        iconRight={
+                          <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        }
                       >
                         {value ? selectedSchema?.name : 'Select source...'}
                       </Button>
@@ -309,7 +313,7 @@ export const LogsQueryPanel = ({
                                   setOpen(false)
                                 }}
                               >
-                                <Check
+                                <CheckIcon
                                   className={cn(
                                     'mr-2 h-4 w-4',
                                     selectedSchema?.reference === schema.reference
@@ -385,14 +389,14 @@ const Field = ({
         {isCopied ? (
           <Tooltip>
             <TooltipTrigger>
-              <Check size={14} strokeWidth={3} className="text-brand" />
+              <CheckIcon size={14} strokeWidth={3} className="text-primary" />
             </TooltipTrigger>
             <TooltipContent side="bottom">Copied</TooltipContent>
           </Tooltip>
         ) : (
           <Tooltip>
             <TooltipTrigger>
-              <Copy size={14} strokeWidth={1.5} />
+              <CopyIcon size={14} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent side="bottom">Copy value</TooltipContent>
           </Tooltip>

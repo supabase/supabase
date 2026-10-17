@@ -1,5 +1,5 @@
 import type { PGPolicy } from '@supabase/pg-meta'
-import { ChevronDown, PanelLeftClose, PanelRightClose, X } from 'lucide-react'
+import { ChevronDownIcon, PanelLeftCloseIcon, PanelRightCloseIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   cn,
@@ -30,13 +30,12 @@ export const PolicyEditorPanelHeader = ({
       <div className="flex flex-row gap-3 max-w-[75%] items-start">
         <SheetClose
           className={cn(
-            'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-            'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
-            'transition disabled:pointer-events-none data-[state=open]:bg-secondary',
+            'text-muted hover:text hover:opacity-100 focus-ring',
+            'disabled:pointer-events-none data-[state=open]:bg-secondary',
             'mt-1.5'
           )}
         >
-          <X className="h-3 w-3" />
+          <XIcon className="h-3 w-3" />
           <span className="sr-only">Close</span>
         </SheetClose>
         <div className="h-[24px] w-px bg-border-overlay" />
@@ -57,7 +56,7 @@ export const PolicyEditorPanelHeader = ({
                   <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                     View policy details
                   </p>
-                  <ChevronDown
+                  <ChevronDownIcon
                     className="transition-transform duration-200"
                     strokeWidth={1.5}
                     size={14}
@@ -105,6 +104,7 @@ export const PolicyEditorPanelHeader = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <button
+            tabIndex={0}
             aria-expanded={showTools}
             aria-controls="ai-chat-assistant"
             className={cn(
@@ -114,9 +114,9 @@ export const PolicyEditorPanelHeader = ({
             onClick={() => setShowTools(!showTools)}
           >
             {!showTools ? (
-              <PanelLeftClose size={19} strokeWidth={1} />
+              <PanelLeftCloseIcon size={19} strokeWidth={1} />
             ) : (
-              <PanelRightClose size={19} strokeWidth={1} />
+              <PanelRightCloseIcon size={19} strokeWidth={1} />
             )}
             <span className="sr-only">{showTools ? 'Hide' : 'Show'} tools</span>
           </button>

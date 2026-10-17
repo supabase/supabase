@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { captureCriticalError } from './error-reporting'
 import { ResponseError } from '@/types'
@@ -13,10 +13,6 @@ vi.mock('@sentry/nextjs', () => ({
 }))
 
 describe('error-reporting', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   describe('captureCriticalError', () => {
     it('should not capture error if message is empty', () => {
       const error = { message: '' }

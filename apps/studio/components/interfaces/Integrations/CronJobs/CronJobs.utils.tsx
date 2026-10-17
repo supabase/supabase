@@ -7,6 +7,8 @@ import { CronJobType } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { CRON_TABLE_COLUMNS, HTTPHeader, secondsPattern } from './CronJobs.constants'
 import { CronJobTableCell } from './CronJobTableCell'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const unescapeSqlLiteral = (value = '', isEscapeString = false) => {
   const unescaped = value.replaceAll("''", "'")
@@ -120,6 +122,9 @@ select
   );`
 }
 
+// Default of pg_net's `timeout_milliseconds` argument, used when a command omits it
+const PG_NET_DEFAULT_TIMEOUT_MS = 5000
+
 const DEFAULT_CRONJOB_COMMAND = {
   type: 'sql_snippet',
   snippet: '',
@@ -129,7 +134,12 @@ const DEFAULT_CRONJOB_COMMAND = {
   httpBody: '',
 } as const
 
-export const parseCronJobCommand = (originalCommand: string, projectRef: string): CronJobType => {
+export const parseCronJobCommand = (
+  originalCommand: string,
+  projectRef: string,
+  restUrl?: string,
+  isPlatform = IS_PLATFORM
+): CronJobType => {
   const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
   if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
@@ -143,7 +153,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     const body = unescapeSqlLiteral(bodyMatch?.[2], Boolean(bodyMatch?.[1]))
 
     const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/i)
-    const timeout = timeoutMatch?.[1] || ''
+    const timeoutMs = timeoutMatch ? Number(timeoutMatch[1]) : PG_NET_DEFAULT_TIMEOUT_MS
 
     let headersObjs: { name: string; value: string }[] = []
     if (/headers:=jsonb_build_object\s*\(/i.test(command)) {
@@ -181,8 +191,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
     } catch {}
 
     if (
-      url.includes(`${projectRef}.supabase.`) &&
-      url.includes('/functions/v1/') &&
+      isEdgeFunctionUrl(url, projectRef, restUrl, isPlatform) &&
       searchParams.length === 0 &&
       urlHash.length === 0
     ) {
@@ -192,7 +201,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: Number(timeout ?? 1000),
+        timeoutMs,
         snippet: originalCommand,
       }
     }
@@ -204,7 +213,7 @@ export const parseCronJobCommand = (originalCommand: string, projectRef: string)
         endpoint: url,
         httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: Number(timeout ?? 1000),
+        timeoutMs,
         snippet: originalCommand,
       }
     }

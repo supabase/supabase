@@ -6,6 +6,8 @@ Aaron Brooks
 Aaron Byrne
 Adam Mohammed
 Adam Mokan
+Adam Whitlock
+Aditya Maruvada
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -15,17 +17,22 @@ Alex Hall
 Alex Hsu
 Alexander Alexandrov
 Alexander Korotkov
+Alexis Aguilar
 Ali Waseem
+Alice Crosbie
 Allan S
 Amir Issaei
 Amogh Rao
 Amy Q
 Ana Mogul
+Andrew Jackson
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anna Baker
 Ant Evans
 Ant Wilson
+Anthony Lio
 Ariuna K
 Arshdeep Singh
 Artur Zakirov
@@ -33,18 +40,23 @@ Artyom Borissov
 Aziz Quadri
 Barco Fourie
 Barry Roodt
+Ben Fritsch
 Beng Eu
 Benjamin Coenen
-Bo Lu
+Beth Long
 Bobbie Soedirgo
+Brad Deam
 Brad Gyger
 Brendan Stephens
+Brent Graveland
 Brent Newson
 Brian Cullen
 Brent Schroeter
 Bruno Kilian
 Burhan A
+Caleb Boylan
 Carel de Waal
+Carson Adam
 Cameron Blackwood
 Cameron Michie
 Cemal Kılıç
@@ -58,17 +70,20 @@ Chris Chapman (Chappie)
 Chris Copplestone
 Chris Gwilliams
 Chris Martin
+Chris Opland
 Chris Stockton
-Chris Ward
 Christian Funkhouser
+Christian Melchior
 Claudiu Dragalina-Paraipan
 Clayton Kast
 Colin Goodheart-Smithe
 Colin Murray
 Colum Ferry
+Connor Davis
 Craig Cannon
-Cuong Do
 Dane Harrigan
+Daniel Chapman
+Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
 Danny White
@@ -77,6 +92,7 @@ David A. Ventimiglia
 David Alvarez
 David Birdsong
 David Camacho Cateura
+David McNeil
 David Weitzman
 David Whittington
 Davide Pellegatta
@@ -85,10 +101,12 @@ Deji I
 Dennis Senn
 Dimitrios Liappis
 Div Arora
+Dion Zeneli
 Divit D
 Divya Sharma
+Donna Alexandra
 Douglas Hunley
-Dustin Keib
+Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
@@ -96,21 +114,23 @@ Emmett Folger
 Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
-Eyal Ehrlich
+Evan Cummack
 Fabrizio Fenoglio
 Fady A
 Fatuma Abdullahi
 Felipe Stival
 Ferhat Elmas
+Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
+Franek Richardson
 Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
+Gonzalo Servat
 Greg Kress
-Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
@@ -127,10 +147,14 @@ Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
 Inian P
+Iryna Deans
+Isaac Dawson
 Ivan Vasilov
 Jamie Boyd
+Jake Ng
 Jared Patterson
 Jason Farber
+Jason Voegele
 Jean-Paul Argudo
 Jeff Smick
 Jefferson Venerando
@@ -146,19 +170,23 @@ Joanna Michniewicz
 Joaquim Moreno
 Joel Low
 Joey Freeland
+Joey Lei
 John Fitzgerald
+John Jarvis
 Joel Martin
 Johan Bergström
 John Pena
-John Schaeffer
 Jon M
+Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
 Jordi Enric
 José Luis Ledesma
 Joshen Lim
+Juan Manuel Valenzuela
 Julian Domke
 Julien Goux
+Kacper Mentel
 Kai M
 Kalleby Santos
 Kanad Gupta
@@ -173,7 +201,10 @@ Keith Fiske
 Kemal Y
 Kevin Brolly
 Kevin Grüneberg
+Kevin Shaffer-Morrison
 Kevin Strong-Holte
+Kevin Webb
+Kody Jackson
 Kostas Botsas
 Krishna Sai Vandavasi
 Lakshan Perera
@@ -185,6 +216,7 @@ Lenny Urbanowski
 Leonardo Santiago
 Liam Cloud Hogan
 Lindsay Moss
+Lovro Mažgon
 Lukas Bernert
 Lukas Klingsbo
 Łukasz Korbasiewicz
@@ -194,18 +226,25 @@ Manuel Mendez
 Manan Gupta
 Marcus Weiner
 Marija Milicevic
+Mario Karuza
 Mark Burggraf
 Márton Boros
 Masha Koltsova
 Matthew Hambright
 Matt Hudson
 Matt Johnston
+Matt McGill
+Matt Robinson
 Matt Rossman
+Matt Smiley
 Matthias Luft
 Mats Kindahl
 Mert Yerekapan
 Michal Kleczek
+Michal Olszewski
 Michelle Jubrey
+Mike Donnalley
+Mike Podobnik
 Miranda Limonczenko
 Mo Khan
 Monica Khoury
@@ -225,8 +264,6 @@ Pamela Chia
 Patricia Szasz
 Patrick Crane
 Paul Bauer
-Paul Caselton
-Paul Cioanca
 Paul Copplestone
 Paul Ibeabuchi
 Pavel Borisov
@@ -235,16 +272,21 @@ Pedro Rodrigues
 Peter Lyn
 Peter Soderberg
 Pierre Ducroquet
+Pierre Frances
+Ping-Min Lin
+Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón
 Raminder Singh
+Rand Arete
 Raúl Barroso
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
 Rodrigo Esteves
 Rodrigo Mansueli
+Román Cuellar
 Roman Hernandez
 Ronan Lehane
 Rory Wilding
@@ -252,6 +294,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Safa Orhan
 Sagar Shedge
 Sam Meech-Ward
 Sam Rome
@@ -260,15 +303,21 @@ Samir Ketema
 Sana Cordeaux
 Sasi Kanumuri
 Sara Read
+Satya Rohith Gannamanedi
+Sean Geoghegan
 Sean Oliver
 Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shaii O
 Shane Adams
-Shane E
+Shaun Newman
+Shardul Borhade
 Shreekar Shetty
+Simon Tomlinson
 Sreyas Udayavarman
+Stephanie Jackson (stejacks)
+Stephen Denham
 Stephen Morgan
 Steve Chavez
 Steven Eubank
@@ -279,28 +328,37 @@ Sugu Sougoumarane
 Supun Sudaraka Kalidasa
 Taha Le Bras
 Tanun Chalermsinsuwan
+Tarun Khandelwal
 Taryn King
 Terry Sutton
 Terry Wilcox
+Thanya Nitithatsanakul
 Thomas E
 Tim Frietas
 Tim Palmer
 Timothy Lim
 Tina Ha
+Tobias Pfeiffer
 Tom Ashley
 Tom G
 Tomás Pozo
+Tomás Torgal
+Tomohiro Mitani
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
 TzeYiing L
 Utkarash Singh
 Victor Farazdagi
+Warda Bibi
 Warwick Mitchell
 Wen Bo Xie
+Wendie Cheung
+Yara Lacerda
 Yorvi Arias
 Yuliya Marinova
 Zach Marinov
+Zoë Braddock
 Zsolt Pazmandy
 ____________
 
@@ -317,7 +375,7 @@ Supabase would not be possible without the work of some other amazing open sourc
 
 - Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
-- Kong - https://github.com/kong/
+- Envoy - https://github.com/envoyproxy/envoy
 - Next.js - https://nextjs.org/
 - Tailwind CSS - https://tailwindcss.com/
 - shadcn/ui - https://ui.shadcn.com/

@@ -433,7 +433,7 @@ export const ERROR_CODES: Record<ErrorCodeService, Record<string, ErrorCodeDefin
         'Your project may have been suspended for exceeding usage quotas. Contact support with your project reference ID and a description of your Realtime use case.',
       references: [
         {
-          href: 'https://supabase.com/docs/troubleshooting/realtime-project-suspended-for-exceeding-quotas',
+          href: 'https://supabase.com/docs/guides/troubleshooting/realtime-project-suspended-for-exceeding-quotas',
           description: 'Troubleshooting guide for suspended projects',
         },
       ],

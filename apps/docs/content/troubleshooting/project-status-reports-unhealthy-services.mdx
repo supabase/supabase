@@ -16,7 +16,7 @@ Services rely on the backend database. Unhealthy services can indicate a databas
 Possible resolutions:
 
 - Restart the database in [Project Settings](/dashboard/project/_/settings/general) (this may be only a temporary fix if the project is undersized / unoptimized).
-- Increase project resources in [Compute and Disk](/dashboard/project/_/settings/compute-and-disk).
+- Increase project resources in [Infrastructure](/dashboard/project/_/settings/infrastructure).
 - [Performance Tune](/docs/guides/platform/performance) the database.
 
 The "Edge Functions Unhealthy" indicator is based on a platform-level health check, not the project's own functions. Confirm the actual functions work by invoking them directly. If functions are working fine, this is likely a false positive.

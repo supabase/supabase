@@ -1,5 +1,5 @@
 import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2Icon, XCircleIcon } from 'lucide-react'
 import {
   Button,
   Dialog,
@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
@@ -77,7 +77,7 @@ const CronJobRunDetailsOverflowDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Learn more</Button>
+        <Button>Learn more</Button>
       </DialogTrigger>
       <DialogContent
         aria-describedby={undefined}
@@ -156,11 +156,7 @@ const CronJobRunDetailsOverflowDialog = ({
                     </SelectContent>
                   </Select>
                 </div>
-                <Button
-                  variant="default"
-                  disabled={isBusy}
-                  onClick={() => runBatchedDeletion(cleanupInterval)}
-                >
+                <Button disabled={isBusy} onClick={() => runBatchedDeletion(cleanupInterval)}>
                   Delete rows now
                 </Button>
               </div>
@@ -188,7 +184,6 @@ const CronJobRunDetailsOverflowDialog = ({
                 <Button
                   block
                   size="small"
-                  variant="default"
                   className="mt-1"
                   loading={isScheduling}
                   disabled={isScheduling}
@@ -245,8 +240,8 @@ interface DeletionSuccessProps {
 }
 
 const DeletionSuccess = ({ totalRowsDeleted }: DeletionSuccessProps) => (
-  <div className="flex items-center gap-2 text-brand">
-    <CheckCircle2 size={16} />
+  <div className="flex items-center gap-2 text-primary">
+    <CheckCircle2Icon size={16} />
     <span className="text-sm">Successfully deleted {totalRowsDeleted.toLocaleString()} rows.</span>
   </div>
 )
@@ -259,10 +254,10 @@ interface DeletionErrorProps {
 const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
   <div className="space-y-2">
     <div className="flex items-center gap-2 text-destructive">
-      <XCircle size={16} />
+      <XCircleIcon size={16} />
       <span className="text-sm">Deletion failed: {error}</span>
     </div>
-    <Button variant="default" size="small" onClick={onRetry}>
+    <Button size="small" onClick={onRetry}>
       Retry
     </Button>
   </div>
@@ -270,8 +265,8 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
 
 const ScheduleSuccess = () => (
   <div className="space-y-2">
-    <div className="flex items-center gap-2 text-brand">
-      <CheckCircle2 size={16} />
+    <div className="flex items-center gap-2 text-primary">
+      <CheckCircle2Icon size={16} />
       <span className="text-sm">Daily cleanup job scheduled successfully.</span>
     </div>
     <div className="flex items-center gap-2">

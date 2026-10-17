@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Edit, Plus, Trash, X } from 'lucide-react'
+import { CheckIcon, EditIcon, HistoryIcon, PlusIcon, TrashIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -17,15 +17,21 @@ import {
   ScrollArea,
 } from 'ui'
 
+import { ShortcutTooltip } from '../ShortcutTooltip'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface AIAssistantChatSelectorProps {
   disabled?: boolean
+  shortcutsEnabled?: boolean
 }
 
-export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSelectorProps) => {
+export const AIAssistantChatSelector = ({
+  disabled = false,
+  shortcutsEnabled = true,
+}: AIAssistantChatSelectorProps) => {
   const snap = useAiAssistantStateSnapshot()
-  const currentChat = snap.activeChat?.name
 
   const [chatSelectorOpen, setChatSelectorOpen] = useState(false)
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
@@ -33,30 +39,32 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
 
   const chats = Object.entries(snap.chats)
 
+  useShortcut(
+    SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY,
+    () => setChatSelectorOpen((prev) => !prev),
+    {
+      enabled: shortcutsEnabled,
+    }
+  )
+
   const handleSelectChat = (id: string) => {
     snap.selectChat(id)
     setChatSelectorOpen(false)
   }
 
   const handleDeleteChat = (id: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     snap.deleteChat(id)
   }
 
   const handleStartEditChat = (id: string, name: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     setEditingChatId(id)
     setEditingChatName(name)
   }
 
   const handleSaveEditChat = (e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     if (editingChatId && editingChatName.trim()) {
       snap.renameChat(editingChatId, editingChatName.trim())
       setEditingChatId(null)
@@ -65,9 +73,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
   }
 
   const handleCancelEditChat = (e?: React.MouseEvent | React.FocusEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     setEditingChatId(null)
     setEditingChatName('')
   }
@@ -86,17 +92,22 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
 
   return (
     <Popover open={chatSelectorOpen} onOpenChange={setChatSelectorOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="text"
-          size="tiny"
-          iconRight={<ChevronDown size={14} />}
-          className="max-w-64 truncate"
-        >
-          {currentChat}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0" align="start">
+      <ShortcutTooltip
+        side="bottom"
+        label="History"
+        shortcutId={SHORTCUT_IDS.AI_ASSISTANT_TOGGLE_HISTORY}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            aria-label="History"
+            variant="text"
+            size="tiny"
+            className="h-7 w-7 p-0"
+            icon={<HistoryIcon />}
+          />
+        </PopoverTrigger>
+      </ShortcutTooltip>
+      <PopoverContent className="w-[250px] p-0" align="end">
         <Command>
           <CommandInput className="text-xs" placeholder="Search chats..." />
           <CommandList>
@@ -138,16 +149,18 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                           />
                           <div className="flex items-center gap-0">
                             <Button
+                              aria-label="Save chat name"
                               variant="text"
                               size="tiny"
-                              icon={<Check size={14} />}
+                              icon={<CheckIcon size={14} />}
                               onClick={(e) => handleSaveEditChat(e)}
                               className="h-7 w-7"
                             />
                             <Button
+                              aria-label="Cancel edit chat"
                               variant="text"
                               size="tiny"
-                              icon={<X size={14} />}
+                              icon={<XIcon size={14} />}
                               onClick={(e) => handleCancelEditChat(e)}
                               className="h-7 w-7"
                             />
@@ -155,7 +168,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                         </div>
                       ) : (
                         <>
-                          <Check
+                          <CheckIcon
                             className={cn(
                               'mr-2 h-4 w-4 shrink-0',
                               snap.activeChatId === id ? 'opacity-100' : 'opacity-0'
@@ -168,17 +181,19 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                     {editingChatId !== id && (
                       <div className="flex items-center gap-x-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
+                          aria-label="Edit chat name"
                           variant="text"
                           size="tiny"
-                          icon={<Edit size={14} />}
+                          icon={<EditIcon size={14} />}
                           onClick={(e) => handleStartEditChat(id, chat.name, e)}
                           className="h-6 w-6"
                         />
                         {chats.length > 1 && (
                           <Button
+                            aria-label="Delete chat"
                             variant="text"
                             size="tiny"
-                            icon={<Trash size={14} />}
+                            icon={<TrashIcon size={14} />}
                             onClick={(e) => handleDeleteChat(id, e)}
                             className="h-6 w-6"
                           />
@@ -203,9 +218,15 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                 }}
                 disabled={disabled}
               >
-                <Plus size={14} strokeWidth={1.5} />
+                <PlusIcon size={14} strokeWidth={1.5} />
                 <span>Start a new chat</span>
               </CommandItem>
+            </CommandGroup>
+            <CommandSeparator />
+            <CommandGroup className="px-2 py-1.5">
+              <p className="text-xs text-foreground-lighter">
+                Chat history is saved to this browser and isn't synced across devices.
+              </p>
             </CommandGroup>
           </CommandList>
         </Command>

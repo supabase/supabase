@@ -1,11 +1,19 @@
 import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from './pg-format'
 
-export const coalesceRowsToArray = (source: string, filter: SafeSqlFragment) => {
+export const coalesceRowsToArray = (
+  source: string,
+  filter: SafeSqlFragment,
+  // Optional ORDER BY (a column reference of `source`) applied INSIDE array_agg
+  // to make the emitted array deterministic. Omit it to keep the historical
+  // (plan-order) rendering byte-for-byte identical for existing callers.
+  orderBy?: SafeSqlFragment
+) => {
+  const orderClause = orderBy ? safeSql` ORDER BY ${orderBy}` : safeSql``
   return safeSql`
 COALESCE(
   (
     SELECT
-      array_agg(row_to_json(${ident(source)})) FILTER (WHERE ${filter})
+      array_agg(row_to_json(${ident(source)})${orderClause}) FILTER (WHERE ${filter})
     FROM
       ${ident(source)}
   ),

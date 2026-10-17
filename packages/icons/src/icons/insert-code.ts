@@ -4,7 +4,7 @@ import createSupabaseIcon from '../createSupabaseIcon';
  * @component @name InsertCode
  * @description Supabase SVG icon component, renders SVG Element with children.
  *
- * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj4KICAgIDxwYXRoCiAgICAgICAgZD0iTS0yMDQzNyAtMTExNDJIMTIxMzFWLTExMTQ0SC0yMDQzN1YtMTExNDJaTTEyMTMyIC0xMTE0MVY3MTEzSDEyMTM0Vi0xMTE0MUgxMjEzMlpNMTIxMzEgNzExNEgtMjA0MzdWNzExNkgxMjEzMVY3MTE0Wk0tMjA0MzggNzExM1YtMTExNDFILTIwNDQwVjcxMTNILTIwNDM4Wk0tMjA0MzcgNzExNEMtMjA0MzcuNiA3MTE0IC0yMDQzOCA3MTEzLjU1IC0yMDQzOCA3MTEzSC0yMDQ0MEMtMjA0NDAgNzExNC42NiAtMjA0MzguNyA3MTE2IC0yMDQzNyA3MTE2VjcxMTRaTTEyMTMyIDcxMTNDMTIxMzIgNzExMy41NSAxMjEzMS42IDcxMTQgMTIxMzEgNzExNFY3MTE2QzEyMTMyLjcgNzExNiAxMjEzNCA3MTE0LjY2IDEyMTM0IDcxMTNIMTIxMzJaTTEyMTMxIC0xMTE0MkMxMjEzMS42IC0xMTE0MiAxMjEzMiAtMTExNDEuNiAxMjEzMiAtMTExNDFIMTIxMzRDMTIxMzQgLTExMTQyLjcgMTIxMzIuNyAtMTExNDQgMTIxMzEgLTExMTQ0Vi0xMTE0MlpNLTIwNDM3IC0xMTE0NEMtMjA0MzguNyAtMTExNDQgLTIwNDQwIC0xMTE0Mi43IC0yMDQ0MCAtMTExNDFILTIwNDM4Qy0yMDQzOCAtMTExNDEuNiAtMjA0MzcuNiAtMTExNDIgLTIwNDM3IC0xMTE0MlYtMTExNDRaIgogICAgICAgIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuMSIgLz4KICAgIDxwYXRoIGQ9Ik0yMi44NDM3IDguNjk0OTlMMTkuNTM2OSAxMi4wMDE4TDIyLjg0MzggMTUuMzA4NiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiAvPgogICAgPHJlY3QgeD0iMC41IiB5PSIxNC4wNjI1IiB3aWR0aD0iMTYiIGhlaWdodD0iOCIgcng9IjEiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIC8+CiAgICA8cmVjdCB4PSIwLjUiIHk9IjEuOTM3NSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjgiIHJ4PSIxIiBzdHJva2UtbGluZWpvaW49InJvdW5kIiAvPgo8L3N2Zz4=)
+ * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgogICAgPHBhdGgKICAgICAgICBkPSJNLTIwNDM3IC0xMTE0MkgxMjEzMVYtMTExNDRILTIwNDM3Vi0xMTE0MlpNMTIxMzIgLTExMTQxVjcxMTNIMTIxMzRWLTExMTQxSDEyMTMyWk0xMjEzMSA3MTE0SC0yMDQzN1Y3MTE2SDEyMTMxVjcxMTRaTS0yMDQzOCA3MTEzVi0xMTE0MUgtMjA0NDBWNzExM0gtMjA0MzhaTS0yMDQzNyA3MTE0Qy0yMDQzNy42IDcxMTQgLTIwNDM4IDcxMTMuNTUgLTIwNDM4IDcxMTNILTIwNDQwQy0yMDQ0MCA3MTE0LjY2IC0yMDQzOC43IDcxMTYgLTIwNDM3IDcxMTZWNzExNFpNMTIxMzIgNzExM0MxMjEzMiA3MTEzLjU1IDEyMTMxLjYgNzExNCAxMjEzMSA3MTE0VjcxMTZDMTIxMzIuNyA3MTE2IDEyMTM0IDcxMTQuNjYgMTIxMzQgNzExM0gxMjEzMlpNMTIxMzEgLTExMTQyQzEyMTMxLjYgLTExMTQyIDEyMTMyIC0xMTE0MS42IDEyMTMyIC0xMTE0MUgxMjEzNEMxMjEzNCAtMTExNDIuNyAxMjEzMi43IC0xMTE0NCAxMjEzMSAtMTExNDRWLTExMTQyWk0tMjA0MzcgLTExMTQ0Qy0yMDQzOC43IC0xMTE0NCAtMjA0NDAgLTExMTQyLjcgLTIwNDQwIC0xMTE0MUgtMjA0MzhDLTIwNDM4IC0xMTE0MS42IC0yMDQzNy42IC0xMTE0MiAtMjA0MzcgLTExMTQyVi0xMTE0NFoiCiAgICAgICAgZmlsbD0id2hpdGUiIGZpbGwtb3BhY2l0eT0iMC4xIiAvPgogICAgPHBhdGggZD0iTTIyLjg0MzcgOC42OTQ5OUwxOS41MzY5IDEyLjAwMThMMjIuODQzOCAxNS4zMDg2IiAvPgogICAgPHJlY3QgeD0iMC41IiB5PSIxNC4wNjI1IiB3aWR0aD0iMTYiIGhlaWdodD0iOCIgcng9IjEiIC8+CiAgICA8cmVjdCB4PSIwLjUiIHk9IjEuOTM3NSIgd2lkdGg9IjE2IiBoZWlnaHQ9IjgiIHJ4PSIxIiAvPgo8L3N2Zz4=)
  *
  * @param {Object} props - Supabase icons props and any valid SVG attribute
  * @returns {JSX.Element} JSX Element
@@ -22,44 +22,14 @@ const InsertCode = createSupabaseIcon(
         key: 'iaqtc1',
       },
     ],
-    [
-      'path',
-      {
-        d: 'M22.8437 8.69499L19.5369 12.0018L22.8438 15.3086',
-        'stroke-linecap': 'round',
-        'stroke-linejoin': 'round',
-        key: '1gnkuu',
-      },
-    ],
-    [
-      'rect',
-      {
-        x: '0.5',
-        y: '14.0625',
-        width: '16',
-        height: '8',
-        rx: '1',
-        'stroke-linejoin': 'round',
-        key: 't6herz',
-      },
-    ],
-    [
-      'rect',
-      {
-        x: '0.5',
-        y: '1.9375',
-        width: '16',
-        height: '8',
-        rx: '1',
-        'stroke-linejoin': 'round',
-        key: '718qtu',
-      },
-    ],
+    ['path', { d: 'M22.8437 8.69499L19.5369 12.0018L22.8438 15.3086', key: '1jwljd' }],
+    ['rect', { x: '0.5', y: '14.0625', width: '16', height: '8', rx: '1', key: 'hj20ku' }],
+    ['rect', { x: '0.5', y: '1.9375', width: '16', height: '8', rx: '1', key: 's8jbkj' }],
   ],
   {
     fill: 'none',
     stroke: 'currentColor',
-    strokeWidth: '1',
+    strokeWidth: '1.5',
     strokeLinecap: 'round',
     strokeLinejoin: 'round',
   },

@@ -120,7 +120,6 @@ export const EdgeFunctionUsageSection = ({
                   },
                 ]}
                 yAxisProps={{
-                  width: 64,
                   tickFormatter: (value: number) => `${Math.round(value)}ms`,
                 }}
               />
@@ -145,7 +144,6 @@ export const EdgeFunctionUsageSection = ({
                   },
                 ]}
                 yAxisProps={{
-                  width: 64,
                   tickFormatter: (value: number) => `${Number(value).toFixed(1)}MB`,
                 }}
               />

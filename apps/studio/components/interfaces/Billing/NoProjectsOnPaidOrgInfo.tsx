@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'

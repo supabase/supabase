@@ -1,0 +1,84 @@
+---
+import { genFaviconLinks } from 'common/MetaFavicons/icons'
+import Footer from '../components/Footer.astro'
+import { Header } from '../components/Header'
+import '../styles/globals.css'
+
+interface Props {
+	title: string
+	description?: string
+}
+
+const { title, description } = Astro.props
+const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="robots" content="noindex, nofollow" />
+		{description && <meta name="description" content={description} />}
+		<script is:inline>
+			// Set data-theme on <html> before first paint, so the page doesn't flash
+			// the wrong theme while this loads. Defaults to dark (no system-preference
+			// check — the toggle in components/ThemeToggle.tsx is light/dark only).
+			;(function () {
+				try {
+					var stored = localStorage.getItem('theme')
+					document.documentElement.setAttribute('data-theme', stored === 'light' ? 'light' : 'dark')
+				} catch (_) {}
+			})()
+		</script>
+		{genFaviconLinks(import.meta.env.BASE_URL, faviconRoute).map((link) => <link {...link} />)}
+		<link rel="manifest" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}${faviconRoute}/manifest.json`} />
+		<meta name="generator" content={Astro.generator} />
+		<!-- Same Inter/Manrope fonts apps/docs loads via next/font, self-hosted there;
+		     loaded from Google Fonts here since kb has no next/font equivalent. -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+		/>
+		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
+		<title>{title} | Supabase Knowledge Base</title>
+	</head>
+	<body>
+		<Header client:load />
+		<main>
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+
+:root {
+  --header-height: 50px;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-weight: 500;
+}
+
+html[data-theme*='dark'] {
+  font-weight: 450;
+}
+	html,
+	body {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	body {
+		background-color: var(--background);
+		color: var(--foreground);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+</style>

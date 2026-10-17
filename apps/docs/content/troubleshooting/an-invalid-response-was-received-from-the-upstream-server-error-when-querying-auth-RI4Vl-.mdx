@@ -23,7 +23,7 @@ We're currently investigating an issue where the tables responsible for keeping 
 
 We've documented some of the migrations that run into this issue and their corresponding fix here:
 
-### Auth: `operator does not exist: uuid = text`
+## Auth: `operator does not exist: uuid = text`
 
 Temporary fix: Run `insert into auth.schema_migrations values ('20221208132122');` via the [SQL editor](/dashboard/project/_/sql/new) to fix the issue.
 

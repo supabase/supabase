@@ -128,10 +128,13 @@ describe('resolveContentPath', () => {
 describe('shouldShowIpv4AddonNotice', () => {
   const BASE = {
     isPlatform: true,
+    isAws: true,
+    isIpv4Enabled: true,
     mode: 'direct' as const,
     connectionMethod: 'direct',
     useSharedPooler: false,
     hasIpv4Addon: false,
+    isHighAvailability: false,
   }
 
   test('returns true for a direct connection with no IPv4 addon', () => {
@@ -168,6 +171,18 @@ describe('shouldShowIpv4AddonNotice', () => {
 
   test('returns false when self-hosted (not platform)', () => {
     expect(shouldShowIpv4AddonNotice({ ...BASE, isPlatform: false })).toBe(false)
+  })
+
+  test('returns false when not on AWS (e.g. Multigres/Fly)', () => {
+    expect(shouldShowIpv4AddonNotice({ ...BASE, isAws: false })).toBe(false)
+  })
+
+  test('returns false when the IPv4 add-on is not enabled for the project', () => {
+    expect(shouldShowIpv4AddonNotice({ ...BASE, isIpv4Enabled: false })).toBe(false)
+  })
+
+  test('returns false for high-availability projects even with a direct connection and no addon', () => {
+    expect(shouldShowIpv4AddonNotice({ ...BASE, isHighAvailability: true })).toBe(false)
   })
 })
 

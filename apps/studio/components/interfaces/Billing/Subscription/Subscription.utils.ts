@@ -22,8 +22,6 @@ export const billingPartnerLabel = (billingPartner?: string) => {
   if (!billingPartner) return billingPartner
 
   switch (billingPartner) {
-    case 'fly':
-      return 'Fly.io'
     case 'aws':
       return 'AWS'
     case 'vercel_marketplace':

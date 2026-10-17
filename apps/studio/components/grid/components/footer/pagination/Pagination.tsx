@@ -1,7 +1,7 @@
 import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
+import { AlertCircleIcon, ArrowLeftIcon, ArrowRightIcon, HelpCircleIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -207,7 +207,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       <div className="flex items-center gap-x-2">
         <Button
           aria-label="Previous page"
-          icon={<ArrowLeft />}
+          icon={<ArrowLeftIcon />}
           variant="outline"
           className="px-1.5"
           disabled={page <= 1}
@@ -233,7 +233,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         />
         <Button
           aria-label="Next page"
-          icon={<ArrowRight />}
+          icon={<ArrowRightIcon />}
           variant="outline"
           className="px-1.5"
           disabled={isLastPage || !enableForeignRowsQuery}
@@ -250,7 +250,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       <div className="flex items-center gap-x-2">
         <Button
           aria-label="Previous page"
-          icon={<ArrowLeft />}
+          icon={<ArrowLeftIcon />}
           variant="outline"
           className="px-1.5"
           disabled={page <= 1 || isLoading}
@@ -284,7 +284,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
 
         <Button
           aria-label="Next page"
-          icon={<ArrowRight />}
+          icon={<ArrowRightIcon />}
           variant="outline"
           className="px-1.5"
           disabled={isLastPage}
@@ -295,11 +295,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       </div>
 
       {isLoading ? (
-        <Button
-          variant="text"
-          className="w-7"
-          icon={<Loader2 size={12} className="animate-spin" />}
-        />
+        <Button variant="text" className="w-7" loading aria-label="Get exact row count" />
       ) : isError ? (
         <Tooltip>
           <TooltipTrigger asChild>
@@ -308,7 +304,9 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               variant="text"
               className="w-7"
               loading={isFetching}
-              icon={<AlertCircle />}
+              icon={<AlertCircleIcon />}
+              aria-label="Get exact row count"
+              disabled
             />
           </TooltipTrigger>
           <TooltipContent side="top">Failed to retrieve count: {error?.message}</TooltipContent>
@@ -330,7 +328,8 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                   variant="text"
                   className="w-7"
                   loading={isFetching}
-                  icon={<HelpCircle />}
+                  icon={<HelpCircleIcon />}
+                  aria-label="Get exact row count"
                   onClick={() => {
                     // Show warning if either NOT a table entity, or table rows estimate is beyond threshold
                     if (rowsCountEstimate === null || count === -1 || count > THRESHOLD_COUNT) {
@@ -346,7 +345,9 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
                   ? `This is an estimated value as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`
                   : `Count not automatically loaded as your table has more than ${THRESHOLD_COUNT.toLocaleString()} rows.`}{' '}
                 <br />
-                <span className="text-brand">Click to retrieve the exact count of the table.</span>
+                <span className="text-primary">
+                  Click to retrieve the exact count of the table.
+                </span>
               </TooltipContent>
             </Tooltip>
           )}

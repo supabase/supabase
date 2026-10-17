@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
@@ -58,6 +58,8 @@ export const MarkdownContent = ({
         {supportExpanding && (
           <div className={cn('bottom-0', !isExpanded ? 'absolute' : 'relative mt-3')}>
             <button
+              type="button"
+              tabIndex={0}
               className="text-foreground-light hover:text-foreground underline text-sm"
               onClick={() => setIsExpanded(!isExpanded)}
             >

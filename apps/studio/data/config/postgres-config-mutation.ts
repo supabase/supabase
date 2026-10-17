@@ -50,9 +50,10 @@ export const usePostgresConfigurationUpdateMutation = ({
     mutationFn: (vars) => updatePostgresConfiguration(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({
-        queryKey: configKeys.postgresConfig(projectRef),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: configKeys.postgresConfig(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

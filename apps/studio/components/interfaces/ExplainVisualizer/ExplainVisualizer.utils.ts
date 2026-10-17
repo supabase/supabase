@@ -1,12 +1,12 @@
 import {
-  Activity,
-  Database,
-  GitMerge,
-  Hash,
-  Layers,
-  ListFilter,
-  SortAsc,
-  Zap,
+  ActivityIcon,
+  DatabaseIcon,
+  GitMergeIcon,
+  HashIcon,
+  LayersIcon,
+  ListFilterIcon,
+  SortAscIcon,
+  ZapIcon,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -102,25 +102,25 @@ export function getOperationDescription(operation: string): string {
 // Get an icon for the operation type
 export function getOperationIcon(operation: string): LucideIcon {
   const op = operation.toLowerCase()
-  if (op === 'hash') return Hash
-  if (op.includes('hash join')) return GitMerge
-  if (op.includes('merge join')) return GitMerge
-  if (op.includes('nested loop')) return GitMerge
-  if (op.includes('join')) return Layers
-  if (op.includes('index')) return Zap
-  if (op.includes('seq scan')) return Database
-  if (op.includes('scan')) return Database
-  if (op.includes('filter')) return ListFilter
-  if (op.includes('sort')) return SortAsc
-  if (op.includes('aggregate') || op.includes('group')) return Activity
-  return Database
+  if (op === 'hash') return HashIcon
+  if (op.includes('hash join')) return GitMergeIcon
+  if (op.includes('merge join')) return GitMergeIcon
+  if (op.includes('nested loop')) return GitMergeIcon
+  if (op.includes('join')) return LayersIcon
+  if (op.includes('index')) return ZapIcon
+  if (op.includes('seq scan')) return DatabaseIcon
+  if (op.includes('scan')) return DatabaseIcon
+  if (op.includes('filter')) return ListFilterIcon
+  if (op.includes('sort')) return SortAscIcon
+  if (op.includes('aggregate') || op.includes('group')) return ActivityIcon
+  return DatabaseIcon
 }
 
 // Get a color class for the operation type
 export function getOperationColor(operation: string): string {
   const op = operation.toLowerCase()
   if (op.includes('seq scan')) return 'text-warning'
-  if (op.includes('index')) return 'text-brand'
+  if (op.includes('index')) return 'text-primary'
   if (op.includes('join')) return 'text-foreground-light'
   if (op.includes('sort') || op.includes('aggregate')) return 'text-foreground-light'
   return 'text-foreground-light'
@@ -131,16 +131,6 @@ export function isExplainQuery(rows: readonly unknown[]): boolean {
   const firstRow = rows[0]
   if (typeof firstRow !== 'object' || firstRow === null) return false
   return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
-}
-
-export function isTextFormatExplain(rows: readonly unknown[]): boolean {
-  if (!isExplainQuery(rows)) return false
-  const firstRow = rows[0] as Record<string, unknown>
-  return typeof firstRow['QUERY PLAN'] === 'string'
-}
-
-export function isExplainSql(sql: string): boolean {
-  return /^\s*explain\b/i.test(sql)
 }
 
 export function formatNodeDuration(ms: number | undefined): string {
@@ -164,7 +154,7 @@ export function getScanBarColor(operation: string): string {
     op.includes('index only scan') ||
     op.includes('bitmap index scan')
   ) {
-    return 'bg-brand/20'
+    return 'bg-brand-default/20'
   }
 
   // Sequential scans are yellow
@@ -195,36 +185,4 @@ export function getScanBorderColor(operation: string): string {
 
   // Default neutral color for other operations
   return 'border-l-border-muted'
-}
-
-export function splitSqlStatements(sql: string): string[] {
-  // Enhanced tokenizer that handles:
-  // - Single-quoted strings: '...' (with '' escaping)
-  // - Double-quoted strings: "..." (with "" escaping)
-  // - Dollar-quoted strings: $tag$...$tag$
-  // - Line comments: -- (until end of line)
-  // - Block comments: /* ... */ (may be multiline)
-  // - Semicolons: ;
-  const tokens =
-    sql.match(
-      /'([^']|'')*'|"([^"]|"")*"|\$[a-zA-Z0-9_]*\$[\s\S]*?\$[a-zA-Z0-9_]*\$|--[^\r\n]*|\/\*[\s\S]*?\*\/|;|[^'"$;\-\/]+|./g
-    ) || []
-
-  const statements: string[] = []
-  let current = ''
-
-  for (const token of tokens) {
-    if (token === ';') {
-      if (current.trim()) statements.push(current.trim())
-      current = ''
-    } else {
-      current += token
-    }
-  }
-
-  if (current.trim()) {
-    statements.push(current.trim())
-  }
-
-  return statements
 }

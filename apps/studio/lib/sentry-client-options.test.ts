@@ -1,5 +1,5 @@
 import type { Event as SentryEvent, StackFrame } from '@sentry/react'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildSentryClientOptions,
@@ -493,5 +493,90 @@ describe('buildSentryClientOptions', () => {
     expect(nextRest.tracesSampleRate).toBe(tanstackRest.tracesSampleRate)
     expect(nextRest.allowUrls).toEqual(tanstackRest.allowUrls)
     expect(nextRest.ignoreErrors).toEqual(tanstackRest.ignoreErrors)
+  })
+})
+
+describe('which errors Studio sends to Sentry', () => {
+  let beforeSend: NonNullable<ReturnType<typeof buildSentryClientOptions>['beforeSend']>
+  let restoreConsent: () => void
+
+  beforeAll(async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'true')
+    vi.resetModules()
+    const { consentState } = await import('common')
+    const previousConsent = consentState.hasConsented
+    consentState.hasConsented = true
+    restoreConsent = () => {
+      consentState.hasConsented = previousConsent
+    }
+    const { buildSentryClientOptions } = await import('./sentry-client-options')
+    const options = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    if (!options.beforeSend) throw new Error('Missing Sentry beforeSend')
+    beforeSend = options.beforeSend
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+    restoreConsent?.()
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
+  it('drops errors from outside the app', async () => {
+    expect(await beforeSend({ type: undefined, tags: { third_party_code: true } }, {})).toBeNull()
+  })
+
+  it.each([true, 'true'])(
+    'sends page crashes even when the code location is missing: %s',
+    async (tag) => {
+      const event: Parameters<typeof beforeSend>[0] = {
+        type: undefined,
+        tags: { third_party_code: true, globalErrorBoundary: tag },
+        exception: { values: [{ value: 'Page crashed' }] },
+      }
+      expect(await beforeSend(event, {})).toBe(event)
+    }
+  )
+
+  it('samples errors that did not crash the page once', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [{ value: 'Application error', stacktrace: { frames: [{ filename: 'app.js' }] } }],
+      },
+    }
+
+    expect(await beforeSend(event, {})).toBe(event)
+    expect(Math.random).toHaveBeenCalledOnce()
+    expect(event.tags?.codeSampleRate).toBe('0.01')
+  })
+
+  it('still applies Studio filters to page crashes', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      tags: { globalErrorBoundary: true },
+      exception: {
+        values: [
+          {
+            value: 'captcha.render is not a function',
+            stacktrace: { frames: [{ filename: 'api.js' }] },
+          },
+        ],
+      },
+    }
+
+    expect(await beforeSend(event, {})).toBeNull()
+    expect(Math.random).not.toHaveBeenCalled()
+  })
+
+  it('drops errors with no code location when they did not crash the page', async () => {
+    expect(
+      await beforeSend({ type: undefined, exception: { values: [{ value: 'No stack' }] } }, {})
+    ).toBeNull()
   })
 })

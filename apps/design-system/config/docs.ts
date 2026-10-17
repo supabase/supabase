@@ -71,6 +71,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Connect Interstitials',
+          href: '/docs/ui-patterns/connect-interstitials',
+          items: [],
+        },
+        {
           title: 'Empty States',
           href: '/docs/ui-patterns/empty-states',
           items: [],
@@ -120,11 +125,6 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Admonition',
           href: '/docs/fragments/admonition',
-          items: [],
-        },
-        {
-          title: 'Collapsible Alert',
-          href: '/docs/fragments/collapsible-alert',
           items: [],
         },
         {
@@ -240,6 +240,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Single Value Field Array',
           href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Skip to Content',
+          href: '/docs/fragments/skip-to-content',
           items: [],
         },
       ],
@@ -485,6 +490,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Sonner',
           href: '/docs/components/sonner',
+          items: [],
+        },
+        {
+          title: 'Success Check',
+          href: '/docs/components/success-check',
           items: [],
         },
         {

@@ -1,7 +1,13 @@
 import { NextRequest } from 'next/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { middleware } from './middleware'
+
+// The real manifest is generated at build time by a content script; mocking
+// it here decouples this test from that build step.
+vi.mock('~/public/markdown/manifest.json', () => ({
+  default: ['auth'],
+}))
 
 // BASE_PATH defaults to '/docs' when NEXT_PUBLIC_BASE_PATH is unset, so test
 // paths include the /docs prefix to match the middleware's GUIDES_PATH check.
@@ -155,5 +161,25 @@ describe('docs middleware — /guides/* content negotiation', () => {
     })
     const rewrite = middleware(req).headers.get(REWRITE_HEADER) ?? ''
     expect(rewrite).not.toContain('/api/guides-md/')
+  })
+})
+
+describe('docs middleware — reference paths', () => {
+  it('does not mistake listv2 for a version segment', () => {
+    const path = '/docs/reference/javascript/file-buckets-listv2'
+    expect(
+      middleware(makeRequest(path, { userAgent: 'Googlebot' })).headers.get(REWRITE_HEADER)
+    ).toBe('https://supabase.com/docs/api/crawlers')
+    expect(middleware(makeRequest(path)).headers.get(REWRITE_HEADER)).toBe(
+      'https://supabase.com/docs/reference/javascript'
+    )
+  })
+
+  it('sends the Kotlin root to the crawler renderer for bots', () => {
+    expect(
+      middleware(makeRequest('/docs/reference/kotlin', { userAgent: 'Googlebot' })).headers.get(
+        REWRITE_HEADER
+      )
+    ).toBe('https://supabase.com/docs/api/crawlers')
   })
 })

@@ -4,12 +4,12 @@ import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '
 import { loadStripe } from '@stripe/stripe-js'
 import { useDebounce } from '@uidotdev/usehooks'
 import { groupBy } from 'lodash'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -201,8 +201,8 @@ export const NewOrgForm = ({
     setLatestTaxId(taxId)
   }, [])
 
-  const selectedPlan = form.watch('plan')
-  const selectedSpendCap = form.watch('spend_cap')
+  const selectedPlan = useWatch({ control: form.control, name: 'plan' })
+  const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -253,8 +253,8 @@ export const NewOrgForm = ({
       }
     },
     onError: (data) => {
-      toast.error(data.message, { duration: 10_000 })
-      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast')
+      const toastId = toast.error(data.message, { duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast', toastId)
       setNewOrgLoading(false)
     },
   })
@@ -266,8 +266,8 @@ export const NewOrgForm = ({
       }
     },
     onError: (error) => {
-      toast.error(error.message, { dismissible: true, duration: 10_000 })
-      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast')
+      const toastId = toast.error(error.message, { dismissible: true, duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast', toastId)
     },
   })
 
@@ -283,15 +283,17 @@ export const NewOrgForm = ({
         size: form.getValues('size'),
       })
     } else {
+      // If the payment intent is not successful, we reset the payment method and show an error
+      const toastId = toast.error(
+        `Could not confirm payment. Please try again or use a different card.`,
+        { duration: 10_000 }
+      )
       trackFunnelError(
         'org_creation',
         classifyStripeError(paymentIntentConfirmation.error),
-        'toast'
+        'toast',
+        toastId
       )
-      // If the payment intent is not successful, we reset the payment method and show an error
-      toast.error(`Could not confirm payment. Please try again or use a different card.`, {
-        duration: 10_000,
-      })
       resetPaymentMethod()
       setNewOrgLoading(false)
     }
@@ -413,7 +415,6 @@ export const NewOrgForm = ({
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                variant="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
                   if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -443,7 +444,7 @@ export const NewOrgForm = ({
           <div className="divide-y divide-border-muted">
             <OrganizationDetailsFields
               control={form.control}
-              kind={form.watch('kind')}
+              kind={useWatch({ control: form.control, name: 'kind' })}
               renderFieldWrapper={(children, field) => (
                 <Panel.Content key={field}>{children}</Panel.Content>
               )}
@@ -492,7 +493,7 @@ export const NewOrgForm = ({
               </Panel.Content>
             )}
 
-            {form.watch('plan') === 'PRO' && (
+            {selectedPlan === 'PRO' && (
               <>
                 <Panel.Content className="border-b border-panel-border-interior-light dark:border-panel-border-interior-dark">
                   <FormField
@@ -503,7 +504,7 @@ export const NewOrgForm = ({
                         label={
                           <div className="flex space-x-2 text-sm items-center">
                             <span>Spend Cap</span>
-                            <HelpCircle
+                            <HelpCircleIcon
                               size={16}
                               strokeWidth={1.5}
                               className="transition opacity-50 cursor-pointer hover:opacity-100"
@@ -533,7 +534,7 @@ export const NewOrgForm = ({
               </>
             )}
 
-            {setupIntent && form.watch('plan') !== 'FREE' && (
+            {setupIntent && selectedPlan !== 'FREE' && (
               <Panel.Content className="pt-5">
                 <Elements stripe={stripePromise} options={stripeOptionsPaymentMethod}>
                   <NewPaymentMethodElement
@@ -591,11 +592,12 @@ export const NewOrgForm = ({
               }
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               onError={(err) => {
-                toast.error(err.message, { duration: 10_000 })
+                const toastId = toast.error(err.message, { duration: 10_000 })
                 trackFunnelError(
                   'org_creation',
                   { errorCategory: 'payment', errorReason: 'payment_error' },
-                  'toast'
+                  'toast',
+                  toastId
                 )
                 setNewOrgLoading(false)
                 resetPaymentMethod()

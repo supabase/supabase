@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Button } from 'ui'
@@ -64,7 +64,7 @@ const ProductEmptyState = ({
                   </ButtonTooltip>
                 ) : null}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                  <Button icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

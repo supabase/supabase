@@ -1,28 +1,29 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UpdatePublicationParams = {
   projectRef: string
   sourceId: number
   publicationName: string
-  tables: { schema: string; name: string }[]
+  config: components['schemas']['PutPublicationBody']
 }
 
 async function updatePublication(
-  { projectRef, sourceId, publicationName, tables }: UpdatePublicationParams,
+  { projectRef, sourceId, publicationName, config }: UpdatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await post(
-    '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}',
+  const { data, error } = await put(
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
       params: { path: { ref: projectRef, source_id: sourceId, publication_name: publicationName } },
-      body: { tables },
+      body: config,
       signal,
     }
   )

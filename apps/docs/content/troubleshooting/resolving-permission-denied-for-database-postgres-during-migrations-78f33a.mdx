@@ -1,0 +1,29 @@
+---
+title = "Resolving 'permission denied for database postgres' during migrations"
+date_created = "2026-09-21T12:04:07+00:00"
+topics = [ "database" ]
+keywords = [ "42501", "create schema", "set role", "migrations" ]
+[[errors]]
+code = "42501"
+message = "permission denied for database postgres"
+---
+
+If you encounter a `permission denied for database postgres` error during migrations, it typically occurs when executing `CREATE SCHEMA` or similar commands after a `SET ROLE` statement.
+
+## Why this happens
+
+Postgres 15 and later versions remove default `CREATE` privileges from the `PUBLIC` role. This means custom roles do not automatically have permission to create objects in the database, even if the session was initiated by the `postgres` user.
+
+## How to resolve the issue
+
+To resolve this, you must grant the `CREATE` privilege on the database to the specific role used in your migration script. Run the following command in the [SQL editor](/dashboard/project/_/sql/new):
+
+```sql
+GRANT CREATE ON DATABASE postgres TO example_role;
+```
+
+Replace `example_role` with the name of the role being assumed during the migration (for example, the owner role of your schemas).
+
+## Related
+
+If this happened via a REST/GraphQL request instead of a direct connection or migration script, see [Database API 42501 errors](/docs/guides/troubleshooting/database-api-42501-errors) instead — that guide covers a different set of causes specific to the Data API.

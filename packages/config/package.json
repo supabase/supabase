@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules"
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
     "@tailwindcss/forms": "^0.5.11",
