@@ -1,6 +1,6 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, Workflow, X } from 'lucide-react'
+import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -22,7 +22,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -31,15 +31,9 @@ import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -100,28 +94,11 @@ export const Destinations = () => {
 
   useRedirectLegacyReadReplicaDestination()
 
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-
-  const newDestinationDefaultType: DestinationType | null = etlEnableBigQuery
-    ? 'BigQuery'
-    : etlEnableIceberg
-      ? 'Analytics Bucket'
-      : etlEnableDucklake
-        ? 'DuckLake'
-        : etlEnableSnowflake
-          ? 'Snowflake'
-          : etlEnableClickHouse
-            ? 'ClickHouse'
-            : null
-
   const prefetchedRef = useRef(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
+  const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [, setDestinationType] = useQueryState(
@@ -210,7 +187,13 @@ export const Destinations = () => {
     return sortDirection === 'asc' ? comparison : -comparison
   })
 
-  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+  const {
+    data: sourcesData,
+    isSuccess: isSourcesSuccess,
+    isError: isSourcesError,
+    error: sourcesError,
+    refetch: refetchSources,
+  } = useReplicationSourcesQuery({
     projectRef,
   })
   const externalReplicationSource = useMemo(
@@ -230,9 +213,36 @@ export const Destinations = () => {
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
+  const canCreate = isSourcesSuccess
+  const isCheckingPipelineStatus = !isSourcesSuccess && !isSourcesError
+  const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
+    ? 'Replication unavailable locally'
+    : 'Failed to retrieve pipeline enablement status'
+
   const openDestinationPanel = () => {
-    if (!newDestinationDefaultType) return
-    setDestinationType(newDestinationDefaultType)
+    if (!canCreate) return
+    if (replicationNotEnabled) {
+      pendingCreationTypeRef.current = 'BigQuery'
+      setShowEnablePipelinesDialog(true)
+      return
+    }
+    setDestinationType('BigQuery')
+  }
+
+  const handleEnableDialogOpenChange = (open: boolean) => {
+    setShowEnablePipelinesDialog(open)
+    if (!open) pendingCreationTypeRef.current = null
+  }
+
+  const handlePipelinesEnabled = () => {
+    const type = pendingCreationTypeRef.current
+    pendingCreationTypeRef.current = null
+    if (
+      type &&
+      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
+    ) {
+      setDestinationType(type)
+    }
   }
 
   useShortcut(
@@ -275,7 +285,7 @@ export const Destinations = () => {
             ref={searchInputRef}
             placeholder="Search pipelines"
             size="tiny"
-            icon={<Search />}
+            icon={<SearchIcon />}
             value={filterString}
             className="w-full lg:w-52"
             onChange={(e) => setFilterString(e.target.value)}
@@ -285,7 +295,7 @@ export const Destinations = () => {
                 <Button
                   aria-label="Clear search"
                   variant="text"
-                  icon={<X />}
+                  icon={<XIcon />}
                   className="p-0 h-5 w-5"
                   onClick={() => setFilterString('')}
                 />
@@ -299,7 +309,7 @@ export const Destinations = () => {
               <Button
                 aria-label="More actions"
                 variant="default"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
                 className="w-6.5 hit-area-1"
               />
             </DropdownMenuTrigger>
@@ -311,7 +321,12 @@ export const Destinations = () => {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {replicationNotEnabled ? (
-                <DropdownMenuItem onClick={() => setShowEnablePipelinesDialog(true)}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    pendingCreationTypeRef.current = null
+                    setShowEnablePipelinesDialog(true)
+                  }}
+                >
                   Enable Pipelines
                 </DropdownMenuItem>
               ) : (
@@ -338,17 +353,22 @@ export const Destinations = () => {
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add pipeline"
             onTrigger={openDestinationPanel}
-            options={{ enabled: !!newDestinationDefaultType }}
+            options={{ enabled: canCreate }}
             side="bottom"
+            tooltipOpen={canCreate ? undefined : false}
           >
-            <Button
+            <ButtonTooltip
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
               variant="primary"
-              icon={<Plus />}
-              disabled={!newDestinationDefaultType}
+              icon={<PlusIcon />}
+              loading={isCheckingPipelineStatus}
+              disabled={!canCreate}
               onClick={openDestinationPanel}
             >
               Add pipeline
-            </Button>
+            </ButtonTooltip>
           </Shortcut>
         </div>
       </div>
@@ -359,11 +379,29 @@ export const Destinations = () => {
           {isDestinationsLoading ? 'Loading pipelines' : ''}
         </p>
 
+        {isSourcesError && (
+          <AlertError
+            layout="responsive"
+            projectRef={projectRef}
+            error={sourcesError}
+            subject={sourceErrorTitle}
+            hideContactSupport={checkLocalETLNotSetUp(sourcesError)}
+            description={
+              checkLocalETLNotSetUp(sourcesError)
+                ? 'Configure the replication API to manage pipelines in local development.'
+                : undefined
+            }
+            additionalActions={<Button onClick={() => refetchSources()}>Retry</Button>}
+          />
+        )}
+
         {hasErrorsFetchingData && (
           <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
-        {isDestinationsLoading && <GenericSkeletonLoader />}
+        {isDestinationsLoading && (
+          <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
+        )}
 
         {!isDestinationsLoading && hasDestinations && (
           <Card>
@@ -413,18 +451,22 @@ export const Destinations = () => {
 
         {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
           <EmptyStatePresentational
-            icon={Workflow}
+            icon={WorkflowIcon}
             title="Add a pipeline"
             description="Send tables to an external destination for analytics workloads."
           >
-            <Button
+            <ButtonTooltip
+              tooltip={{
+                content: { text: isSourcesError && !canCreate ? sourceErrorTitle : undefined },
+              }}
               variant="default"
-              icon={<Plus />}
-              disabled={!newDestinationDefaultType}
+              icon={<PlusIcon />}
+              loading={isCheckingPipelineStatus}
+              disabled={!canCreate}
               onClick={openDestinationPanel}
             >
               Add pipeline
-            </Button>
+            </ButtonTooltip>
           </EmptyStatePresentational>
         )}
       </div>
@@ -433,7 +475,8 @@ export const Destinations = () => {
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}
-        onOpenChange={setShowEnablePipelinesDialog}
+        onOpenChange={handleEnableDialogOpenChange}
+        onSuccess={handlePipelinesEnabled}
       />
 
       <DisablePipelinesDialog

@@ -4,6 +4,8 @@ import { IS_PLATFORM } from 'common'
 import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import type { ToolContext } from './types'
 import { getDatabaseFunctions } from '@/data/database-functions/database-functions-query'
 import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -15,17 +17,16 @@ export const getFallbackTools = ({
   cookie,
   authorization,
   includeSchemaMetadata,
-}: {
+}: ToolContext & {
   projectRef: string
   connectionString: string
   cookie?: string
-  authorization?: string
   includeSchemaMetadata: boolean
 }) => {
   const headers = {
     'Content-Type': 'application/json',
     ...(cookie && { cookie }),
-    ...(authorization && { Authorization: authorization }),
+    ...getAuthHeaders(authorization),
   }
 
   return {

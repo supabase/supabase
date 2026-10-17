@@ -1,4 +1,4 @@
-import { Table2 } from 'lucide-react'
+import { Table2Icon } from 'lucide-react'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -31,7 +31,7 @@ export function NewTab() {
     ? []
     : [
         {
-          icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+          icon: <Table2Icon className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
           title: 'Create a table',
           description: 'Design and create a new database table',
           bgColor: 'bg-blue-500',

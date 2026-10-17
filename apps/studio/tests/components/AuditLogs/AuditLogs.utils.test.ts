@@ -1,11 +1,12 @@
 import dayjs from 'dayjs'
+import type { FilterGroup } from 'ui-patterns/FilterBar'
 import { describe, expect, test } from 'vitest'
 
 import {
+  filterByFilterGroup,
   filterByProjects,
-  filterByUsers,
-  sortAuditLogs,
-} from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
+} from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import { filterByUsers } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
 import {
   TIMESTAMP_MICROS_PER_MS,
   type AuditLog,
@@ -52,32 +53,6 @@ describe('timestamp conversion (microseconds → milliseconds)', () => {
     // Guard: confirms the bug we fixed — dayjs.unix() treats the value as seconds,
     // overflowing JS Date's max and producing "Invalid Date"
     expect(dayjs.unix(TS_A).isValid()).toBe(false)
-  })
-})
-
-describe('sortAuditLogs', () => {
-  test('sorts descending (newest first)', () => {
-    const result = sortAuditLogs([logA, logC, logB], true)
-    expect(result.map((l) => l.request_id)).toEqual(['req-c', 'req-b', 'req-a'])
-  })
-
-  test('sorts ascending (oldest first)', () => {
-    const result = sortAuditLogs([logC, logA, logB], false)
-    expect(result.map((l) => l.request_id)).toEqual(['req-a', 'req-b', 'req-c'])
-  })
-
-  test('does not mutate the input array', () => {
-    const input = [logC, logA]
-    sortAuditLogs(input, true)
-    expect(input[0].request_id).toBe('req-c')
-  })
-
-  test('returns empty array unchanged', () => {
-    expect(sortAuditLogs([], true)).toEqual([])
-  })
-
-  test('handles a single log', () => {
-    expect(sortAuditLogs([logA], true)).toEqual([logA])
   })
 })
 
@@ -128,5 +103,90 @@ describe('filterByProjects', () => {
 
   test('returns empty array when no logs match', () => {
     expect(filterByProjects([logA, logB, logC], ['proj-unknown'])).toEqual([])
+  })
+})
+
+describe('filterByFilterGroup', () => {
+  const project = (value: string) => ({
+    propertyName: 'project',
+    operator: '=',
+    value,
+  })
+  const date = {
+    propertyName: 'date',
+    operator: '=',
+    value: '2026-04-29T00:00:00.000Z – 2026-04-30T00:00:00.000Z',
+  }
+  const logs = [logA, logB, logC]
+  const requestIds = (group: FilterGroup) =>
+    filterByFilterGroup(logs, group).map((l) => l.request_id)
+
+  test('returns all logs when there are no conditions', () => {
+    expect(requestIds({ logicalOperator: 'AND', conditions: [] })).toEqual([
+      'req-a',
+      'req-b',
+      'req-c',
+    ])
+  })
+
+  test('OR matches logs from any of the projects', () => {
+    expect(
+      requestIds({ logicalOperator: 'OR', conditions: [project('proj-1'), project('proj-2')] })
+    ).toEqual(['req-a', 'req-b'])
+  })
+
+  test('AND of two different projects matches nothing', () => {
+    expect(
+      requestIds({ logicalOperator: 'AND', conditions: [project('proj-1'), project('proj-2')] })
+    ).toEqual([])
+  })
+
+  test('evaluates nested groups: date AND (project A OR project B)', () => {
+    expect(
+      requestIds({
+        logicalOperator: 'AND',
+        conditions: [
+          date,
+          { logicalOperator: 'OR', conditions: [project('proj-1'), project('proj-2')] },
+        ],
+      })
+    ).toEqual(['req-a', 'req-b'])
+  })
+
+  test('ignores the date condition since the API already applies it', () => {
+    expect(requestIds({ logicalOperator: 'AND', conditions: [date] })).toEqual([
+      'req-a',
+      'req-b',
+      'req-c',
+    ])
+    expect(requestIds({ logicalOperator: 'OR', conditions: [date, project('proj-1')] })).toEqual([
+      'req-a',
+    ])
+  })
+
+  test('ignores chips that have no value yet', () => {
+    expect(requestIds({ logicalOperator: 'AND', conditions: [project('')] })).toEqual([
+      'req-a',
+      'req-b',
+      'req-c',
+    ])
+    expect(
+      requestIds({ logicalOperator: 'OR', conditions: [project(''), project('proj-1')] })
+    ).toEqual(['req-a'])
+  })
+
+  test('ignores an empty nested group', () => {
+    expect(
+      requestIds({
+        logicalOperator: 'AND',
+        conditions: [project('proj-1'), { logicalOperator: 'OR', conditions: [] }],
+      })
+    ).toEqual(['req-a'])
+  })
+
+  test('excludes logs without a project_ref when a project is selected', () => {
+    expect(requestIds({ logicalOperator: 'OR', conditions: [project('proj-1')] })).not.toContain(
+      'req-c'
+    )
   })
 })

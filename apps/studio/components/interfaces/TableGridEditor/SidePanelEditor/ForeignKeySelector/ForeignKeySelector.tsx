@@ -1,7 +1,7 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import type { PGTable } from '@supabase/pg-meta'
 import { sortBy } from 'lodash'
-import { ArrowRight, HelpCircle, Loader2, X } from 'lucide-react'
+import { ArrowRightIcon, HelpCircleIcon, Loader2Icon, XIcon } from 'lucide-react'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
@@ -316,7 +316,7 @@ export const ForeignKeySelector = ({
         <SidePanel.Content>
           <div className="py-6 space-y-6">
             <InformationBox
-              icon={<HelpCircle size={20} strokeWidth={1.5} />}
+              icon={<HelpCircleIcon size={20} strokeWidth={1.5} />}
               title="What are foreign keys?"
               description={`Foreign keys help maintain referential integrity of your data by ensuring that no
                 one can insert rows into the table that do not have a matching entry to another
@@ -380,7 +380,7 @@ export const ForeignKeySelector = ({
               <>
                 {isLoadingSelectedTable ? (
                   <div className="flex py-6 flex-col items-center justify-center space-y-2">
-                    <Loader2 size={14} className="animate-spin" />
+                    <Loader2Icon size={14} className="animate-spin" />
                     <p className="text-sm text-foreground-light">Loading table columns</p>
                   </div>
                 ) : (
@@ -441,7 +441,7 @@ export const ForeignKeySelector = ({
                             </Select>
                           </div>
                           <div className="col-span-1 flex justify-center items-center">
-                            <ArrowRight />
+                            <ArrowRightIcon />
                           </div>
                           <div className="col-span-4">
                             <Select
@@ -474,7 +474,7 @@ export const ForeignKeySelector = ({
                           <div className="col-span-1 flex justify-end items-center">
                             <Button
                               className="px-1"
-                              icon={<X />}
+                              icon={<XIcon />}
                               disabled={fk.columns.length === 1}
                               onClick={() => onRemoveColumn(idx)}
                             />
@@ -530,7 +530,7 @@ export const ForeignKeySelector = ({
                                 <li key={`type-error-${idx}`}>
                                   <div className="flex items-center gap-x-1">
                                     <code className="text-code-inline">{x.source}</code>{' '}
-                                    <ArrowRight size={14} />{' '}
+                                    <ArrowRightIcon size={14} />{' '}
                                     {displayColumnType(
                                       x.targetType,
                                       x.targetTypeSchema,
@@ -552,7 +552,7 @@ export const ForeignKeySelector = ({
                     <SidePanel.Separator />
 
                     <InformationBox
-                      icon={<HelpCircle size="20" strokeWidth={1.5} />}
+                      icon={<HelpCircleIcon size="20" strokeWidth={1.5} />}
                       title="Which action is most appropriate?"
                       description={
                         <>

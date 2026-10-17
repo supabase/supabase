@@ -8,6 +8,8 @@ import {
 } from 'ai'
 import isEqual from 'lodash/isEqual'
 
+import { KNOWLEDGE_TOPIC_LABELS, type KnowledgeName } from '@/lib/ai/tools/knowledge-topics'
+
 type MessagePart = UIMessage['parts'][number]
 type ToolPart = ToolUIPart | DynamicToolUIPart
 /** A one-line row that folds into a tool group: reasoning, or a lookup tool call. */
@@ -59,18 +61,11 @@ function forDocsQuery(input: unknown) {
   return query ? `for "${query}"` : undefined
 }
 
-const KNOWLEDGE_TOPICS: Record<string, string> = {
-  pg_best_practices: 'Postgres best practices',
-  rls: 'RLS',
-  storage: 'Storage',
-  edge_functions: 'Edge Functions',
-  realtime: 'Realtime',
-  logs: 'logs',
-}
-
 function onKnowledgeTopic(input: unknown) {
   const name = String(getField(input, 'name'))
-  return Object.hasOwn(KNOWLEDGE_TOPICS, name) ? `on ${KNOWLEDGE_TOPICS[name]}` : undefined
+  return Object.hasOwn(KNOWLEDGE_TOPIC_LABELS, name)
+    ? `on ${KNOWLEDGE_TOPIC_LABELS[name as KnowledgeName]}`
+    : undefined
 }
 
 function forAdvisorType(input: unknown) {
@@ -122,6 +117,7 @@ const BLOCK_TOOLS = new Set([
   'update_notebook',
   'delete_notebook',
   'run_notebook',
+  'update_opt_in_level',
 ])
 
 /** Lookups get a compact row. Studio's own tools need a label; any MCP tool gets a generic one. */

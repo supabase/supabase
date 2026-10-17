@@ -246,7 +246,7 @@ export const supabaseAdmin = createClient(
 Don't read the key from the environment inside an Edge Function. Use the [`@supabase/server`](/docs/guides/functions/auth) SDK instead. It verifies the caller's secret key for you and hands back a privileged client on `ctx`, so the key never appears in your code.
 
 ```ts supabase/functions/roster/index.ts
-import { withSupabase } from 'npm:@supabase/server'
+import { withSupabase } from 'npm:@supabase/server@1'
 
 export default {
   fetch: withSupabase({ auth: 'secret' }, async (_req, ctx) => {

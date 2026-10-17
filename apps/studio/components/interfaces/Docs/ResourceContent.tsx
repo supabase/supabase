@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Table2 } from 'lucide-react'
+import { Table2Icon } from 'lucide-react'
 
 import { DocSection } from './DocSection'
 import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
@@ -55,7 +55,7 @@ export const ResourceContent = ({
       <DocSection
         title={
           <span className="flex items-center gap-2 text-subTitle">
-            <Table2 size={16} strokeWidth={1.5} />
+            <Table2Icon size={16} strokeWidth={1.5} />
             {resourceId}
           </span>
         }
