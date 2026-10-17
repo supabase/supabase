@@ -68,20 +68,6 @@ export const DeleteProjectModal = ({
 
   const { mutate: deleteProject, isPending: isDeleting } = useProjectDeleteMutation({
     onSuccess: async () => {
-      if (!isFree) {
-        try {
-          await sendExitSurvey({
-            orgSlug: organization?.slug,
-            projectRef,
-            message,
-            reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
-            exitAction: 'delete',
-          })
-        } catch (error) {
-          // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
-        }
-      }
-
       toast.success(`Successfully deleted ${project?.name}`)
 
       // Only redirect if still viewing the deleted project
@@ -94,13 +80,32 @@ export const DeleteProjectModal = ({
       }
     },
   })
-  const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation()
+  const { mutateAsync: sendExitSurvey, isPending: isSending } = useSendDowngradeFeedbackMutation({
+    // The user should not get a toast saying "submitting survey failed"
+    onError: () => {},
+  })
   const isSubmitting = isDeleting || isSending
 
   async function handleDeleteProject() {
     if (project === undefined) return
     if (!isFree && selectedReason.length === 0) {
       return toast.error('Please select a reason for deleting your project')
+    }
+
+    if (!isFree) {
+      // The survey must be sent before the delete: deleting the project removes its permissions,
+      // so the survey endpoint would reject the request afterwards.
+      try {
+        await sendExitSurvey({
+          orgSlug: organization?.slug,
+          projectRef: project.ref,
+          message,
+          reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
+          exitAction: 'delete',
+        })
+      } catch {
+        // A failed survey should never block the user from deleting their project
+      }
     }
 
     deleteProject({ projectRef: project.ref, organizationSlug: organization?.slug })
