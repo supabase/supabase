@@ -150,6 +150,10 @@ patchedDependencies:
 importers:
 
   .:
+    dependencies:
+      '@supabase/server':
+        specifier: ^1.2.0
+        version: 1.2.0(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))(hono@4.13.7)
     devDependencies:
       '@aws-sdk/client-secrets-manager':
         specifier: ^3.1041.0
@@ -8455,6 +8459,25 @@ packages:
     resolution: {integrity: sha512-4W4ISbreRygNXbhwqxeqyuRul8RPx+SF+Hp2IT8wctebQEHSVCULfKatiRiEhmasfoXvYm2AHV4XFsOxhoousA==}
     engines: {node: '>=22.0.0'}
 
+  '@supabase/server@1.2.0':
+    resolution: {integrity: sha512-6ts8/aC5FEf03A9+WnEsrb79YYqlE1lf8KKtWKVHZIyaDq+RM5tzP4tHRzc8Bwg88pmoDImAkaj9D3lunnanvg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@supabase/supabase-js': ^2.0.0
+      elysia: ^1.4.0
+      h3: ^2.0.0
+      hono: ^4.0.0
+    peerDependenciesMeta:
+      '@nestjs/common':
+        optional: true
+      elysia:
+        optional: true
+      h3:
+        optional: true
+      hono:
+        optional: true
+
   '@supabase/shared-types@0.1.96':
     resolution: {integrity: sha512-2qB7Cmtu/59VgDpSjFN11hQhmhKK0RXgmGuF8F4fKDFHiTWA5Tu3EhPpcU5/j7jKhEsgUPFLXiZaGxn9hNQk/g==}
 
@@ -13647,6 +13670,9 @@ packages:
 
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
+
+  jose@6.2.3:
+    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
   jose@6.2.9:
     resolution: {integrity: sha512-XrchZOFZUl/T3vTwRe8XK+cJrGtMF4th1ARnDfwbBXFKThGhlsxEE4Zu03AD/bjJSt/9jT/mxrOCkJWOg77aPA==}
@@ -25470,6 +25496,13 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
+  '@supabase/server@1.2.0(@supabase/supabase-js@2.117.3(@opentelemetry/api@1.9.1))(hono@4.13.7)':
+    dependencies:
+      '@supabase/supabase-js': 2.117.3(@opentelemetry/api@1.9.1)
+      jose: 6.2.3
+    optionalDependencies:
+      hono: 4.13.7
+
   '@supabase/shared-types@0.1.96': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
@@ -31673,6 +31706,8 @@ snapshots:
   jiti@2.7.0: {}
 
   jose@5.9.6: {}
+
+  jose@6.2.3: {}
 
   jose@6.2.9: {}
 

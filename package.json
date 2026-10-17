@@ -85,5 +85,8 @@
     "node": ">=22.13"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
-  "packageManager": "pnpm@11.13.1"
+  "packageManager": "pnpm@11.13.1",
+  "dependencies": {
+    "@supabase/server": "^1.2.0"
+  }
 }
