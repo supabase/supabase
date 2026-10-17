@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button, Card, CardContent, cn } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
@@ -15,12 +15,14 @@ export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) 
       <div className="absolute -inset-16 z-0 opacity-100 pointer-events-none">
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-dark.svg`}
-          alt="Background pattern"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover object-right hidden dark:block"
         />
         <img
           src={`${BASE_PATH}/img/reports/bg-grafana-light.svg`}
-          alt="Background pattern"
+          alt=""
+          aria-hidden="true"
           className="w-full h-full object-cover object-right dark:hidden"
         />
         <div className="absolute inset-0 bg-linear-to-r from-background-alternative to-transparent" />
@@ -33,7 +35,7 @@ export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) 
               variant="text"
               size="tiny"
               type="button"
-              icon={<X size={16} strokeWidth={1.5} />}
+              icon={<XIcon size={16} strokeWidth={1.5} />}
               onClick={(e) => {
                 e.preventDefault()
                 onDismiss()

@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 
 export type DNSTableHeaderProps = {
   display: string
@@ -29,7 +29,7 @@ export const DNSTableHeaders = ({ display }: DNSTableHeaderProps) => {
   // If we have not detected SSL TXT records ask the user to (re)validate
   return (
     <div className="flex items-center gap-2">
-      <Loader2 size={14} className="animate-spin" />
+      <Loader2Icon size={14} className="animate-spin" />
       <p className="text-sm text-foreground-light">
         Validating custom domain and TLS configuration...
       </p>

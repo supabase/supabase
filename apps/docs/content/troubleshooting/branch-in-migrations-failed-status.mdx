@@ -1,0 +1,86 @@
+---
+title = "Troubleshooting MIGRATIONS_FAILED: missing tables or an incomplete schema on your branch"
+topics = [ "branching" ]
+keywords = [ "branching", "migrations", "MIGRATIONS_FAILED", "failed" ]
+database_id = ""
+---
+
+When a Preview Branch is created through the Dashboard, it's built by replaying the migration history from your `main` branch against a fresh database. If that replay fails partway through, the branch is left either empty or partly complete and its status shows `MIGRATIONS_FAILED`. This almost always means the migration history on `main` is out of sync with its actual live schema, commonly because a change was made directly in the SQL Editor or through another manual edit that was never captured as a migration file.
+
+Work through the following steps to diagnose and repair your migration history so branching can complete successfully.
+
+---
+
+## 1. Confirm the branch failure and view its workflow
+
+1. Go to [Branches](/dashboard/project/_/branches) and find the affected branch.
+2. Click **View logs**. A dialog shows the branch's creation workflow, including the failed step.
+
+![Branch creation workflow logs showing the failed migration step for a branch in MIGRATIONS_FAILED status](/docs/img/troubleshooting/migrations-failed-status.png)
+
+---
+
+## 2. Find the exact SQL error in your Postgres logs
+
+1. Go to [Postgres Logs](/dashboard/project/_/logs?filter=log_type:eq:postgres).
+2. Look for entries beginning with `execute <unnamed>:`. These are the individual migration statements being replayed.
+3. Find the entry marked as an **error**, which the Dashboard also highlights in red. This is the statement that failed, and its message explains why. Common messages include relation already exists, column not found, permission denied, and relation does not exist.
+
+![Postgres Logs with the failed migration statement marked as an error and its message expanded](/docs/img/troubleshooting/postgres-logs-migration-failed.png)
+
+---
+
+## 3. Prepare a local Supabase environment
+
+If you don't already have one, follow the [local development getting started guide](/docs/guides/local-development/cli/getting-started), then link your project:
+
+```bash
+supabase link
+```
+
+---
+
+## 4. Pull down your production migration history
+
+```bash
+supabase migration fetch
+```
+
+This retrieves the migration files currently recorded against your `main` branch, so you can compare them against the actual live schema and locate the one causing the failure.
+
+---
+
+## 5. Repair the culprit migration
+
+1. Locate the migration file containing the SQL statement that matches the error you found in step 2, and correct it so it reflects the real state of your production schema.
+2. After correcting the file, mark it as applied using its timestamp:
+
+   ```bash
+   supabase migration repair <timestamp> --status applied
+   ```
+
+3. Verify the repair took effect by checking [production migrations](/dashboard/project/_/database/migrations) in the Dashboard.
+
+---
+
+## 6. Re-test branch creation
+
+After repairing the migration history, either create a new branch or **rebase** the existing affected branch.
+
+![The rebase branch button in the Dashboard branch details view](/docs/img/troubleshooting/rebase-image.png)
+
+Check the branch's workflow logs again, as described in step 1, to confirm migrations now complete successfully.
+
+<Admonition type="note">
+
+Branch creation can fail more than once because more than one migration is out of sync. Each failure surfaces the next problem statement, so repeat steps 2 through 6 to work through them one at a time.
+
+</Admonition>
+
+---
+
+## Additional tips
+
+If issues persist after repairing migration history, such as schema drift or repeated mismatches, review the [branching troubleshooting documentation](/docs/guides/deployment/branching/troubleshooting#migration-issues) and consider further manual repair with [`supabase migration repair`](/docs/reference/cli/supabase-migration-repair).
+
+If your migration history has drifted too far out of sync for repairing individual migrations to be practical, consider creating a single baseline migration that encapsulates your production project's current schema instead. The [new branch doesn't copy database troubleshooting guide](/docs/guides/troubleshooting/new-branch-doesnt-copy-database) walks through the commands for setting this up.

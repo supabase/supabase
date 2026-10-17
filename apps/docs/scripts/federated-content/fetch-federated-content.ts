@@ -16,6 +16,7 @@ import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
+import emoji from 'remark-emoji'
 import { visit } from 'unist-util-visit'
 
 import type { FederatedContentSource, FederatedPage } from './types'
@@ -34,6 +35,9 @@ const STRINGIFY_OPTIONS = {
   listItemIndent: 'one' as const,
   fences: true,
 }
+// remark-emoji's attacher is typed with a unified `this: Processor` context
+// it never actually uses; cast it to the plain transformer factory it is.
+const emojiTransform = (emoji as unknown as () => (tree: any) => void)()
 
 /**
  * Discovers every `FederatedContentSource` under `./sources`.
@@ -56,11 +60,76 @@ function remotePath(source: FederatedContentSource, page: FederatedPage): string
   return page.useRoot ? page.remoteFile : `${source.docsDir}/${page.remoteFile}`
 }
 
+type LatestTagQueryResponse = {
+  repository: {
+    refs: {
+      nodes: { name: string }[] | null
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
+    }
+  }
+}
+
+const LATEST_TAG_QUERY = `
+  query LatestTagQuery($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+      refs(
+        refPrefix: "refs/tags/",
+        orderBy: { field: TAG_COMMIT_DATE, direction: DESC },
+        first: 20,
+        after: $after
+      ) {
+        nodes { name }
+        pageInfo { hasNextPage endCursor }
+      }
+    }
+  }
+`
+
+/**
+ * Resolves a source's `latestTag.pattern` to the newest matching tag name.
+ * GraphQL is required here since the REST API can't order tags by date.
+ */
+async function resolveLatestTag(
+  source: FederatedContentSource,
+  after: string | null = null
+): Promise<string> {
+  const pattern = new RegExp(source.latestTag!.pattern)
+
+  const {
+    repository: {
+      refs: {
+        nodes,
+        pageInfo: { hasNextPage, endCursor },
+      },
+    },
+  } = await octokit().graphql<LatestTagQueryResponse>(LATEST_TAG_QUERY, {
+    owner: source.org,
+    name: source.repo,
+    after,
+  })
+
+  const tag = nodes?.find(({ name }) => pattern.test(name))?.name
+  if (tag) return tag
+  if (hasNextPage && endCursor) return resolveLatestTag(source, endCursor)
+
+  throw new Error(
+    `No tag matching ${source.latestTag!.pattern} found for ${source.org}/${source.repo}`
+  )
+}
+
 /**
  * Rewrites a link URL: pages mapped in `source.pageMap` go to their local
  * `/guides/<section>` route, everything else falls back to `externalSite`.
  */
 function transformUrl(source: FederatedContentSource, url: string): string {
+  const assetPattern = /(\.\.\/)+assets\//
+  if (source.assetsDir && assetPattern.test(url)) {
+    return url.replace(
+      assetPattern,
+      `https://raw.githubusercontent.com/${source.org}/${source.repo}/${source.branch}/${source.assetsDir}/`
+    )
+  }
+
   try {
     const placeholderHostname = 'placeholder'
     const { hostname, pathname, hash } = new URL(url, `http://${placeholderHostname}`)
@@ -104,9 +173,12 @@ async function fetchPage(source: FederatedContentSource, page: FederatedPage): P
     branch: source.branch,
   })
 
-  const tree = fromMarkdown(raw, PARSE_OPTIONS)
+  // Strip the source file's own frontmatter, if any; we build our own from
+  // `page.meta` below rather than merging it in.
+  const tree = fromMarkdown(matter(raw).content, PARSE_OPTIONS)
   remarkMkDocsAdmonition()(tree)
   remarkPyMdownTabs()(tree)
+  emojiTransform(tree)
   if (page.dropLeadingHeading) {
     const [firstNode] = tree.children
     if (firstNode?.type === 'heading' && firstNode.depth === 1) tree.children.splice(0, 1)
@@ -116,7 +188,10 @@ async function fetchPage(source: FederatedContentSource, page: FederatedPage): P
   visit(tree, ['link', 'image', 'definition'], (node: any) => {
     node.url = transformUrl(source, node.url)
   })
-  const content = toMarkdown(tree, STRINGIFY_OPTIONS).trim()
+  let content = toMarkdown(tree, STRINGIFY_OPTIONS).trim()
+  if (page.meta.dashboardIntegrationPath) {
+    content = `<WrapperDashboardIntegration title="${page.meta.title}" path="${page.meta.dashboardIntegrationPath}" />\n\n${content}`
+  }
 
   const frontmatter: Record<string, string> = {
     title: page.meta.title,
@@ -146,7 +221,11 @@ async function fetchRawFile(
   await writeFile(join(GENERATED_DIRECTORY, rawFile.outFile), content)
 }
 
-async function fetchSource(source: FederatedContentSource): Promise<void> {
+async function fetchSource(baseSource: FederatedContentSource): Promise<void> {
+  const source = baseSource.latestTag
+    ? { ...baseSource, branch: await resolveLatestTag(baseSource) }
+    : baseSource
+
   await mkdir(join(GUIDES_DIRECTORY, source.section), { recursive: true })
 
   await Promise.all([
@@ -214,10 +293,99 @@ async function fetchAiSkills(): Promise<void> {
   await writeFile(join(GENERATED_DIRECTORY, 'ai-skills.json'), JSON.stringify(skills, null, 2))
 }
 
+const SPLINTER_REPO = {
+  org: 'supabase',
+  repo: 'splinter',
+  branch: 'main',
+  docsDir: 'docs',
+}
+
+/**
+ * Rewrites a splinter lint doc's link: cross-references to other lints
+ * become `?lint=<path>` (matching `Tabs`'s `queryGroup` tab-switching), and
+ * everything else falls back to viewing the file on GitHub.
+ */
+function splinterUrlTransform(lintPaths: string[]) {
+  return (url: string): string => {
+    try {
+      const placeholderHostname = 'placeholder'
+      const { hostname, pathname, hash } = new URL(url, `http://${placeholderHostname}`)
+
+      if (hostname !== placeholderHostname || pathname === '/') {
+        return url
+      }
+
+      const basename = pathname.split('/').at(-1)!.replace(/\.md$/, '')
+
+      if (lintPaths.includes(basename)) {
+        return `?lint=${basename}${hash}`
+      }
+
+      return `https://github.com/${SPLINTER_REPO.org}/${SPLINTER_REPO.repo}/blob/${SPLINTER_REPO.branch}${pathname}${hash}`
+    } catch (err) {
+      console.error('Error transforming markdown URL', err)
+      return url
+    }
+  }
+}
+
+/**
+ * Lists the numbered lint docs in the splinter repo, transforms each the
+ * same way as a guide page, and writes them to
+ * `features/docs/generated/database-advisors.json` for the
+ * `DatabaseAdvisorsIndex` component to read.
+ */
+async function fetchDatabaseAdvisors(): Promise<void> {
+  const { data: contents } = await octokit().request('GET /repos/{owner}/{repo}/contents/{path}', {
+    owner: SPLINTER_REPO.org,
+    repo: SPLINTER_REPO.repo,
+    path: SPLINTER_REPO.docsDir,
+    ref: SPLINTER_REPO.branch,
+    request: OCTOKIT_RETRY_OPTIONS,
+  })
+
+  if (!Array.isArray(contents)) {
+    throw new Error('Expected directory listing from GitHub splinter repo')
+  }
+
+  const lintFiles = contents.filter(({ path }) => /docs\/\d+.+\.md$/.test(path))
+  const lintPaths = lintFiles.map(({ path }) => path.split('/').at(-1)!.replace(/\.md$/, ''))
+  const urlTransform = splinterUrlTransform(lintPaths)
+
+  const lints = await Promise.all(
+    lintFiles.map(async ({ path }) => {
+      const raw = await getGitHubFileContents({
+        org: SPLINTER_REPO.org,
+        repo: SPLINTER_REPO.repo,
+        path,
+        branch: SPLINTER_REPO.branch,
+      })
+
+      const tree = fromMarkdown(matter(raw).content, PARSE_OPTIONS)
+      remarkMkDocsAdmonition()(tree)
+      remarkPyMdownTabs()(tree)
+      visit(tree, ['link', 'image', 'definition'], (node: any) => {
+        node.url = urlTransform(node.url)
+      })
+
+      return {
+        path: path.split('/').at(-1)!.replace(/\.md$/, ''),
+        content: toMarkdown(tree, STRINGIFY_OPTIONS).trim(),
+      }
+    })
+  )
+
+  await mkdir(GENERATED_DIRECTORY, { recursive: true })
+  await writeFile(
+    join(GENERATED_DIRECTORY, 'database-advisors.json'),
+    JSON.stringify(lints, null, 2)
+  )
+}
+
 async function fetchFederatedContent() {
   const sources = await loadSources()
 
-  await Promise.all([...sources.map(fetchSource), fetchAiSkills()])
+  await Promise.all([...sources.map(fetchSource), fetchAiSkills(), fetchDatabaseAdvisors()])
 
   const pageCount = sources.reduce((sum, source) => sum + source.pageMap.length, 0)
   console.log(

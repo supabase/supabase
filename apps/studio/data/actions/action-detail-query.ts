@@ -10,7 +10,7 @@ type ActionRunVariables = {
   runId?: string
 }
 
-export type ActionRun = components['schemas']['ActionRunResponse'] & {
+export type ActionRun = components['schemas']['ActionRunResponse_Output'] & {
   status?: 'SUCCESS' | 'FAILED' | 'RUNNING'
 }
 

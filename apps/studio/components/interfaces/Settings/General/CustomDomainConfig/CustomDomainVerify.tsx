@@ -1,9 +1,9 @@
 import { useParams } from 'common'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import { AlertCircleIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DNSRecord } from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
@@ -159,7 +159,7 @@ export const CustomDomainVerify = () => {
 
             {customDomain?.ssl.status === 'pending_deployment' && (
               <div className="flex items-center justify-center space-x-2 py-8">
-                <AlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircleIcon size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">
                   SSL certificate is being deployed. Please wait a few minutes and try again.
                 </p>
@@ -175,16 +175,12 @@ export const CustomDomainVerify = () => {
         <div className="flex items-center justify-between">
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
-            <Button
-              variant="default"
-              onClick={onCancelCustomDomain}
-              loading={isDeleting}
-              className="self-end"
-            >
+            <Button onClick={onCancelCustomDomain} loading={isDeleting} className="self-end">
               Cancel
             </Button>
             <Button
-              icon={<RefreshCw />}
+              variant="primary"
+              icon={<RefreshCwIcon />}
               onClick={onReverifyCustomDomain}
               loading={!isValidating && isReverifyLoading}
               disabled={isDeleting || isReverifyLoading || isValidating}

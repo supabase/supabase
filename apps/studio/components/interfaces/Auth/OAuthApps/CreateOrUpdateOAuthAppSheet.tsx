@@ -6,9 +6,9 @@ import type {
 } from '@supabase/supabase-js'
 import { useParams } from 'common'
 import { Storage } from 'icons'
-import { ImageOff, Trash2, X } from 'lucide-react'
+import { ImageOffIcon, Trash2Icon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -110,6 +110,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
+
+  const clientType = useWatch({ control: form.control, name: 'client_type' })
 
   const { hostEndpoint: clientEndpoint } = useProjectApiUrl({ projectRef })
 
@@ -256,20 +258,17 @@ export const CreateOrUpdateOAuthAppSheet = ({
           size="lg"
           showClose={false}
           className="flex flex-col gap-0"
-          tabIndex={undefined}
           aria-describedby={undefined}
         >
           <SheetHeader>
             <div className="flex flex-row gap-3 items-center">
               <SheetClose
                 className={cn(
-                  'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
-                  'focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                  'disabled:pointer-events-none data-[state=open]:bg-secondary',
-                  'transition'
+                  'text-muted hover:text hover:opacity-100 focus-ring',
+                  'disabled:pointer-events-none data-[state=open]:bg-secondary'
                 )}
               >
-                <X className="h-3 w-3" />
+                <XIcon className="h-3 w-3" />
                 <span className="sr-only">Close</span>
               </SheetClose>
               <SheetTitle className="truncate">
@@ -313,7 +312,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                                   }}
                                 >
-                                  {!hasLogo && <ImageOff size={14} />}
+                                  {!hasLogo && <ImageOffIcon size={14} />}
                                 </div>
                                 <div className="flex min-w-0 flex-1 items-center gap-2">
                                   <div className="group relative min-w-0 flex-1">
@@ -330,7 +329,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     />
                                     {projectRef ? (
                                       <Button
-                                        variant="default"
                                         size="tiny"
                                         icon={<Storage strokeWidth={1.5} />}
                                         className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 justify-center overflow-hidden px-1 transition-all duration-150 group-hover:w-36 group-focus-within:w-36 [&_span]:hidden group-hover:[&_span]:block group-focus-within:[&_span]:block"
@@ -344,9 +342,8 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                   </div>
                                   {field.value ? (
                                     <Button
-                                      variant="default"
                                       size="tiny"
-                                      icon={<Trash2 size={12} />}
+                                      icon={<Trash2Icon size={12} />}
                                       onClick={handleRemoveLogo}
                                     />
                                   ) : null}
@@ -409,7 +406,6 @@ export const CreateOrUpdateOAuthAppSheet = ({
                               />
 
                               <Button
-                                variant="default"
                                 onClick={handleRegenerateSecret}
                                 className="w-min"
                                 disabled={isRegenerating}
@@ -483,7 +479,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                   )}
                 />
 
-                {form.watch('client_type') === 'confidential' && (
+                {clientType === 'confidential' && (
                   <FormField
                     control={form.control}
                     name="token_endpoint_auth_method"
@@ -516,10 +512,15 @@ export const CreateOrUpdateOAuthAppSheet = ({
             </Form>
           </SheetSection>
           <SheetFooter>
-            <Button variant="default" disabled={isCreating || isUpdating} onClick={onClose}>
+            <Button disabled={isCreating || isUpdating} onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" form={FORM_ID} loading={isCreating || isUpdating}>
+            <Button
+              variant="primary"
+              type="submit"
+              form={FORM_ID}
+              loading={isCreating || isUpdating}
+            >
               {isEditMode ? 'Update app' : 'Create app'}
             </Button>
           </SheetFooter>

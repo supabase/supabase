@@ -1,4 +1,4 @@
-import { MinusCircle, PauseCircle } from 'lucide-react'
+import { MinusCircleIcon, PauseCircleIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import {
@@ -10,7 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
@@ -144,12 +144,12 @@ export const DowngradeModal = ({
 
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex items-center gap-3">
-              <PauseCircle size={18} />
+              <PauseCircleIcon size={18} />
               <span>Projects will be paused after a week of inactivity</span>
             </li>
 
             <li className="flex items-center gap-3 mb-2">
-              <MinusCircle size={18} />
+              <MinusCircleIcon size={18} />
               <span>Add ons from all projects under this organization will be removed.</span>
             </li>
 
@@ -170,12 +170,6 @@ export const DowngradeModal = ({
               </div>
             </li>
           </ul>
-
-          {subscription?.billing_via_partner === true && subscription.billing_partner === 'fly' && (
-            <p className="mt-4 text-sm">
-              Your organization will be downgraded at the end of your current billing cycle.
-            </p>
-          )}
         </div>
         <DialogFooter>
           <Button variant={'default'} onClick={onClose}>

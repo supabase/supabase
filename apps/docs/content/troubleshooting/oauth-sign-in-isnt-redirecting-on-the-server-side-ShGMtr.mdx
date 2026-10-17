@@ -9,6 +9,8 @@ database_id = "3e9246cb-d592-4051-93c8-53e4e555711c"
 
 The reason behind this limitation is that the auth helpers library lacks a direct mechanism for performing server-side redirects, as each framework handles redirects differently. However, the library does offer a URL through the data property it returns, which should be used for the purpose of redirection.
 
+With the PKCE flow in `@supabase/ssr`, `signInWithOAuth` stores the code verifier in a cookie. When your `setAll` collects `Set-Cookie` headers into a `Headers` object, as in Remix, pass them on the redirect. Otherwise the browser never stores the code verifier and the callback exchange fails. In Next.js and SvelteKit, the framework's cookie API writes to the response for you, so the redirect needs nothing extra.
+
 **Next.js:**
 
 ```ts
@@ -36,11 +38,36 @@ throw redirect(303, data.url)
 **Remix:**
 
 ```ts
-import { redirect } from "@remix-run/node"; // or cloudflare/deno
-...
-const { data } = await supabase.auth.signInWithOAuth({
-  provider: 'github',
-})
+import { redirect, type ActionFunctionArgs } from '@remix-run/node'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
 
-return redirect(data.url)
+export async function action({ request }: ActionFunctionArgs) {
+  const responseHeaders = new Headers()
+
+  // Collect every cookie the client sets, so they can be sent with the redirect
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet, cacheHeaders) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+          Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
+        },
+      },
+    }
+  )
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+  })
+  if (error) throw error
+
+  return redirect(data.url, { headers: responseHeaders })
+}
 ```

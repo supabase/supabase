@@ -1,6 +1,8 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 
+import { isOptInLevelAtLeast, optInLevelSchema } from './opt-in-level'
+import { getToolContract, type ContractToolName } from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 // Add the DatabaseExtension type import
@@ -26,15 +28,26 @@ export const toolSetValidationSchema = z.record(
     'list_branches',
     'search_docs',
     'get_advisors',
-    'get_logs',
+    'query_logs',
+    'get_active_incidents',
 
     // Local tools
     'execute_sql',
     'deploy_edge_function',
     'rename_chat',
+    'update_opt_in_level',
     'escalate_to_human',
     'resolve_support_conversation',
     'list_policies',
+    'list_reports',
+    'get_report',
+    'list_databases',
+    'list_notebooks',
+    'get_notebook',
+    'run_notebook',
+    'create_notebook',
+    'update_notebook',
+    'delete_notebook',
 
     // Fallback tools for self-hosted
     'getSchemaTables',
@@ -47,6 +60,20 @@ export const toolSetValidationSchema = z.record(
   basicToolSchema
 )
 export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
+
+export const updateOptInLevelInputSchema = z.object({
+  requiredLevel: z
+    .enum(['schema', 'schema_and_log', 'schema_and_log_and_data'])
+    .optional()
+    .describe(
+      'The lowest opt-in level that unlocks what you need: `schema` for table and column metadata, `schema_and_log` for logs, `schema_and_log_and_data` for query results. Omit it when the user just wants to review or change the setting, for example to lower it.'
+    ),
+})
+
+/** Input as stored on the message. `levelWhenAsked` is the org's level when the call was made. */
+export const storedUpdateOptInLevelInputSchema = updateOptInLevelInputSchema.extend({
+  levelWhenAsked: optInLevelSchema.optional(),
+})
 
 /**
  * Tool categories based on the data they access
@@ -65,18 +92,16 @@ export const TOOL_CATEGORIES = {
 type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
 
 /**
- * Mapping of tool names to their categories
+ * Mapping of tool names to their categories. Tools that have migrated to a contract
+ * (`TOOL_CONTRACTS`) declare their own `minOptInLevel` instead and aren't listed here.
  */
-export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
+export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, ToolCategory> = {
   // UI tools - always available
-  execute_sql: TOOL_CATEGORIES.UI,
-  deploy_edge_function: TOOL_CATEGORIES.UI,
-  rename_chat: TOOL_CATEGORIES.UI,
+  update_opt_in_level: TOOL_CATEGORIES.UI,
   escalate_to_human: TOOL_CATEGORIES.UI,
   resolve_support_conversation: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
   get_active_incidents: TOOL_CATEGORIES.UI,
-  load_knowledge: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,
@@ -84,6 +109,11 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
   list_policies: TOOL_CATEGORIES.SCHEMA,
+  list_reports: TOOL_CATEGORIES.SCHEMA,
+  get_report: TOOL_CATEGORIES.SCHEMA,
+  list_databases: TOOL_CATEGORIES.SCHEMA,
+  list_notebooks: TOOL_CATEGORIES.SCHEMA,
+  get_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,
@@ -91,7 +121,7 @@ export const TOOL_CATEGORY_MAP: Record<string, ToolCategory> = {
 
   // Log tools - MCP and local
   get_advisors: TOOL_CATEGORIES.LOG,
-  get_logs: TOOL_CATEGORIES.LOG,
+  query_logs: TOOL_CATEGORIES.LOG,
 }
 
 /**
@@ -112,50 +142,64 @@ function getMinimumOptInLevel(category: ToolCategory): AiOptInLevel | null {
   }
 }
 
+function isCategorizedTool(name: string): name is keyof typeof TOOL_CATEGORY_MAP {
+  return Object.hasOwn(TOOL_CATEGORY_MAP, name)
+}
+
+/**
+ * The lowest opt-in level a tool needs, `null` if it's always available, or `undefined` if the
+ * tool isn't on the allowlist. A contract's `minOptInLevel` wins over the category map.
+ */
+function getToolMinimumLevel(toolName: string): AiOptInLevel | null | undefined {
+  const contract = getToolContract(toolName)
+  if (contract) return contract.minOptInLevel
+  if (isCategorizedTool(toolName)) return getMinimumOptInLevel(TOOL_CATEGORY_MAP[toolName])
+  return undefined
+}
+
 /**
  * Check if a tool is allowed based on the current opt-in level
  */
 function isToolAllowed(toolName: string, aiOptInLevel: AiOptInLevel): boolean {
-  const category = TOOL_CATEGORY_MAP[toolName]
+  const minimumLevel = getToolMinimumLevel(toolName)
 
-  if (!category) {
+  if (minimumLevel === undefined) {
     return false
   }
-
-  const minimumLevel = getMinimumOptInLevel(category)
 
   // UI tools are always allowed
   if (!minimumLevel) {
     return true
   }
 
-  // Check if current opt-in level meets the minimum requirement
-  const optInHierarchy: AiOptInLevel[] = [
-    'disabled',
-    'schema',
-    'schema_and_log',
-    'schema_and_log_and_data',
-  ]
-
-  const currentLevelIndex = optInHierarchy.indexOf(aiOptInLevel)
-  const minimumLevelIndex = optInHierarchy.indexOf(minimumLevel)
-
-  return currentLevelIndex >= minimumLevelIndex
+  return isOptInLevelAtLeast(aiOptInLevel, minimumLevel)
 }
 
 /**
- * Create a privacy message tool that explains why the tool is not available
+ * Replaces a blocked tool with a stub that explains the opt-in instead of executing.
+ *
+ * Names no provider. Studio switches inference providers, and a stale name here becomes a
+ * false privacy claim shown to users.
  */
 export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
   const privacyMessage =
-    "You don't have permission to use this tool. This is an organization-wide setting requiring you to opt-in. Please choose your preferred data sharing level in your organization's settings. Supabase Assistant uses Amazon Bedrock, which does not store or log your prompts and completions, use them to train AWS models, or distribute them to third parties. By default, no data is shared. Granting permission allows Supabase to send information (like schema, logs, or data, depending on your chosen level) to Bedrock solely to generate responses."
+    'This tool needs a higher opt-in level than your organization has set. The opt-in level is an organization-wide setting. Call `update_opt_in_level` with the lowest level that unlocks this tool so the user can review it. By default, no data is shared. A higher level allows Supabase to send information (like schema, logs, or data) to third-party AI providers solely to generate responses.'
   const condensedPrivacyMessage =
-    'Requires opting in to sending data to Bedrock which does not store, train on, or distribute it. You can opt in via organization settings.'
+    'Requires opting in to a higher level of sharing data with third-party AI providers. Call `update_opt_in_level` to ask the user to update it.'
+  const toolDescription = toolInstance.description
+  const description =
+    typeof toolDescription === 'function'
+      ? (...args: Parameters<typeof toolDescription>) =>
+          `${toolDescription(...args)} (Note: ${condensedPrivacyMessage})`
+      : `${toolDescription ?? ''} (Note: ${condensedPrivacyMessage})`
 
   return {
     ...toolInstance,
-    description: `${toolInstance.description} (Note: ${condensedPrivacyMessage})`,
+    description,
     execute: async (_args: any, _context: any) => ({ status: privacyMessage }),
+    // The original transformer expects the original tool's output shape. The privacy
+    // stub returns only a status message, so retaining it can crash the response stream.
+    toModelOutput: undefined,
   }
 }
 
@@ -165,7 +209,7 @@ export function createPrivacyMessageTool(toolInstance: Tool<any, any>) {
 export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLevel): ToolSet {
   return Object.fromEntries(
     Object.entries(tools)
-      .filter(([toolName]) => TOOL_CATEGORY_MAP[toolName] !== undefined)
+      .filter(([toolName]) => getToolMinimumLevel(toolName) !== undefined)
       .map(([toolName, toolInstance]) => {
         if (isToolAllowed(toolName, aiOptInLevel)) {
           return [toolName, toolInstance]

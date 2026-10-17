@@ -52,7 +52,7 @@ Before restoring, check the following on your self-hosted instance:
 
 ## Step 4: Restore to your self-hosted database
 
-Connect to your self-hosted Postgres and restore the dump files. The [default](/docs/guides/self-hosting/docker#accessing-postgres) connection string for self-hosted Supabase is:
+Connect to your self-hosted Postgres and restore the dump files. The [default](/docs/guides/self-hosting/accessing-postgres#connect-through-supavisor) connection string for self-hosted Supabase is:
 
 ```
 postgres://postgres.your-tenant-id:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres
@@ -121,7 +121,7 @@ Your `auth.users` table and related data are included in the database dump, so u
 
 Managed Supabase may run a newer Postgres version (Postgres 17) than the self-hosted Docker image (currently it's Postgres 15 by default). The `supabase db dump` command produces plain SQL files that work across major Postgres versions.
 
-<Admonition type="tip">
+<Admonition type="note">
 
 If your managed project runs Postgres 17, consider starting your self-hosted deployment with Postgres 17 as well. See the [Postgres 17 guide](/docs/guides/self-hosting/postgres-upgrade-17) for setup instructions.
 
@@ -166,7 +166,7 @@ select * from pg_available_extensions;
 
 ### Connection refused
 
-Make sure your self-hosted Postgres port is accessible. In the default [self-hosted Supabase](/docs/guides/self-hosting/docker#accessing-postgres) setup, the user is `postgres.your-tenant-id` with Supavisor on port `5432`.
+Make sure your self-hosted Postgres port is accessible. In the default [self-hosted Supabase](/docs/guides/self-hosting/accessing-postgres#connect-through-supavisor) setup, the user is `postgres.your-tenant-id` with Supavisor on port `5432`.
 
 ### Legacy Studio configuration
 

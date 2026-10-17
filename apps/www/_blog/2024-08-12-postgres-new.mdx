@@ -144,7 +144,7 @@ In the future, we would also like to support a “seeds” section that outputs 
 
 ElectricSQL has been working hard to support real Postgres extensions in PGlite (compiled to WASM). One extension that was high on the priority list was [pgvector](https://github.com/pgvector/pgvector) which enables in-browser vector search.
 
-pgvector is enabled by default in database.build, meaning you can create and query vector columns on any table immediately. Of course, this is only useful if you have real embeddings to work with - so we gave AI access to [Transformers.js](https://github.com/xenova/transformers.js) which allows you to generate text embeddings directly in the browser, then store/query them in PGlite.
+[pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) is enabled by default in database.build, meaning you can create and query vector columns on any table immediately. Of course, this is only useful if you have real embeddings to work with - so we gave AI access to [Transformers.js](https://github.com/xenova/transformers.js) which allows you to generate text embeddings directly in the browser, then store/query them in PGlite.
 
 <div>
   <Img

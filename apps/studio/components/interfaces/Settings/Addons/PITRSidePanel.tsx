@@ -101,15 +101,12 @@ const PITRSidePanel = () => {
   const selectedAddons = addons?.selected_addons ?? []
   const availableAddons = addons?.available_addons ?? []
 
-  const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
   const subscriptionPitr = selectedAddons.find((addon) => addon.type === 'pitr')
   const availableOptions = availableAddons.find((addon) => addon.type === 'pitr')?.variants ?? []
 
   const hasChanges = selectedOption !== (subscriptionPitr?.variant.identifier ?? 'pitr_0')
   const { hasAccess: hasAccessToPitrVariants } = useCheckEntitlements('pitr.available_variants')
   const selectedPitr = availableOptions.find((option) => option.identifier === selectedOption)
-  const hasSufficientCompute =
-    !!subscriptionCompute && subscriptionCompute.variant.identifier !== 'ci_micro'
 
   // These are illegal states. If they are true, we should block the user from saving them.
   const blockDowngradeDueToHipaa =
@@ -117,6 +114,11 @@ const PITRSidePanel = () => {
     (selectedCategory !== 'on' ||
       // If the project is HIPAA, we don't allow the user to downgrade below 28 days
       selectedPitr?.identifier !== 'pitr_28')
+
+  // HIPAA projects can't disable PITR, so don't offer the option at all
+  const categoryOptions = hasHipaaAddon
+    ? PITR_CATEGORY_OPTIONS.filter((option) => option.id !== 'off')
+    : PITR_CATEGORY_OPTIONS
 
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
@@ -133,6 +135,9 @@ const PITRSidePanel = () => {
       if (subscriptionPitr !== undefined) {
         setSelectedCategory('on')
         setSelectedOption(subscriptionPitr.variant.identifier)
+      } else if (hasHipaaAddon) {
+        setSelectedCategory('on')
+        setSelectedOption('pitr_28')
       } else {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
@@ -153,8 +158,7 @@ const PITRSidePanel = () => {
         !hasChanges ||
         isSubmitting ||
         !canUpdatePitr ||
-        (!!selectedPitr && !hasSufficientCompute) ||
-        blockDowngradeDueToHipaa
+        (blockDowngradeDueToHipaa ?? undefined)
       }
       tooltip={
         blockDowngradeDueToHipaa
@@ -182,7 +186,7 @@ const PITRSidePanel = () => {
 
           <div className="mt-8! pb-4">
             <div className="flex gap-3">
-              {PITR_CATEGORY_OPTIONS.map((option) => {
+              {categoryOptions.map((option) => {
                 const isSelected = selectedCategory === option.id
                 return (
                   <div
@@ -252,7 +256,7 @@ const PITRSidePanel = () => {
                 support for further assistance.
               </AlertDescription>
               <div className="mt-4">
-                <Button variant="default" asChild>
+                <Button asChild>
                   <SupportLink>Contact support</SupportLink>
                 </Button>
               </div>
@@ -269,14 +273,6 @@ const PITRSidePanel = () => {
                   secondaryText="Upgrade your plan to change PITR for your project."
                   featureProposition="enable PITR"
                 />
-              ) : !hasSufficientCompute ? (
-                <UpgradeToPro
-                  className="mb-4"
-                  addon="computeSize"
-                  primaryText="Project needs to be at least on a Small compute size to enable PITR"
-                  secondaryText="This ensures enough resources to execute PITR successfully."
-                  featureProposition="enable PITR"
-                />
               ) : null}
 
               <label className="block text-sm text-foreground-light mb-4" htmlFor="pitr">
@@ -287,7 +283,7 @@ const PITRSidePanel = () => {
                 className="flex flex-wrap gap-3"
                 value={selectedOption}
                 onValueChange={(value) => setSelectedOption(value)}
-                disabled={!hasAccessToPitrVariants || subscriptionCompute === undefined}
+                disabled={!hasAccessToPitrVariants}
               >
                 {availableOptions.map((option) => (
                   <RadioGroupCardItem
@@ -317,11 +313,12 @@ const PITRSidePanel = () => {
                   />
                 ))}
               </RadioGroupCard>
-              <TaxDisclaimer className="mt-3" />
+
+              {availableOptions.some((it) => it.price > 0) && <TaxDisclaimer className="mt-3" />}
             </div>
           )}
 
-          {hasChanges && selectedOption !== 'pitr_0' && (
+          {hasChanges && selectedOption !== 'pitr_0' && selectedPitr?.price !== 0 && (
             <p className="text-sm text-foreground-light">
               There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.

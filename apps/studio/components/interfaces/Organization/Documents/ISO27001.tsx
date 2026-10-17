@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -81,12 +81,7 @@ export const ISO27001 = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button
-              variant="default"
-              icon={<Download />}
-              onClick={handleDownloadClick}
-              disabled={!slug}
-            >
+            <Button icon={<DownloadIcon />} onClick={handleDownloadClick} disabled={!slug}>
               Download ISO 27001 Certificate
             </Button>
           </div>

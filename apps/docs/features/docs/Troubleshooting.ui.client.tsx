@@ -260,6 +260,7 @@ function TroubleshootingFilterInternal({
           />
           {searchState && (
             <button
+              tabIndex={0}
               className="absolute right-1 top-1/2 -translate-y-1/2 text-foreground-light border-alternative hover:border-stronger rounded-md p-1 transition-colors"
               onClick={() => {
                 setSearchState('')

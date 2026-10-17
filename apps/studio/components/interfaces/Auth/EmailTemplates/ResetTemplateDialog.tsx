@@ -15,7 +15,7 @@ import {
   AlertDialogTrigger,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { type AuthTemplate } from './EmailTemplates.types'
 import { getAuthTemplateType } from './EmailTemplates.utils'
@@ -78,7 +78,7 @@ export const ResetTemplateDialog = ({
       }}
     >
       <AlertDialogTrigger asChild>
-        <Button variant="default" type="button" disabled={!canUpdateConfig}>
+        <Button type="button" disabled={!canUpdateConfig}>
           Reset template
         </Button>
       </AlertDialogTrigger>

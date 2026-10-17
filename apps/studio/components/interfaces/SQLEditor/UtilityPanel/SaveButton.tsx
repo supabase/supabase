@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { Button, KeyboardShortcut } from 'ui'
 
 import { hasUnsavedChanges, isSaving } from '@/state/sql-editor/sql-editor-lifecycle'
@@ -22,12 +22,11 @@ export const SqlSaveButton = ({ id, className }: SqlSaveButtonProps) => {
     <Button
       onClick={() => requestSave(id)}
       disabled={!isDirty}
-      variant="default"
       size="tiny"
       data-testid="sql-save-button"
       iconRight={
         saving ? (
-          <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+          <Loader2Icon className="animate-spin" size={10} strokeWidth={1.5} />
         ) : (
           <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
         )

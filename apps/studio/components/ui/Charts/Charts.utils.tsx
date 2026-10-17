@@ -74,6 +74,24 @@ export const compactNumberFormatter = (num: number): string => {
 }
 
 /**
+ * Formats a duration in milliseconds with thousands separators and a unit suffix.
+ *
+ * @example
+ * millisecondFormatter(123)          // "123ms"
+ * millisecondFormatter(90000)        // "90,000ms"
+ * millisecondFormatter(1234.56)      // "1,235ms"
+ * millisecondFormatter(1234.56, 2)   // "1,234.56ms"
+ */
+export const millisecondFormatter = (value: number, precision = 0) => {
+  if (!Number.isFinite(value)) return '0ms'
+
+  return `${value.toLocaleString('en-US', {
+    minimumFractionDigits: precision,
+    maximumFractionDigits: precision,
+  })}ms`
+}
+
+/**
  * Formats a percentage, trimming decimals at 100.
  *
  * @example

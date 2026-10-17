@@ -1,5 +1,5 @@
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { KeyboardEventHandler, MouseEventHandler } from 'react'
 import { Badge, cn, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -11,27 +11,6 @@ import { Bucket } from '@/data/storage/buckets-query'
 import { formatBytes } from '@/lib/helpers'
 
 type BucketTableMode = 'standard' | 'virtualized'
-
-type BucketTableEmptyStateProps = {
-  mode: BucketTableMode
-  filterString: string
-}
-
-export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptyStateProps) => {
-  const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
-  const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
-
-  return (
-    <BucketTableRow className="[&>td]:hover:bg-inherit">
-      <BucketTableCell colSpan={5}>
-        <p className="text-sm text-foreground">No results found</p>
-        <p className="text-sm text-foreground-lighter">
-          Your search for “{filterString}” did not return any results
-        </p>
-      </BucketTableCell>
-    </BucketTableRow>
-  )
-}
 
 type BucketTableRowProps = {
   mode: BucketTableMode
@@ -80,7 +59,7 @@ export const BucketTableRow = ({
           key={bucket.id}
           data-bucket-id={bucket.id}
           className={cn(
-            'relative cursor-pointer h-16 group inset-focus',
+            'relative cursor-pointer h-16 group focus-inset',
             isDisabled && 'opacity-50 [&>td]:hover:bg-transparent cursor-not-allowed'
           )}
           onClick={handleRowActivate}
@@ -135,7 +114,11 @@ export const BucketTableRow = ({
             {!isDisabled && (
               <>
                 <div className="flex justify-end items-center h-full">
-                  <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
+                  <ChevronRightIcon
+                    aria-hidden={true}
+                    size={14}
+                    className="text-foreground-muted/60"
+                  />
                 </div>
                 <button tabIndex={-1} className="sr-only">
                   Go to bucket details

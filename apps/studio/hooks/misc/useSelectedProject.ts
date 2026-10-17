@@ -1,5 +1,10 @@
 import { useParams } from 'common'
 
+import {
+  isOrioleDbVersionAtLeast,
+  ORIOLEDB_PUBLIC_BETA_VERSION,
+  type OrioleDbReleaseStage,
+} from './useSelectedProject.utils'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { PROJECT_STATUS, PROVIDERS } from '@/lib/constants'
 
@@ -54,6 +59,17 @@ export const useIsOrioleDbInAws = () => {
   return isOrioleDbInAws
 }
 
+// OrioleDB moved from Public Alpha to Public Beta at engine version 17.11.0.001.
+// PITR remains unsupported for every OrioleDB version regardless of stage.
+export const useOrioleDbReleaseStage = (): OrioleDbReleaseStage | undefined => {
+  const { data: project } = useSelectedProjectQuery()
+  if (!project?.dbVersion?.endsWith('orioledb')) return undefined
+  return isOrioleDbVersionAtLeast(project.dbVersion, ORIOLEDB_PUBLIC_BETA_VERSION)
+    ? 'beta'
+    : 'alpha'
+}
+
+// [Joshen TODO] There's a duplicate method `resolveHighAvailability` in `useHighAvailability.constants`
 export const useIsHighAvailability = () => {
   const { data: project } = useSelectedProjectQuery()
   return project?.high_availability ?? false

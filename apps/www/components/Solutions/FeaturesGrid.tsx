@@ -7,7 +7,7 @@ import styles from './features-grid.module.css'
 
 export default function FeaturesGrid(props: any) {
   const hasExtendedCards = props.features.some(
-    (f: any) => f.id === 'claim-flow' || f.id === 'platform-kit' || f.id === 'pico-instances'
+    (f: any) => f.id === 'claim-flow' || f.id === 'platform-kit' || f.id === 'nano-instances'
   )
 
   return (
@@ -43,7 +43,7 @@ export default function FeaturesGrid(props: any) {
         <Content card={props.features.find((f: any) => f.id === 'claim-flow')} />
         <Content card={props.features.find((f: any) => f.id === 'platform-kit')} />
         <Content
-          card={props.features.find((f: any) => f.id === 'pico-instances')}
+          card={props.features.find((f: any) => f.id === 'nano-instances')}
           innerClassName="
             xl:flex-row
             [&_.image-container]:border-b

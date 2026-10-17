@@ -6,7 +6,7 @@ import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
-import { User as IconUser } from 'lucide-react'
+import { UserIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -30,8 +30,8 @@ import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 
 const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   title: 'Role Impersonation',
-  icon: () => <IconUser />,
-  content: () => <RoleImpersonationSelector orientation="vertical" />,
+  icon: () => <UserIcon />,
+  content: () => <RoleImpersonationSelector />,
 }
 
 /**

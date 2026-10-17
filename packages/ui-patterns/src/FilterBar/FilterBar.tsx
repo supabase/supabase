@@ -1,7 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Search } from 'lucide-react'
+import { motion } from 'motion/react'
 import React, { forwardRef } from 'react'
 import { cn } from 'ui'
 
@@ -22,6 +22,8 @@ export type FilterBarProps = {
   isLoading?: boolean
   className?: string
   supportsOperators?: boolean
+  /** Logical operator for groups created via "New Group". Defaults to 'AND'. */
+  defaultGroupOperator?: FilterGroupType['logicalOperator']
   variant?: FilterBarVariant
   icon?: React.ReactNode
   /**
@@ -59,7 +61,7 @@ function FilterBarContent({ className }: { className?: string }) {
     <div className="w-full space-y-2 relative">
       <div
         className={cn(
-          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 pr-2 overflow-auto',
+          'relative flex items-stretch gap-0 w-full border rounded-md h-full bg-foreground/[.026] cursor-text p-0 overflow-auto',
           className
         )}
       >
@@ -141,6 +143,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
     isLoading,
     className,
     supportsOperators = false,
+    defaultGroupOperator,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -159,6 +162,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
       actions={actions}
       isLoading={isLoading}
       supportsOperators={supportsOperators}
+      defaultGroupOperator={defaultGroupOperator}
       variant={variant}
       icon={icon}
       freeformDefaultProperty={freeformDefaultProperty}

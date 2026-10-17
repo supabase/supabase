@@ -2,23 +2,28 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '../SupportForm.utils'
+import { NO_PROJECT_MARKER } from '../SupportForm.utils'
 import { SupportForm, SupportFormPage, SupportFormStatusButton } from '../SupportFormPage'
 // End of third-party imports
 
 import { API_URL, BASE_PATH } from '@/lib/constants'
+import type { StatusPageResponse } from '@/lib/status-page/status-page.schema'
 import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+// The project selector's infinite-scroll sentinel uses IntersectionObserver, which jsdom lacks
+mockIntersectionObserver()
+
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 type OrganizationProjectsProject = OrganizationProjectsResponse['projects'][number]
-type SendFeedbackResponse = components['schemas']['SendFeedbackResponse']
+type SendFeedbackResponse = components['schemas']['SendFeedbackResponse_Output']
 
 // Builders that return shapes matching the OpenAPI contract for endpoints
 // the support form depends on. The test only exercises a few fields, but the
@@ -45,6 +50,7 @@ const toProjectDetailResponse = (project: {
   status: 'ACTIVE_HEALTHY',
   subscription_id: 'subscription-1',
   updated_at: new Date().toISOString(),
+  connectionString: '',
 })
 
 const toOrganizationProject = (project: {
@@ -185,6 +191,7 @@ vi.mock(import('common'), async (importOriginal) => {
     ...actual,
     useParams: vi.fn().mockReturnValue({ ref: 'default' }),
     useIsLoggedIn: vi.fn().mockReturnValue(true),
+    useFlag: vi.fn().mockReturnValue(false),
     isFeatureEnabled: vi.fn((feature: any, disabledFeatures: any) => {
       if (typeof feature === 'string') {
         if (feature === 'support:show_client_libraries') {
@@ -314,6 +321,19 @@ const getDashboardLogsToggle = (screen: Screen, type: 'find' | 'query' = 'find')
   return type === 'find'
     ? screen.findByRole('switch', { name: labelMatcher })
     : screen.queryByRole('switch', { name: labelMatcher })
+}
+
+const getSupportAccessToggle = (screen: Screen, type: 'find' | 'query' = 'find') => {
+  const labelMatcher = /allow support access to your project/i
+  return type === 'find'
+    ? screen.findByRole('switch', { name: labelMatcher })
+    : screen.queryByRole('switch', { name: labelMatcher })
+}
+
+const selectNoSpecificProject = async (screen: Screen) => {
+  await userEvent.click(getProjectSelector(screen))
+  const option = await screen.findByRole('option', { name: /no specific project/i })
+  await userEvent.click(option)
 }
 
 const getSupportForm = () => {
@@ -475,7 +495,15 @@ describe('SupportFormPage', () => {
     })
 
     mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () => HttpResponse.json([], { status: 200 }))
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json<StatusPageResponse>({
+          page_title: 'Supabase status',
+          page_url: 'https://status.supabase.com/',
+          ongoing_incidents: [],
+          in_progress_maintenances: [],
+          scheduled_maintenances: [],
+        })
+      )
     )
 
     addAPIMock({
@@ -533,34 +561,9 @@ describe('SupportFormPage', () => {
     })
   })
 
-  test('shows system status: not healthy', async () => {
-    mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () =>
-        HttpResponse.json(
-          [
-            {
-              id: 'z3qp8rln72pl',
-              active_since: '2026-01-26T10:30:00Z',
-              impact: 'critical',
-              status: 'in_progress',
-              name: 'Test incident',
-            },
-          ],
-          { status: 200 }
-        )
-      )
-    )
-
-    renderSupportFormStatusButton()
-
-    await waitFor(() => {
-      expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
-    })
-  })
-
   test('shows system status: check failed', async () => {
     mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () =>
+      http.get(`${BASE_PATH}/api/status-page`, () =>
         HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
       )
     )
@@ -570,6 +573,46 @@ describe('SupportFormPage', () => {
     await waitFor(() => {
       expect(getStatusLink(screen)).toHaveTextContent('Failed to check status')
     })
+  })
+
+  test('shows system status: not healthy', async () => {
+    mswServer.use(
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json<StatusPageResponse>({
+          page_title: 'Supabase status',
+          page_url: 'https://status.supabase.com/',
+          ongoing_incidents: [
+            {
+              id: 'inc-1',
+              name: 'Elevated errors',
+              url: 'https://status.supabase.com/incidents/inc-1',
+              last_update_at: '2026-01-01T00:00:00Z',
+              last_update_message: null,
+              affected_components: [],
+              status: 'investigating',
+              current_worst_impact: 'full_outage',
+              visible: true,
+              show_banner: true,
+            },
+          ],
+          in_progress_maintenances: [],
+          scheduled_maintenances: [],
+        })
+      )
+    )
+
+    renderSupportFormPage()
+
+    await waitFor(() => {
+      expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
+    })
+
+    expect(await screen.findByText('Elevated errors')).toBeInTheDocument()
+    expect(
+      screen.getByText('We are investigating this issue. Follow the status page for updates.')
+    ).toBeInTheDocument()
+
+    expect(screen.queryByText('Try Supabase Assistant')).not.toBeInTheDocument()
   })
 
   test('loading with initial params prefills the organization and project', async () => {
@@ -633,6 +676,63 @@ describe('SupportFormPage', () => {
       { timeout: 5_000 }
     )
   })
+
+  test('hides support access toggle and submits allowSupportAccess: false when no project is selected', async () => {
+    const submitSpy = vi.fn()
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json<SendFeedbackResponse>({ result: 'ok' })
+      },
+    })
+
+    renderSupportFormPage()
+
+    await waitFor(
+      () => {
+        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+      },
+      { timeout: 5_000 }
+    )
+
+    await selectCategoryOption(screen, 'Dashboard bug')
+    await waitFor(() => {
+      expect(getCategorySelector(screen)).toHaveTextContent('Dashboard bug')
+    })
+
+    // A project is selected, so the toggle to grant support access is available
+    await expect(getSupportAccessToggle(screen)).resolves.toBeInTheDocument()
+
+    await selectNoSpecificProject(screen)
+    await waitFor(() => {
+      expect(getProjectSelector(screen)).toHaveTextContent('No specific project')
+    })
+
+    // Support access is granted on a per-project basis, so the toggle should disappear
+    // once no project is selected, rather than allowing it to be enabled with nothing to grant access to
+    await waitFor(() => {
+      expect(getSupportAccessToggle(screen, 'query')).not.toBeInTheDocument()
+    })
+
+    await fillField(getSummaryField(screen), 'Cannot access my account')
+    await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
+
+    await userEvent.click(getSubmitButton(screen))
+
+    await waitFor(() => {
+      expect(submitSpy).toHaveBeenCalledTimes(1)
+    })
+
+    const payload = submitSpy.mock.calls[0]?.[0]
+    expect(payload).toMatchObject({
+      organizationSlug: 'org-1',
+      allowSupportAccess: false,
+    })
+  }, 10_000)
 
   test('loading a URL with an invalid project slug falls back to first organization and project', async () => {
     mswServer.use(
@@ -804,7 +904,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: createMockLocation(`?error=${encodeURIComponent(initialError)}`),
+      value: createMockLocation(`?errorMessage=${encodeURIComponent(initialError)}`),
       writable: true,
     })
 
@@ -1067,7 +1167,7 @@ describe('SupportFormPage', () => {
     })
 
     Object.defineProperty(window, 'location', {
-      value: createMockLocation('?projectRef=project-3&error=Connection timeout detected'),
+      value: createMockLocation('?projectRef=project-3&errorMessage=Connection timeout detected'),
       writable: true,
     })
 
@@ -1153,9 +1253,12 @@ describe('SupportFormPage', () => {
       expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 2')
     })
 
-    await waitFor(() => {
-      expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
-    })
+    await waitFor(
+      () => {
+        expect(getProjectSelector(screen)).toHaveTextContent('Project 2')
+      },
+      { timeout: 5_000 }
+    )
   })
 
   test('AI Assistant suggestion displays when valid project and organization are selected', async () => {
@@ -1683,10 +1786,13 @@ describe('SupportFormPage', () => {
       const renderResult = renderSupportFormPage()
       unmount = renderResult.unmount
 
-      await waitFor(() => {
-        expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
-        expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
-      })
+      await waitFor(
+        () => {
+          expect(getOrganizationSelector(screen)).toHaveTextContent('Organization 1')
+          expect(getProjectSelector(screen)).toHaveTextContent('Project 1')
+        },
+        { timeout: 5_000 }
+      )
 
       await selectCategoryOption(screen, 'Database unresponsive')
       await waitFor(() => {
@@ -1805,6 +1911,9 @@ describe('SupportFormPage', () => {
     await userEvent.click(dashboardLogToggle!)
     expect(dashboardLogToggle).not.toBeChecked()
 
+    // Support access is per-project, so with no project selected the toggle shouldn't be offered
+    expect(getSupportAccessToggle(screen, 'query')).not.toBeInTheDocument()
+
     await fillField(getSummaryField(screen), 'Cannot access my account')
     await fillField(getMessageField(screen), 'I need help accessing my Supabase account')
 
@@ -1818,11 +1927,9 @@ describe('SupportFormPage', () => {
     expect(payload).toMatchObject({
       subject: 'Cannot access my account',
       category: 'Dashboard_bug',
-      projectRef: NO_PROJECT_MARKER,
-      organizationSlug: NO_ORG_MARKER,
       library: '',
       affectedServices: '',
-      allowSupportAccess: true,
+      allowSupportAccess: false,
       verified: true,
       tags: ['dashboard-support-form'],
       browserInformation: 'Chrome',

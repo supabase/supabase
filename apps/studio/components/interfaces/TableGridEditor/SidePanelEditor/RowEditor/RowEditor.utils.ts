@@ -79,6 +79,7 @@ export const generateRowFields = (
       defaultValue: column?.default_value as string | null,
       isNullable: column.is_nullable,
       isIdentity: column.is_identity,
+      isGenerated: column.is_generated,
       isPrimaryKey: primaryKeyColumns.includes(column.name),
     }
   })
@@ -87,6 +88,9 @@ export const generateRowFields = (
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {
+    // Generated columns are not shown in the form, so any error on them would not be fixable
+    if (field.isGenerated) return
+
     const isArray = field.format.startsWith('_')
 
     if (isArray && field.value) {
@@ -199,6 +203,10 @@ export const generateRowObjectFromFields = ({
 }): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
+    // Generated columns are always computed by the database - Postgres rejects
+    // inserts and updates that provide an explicit value for them
+    if (field.isGenerated) return
+
     const isArray = field.format.startsWith('_')
     const value = field.value
     const shouldUseDefaultValue =

@@ -5,7 +5,7 @@ import DatabaseConnections from '@/pages/project/[ref]/observability/connections
 export const Route = createFileRoute('/project/$ref/observability/connections')({
   component: ObservabilityConnectionsRoute,
   staticData: {
-    observabilityLayoutTitle: 'API Gateway',
+    observabilityLayoutTitle: 'Database Connections',
   },
 })
 

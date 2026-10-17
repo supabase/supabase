@@ -345,6 +345,8 @@ export const getTableEditorSql = ({
     left join columns c on b.id = c.table_id;
   `
     : safeSql`
+    -- FROZEN legacy path (pgMetaScopedIntrospection off): do not edit -- it must
+    -- keep matching production behavior until the flag cleanup deletes it.
     with base_table_info as (
         select
             c.oid::int8 as id,

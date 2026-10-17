@@ -21,9 +21,9 @@ export const functionsExamplesSupabase: ContentListingGroup = {
   type: 'grid',
   items: [
     {
-      title: 'With supabase-js',
+      title: 'Securing Edge Functions',
       href: '/guides/functions/auth',
-      description: 'Use the Supabase client inside your Edge Function.',
+      description: 'Declare which credentials your Edge Function accepts.',
     },
     {
       title: 'Connect to Postgres',

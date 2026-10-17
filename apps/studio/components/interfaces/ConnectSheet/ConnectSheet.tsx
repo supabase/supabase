@@ -6,12 +6,16 @@ import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } fr
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
-import { resolveConnectSheetHydration } from './ConnectSheet.utils'
+import {
+  CLEARED_CONNECT_SHEET_QUERY_PARAMS,
+  resolveConnectSheetHydration,
+} from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
+import { WarehouseTab } from './WarehouseTab'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -44,6 +48,7 @@ export const ConnectSheet = () => {
     method: queryMethod,
     type: queryType,
     mcpClient: queryMcpClient,
+    warehouseQueryEngine: queryWarehouseQueryEngine,
   } = params
 
   useEffect(() => {
@@ -63,6 +68,7 @@ export const ConnectSheet = () => {
         method: queryMethod,
         type: queryType,
         mcpClient: queryMcpClient,
+        warehouseQueryEngine: queryWarehouseQueryEngine,
       },
       storedPrefs,
       availableModeIds
@@ -80,6 +86,7 @@ export const ConnectSheet = () => {
     queryMethod,
     queryType,
     queryMcpClient,
+    queryWarehouseQueryEngine,
     storedPrefs,
     availableModeIds,
     track,
@@ -90,14 +97,7 @@ export const ConnectSheet = () => {
   ])
 
   const clearAllQueryParams = () => {
-    setQueryParams({
-      connectTab: null,
-      framework: null,
-      using: null,
-      method: null,
-      type: null,
-      mcpClient: null,
-    })
+    setQueryParams(CLEARED_CONNECT_SHEET_QUERY_PARAMS)
   }
 
   const handleOpenChange = (sheetOpen: boolean) => {
@@ -136,6 +136,7 @@ export const ConnectSheet = () => {
       method: null,
       type: null,
       mcpClient: null,
+      warehouseQueryEngine: null,
     })
   }
 
@@ -159,13 +160,16 @@ export const ConnectSheet = () => {
 
   return (
     <Sheet open={showConnect} onOpenChange={handleOpenChange}>
-      <SheetContent size="lg" className="flex flex-col gap-0 p-0 space-y-0" tabIndex={undefined}>
+      <SheetContent
+        size="lg"
+        className="flex w-full min-w-0 flex-col gap-0 space-y-0 p-0 max-w-4xl"
+      >
         <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
           <SheetTitle>Connect to your project</SheetTitle>
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex flex-1 flex-col overflow-y-auto divide-y">
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
           <div className="p-8">
             <ModeSelector
               modes={availableModes}
@@ -174,18 +178,24 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          {activeFields.length > 0 && (
-            <div className="border-b p-8">
-              <ConnectConfigSection
-                state={state}
-                activeFields={activeFields}
-                onFieldChange={handleFieldChange}
-                getFieldOptions={getFieldOptions}
-              />
-            </div>
-          )}
+          {state.mode === 'warehouse' ? (
+            <WarehouseTab />
+          ) : (
+            <>
+              {activeFields.length > 0 && (
+                <div className="p-8">
+                  <ConnectConfigSection
+                    state={state}
+                    activeFields={activeFields}
+                    onFieldChange={handleFieldChange}
+                    getFieldOptions={getFieldOptions}
+                  />
+                </div>
+              )}
 
-          <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+              <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
+            </>
+          )}
         </div>
       </SheetContent>
     </Sheet>

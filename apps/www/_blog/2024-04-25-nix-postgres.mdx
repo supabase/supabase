@@ -41,7 +41,7 @@ The main artifacts from the `supabase/postgres` build pipeline include:
 
 We use popular tools like Packer and Ansible in tandem with GitHub Actions to build, test, and release those artifacts in CI.
 
-Over time the Supabase Platform has grown up. We started with Postgres, PostgREST and Realtime. Next came Auth, and Storage, then GraphQL, and Functions. Postgres itself also has a suite of independently versioned extensions that we maintain and periodically upgrade.
+Over time the Supabase Platform has grown up. We started with Postgres, PostgREST and [Realtime](https://supabase.com/docs/guides/realtime). Next came [Auth](/auth), and [Storage](/storage), then [GraphQL](https://supabase.com/docs/guides/graphql), and [Functions](/edge-functions). Postgres itself also has a suite of independently versioned extensions that we maintain and periodically upgrade.
 
 As the constraints from the various tools in our stack combined it became impractical to run builds on local development machines. To accommodate, we pushed all builds to consistent build machines on CI. Today those builds take between 30-60 minutes. Given some of the larger components we bake in, like PL/v8, we’re fairly happy with that runtime. Even so, we can do better!
 

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus, Trash2 } from 'lucide-react'
+import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -23,11 +23,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
+import { inverseValidBucketNameRegex } from '../Storage.utils'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -202,7 +202,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           size="tiny"
           variant="primary"
           className="w-fit"
-          icon={<Plus size={14} />}
+          icon={<PlusIcon size={14} />}
           disabled={!canCreateBuckets}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -376,14 +376,14 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                       variant="text"
                       className="w-[34px] h-[34px]" // Match the height of the input
                       size="tiny"
-                      icon={<Trash2 size={12} />}
+                      icon={<Trash2Icon size={12} />}
                       onClick={() => remove(index)}
                     />
                   </div>
                 ))}
               </div>
               <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-                <Button variant="default" size="tiny" onClick={() => append({ value: '' })}>
+                <Button size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
@@ -392,10 +392,11 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </Form>
 
         <SheetFooter>
-          <Button variant="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
           <Button
+            variant="primary"
             form={formId}
             type="submit"
             loading={isCreating}

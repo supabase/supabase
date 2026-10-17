@@ -46,9 +46,9 @@ let supabase = SupabaseClient(
 
 </$CodeTabs>
 
-### Set up a login view
+### Set up a sign-in view
 
-Set up a SwiftUI view to manage logins and sign ups.
+Set up a SwiftUI view to manage sign-ins and sign-ups.
 Users should be able to sign in using a magic link.
 
 <$CodeTabs>
@@ -277,8 +277,6 @@ struct UpdateProfileParams: Encodable {
 
 Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ### Add `PhotosPicker`
 
 Add support for the user to pick an image from the library and upload it.
@@ -321,8 +319,6 @@ enum TransferError: Error {
 ```
 
 </$CodeTabs>
-
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 #### Add `PhotosPicker` to profile page
 

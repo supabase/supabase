@@ -58,15 +58,17 @@ const OUT_PATH = join(VERSION_DIR, 'supabase_flutter.json')
 const HEADER_IDS = new Set([
   'auth-api',
   'auth-mfa-api',
+  'oauth-server-api',
   'passkey-api',
   'admin-api',
   'admin-passkey-api',
-  'oauth-server-api',
   'admin-custom-providers-api',
   'functions-api',
   'database-api',
   'realtime-api',
   'file-buckets',
+  'analytics-buckets',
+  'vector-buckets',
   'using-modifiers',
   'using-filters',
 ])

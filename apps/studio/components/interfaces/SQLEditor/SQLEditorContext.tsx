@@ -1,5 +1,4 @@
 import type { Monaco } from '@monaco-editor/react'
-import type { UntrustedSqlFragment } from '@supabase/pg-meta'
 import {
   createContext,
   use,
@@ -48,7 +47,22 @@ export const useSQLEditorContext = () => {
   return context
 }
 
-export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
+type SQLEditorProviderProps = PropsWithChildren<{
+  /**
+   * Test-only seam: production omits these and gets the real Monaco-backed
+   * controllers built from `editorRef`/`diffEditorRef` below. Tests pass a
+   * real in-memory implementation (see `tests/lib/sql-editor-test-utils.tsx`)
+   * instead of mocking Monaco.
+   */
+  editor?: EditorController
+  diff?: DiffController
+}>
+
+export const SQLEditorProvider = ({
+  children,
+  editor: editorProp,
+  diff: diffProp,
+}: SQLEditorProviderProps) => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
@@ -88,7 +102,7 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
     []
   )
 
-  const getSqlFromEditor = useCallback((snippetContent?: UntrustedSqlFragment) => {
+  const getSqlFromEditor = useCallback((snippetContent?: string) => {
     const editorInstance = editorRef.current
     if (!editorInstance) return undefined
     return getEditorSql(editorInstance, snippetContent)
@@ -148,7 +162,7 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
     []
   )
 
-  const editor = useMemo<EditorController>(
+  const builtEditor = useMemo<EditorController>(
     () => ({
       isReady: isEditorReady,
       getValue: getEditorValue,
@@ -172,6 +186,7 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
       clearHighlights,
     ]
   )
+  const editor = editorProp ?? builtEditor
 
   const isDiffMounted = useCallback(() => diffEditorRef.current !== null, [])
 
@@ -194,7 +209,7 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
     diffEditorRef.current = editorInstance
   }, [])
 
-  const diff = useMemo<DiffController>(
+  const builtDiff = useMemo<DiffController>(
     () => ({
       isMounted: isDiffMounted,
       getModifiedValue,
@@ -203,6 +218,7 @@ export const SQLEditorProvider = ({ children }: PropsWithChildren) => {
     }),
     [isDiffMounted, getModifiedValue, setDiff, attachDiffEditor]
   )
+  const diff = diffProp ?? builtDiff
 
   const value = useMemo<SQLEditorContextValue>(
     () => ({

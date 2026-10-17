@@ -1,7 +1,7 @@
 import 'swiper/css'
 
 import { useBreakpoint } from 'common'
-import { domAnimation, LazyMotion, m, useAnimation, useInView } from 'framer-motion'
+import { domAnimation, LazyMotion, m, useAnimation, useInView } from 'motion/react'
 import React, { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { cn } from 'ui'
@@ -25,6 +25,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 
   return (
     <button
+      tabIndex={0}
       onClick={onClick}
       className={cn(
         'hover:text-foreground w-full text-left text-lg flex flex-col group transition-all',

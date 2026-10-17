@@ -50,6 +50,25 @@ except Exception as error:
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+try
+{
+    var bytes = await supabase.Storage.From("avatars").Download("avatar.png");
+}
+catch (SupabaseStorageException error)
+{
+    // Access error details
+    Console.WriteLine($"Error message: {error.Message}");
+    Console.WriteLine($"HTTP status: {error.StatusCode}");
+    Console.WriteLine($"Reason: {error.Reason}");
+}
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Storage error codes

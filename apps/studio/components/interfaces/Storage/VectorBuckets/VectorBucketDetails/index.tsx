@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { SqlEditor, TableEditor } from 'icons'
-import { MoreVertical, Search, Trash2 } from 'lucide-react'
+import { MoreVerticalIcon, SearchIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
@@ -45,6 +45,7 @@ import {
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketQuery } from '@/data/storage/vector-bucket-query'
 import { useVectorBucketsIndexesQuery } from '@/data/storage/vector-buckets-indexes-query'
 
@@ -130,7 +131,7 @@ export const VectorBucketDetails = () => {
                 placeholder="Search for a table"
                 value={filterString}
                 onChange={(e) => setFilterString(e.target.value)}
-                icon={<Search />}
+                icon={<SearchIcon />}
                 className="w-48"
               />
               <div className="flex items-center gap-x-2">
@@ -182,25 +183,20 @@ export const VectorBucketDetails = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredList.length === 0 ? (
-                      <TableRow className="[&>td]:hover:bg-inherit">
-                        <TableCell colSpan={3}>
-                          {filterString.length > 0 ? (
-                            <>
-                              <p className="text-sm text-foreground">No results found</p>
-                              <p className="text-sm text-foreground-lighter">
-                                Your search for "{filterString}" did not return any results
-                              </p>
-                            </>
-                          ) : (
-                            <>
-                              <p className="text-sm text-foreground">No tables yet</p>
-                              <p className="text-sm text-foreground-lighter">
-                                Create your first table to get started
-                              </p>
-                            </>
-                          )}
-                        </TableCell>
-                      </TableRow>
+                      <TableRowNoResults
+                        className="[&>td]:hover:bg-inherit"
+                        colSpan={3}
+                        search={filterString}
+                      >
+                        {filterString.length === 0 ? (
+                          <>
+                            <p className="text-sm text-foreground">No tables yet</p>
+                            <p className="text-sm text-foreground-lighter">
+                              Create your first table to get started
+                            </p>
+                          </>
+                        ) : undefined}
+                      </TableRowNoResults>
                     ) : (
                       filteredList.map((index, idx: number) => {
                         const id = `index-${idx}`
@@ -225,9 +221,9 @@ export const VectorBucketDetails = () => {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button
-                                      variant="default"
+                                      aria-label="More options"
                                       className="w-7"
-                                      icon={<MoreVertical />}
+                                      icon={<MoreVerticalIcon />}
                                       onClick={(e) => e.stopPropagation()}
                                     />
                                   </DropdownMenuTrigger>
@@ -274,7 +270,7 @@ export const VectorBucketDetails = () => {
                                         setSelectedTableIdToDelete(index.indexName)
                                       }}
                                     >
-                                      <Trash2 size={12} className="text-foreground-lighter" />
+                                      <Trash2Icon size={12} className="text-foreground-lighter" />
                                       <p>Delete table</p>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>

@@ -19,16 +19,22 @@ import type { UtilityTab } from './SQLEditor.types'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useAddDefinitions } from './useAddDefinitions'
 import { useEditorMount } from './useEditorMount'
+import { useLogsSqlExecution } from './useLogsSqlExecution'
 import { usePrettifyQuery } from './usePrettifyQuery'
+import { useRunSource } from './useRunSource'
 import { useSnippetIdentity } from './useSnippetIdentity'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { useSqlEditorAi } from './useSqlEditorAi'
+import { useSqlEditorDatabaseSelection } from './useSqlEditorDatabaseSelection'
 import { useSqlEditorExecution } from './useSqlEditorExecution'
 import { useSqlEditorShortcuts } from './useSqlEditorShortcuts'
-import { isValidConnString } from '@/data/fetchers'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import {
+  untrustedLogSql,
+  type SafeLogSqlFragment,
+  type UntrustedLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
+import { type QuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import {
   getSqlEditorV2StateSnapshot,
   useSqlEditorV2StateSnapshot,
@@ -73,6 +79,9 @@ type RunContextValue = {
   potentialIssues: SqlEditorExecution['potentialIssues']
   resetPotentialIssues: () => void
   prettifyQuery: () => void
+  runSource: QuerySourceBinding
+  executeLogsQuery: (sql: SafeLogSqlFragment) => void
+  readEditorLogsSql: () => UntrustedLogSqlFragment | undefined
 }
 
 /** Editor-surface UI state: selection, the active results tab, and mount. */
@@ -118,7 +127,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
 
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { setSelectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
   const diff = useSqlEditorDiff()
   const { isDiffOpen } = diff
@@ -131,14 +139,11 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   const { id, urlId, generatedNewSnippetName, isLoading } = useSnippetIdentity()
   const { onMount, editorMountCount } = useEditorMount({ id })
 
-  useAddDefinitions(id, monacoRef.current)
+  const runSource = useRunSource(id)
 
-  const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
-    {
-      projectRef: ref,
-    },
-    { enabled: isValidConnString(project?.connectionString) }
-  )
+  useAddDefinitions(id, monacoRef.current, { enabled: runSource._tag !== 'logs' })
+
+  useSqlEditorDatabaseSelection({ ref, connectionString: project?.connectionString })
 
   const { setAiTitle } = useSnippetTitleGenerator()
 
@@ -147,19 +152,38 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   // Reads the SQL to run from the editor as an UntrustedSqlFragment. Promotion
   // to safety (acceptUntrustedSql) happens at each user-action site, never here.
   const readEditorSql = useCallback((): UntrustedSqlFragment | undefined => {
-    const snippet = getSqlEditorV2StateSnapshot().snippets[id]
-    return editor.getSql(snippet?.snippet.content?.unchecked_sql)
+    const snippet = getSqlEditorV2StateSnapshot().snippets[id]?.snippet
+    const fallback = snippet?.type === 'log_sql' ? undefined : snippet?.content?.unchecked_sql
+    return editor.getSql(fallback)
   }, [editor, id])
 
-  const { executeQuery, isExecuting, potentialIssues, resetPotentialIssues } =
-    useSqlEditorExecution({
-      id,
-      isDiffOpen,
-      hasSelection,
-      setAiTitle,
-    })
+  // Reads the SQL to run from the editor as an UntrustedLogSqlFragment — the logs
+  // sibling of readEditorSql. Promotion (acceptUntrustedLogsSql) happens at each
+  // user-action site, never here.
+  const readEditorLogsSql = useCallback((): UntrustedLogSqlFragment | undefined => {
+    const snippet = getSqlEditorV2StateSnapshot().snippets[id]?.snippet
+    const fallback = snippet?.type === 'log_sql' ? snippet.content?.unchecked_sql : undefined
+    const sql = editor.getSql(fallback)
+    return sql === undefined ? undefined : untrustedLogSql(sql)
+  }, [editor, id])
 
-  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt })
+  const {
+    executeQuery,
+    isExecuting: isExecutingDb,
+    potentialIssues,
+    resetPotentialIssues,
+  } = useSqlEditorExecution({
+    id,
+    isDiffOpen,
+    hasSelection,
+    setAiTitle,
+  })
+
+  const { executeLogsQuery, isExecuting: isExecutingLogs } = useLogsSqlExecution({ id })
+
+  const isExecuting = isExecutingDb || isExecutingLogs
+
+  const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt, sqlSource: runSource._tag })
   const { acceptAiHandler, discardAiHandler } = ai
 
   useSqlEditorShortcuts({
@@ -180,16 +204,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   useEffect(() => {
     // Save the departing snippet's scroll position on unmount / snippet switch.
     return () => saveScrollPosition(id)
-    // Temporary until we update eslint to ignore useEffectEvent
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
-
-  useEffect(() => {
-    if (isSuccessReadReplicas) {
-      const primaryDatabase = databases.find((db) => db.identifier === ref)
-      setSelectedDatabaseId(primaryDatabase?.identifier)
-    }
-  }, [isSuccessReadReplicas, databases, ref, setSelectedDatabaseId])
 
   const snippetName =
     urlId === 'new'
@@ -214,8 +229,21 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
       potentialIssues,
       resetPotentialIssues,
       prettifyQuery,
+      runSource,
+      executeLogsQuery,
+      readEditorLogsSql,
     }),
-    [executeQuery, readEditorSql, isExecuting, potentialIssues, resetPotentialIssues, prettifyQuery]
+    [
+      executeQuery,
+      readEditorSql,
+      isExecuting,
+      potentialIssues,
+      resetPotentialIssues,
+      prettifyQuery,
+      runSource,
+      executeLogsQuery,
+      readEditorLogsSql,
+    ]
   )
 
   const uiValue = useMemo<UiContextValue>(

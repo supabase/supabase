@@ -104,10 +104,6 @@ describe('useTrackDefaultPrivilegesExposure', () => {
     vi.mocked(useTrack).mockReturnValue(track)
   })
 
-  afterEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('does not fire while the flag is undefined', () => {
     vi.mocked(usePHFlag).mockReturnValue(undefined)
     renderHook(() =>

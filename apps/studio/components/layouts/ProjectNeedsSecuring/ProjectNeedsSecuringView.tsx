@@ -1,4 +1,4 @@
-import { ArrowRight, Check, ExternalLink, Lightbulb, X } from 'lucide-react'
+import { ArrowRightIcon, CheckIcon, ExternalLinkIcon, LightbulbIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -54,9 +54,9 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 const StatusCell = ({ enabled, label }: { enabled: boolean; label: string }) => (
   <div className="flex items-center gap-2 text-sm">
     {enabled ? (
-      <Check size={14} className="text-brand" aria-hidden="true" />
+      <CheckIcon size={14} className="text-primary" aria-hidden="true" />
     ) : (
-      <X size={14} className="text-destructive" aria-hidden="true" />
+      <XIcon size={14} className="text-destructive" aria-hidden="true" />
     )}
     <span>{label}</span>
   </div>
@@ -103,7 +103,7 @@ export const ProjectNeedsSecuringView = ({
         <PageHeaderMeta>
           <PageHeaderIcon>
             <div className="shrink-0 w-14 h-14 relative bg-destructive-200 border border-destructive-400 rounded-md flex items-center justify-center">
-              <Lightbulb size={20} strokeWidth={1.5} className="text-destructive" />
+              <LightbulbIcon size={20} strokeWidth={1.5} className="text-destructive" />
             </div>
           </PageHeaderIcon>
           <PageHeaderSummary>
@@ -111,7 +111,7 @@ export const ProjectNeedsSecuringView = ({
             <PageHeaderDescription>{formatRlsDescription(issueCount)}</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button asChild variant="text" iconRight={<ArrowRight />}>
+            <Button asChild variant="text" iconRight={<ArrowRightIcon />}>
               <Link
                 href={`/project/${projectRef}`}
                 onClick={() => {
@@ -170,7 +170,7 @@ export const ProjectNeedsSecuringView = ({
                               rel="noreferrer"
                               aria-label="Open Data API settings"
                             >
-                              <ExternalLink size={14} aria-hidden="true" />
+                              <ExternalLinkIcon size={14} aria-hidden="true" />
                             </Link>
                           </Button_Shadcn_>
                         </div>
@@ -195,7 +195,7 @@ export const ProjectNeedsSecuringView = ({
                       return (
                         <TableRow
                           key={getTableKey(table)}
-                          className="relative cursor-pointer inset-focus"
+                          className="relative cursor-pointer focus-inset"
                           onClick={(event) => {
                             trackViewPolicies()
                             handleNavigation(event)

@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -68,7 +68,7 @@ export const ComplianceConfig = () => {
   return (
     <PageSection id="compliance-configuration">
       <PageSectionMeta>
-        <div className="flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
+        <div className="w-full flex flex-col gap-3 @lg:flex-row @lg:items-center @lg:justify-between">
           <PageSectionSummary>
             <PageSectionTitle>High Compliance Configuration</PageSectionTitle>
             <PageSectionDescription>
@@ -91,7 +91,7 @@ export const ComplianceConfig = () => {
             </div>
             <div className="flex items-center justify-end space-x-2">
               {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                <Loader2Icon className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               {isError && (
                 <AlertError error={error} subject="Failed to retrieve project settings" />

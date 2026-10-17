@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Code, Play } from 'lucide-react'
+import { CodeIcon, PlayIcon } from 'lucide-react'
 import { DragEvent, ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge, Button, ChartContainer, ChartTooltipContent, cn } from 'ui'
@@ -9,6 +9,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
 import { PortalChartTooltip } from '../Charts/PortalChartTooltip'
+import { DataGridResults } from '../DataGridResults'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -21,7 +22,6 @@ import {
 } from './QueryBlock.utils'
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -171,7 +171,7 @@ export const QueryBlock = ({
                 variant="text"
                 size="tiny"
                 className="w-7 h-7"
-                icon={<Code size={14} strokeWidth={1.5} />}
+                icon={<CodeIcon size={14} strokeWidth={1.5} />}
                 onClick={() => setShowSql(!showSql)}
                 tooltip={{
                   content: { side: 'bottom', text: showSql ? 'Hide query' : 'Show query' },
@@ -201,7 +201,7 @@ export const QueryBlock = ({
                 variant="text"
                 size="tiny"
                 className="w-7 h-7"
-                icon={<Play size={14} strokeWidth={1.5} />}
+                icon={<PlayIcon size={14} strokeWidth={1.5} />}
                 loading={isExecuting}
                 disabled={isExecuting || disabled || !sql}
                 onClick={runSelect}
@@ -375,7 +375,7 @@ export const QueryBlock = ({
                 Queries that involve any mutation will not be run in reports
               </p>
               {!!onRemoveChart && (
-                <Button variant="default" className="mt-2" onClick={() => onRemoveChart()}>
+                <Button className="mt-2" onClick={() => onRemoveChart()}>
                   Remove chart
                 </Button>
               )}
@@ -391,7 +391,7 @@ export const QueryBlock = ({
                   'flex flex-col flex-1 w-full overflow-auto overscroll-contain relative max-h-64'
                 )}
               >
-                <Results rows={results} />
+                <DataGridResults rows={results} />
                 {autoLimit && (
                   <p className="text-xs font-mono px-2 py-1 border-t text-foreground-light">
                     Limited to only 100 rows

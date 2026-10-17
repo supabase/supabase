@@ -11,12 +11,11 @@ export const RESTRICTION_MESSAGES = {
       const label = dayjs(date).format('DD MMM, YYYY')
       return (
         <>
-          You have a grace period until{' '}
-          <TimestampInfo className="text-sm" utcTimestamp={date} label={label} />. After that, your
-          projects will be restricted while your organization is over quota.{' '}
+          Projects will be restricted from{' '}
+          <TimestampInfo className="text-sm" utcTimestamp={date} label={label} /> if your
+          organization remains over quota.{' '}
           <InlineLink href={`/org/${slug}/usage`}>Review usage</InlineLink> or{' '}
-          <InlineLink href={`/org/${slug}/billing`}>manage your plan</InlineLink> to avoid
-          restrictions.
+          <InlineLink href={`/org/${slug}/billing`}>billing</InlineLink>.
         </>
       )
     },
@@ -49,12 +48,28 @@ export const RESTRICTION_MESSAGES = {
     ),
   },
   OVERDUE_INVOICES_FROM_OTHER_ORGS: {
-    title: 'Outstanding invoices in other organization',
-    description: (slug: string): ReactNode => (
-      <>
-        Please <InlineLink href={`/org/${slug}/billing#invoices`}>pay invoices</InlineLink> for
-        other organizations to avoid service disruption
-      </>
-    ),
+    title: 'Outstanding invoices in other organizations',
+    description: (orgs: { name: string; slug: string }[]): ReactNode => {
+      const [firstOrg, ...remainingOrgs] = orgs
+
+      if (!firstOrg) {
+        return (
+          <>
+            <InlineLink href="/organizations">Pay outstanding invoices</InlineLink> to avoid service
+            disruption
+          </>
+        )
+      }
+
+      return (
+        <>
+          Pay invoices for{' '}
+          <InlineLink href={`/org/${firstOrg.slug}/billing#invoices`}>{firstOrg.name}</InlineLink>
+          {remainingOrgs.length > 0 &&
+            ` and ${remainingOrgs.length} other${remainingOrgs.length === 1 ? '' : 's'}`}{' '}
+          to avoid service disruption
+        </>
+      )
+    },
   },
 }

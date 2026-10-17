@@ -24,10 +24,7 @@ export async function getBranchDiff({
   const { data: diffData, error } = await get('/v1/branches/{branch_id_or_ref}/diff', {
     params: {
       path: { branch_id_or_ref: branchRef },
-      query:
-        Object.keys(query).length > 0
-          ? (query as { included_schemas?: string; pgdelta?: boolean })
-          : undefined,
+      query: Object.keys(query).length > 0 ? query : undefined,
     },
     headers: {
       Accept: 'text/plain',

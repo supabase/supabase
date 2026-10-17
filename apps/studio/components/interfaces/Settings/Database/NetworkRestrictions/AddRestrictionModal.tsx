@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -200,7 +200,7 @@ const AddRestrictionModal = ({
                           <p>CIDR Block Size</p>
                           <Tooltip>
                             <TooltipTrigger>
-                              <HelpCircle size="14" strokeWidth={2} />
+                              <HelpCircleIcon size="14" strokeWidth={2} />
                             </TooltipTrigger>
                             <TooltipContent side="bottom" className="w-80">
                               Classless inter-domain routing (CIDR) notation is the notation used to
@@ -264,10 +264,16 @@ const AddRestrictionModal = ({
             </DialogSection>
           )}
           <DialogFooter>
-            <Button variant="default" disabled={isApplying} onClick={() => onClose()}>
+            <Button disabled={isApplying} onClick={() => onClose()}>
               Cancel
             </Button>
-            <Button form={formId} type="submit" loading={isApplying} disabled={isApplying}>
+            <Button
+              variant="primary"
+              form={formId}
+              type="submit"
+              loading={isApplying}
+              disabled={isApplying}
+            >
               Save restriction
             </Button>
           </DialogFooter>

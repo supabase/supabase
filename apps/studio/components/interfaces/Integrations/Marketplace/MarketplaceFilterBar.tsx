@@ -1,4 +1,4 @@
-import { ChevronDown, LayoutGrid, List, Search } from 'lucide-react'
+import { ChevronDownIcon, LayoutGridIcon, ListIcon, SearchIcon } from 'lucide-react'
 import type { Ref } from 'react'
 import {
   Button,
@@ -91,13 +91,13 @@ export const MarketplaceFilterBar = ({
         onChange={(e) => onSearchChange(e.target.value)}
         onKeyDown={onSearchInputEscape(search, onSearchChange)}
         placeholder={`Search integration${resultCount === 1 ? '' : 's'}…`}
-        icon={<Search size={14} />}
+        icon={<SearchIcon size={14} />}
         containerClassName="w-full min-w-40 max-w-60 grow flex-1"
       />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button iconRight={<ChevronDownIcon />} className={triggerCls}>
             <span className="truncate">Category: {categoryLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -136,7 +136,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button iconRight={<ChevronDownIcon />} className={triggerCls}>
             <span className="truncate">Type: {typeLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -170,7 +170,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button iconRight={<ChevronDownIcon />} className={triggerCls}>
             <span className="truncate">Source: {sourceLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -220,13 +220,13 @@ export const MarketplaceFilterBar = ({
           onClick={() => onViewModeChange('grid')}
           className={cn(
             'border-r px-2 py-1.5 rounded-l-md cursor-pointer',
-            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            'focus-visible:z-10 focus-ring',
             viewMode === 'grid'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'
           )}
         >
-          <LayoutGrid size={13} />
+          <LayoutGridIcon size={13} />
         </button>
         <button
           type="button"
@@ -235,13 +235,13 @@ export const MarketplaceFilterBar = ({
           onClick={() => onViewModeChange('list')}
           className={cn(
             'px-2 py-1.5 rounded-r-md cursor-pointer',
-            'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
+            'focus-visible:z-10 focus-ring',
             viewMode === 'list'
               ? 'bg-surface-200 text-foreground'
               : 'text-foreground-light hover:bg-surface-100'
           )}
         >
-          <List size={13} />
+          <ListIcon size={13} />
         </button>
       </div>
     </div>

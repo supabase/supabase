@@ -7,6 +7,7 @@ import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { ContentListings } from '~/components/ContentListings'
 import { CustomContent } from '~/components/CustomContent'
+import { DatabaseAdvisorsIndex } from '~/components/DatabaseAdvisorsIndex'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { McpCiConfigBlock } from '~/components/McpCiConfigBlock'
@@ -18,33 +19,35 @@ import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
-import StepHikeCompact from '~/components/StepHikeCompact'
+import { StepHikeCompact } from '~/components/StepHikeCompact'
+import Table from '~/components/Table'
 import { TerraformProviderSchema } from '~/components/TerraformProviderSchema'
+import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegration'
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
-import { NamedCodeBlock } from '~/features/directives/CodeTabs.components'
+import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
-import InfoTooltip from '~/features/ui/InfoTooltip'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { YouTube } from '~/features/ui/YouTube'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
 import { type ComponentPropsWithoutRef } from 'react'
-import { Badge, Button } from 'ui'
-import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
+import { Badge, Button, Heading } from 'ui'
+import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { IconPanel } from 'ui-patterns/IconPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
 
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
+import { AgentSetup } from '../ui/AgentSetup'
+import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
+import { AiPrompt, type AiPromptProps } from '../ui/AiPrompt'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
-import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from '../ui/PromptPanel'
 
-// Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
-const AdmonitionWithMargin = (props: AdmonitionProps) => {
+// Admonition as it appears in docs pages: sits in MDX prose, so it needs a margin-bottom.
+const DocsAdmonition = (props: AdmonitionProps) => {
   return <Admonition {...props} className="mb-8" />
 }
 
@@ -67,8 +70,13 @@ const Pre = (props: any) => {
 const components = {
   Accordion,
   AccordionItem,
-  Admonition: AdmonitionWithMargin,
+  Admonition: DocsAdmonition,
   AgentPluginsPanel,
+  AgentSetup,
+  AgentWatchSchedule,
+  AiPrompt: (props: Omit<AiPromptProps, 'telemetry'>) => (
+    <AiPrompt {...props} telemetry={{ source: 'guide' }} />
+  ),
   AiPromptsIndex,
   AiSkillsIndex,
   AuthSmsProviderConfig,
@@ -79,15 +87,16 @@ const components = {
   ButtonCard,
   CodeSampleDummy,
   CodeSampleWrapper,
+  CodeTabs,
   ComputeDiskLimitsTable,
   CustomContent,
   ContentListings,
+  DatabaseAdvisorsIndex,
   ErrorCodes,
   Extensions,
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
-  IconPanel,
   IconX: X,
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,
@@ -98,11 +107,6 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
-  Prompt,
-  PromptContent,
-  PromptCopy,
-  PromptPanel,
-  PromptTitle,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
@@ -110,10 +114,12 @@ const components = {
   ShowUntil,
   SqlToRest,
   StepHikeCompact,
+  Table,
   Tabs,
   TabPanel,
   TerraformProviderSchema,
-  InfoTooltip,
+  WrapperDashboardIntegration,
+  YouTube,
   a: MdxAnchor,
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (
     <Heading tag="h2" {...props}>
@@ -131,6 +137,7 @@ const components = {
     </Heading>
   ),
   pre: Pre,
+  table: Table,
   /**
    * Force inline code tags to go sync, this prevents Heading anchor resolution fail due to
    * our CodeBlock component being async. We need to find a better solution for more future

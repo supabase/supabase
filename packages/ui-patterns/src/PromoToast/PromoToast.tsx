@@ -3,8 +3,7 @@
 import { hasConsented, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Button } from 'ui/src/components/Button/Button'
-import { cn } from 'ui/src/lib/utils/cn'
+import { Button, cn } from 'ui'
 
 import announcement from '../Banners/data.json'
 
@@ -58,9 +57,7 @@ const PromoToast = () => {
             Claim your ticket
           </Link>
         </Button>
-        <Button variant="default" onClick={handleHide}>
-          Dismiss
-        </Button>
+        <Button onClick={handleHide}>Dismiss</Button>
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { CopyIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  GithubIcon,
 } from 'ui'
 
 import { inferProjectStatus } from './ProjectCard.utils'
@@ -21,7 +22,6 @@ import { getManagedByFromOrganizationPartner } from '@/data/organizations/manage
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { getComputeSize, OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
-import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 import type { Organization } from '@/types'
@@ -46,12 +46,6 @@ export const ProjectCard = ({
 }: ProjectCardProps) => {
   const router = useRouter()
   const { name, ref: projectRef } = project
-
-  const { infraAwsNimbusLabel } = useCustomContent(['infra:aws_nimbus_label'])
-  const providerLabel =
-    project.cloud_provider === 'AWS_NIMBUS' ? infraAwsNimbusLabel : project.cloud_provider
-
-  const desc = `${providerLabel} | ${project.region}`
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
@@ -84,7 +78,7 @@ export const ProjectCard = ({
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="text"
-                          icon={<MoreVertical size={14} />}
+                          icon={<MoreVerticalIcon size={14} />}
                           className="w-6 h-6 px-0"
                           onClick={(e) => {
                             e.stopPropagation()
@@ -103,7 +97,7 @@ export const ProjectCard = ({
                             toast.success('Copied project ID to clipboard')
                           }}
                         >
-                          <Copy size={14} />
+                          <CopyIcon size={14} />
                           <span>Copy project ID</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -113,14 +107,14 @@ export const ProjectCard = ({
                             router.push(`/project/${projectRef}/settings/general`)
                           }}
                         >
-                          <Settings size={14} />
+                          <SettingsIcon size={14} />
                           <span>Settings</span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
-                <p className="text-sm text-foreground-lighter">{desc}</p>
+                <p className="text-sm text-foreground-lighter">{project.region}</p>
               </div>
               <div className="flex items-center gap-x-1.5 relative overflow-hidden">
                 {project.status !== 'INACTIVE' && projectHomepageShowInstanceSize && (
@@ -146,7 +140,7 @@ export const ProjectCard = ({
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md min-w-0">
                     <div className="w-5 h-5 p-1 flex items-center justify-center shrink-0">
-                      <Github size={12} strokeWidth={1.5} />
+                      <GithubIcon size={12} strokeWidth={1.5} />
                     </div>
                     <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
                   </div>

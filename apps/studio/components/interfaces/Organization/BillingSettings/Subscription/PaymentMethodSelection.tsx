@@ -2,7 +2,7 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { Loader, Plus } from 'lucide-react'
+import { LoaderIcon, PlusIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import {
   forwardRef,
@@ -234,7 +234,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
           <div>
             <p>{errorMessage} Update your billing address or tax ID before upgrading your plan.</p>
             <Button
-              variant="default"
               className="mt-2"
               onClick={() => {
                 if (onClose) {
@@ -314,7 +313,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
       <div>
         {isLoading || isCustomerProfileLoading ? (
           <div className="flex items-center px-4 py-2 space-x-4 border rounded-md border-strong bg-surface-200">
-            <Loader className="animate-spin" size={14} />
+            <LoaderIcon className="animate-spin" size={14} />
             <p className="text-sm text-foreground-light">Retrieving payment methods</p>
           </div>
         ) : paymentMethods?.data && paymentMethods?.data.length > 0 && !setupNewPaymentMethod ? (
@@ -359,7 +358,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 })}
                 <SelectItem value="new">
                   <div className="flex gap-2">
-                    <Plus size={16} />
+                    <PlusIcon size={16} />
                     <p className="transition text-foreground-light group-hover:text-foreground">
                       Add new payment method
                     </p>

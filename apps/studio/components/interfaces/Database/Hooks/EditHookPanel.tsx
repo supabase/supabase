@@ -72,7 +72,7 @@ export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isLoadingTable, setIsLoadingTable] = useState(false)
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
     projectRef: project?.ref,
@@ -301,13 +301,7 @@ export const EditHookPanel = () => {
         onCancel={confirmOnClose}
         customFooter={
           <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
-            <Button
-              size="tiny"
-              variant="default"
-              type="button"
-              onClick={confirmOnClose}
-              disabled={isSubmitting}
-            >
+            <Button size="tiny" type="button" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button

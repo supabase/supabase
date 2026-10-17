@@ -1,12 +1,10 @@
 'use client'
 
 import { ChevronDownIcon } from '@heroicons/react/outline'
-import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { plans as allPlans } from 'shared-data/plans'
-import { Button, cn } from 'ui'
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
+import { Button, cn, ToggleGroup, ToggleGroupItem } from 'ui'
 
 import Panel from '../Panel'
 import ComputePricingCalculator from './ComputePricingCalculator'
@@ -125,14 +123,14 @@ const PricingComputeSection = () => {
             </p>
             <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
-              <br className="hidden sm:block" /> 64 cores and 256 GB RAM
+              <br className="hidden sm:block" /> 64 vCPUs and 256 GB RAM
             </h3>
           </div>
 
-          <Button asChild size="tiny" variant="default">
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+          <Button asChild size="tiny">
+            <a href="https://supabase.com/docs/guides/platform/compute-add-ons">
               Learn about Compute add-ons
-            </Link>
+            </a>
           </Button>
         </div>
         <div
@@ -162,21 +160,21 @@ const PricingComputeSection = () => {
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Read more on{' '}
-                  <Link
+                  <a
                     href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     usage-based billing for compute
-                  </Link>{' '}
+                  </a>{' '}
                   or{' '}
-                  <Link
+                  <a
                     href="https://supabase.com/docs/guides/platform/compute-add-ons"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     Compute Add-ons
-                  </Link>
+                  </a>
                   .
                 </p>
               </div>
@@ -187,16 +185,20 @@ const PricingComputeSection = () => {
           </div>
         </div>
         <button
+          tabIndex={0}
           onClick={() => setShowTable(!showTable)}
-          className="w-full p-2 border-t border-muted text-foreground focus-visible:outline-brand-600 focus-visible:rounded-b-xl text-sm bg-alternative flex items-center justify-center gap-2"
+          className="group w-full p-2 border-t border-muted text-foreground outline-hidden rounded-b-xl text-sm bg-alternative flex items-center justify-center"
         >
-          <ChevronDownIcon
-            className={cn(
-              'w-4 transition-transform transform origin-center',
-              showTable ? 'rotate-180' : 'rotate-0'
-            )}
-          />{' '}
-          {!showTable ? 'Expand' : 'Hide'} Pricing breakdown
+          {/* Label-scoped ring: full-bleed focus-ring clips under Panel overflow-hidden */}
+          <span className="inline-flex items-center gap-2 rounded-md px-2 py-0.5 group-focus-visible:ring-2 group-focus-visible:ring-ring">
+            <ChevronDownIcon
+              className={cn(
+                'w-4 transition-transform transform origin-center',
+                showTable ? 'rotate-180' : 'rotate-0'
+              )}
+            />
+            {!showTable ? 'Expand' : 'Hide'} Pricing breakdown
+          </span>
         </button>
       </div>
     </Panel>

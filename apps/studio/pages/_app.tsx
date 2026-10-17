@@ -1,5 +1,4 @@
 import '@/styles/code.css'
-import '@/styles/focus.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
 import '@/styles/grid.css'
@@ -39,14 +38,17 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { FeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { IndirectTaxDeclarationModal } from '@/components/interfaces/App/IndirectTaxDeclarationModal'
 import { MonacoThemeProvider } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RouteValidationWrapper } from '@/components/interfaces/App/RouteValidationWrapper'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
+import { clearBootTimeoutFallback } from '@/components/ui/BootTimeoutFallback/BootTimeoutFallback'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
@@ -54,7 +56,9 @@ import { useRootQueryClient } from '@/data/query-client'
 import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
@@ -99,6 +103,7 @@ const FeatureFlagProviderWithOrgContext = ({
   ...props
 }: ComponentProps<typeof FeatureFlagProvider>) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
+  const { data: organizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
@@ -106,9 +111,17 @@ const FeatureFlagProviderWithOrgContext = ({
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
+      if (selectedOrganization?.slug) customAttributes.organization_slug = selectedOrganization.slug
+      const createdAtUnixSeconds = toUnixSecondsString(organizationCreatedAt)
+      if (createdAtUnixSeconds) customAttributes.organization_created_at = createdAtUnixSeconds
       return getFlags(userEmail, customAttributes)
     },
-    [cloudProvider, selectedOrganization?.plan?.id]
+    [
+      cloudProvider,
+      selectedOrganization?.plan?.id,
+      selectedOrganization?.slug,
+      organizationCreatedAt,
+    ]
   )
 
   return (
@@ -156,10 +169,21 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  useEffect(() => {
+    clearBootTimeoutFallback()
+  }, [])
+
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   // [Joshen] Should target hosted staging, local dev, and local CLI only
   const isNonProdEnv = (IS_PLATFORM && process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod') || isCLI
+  const isLocalEnv =
+    process.env.NODE_ENV === 'development' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    isCLI
+  let faviconRoute = '/favicon'
+  if (isNonProdEnv) faviconRoute = '/favicon/staging'
+  if (isLocalEnv) faviconRoute = '/favicon/local'
 
   const checkCliEnvironment = async () => {
     const data = await getCLIReleaseVersion()
@@ -203,7 +227,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <MetaFaviconsPagesRouter
                         includeManifest
                         applicationName="Supabase Studio"
-                        route={isNonProdEnv ? '/favicon/staging' : '/favicon'}
+                        route={faviconRoute}
                       />
                       <TooltipProvider>
                         <RouteValidationWrapper>
@@ -219,10 +243,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                       <GlobalShortcuts />
                                       <StudioCommandMenu />
                                       <FeaturePreviewModal />
+                                      <IndirectTaxDeclarationModal />
                                     </FeaturePreviewContextProvider>
                                   </BannerStackProvider>
                                   <Toaster />
                                   <MonacoThemeProvider />
+                                  <AppearanceSettingsProvider />
                                 </CommandProvider>
                               </AiAssistantStateContextProvider>
                               <DevToolbar extraTabs={devToolbarExtraTabs} />
