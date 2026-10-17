@@ -123,13 +123,35 @@ describe('applyAutoLimit', () => {
     safeSql`select 1 limit null;`,
     safeSql`select 1 limit all offset 2;`,
     safeSql`SELECT 1 LIMIT NULL OFFSET 2;`,
+    safeSql`select 1 limit all offset (2);`,
+    safeSql`select 1 limit null offset (2);`,
+    safeSql`select 1 limit all offset +2;`,
+    safeSql`select 1 limit null offset 2::int;`,
+    safeSql`select 1 limit all offset $1;`,
+    safeSql`select 1 limit all /* note */;`,
+    safeSql`select 1 limit null /* note */;`,
+    safeSql`select 1 limit /* note */ all;`,
   ])('does not add a second limit to %s', (sql) => {
     expect(applyAutoLimit(sql, 100)).toEqual({ sql, appendAutoLimit: false })
   })
-  test('still limits queries containing the words limit all in a string literal', () => {
-    const sql = safeSql`select 'limit all' as label;`
+  test.each([
+    safeSql`select 'limit all' as label;`,
+    safeSql`select 'limit null' as label;`,
+    safeSql`select $$limit all$$ as label;`,
+    safeSql`select "limit" as label from (select 1 as "limit") as nested;`,
+    safeSql`select 1 /* limit null */;`,
+  ])('still limits queries containing limit words only in quoted text or comments: %s', (sql) => {
     expect(applyAutoLimit(sql, 100)).toEqual({
-      sql: "select 'limit all' as label limit 100;",
+      sql: safeSql`${trimTrailingSemicolons(sql)} limit 100;`,
+      appendAutoLimit: true,
+    })
+  })
+  test.each([
+    safeSql`select * from (select 1 limit all) as nested;`,
+    safeSql`select * from (select 1 limit null) as nested;`,
+  ])('adds an outer limit when only a nested query has one: %s', (sql) => {
+    expect(applyAutoLimit(sql, 100)).toEqual({
+      sql: safeSql`${trimTrailingSemicolons(sql)} limit 100;`,
       appendAutoLimit: true,
     })
   })

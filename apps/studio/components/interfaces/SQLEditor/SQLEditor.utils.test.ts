@@ -122,20 +122,23 @@ describe('SQLEditor.utils.ts:buildExecuteParams', () => {
     expect(params.sql).toBe('select * from countries limit 10;')
     expect(params.autoLimit).toBeUndefined()
   })
-  test.each([safeSql`select 1 limit all;`, safeSql`select 1 limit null;`])(
-    'preserves the existing limit when executing %s',
-    (sql) => {
-      const params = buildExecuteParams({
-        sql,
-        limit: 100,
-        connectionString: 'postgresql://example',
-        projectRef: 'default',
-        impersonatedRoleState,
-      })
-      expect(params.sql).toBe(sql)
-      expect(params.autoLimit).toBeUndefined()
-    }
-  )
+  test.each([
+    safeSql`select 1 limit all;`,
+    safeSql`select 1 limit null;`,
+    safeSql`select 1 limit all offset (2);`,
+    safeSql`select 1 limit null offset (2);`,
+    safeSql`select 1 limit all /* note */;`,
+  ])('preserves the existing limit when executing %s', (sql) => {
+    const params = buildExecuteParams({
+      sql,
+      limit: 100,
+      connectionString: 'postgresql://example',
+      projectRef: 'default',
+      impersonatedRoleState,
+    })
+    expect(params.sql).toBe(sql)
+    expect(params.autoLimit).toBeUndefined()
+  })
   test('reflects isRoleImpersonationEnabled from the impersonation state', () => {
     const params = buildExecuteParams({
       sql: safeSql`select * from countries`,
