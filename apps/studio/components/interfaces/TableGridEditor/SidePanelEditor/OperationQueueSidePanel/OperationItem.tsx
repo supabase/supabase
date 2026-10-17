@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Undo2 } from 'lucide-react'
+import { Undo2Icon } from 'lucide-react'
 import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
@@ -61,7 +61,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
           variant="text"
           aria-label="Discard change"
           className="px-1.5"
-          icon={<Undo2 />}
+          icon={<Undo2Icon />}
           onClick={handleDelete}
           tooltip={{
             content: {

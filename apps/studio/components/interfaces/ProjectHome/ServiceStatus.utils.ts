@@ -3,8 +3,8 @@ import type { ProjectServiceStatus as APIProjectServiceStatus } from '@/data/ser
 export type ProjectServiceStatus = APIProjectServiceStatus | 'DISABLED'
 
 export const resolveRealtimeServiceStatus = (
-  isHighAvailability: boolean,
+  isRealtimeUnavailable: boolean,
   status?: APIProjectServiceStatus
 ): ProjectServiceStatus => {
-  return isHighAvailability ? 'DISABLED' : (status ?? 'UNHEALTHY')
+  return isRealtimeUnavailable ? 'DISABLED' : (status ?? 'UNHEALTHY')
 }

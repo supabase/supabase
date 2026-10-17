@@ -1,4 +1,4 @@
-import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react'
+import { ArrowDownNarrowWideIcon, ArrowDownWideNarrowIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -45,9 +45,9 @@ export const EdgeFunctionsSortDropdown = ({ value, onChange }: EdgeFunctionsSort
         <Button
           icon={
             value.includes('desc') ? (
-              <ArrowDownWideNarrow size={14} />
+              <ArrowDownWideNarrowIcon size={14} />
             ) : (
-              <ArrowDownNarrowWide size={14} />
+              <ArrowDownNarrowWideIcon size={14} />
             )
           }
         >

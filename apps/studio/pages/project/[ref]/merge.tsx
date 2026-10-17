@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertTriangle, GitBranchIcon, X } from 'lucide-react'
+import { AlertTriangleIcon, GitBranchIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -380,7 +380,7 @@ const MergePage: NextPageWithLayout = () => {
                 }
                 overrideIcon={
                   hasCurrentWorkflowFailed ? (
-                    <AlertTriangle
+                    <AlertTriangleIcon
                       size={16}
                       strokeWidth={1.5}
                       className="text-destructive shrink-0"
@@ -400,7 +400,7 @@ const MergePage: NextPageWithLayout = () => {
                     <Button
                       onClick={handleCloseBranch}
                       loading={isDeleting}
-                      icon={<X size={16} strokeWidth={1.5} />}
+                      icon={<XIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
                     >
                       Close branch

@@ -37,6 +37,11 @@ export const ProductDropdown = () => {
                       icon={product.icon}
                       className="h-fit p-0"
                       hasChevron
+                      badge={
+                        product.name === 'Compute'
+                          ? { label: 'Private Alpha', variant: 'default' }
+                          : undefined
+                      }
                     />
                   </NavigationMenuLink>
                 ))}

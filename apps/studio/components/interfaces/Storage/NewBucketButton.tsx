@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { MouseEventHandler } from 'react'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -18,7 +18,7 @@ export const CreateBucketButton = ({
       size="tiny"
       variant="primary"
       className="w-fit"
-      icon={<Plus size={14} />}
+      icon={<PlusIcon size={14} />}
       disabled={!canCreateBuckets}
       onClick={onClick}
       tooltip={{

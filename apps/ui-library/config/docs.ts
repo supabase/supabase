@@ -55,7 +55,7 @@ export const mcpBlocks: SidebarNavGroup = {
   items: [
     {
       title: 'MCP Server',
-      href: '/docs/headless/mcp-server',
+      href: '/docs/headless/mcp',
       items: [],
       new: true,
       commandItemLabel: 'MCP Server',

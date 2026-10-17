@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Save } from 'lucide-react'
+import { SaveIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
@@ -92,7 +92,10 @@ export const SaveQueryDropdown = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {children ?? (
-          <ExplorerToolbarAction icon={<Save size={16} strokeWidth={2} />} tooltip="Save query" />
+          <ExplorerToolbarAction
+            icon={<SaveIcon size={16} strokeWidth={2} />}
+            tooltip="Save query"
+          />
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48" align="end">

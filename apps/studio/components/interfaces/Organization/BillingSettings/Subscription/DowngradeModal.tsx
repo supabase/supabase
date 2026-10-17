@@ -1,4 +1,4 @@
-import { MinusCircle, PauseCircle } from 'lucide-react'
+import { MinusCircleIcon, PauseCircleIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import {
@@ -144,12 +144,12 @@ export const DowngradeModal = ({
 
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex items-center gap-3">
-              <PauseCircle size={18} />
+              <PauseCircleIcon size={18} />
               <span>Projects will be paused after a week of inactivity</span>
             </li>
 
             <li className="flex items-center gap-3 mb-2">
-              <MinusCircle size={18} />
+              <MinusCircleIcon size={18} />
               <span>Add ons from all projects under this organization will be removed.</span>
             </li>
 
