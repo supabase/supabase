@@ -120,11 +120,15 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
     }
   }
 
-  function handleSelect(path: string) {
+  function trackResultClicked(path: string) {
     sendTelemetryEvent({
       action: 'docs_search_v2_result_clicked',
       properties: { resultPath: path, query: highlightQuery },
     })
+  }
+
+  function handleSelect(path: string) {
+    trackResultClicked(path)
     onResultSelect(path)
   }
 
@@ -198,6 +202,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
                 result={result}
                 highlightQuery={highlightQuery}
                 onResultSelect={handleSelect}
+                onResultClick={trackResultClicked}
                 onResultOpen={onResultOpen}
               />
             ))}
