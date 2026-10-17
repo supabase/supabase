@@ -16262,6 +16262,11 @@ export interface components {
             type: 'table'
           }
       )[]
+      /**
+       * @description Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.
+       * @example ap-southeast-1
+       */
+      warehouse_region?: string
     }
     WarehouseSetupResponse_Output: {
       /**
@@ -16313,6 +16318,13 @@ export interface components {
     WarehouseSetupStatusResponse_Output: {
       /** @description Whether the current disable request deletes DuckLake data. */
       delete_data?: boolean
+      /** @description Warehouse DNS delivery status. Ready means the DNS API accepted the route; client DNS caches may still be updating. */
+      dns?: {
+        hostname: string
+        region: string
+        /** @enum {string} */
+        status: 'pending' | 'ready' | 'error' | 'removed'
+      }
       /** @description Warehouse cleanup failure, when present. */
       error?: string
       /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
@@ -23282,7 +23294,7 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
-        /** @description Search projects by name */
+        /** @description Search projects by name, or by exact project ref */
         search?: string
         /** @description Sort order for projects */
         sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
