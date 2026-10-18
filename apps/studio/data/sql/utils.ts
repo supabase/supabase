@@ -30,6 +30,23 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
   return sql.replace(/;+\s*$/, '') as SafeSqlFragment
 }
 
+// A statement is limitable when it reads and nothing else. `select ...` is the
+// obvious case; `with ... select ...` is the same shape but was previously
+// skipped, so the editor's row limit silently did not apply to any CTE query
+// (supabase/supabase#51879).
+//
+// Postgres also allows data-modifying CTEs — `with x as (...) insert into ...`,
+// `with d as (delete ... returning *) select * from d` — and appending a limit
+// to those would be wrong. In keeping with the note above, the check stays
+// deliberately blunt: any write keyword anywhere in the statement disqualifies
+// it, which errs toward leaving the query untouched.
+function isLimitableSelect(cleanedSql: string): boolean {
+  const lower = cleanedSql.toLowerCase()
+  if (lower.startsWith('select')) return true
+  if (!lower.startsWith('with')) return false
+  return !/\b(insert|update|delete|merge)\b/i.test(cleanedSql)
+}
+
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
 // This is to prevent dashboard from accidentally appending limit to the end of a query
 // thats not supposed to have any, since there's too many cases to cover.
@@ -64,7 +81,7 @@ export function applyAutoLimit(
     limit > 0 &&
     !hasComments &&
     !hasMultipleQueries &&
-    cleanedSql.toLowerCase().startsWith('select') &&
+    isLimitableSelect(cleanedSql) &&
     !cleanedSql.toLowerCase().match(/fetch\s+(first|next)/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
