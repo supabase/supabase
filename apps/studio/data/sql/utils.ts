@@ -36,15 +36,22 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
 // (supabase/supabase#51879).
 //
 // Postgres also allows data-modifying CTEs — `with x as (...) insert into ...`,
-// `with d as (delete ... returning *) select * from d` — and appending a limit
-// to those would be wrong. In keeping with the note above, the check stays
-// deliberately blunt: any write keyword anywhere in the statement disqualifies
-// it, which errs toward leaving the query untouched.
+// `with d as (delete ... returning *) select * from d` — and `select ... into`
+// creates a table, so none of those may be limited. In keeping with the note
+// above this file stays keyword-based rather than parsing, but string literals
+// and quoted identifiers are dropped first so that text which merely looks like
+// a write (`select 'update' as k`, a column named "delete") does not needlessly
+// disqualify a read-only query.
 function isLimitableSelect(cleanedSql: string): boolean {
   const lower = cleanedSql.toLowerCase()
   if (lower.startsWith('select')) return true
   if (!lower.startsWith('with')) return false
-  return !/\b(insert|update|delete|merge)\b/i.test(cleanedSql)
+
+  const withoutLiterals = cleanedSql
+    .replace(/'(?:[^']|'')*'/g, "''")
+    .replace(/"(?:[^"]|"")*"/g, '""')
+
+  return !/\b(insert|update|delete|merge|into)\b/i.test(withoutLiterals)
 }
 
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
