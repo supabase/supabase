@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import { describe, expect, it } from 'vitest'
 
-import { middleware } from './middleware'
+import { proxy } from './proxy'
 
 const DOCS_URL = 'https://supabase.com/library/docs/nextjs/client'
 
@@ -9,9 +9,9 @@ function request(url: string, headers: Record<string, string>) {
   return new NextRequest(new Request(url, { headers }))
 }
 
-describe('middleware markdown negotiation', () => {
+describe('proxy markdown negotiation', () => {
   it('rewrites to the markdown route when Accept prefers markdown', () => {
-    const response = middleware(request(DOCS_URL, { accept: 'text/markdown' }))
+    const response = proxy(request(DOCS_URL, { accept: 'text/markdown' }))
 
     expect(response.headers.get('x-middleware-rewrite')).toBe(
       'https://supabase.com/library/api/docs-md/nextjs/client'
@@ -19,14 +19,14 @@ describe('middleware markdown negotiation', () => {
   })
 
   it('406s when Accept rejects both html and markdown', () => {
-    const response = middleware(request(DOCS_URL, { accept: 'application/json' }))
+    const response = proxy(request(DOCS_URL, { accept: 'application/json' }))
 
     expect(response.status).toBe(406)
   })
 
   it('passes Server Action requests through untouched', () => {
     // Server Actions POST to the page URL with `Accept: text/x-component`.
-    const response = middleware(
+    const response = proxy(
       request(DOCS_URL, {
         accept: 'text/x-component',
         'next-action': '7f1e0c0d5a1b2c3d4e5f60718293a4b5c6d7e8f900',
@@ -38,7 +38,7 @@ describe('middleware markdown negotiation', () => {
   })
 
   it('serves html to browsers', () => {
-    const response = middleware(
+    const response = proxy(
       request(DOCS_URL, { accept: 'text/html,application/xhtml+xml,*/*;q=0.8' })
     )
 
@@ -47,11 +47,11 @@ describe('middleware markdown negotiation', () => {
   })
 })
 
-describe('middleware homepage negotiation', () => {
+describe('proxy homepage negotiation', () => {
   const HOME_URL = 'https://supabase.com/library'
 
   it('rewrites the homepage to the index markdown route when Accept prefers markdown', () => {
-    const response = middleware(request(HOME_URL, { accept: 'text/markdown' }))
+    const response = proxy(request(HOME_URL, { accept: 'text/markdown' }))
 
     expect(response.headers.get('x-middleware-rewrite')).toBe(
       'https://supabase.com/library/api/index-md'
@@ -59,7 +59,7 @@ describe('middleware homepage negotiation', () => {
   })
 
   it('serves the index markdown at /index.md regardless of Accept', () => {
-    const response = middleware(request(`${HOME_URL}/index.md`, { accept: 'text/html' }))
+    const response = proxy(request(`${HOME_URL}/index.md`, { accept: 'text/html' }))
 
     expect(response.headers.get('x-middleware-rewrite')).toBe(
       'https://supabase.com/library/api/index-md'
@@ -67,7 +67,7 @@ describe('middleware homepage negotiation', () => {
   })
 
   it('serves the homepage as html to browsers', () => {
-    const response = middleware(
+    const response = proxy(
       request(`${HOME_URL}/`, { accept: 'text/html,application/xhtml+xml,*/*;q=0.8' })
     )
 
