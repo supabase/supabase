@@ -41,11 +41,8 @@ import { Route as ApiGetDeploymentCommitRouteImport } from './routes/api/get-dep
 import { Route as ApiGetIpAddressRouteImport } from './routes/api/get-ip-address'
 import { Route as ApiGetS3KeysRouteImport } from './routes/api/get-s3-keys'
 import { Route as ApiGetUtcTimeRouteImport } from './routes/api/get-utc-time'
-import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
-import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
-import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiStatusPageRouteImport } from './routes/api/status-page'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
@@ -498,16 +495,6 @@ const ApiGetUtcTimeRoute = ApiGetUtcTimeRouteImport.update({
   path: '/api/get-utc-time',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiIncidentBannerRoute = ApiIncidentBannerRouteImport.update({
-  id: '/api/incident-banner',
-  path: '/api/incident-banner',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiIncidentStatusRoute = ApiIncidentStatusRouteImport.update({
-  id: '/api/incident-status',
-  path: '/api/incident-status',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiParseQueryRoute = ApiParseQueryRouteImport.update({
   id: '/api/parse-query',
   path: '/api/parse-query',
@@ -519,11 +506,6 @@ const ApiScopedAccessTokenPermissionsRoute =
     path: '/api/scoped-access-token-permissions',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
-  id: '/api/status-override',
-  path: '/api/status-override',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiStatusPageRoute = ApiStatusPageRouteImport.update({
   id: '/api/status-page',
   path: '/api/status-page',
@@ -2195,11 +2177,8 @@ export interface FileRoutesByFullPath {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2521,11 +2500,8 @@ export interface FileRoutesByTo {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2837,11 +2813,8 @@ export interface FileRoutesById {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -3166,11 +3139,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3492,11 +3462,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3807,11 +3774,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -4125,11 +4089,8 @@ export interface RootRouteChildren {
   ApiGetIpAddressRoute: typeof ApiGetIpAddressRoute
   ApiGetS3KeysRoute: typeof ApiGetS3KeysRoute
   ApiGetUtcTimeRoute: typeof ApiGetUtcTimeRoute
-  ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
-  ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiParseQueryRoute: typeof ApiParseQueryRoute
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
-  ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   ApiStatusPageRoute: typeof ApiStatusPageRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   McpSecretsRoute: typeof McpSecretsRoute
@@ -4458,20 +4419,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGetUtcTimeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/incident-banner': {
-      id: '/api/incident-banner'
-      path: '/api/incident-banner'
-      fullPath: '/api/incident-banner'
-      preLoaderRoute: typeof ApiIncidentBannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/incident-status': {
-      id: '/api/incident-status'
-      path: '/api/incident-status'
-      fullPath: '/api/incident-status'
-      preLoaderRoute: typeof ApiIncidentStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/parse-query': {
       id: '/api/parse-query'
       path: '/api/parse-query'
@@ -4484,13 +4431,6 @@ declare module '@tanstack/react-router' {
       path: '/api/scoped-access-token-permissions'
       fullPath: '/api/scoped-access-token-permissions'
       preLoaderRoute: typeof ApiScopedAccessTokenPermissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/status-override': {
-      id: '/api/status-override'
-      path: '/api/status-override'
-      fullPath: '/api/status-override'
-      preLoaderRoute: typeof ApiStatusOverrideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-page': {
@@ -7285,11 +7225,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGetIpAddressRoute: ApiGetIpAddressRoute,
   ApiGetS3KeysRoute: ApiGetS3KeysRoute,
   ApiGetUtcTimeRoute: ApiGetUtcTimeRoute,
-  ApiIncidentBannerRoute: ApiIncidentBannerRoute,
-  ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiParseQueryRoute: ApiParseQueryRoute,
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
-  ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   ApiStatusPageRoute: ApiStatusPageRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   McpSecretsRoute: McpSecretsRoute,
@@ -7434,3 +7371,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

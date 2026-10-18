@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 
 import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
@@ -22,7 +22,6 @@ export const usePipelineConnectionValidation = ({
   const values = useWatch({ control: form.control, name: names })
   const snapshot = JSON.stringify([type, ...values])
   const currentSnapshotRef = useRef(snapshot)
-  currentSnapshotRef.current = snapshot
   const [result, setResult] = useState<{
     snapshot: string
     type: typeof type
@@ -32,9 +31,9 @@ export const usePipelineConnectionValidation = ({
   const [isValidating, setIsValidating] = useState(false)
   const isValidatingRef = useRef(false)
   const { validateDestination } = useDestinationValidation({ projectRef, selectedType: type })
-  const currentResult = result?.type === type ? result : undefined
-  const isResultStale = !!currentResult && currentResult.snapshot !== snapshot
-  const isConnectionVerified = !isResultStale && currentResult?.verified === true
+  const isConnectionVerified = result?.snapshot === snapshot && result.verified
+  const failures =
+    result?.type === type && (!result.verified || isConnectionVerified) ? result.failures : []
 
   const validateConnection = async () => {
     if (isValidatingRef.current) return false
@@ -56,8 +55,8 @@ export const usePipelineConnectionValidation = ({
       if (currentSnapshotRef.current !== snapshot) return false
       const verified = !failures.some((failure) => failure.failure_type === 'critical')
       setResult({ snapshot, type, failures, verified })
-      // Keep warnings visible for review; the next click acknowledges them.
-      return false
+      // Warnings stay on this step for review before continuing.
+      return verified && failures.length === 0
     } catch (error) {
       if (currentSnapshotRef.current === snapshot) {
         setResult({
@@ -80,11 +79,15 @@ export const usePipelineConnectionValidation = ({
     }
   }
 
+  useLayoutEffect(() => {
+    currentSnapshotRef.current = snapshot
+  }, [snapshot])
+
   return {
     validateConnection,
+    resetValidation: () => setResult(undefined),
     isValidating,
     isConnectionVerified,
-    failures: currentResult?.failures ?? [],
-    isResultStale,
+    failures,
   }
 }

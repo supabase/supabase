@@ -34,7 +34,6 @@ export const Markdown = ({
   className,
   content = '',
   extLinks = false,
-  components,
   ...props
 }: PropsWithChildren<MarkdownProps>) => {
   return (
@@ -45,7 +44,6 @@ export const Markdown = ({
           h3: H3,
           code: Code,
           a: A,
-          ...components,
         }}
         {...props}
       >

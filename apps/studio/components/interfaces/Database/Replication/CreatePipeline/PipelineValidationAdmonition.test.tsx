@@ -60,7 +60,6 @@ test('shows critical issues without suggesting replication can start', () => {
 test('preserves API copy and inline code in compact results', () => {
   customRender(
     <PipelineValidationAdmonition
-      stale
       failures={[
         {
           name: 'BigQuery dataset not found',
@@ -71,10 +70,7 @@ test('preserves API copy and inline code in compact results', () => {
     />
   )
   expect(screen.getByText('BigQuery dataset not found')).toBeInTheDocument()
-  expect(screen.getByText('The dataset was not found.').parentElement).toHaveTextContent(
-    'The dataset was not found. Check access to project my-gcp-proj.'
-  )
-  expect(screen.getByText('Settings changed. Test again.')).toBeInTheDocument()
+  expect(screen.getByText('The dataset was not found.')).toBeInTheDocument()
   expect(screen.queryByRole('list')).not.toBeInTheDocument()
   expect(screen.getByText('my-gcp-proj').tagName).toBe('CODE')
   expect(screen.getByText('my-gcp-proj')).toHaveClass('text-code-inline')

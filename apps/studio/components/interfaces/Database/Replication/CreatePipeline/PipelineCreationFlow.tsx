@@ -20,10 +20,7 @@ import { PipelineDataSection } from './PipelineDataSection'
 import { PipelineDestinationReview } from './PipelineDestinationReview'
 import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
-import {
-  PipelineValidationAdmonition,
-  SANDWICHED_ADMONITION_CLASS,
-} from './PipelineValidationAdmonition'
+import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
@@ -67,7 +64,7 @@ export const PipelineCreationFlow = ({
   )
   const handleClose = () => requestNavigation(onClose)
   const { ref: projectRef } = useParams()
-  const { validateConnection, isValidating, isConnectionVerified, failures, isResultStale } =
+  const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
   const { validateData, isValidatingData, isDataVerified, dataError, publication } =
@@ -77,14 +74,6 @@ export const PipelineCreationFlow = ({
     if (step === 'review' && !isDataVerified) return 'data'
     return step
   })()
-  useEffect(() => {
-    if (!hasInitializedStepRef.current) {
-      hasInitializedStepRef.current = true
-      void setStep('destination', { history: 'replace' })
-      return
-    }
-    if (step !== accessibleStep) void setStep(accessibleStep, { history: 'replace' })
-  }, [step, accessibleStep, setStep])
   const handleNext = async () => {
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
@@ -94,6 +83,15 @@ export const PipelineCreationFlow = ({
   }
   const currentStep = steps.find((item) => item.id === accessibleStep) ?? steps[0]
   const canSelectDestination = availableDestinations.includes(type)
+
+  useEffect(() => {
+    if (!hasInitializedStepRef.current) {
+      hasInitializedStepRef.current = true
+      void setStep('destination', { history: 'replace' })
+      return
+    }
+    if (step !== accessibleStep) void setStep(accessibleStep, { history: 'replace' })
+  }, [step, accessibleStep, setStep])
 
   return (
     <div className="flex min-h-screen flex-col bg-dash-sidebar">
@@ -113,11 +111,7 @@ export const PipelineCreationFlow = ({
               onNext={handleNext}
               nextLoading={isValidating || isValidatingData}
               navigationDisabled={isValidating || isValidatingData}
-              nextLabel={
-                accessibleStep === 'connection' && !isConnectionVerified
-                  ? 'Test connection'
-                  : 'Continue'
-              }
+              nextLabel="Continue"
               nextDisabled={accessibleStep === 'destination' && !canSelectDestination}
               onCancel={handleClose}
               finalAction={{ label: 'Start pipeline', disabled: true }}
@@ -130,7 +124,10 @@ export const PipelineCreationFlow = ({
                     value={type}
                     onChange={(value) => {
                       const next = availableDestinations.find((item) => item === value)
-                      if (next) setType(next)
+                      if (next) {
+                        resetValidation()
+                        setType(next)
+                      }
                     }}
                     renderLogo={(value) => <DestinationLogo type={value} />}
                   />
@@ -144,16 +141,7 @@ export const PipelineCreationFlow = ({
                     {type === 'Snowflake' && <SnowflakeFields form={form} editMode={false} />}
                     {type === 'ClickHouse' && <ClickHouseFields form={form} editMode={false} />}
                   </PipelineConnectionSection>
-                  <PipelineValidationAdmonition failures={failures} stale={isResultStale} />
-                  {isConnectionVerified && failures.length === 0 && (
-                    <Admonition
-                      type="success"
-                      title="Ready to continue"
-                      className={SANDWICHED_ADMONITION_CLASS}
-                    >
-                      Supabase can connect to this destination.
-                    </Admonition>
-                  )}
+                  <PipelineValidationAdmonition failures={failures} />
                 </>
               )}
               {accessibleStep === 'data' && (
@@ -168,7 +156,7 @@ export const PipelineCreationFlow = ({
                     <Admonition
                       type="destructive"
                       title="Check data settings"
-                      className={SANDWICHED_ADMONITION_CLASS}
+                      className="mb-0 rounded-none border-x-0 border-t border-b-0 border-default"
                     >
                       {dataError}
                     </Admonition>

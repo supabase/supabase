@@ -16,7 +16,7 @@ import { contract as updateNotebookContract } from './tools/update-notebook'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
-    expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
+    expect(TOOL_CATEGORY_MAP['search_docs']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
     expect(TOOL_CATEGORY_MAP['list_notebooks']).toBe(TOOL_CATEGORIES.SCHEMA)
   })

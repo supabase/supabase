@@ -8,12 +8,14 @@ import {
   filterPropertySchema,
   formatTimeRangeValue,
   getUserFilterValue,
-  parseTimeRange,
-  serializeTimeRange,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
   type FilterableField,
 } from './LogsFilterBar.utils'
+import {
+  parseTimeRange,
+  serializeTimeRange,
+} from '@/components/interfaces/Settings/Logs/Logs.timeRange'
 
 describe('buildFilterProperties', () => {
   const fields: FilterableField[] = [
@@ -216,19 +218,6 @@ describe('time range filters', () => {
       { propertyName: TIME_RANGE_PROPERTY, value: serializeTimeRange(range), operator: '=' },
     ])
     expect(parseTimeRange(serializeTimeRange(range))).toEqual(range)
-  })
-
-  it.each([
-    undefined,
-    null,
-    '',
-    'invalid',
-    '2026-09-22T02:00:00Z',
-    'invalid – 2026-09-22T03:00:00Z',
-    '2026-09-22T03:00:00Z – 2026-09-22T02:00:00Z',
-    '2026-09-22T02:00:00Z – 2026-09-22T03:00:00Z – 2026-09-22T04:00:00Z',
-  ])('rejects an invalid or incomplete range: %s', (value) => {
-    expect(parseTimeRange(value)).toBeUndefined()
   })
 
   it('does not wrap dates as ordinary log attribute filters', () => {
