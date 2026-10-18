@@ -15,7 +15,7 @@
       "description": "The Supabase client instance to run the query against."
     }
   ],
-  "notes": "- Aggregates use PostgREST aggregate functions, which are disabled by default. Enable them with `alter role authenticator set pgrst.db_aggregates_enabled = 'true';` followed by `notify pgrst, 'reload config';`.\n- Queries that use aggregates, `groupBy`, or `having` run as a single PostgREST request and require fully pushable `where` expressions. Unsupported filters throw instead of aggregating over unfiltered rows.\n- Aggregate, `groupBy`, and `having` results aren't paginated. PostgREST's `db-max-rows` limit can silently truncate grouped output. The default on Supabase is 1000 rows. Add an explicit `limit` or narrow the query if you expect more rows.",
+  "notes": "- Aggregates use PostgREST aggregate functions, which are disabled by default. Enable them with `alter role authenticator set pgrst.db_aggregates_enabled = 'true';` followed by `notify pgrst, 'reload config';`.\n- Queries with aggregates run as a single PostgREST request and require fully pushable `where` expressions. Unsupported filters throw instead of aggregating over unfiltered rows.\n- `groupBy` and `having` aren't supported yet.",
   "examples": [
     {
       "id": "query-once-example",

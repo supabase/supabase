@@ -75,6 +75,18 @@ export async function fetchMiddlewareLibReferenceSource() {
   })
 }
 
+export async function fetchTanstackDbLibReferenceSource() {
+  // TanStack DB is driven by the new reference pipeline. Ingest search sources
+  // from the generated `content/reference/tanstack_db/v1/` outputs so
+  // embeddings never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'tanstack-db-lib',
+    path: '/reference/tanstack_db',
+    meta: { title: 'TanStack DB Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/tanstack_db/v1',
+  })
+}
+
 export async function fetchDartLibReferenceSource() {
   // Dart v2 is driven by the new reference pipeline. Ingest search sources from
   // the generated `content/reference/dart/v2/` outputs so embeddings never
@@ -158,6 +170,7 @@ export async function fetchAllSources(fullIndex: boolean) {
   const jsLibReferenceSource = fetchJsLibReferenceSource()
   const serverLibReferenceSource = fullIndex ? fetchServerLibReferenceSource() : []
   const middlewareLibReferenceSource = fullIndex ? fetchMiddlewareLibReferenceSource() : []
+  const tanstackDbLibReferenceSource = fullIndex ? fetchTanstackDbLibReferenceSource() : []
   const dartLibReferenceSource = fullIndex ? fetchDartLibReferenceSource() : []
   const pythonLibReferenceSource = fullIndex ? fetchPythonLibReferenceSource() : []
   const cSharpLibReferenceSource = fullIndex ? fetchCSharpLibReferenceSource() : []
@@ -193,6 +206,7 @@ export async function fetchAllSources(fullIndex: boolean) {
       jsLibReferenceSource,
       serverLibReferenceSource,
       middlewareLibReferenceSource,
+      tanstackDbLibReferenceSource,
       dartLibReferenceSource,
       pythonLibReferenceSource,
       cSharpLibReferenceSource,
