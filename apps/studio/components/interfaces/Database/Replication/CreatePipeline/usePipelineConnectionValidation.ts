@@ -24,14 +24,16 @@ export const usePipelineConnectionValidation = ({
   const currentSnapshotRef = useRef(snapshot)
   const [result, setResult] = useState<{
     snapshot: string
+    type: typeof type
     failures: ValidationFailure[]
     verified: boolean
   }>()
   const [isValidating, setIsValidating] = useState(false)
   const isValidatingRef = useRef(false)
   const { validateDestination } = useDestinationValidation({ projectRef, selectedType: type })
-  const currentResult = result?.snapshot === snapshot ? result : undefined
-  const isConnectionVerified = currentResult?.verified === true
+  const isConnectionVerified = result?.snapshot === snapshot && result.verified
+  const failures =
+    result?.type === type && (!result.verified || isConnectionVerified) ? result.failures : []
 
   const validateConnection = async () => {
     if (isValidatingRef.current) return false
@@ -52,13 +54,14 @@ export const usePipelineConnectionValidation = ({
       const { validation_failures: failures } = await validateDestination({ data })
       if (currentSnapshotRef.current !== snapshot) return false
       const verified = !failures.some((failure) => failure.failure_type === 'critical')
-      setResult({ snapshot, failures, verified })
+      setResult({ snapshot, type, failures, verified })
       // Warnings stay on this step for review before continuing.
       return verified && failures.length === 0
     } catch (error) {
       if (currentSnapshotRef.current === snapshot) {
         setResult({
           snapshot,
+          type,
           verified: false,
           failures: [
             {
@@ -82,8 +85,9 @@ export const usePipelineConnectionValidation = ({
 
   return {
     validateConnection,
+    resetValidation: () => setResult(undefined),
     isValidating,
     isConnectionVerified,
-    failures: currentResult?.failures ?? [],
+    failures,
   }
 }

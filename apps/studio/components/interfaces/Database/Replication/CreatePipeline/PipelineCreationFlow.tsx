@@ -74,7 +74,7 @@ export const PipelineCreationFlow = ({
     confirmOnClose()
   }
   const { ref: projectRef } = useParams()
-  const { validateConnection, isValidating, isConnectionVerified, failures } =
+  const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
@@ -146,7 +146,10 @@ export const PipelineCreationFlow = ({
                     value={type}
                     onChange={(value) => {
                       const next = availableDestinations.find((item) => item === value)
-                      if (next) setType(next)
+                      if (next) {
+                        resetValidation()
+                        setType(next)
+                      }
                     }}
                     renderLogo={(value) => <DestinationLogo type={value} />}
                   />

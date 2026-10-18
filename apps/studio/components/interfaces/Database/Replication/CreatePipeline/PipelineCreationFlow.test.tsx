@@ -101,9 +101,12 @@ describe('PipelineCreationFlow', () => {
         })
       },
     })
-    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
-      nuqs: { hasMemory: true },
-    })
+    customRender(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
+      {
+        nuqs: { hasMemory: true },
+      }
+    )
     next()
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
@@ -131,10 +134,26 @@ describe('PipelineCreationFlow', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'retry-project' },
     })
+    expect(screen.getByText('Try again')).toBeInTheDocument()
+    back()
+    fireEvent.click(screen.getByRole('radio', { name: /Snowflake/ }))
+    next()
+    expect(screen.queryByText('Try again')).not.toBeInTheDocument()
+    back()
+    fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
+    next()
     expect(screen.queryByText('Try again')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect(await screen.findByText('Check credentials')).toBeInTheDocument()
     await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'edited-project' },
+    })
+    expect(screen.getByText('Check credentials')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'retry-project' },
+    })
+    expect(screen.getByText('Check credentials')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     await screen.findByText(/Replication can start/)
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
