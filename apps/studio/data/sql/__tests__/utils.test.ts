@@ -100,6 +100,41 @@ describe('trimTrailingSemicolons', () => {
 })
 
 describe('applyAutoLimit', () => {
+  test('Should return true for a read-only CTE (supabase/supabase#51879)', () => {
+    const sql = safeSql`with numbers as (select generate_series(1, 2000) as n) select n from numbers;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(true)
+  })
+  test('Should return true for a read-only CTE regardless of casing', () => {
+    const sql = safeSql`WITH numbers AS (SELECT 1 AS n) SELECT n FROM numbers;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(true)
+  })
+  test('Should return false if a CTE query already has a limit', () => {
+    const sql = safeSql`with x as (select 1) select * from x limit 5;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return true for a read-only CTE whose columns merely look like writes', () => {
+    const sql = safeSql`with recent as (select id, updated_at, deleted_at from t) select * from recent;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(true)
+  })
+  test('Should return false for a data-modifying CTE that inserts', () => {
+    const sql = safeSql`with x as (select 1 as n) insert into t select n from x;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false for a data-modifying CTE that deletes and returns', () => {
+    const sql = safeSql`with d as (delete from t returning *) select * from d;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false for a data-modifying CTE that updates and returns', () => {
+    const sql = safeSql`with u as (update t set a = 1 returning *) select * from u;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+  })
   test('Should return false if limit passed is <= 0', () => {
     const sql = safeSql`select * from countries;`
     const limit = -1
