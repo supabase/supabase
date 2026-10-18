@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { MultipleCodeBlock } from './index'
 
@@ -52,5 +52,34 @@ describe('MultipleCodeBlock', () => {
     const tabContent = container.querySelector('[data-connect-tab-content]')
     expect(tabContent).toHaveClass('overflow-y-auto')
     expect(tabContent).not.toHaveClass('overflow-scroll')
+  })
+
+  it('stops propagation of Shift+wheel events on the tab list and code block', () => {
+    const onParentWheel = vi.fn()
+    const { container } = render(
+      <div onWheel={onParentWheel}>
+        <MultipleCodeBlock
+          files={[
+            {
+              name: 'page.tsx',
+              language: 'tsx',
+              code: 'export default function Page() { return null }',
+            },
+          ]}
+        />
+      </div>
+    )
+
+    const tabList = screen.getByRole('tablist')
+    const codeElement = container.querySelector('code')
+    expect(codeElement).not.toBeNull()
+
+    fireEvent.wheel(tabList, { deltaY: 100, shiftKey: true })
+    fireEvent.wheel(codeElement!, { deltaY: 100, shiftKey: true })
+    expect(onParentWheel).not.toHaveBeenCalled()
+
+    fireEvent.wheel(tabList, { deltaY: 100, shiftKey: false })
+    fireEvent.wheel(codeElement!, { deltaY: 100, shiftKey: false })
+    expect(onParentWheel).toHaveBeenCalledTimes(2)
   })
 })
