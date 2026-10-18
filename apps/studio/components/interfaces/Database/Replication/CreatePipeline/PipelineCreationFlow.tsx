@@ -1,8 +1,9 @@
 import { useParams } from 'common'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useId, useRef, useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { Form, Separator } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { BigQueryFields } from '../DestinationPanel/DestinationForm/BigQuery/Fields'
@@ -21,9 +22,9 @@ import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
 import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
+import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
-import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
@@ -77,17 +78,17 @@ export const PipelineCreationFlow = ({
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
-  const publicationName = useWatch({ control: form.control, name: 'publicationName' })
-  const { data: publication } = useReplicationPublicationQuery({
-    projectRef,
-    sourceId,
-    publicationName,
-  })
-  const accessibleStep =
-    (step === 'data' || step === 'review') && !isConnectionVerified ? 'connection' : step
+  const { validateData, isValidatingData, isDataVerified, dataError, publication } =
+    usePipelineDataValidation({ projectRef, sourceId, type, form })
+  const accessibleStep = (() => {
+    if ((step === 'data' || step === 'review') && !isConnectionVerified) return 'connection'
+    if (step === 'review' && !isDataVerified) return 'data'
+    return step
+  })()
   const handleNext = async () => {
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
+    if (accessibleStep === 'data' && !(await validateData())) return
     const next = steps[steps.findIndex(({ id }) => id === accessibleStep) + 1]
     if (next) void setStep(next.id)
   }
@@ -131,8 +132,8 @@ export const PipelineCreationFlow = ({
               currentStep={accessibleStep}
               onStepChange={setStep}
               onNext={handleNext}
-              nextLoading={isValidating}
-              navigationDisabled={isValidating}
+              nextLoading={isValidating || isValidatingData}
+              navigationDisabled={isValidating || isValidatingData}
               nextLabel="Continue"
               nextDisabled={accessibleStep === 'destination' && !canSelectDestination}
               onCancel={handleClose}
@@ -167,11 +168,23 @@ export const PipelineCreationFlow = ({
                 </>
               )}
               {accessibleStep === 'data' && (
-                <PipelineDataSection
-                  type={type}
-                  form={form}
-                  onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
-                />
+                <>
+                  <PipelineDataSection
+                    type={type}
+                    form={form}
+                    onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
+                    revealInvalidSettings
+                  />
+                  {dataError && (
+                    <Admonition
+                      type="destructive"
+                      title="Check data settings"
+                      className="mb-0 rounded-none border-x-0 border-t border-b-0 border-default"
+                    >
+                      {dataError}
+                    </Admonition>
+                  )}
+                </>
               )}
               {accessibleStep === 'review' && (
                 <>
