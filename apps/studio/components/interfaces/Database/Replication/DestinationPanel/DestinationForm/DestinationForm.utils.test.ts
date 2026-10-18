@@ -132,7 +132,7 @@ describe('DestinationForm.utils table copy selection', () => {
 
   it.each([
     ['include_tables', 'Select at least one table for the initial sync.'],
-    ['skip_tables', 'Please select at least one table to exclude for the initial sync.'],
+    ['skip_tables', 'Select at least one table to exclude from the initial sync.'],
   ] as const)('explains the empty selection for %s', (mode, message) => {
     expect(() => buildTableSyncCopyConfig({ mode, selectedTableIds: [] })).toThrow(message)
   })

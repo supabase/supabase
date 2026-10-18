@@ -173,7 +173,7 @@ export const buildTableSyncCopyConfig = ({
   if (selectedTableIds.length === 0) {
     throw new Error(
       mode === 'skip_tables'
-        ? 'Please select at least one table to exclude for the initial sync.'
+        ? 'Select at least one table to exclude from the initial sync.'
         : 'Select at least one table for the initial sync.'
     )
   }
