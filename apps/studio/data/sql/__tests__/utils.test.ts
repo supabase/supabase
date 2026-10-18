@@ -120,6 +120,21 @@ describe('applyAutoLimit', () => {
     const { appendAutoLimit } = applyAutoLimit(sql, 100)
     expect(appendAutoLimit).toBe(true)
   })
+  test('Should return true when a write keyword only appears inside a string literal', () => {
+    const sql = safeSql`with a as (select 'update' as k) select * from a;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(true)
+  })
+  test('Should return true when a write keyword is only a quoted identifier', () => {
+    const sql = safeSql`with a as (select 1 as "delete") select * from a;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(true)
+  })
+  test('Should return false for a CTE that writes a new table with select into', () => {
+    const sql = safeSql`with a as (select 1) select * into t from a;`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+  })
   test('Should return false for a data-modifying CTE that inserts', () => {
     const sql = safeSql`with x as (select 1 as n) insert into t select n from x;`
     const { appendAutoLimit } = applyAutoLimit(sql, 100)
