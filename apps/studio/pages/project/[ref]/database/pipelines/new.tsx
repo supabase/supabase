@@ -16,8 +16,10 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { BASE_PATH } from '@/lib/constants'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from '@/types'
 
-const PipelineCreationPage = () => {
+const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const { ref } = useParams()
   const { hasLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
@@ -58,5 +60,9 @@ const PipelineCreationPage = () => {
     </>
   )
 }
+
+PipelineCreationPage.getLayout = (page) => (
+  <PipelineRequestStatusProvider>{page}</PipelineRequestStatusProvider>
+)
 
 export default withAuth(PipelineCreationPage)

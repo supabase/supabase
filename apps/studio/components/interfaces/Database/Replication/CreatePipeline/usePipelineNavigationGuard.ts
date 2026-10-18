@@ -61,6 +61,10 @@ export const usePipelineNavigationGuard = (hasChanges: boolean) => {
 
   return {
     requestNavigation,
+    completeNavigation: (proceed: () => void) => {
+      canLeave.current = true
+      proceed()
+    },
     modalProps: {
       ...modalProps,
       onCancel: () => {
