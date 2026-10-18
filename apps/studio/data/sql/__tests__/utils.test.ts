@@ -100,6 +100,248 @@ describe('trimTrailingSemicolons', () => {
 })
 
 describe('applyAutoLimit', () => {
+  test('Should add the limit to a read-only SELECT query using a CTE', () => {
+    const sql = safeSql`WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe(
+      'WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers limit 100;'
+    )
+  })
+
+  test('Should not append a limit to a data-modifying CTE', () => {
+    const sql = safeSql`WITH deleted AS (DELETE FROM countries RETURNING *) SELECT * FROM deleted;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a CTE using INSERT', () => {
+    const sql = safeSql`WITH inserted AS (INSERT INTO countries (name) VALUES ('Atlantis') RETURNING *) SELECT * FROM inserted;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a CTE using UPDATE', () => {
+    const sql = safeSql`WITH updated AS (UPDATE countries SET name = 'Atlantis' RETURNING *) SELECT * FROM updated;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit when the main query of a CTE is data-modifying', () => {
+    const sql = safeSql`WITH safe_cte AS (SELECT 1 AS id) DELETE FROM countries WHERE id IN (SELECT id FROM safe_cte);`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should add the limit to multiple read-only CTEs', () => {
+    const sql = safeSql`WITH
+  users_cte AS (SELECT id, name FROM users),
+  posts_cte AS (SELECT user_id, title FROM posts)
+SELECT users_cte.name, posts_cte.title FROM users_cte JOIN posts_cte ON users_cte.id = posts_cte.user_id;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe(
+      `WITH
+  users_cte AS (SELECT id, name FROM users),
+  posts_cte AS (SELECT user_id, title FROM posts)
+SELECT users_cte.name, posts_cte.title FROM users_cte JOIN posts_cte ON users_cte.id = posts_cte.user_id limit 100;`
+    )
+  })
+
+  test('Should not append a limit if any CTE in a multi-CTE query is data-modifying', () => {
+    const sql = safeSql`WITH
+  users_cte AS (SELECT id, name FROM users),
+  deleted_posts AS (DELETE FROM posts WHERE user_id = 1 RETURNING user_id, title)
+SELECT users_cte.name, deleted_posts.title FROM users_cte JOIN deleted_posts ON users_cte.id = deleted_posts.user_id;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should add the limit to a WITH RECURSIVE query', () => {
+    const sql = safeSql`WITH RECURSIVE countdown(val) AS (
+  SELECT 10
+  UNION ALL
+  SELECT val - 1 FROM countdown WHERE val > 1
+)
+SELECT val FROM countdown;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe(
+      `WITH RECURSIVE countdown(val) AS (
+  SELECT 10
+  UNION ALL
+  SELECT val - 1 FROM countdown WHERE val > 1
+)
+SELECT val FROM countdown limit 100;`
+    )
+  })
+
+  test('Should add the limit to CTE with column list and MATERIALIZED modifier', () => {
+    const sql = safeSql`WITH numbers(val) AS NOT MATERIALIZED (SELECT generate_series(1, 100)) SELECT val FROM numbers;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe(
+      'WITH numbers(val) AS NOT MATERIALIZED (SELECT generate_series(1, 100)) SELECT val FROM numbers limit 100;'
+    )
+  })
+
+  test('Should not append a limit if outer CTE query already has a LIMIT', () => {
+    const sql = safeSql`WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers LIMIT 50;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit if outer CTE query already has a FETCH FIRST clause', () => {
+    const sql = safeSql`WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers FETCH FIRST 50 ROWS ONLY;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should add limit to outer query even if inner CTE query already has a LIMIT', () => {
+    const sql = safeSql`WITH numbers AS (SELECT generate_series(1, 2000) AS n LIMIT 500) SELECT n FROM numbers;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe(
+      'WITH numbers AS (SELECT generate_series(1, 2000) AS n LIMIT 500) SELECT n FROM numbers limit 100;'
+    )
+  })
+
+  test('Should not mistake keywords inside string literals or quoted identifiers as statements', () => {
+    const sql = safeSql`WITH "delete" AS (SELECT 'DELETE FROM countries' AS note) SELECT note, "delete" FROM "delete";`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe(
+      'WITH "delete" AS (SELECT \'DELETE FROM countries\' AS note) SELECT note, "delete" FROM "delete" limit 100;'
+    )
+  })
+
+  test('Should not append a limit to nested CTEs that contain data-modifying statements', () => {
+    const sql = safeSql`WITH outer_cte AS (
+  WITH inner_cte AS (DELETE FROM countries RETURNING *)
+  SELECT * FROM inner_cte
+)
+SELECT * FROM outer_cte;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should handle semicolons inside string literals without treating them as multiple queries', () => {
+    const sql = safeSql`WITH cte AS (SELECT 'a;b;c' AS val) SELECT * FROM cte;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(true)
+    expect(formattedSql).toBe("WITH cte AS (SELECT 'a;b;c' AS val) SELECT * FROM cte limit 100;")
+  })
+
+  test('Should not append a limit to a SELECT ... INTO statement', () => {
+    const sql = safeSql`SELECT * INTO new_table FROM countries;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a CTE query using SELECT ... INTO', () => {
+    const sql = safeSql`WITH t AS (SELECT 1) SELECT * INTO new_t FROM t;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a query using FOR UPDATE', () => {
+    const sql = safeSql`SELECT * FROM countries FOR UPDATE;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a query using FOR KEY SHARE', () => {
+    const sql = safeSql`SELECT * FROM countries FOR KEY SHARE;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a CTE query using FOR UPDATE', () => {
+    const sql = safeSql`WITH t AS (SELECT 1) SELECT * FROM t FOR UPDATE;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a CTE query using FOR KEY SHARE', () => {
+    const sql = safeSql`WITH t AS (SELECT 1) SELECT * FROM t FOR KEY SHARE;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a query where CTE contains FOR SHARE', () => {
+    const sql = safeSql`WITH t AS (SELECT * FROM countries FOR SHARE) SELECT * FROM t;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
+  test('Should not append a limit to a query where CTE contains FOR KEY SHARE', () => {
+    const sql = safeSql`WITH t AS (SELECT * FROM countries FOR KEY SHARE) SELECT * FROM t;`
+
+    const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, 100)
+
+    expect(appendAutoLimit).toBe(false)
+    expect(formattedSql).toBe(sql)
+  })
+
   test('Should return false if limit passed is <= 0', () => {
     const sql = safeSql`select * from countries;`
     const limit = -1
