@@ -1,4 +1,4 @@
-import { forwardRef, type ComponentRef, type PropsWithChildren } from 'react'
+import { forwardRef, type ComponentRef } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
@@ -11,8 +11,6 @@ export const DATA_VALIDATION_HINT =
   'Some issues may require changes to the project’s database settings.'
 
 const GENERIC_WARNING_TITLES = new Set(['warning', 'warnings'])
-
-const InlineParagraph = ({ children }: PropsWithChildren) => <span>{children} </span>
 
 const getValidationHeading = ({
   failures,
@@ -43,9 +41,8 @@ export const PipelineValidationAdmonition = forwardRef<
     failures: ValidationFailure[]
     title?: string
     hint?: string
-    stale?: boolean
   }
->(function PipelineValidationAdmonition({ failures, title, hint, stale = false }, ref) {
+>(function PipelineValidationAdmonition({ failures, title, hint }, ref) {
   if (failures.length === 0) return null
 
   const hasCritical = failures.some((failure) => failure.failure_type === 'critical')
@@ -59,7 +56,7 @@ export const PipelineValidationAdmonition = forwardRef<
       layout="responsive"
       className={SANDWICHED_ADMONITION_CLASS}
     >
-      {!hasCritical && !stale ? (
+      {!hasCritical ? (
         <p className="mb-2! text-sm text-foreground-light">
           Replication can start, but review these items before continuing. They may affect how
           changes are applied downstream.
@@ -76,15 +73,9 @@ export const PipelineValidationAdmonition = forwardRef<
                   : ''}
               </p>
             ) : null}
-            <Markdown
-              className="inline text-sm text-foreground-light"
-              components={{ p: InlineParagraph }}
-            >
+            <Markdown className="text-sm text-foreground-light [&>p]:inline [&>p+p]:before:content-[' ']">
               {failure.reason}
             </Markdown>
-            {stale && index === failures.length - 1 && (
-              <span className="text-sm text-foreground-light">Settings changed. Test again.</span>
-            )}
           </div>
         ))}
       </div>

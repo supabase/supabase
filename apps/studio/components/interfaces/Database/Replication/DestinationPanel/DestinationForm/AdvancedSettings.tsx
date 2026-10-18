@@ -27,19 +27,21 @@ export const AdvancedSettings = ({
     (type === 'BigQuery' && (errors.connectionPoolSize || errors.maxStalenessMins)) ||
     (type === 'DuckLake' && errors.ducklakePoolSize) ||
     (type === 'Snowflake' && errors.snowflakeRole)
-  useEffect(() => {
-    if (revealInvalidSettings && advancedError) setExpanded('item-1')
-  }, [revealInvalidSettings, advancedError])
   const shouldShowConnection = group !== 'data'
   const shouldShowData = group !== 'connection'
-  if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
-    return null
 
   let description = 'Customize how the pipeline syncs and replicates data.'
   if (type === 'DuckLake' && group === 'all')
     description = 'Adjust catalog connections and replication settings.'
   if (group === 'connection') description = `Adjust how data is written to ${type}.`
   if (group === 'data') description = 'Adjust initial sync and replication slot behavior.'
+
+  useEffect(() => {
+    if (revealInvalidSettings && advancedError) setExpanded('item-1')
+  }, [revealInvalidSettings, advancedError])
+
+  if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
+    return null
 
   return (
     <div className={cn('w-full', group !== 'all' && 'border-t border-default')}>

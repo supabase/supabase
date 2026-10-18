@@ -22,21 +22,16 @@ export const usePipelineConnectionValidation = ({
   const values = useWatch({ control: form.control, name: names })
   const snapshot = JSON.stringify([type, ...values])
   const currentSnapshotRef = useRef(snapshot)
-  useLayoutEffect(() => {
-    currentSnapshotRef.current = snapshot
-  }, [snapshot])
   const [result, setResult] = useState<{
     snapshot: string
-    type: typeof type
     failures: ValidationFailure[]
     verified: boolean
   }>()
   const [isValidating, setIsValidating] = useState(false)
   const isValidatingRef = useRef(false)
   const { validateDestination } = useDestinationValidation({ projectRef, selectedType: type })
-  const currentResult = result?.type === type ? result : undefined
-  const isResultStale = !!currentResult && currentResult.snapshot !== snapshot
-  const isConnectionVerified = !isResultStale && currentResult?.verified === true
+  const currentResult = result?.snapshot === snapshot ? result : undefined
+  const isConnectionVerified = currentResult?.verified === true
 
   const validateConnection = async () => {
     if (isValidatingRef.current) return false
@@ -57,14 +52,13 @@ export const usePipelineConnectionValidation = ({
       const { validation_failures: failures } = await validateDestination({ data })
       if (currentSnapshotRef.current !== snapshot) return false
       const verified = !failures.some((failure) => failure.failure_type === 'critical')
-      setResult({ snapshot, type, failures, verified })
-      // Keep warnings visible for review; the next click acknowledges them.
-      return false
+      setResult({ snapshot, failures, verified })
+      // Warnings stay on this step for review before continuing.
+      return verified && failures.length === 0
     } catch (error) {
       if (currentSnapshotRef.current === snapshot) {
         setResult({
           snapshot,
-          type,
           verified: false,
           failures: [
             {
@@ -82,11 +76,14 @@ export const usePipelineConnectionValidation = ({
     }
   }
 
+  useLayoutEffect(() => {
+    currentSnapshotRef.current = snapshot
+  }, [snapshot])
+
   return {
     validateConnection,
     isValidating,
     isConnectionVerified,
     failures: currentResult?.failures ?? [],
-    isResultStale,
   }
 }
