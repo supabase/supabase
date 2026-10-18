@@ -290,7 +290,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-javascript',
             href: '/reference/tanstack_db' as `/${string}`,
             level: 'reference_tanstack_db',
-            new: true,
+            experimental: true,
           },
           {
             label: 'CLI Commands',
