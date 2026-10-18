@@ -1,4 +1,5 @@
-import type { UseFormReturn } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useFormState, type UseFormReturn } from 'react-hook-form'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from 'ui'
 
 import { DestinationType } from '../DestinationPanel.types'
@@ -13,15 +14,21 @@ export const AdvancedSettings = ({
   type,
   form,
   group = 'all',
+  revealInvalidSettings = false,
 }: {
   group?: 'all' | 'connection' | 'data'
+  revealInvalidSettings?: boolean
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
+  const [expanded, setExpanded] = useState('')
+  const { errors } = useFormState({ control: form.control })
+  const advancedError =
+    (type === 'BigQuery' && (errors.connectionPoolSize || errors.maxStalenessMins)) ||
+    (type === 'DuckLake' && errors.ducklakePoolSize) ||
+    (type === 'Snowflake' && errors.snowflakeRole)
   const shouldShowConnection = group !== 'data'
   const shouldShowData = group !== 'connection'
-  if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
-    return null
 
   let description = 'Customize how the pipeline syncs and replicates data.'
   if (type === 'DuckLake' && group === 'all')
@@ -29,9 +36,16 @@ export const AdvancedSettings = ({
   if (group === 'connection') description = `Adjust how data is written to ${type}.`
   if (group === 'data') description = 'Adjust initial sync and replication slot behavior.'
 
+  useEffect(() => {
+    if (revealInvalidSettings && advancedError) setExpanded('item-1')
+  }, [revealInvalidSettings, advancedError])
+
+  if (group === 'connection' && type !== 'BigQuery' && type !== 'DuckLake' && type !== 'Snowflake')
+    return null
+
   return (
     <div className={cn('w-full', group !== 'all' && 'border-t border-default')}>
-      <Accordion type="single" collapsible>
+      <Accordion type="single" collapsible value={expanded} onValueChange={setExpanded}>
         <AccordionItem value="item-1" className="border-none">
           <AccordionTrigger className="font-normal gap-2 justify-between px-5 py-3 text-sm hover:no-underline">
             <div className="flex flex-col items-start gap-0.5">
