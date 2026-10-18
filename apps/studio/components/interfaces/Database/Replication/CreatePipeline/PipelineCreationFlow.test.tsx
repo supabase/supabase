@@ -119,14 +119,14 @@ describe('PipelineCreationFlow', () => {
       target: { value: '-1' },
     })
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
     expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     expect(
       screen.queryByRole('spinbutton', { name: 'Connection pool size' })
     ).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Test connection' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
       target: { value: '5' },
@@ -216,7 +216,8 @@ describe('PipelineCreationFlow', () => {
     })
     next()
     fillConnection()
-    await testConnection()
+    next()
+    await screen.findByText(/Replication can start/)
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'changed' },
     })
@@ -345,8 +346,7 @@ describe('PipelineCreationFlow', () => {
     })
     next()
     fillConnection()
-    await testConnection()
-    next()
+    await continueToData()
     next()
     expect(await screen.findByText('Select an available publication.')).toBeInTheDocument()
     await selectPublication()
@@ -408,8 +408,7 @@ describe('PipelineCreationFlow', () => {
     next()
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
     fillConnection()
-    await testConnection()
-    next()
+    await continueToData()
     await screen.findByText('Select publication')
     await selectPublication()
     next()

@@ -179,7 +179,7 @@ export const PipelineCreationFlow = ({
                     <Admonition
                       type="destructive"
                       title="Check data settings"
-                      className="rounded-none border-x-0 border-b-0 -mb-px"
+                      className="mb-0 rounded-none border-x-0 border-t border-b-0 border-default"
                     >
                       {dataError}
                     </Admonition>
