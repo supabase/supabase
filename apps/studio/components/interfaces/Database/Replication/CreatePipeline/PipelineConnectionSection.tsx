@@ -12,10 +12,12 @@ export const PipelineConnectionSection = ({
   type,
   form,
   children,
+  revealInvalidSettings = false,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
   children: ReactNode
+  revealInvalidSettings?: boolean
 }) => (
   <section aria-label="Destination connection">
     <div className="flex flex-col gap-y-4 p-5">
@@ -25,6 +27,11 @@ export const PipelineConnectionSection = ({
     </div>
     <DialogSectionSeparator />
     {children}
-    <AdvancedSettings type={type} form={form} group="connection" />
+    <AdvancedSettings
+      type={type}
+      form={form}
+      group="connection"
+      revealInvalidSettings={revealInvalidSettings}
+    />
   </section>
 )
