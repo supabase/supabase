@@ -434,6 +434,7 @@ services:
   functions:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.77.4
+    mem_limit: ${FUNCTIONS_MEMORY_LIMIT:-2g}
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:z
