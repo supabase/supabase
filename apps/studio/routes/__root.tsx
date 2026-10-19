@@ -18,6 +18,7 @@ import '@/styles/storage.css'
 import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
+import '@/lib/history-traverse'
 
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'

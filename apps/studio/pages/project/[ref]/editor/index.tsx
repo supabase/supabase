@@ -1,7 +1,8 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
+import { readExplicitSchemaQueryParam, shouldOpenLastTableOnEditorIndex } from './index.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -11,6 +12,7 @@ import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEdi
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { isHistoryTraverseNavigation } from '@/lib/history-traverse'
 import { editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
@@ -20,6 +22,8 @@ const TableEditorPage: NextPageWithLayout = () => {
   const tabStore = useTabsStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
+  const hasDecidedRedirectRef = useRef(false)
+  const explicitSchema = readExplicitSchemaQueryParam(router.query.schema)
 
   const onTableCreated = (table: { id: number }) => {
     router.push(
@@ -28,47 +32,67 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (isHistoryLoaded && projectRef && router) {
-      const lastOpenedTableId = Number(history.editor)
-      const lastTableTabId = tabStore.openTabs.find((id) =>
-        editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
-      )
-      const lastTableTab = lastTableTabId ? tabStore.tabsMap[lastTableTabId] : undefined
-      const lastTabId = lastTableTab?.metadata?.tableId
+    if (hasDecidedRedirectRef.current) {
+      return
+    }
 
-      // Redirect to the last opened table tab, or last table tab. Replace so Back skips this
-      // index rather than landing on it and redirecting again.
-      if (Number.isInteger(lastOpenedTableId)) {
-        // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
-        // the bare table id, so look up the tab by its metadata instead of by key.
-        const lastOpenedTableData = Object.values(tabStore.tabsMap).find(
+    if (!isHistoryLoaded || !projectRef || !router.isReady) {
+      return
+    }
+
+    // Decide once per visit. A later schema change on the list must not reopen a table.
+    hasDecidedRedirectRef.current = true
+
+    const lastOpenedTableId = Number(history.editor)
+    const hasHistoryTable = Number.isInteger(lastOpenedTableId)
+    const lastTableTabId = tabStore.openTabs.find((id) =>
+      editorEntityTypes.table.includes(tabStore.tabsMap[id]?.type)
+    )
+    const lastTableTab = lastTableTabId ? tabStore.tabsMap[lastTableTabId] : undefined
+    const lastTabId = lastTableTab?.metadata?.tableId
+    // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
+    // the bare table id, so look up the tab by its metadata instead of by key.
+    const historyTable = hasHistoryTable
+      ? Object.values(tabStore.tabsMap).find(
           (tab) =>
             editorEntityTypes.table.includes(tab.type) &&
             tab.metadata?.tableId === lastOpenedTableId
         )
-        router.replace(
-          buildTableEditorUrl({
-            projectRef,
-            tableId: lastOpenedTableId,
-            schema: lastOpenedTableData?.metadata?.schema,
-          })
-        )
-      } else if (lastTabId !== undefined) {
-        router.replace(
-          buildTableEditorUrl({
-            projectRef,
-            tableId: lastTabId,
-            schema: lastTableTab?.metadata?.schema,
-          })
-        )
-      }
+      : undefined
+    const tableId = hasHistoryTable ? lastOpenedTableId : lastTabId
+    const tableSchema = hasHistoryTable
+      ? historyTable?.metadata?.schema
+      : lastTableTab?.metadata?.schema
+    const hasLastTable = tableId !== undefined
+    const shouldRedirect = shouldOpenLastTableOnEditorIndex({
+      isHistoryTraverse: isHistoryTraverseNavigation(),
+      hasLastTable,
+      explicitSchema,
+      lastTableSchema: tableSchema,
+    })
+
+    if (!shouldRedirect) {
+      return
     }
-    // router is intentionally excluded: in the TanStack build useRouter() returns a
-    // new object on every navigation-related render, and including it here caused
-    // this effect to re-fire mid-navigation and push the same redirect repeatedly,
+
+    if (tableId === undefined) {
+      return
+    }
+
+    // Replace so Back skips this index rather than landing on it and redirecting again.
+    router.replace(
+      buildTableEditorUrl({
+        projectRef,
+        tableId,
+        schema: tableSchema,
+      })
+    )
+    // router and tabStore are intentionally excluded: in the TanStack build useRouter()
+    // returns a new object on every navigation-related render, and including it here
+    // caused this effect to re-fire mid-navigation and push the same redirect repeatedly,
     // freezing the page.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isHistoryLoaded, projectRef])
+  }, [explicitSchema, history.editor, isHistoryLoaded, projectRef, router.isReady])
 
   return (
     <>

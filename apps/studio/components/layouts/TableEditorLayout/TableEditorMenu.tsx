@@ -1,6 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { FilterIcon, PlusIcon } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button, Checkbox, Label, Popover, PopoverContent, PopoverTrigger } from 'ui'
 import {
@@ -13,6 +14,11 @@ import {
 
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
+import {
+  buildTableEditorSchemaListPath,
+  readSidebarQueryParam,
+  shouldLeaveOpenTableForSchema,
+} from './TableEditorMenu.utils'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 import { TableMenuFilterEmptyState } from './TableMenuFilterEmptyState'
 import { ExportDialog } from '@/components/grid/components/header/ExportDialog'
@@ -42,6 +48,7 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
 type Sort = 'alphabetical' | 'grouped-alphabetical'
 
 export const TableEditorMenu = () => {
+  const router = useRouter()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
@@ -172,8 +179,27 @@ export const TableEditorMenu = () => {
               selectedSchemaName={selectedSchema}
               onSelectSchema={(name: string) => {
                 setSearchText('')
-                setSelectedSchema(name)
                 setIsSchemaDropdownOpen(false)
+
+                const shouldShowSchemaList = shouldLeaveOpenTableForSchema({
+                  entityId: id,
+                  nextSchema: name,
+                  currentSchema: selectedSchema,
+                })
+
+                if (shouldShowSchemaList && projectRef) {
+                  const sidebar = readSidebarQueryParam(router.query.sidebar)
+                  router.replace(
+                    buildTableEditorSchemaListPath({
+                      projectRef,
+                      schema: name,
+                      sidebar,
+                    })
+                  )
+                  return
+                }
+
+                setSelectedSchema(name)
               }}
               onSelectCreateSchema={() => {
                 snap.onAddSchema()

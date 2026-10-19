@@ -38,6 +38,8 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import '@/lib/history-traverse'
+
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
