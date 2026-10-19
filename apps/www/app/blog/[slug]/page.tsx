@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       openGraph: {
         title: blogPost.title,
         description: blogPost.description,
-        url: `${SITE_ORIGIN}/blog/${slug}`,
+        url: `${SITE_ORIGIN}/blog/${canonicalSlug}`,
         type: 'article',
         images: metaImageUrl ? [metaImageUrl] : undefined,
       },
@@ -160,12 +160,14 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     }
 
     const frontmatter = parsedContent.data
+    // Same identity as the canonical, so alias pages publish one post URL.
+    const canonicalSlug = resolveBlogSlug(slug) ?? slug
     const blogAuthors = resolveBlogAuthors(frontmatter.author)
     const imageUrl =
       getAbsoluteBlogSocialImage(frontmatter, SITE_ORIGIN) ??
       toAbsoluteBlogImageUrl(BLOG_PLACEHOLDER_IMAGE, SITE_ORIGIN)
     const blogJsonLd = blogPostingSchema({
-      url: `${SITE_ORIGIN}/blog/${slug}`,
+      url: `${SITE_ORIGIN}/blog/${canonicalSlug}`,
       headline: frontmatter.title,
       description: frontmatter.description,
       image: imageUrl,
@@ -175,7 +177,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     })
     const breadcrumbJsonLd = breadcrumbListSchema([
       ...breadcrumbs.blogIndex,
-      { name: frontmatter.title, url: `https://supabase.com/blog/${slug}` },
+      { name: frontmatter.title, url: `https://supabase.com/blog/${canonicalSlug}` },
     ])
 
     return (
