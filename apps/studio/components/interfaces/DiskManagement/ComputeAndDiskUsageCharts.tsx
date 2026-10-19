@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Activity, BarChart2, Database } from 'lucide-react'
+import { ActivityIcon, BarChart2Icon, DatabaseIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import type { ChartConfig } from 'ui'
 import { cn } from 'ui'
@@ -210,14 +210,14 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
               errorState={
                 <ChartEmptyState
                   className="h-48 border-x-0 border-b-0"
-                  icon={<Activity size={16} />}
+                  icon={<ActivityIcon size={16} />}
                   title="Failed to load usage data"
                 />
               }
               emptyState={
                 <ChartEmptyState
                   className="h-48 border-x-0 border-b-0"
-                  icon={<Activity size={16} />}
+                  icon={<ActivityIcon size={16} />}
                   title="No compute data"
                   description="Usage data may take a few minutes to appear."
                 />
@@ -292,14 +292,14 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
               errorState={
                 <ChartEmptyState
                   className="h-48 border-x-0 border-b-0"
-                  icon={<BarChart2 size={16} />}
+                  icon={<BarChart2Icon size={16} />}
                   title="Failed to load usage data"
                 />
               }
               emptyState={
                 <ChartEmptyState
                   className="h-48 border-x-0 border-b-0"
-                  icon={<Database size={16} />}
+                  icon={<DatabaseIcon size={16} />}
                   title="No disk data"
                   description="Disk metrics may take a few minutes to appear."
                 />

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useLatest } from 'react-use'
@@ -149,7 +149,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                         <Button
                           variant="text"
                           className="absolute right-1 top-1 px-1"
-                          icon={showSecretValue ? <EyeOff /> : <Eye />}
+                          icon={showSecretValue ? <EyeOffIcon /> : <EyeIcon />}
                           onClick={() => setShowSecretValue(!showSecretValue)}
                         />
                       </div>

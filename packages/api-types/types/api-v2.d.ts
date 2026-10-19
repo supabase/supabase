@@ -2573,6 +2573,8 @@ export interface components {
             }
             /** @description Postgres parameter overrides. Empty when the project runs entirely on defaults. */
             postgres_settings: {
+              autovacuum_max_workers?: number
+              autovacuum_work_mem?: string
               /** @description Default unit: s */
               checkpoint_timeout?: string
               cron_log_statement?: boolean
@@ -2606,6 +2608,8 @@ export interface components {
               max_wal_senders?: number
               max_wal_size?: string
               max_worker_processes?: number
+              pg_net_batch_size?: number
+              pg_stat_statements_max?: number
               /** @enum {string} */
               session_replication_role?: 'origin' | 'replica' | 'local'
               shared_buffers?: string
@@ -3052,7 +3056,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -3123,7 +3127,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -3185,7 +3189,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -3350,6 +3354,8 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
                 event: {
                   /** @description Final data sent to the consumer. */
                   payload: {
@@ -3390,27 +3396,6 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
-                    | 'project.v1.paused'
-                    | 'project.v1.created'
-                    | 'project.v1.restored'
-                    | 'project.v1.transferred'
-                    | 'project.v1.removed'
-                    | 'project.v1.restarted'
-                    | 'project.v1.status.changed'
-                    | 'project.v1.backup.started'
-                    | 'project.v1.branch.created'
-                    | 'project.v1.branch.updated'
-                    | 'project.v1.branch.removed'
-                    | 'organization.v1.member.invitation.created'
-                    | 'organization.v1.member.invitation.canceled'
-                    | 'organization.v1.member.added'
-                    | 'organization.v1.member.removed'
-                    | 'organization.v1.member.role.assigned'
-                    | 'organization.v1.member.role.removed'
-                    | 'organization.v1.member.role.updated'
-                    | 'organization.v1.billing.plan.upgraded'
-                    | 'organization.v1.billing.plan.downgraded'
-                    | 'project.v1.branch.deleted'
                 }
                 /**
                  * Format: uuid
@@ -3435,7 +3420,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -4032,7 +4017,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4356,7 +4341,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /**
@@ -4446,7 +4431,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4764,7 +4749,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5084,7 +5069,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5441,7 +5426,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5782,7 +5767,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5869,7 +5854,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -6220,6 +6205,49 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                }
                 /**
                  * Format: uuid
                  * @description Identifier of the event, which triggered the delivery (UUID v7).
@@ -6243,7 +6271,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -6577,27 +6605,6 @@ export interface operations {
                 | 'v1.organization.member.role.updated'
                 | 'v1.organization.billing.plan.upgraded'
                 | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
             }
             /**
              * @description Resource type.
@@ -8355,6 +8362,8 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
                 event: {
                   /** @description Final data sent to the consumer. */
                   payload: {
@@ -8395,27 +8404,6 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
-                    | 'project.v1.paused'
-                    | 'project.v1.created'
-                    | 'project.v1.restored'
-                    | 'project.v1.transferred'
-                    | 'project.v1.removed'
-                    | 'project.v1.restarted'
-                    | 'project.v1.status.changed'
-                    | 'project.v1.backup.started'
-                    | 'project.v1.branch.created'
-                    | 'project.v1.branch.updated'
-                    | 'project.v1.branch.removed'
-                    | 'organization.v1.member.invitation.created'
-                    | 'organization.v1.member.invitation.canceled'
-                    | 'organization.v1.member.added'
-                    | 'organization.v1.member.removed'
-                    | 'organization.v1.member.role.assigned'
-                    | 'organization.v1.member.role.removed'
-                    | 'organization.v1.member.role.updated'
-                    | 'organization.v1.billing.plan.upgraded'
-                    | 'organization.v1.billing.plan.downgraded'
-                    | 'project.v1.branch.deleted'
                 }
                 /**
                  * Format: uuid
@@ -8440,7 +8428,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -9037,7 +9025,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9361,7 +9349,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /**
@@ -9451,7 +9439,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9769,7 +9757,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10089,7 +10077,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10446,7 +10434,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10787,7 +10775,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10874,7 +10862,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -11225,6 +11213,49 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                }
                 /**
                  * Format: uuid
                  * @description Identifier of the event, which triggered the delivery (UUID v7).
@@ -11248,7 +11279,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -11582,27 +11613,6 @@ export interface operations {
                 | 'v1.organization.member.role.updated'
                 | 'v1.organization.billing.plan.upgraded'
                 | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
             }
             /**
              * @description Resource type.

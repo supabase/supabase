@@ -456,11 +456,18 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * Whether the submitted region is a smart region group ('general', e.g. Americas) or an
-     * exact region ('specific', e.g. us-east-1). Only set when smart regions are enabled for
-     * the selected cloud provider.
+     * How the submitted region was arrived at. 'auto' = the user never touched the region field
+     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
+     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
+     * smart regions are enabled for the selected cloud provider.
      */
-    regionSelectionType?: 'general' | 'specific'
+    regionSelectionType?: 'general' | 'auto' | 'specific'
+    /**
+     * The exact region code the project was provisioned in (e.g. sa-east-1), as returned by
+     * the create-project API. This is the resolved region — for a smart group selection (e.g.
+     * Americas) it's the specific region the backend picked, not the group name.
+     */
+    regionCode?: string
   }
   groups: TelemetryGroups
 }
@@ -545,6 +552,31 @@ export interface FreeTierGeneralRegionExperimentExposedEvent {
  */
 export interface FreeTierGeneralRegionUpgradeClickedEvent {
   action: 'free_tier_general_region_upgrade_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "specific region" docs link in the region selector's footer.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug} and /integrations/vercel/{slug}/deploy-button/new-project
+ */
+export interface FreeTierGeneralRegionDocsLinkClickedEvent {
+  action: 'free_tier_general_region_docs_link_clicked'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * User clicked the "Need a specific region?" link to reveal the specific regions
+ * list in the project creation region selector.
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationSpecificRegionLinkClickedEvent {
+  action: 'project_creation_specific_region_link_clicked'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -991,6 +1023,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'troubleshooting'
 
 /**
  * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
@@ -1017,6 +1050,22 @@ export interface CopyAsMarkdownClickedEvent {
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+}
+
+/**
+ * User clicked the sidebar link to add Supabase as a preferred source on Google.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface PreferredSourceClickedEvent {
+  action: 'preferred_source_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -1116,6 +1165,10 @@ export interface DocsSearchV2SearchSubmittedEvent {
      * The search term sent to the Search V2 endpoint.
      */
     query: string
+    /**
+     * Whether the Search V2 endpoint returned at least one result for the query.
+     */
+    hasResults: boolean
   }
 }
 
@@ -2149,6 +2202,24 @@ export interface StorageBucketCreatedEvent {
      * The type of the bucket created. E.g. standard or analytics iceberg.
      */
     bucketType?: string
+    /** Whether object versioning was turned on at creation time. */
+    hasVersioningEnabled?: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * Triggered when object versioning is turned on for a bucket that has never had it.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/storage/files/buckets/{bucketId}
+ */
+export interface StorageBucketVersioningEnabledEvent {
+  action: 'storage_bucket_versioning_enabled'
+  properties: {
+    /** Whether a lifecycle policy was configured at the same time. */
+    hasLifecyclePolicy?: boolean
   }
   groups: TelemetryGroups
 }
@@ -3827,25 +3898,6 @@ export interface UpgradeCtaClickedEvent {
 }
 
 /**
- * User was exposed to the plan-change panel presentation experiment.
- * Fires once per session per enrolled user in any variant (including control), so the
- * conversion analysis has a baseline cohort. Conversion itself is tracked server-side.
- * GROWTH experiment: `pricingPanelPlanPresentation`.
- *
- * @group Events
- * @page /org/[slug]/billing (plan-change side panel)
- * @source studio
- */
-export interface PricingPanelPlanPresentationExperimentExposedEvent {
-  action: 'pricing_panel_plan_presentation_experiment_exposed'
-  properties: {
-    /** The experiment variant the user is enrolled in */
-    variant: 'control' | 'parity' | 'gaps' | 'fullscreen' | 'fullscreen-gaps'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
  * User clicked the primary CTA on a resource exhaustion warning banner.
  *
  * @group Events
@@ -4165,6 +4217,8 @@ export type TelemetryEvent =
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
+  | FreeTierGeneralRegionDocsLinkClickedEvent
+  | ProjectCreationSpecificRegionLinkClickedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
@@ -4193,6 +4247,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
+  | PreferredSourceClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
@@ -4268,6 +4323,7 @@ export type TelemetryEvent =
   | OrganizationMfaEnforcementUpdatedEvent
   | ForeignDataWrapperCreatedEvent
   | StorageBucketCreatedEvent
+  | StorageBucketVersioningEnabledEvent
   | BranchCreateButtonClickedEvent
   | BranchDeleteButtonClickedEvent
   | BranchCreateMergeRequestButtonClickedEvent
@@ -4335,7 +4391,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | PricingPanelPlanPresentationExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenCreationSheetDismissedEvent
   | AccessTokenRemovedEvent

@@ -6,7 +6,7 @@ import {
   useFlag,
 } from 'common'
 import { fullImageUrl } from 'common/marketplace-client'
-import { Boxes } from 'lucide-react'
+import { BoxesIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { useContext, useMemo } from 'react'
@@ -34,7 +34,7 @@ const renderMarketplaceLogo = (listingLogo?: string | null) => {
           {...props}
         />
       ) : (
-        <Boxes className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+        <BoxesIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
       )}
     </div>
   )

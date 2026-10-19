@@ -24,7 +24,7 @@ describe('SkipToContent', () => {
     const { container } = render(<SkipToContent href="#main" />)
 
     const wrapper = container.firstElementChild as HTMLElement
-    expect(wrapper.className).toContain('-translate-y-full')
+    expect(wrapper.className).toContain('-translate-y-[calc(100%+8px)]')
     expect(wrapper.className).toContain('focus-within:translate-y-[10px]')
     expect(wrapper.className).toContain('w-fit')
     expect(wrapper.className).toContain('left-[10px]')

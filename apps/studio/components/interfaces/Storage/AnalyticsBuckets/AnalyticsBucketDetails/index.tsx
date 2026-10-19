@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { uniq } from 'lodash'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -187,7 +187,7 @@ export const AnalyticBucketDetails = () => {
                     ) : isPollingForData ? (
                       <EmptyStatePresentational
                         icon={
-                          <Loader2
+                          <Loader2Icon
                             size={24}
                             strokeWidth={1.5}
                             className="animate-spin text-foreground-muted"

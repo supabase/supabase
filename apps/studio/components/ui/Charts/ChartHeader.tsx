@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 import {
-  Activity,
+  ActivityIcon,
   BarChartIcon,
   GitCommitHorizontalIcon,
   InfoIcon,
-  SquareTerminal,
+  SquareTerminalIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -289,7 +289,7 @@ export const ChartHeader = ({
             }}
           >
             <Link href={`/project/${ref}/logs/explorer?q=${encodeURIComponent(sql)}`}>
-              <SquareTerminal className="w-4 h-4 text-foreground-lighter" />
+              <SquareTerminalIcon className="w-4 h-4 text-foreground-lighter" />
             </Link>
           </ButtonTooltip>
         ) : null}
@@ -297,7 +297,7 @@ export const ChartHeader = ({
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
             className="px-1.5"
-            icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
+            icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
             tooltip={{
               content: {
