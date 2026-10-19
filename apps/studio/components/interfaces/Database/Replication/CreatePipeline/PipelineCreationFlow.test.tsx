@@ -1,11 +1,12 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { HttpResponse } from 'msw'
+import { delay, HttpResponse } from 'msw'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow } from './PipelineCreationFlow'
+import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -30,6 +31,25 @@ mockAnimationsApi()
 beforeEach(() => {
   addAPIMock({
     method: 'get',
+    path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+    response: () =>
+      HttpResponse.json<ReplicationCostEstimateData>({
+        currency: 'usd',
+        pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
+        streaming: { rate_per_gb: 3 },
+        table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
+      }),
+  })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/replication/:ref/destinations/validate',
+    response: () =>
+      HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+        validation_failures: [],
+      }),
+  })
+  addAPIMock({
+    method: 'get',
     path: '/platform/replication/:ref/sources',
     response: () =>
       HttpResponse.json<components['schemas']['SourcesResponse_Output']>({
@@ -48,14 +68,170 @@ beforeEach(() => {
     path: '/platform/replication/v2/:ref/sources/:source_id/publications',
     response: () =>
       HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
-        publications: [],
+        publications: [{ name: 'analytics' }],
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+    response: () =>
+      HttpResponse.json<components['schemas']['PublicationDetailsResponse_Output']>({
+        name: 'analytics',
+        config: {
+          type: 'tables',
+          tables: [],
+          operations: ['insert'],
+          publish_via_partition_root: false,
+        },
+        tables: [],
       }),
   })
 })
 const next = () => fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+const fillConnection = () => {
+  for (const [name, value] of [
+    ['Pipeline name', 'Warehouse'],
+    ['Project ID', 'my-project'],
+    ['Dataset ID', 'dataset'],
+    ['Service account key', '{}'],
+  ]) {
+    fireEvent.change(screen.getByRole('textbox', { name }), { target: { value } })
+  }
+}
+const continueToData = async () => {
+  next()
+  await screen.findByText(/Step 3 of 4/)
+}
+const selectPublication = async () => {
+  fireEvent.click(screen.getByText('Select publication'))
+  fireEvent.click(await screen.findByText('analytics'))
+}
 const back = () => fireEvent.click(screen.getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
+  it('requires connection fields and reveals invalid advanced settings', async () => {
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+      target: { value: '-1' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
+    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    expect(
+      screen.queryByRole('spinbutton', { name: 'Connection pool size' })
+    ).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+      target: { value: '5' },
+    })
+    expect(screen.queryByText('Check connection settings')).not.toBeInTheDocument()
+  })
+
+  it('recovers from request and critical failures and reviews warnings before continuing', async () => {
+    let attempt = 0
+    const requests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async ({ request }) => {
+        requests.push(await request.json())
+        await delay(10)
+        attempt++
+        if (attempt === 1)
+          return HttpResponse.json<{ message: string }>({ message: 'Try again' }, { status: 500 })
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [
+            {
+              name: 'Credentials',
+              reason: 'Check credentials',
+              failure_type: attempt === 2 ? 'critical' : 'warning',
+            },
+          ],
+        })
+      },
+    })
+    customRender(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
+      {
+        nuqs: { hasMemory: true },
+      }
+    )
+    next()
+    fillConnection()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
+    expect(await screen.findByText('Try again')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'retry-project' },
+    })
+    expect(screen.getByText('Try again')).toBeInTheDocument()
+    back()
+    fireEvent.click(screen.getByRole('radio', { name: /Snowflake/ }))
+    next()
+    expect(screen.queryByText('Try again')).not.toBeInTheDocument()
+    back()
+    fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
+    next()
+    expect(screen.queryByText('Try again')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(await screen.findByText('Check credentials')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'edited-project' },
+    })
+    expect(screen.getByText('Check credentials')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'retry-project' },
+    })
+    expect(screen.getByText('Check credentials')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await screen.findByText(/Replication can start/)
+    expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
+    expect(requests[2]).not.toHaveProperty('pipeline_config')
+    expect(requests[2]).not.toHaveProperty('source_id')
+  })
+
+  it('invalidates connection verification after edits and ignores stale responses', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async () => {
+        await delay(10)
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [
+            { name: 'Credentials', reason: 'Check credentials', failure_type: 'warning' },
+          ],
+        })
+      },
+    })
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fillConnection()
+    next()
+    await screen.findByText(/Replication can start/)
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'changed' },
+    })
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(screen.queryByText('Check credentials')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'changed-during-test' },
+    })
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled())
+    expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
+    expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
+  })
+
   it('uses browser Back and Forward to revisit steps without losing values', async () => {
     window.history.replaceState(null, '', '/project/default/database/pipelines/new')
     customRender(
@@ -68,7 +244,8 @@ describe('PipelineCreationFlow', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'history-project' },
     })
-    next()
+    fillConnection()
+    await continueToData()
     await waitFor(() => expect(window.location.search).toBe('?step=data'))
     await act(async () => {
       await new Promise<void>((resolve) => {
@@ -77,7 +254,7 @@ describe('PipelineCreationFlow', () => {
       })
     })
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('history-project')
+    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
     await act(async () => {
       await new Promise<void>((resolve) => {
         window.addEventListener('popstate', () => resolve(), { once: true })
@@ -85,9 +262,25 @@ describe('PipelineCreationFlow', () => {
       })
     })
     expect(screen.getByText(/Step 3 of 4/)).toBeInTheDocument()
-    back()
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('popstate', () => resolve(), { once: true })
+        window.history.back()
+      })
+    })
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
-    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('history-project')
+    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
+    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+      target: { value: 'changed-project' },
+    })
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('popstate', () => resolve(), { once: true })
+        window.history.forward()
+      })
+    })
+    await waitFor(() => expect(window.location.search).toBe('?step=connection'))
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
   })
 
   it.each(['connection', 'data', 'review', 'invalid'])(
@@ -104,7 +297,7 @@ describe('PipelineCreationFlow', () => {
     }
   )
 
-  it('preserves connection and data values across steps and destination changes', () => {
+  it('preserves connection and data values across steps and destination changes', async () => {
     customRender(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
       { nuqs: { hasMemory: true } }
@@ -117,7 +310,8 @@ describe('PipelineCreationFlow', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
       target: { value: 'my-project' },
     })
-    next()
+    fillConnection()
+    await continueToData()
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 3 of 4')
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
@@ -133,13 +327,110 @@ describe('PipelineCreationFlow', () => {
     fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
     next()
     expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
-    next()
+    await continueToData()
     fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
     expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
+    await selectPublication()
     next()
-    expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 4 of 4')
+    await waitFor(() =>
+      expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 4 of 4')
+    )
     expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
+  })
+
+  it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
+    const onUrlUpdate = vi.fn()
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
+    })
+    next()
+    fillConnection()
+    await continueToData()
+    next()
+    expect(await screen.findByText('Select an available publication.')).toBeInTheDocument()
+    await selectPublication()
+    await waitFor(() =>
+      expect(screen.queryByText('Select an available publication.')).not.toBeInTheDocument()
+    )
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
+      target: { value: '-1' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    next()
+    await waitFor(() =>
+      expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toBeVisible()
+    )
+    expect(screen.getByText('Check data settings')).toBeInTheDocument()
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
+      target: { value: '750' },
+    })
+    expect(screen.queryByText('Check data settings')).not.toBeInTheDocument()
+    let shouldFail = true
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        shouldFail
+          ? HttpResponse.json<{ message: string }>({ message: 'Unavailable' }, { status: 500 })
+          : HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+              publications: [{ name: 'analytics' }],
+            }),
+    })
+    next()
+    expect(
+      await screen.findByText(
+        'Publication tables could not be loaded. Click Continue to try again.'
+      )
+    ).toBeInTheDocument()
+    shouldFail = false
+    next()
+    await waitFor(() => expect(screen.getByText(/Step 4 of 4/)).toBeInTheDocument())
+    // Wait for the URL write, not just the optimistic step render, before going back.
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=review' })
+      )
+    )
+    await act(async () => back())
+    fireEvent.click(await screen.findByRole('button', { name: /Advanced settings/ }))
+    expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
+  })
+
+  it('blocks browser Forward to Review after data changes', async () => {
+    window.history.replaceState(null, '', '/project/default/database/pipelines/new')
+    customRender(
+      <NuqsAdapter>
+        <PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />
+      </NuqsAdapter>
+    )
+    next()
+    await waitFor(() => expect(window.location.search).toBe('?step=connection'))
+    fillConnection()
+    await continueToData()
+    await screen.findByText('Select publication')
+    await selectPublication()
+    next()
+    await waitFor(() => expect(window.location.search).toBe('?step=review'))
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('popstate', () => resolve(), { once: true })
+        window.history.back()
+      })
+    })
+    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
+      target: { value: '-1' },
+    })
+    await act(async () => {
+      await new Promise<void>((resolve) => {
+        window.addEventListener('popstate', () => resolve(), { once: true })
+        window.history.forward()
+      })
+    })
+    await waitFor(() => expect(window.location.search).toBe('?step=data'))
+    expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(-1)
   })
 
   it('confirms destination-only changes and treats a reverted selection as pristine', async () => {

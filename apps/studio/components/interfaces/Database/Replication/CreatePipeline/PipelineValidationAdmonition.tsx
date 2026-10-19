@@ -1,15 +1,11 @@
 import { forwardRef, type ComponentRef } from 'react'
-import { Badge } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 export const SANDWICHED_ADMONITION_CLASS =
-  'mb-0 rounded-none border-x-0 border-t-0 border-b border-default'
-
-export const CONNECTION_VALIDATION_HINT =
-  'Check destination credentials and connection settings, including Advanced settings under Destination connection.'
+  'mb-0 rounded-none border-x-0 border-t border-b-0 border-default'
 
 export const DATA_VALIDATION_HINT =
   'Some issues may require changes to the project’s database settings.'
@@ -66,21 +62,23 @@ export const PipelineValidationAdmonition = forwardRef<
           changes are applied downstream.
         </p>
       ) : null}
-      <ul className="space-y-2">
+      <div className="space-y-2">
         {failures.map((failure, index) => (
-          <li key={`${failure.name}-${index}`}>
-            <Badge className="mb-1">
-              {failure.failure_type === 'critical' ? 'Required' : 'Warning'}
-            </Badge>
+          <div key={`${failure.name}-${index}`}>
             {failures.length > 1 ? (
-              <p className="mb-0.5! font-medium text-foreground">{failure.name}</p>
+              <p className="mb-0.5! font-medium text-foreground">
+                {failure.name}
+                {hasCritical && failures.some((item) => item.failure_type === 'warning')
+                  ? ` (${failure.failure_type === 'critical' ? 'required' : 'warning'})`
+                  : ''}
+              </p>
             ) : null}
-            <Markdown className="text-sm text-foreground-light [&>p]:mb-0!">
+            <Markdown className="text-sm text-foreground-light [&>p]:inline [&>p+p]:before:content-[' ']">
               {failure.reason}
             </Markdown>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
       {hint ? <p className="mt-2 mb-0! text-sm text-foreground-light">{hint}</p> : null}
     </Admonition>
   )
