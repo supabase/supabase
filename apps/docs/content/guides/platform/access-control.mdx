@@ -61,15 +61,15 @@ Each example names the permission a scoped access token needs. For more informat
 
 An invite is valid for 24 hours. The person gets access only after they accept it.
 
-To invite someone in the dashboard:
+To invite someone in the Supabase Dashboard:
 
 1. In your organization's [team settings](/dashboard/org/_/team), click **Invite members**.
-2. Choose a **Role**.
-3. To limit the role to one project, turn off **Grant this role on all projects**, then choose the project in **Select a project**.
+2. Select a **Role**.
+3. To limit the role to one project, turn off **Grant this role on all projects**. In **Select a project**, select the project. An invite can grant a project-scoped role on only one project.
 4. In **Email addresses**, enter the person's email address.
 5. Click **Send invitation**.
 
-An invite with a project-scoped role can assign that role on only one project. After the person accepts, you can assign roles on more projects.
+After the person accepts, you can assign roles on more projects.
 
 If an invite expires before the person accepts it, send a new one. Next to the invite, click **More options**, then click **Resend invitation**.
 
@@ -121,17 +121,17 @@ curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invita
 
 ### Change a member's role
 
-You can change a member's roles after they accept their invite.
+You can change a member's role after they accept their invite.
 
-To change a member's role in the dashboard:
+To change a member's role in the Supabase Dashboard:
 
 1. In your organization's [team settings](/dashboard/org/_/team), next to the member, click **Manage access**.
 2. Choose where the role applies:
-   - To give the member one role across the organization, turn on **Apply roles to all projects in the organization**, then choose the role.
-   - To limit the member to specific projects, turn off **Apply roles to all projects in the organization**. Click **Add project**, choose a project, and choose a role for it. Repeat for each project.
-3. Click **Save roles**, then click **Update roles**.
+   - To give the member one role across the organization, turn on **Apply roles to all projects in the organization**, then select the role.
+   - To limit the member to specific projects, turn off **Apply roles to all projects in the organization**. Click **Add project**, select a project, and select a role for it. Repeat for each project.
+3. Click **Save roles**. In the confirmation dialog, click **Update roles**.
 
-The dashboard replaces the member's previous roles with the roles you save.
+The Supabase Dashboard replaces the member's previous roles with the roles you save.
 
 To change a member's role with the Management API, call [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role) with the member's user ID. The token needs the **Organization Settings** permission with **Read-write** access. To find a member's user ID, list the organization's members.
 
@@ -193,18 +193,18 @@ Each member's `roles` array shows every role they have. A role's `scope` is `org
 }
 ```
 
-The results are paginated. For the paging parameters, see the endpoint's reference.
+The results are paginated. The endpoint's reference page lists the pagination parameters.
 
 ### Transfer ownership of an organization
 
-Each Supabase organization must have at least one owner. If your organization has other owners, you can give up ownership and leave the organization. In your organization's [team settings](/dashboard/org/_/team), click **Leave team**.
+Each Supabase organization must have at least one **Owner**. If you're the only **Owner**, make another member an **Owner** before you leave. Members with the **Administrator** role can't take over, because they can't update organization settings or add **Owners**.
 
-If you're the only owner, make another member an **Owner** before you leave. An **Administrator** can't take over, because administrators can't update organization settings or add owners.
+To leave an organization:
 
-1. Make another member an **Owner** in one of these ways:
-   - Promote an existing member. In **Manage access**, turn on **Apply roles to all projects in the organization**, choose **Owner**, and save the roles. With the Management API, [assign the role](#change-a-members-role) `owner` without `projects`.
+1. If you're the only **Owner**, make another member an **Owner** in one of these ways:
+   - Promote an existing member. In team settings, next to the member, click **Manage access**. Turn on **Apply roles to all projects in the organization**, select **Owner**, and save the roles. With the Management API, [assign the role](#change-a-members-role) `owner` without `projects`.
    - Invite someone as **Owner**, and wait for them to accept.
-2. In your organization's [team settings](/dashboard/org/_/team), click **Leave team**.
+2. In your organization's team settings, click **Leave team**.
 
 ## Permissions across roles
 
