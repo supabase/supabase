@@ -340,7 +340,7 @@ export const UsersV2 = () => {
       connectionString: project?.connectionString,
       keywords: filterKeywords,
       filter:
-        (shouldUseColumnSearch && !improvedSearchEnabled) || filterUserType === 'all'
+        (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) || filterUserType === 'all'
           ? undefined
           : filterUserType,
       providers: selectedProviders,
