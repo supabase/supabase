@@ -138,9 +138,6 @@ url = ""
 [functions.search-embeddings]
 verify_jwt = false
 
-[functions.search-fts]
-verify_jwt = false
-
 [db.migrations]
 schema_paths = [
   "schemas",
