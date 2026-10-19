@@ -1,6 +1,13 @@
 import type { InferUITools, Tool, ToolUIPart, UIDataTypes, UIMessage } from 'ai'
 
 import type { ToolName } from '../tool-filter'
+import { contract as createNotebook } from './create-notebook'
+import { contract as deleteNotebook } from './delete-notebook'
+import { contract as deployEdgeFunction } from './deploy-edge-function'
+import { contract as executeSql } from './execute-sql'
+import { contract as loadKnowledge } from './load-knowledge'
+import { contract as renameChat } from './rename-chat'
+import { contract as runNotebook } from './run-notebook'
 import type { ToolContract, ToolContractInput, ToolContractOutput } from './types'
 import { contract as updateNotebook } from './update-notebook'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
@@ -10,6 +17,13 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
  * by hand in the places the contract replaces.
  */
 export const TOOL_CONTRACTS = {
+  create_notebook: createNotebook,
+  delete_notebook: deleteNotebook,
+  deploy_edge_function: deployEdgeFunction,
+  execute_sql: executeSql,
+  load_knowledge: loadKnowledge,
+  rename_chat: renameChat,
+  run_notebook: runNotebook,
   update_notebook: updateNotebook,
 } as const satisfies Partial<Record<ToolName, ToolContract>>
 
@@ -53,6 +67,8 @@ export function sanitizeContractPart<Part extends ToolUIPart>(
   const parsed = contract.outputSchema.safeParse(part.output)
   return {
     ...part,
-    output: parsed.success ? contract.toModelOutput(parsed.data, optInLevel) : undefined,
+    output: parsed.success
+      ? contract.toModelOutput(parsed.data, optInLevel)
+      : contract.outputOnInvalid,
   }
 }

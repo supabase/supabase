@@ -317,6 +317,10 @@ describe('DestinationForm edit submission', () => {
           onClose={vi.fn()}
         />
       )
+      expect(screen.queryByRole('region', { name: 'Destination review' }) !== null).toBe(
+        shouldShowSection
+      )
+      expect(screen.queryByRole('region', { name: 'Data review' }) !== null).toBe(shouldShowSection)
       expect(screen.queryByRole('region', { name: 'Data' }) !== null).toBe(shouldShowSection)
       expect(screen.queryByRole('region', { name: 'Destination connection' }) !== null).toBe(
         shouldShowSection
@@ -324,7 +328,7 @@ describe('DestinationForm edit submission', () => {
       if (shouldShowSection) {
         const section = screen.getByRole('region', { name: 'Destination connection' })
         expect(
-          section.compareDocumentPosition(screen.getByText('Data')) &
+          section.compareDocumentPosition(screen.getByRole('region', { name: 'Data' })) &
             Node.DOCUMENT_POSITION_FOLLOWING
         ).toBeTruthy()
       }

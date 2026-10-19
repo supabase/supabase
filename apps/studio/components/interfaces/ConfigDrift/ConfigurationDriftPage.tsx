@@ -1,13 +1,7 @@
 import { useParams } from 'common'
-import {
-  ArrowRightIcon,
-  CheckCircle2Icon,
-  FileWarningIcon,
-  GithubIcon,
-  PlusIcon,
-} from 'lucide-react'
+import { ArrowRightIcon, CheckCircle2Icon, FileWarningIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card, Skeleton } from 'ui'
+import { Button, Card, GithubIcon, Skeleton } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'

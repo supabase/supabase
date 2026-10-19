@@ -39,7 +39,7 @@
     "eslint-config-supabase": "workspace:*",
     "icons": "workspace:*",
     "jotai": "^2.8.0",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "monaco-editor": "catalog:",
     "motion": "catalog:",
     "next": "catalog:",

@@ -4,13 +4,21 @@ import * as common from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getUnifiedLogs, useUnifiedLogsInfiniteQuery } from './unified-logs-infinite-query'
-import { compareRows, createRow, mockLogs, now, search } from './unified-logs.test-utils'
+import {
+  compareRows,
+  createRow,
+  mockLogs as mockBackendLogs,
+  now,
+  search,
+} from './unified-logs.test-utils'
 import { deduplicateUnifiedLogs } from './unified-logs.utils'
 import { customRenderHook } from '@/tests/lib/custom-render'
 
+const mockLogs = (rows: ReturnType<typeof createRow>[]) => mockBackendLogs(rows, true)
+
 beforeEach(() => {
   vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
-    configcat: { otelUnifiedLogs: false },
+    configcat: { otelUnifiedLogs: true },
     posthog: {},
     hasLoaded: true,
   })
@@ -20,6 +28,7 @@ const getLiveLogs = (cursor: number) =>
   getUnifiedLogs({
     projectRef: 'default',
     search,
+    useOtel: true,
     pageParam: { cursor, direction: 'prev' },
   })
 
@@ -36,7 +45,9 @@ describe('getUnifiedLogs live polling', () => {
 
     const firstPoll = await getLiveLogs(now.getTime())
     vi.setSystemTime(new Date('2026-09-30T12:00:10.000Z'))
-    await getLiveLogs(firstPoll.prevCursor)
+    const secondPoll = await getLiveLogs(firstPoll.prevCursor)
+    vi.setSystemTime(new Date('2026-09-30T12:00:20.000Z'))
+    await getLiveLogs(secondPoll.prevCursor)
 
     expect(
       requests.map(({ iso_timestamp_start, iso_timestamp_end }) => ({
@@ -51,6 +62,10 @@ describe('getUnifiedLogs live polling', () => {
       {
         iso_timestamp_start: '2026-09-30T11:58:00.000Z',
         iso_timestamp_end: '2026-09-30T12:00:10.000Z',
+      },
+      {
+        iso_timestamp_start: '2026-09-30T11:58:10.000Z',
+        iso_timestamp_end: '2026-09-30T12:00:20.000Z',
       },
     ])
   })
@@ -67,7 +82,7 @@ describe('getUnifiedLogs live polling', () => {
       [...rows].sort(compareRows).map((row) => row.id)
     )
     expect(requests).toHaveLength(2)
-    expect(requests[1].sql).toContain('TIMESTAMP_MICROS(')
+    expect(requests[1].sql).toContain('fromUnixTimestamp64Micro(')
     expect(requests[1].sql).not.toContain('OFFSET')
   })
 
@@ -94,6 +109,7 @@ describe('getUnifiedLogs live polling', () => {
     await getUnifiedLogs({
       projectRef: 'default',
       search: { ...search, date: [start, end] },
+      useOtel: true,
       pageParam: { cursor: now.getTime(), direction: 'prev' },
     })
 
@@ -111,22 +127,6 @@ describe('getUnifiedLogs live polling', () => {
     const response = await getLiveLogs(now.getTime())
 
     expect(response).toMatchObject({ data: [], nextCursor: null, prevCursor: now.getTime() })
-  })
-
-  it('uses the same live pagination for the OTEL endpoint', async () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(now)
-    const requests = mockLogs([createRow('otel-log')], true)
-
-    const response = await getUnifiedLogs({
-      projectRef: 'default',
-      search,
-      pageParam: { cursor: now.getTime(), direction: 'prev' },
-      useOtel: true,
-    })
-
-    expect(response.data.map((row) => row.id)).toEqual(['otel-log'])
-    expect(requests[0].sql).toContain('ORDER BY timestamp DESC, toString(id) DESC LIMIT 50')
   })
 
   it('removes overlap duplicates before rendering rows', () => {
@@ -181,7 +181,7 @@ describe('getUnifiedLogs live polling', () => {
     ).toBe(60 * 60 * 1000)
   })
 
-  it.each([false, true])('handles arrivals between pages on backend otel=%s', async (useOtel) => {
+  it('handles arrivals between pages', async () => {
     vi.useFakeTimers()
     vi.setSystemTime(now)
     const timestamp = (now.getTime() - 1000) * 1000 + 123
@@ -189,8 +189,9 @@ describe('getUnifiedLogs live polling', () => {
       createRow(`log-${String(index).padStart(3, '0')}`, timestamp)
     )
     const originalIds = rows.map((row) => row.id)
-    const requests = mockLogs(rows, useOtel, (requestNumber) => {
+    const requests = mockBackendLogs(rows, true, (requestNumber) => {
       if (requestNumber === 2) {
+        vi.setSystemTime(new Date('2026-09-30T12:00:10.000Z'))
         rows.push(createRow('zzz-late', timestamp), createRow('aaa-late', timestamp))
       }
     })
@@ -198,13 +199,21 @@ describe('getUnifiedLogs live polling', () => {
       projectRef: 'default',
       search,
       pageParam: { cursor: now.getTime(), direction: 'prev' as const },
-      useOtel,
+      useOtel: true,
     }
     const firstPoll = await getUnifiedLogs(variables)
     expect(new Set(firstPoll.data.map((row) => row.id))).toEqual(
       new Set([...originalIds, 'aaa-late'])
     )
     expect(requests[1].sql).toContain(String(timestamp))
+    expect(
+      requests
+        .slice(0, 3)
+        .map(({ iso_timestamp_start, iso_timestamp_end }) => [
+          iso_timestamp_start,
+          iso_timestamp_end,
+        ])
+    ).toEqual(Array(3).fill(['2026-09-30T11:58:00.000Z', '2026-09-30T12:00:00.000Z']))
     const nextPoll = await getUnifiedLogs({
       ...variables,
       pageParam: { cursor: firstPoll.prevCursor, direction: 'prev' },
@@ -216,24 +225,14 @@ describe('getUnifiedLogs live polling', () => {
     )
   })
 
-  it.each([
-    { useOtel: false, hasOverlap: false },
-    { useOtel: true, hasOverlap: false },
-    { useOtel: false, hasOverlap: true },
-    { useOtel: true, hasOverlap: true },
-  ])(
-    'retains Live bursts across refreshes with otel=$useOtel and overlap=$hasOverlap',
-    async ({ useOtel, hasOverlap }) => {
-      vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
-        configcat: { otelUnifiedLogs: useOtel },
-        posthog: {},
-        hasLoaded: true,
-      })
+  it.each([false, true])(
+    'retains Live bursts across refreshes with overlap=%s',
+    async (hasOverlap) => {
       const timestamp = Date.now() - (hasOverlap ? 30 * 1000 : 10 * 60 * 1000)
       const rows = Array.from({ length: 110 }, (_, index) =>
         createRow(`old-${String(index).padStart(3, '0')}`, (timestamp - index * 1000) * 1000 + 123)
       )
-      mockLogs(rows, useOtel)
+      mockLogs(rows)
       const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
       const { result } = customRenderHook(
         () => useUnifiedLogsInfiniteQuery({ projectRef: 'default', search }),
@@ -254,9 +253,7 @@ describe('getUnifiedLogs live polling', () => {
 
       const liveTimestamp = Date.now() - 1000
       const burst = Array.from({ length: 120 }, (_, index) => {
-        const timestamp = useOtel
-          ? new Date(liveTimestamp).toISOString().replace('Z', '000123Z')
-          : liveTimestamp * 1000 + 123
+        const timestamp = new Date(liveTimestamp).toISOString().replace('Z', '000123Z')
         return createRow(`live-${String(index).padStart(3, '0')}`, timestamp)
       })
       rows.push(...burst)
@@ -334,7 +331,7 @@ describe('getUnifiedLogs live polling', () => {
         `2026-09-30T11:59:59.000000${String(index).padStart(3, '0')}`
       )
     )
-    const requests = mockLogs(rows, true)
+    const requests = mockLogs(rows)
     const response = await getUnifiedLogs({
       projectRef: 'default',
       search,
