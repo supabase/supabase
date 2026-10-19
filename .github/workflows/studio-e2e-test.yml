@@ -61,7 +61,7 @@ jobs:
       # Reserve them before dependency installs and image pulls.
       - name: Reserve Supabase local ports from the ephemeral range
         if: steps.filter.outputs.studio == 'true'
-        run: sudo sysctl -w net.ipv4.ip_local_reserved_ports=54320-54324,54327,54329
+        run: current=$(cat /proc/sys/net/ipv4/ip_local_reserved_ports); sudo sysctl -w net.ipv4.ip_local_reserved_ports="${current:+$current,}54320-54329"
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         if: steps.filter.outputs.studio == 'true'
@@ -118,7 +118,8 @@ jobs:
         run: |
           docker ps -a
           echo "ip_local_reserved_ports=$(cat /proc/sys/net/ipv4/ip_local_reserved_ports)"
-          sudo ss -tanp 'sport = :54322' || true
+          echo "ip_local_port_range=$(cat /proc/sys/net/ipv4/ip_local_port_range)"
+          sudo ss -tanp '( sport >= :54320 and sport <= :54329 )' || true
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
@@ -126,7 +127,10 @@ jobs:
         background: true
         run: |
           pnpm exec supabase stop --all --no-backup --workdir ./e2e/studio || true
-          pnpm exec supabase start --exclude studio,mailpit --workdir ./e2e/studio
+          if ! pnpm exec supabase start --exclude studio,mailpit --workdir ./e2e/studio; then
+            sudo ss -tanp '( sport >= :54320 and sport <= :54329 )' || true
+            exit 1
+          fi
 
       - name: Build studio
         if: steps.filter.outputs.studio == 'true'
@@ -153,9 +157,11 @@ jobs:
         if: failure()
         run: |
           docker ps -a
-          sudo ss -tanp 'sport = :54322' || true
+          sudo ss -tanp '( sport >= :54320 and sport <= :54329 )' || true
           for id in $(docker ps -aq); do
-            docker logs "$id" 2>&1 || true
+            echo "::group::$(docker inspect -f '{{.Name}}' "$id")"
+            docker logs --tail 300 "$id" 2>&1 || true
+            echo "::endgroup::"
           done
 
       - name: Write runtime env
