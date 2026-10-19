@@ -75,6 +75,20 @@ enable_confirmations = false
 [remotes.prod.auth.email]
 enable_signup = false
 
+[remotes.prod.db.pooler]
+default_pool_size = 15
+max_client_conn = 400
+
+[remotes.prod.db.ssl_enforcement]
+enabled = true
+
+[remotes.prod.storage.analytics]
+enabled = true
+max_namespaces = 10
+
+[remotes.prod.storage.image_transformation]
+enabled = true
+
 # Uncomment the following to use gh oAuth app locally with your own test app
 # to use env vars locally, run > `source ./supabase/.env && supabase [command...]`
 # [auth.external.github]
