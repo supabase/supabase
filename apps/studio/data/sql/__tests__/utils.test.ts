@@ -135,6 +135,25 @@ describe('applyAutoLimit', () => {
     const { appendAutoLimit } = applyAutoLimit(sql, 100)
     expect(appendAutoLimit).toBe(false)
   })
+  test('Should not limit when a dollar-quoted literal could hide a write keyword', () => {
+    // The quote inside the first $$'$$ pairs with the one in the second, which
+    // would mask `into` if literals were stripped with a plain regex.
+    const sql = safeSql`with a as (select $$'$$ as s from generate_series(1, 200)) select s into t from a where s = $$'$$;`
+    const { sql: result, appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+    expect(result).toBe(sql)
+  })
+  test('Should not limit when an E escape string could hide a write keyword', () => {
+    const sql = safeSql`with a as (select E'\'' as s) select s into t from a where s = E'\'';`
+    const { sql: result, appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+    expect(result).toBe(sql)
+  })
+  test('Should still limit a read-only CTE that uses like without a space', () => {
+    const sql = safeSql`with a as (select k from t) select * from a where k like'%x%';`
+    const { appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(true)
+  })
   test('Should return false for a data-modifying CTE that inserts', () => {
     const sql = safeSql`with x as (select 1 as n) insert into t select n from x;`
     const { appendAutoLimit } = applyAutoLimit(sql, 100)
