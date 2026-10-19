@@ -16,7 +16,9 @@ If you have policies that depend on having a signed in user (TO set to `authenti
 For more information on RLS see https://supabase.com/docs/guides/auth/row-level-security
 
 Adding:
-To test if you have a user session at time of your call you can add this function with the SQL editor and an RPC call in your code at same place as your current database call.
+To test if you have a user session at time of your call you can add this function and an RPC call in your code at same place as your current database call.
+
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 create function test_authorization_header() returns json

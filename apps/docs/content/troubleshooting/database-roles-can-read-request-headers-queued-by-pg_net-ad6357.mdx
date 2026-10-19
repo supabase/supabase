@@ -8,7 +8,9 @@ When you call `net.http_get`, `net.http_post`, or `net.http_delete`, pg_net stor
 
 ## Check what your requests expose
 
-To see the requests waiting to be sent, run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+The following query lists the requests waiting to be sent.
+
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 select id, url, headers

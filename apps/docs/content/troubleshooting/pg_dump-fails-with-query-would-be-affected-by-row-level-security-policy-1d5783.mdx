@@ -26,7 +26,9 @@ pg_dump: error: query would be affected by row-level security policy for table "
 
 ## Create a backup role
 
-Create a dedicated role that can read every table without the `postgres` password. Run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+Create a dedicated role that can read every table without the `postgres` password.
+
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 create role backup_reader login password '<strong-password>' bypassrls;

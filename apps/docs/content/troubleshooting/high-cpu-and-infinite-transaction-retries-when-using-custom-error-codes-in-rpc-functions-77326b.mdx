@@ -40,8 +40,12 @@ where usename = 'authenticator'
 order by query_start;
 ```
 
-Match the `pid` against the `process_id` from your logs to confirm you have the right backend, then terminate it from the [SQL editor](/dashboard/project/_/sql/new):
+Match the `pid` against the `process_id` from your logs to confirm you have the right backend, then terminate it.
 
-`SELECT pg_terminate_backend(pid);`
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+```sql
+select pg_terminate_backend(pid);
+```
 
 Alternatively, you can restart the project from the dashboard to clear all hanging backends at once.

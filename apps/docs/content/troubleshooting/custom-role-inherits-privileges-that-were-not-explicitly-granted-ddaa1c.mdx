@@ -20,7 +20,9 @@ A role you create to limit a service or a person can therefore do more than you 
 
 ## Find privileges you didn't grant
 
-To find privileges you didn't grant, list what the role can access and compare it with your own grants. The following queries check schema `usage` and the table and sequence privileges they name. They don't check column-level grants or `execute` on functions. To list the schemas a role can use, replace `app_svc` and run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+To find privileges you didn't grant, list what the role can access and compare it with your own grants. The following queries check schema `usage` and the table and sequence privileges they name. They don't check column-level grants or `execute` on functions. To list the schemas a role can use, replace `app_svc` in the following query.
+
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 select nspname as schema

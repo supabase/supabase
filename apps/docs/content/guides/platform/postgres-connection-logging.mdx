@@ -72,7 +72,7 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/config/database/p
   }'
 ```
 
-To verify the setting, use the SQL Editor:
+The following query verifies the setting. Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 show log_connections;

@@ -14,7 +14,7 @@ If you are observing an `ERROR: HV000: guest fdw error: component verification f
 To resolve this, update your foreign server configuration to use the correct package version and checksum. Details depend on the exact Wrapper and can be found here: https://fdw.dev/catalog/wasm/
 
 **How to fix the configuration:**
-Run the following SQL via the [SQL Editor](/dashboard/project/_/sql/new):
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 ALTER SERVER example_server OPTIONS (
