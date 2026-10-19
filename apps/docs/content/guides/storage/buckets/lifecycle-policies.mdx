@@ -49,6 +49,8 @@ const { data, error } = await supabase.storage.updateBucketLifecycle('avatars', 
 
 This rule keeps the 2 newest noncurrent versions of each object. It expires the others after they've been noncurrent for 30 days. Both conditions in a rule must be true for a version to expire. If a policy has more than one rule, a version expires when any enabled rule matches it.
 
+Noncurrent delete markers count toward `newerNoncurrentVersions` and expire like other noncurrent versions. Storage applies lifecycle rules about once a day, so a version can be deleted up to a day after it meets a rule's conditions.
+
 ## Get or delete a policy
 
 To read the policy, call `getBucketLifecycle`. If the bucket has no policy, the call fails with `NoSuchLifecycleConfiguration`.
