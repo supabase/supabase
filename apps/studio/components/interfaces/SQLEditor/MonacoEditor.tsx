@@ -35,6 +35,7 @@ export type MonacoEditorProps = {
     endLineNumber: number
   }) => void
   placeholder?: string
+  showPasteButton?: boolean
 }
 
 export const MonacoEditor = ({
@@ -50,6 +51,7 @@ export const MonacoEditor = ({
   onHasSelection,
   onPrompt,
   onMount,
+  showPasteButton = false,
 }: MonacoEditorProps) => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar, toggleSidebar } = useSidebarManagerSnapshot()
@@ -200,6 +202,7 @@ export const MonacoEditor = ({
         className={className}
         autofocus={autoFocus}
         isReadOnly={disableEdit}
+        showPasteButton={showPasteButton}
         defaultValue={snippet?.snippet.content?.unchecked_sql}
         editorRef={editorRef}
         monacoRef={monacoRef}
