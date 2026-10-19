@@ -58,6 +58,18 @@ enabled = true
 public = true
 objects_path = "buckets/fonts"
 
+[storage.buckets.images]
+public = true
+
+[storage.buckets.videos]
+public = true
+
+[storage.buckets.integrations-images]
+public = true
+
+[storage.buckets.temp-for-testing-integrations]
+public = true
+
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
@@ -124,6 +136,9 @@ redirect_uri = ""
 url = ""
 
 [functions.search-embeddings]
+verify_jwt = false
+
+[functions.search-fts]
 verify_jwt = false
 
 [db.migrations]
