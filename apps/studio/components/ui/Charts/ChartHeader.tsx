@@ -297,6 +297,7 @@ export const ChartHeader = ({
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
             className="px-1.5"
+            aria-label={`View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`}
             icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
             tooltip={{

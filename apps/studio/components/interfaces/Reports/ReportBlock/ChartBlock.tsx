@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { ActivityIcon, BarChartIcon, Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -68,12 +69,14 @@ export const ChartBlock = ({
   maxHeight,
   onUpdateChartConfig,
 }: ChartBlockProps) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const router = useRouter()
   const { ref } = router.query
 
   const state = useDatabaseSelectorStateSnapshot()
   const chartRef = useRef<HTMLDivElement>(null)
   const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
+  const effectiveChartStyle = shouldDefaultToLineCharts ? 'line' : chartStyle
   const logScale = useMemo(() => defaultLogScale, [defaultLogScale])
   const [latestValue, setLatestValue] = useState<string | undefined>()
   const formatChartDate = useFormatDateTime()
@@ -223,25 +226,28 @@ export const ChartBlock = ({
       label={label}
       actions={
         <>
-          <ButtonTooltip
-            variant="text"
-            size="tiny"
-            disabled={loading}
-            className="w-7 h-7"
-            icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
-            onClick={() => {
-              const style = chartStyle === 'bar' ? 'line' : 'bar'
-              if (onUpdateChartConfig) onUpdateChartConfig({ chart: { chart_type: style } })
-              setChartStyle(style)
-            }}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                className: 'max-w-56 text-center',
-                text: `View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`,
-              },
-            }}
-          />
+          {!shouldDefaultToLineCharts && (
+            <ButtonTooltip
+              variant="text"
+              size="tiny"
+              disabled={loading}
+              className="w-7 h-7"
+              aria-label={`View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`}
+              icon={chartStyle === 'bar' ? <ActivityIcon /> : <BarChartIcon />}
+              onClick={() => {
+                const style = chartStyle === 'bar' ? 'line' : 'bar'
+                if (onUpdateChartConfig) onUpdateChartConfig({ chart: { chart_type: style } })
+                setChartStyle(style)
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  className: 'max-w-56 text-center',
+                  text: `View as ${chartStyle === 'bar' ? 'line chart' : 'bar chart'}`,
+                },
+              }}
+            />
+          )}
           <ButtonTooltip
             variant={logScale ? 'default' : 'text'}
             size="tiny"
@@ -307,7 +313,7 @@ export const ChartBlock = ({
               minHeight: maxHeight ? `${maxHeight}px` : undefined,
             }}
           >
-            {chartStyle === 'bar' ? (
+            {effectiveChartStyle === 'bar' ? (
               <BarChart accessibilityLayer margin={{ left: 0, right: 0 }} data={data}>
                 <CartesianGrid vertical={false} />
                 <XAxis
