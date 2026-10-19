@@ -21,6 +21,8 @@ To replicate data to ClickHouse:
 
 The source table requirements depend on the selected table engine and the operations in the Postgres publication. `ReplacingMergeTree` requires a source primary key. `MergeTree` can replicate insert-only tables without one. If a table has a primary key, include all its key columns in the publication.
 
+For either engine, source primary keys must be `NOT DEFERRABLE`; `DEFERRABLE` keys are unsupported.
+
 Check the [replica-identity and array requirements](#replica-identity-and-arrays) for your source tables.
 
 ### Choose a table engine
@@ -75,7 +77,9 @@ Pipelines maps each Postgres schema and table pair to one ClickHouse table. Exis
 | `public.orders`  | `public_orders`   |
 | `my_schema.logs` | `my__schema_logs` |
 
-Postgres schema and table names cannot start or end with `_` or contain `"` or `;` when replicating to ClickHouse.
+A schema or table name that starts or ends with `_` uses a length-prefixed name: `public._orders` becomes `_0607_public__orders`.
+
+Postgres schema and table names cannot contain `"` or `;`. Leading or trailing underscores are supported when both names contain only ASCII letters, digits, and underscores.
 
 ### ReplacingMergeTree
 
@@ -162,6 +166,7 @@ Pipelines supports:
 
 - Adding columns
 - Renaming or dropping columns; nested subcolumns must stay under the same parent when renamed
+- Renaming tables within the same schema; with `ReplacingMergeTree`, the `__current` view is recreated under the new name
 - Dropping `NOT NULL` from an existing scalar column
 - Adding, changing, or removing supported column defaults
 - Adding or removing published columns on tracked tables, subject to the same restrictions
