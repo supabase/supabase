@@ -321,7 +321,7 @@ const frameworkExamples: Record<
     {
       title: 'Server Routes',
       description: 'Service role access from server.',
-      url: '/docs/guides/auth/server-side/nuxt',
+      url: '/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=nuxt',
       icon: 'Server',
     },
   ],
