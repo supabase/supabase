@@ -463,7 +463,7 @@ describe('/project/[ref]/settings/infrastructure', () => {
   })
 
   test('submits disk and autoscaling changes to both infrastructure APIs', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.setup({ delay: null })
     let diskRequest: unknown
     let autoscaleRequest: unknown
 
