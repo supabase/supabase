@@ -222,13 +222,12 @@ Agents can't use the Dashboard. For any change a reader makes there, also give a
 path, such as `psql`, the Supabase CLI, or the Management API. Put paths with separate
 steps in [tabs](#tabs).
 
-#### Follow a SQL block with the standard run sentence
+#### For every "run this query" step
 
-After SQL the reader runs against their project, paste:
+Paste this standard snippet inline:
 
 ```mdx
-You can run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard, or with `psql` over a direct connection. For more information about connecting with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
-```
+Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ### Code blocks
 
