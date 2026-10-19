@@ -30,7 +30,7 @@
     "astro": "^7.2.6",
     "common": "workspace:*",
     "gray-matter": "^4.0.3",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "remark-gfm": "^4.0.1",

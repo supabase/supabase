@@ -130,6 +130,13 @@ describe('DestinationForm.utils table copy selection', () => {
     ).toEqual({ type: mode, table_ids: [202, 101] })
   })
 
+  it.each([
+    ['include_tables', 'Select at least one table for the initial sync.'],
+    ['skip_tables', 'Select at least one table to exclude from the initial sync.'],
+  ] as const)('explains the empty selection for %s', (mode, message) => {
+    expect(() => buildTableSyncCopyConfig({ mode, selectedTableIds: [] })).toThrow(message)
+  })
+
   it('rejects an invalid selected table id', () => {
     expect(() =>
       buildTableSyncCopyConfig({
