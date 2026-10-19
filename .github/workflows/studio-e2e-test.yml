@@ -57,6 +57,12 @@ jobs:
               - 'pnpm-lock.yaml'
               - '.github/workflows/studio-e2e-test.yml'
 
+      # NOTE: Ports in e2e/studio/supabase/config.toml overlap the ephemeral range.
+      # Reserve them before dependency installs and image pulls.
+      - name: Reserve Supabase local ports from the ephemeral range
+        if: steps.filter.outputs.studio == 'true'
+        run: sudo sysctl -w net.ipv4.ip_local_reserved_ports=54320-54324,54327,54329
+
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         if: steps.filter.outputs.studio == 'true'
         name: Install pnpm
