@@ -20,25 +20,7 @@ jobs:
           ref: master
 
       - name: Download current sitemaps
-        env:
-          SITEMAP_WWW_URL: https://supabase.com/sitemap_www.xml
-          SITEMAP_DOCS_URL: https://supabase.com/docs/sitemap.xml
-          SITEMAP_KB_URL: https://supabase.com/kb/sitemap-0.xml
-        run: |
-          set -euo pipefail
-
-          fetch() {
-            local url="$1" dest="$2"
-            mkdir -p "$(dirname "$dest")"
-            curl -sSfL --retry 3 --max-time 120 -o "$dest" "$url"
-            # Fail early if the response is not well-formed XML
-            python3 -c "import sys, xml.etree.ElementTree as E; E.parse(sys.argv[1])" "$dest"
-            echo "Fetched $url -> $dest ($(wc -c < "$dest") bytes)"
-          }
-
-          fetch "$SITEMAP_WWW_URL" sitemaps/raw_output/sitemap_www.xml
-          fetch "$SITEMAP_DOCS_URL" sitemaps/raw_output/sitemap_docs.xml
-          fetch "$SITEMAP_KB_URL" sitemaps/raw_output/sitemap_kb.xml
+        run: bash scripts/refresh-sitemaps.sh
 
       - name: Generate token
         id: app-token
