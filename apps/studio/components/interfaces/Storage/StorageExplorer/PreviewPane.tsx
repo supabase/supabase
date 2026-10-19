@@ -445,6 +445,5 @@ export const PreviewPane = () => {
 }
 
 const getBaseFileName = (name: string) => {
-  const parts = name.split('/')
-  return parts[parts.length - 1]
+  return name.split('/').filter(Boolean).pop() ?? name
 }
