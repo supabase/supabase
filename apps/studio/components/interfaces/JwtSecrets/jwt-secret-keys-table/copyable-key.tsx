@@ -12,8 +12,7 @@ export const CopyableKey = ({ keyId }: { keyId: string }) => {
   }, [isCopied])
 
   const handleCopy = () => {
-    copyToClipboard(keyId)
-    setIsCopied(true)
+    copyToClipboard(keyId, () => setIsCopied(true))
   }
 
   return (
