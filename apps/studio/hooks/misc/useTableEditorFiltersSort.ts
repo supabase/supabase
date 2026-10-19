@@ -1,3 +1,4 @@
+import { isEqual } from 'lodash'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo } from 'react'
 
@@ -49,7 +50,7 @@ export const useTableEditorFiltersSort = () => {
   }, [])
 
   const urlParams = useMemo(() => {
-    return new URLSearchParams(router.asPath.split('?')[1])
+    return new URLSearchParams(router.asPath.split('?')[1]?.split('#')[0])
   }, [router.asPath])
 
   const filters = useMemo(() => {
@@ -78,17 +79,32 @@ export const useTableEditorFiltersSort = () => {
 
       const hasFilter = newParams.filter !== undefined
       const hasSort = newParams.sort !== undefined
+      // Compare to the query this push would build on (the in-flight edit, or the URL). A no-op
+      // sync must not create an entry that discards browser Forward history.
+      const areFiltersUnchanged = !hasFilter || isEqual(newParams.filter, prevParams.filter)
+      const areSortsUnchanged = !hasSort || isEqual(newParams.sort, prevParams.sort)
+      if (areFiltersUnchanged && areSortsUnchanged) return
 
       const query = {
         ...baseQuery,
         ...(hasFilter ? { filter: newParams.filter } : {}),
         ...(hasSort ? { sort: newParams.sort } : {}),
       }
+      const hashStart = router.asPath.indexOf('#')
       const push = { fromAsPath: router.asPath, query }
       inFlightPush = push
-      void router.push({ query }, undefined, { shallow: true }).finally(() => {
-        if (inFlightPush === push) inFlightPush = null
-      })
+      void router
+        .push(
+          {
+            hash: hashStart === -1 ? undefined : router.asPath.slice(hashStart),
+            query,
+          },
+          undefined,
+          { shallow: true }
+        )
+        .finally(() => {
+          if (inFlightPush === push) inFlightPush = null
+        })
     },
     [latestRouter]
   )
