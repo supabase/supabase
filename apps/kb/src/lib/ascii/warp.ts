@@ -40,6 +40,11 @@ export interface WarpCell {
   spoke: number
 }
 
+interface FrontRadiusParams {
+  shape: WarpShape
+  y: number
+}
+
 interface RingRadiiParams {
   r0: number
   maxRadius: number
@@ -61,6 +66,11 @@ const ringEllipse = ({ rimY, throatY, r0 }: WarpShape, r: number) => ({
   centerY: rimY + (throatY - rimY) * (r0 / r),
   ry: TILT * (r - THROAT_FLATTENING * r0),
 })
+
+export const frontRadius = ({ shape: { rimY, throatY, r0 }, y }: FrontRadiusParams): number => {
+  const b = rimY - TILT * THROAT_FLATTENING * r0 - y
+  return (-b + Math.sqrt(b * b - 4 * TILT * (throatY - rimY) * r0)) / (2 * TILT)
+}
 
 export const projectWarp = ({ shape, r, angle, flatten, lineY }: ProjectParams): WarpPoint => {
   const { centerY, ry } = ringEllipse(shape, r)
@@ -103,3 +113,5 @@ export const locateCell = ({
 }
 
 export const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)
+
+export const easeOutCubic = (t: number) => 1 - (1 - t) ** 3

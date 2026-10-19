@@ -47,6 +47,12 @@ interface HeroFieldParams {
   seed: number
 }
 
+interface PhaseParams {
+  t: number
+  start: number
+  length: number
+}
+
 interface BeamParams {
   col: number
   row: number
@@ -114,6 +120,10 @@ export const latticeSize = ({ xs, ys }: Lattice) => ({
 
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value))
+
+export const phase = ({ t, start, length }: PhaseParams) => clamp((t - start) / length, 0, 1)
+
+export const drawStep = (progress: number) => Math.floor(progress * 8) / 8
 
 const firstIndexAtOrBefore = (edges: number[], value: number) => {
   let index = 0

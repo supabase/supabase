@@ -8,14 +8,17 @@ import {
   clamp,
   createRng,
   decayEnergy,
+  drawStep,
   GLYPH_PITCH,
   glyphRun,
   latticeSize,
+  phase,
   snapRect,
   type Lattice,
   type PixelRect,
 } from '../lib/ascii/field'
 import { createGrainPattern, punchGrain } from '../lib/ascii/grain'
+import { easeOutCubic } from '../lib/ascii/warp'
 import { ColorProbes, readProbeColor } from './ColorProbes'
 
 export interface CanvasSize {
@@ -37,14 +40,7 @@ export interface AsciiCanvasProps {
   words?: string[]
   decay?: number
   isActive?: boolean
-  revealDuration?: number
   className?: string
-}
-
-interface PhaseParams {
-  t: number
-  start: number
-  length: number
 }
 
 interface RunParams {
@@ -70,17 +66,11 @@ interface Palette {
   hot: string
 }
 
-const FONT = '12px ui-monospace, SFMono-Regular, Menlo, monospace'
 const CELL_PADDING = 8
-const DECAY = 0.92
-const WORD_ENERGY = 0.9
-const HOT_THRESHOLD = 0.15
 const DENSITY_STEPS = 8
 const TYPE_SPAN = 0.2
 const LETTER_STEP_MS = 90
 const LETTER_SCRAMBLE_MS = 240
-const SCRAMBLE_STEP_MS = 70
-const WORD_HOLD_MS = 900
 
 const PROBES = {
   grid: 'text-border-muted',
@@ -89,31 +79,24 @@ const PROBES = {
   background: 'text-background',
 } as const
 
-const LINE_STEPS = 8
-
-const easeOutCubic = (t: number) => 1 - (1 - t) ** 3
-
-const phase = ({ t, start, length }: PhaseParams) => clamp((t - start) / length, 0, 1)
-
-const drawStep = (progress: number) => Math.floor(progress * LINE_STEPS) / LINE_STEPS
-
 // knuth hash gives each cell a stable random start, capped so the last cell finishes with the reveal
 const revealOrder = (index: number) =>
   ((Math.imul(index + 1, 2654435761) >>> 0) / 2 ** 32) * (1 - TYPE_SPAN)
 
 const visibleLetters = ({ ingest, now }: VisibleLettersParams) => {
   const { word, startedAt } = ingest
-  const heldUntil = word.length * LETTER_STEP_MS + LETTER_SCRAMBLE_MS + WORD_HOLD_MS
+  const heldUntil = word.length * LETTER_STEP_MS + LETTER_SCRAMBLE_MS + 900
   return word.length - Math.max(0, Math.floor((now - startedAt - heldUntil) / LETTER_STEP_MS))
 }
-
-const isTransparent = (color: string) => color === 'transparent' || color.endsWith(', 0)')
 
 const readPalette = (probeRoot: HTMLElement, host: HTMLElement): Palette => {
   const hostBackground = getComputedStyle(host).backgroundColor
   const read = (role: keyof typeof PROBES) => readProbeColor(probeRoot, role)
   return {
-    background: isTransparent(hostBackground) ? read('background') : hostBackground,
+    background:
+      hostBackground === 'transparent' || hostBackground.endsWith(', 0)')
+        ? read('background')
+        : hostBackground,
     grid: read('grid'),
     muted: read('muted'),
     hot: read('hot'),
@@ -136,9 +119,8 @@ export const AsciiCanvas = ({
   keepOutRefs = [],
   keepOutMargin = 1,
   words = [],
-  decay = DECAY,
+  decay = 0.92,
   isActive = true,
-  revealDuration = 0,
   className,
 }: AsciiCanvasProps) => {
   const setupCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
@@ -165,18 +147,14 @@ export const AsciiCanvas = ({
     let isVisible = false
     let frame = 0
     const observed = new Set<HTMLElement>()
-    let revealStartedAt: number | null = null
+    const revealStartedAt = performance.now()
 
     const isRunning = () =>
       isVisible && document.visibilityState === 'visible' && canvas.dataset.active === 'true'
 
-    const revealProgress = () => {
-      if (revealDuration === 0 || isReducedMotion) return 1
-      if (revealStartedAt === null) return 0
-      return Math.min(1, (performance.now() - revealStartedAt) / revealDuration)
-    }
+    const revealProgress = () =>
+      isReducedMotion ? 1 : Math.min(1, (performance.now() - revealStartedAt) / 1000)
 
-    // snap from 1px above the keep-out so its top grid line never lands under an opaque edge
     const keepOutCell = (rect: PixelRect, margin: number) =>
       snapRect({ lattice, rect: { ...rect, top: rect.top - 1 }, margin })
 
@@ -232,7 +210,7 @@ export const AsciiCanvas = ({
         ctx.fillRect(left, top, Math.round(cell.right) - left, Math.round(cell.bottom) - top)
       }
 
-      ctx.font = FONT
+      ctx.font = '12px ui-monospace, SFMono-Regular, Menlo, monospace'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       const now = performance.now()
@@ -252,7 +230,7 @@ export const AsciiCanvas = ({
           )
           const runStart =
             capacity === 1 ? xs[c] + cellWidth / 2 : xs[c] + CELL_PADDING + GLYPH_PITCH / 2
-          const runColor = energy[index] > HOT_THRESHOLD ? palette.hot : palette.muted
+          const runColor = energy[index] > 0.15 ? palette.hot : palette.muted
           const shown = ingest ? visibleLetters({ ingest, now }) : 0
           if (ingest && shown <= 0) ingested.delete(index)
           if (ingest && shown > 0) {
@@ -264,11 +242,10 @@ export const AsciiCanvas = ({
               if (since < 0) break
               const char =
                 since < LETTER_SCRAMBLE_MS
-                  ? BLOCK_GLYPHS[Math.floor(since / SCRAMBLE_STEP_MS) % BLOCK_GLYPHS.length]
+                  ? BLOCK_GLYPHS[Math.floor(since / 70) % BLOCK_GLYPHS.length]
                   : ingest.word[i]
               ctx.fillText(char, wordStart + i * GLYPH_PITCH, cy)
             }
-            // while backspacing, each freed slot falls back to the cell's own glyph
             if (shown < ingest.word.length) {
               ctx.fillStyle = runColor
               for (let i = shown; i < typed; i++) {
@@ -337,7 +314,7 @@ export const AsciiCanvas = ({
       if (!cell) return
       const index = cell.r0 * latticeSize(lattice).cols + cell.c0
       if (mask[index]) return
-      energy[index] = WORD_ENERGY
+      energy[index] = 0.9
       const shownWords = new Set([...ingested.values()].map(({ word }) => word))
       const fitting = words.filter((word) => word.length <= capacityAt(cell.c0))
       const unseen = fitting.filter((word) => !shownWords.has(word))
@@ -375,10 +352,7 @@ export const AsciiCanvas = ({
     host.addEventListener('pointerdown', typeWordAt)
     document.addEventListener('visibilitychange', wake)
     document.fonts?.ready.then(measure)
-    if (revealDuration > 0 && !isReducedMotion) {
-      revealStartedAt = performance.now()
-      wake()
-    }
+    if (!isReducedMotion) wake()
 
     return () => {
       isDisposed = true

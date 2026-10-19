@@ -22,6 +22,7 @@ export interface HeroProps {
   description: string
   guides: GuideSummary[]
   breadcrumb?: ReactNode
+  variant?: 'grid' | 'warp'
   children?: ReactNode
   className?: string
 }
@@ -35,17 +36,11 @@ interface HeroSearchProps {
   guides: GuideSummary[]
 }
 
-const HERO_VARIANTS = ['grid', 'warp'] as const
 // hidden for launch. preview with ?search=on, flip the fallback to ship it
 const SEARCH_FLAG = ['off', 'on'] as const
 
-const CONTENT_MAX_WIDTH = 1152
-const CONTENT_GUTTER = 24
-const HERO_DECAY = 0.985
-const HERO_REVEAL_DURATION = 1000
-
 const getHeroLattice = ({ width, height }: CanvasSize): Lattice => {
-  const contentLeft = Math.max(0, (width - CONTENT_MAX_WIDTH) / 2) + CONTENT_GUTTER
+  const contentLeft = Math.max(0, (width - 1152) / 2) + 24
   return {
     xs: alignedEdges({
       size: width,
@@ -56,17 +51,6 @@ const getHeroLattice = ({ width, height }: CanvasSize): Lattice => {
     ys: uniformEdges({ size: height, step: CELL_HEIGHT }),
   }
 }
-
-const getIngestWords = (guides: GuideSummary[]) => [
-  ...new Set(
-    guides.flatMap((guide) =>
-      guide.title
-        .toLowerCase()
-        .split(/[^a-z0-9]+/)
-        .filter((word) => word.length >= 5)
-    )
-  ),
-]
 
 const subscribeToNothing = () => () => {}
 
@@ -79,20 +63,28 @@ export const Hero = ({
   description,
   guides,
   breadcrumb,
+  variant = 'warp',
   children,
   className,
 }: HeroProps) => {
-  const variant = useQueryVariant({ key: 'hero', options: HERO_VARIANTS, fallback: 'grid' })
   const isWarp = variant === 'warp'
   const copyRef = useRef<HTMLDivElement>(null)
-  const ingestWords = getIngestWords(guides)
+  const ingestWords = [
+    ...new Set(
+      guides.flatMap((guide) =>
+        guide.title
+          .toLowerCase()
+          .split(/[^a-z0-9]+/)
+          .filter((word) => word.length >= 5)
+      )
+    ),
+  ]
 
   return (
     <section
       className={cn(
-        'relative isolate flex justify-center pb-39 pt-39',
-        'max-sm:not-in-data-[hero-kind=warp]:pb-19.5 max-sm:not-in-data-[hero-kind=warp]:pt-19.5',
-        'in-data-[hero-kind=warp]:mt-6.5 in-data-[hero-kind=warp]:pb-84.5 in-data-[hero-kind=warp]:pt-32.5',
+        'relative isolate flex justify-center',
+        isWarp ? 'mt-6.5 pt-32.5 pb-78' : 'pt-39 pb-39 max-sm:pt-19.5 max-sm:pb-19.5',
         'overflow-hidden bg-background',
         className
       )}
@@ -106,8 +98,7 @@ export const Hero = ({
           keepOutRefs={[copyRef]}
           keepOutMargin={0}
           words={ingestWords}
-          decay={HERO_DECAY}
-          revealDuration={HERO_REVEAL_DURATION}
+          decay={0.985}
         />
       )}
       <div className="relative z-10 w-full max-w-6xl px-6">

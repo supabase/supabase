@@ -26,7 +26,7 @@ export const Header = () => {
 
   return (
     <>
-      <nav className="relative h-(--header-height) border-b border-default bg-background/90 backdrop-blur-xs dark:bg-background/95 in-data-[hero-kind=warp]:border-b-transparent">
+      <nav className="relative h-(--header-height) border-b border-default bg-background/90 backdrop-blur-xs dark:bg-background/95">
         <div className="section-container flex h-full items-center justify-between">
           <div className="flex h-full items-center">
             <div className="lg:w-[calc(var(--nav-inset)-0.625rem-1px)]">
