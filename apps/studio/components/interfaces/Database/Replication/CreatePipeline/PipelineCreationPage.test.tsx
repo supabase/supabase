@@ -1,13 +1,16 @@
+import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, expect, it, vi } from 'vitest'
 
+import { replicationKeys } from '@/data/replication/keys'
 import PipelineCreationPage from '@/pages/project/[ref]/database/pipelines/new'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const state = vi.hoisted(() => ({
+  hasProjectRef: true,
   navigate: vi.fn(),
   push: vi.fn(),
   isTanStack: false,
@@ -27,7 +30,7 @@ vi.mock('next/compat/router', () => ({
 }))
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
-  useParams: () => ({ ref: 'default' }),
+  useParams: () => ({ ref: state.hasProjectRef ? 'default' : undefined }),
   useFeatureFlags: () => ({ hasLoaded: state.flagsLoaded }),
 }))
 vi.mock('@/hooks/misc/withAuth', () => ({ withAuth: (component: unknown) => component }))
@@ -78,6 +81,7 @@ beforeEach(() => {
     },
   ])
   Object.assign(state, {
+    hasProjectRef: true,
     isTanStack: false,
     enabled: true,
     loading: false,
@@ -157,3 +161,35 @@ it.each(['disabled', 'error'])(
     expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
   }
 )
+
+it.each([false, true])('waits for the project reference (preview: %s)', (enabled) => {
+  state.enabled = enabled
+  state.hasProjectRef = false
+  customRender(<PipelineCreationPage />)
+  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+})
+it('rechecks cached enablement before allowing direct entry', async () => {
+  const queryClient = new QueryClient()
+  queryClient.setQueryData(replicationKeys.sources('default'), {
+    sources: [{ id: 42, name: 'default' }],
+  })
+  let finish: (() => void) | undefined
+  const gate = new Promise<void>((resolve) => {
+    finish = resolve
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: async () => {
+      await gate
+      return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources: [] })
+    },
+  })
+  customRender(<PipelineCreationPage />, { queryClient })
+  expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  finish?.()
+  expect(await screen.findByRole('status')).toHaveTextContent('Returning to Pipelines')
+  expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+})

@@ -326,3 +326,16 @@ test.each(['previewLoading', 'flagsLoaded'] as const)(
     expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
   }
 )
+
+test('keeps request-access creation in the sheet when no wizard destination is available', async () => {
+  options.wizard = true
+  options.legacy = true
+  isEnabled = true
+  await renderList()
+  addPipeline()
+  expect(
+    await screen.findByRole('heading', { name: 'Creation sheet: BigQuery' })
+  ).toBeInTheDocument()
+  expect(options.push).not.toHaveBeenCalled()
+  expect(options.navigate).not.toHaveBeenCalled()
+})

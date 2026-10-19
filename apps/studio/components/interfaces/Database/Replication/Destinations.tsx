@@ -33,6 +33,12 @@ import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
@@ -96,6 +102,11 @@ export const Destinations = () => {
   const router = useTanStackRouter({ warn: false })
   const nextRouter = useNextRouter()
   const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
+  const bigQuery = useIsETLBigQueryPrivateAlpha()
+  const duckLake = useIsETLDucklakePrivateAlpha()
+  const snowflake = useIsETLSnowflakePrivateAlpha()
+  const clickHouse = useIsETLClickHousePrivateAlpha()
+  const hasWizardDestination = bigQuery || duckLake || snowflake || clickHouse
   const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
   const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
@@ -229,7 +240,7 @@ export const Destinations = () => {
     : 'Failed to retrieve pipeline enablement status'
 
   const openCreation = (type: DestinationType) => {
-    if (isWizardEnabled && projectRef) {
+    if (isWizardEnabled && hasWizardDestination && projectRef) {
       if (router)
         void router.navigate({
           to: '/project/$ref/database/pipelines/new',
