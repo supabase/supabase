@@ -213,7 +213,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   </Admonition>
                 )}
 
-              {!isApplyingRoleToAllProjects && (
+              {isSuccessRoles && !isApplyingRoleToAllProjects && (
                 <OrganizationProjectsMultiSelect
                   selectedRefs={projectsRoleConfiguration
                     .filter(
