@@ -271,31 +271,32 @@ test.each(['loading', 'error'])('blocks creation when source status is %s', asyn
   expect(await screen.findByRole('dialog')).toHaveTextContent('Enable Pipelines')
 })
 
-test.each([
-  [false, 'header'],
-  [true, 'empty'],
-  [false, 'shortcut'],
-] as const)(
-  'opens the wizard with preview enabled (TanStack: %s, entry: %s)',
-  async (tanStack, entry) => {
-    options.wizard = true
-    options.tanStack = tanStack
-    isEnabled = true
-    await renderList()
-    if (entry === 'shortcut') fireEvent.keyDown(document, { key: 'N', shiftKey: true })
-    else
-      fireEvent.click(
-        screen.getAllByRole('button', { name: 'Add pipeline' })[entry === 'header' ? 0 : 1]
-      )
-    if (tanStack)
-      expect(options.navigate).toHaveBeenCalledWith({
-        to: '/project/$ref/database/pipelines/new',
-        params: { ref: 'default' },
-      })
-    else expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
-    expect(screen.queryByRole('heading', { name: /Creation sheet/ })).not.toBeInTheDocument()
-  }
-)
+test('renders both wizard entry controls as links', async () => {
+  options.wizard = true
+  isEnabled = true
+  await renderList()
+  const links = screen.getAllByRole('link', { name: 'Add pipeline' })
+  expect(links).toHaveLength(2)
+  links.forEach((link) =>
+    expect(link).toHaveAttribute('href', '/project/default/database/pipelines/new')
+  )
+  fireEvent.click(links[0], { ctrlKey: true })
+  expect(options.push).not.toHaveBeenCalled()
+  expect(options.navigate).not.toHaveBeenCalled()
+})
+test.each([false, true])('opens the wizard with the shortcut (TanStack: %s)', async (tanStack) => {
+  options.wizard = true
+  options.tanStack = tanStack
+  isEnabled = true
+  await renderList()
+  fireEvent.keyDown(document, { key: 'N', shiftKey: true })
+  if (tanStack)
+    expect(options.navigate).toHaveBeenCalledWith({
+      to: '/project/$ref/database/pipelines/new',
+      params: { ref: 'default' },
+    })
+  else expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
+})
 test('enables Pipelines before opening the wizard', async () => {
   options.wizard = true
   await renderList()
@@ -322,7 +323,7 @@ test.each(['previewLoading', 'flagsLoaded'] as const)(
     options.flagsLoaded = true
     options.wizard = true
     view.rerender(<Destinations />)
-    addPipeline()
+    fireEvent.keyDown(document, { key: 'N', shiftKey: true })
     expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
   }
 )

@@ -239,6 +239,10 @@ export const Destinations = () => {
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
 
+  const canLinkToWizard =
+    isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
+  const wizardHref = `/project/${projectRef}/database/pipelines/new`
+
   const openCreation = (type: DestinationType) => {
     if (isWizardEnabled && hasWizardDestination && projectRef) {
       if (router)
@@ -398,9 +402,10 @@ export const Destinations = () => {
               icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
-              onClick={handleAddPipeline}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              Add pipeline
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
             </ButtonTooltip>
           </Shortcut>
         </div>
@@ -496,9 +501,10 @@ export const Destinations = () => {
               icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
-              onClick={handleAddPipeline}
+              asChild={canLinkToWizard}
+              onClick={canLinkToWizard ? undefined : handleAddPipeline}
             >
-              Add pipeline
+              {canLinkToWizard ? <Link href={wizardHref}>Add pipeline</Link> : 'Add pipeline'}
             </ButtonTooltip>
           </EmptyStatePresentational>
         )}
