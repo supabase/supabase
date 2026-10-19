@@ -33,7 +33,10 @@
       .not-prose *
     )
   ) {
-    @apply break-all text-xs tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
+    @apply break-all tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
+
+    font-size: inherit;
+    line-height: inherit;
 
     &::before,
     &::after {

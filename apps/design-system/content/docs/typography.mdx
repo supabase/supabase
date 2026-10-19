@@ -22,7 +22,8 @@ to use each green.
 
 Inline `code` elements use shared styles by default in Studio, docs, www, and design-system.
 The shared defaults live in [`inline-code.css`](https://github.com/supabase/supabase/blob/master/packages/config/inline-code.css).
-No class is required. Local utility classes can adjust size, color, spacing, and wrapping.
+No class is required. Inside `prose`, inline code inherits the surrounding font size and line height.
+Other UI keeps the compact default size. Local utility classes can adjust size, color, spacing, and wrapping.
 
 Code inside `pre` elements and syntax-highlighting containers keeps its own styles.
 For other custom code displays, add `data-code-style="plain"` to the `code` element
