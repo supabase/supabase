@@ -65,6 +65,18 @@ Every change is another `push`: edit code and push; scale with `push <name> --in
 
 Machine-readable output: `status` and `list` take `-o json`; the other compute commands already emit JSON when not attached to a terminal.
 
+## Dependency management
+
+For the `node` runtime, add `exclude = ["node_modules"]` to the service's entry in `supabase/config.toml`. Compute then installs your dependencies before the first boot, so you don't need to vendor `node_modules` with the service. This applies to the `node` runtime only.
+
+```toml
+[compute.my-service]
+runtime = "node"
+size = "2gb"
+exposure = "public"
+exclude = ["node_modules"]
+```
+
 ## Rules
 
 - Treat instances as stateless: they can be replaced at any time. Durable state belongs in the user's database or storage.
