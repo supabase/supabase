@@ -93,7 +93,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
             </Table.td>
             <Table.td className="hidden xl:table-cell">
               <p className="truncate" title={url}>
-                <code className="text-code-inline">{method}</code>: {url}
+                <code>{method}</code>: {url}
               </p>
             </Table.td>
             <Table.td className="text-right">

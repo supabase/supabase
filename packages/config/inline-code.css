@@ -1,0 +1,43 @@
+/* Keep block renderers and displays with their own code styling independent. */
+@layer base {
+  code:not(
+    :where(
+      pre *,
+      [data-code-style='plain'],
+      [data-code-style='plain'] *,
+      [data-rehype-pretty-code-figure] *,
+      .ch-codeblock *,
+      .code-block *,
+      .code *,
+      .monaco-editor *,
+      .cm-editor *
+    )
+  ) {
+    @apply text-code-inline;
+  }
+}
+
+/* Override legacy prose decoration only in apps importing these defaults. */
+@utility prose {
+  :where(code):not(
+    :where(
+      pre *,
+      [data-code-style='plain'],
+      [data-code-style='plain'] *,
+      [data-rehype-pretty-code-figure] *,
+      .ch-codeblock *,
+      .code-block *,
+      .code *,
+      .monaco-editor *,
+      .cm-editor *,
+      .not-prose *
+    )
+  ) {
+    @apply text-code-inline;
+
+    &::before,
+    &::after {
+      content: none;
+    }
+  }
+}

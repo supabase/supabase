@@ -1,4 +1,6 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code-utility.css';
+@import 'config/inline-code.css';
 @import './code-block.css';
 @import './reference.css';
 @import './loading-beam.css';
@@ -148,7 +150,7 @@ h6:not(.font-mono),
   white-space: pre-line;
 }
 
-.prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+.prose :where(p, a, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
 .prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
   font-weight: inherit;
 }
@@ -373,7 +375,7 @@ th code {
  * First column (e.g. variable names): wrap at word boundaries, not mid-token.
  */
 .prose :where(td:first-child) code {
-  @apply break-words whitespace-normal;
+  @apply break-normal break-words whitespace-normal;
 }
 
 /*

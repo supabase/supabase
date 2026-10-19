@@ -35,7 +35,7 @@ export const SLOT_LAG_FIELDS: SlotLagField[] = [
     description: (
       <>
         How much more WAL can accumulate before the replication slot is at risk of being lost.
-        Controlled by the <code className="text-code-inline">max_slot_wal_keep_size</code> setting.
+        Controlled by the <code>max_slot_wal_keep_size</code> setting.
       </>
     ),
     nullLabel: 'Unlimited',

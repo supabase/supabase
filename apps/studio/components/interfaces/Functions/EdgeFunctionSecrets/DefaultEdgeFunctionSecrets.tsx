@@ -53,7 +53,7 @@ const SecretRow = ({ secret }: { secret: DefaultEdgeFunctionSecret }) => {
               }}
             >
               <p className="truncate">
-                <code className="text-code-inline">{secret.name}</code>
+                <code>{secret.name}</code>
               </p>
             </TooltipTrigger>
             <TooltipContent side="bottom">Click to copy</TooltipContent>

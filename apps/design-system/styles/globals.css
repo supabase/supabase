@@ -1,4 +1,5 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
 @import 'config/typography.css';
 
 @source '../app/**/*.{js,ts,jsx,tsx}';

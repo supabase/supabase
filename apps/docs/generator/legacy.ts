@@ -11,6 +11,7 @@
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 import { uniqBy } from 'lodash-es'
+
 import { flattenSections } from '../lib/helpers'
 import Example from './legacy/components/Example'
 import Page from './legacy/components/Page'
@@ -169,7 +170,7 @@ const methodListItemLabel = ({ name, isOptional, type, description }, subContent
     <span className="method-list-item-label-badge ${!isOptional && 'required'}">
       ${isOptional ? 'optional' : 'required'}
     </span>
-    <span className="method-list-item-validation">
+    <span className="method-list-item-validation" data-code-style="plain">
       ${type}
     </span>
   </h4>
