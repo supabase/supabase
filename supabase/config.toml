@@ -104,3 +104,8 @@ url = ""
 
 [functions.search-embeddings]
 verify_jwt = false
+
+[db.migrations]
+schema_paths = [
+  "schemas",
+]
