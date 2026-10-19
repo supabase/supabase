@@ -12,11 +12,13 @@ import {
 } from '~/features/docs/Reference.utils'
 import { serializeJsonLd } from '~/lib/json-ld'
 import { notFound } from 'next/navigation'
+import type { ReactNode } from 'react'
 
 export const dynamicParams = false
 
 export default async function ReferencePage(props: { params: Promise<{ slug: Array<string> }> }) {
   const params = await props.params
+  let page: ReactNode
 
   const { slug } = params
 
@@ -29,14 +31,6 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
   const isCliReference = parsedPath.__type === 'cli'
   const isApiReference = parsedPath.__type === 'api'
   const isSelfHostingReference = parsedPath.__type === 'self-hosting'
-
-  const jsonLd = await generateReferenceJsonLd(slug)
-  const jsonLdScript = jsonLd ? (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
-    />
-  ) : null
 
   if (isClientSdkReference) {
     const { sdkId, maybeVersion, path } = parsedPath
@@ -51,39 +45,33 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
 
     await redirectNonexistentReferenceSection(sdkId, version, path, version === latestVersion)
 
-    return (
-      <>
-        {jsonLdScript}
-        <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
-      </>
-    )
+    page = <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
   } else if (isCliReference) {
-    return (
-      <>
-        {jsonLdScript}
-        <CliReferencePage />
-      </>
-    )
+    page = <CliReferencePage />
   } else if (isApiReference) {
-    return (
-      <>
-        {jsonLdScript}
-        <ApiReferencePage path={parsedPath.path} />
-      </>
-    )
+    page = <ApiReferencePage path={parsedPath.path} />
   } else if (isSelfHostingReference) {
-    return (
-      <>
-        {jsonLdScript}
-        <SelfHostingReferencePage
-          service={parsedPath.service}
-          servicePath={parsedPath.servicePath}
-        />
-      </>
+    page = (
+      <SelfHostingReferencePage service={parsedPath.service} servicePath={parsedPath.servicePath} />
     )
   } else {
     notFound()
   }
+
+  const jsonLd = await generateReferenceJsonLd(slug)
+  const jsonLdScript = jsonLd ? (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+    />
+  ) : null
+
+  return (
+    <>
+      {jsonLdScript}
+      {page}
+    </>
+  )
 }
 
 export const generateStaticParams = generateReferenceStaticParams
