@@ -22,11 +22,26 @@ to use each green.
 
 Inline `code` elements use shared styles by default in Studio, docs, www, and design-system.
 The shared defaults live in [`inline-code.css`](https://github.com/supabase/supabase/blob/master/packages/config/inline-code.css).
-No class is required. Inside `prose`, inline code inherits the surrounding font size and line height.
-Other UI keeps the compact default size. Local utility classes can adjust size, color, spacing, and wrapping.
+No class is required. Inline code uses `font-size: calc(1em - 2px)` and inherits line height.
+For example, code in 16px text is 14px; code in 14px text is 12px. This applies inside and outside `prose`.
+
+A size class on the `code` element, such as `text-sm`, replaces the calculation. The 2px reduction
+is not applied again. To change the surrounding size and keep the reduction, put the size class
+on a parent instead:
+
+```tsx
+<span className="text-sm">
+  <code>project_id</code>
+</span>
+```
+
+Other local utility classes can adjust color, spacing, and wrapping.
 
 Code inside `pre` elements and syntax-highlighting containers keeps its own styles.
 For other custom code displays, add `data-code-style="plain"` to the `code` element
-or a containing element to exclude its subtree from the default styles.
+or a containing element to exclude its subtree from all default inline-code styles, including
+background, border, padding, and sizing. Use this for displays with their own presentation,
+such as command strips and syntax-colored header rows. A size override alone does not opt out
+of the other inline-code styles.
 
 <ComponentPreview name="typography-inline-code" />
