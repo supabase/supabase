@@ -74,8 +74,12 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: pnpm install --frozen-lockfile
 
+      # Chromium install, `supabase start` and the Studio build don't depend on
+      # each other, so run them side by side and wait before the tests.
       - name: Install Playwright Browsers
         if: steps.filter.outputs.studio == 'true'
+        id: playwright-install
+        background: true
         run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
 
       - name: Set up NextJS/Turbo cache
@@ -111,7 +115,32 @@ jobs:
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
-        run: SKIP_ASSET_UPLOAD=1 pnpm run e2e:setup:cli
+        id: supabase
+        background: true
+        run: |
+          pnpm exec supabase stop --all --no-backup --workdir ./e2e/studio || true
+          pnpm exec supabase start --exclude studio,mailpit --workdir ./e2e/studio
+
+      - name: Build studio
+        if: steps.filter.outputs.studio == 'true'
+        # The build runs before `supabase status` can report keys. It only
+        # inlines NEXT_PUBLIC_* vars, and the only one derived from status is
+        # the API URL, fixed by e2e/studio/supabase/config.toml. So build
+        # against that URL and check it against the real value once supabase is up.
+        #
+        # `MODE=test` so the Vite build (TanStack) loads `.env.test` for env
+        # resolution; Next ignores it but reads `NODE_ENV=test` for the same
+        # purpose. Vite's `vite.config.ts` overrides the bundle NODE_ENV to
+        # 'production' regardless of input, mirroring Next's build behaviour
+        # so vitest-only constants (e.g. `API_URL`) don't bleed in here.
+        run: |
+          echo '{"API_URL":"http://127.0.0.1:54321"}' > keys.json
+          node scripts/generateLocalEnv.js
+          grep '^NEXT_PUBLIC_' apps/studio/.env.test | sort > "$RUNNER_TEMP/build-public-env"
+          SKIP_ASSET_UPLOAD=1 NODE_ENV=test MODE=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+
+      - name: Wait for supabase and Playwright browsers
+        wait: [supabase, playwright-install]
 
       - name: Failure diagnostics
         if: failure()
@@ -120,14 +149,13 @@ jobs:
           sudo ss -tlnp | grep 54322 || echo "54322 not listening"
           docker logs $(docker ps -aq) 2>&1 || true
 
-      - name: Build studio
+      - name: Write runtime env
         if: steps.filter.outputs.studio == 'true'
-        # `MODE=test` so the Vite build (TanStack) loads `.env.test` for env
-        # resolution; Next ignores it but reads `NODE_ENV=test` for the same
-        # purpose. Vite's `vite.config.ts` overrides the bundle NODE_ENV to
-        # 'production' regardless of input, mirroring Next's build behaviour
-        # so vitest-only constants (e.g. `API_URL`) don't bleed in here.
-        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test MODE=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+        run: |
+          pnpm exec supabase status --output json --workdir ./e2e/studio > keys.json
+          node scripts/generateLocalEnv.js
+          # Fail if the build inlined NEXT_PUBLIC_* values that differ from the real ones.
+          diff "$RUNNER_TEMP/build-public-env" <(grep '^NEXT_PUBLIC_' apps/studio/.env.test | sort)
 
       - name: 🚀 Run Playwright tests against local studio build
         if: steps.filter.outputs.studio == 'true'
