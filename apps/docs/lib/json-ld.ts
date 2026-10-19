@@ -98,26 +98,3 @@ export function techArticleSchema({ url, headline, description }: TechArticleSch
     publisher: PUBLISHER,
   }
 }
-
-interface ApiReferenceSchemaInput {
-  url: string
-  headline: string
-  description?: string
-}
-
-export function apiReferenceSchema({ url, headline, description }: ApiReferenceSchemaInput) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'APIReference',
-    '@id': `${url}#page`,
-    mainEntityOfPage: {
-      '@type': 'WebPage',
-      '@id': url,
-    },
-    url,
-    headline,
-    description,
-    inLanguage: 'en',
-    publisher: PUBLISHER,
-  }
-}

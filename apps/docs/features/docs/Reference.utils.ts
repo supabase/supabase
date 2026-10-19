@@ -4,7 +4,7 @@ import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import type { BreadcrumbItem } from '~/lib/breadcrumbs'
 import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
-import { apiReferenceSchema, breadcrumbListSchema, techArticleSchema } from '~/lib/json-ld'
+import { breadcrumbListSchema, techArticleSchema } from '~/lib/json-ld'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -235,23 +235,6 @@ export async function generateReferenceMetadata(
   }
 }
 
-/**
- * JSON-LD `@type` for reference pages, matched by pathname prefix. The first
- * matching rule wins, and paths that match no rule get `APIReference`. To
- * switch a whole section, edit or add its prefix here.
- */
-const REFERENCE_JSON_LD_TYPE_RULES: ReadonlyArray<{
-  prefix: string
-  type: 'APIReference' | 'TechArticle'
-}> = [{ prefix: '/reference/self-hosting-', type: 'TechArticle' }]
-
-export function referenceJsonLdType(pathname: string) {
-  return (
-    REFERENCE_JSON_LD_TYPE_RULES.find((rule) => pathname.startsWith(rule.prefix))?.type ??
-    'APIReference'
-  )
-}
-
 export async function generateReferenceJsonLd(slug: Array<string>) {
   const parsedPath = parseReferencePath(slug)
   let pathname: string
@@ -302,10 +285,7 @@ export async function generateReferenceJsonLd(slug: Array<string>) {
   }
 
   const input = { url: `${PROD_URL}${pathname}`, headline, description }
-  const pageSchema =
-    referenceJsonLdType(pathname) === 'TechArticle'
-      ? techArticleSchema(input)
-      : apiReferenceSchema(input)
+  const pageSchema = techArticleSchema(input)
   const breadcrumbSchema = breadcrumbListSchema({
     pathname,
     chain: [
