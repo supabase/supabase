@@ -199,7 +199,7 @@ ssh user@<your-domain> 'cd /path/to/self-hosted && sh run.sh restart functions'
 If you have existing functions on Supabase platform, you can download them and run them on your self-hosted instance. There are two ways to get the function source code:
 
 - **Dashboard** - open the function details in Dashboard and click **Download**.
-- **Local development & CLI** - run `supabase functions download <function-name> --project-ref <ref>` to download the source.
+- **[Local development & CLI](/docs/guides/local-development)** - run `supabase functions download <function-name> --project-ref <ref>` to download the source.
 
 Use `scp` to copy the function into `volumes/functions/<function-name>/` on your self-hosted instance, then restart the functions service.
 

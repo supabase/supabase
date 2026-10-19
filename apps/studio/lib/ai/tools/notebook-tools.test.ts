@@ -129,8 +129,9 @@ describe('ai/tools/notebook-tools', () => {
     it('should not require approval to read notebooks', () => {
       const tools = getNotebookTools()
 
-      expect(tools.list_notebooks.needsApproval).toBeUndefined()
-      expect(tools.get_notebook.needsApproval).toBeUndefined()
+      expect(tools.list_databases.needsApproval).toBe(false)
+      expect(tools.list_notebooks.needsApproval).toBe(false)
+      expect(tools.get_notebook.needsApproval).toBe(false)
     })
 
     it('should require approval to run, create, update, or delete a notebook', () => {
