@@ -1,14 +1,17 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
-import type { ButtonHTMLAttributes, PropsWithChildren } from 'react'
+import type { ButtonHTMLAttributes, PropsWithChildren, ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { DestinationForm } from './index'
+import { projectKeys } from '@/data/projects/keys'
+import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
@@ -134,6 +137,28 @@ const projectSettings: ProjectSettingsResponse = {
   status: 'ACTIVE_HEALTHY',
 }
 
+const project: ProjectDetail = {
+  cloud_provider: 'AWS',
+  connectionString: 'postgresql://postgres@localhost:5432/postgres',
+  db_host: 'db.project-ref.supabase.co',
+  dbVersion: 'supabase-postgres-17.6.1.001',
+  high_availability: false,
+  id: 1,
+  inserted_at: '2026-01-01T00:00:00.000Z',
+  integration_source: null,
+  is_branch_enabled: false,
+  is_hibernating: false,
+  is_physical_backups_enabled: false,
+  name: 'Test project',
+  organization_id: 1,
+  ref: 'project-ref',
+  region: 'us-east-1',
+  restUrl: 'https://project-ref.supabase.co/rest/v1',
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: '2026-01-01T00:00:00.000Z',
+}
+
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return { ...actual, useParams: () => ({ ref: 'project-ref' }) }
@@ -174,7 +199,23 @@ vi.mock('ui', async (importOriginal) => {
 })
 
 vi.mock('ui-patterns/Admonition', () => ({
-  Admonition: ({ children }: PropsWithChildren) => <div>{children}</div>,
+  Admonition: ({
+    children,
+    title,
+    description,
+    actions,
+  }: PropsWithChildren<{
+    title?: ReactNode
+    description?: ReactNode
+    actions?: ReactNode
+  }>) => (
+    <div>
+      {title}
+      {description}
+      {children}
+      {actions}
+    </div>
+  ),
 }))
 
 vi.mock('ui-patterns/form/FormItemLayout/FormItemLayout', () => ({
@@ -184,7 +225,7 @@ vi.mock('ui-patterns/form/FormItemLayout/FormItemLayout', () => ({
 vi.mock('../../useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => true,
   useIsETLClickHousePrivateAlpha: () => false,
-  useIsETLDucklakePrivateAlpha: () => false,
+  useIsETLDucklakePrivateAlpha: () => true,
   useIsETLIcebergPrivateAlpha: () => false,
   useIsETLSnowflakePrivateAlpha: () => false,
 }))
@@ -243,19 +284,47 @@ vi.mock('./TableCopySelection', () => ({
 vi.mock('./AdvancedSettings', () => ({ AdvancedSettings: () => null }))
 vi.mock('./BigQuery/Fields', () => ({ BigQueryFields: () => null }))
 vi.mock('./AnalyticsBucket/Fields', () => ({ AnalyticsBucketFields: () => null }))
-vi.mock('./DuckLake/Fields', () => ({ DuckLakeFields: () => null }))
+vi.mock('./DuckLake/Fields', () => ({
+  DuckLakeFields: ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => (
+    <>
+      <input aria-label="Destination name" {...form.register('name')} />
+      <select aria-label="Publication" {...form.register('publicationName')}>
+        <option value="">Select a publication</option>
+        <option value="analytics">analytics</option>
+      </select>
+      <select aria-label="Configuration method" {...form.register('ducklakeMode')}>
+        <option value="supabase">Use this Supabase project</option>
+        <option value="custom">Enter connection details</option>
+      </select>
+      <input aria-label="Storage bucket" {...form.register('ducklakeStorageBucket')} />
+      <input aria-label="Catalog URL" {...form.register('ducklakeCatalogUrl')} />
+      <input aria-label="Data path" {...form.register('ducklakeDataPath')} />
+      <input aria-label="S3 access key ID" {...form.register('ducklakeS3AccessKeyId')} />
+      <input aria-label="S3 secret access key" {...form.register('ducklakeS3SecretAccessKey')} />
+      <input aria-label="S3 region" {...form.register('ducklakeS3Region')} />
+      <input aria-label="S3 endpoint" {...form.register('ducklakeS3Endpoint')} />
+    </>
+  ),
+}))
 vi.mock('./Snowflake/Fields', () => ({ SnowflakeFields: () => null }))
 vi.mock('./ClickHouse/Fields', () => ({ ClickHouseFields: () => null }))
 vi.mock('./NewPublicationPanel', () => ({ NewPublicationPanel: () => null }))
 vi.mock('./NoDestinationsAvailable', () => ({ NoDestinationsAvailable: () => null }))
-vi.mock('./PipelineCostDialog', () => ({ PipelineCostDialog: () => null }))
+vi.mock('./PipelineCostDialog', () => ({
+  PipelineCostDialog: ({ open, onConfirm }: { open: boolean; onConfirm: () => void }) =>
+    open ? (
+      <button tabIndex={0} onClick={onConfirm}>
+        Confirm pipeline creation
+      </button>
+    ) : null,
+}))
 vi.mock('./ValidationFailuresSection', () => ({ ValidationFailuresSection: () => null }))
 vi.mock('./ValidationWarningsDialog', () => ({ ValidationWarningsDialog: () => null }))
 vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet', () => ({
   CreateAnalyticsBucketSheet: () => null,
 }))
 
-describe('DestinationForm edit submission', () => {
+describe('DestinationForm', () => {
   beforeEach(() => {
     pipelineTableIds = [101, 999]
     mocks.isSaving = false
@@ -298,6 +367,171 @@ describe('DestinationForm edit submission', () => {
       method: 'get',
       path: '/platform/projects/:ref/settings',
       response: () => HttpResponse.json<ProjectSettingsResponse>(projectSettings),
+    })
+  })
+
+  describe('DuckLake project checks', () => {
+    const fillDuckLakeForm = async () => {
+      const fields = {
+        'Destination name': 'Warehouse',
+        Publication: 'analytics',
+        'Configuration method': 'custom',
+        'Storage bucket': 'warehouse',
+        'Catalog URL': 'postgresql://postgres:password@catalog.example.com:5432/postgres',
+        'Data path': 's3://warehouse/data',
+        'S3 access key ID': 'access-key',
+        'S3 secret access key': 'secret-key',
+        'S3 region': 'us-east-1',
+        'S3 endpoint': 'storage.example.com',
+      }
+      for (const [label, value] of Object.entries(fields)) {
+        fireEvent.change(screen.getByLabelText(label), { target: { value } })
+      }
+
+      const submitButton = screen.getByRole('button', { name: 'Start pipeline' })
+      await waitFor(() => expect(submitButton).toBeEnabled())
+      return submitButton
+    }
+
+    it.each(['pending', 'error'] as const)(
+      'blocks managed submission while the project query is %s and allows it after recovery',
+      async (queryState) => {
+        const response = Promise.withResolvers<void>()
+        addAPIMock({
+          method: 'get',
+          path: '/platform/projects/:ref',
+          response: async () => {
+            if (queryState === 'pending') {
+              await response.promise
+              return HttpResponse.json<ProjectDetail>(project)
+            }
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Project details unavailable' },
+              { status: 500 }
+            )
+          },
+        })
+
+        try {
+          customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />)
+          const submitButton = await fillDuckLakeForm()
+          fireEvent.change(screen.getByLabelText('Configuration method'), {
+            target: { value: 'supabase' },
+          })
+
+          expect(submitButton).toBeDisabled()
+          if (queryState === 'error') {
+            expect(await screen.findByText('Failed to load project')).toBeInTheDocument()
+            expect(await screen.findByText(/Project details unavailable/)).toBeInTheDocument()
+          } else {
+            expect(screen.getByText('Checking project compatibility...')).toBeInTheDocument()
+          }
+
+          // Submitting the form directly also exercises the handler behind the disabled button.
+          await act(async () => {
+            fireEvent.submit(screen.getByLabelText('Destination name').closest('form')!)
+          })
+          expect(mocks.validateConfiguration).not.toHaveBeenCalled()
+          expect(mocks.submitPipeline).not.toHaveBeenCalled()
+
+          if (queryState === 'error') {
+            addAPIMock({
+              method: 'get',
+              path: '/platform/projects/:ref',
+              response: () => HttpResponse.json<ProjectDetail>(project),
+            })
+            fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+          } else {
+            response.resolve()
+          }
+
+          await waitFor(() => expect(submitButton).toBeEnabled())
+          fireEvent.click(submitButton)
+          fireEvent.click(await screen.findByRole('button', { name: 'Confirm pipeline creation' }))
+          await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
+          expect(mocks.submitPipeline).toHaveBeenCalledWith(
+            expect.objectContaining({ data: expect.objectContaining({ ducklakeMode: 'supabase' }) })
+          )
+        } finally {
+          response.resolve()
+        }
+      }
+    )
+
+    it.each(['pending', 'error'] as const)(
+      'allows custom submission while the project query is %s',
+      async (queryState) => {
+        const response = Promise.withResolvers<void>()
+        addAPIMock({
+          method: 'get',
+          path: '/platform/projects/:ref',
+          response: async () => {
+            if (queryState === 'pending') await response.promise
+            return HttpResponse.json<APIErrorBody>(
+              { message: 'Project details unavailable' },
+              { status: 500 }
+            )
+          },
+        })
+
+        try {
+          customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />)
+          if (queryState === 'error') {
+            expect(await screen.findByText(/Project details unavailable/)).toBeInTheDocument()
+          }
+          const submitButton = await fillDuckLakeForm()
+          expect(screen.queryByText('Failed to load project')).not.toBeInTheDocument()
+          fireEvent.click(submitButton)
+          fireEvent.click(await screen.findByRole('button', { name: 'Confirm pipeline creation' }))
+          await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
+          expect(mocks.submitPipeline).toHaveBeenCalledWith(
+            expect.objectContaining({ data: expect.objectContaining({ ducklakeMode: 'custom' }) })
+          )
+        } finally {
+          response.resolve()
+        }
+      }
+    )
+
+    it('rechecks the project before confirming managed pipeline creation', async () => {
+      const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref',
+        response: () => HttpResponse.json<ProjectDetail>(project),
+      })
+      customRender(<DestinationForm selectedType="DuckLake" visible onClose={vi.fn()} />, {
+        queryClient,
+      })
+      const submitButton = await fillDuckLakeForm()
+      fireEvent.change(screen.getByLabelText('Configuration method'), {
+        target: { value: 'supabase' },
+      })
+      await waitFor(() => expect(submitButton).toBeEnabled())
+      fireEvent.click(submitButton)
+      const confirmButton = await screen.findByRole('button', { name: 'Confirm pipeline creation' })
+
+      addAPIMock({
+        method: 'get',
+        path: '/platform/projects/:ref',
+        response: () =>
+          HttpResponse.json<APIErrorBody>(
+            { message: 'Project details unavailable' },
+            { status: 500 }
+          ),
+      })
+      await act(async () => {
+        await queryClient.invalidateQueries({ queryKey: projectKeys.detail('project-ref') })
+      })
+      expect(await screen.findByText('Failed to load project')).toBeInTheDocument()
+      fireEvent.click(confirmButton)
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('button', { name: 'Confirm pipeline creation' })
+        ).not.toBeInTheDocument()
+      )
+      expect(mocks.submitPipeline).not.toHaveBeenCalled()
     })
   })
 
