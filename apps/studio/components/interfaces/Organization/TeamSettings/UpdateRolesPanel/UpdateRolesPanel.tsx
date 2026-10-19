@@ -35,14 +35,11 @@ import {
 } from './UpdateRolesPanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { OrganizationProjectsMultiSelect } from '@/components/ui/OrganizationProjectsMultiSelect'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import {
-  OrgProject,
-  useOrgProjectsInfiniteQuery,
-} from '@/data/projects/org-projects-infinite-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
@@ -78,7 +75,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
   const [showConfirmation, setShowConfirmation] = useState(false)
-  const [showProjectDropdown, setShowProjectDropdown] = useState(false)
   const [projectsRoleConfiguration, setProjectsRoleConfiguration] = useState<
     ProjectRoleConfiguration[]
   >([])
@@ -102,20 +98,27 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   ).length
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
-  const onSelectProject = (project: OrgProject) => {
-    setProjectsRoleConfiguration(
-      projectsRoleConfiguration.concat({
-        ref: project.ref,
-        name: project.name,
-        roleId: lowerPermissionsRole ?? orgScopedRoles[0].id,
-      })
-    )
-    setShowProjectDropdown(false)
-  }
-
   const onRemoveProject = (ref?: string) => {
     if (ref === undefined) return
     setProjectsRoleConfiguration(projectsRoleConfiguration.filter((p) => p.ref !== ref))
+  }
+
+  const getRoleForProject = (project: ProjectRoleConfiguration) =>
+    orgScopedRoles.find((r) => r.id === (project.baseRoleId ?? project.roleId))
+
+  const onProjectSelectionChange = (refs: string[], selected: { ref: string; name: string }[]) => {
+    const currentRefs = projectsRoleConfiguration
+      .filter((p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined)
+      .map((p) => p.ref)
+    const removedRefs = currentRefs.filter((ref) => !refs.includes(ref))
+    const addedProjects = selected.filter((p) => !currentRefs.includes(p.ref))
+    const roleIdToApply = lowerPermissionsRole ?? orgScopedRoles[0].id
+
+    setProjectsRoleConfiguration(
+      projectsRoleConfiguration
+        .filter((p) => p.ref === undefined || !removedRefs.includes(p.ref))
+        .concat(addedProjects.map((p) => ({ ref: p.ref, name: p.name, roleId: roleIdToApply })))
+    )
   }
 
   const onSelectRole = (value: string, project: ProjectRoleConfiguration) => {
@@ -166,7 +169,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <SheetContent
           showClose={false}
           size="default"
-          className="bg-surface-200 p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full"
+          className="p-0 flex flex-row gap-0 md:w-[600px] lg:w-[600px] w-full"
         >
           <div className="flex flex-col grow w-full">
             <SheetHeader className="py-3 flex flex-row justify-between gap-x-4 items-center border-b bg-transparent">
@@ -210,13 +213,34 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   </Admonition>
                 )}
 
+              {!isApplyingRoleToAllProjects && (
+                <OrganizationProjectsMultiSelect
+                  selectedRefs={projectsRoleConfiguration
+                    .filter(
+                      (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
+                    )
+                    .map((p) => p.ref)}
+                  onChange={onProjectSelectionChange}
+                  knownProjects={projectsRoleConfiguration
+                    .filter(
+                      (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
+                    )
+                    .map((p) => ({ ref: p.ref, name: p.name ?? p.ref }))}
+                  disabledRefs={projectsRoleConfiguration
+                    .filter(
+                      (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
+                    )
+                    .filter((p) => !rolesRemovable.includes(getRoleForProject(p)?.id ?? 0))
+                    .map((p) => p.ref)}
+                  disabledTooltip="Additional permission required to remove role from member"
+                  triggerLabel="Add projects..."
+                />
+              )}
+
               <div className="flex flex-col divide-y divide-border">
                 {projectsRoleConfiguration.map((project) => {
                   const name = project.ref === undefined ? 'All projects' : project.name
-                  const role = orgScopedRoles.find((r) => {
-                    if (project.baseRoleId !== undefined) return r.id === project.baseRoleId
-                    else return r.id === project.roleId
-                  })
+                  const role = getRoleForProject(project)
                   const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
 
                   return (
@@ -316,30 +340,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   )
                 })}
               </div>
-
-              {!isApplyingRoleToAllProjects && (
-                <OrganizationProjectSelector
-                  open={showProjectDropdown}
-                  setOpen={setShowProjectDropdown}
-                  modal={true}
-                  onSelect={onSelectProject}
-                  renderTrigger={() => <Button className="w-min">Add project</Button>}
-                  renderRow={(project) => {
-                    const hasRoleAssigned = projectsRoleConfiguration.some(
-                      (p) => p.ref === project.ref
-                    )
-                    return (
-                      <div className="w-full flex items-center justify-between">
-                        <span className="truncate">{project.name}</span>
-                        {hasRoleAssigned && <p className="w-[45%] text-right">Already assigned</p>}
-                      </div>
-                    )
-                  }}
-                  isOptionDisabled={(project) =>
-                    projectsRoleConfiguration.some((p) => p.ref === project.ref)
-                  }
-                />
-              )}
             </SheetSection>
 
             <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
