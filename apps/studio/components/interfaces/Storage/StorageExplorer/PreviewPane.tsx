@@ -126,7 +126,7 @@ const CurrentFilePreview = ({
       <div className="shrink">
         {/* No `title`: the explorer rows use it as their handle, and a second
             element carrying the same one makes `getByTitle` ambiguous. */}
-        <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+        <p className="truncate text-sm font-medium text-foreground">{getBaseFileName(file.name)}</p>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
           {mimeType}
           {size && <>, {size}</>}
@@ -442,4 +442,9 @@ export const PreviewPane = () => {
       </div>
     </div>
   )
+}
+
+const getBaseFileName = (name: string) => {
+  const parts = name.split('/')
+  return parts[parts.length - 1]
 }
