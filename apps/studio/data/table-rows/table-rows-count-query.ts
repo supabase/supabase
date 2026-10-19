@@ -1,10 +1,10 @@
 import { getTableRowsCountSql } from '@supabase/pg-meta'
+import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, useFlag } from 'common'
 
 import { tableRowKeys } from './keys'
-import { formatFilterValue } from './utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
@@ -67,7 +67,7 @@ export async function getTableRowsCount(
 
   const table = parseSupaTable(entity)
 
-  const formattedFilters = filters?.map((x) => ({ ...x, value: formatFilterValue(table, x) }))
+  const formattedFilters = filters?.map((x) => ({ ...x, value: formatPatternMatchFilterValue(x.value, x.operator) }))
   const sql = wrapWithRoleImpersonation(
     getTableRowsCountSql({
       table,
