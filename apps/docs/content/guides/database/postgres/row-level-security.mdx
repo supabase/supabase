@@ -51,7 +51,7 @@ You write RLS rules in SQL, so a rule can express whatever access logic your app
 
 Postgres runs two checks before a client touches a table. Grants decide whether a role can run an operation on the table at all. Policies decide which rows that operation applies to. Set both for every table you expose.
 
-On existing projects, a new table in `public` starts with every privilege already granted to all three roles. Besides `select`, `insert`, `update`, and `delete`, the default grants include `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`:
+On existing projects, a new table in `public` starts with every privilege already granted to all three roles. The default grants include `select`, `insert`, `update`, `delete`, `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`:
 
 | Role            | Granted automatically | What it should keep                                     |
 | --------------- | --------------------- | ------------------------------------------------------- |

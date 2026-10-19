@@ -30,7 +30,7 @@ To apply these controls, see [Grant access explicitly](#grant-access-explicitly)
 
 ### Default privileges
 
-On existing projects, tables created in `public` receive every table privilege for `anon`, `authenticated`, and `service_role` by default. Besides `select`, `insert`, `update`, and `delete`, the default grants include `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`. Functions receive `execute`, and sequences receive `usage`, `select`, and `update`. These grants make new objects reachable through the Data API, even when you don't intend to expose them.
+On existing projects, tables created in `public` receive every table privilege for `anon`, `authenticated`, and `service_role` by default. The default grants include `select`, `insert`, `update`, `delete`, `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`. Functions receive `execute`, and sequences receive `usage`, `select`, and `update`. These grants make new objects reachable through the Data API, even when you don't intend to expose them.
 
 Supabase is changing the platform default to revoke these automatic grants so that exposure becomes opt-in. See [the platform defaults discussion](https://github.com/orgs/supabase/discussions/45329) in the Supabase GitHub discussions.
 
