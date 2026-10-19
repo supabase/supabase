@@ -67,7 +67,10 @@ export async function getTableRowsCount(
 
   const table = parseSupaTable(entity)
 
-  const formattedFilters = filters?.map((x) => ({ ...x, value: formatPatternMatchFilterValue(x.value, x.operator) }))
+  const formattedFilters = filters?.map((x) => ({
+    ...x,
+    value: formatPatternMatchFilterValue(x.value, x.operator),
+  }))
   const sql = wrapWithRoleImpersonation(
     getTableRowsCountSql({
       table,
