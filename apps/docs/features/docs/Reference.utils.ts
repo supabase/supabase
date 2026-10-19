@@ -1,8 +1,10 @@
 import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
-import { BASE_PATH } from '~/lib/constants'
+import type { BreadcrumbItem } from '~/lib/breadcrumbs'
+import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { breadcrumbListSchema, techArticleSchema } from '~/lib/json-ld'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -142,95 +144,123 @@ export async function generateReferenceStaticParams() {
   return [...sdkPages, ...cliPages, ...apiPages, ...selfHostingPages]
 }
 
+async function getSectionTitle(sdkId: string, version: string, sectionSlug: string | undefined) {
+  if (!sectionSlug) return undefined
+  const flattenedSections = await getFlattenedSections(sdkId, version)
+  return flattenedSections?.find((section) => section.slug === sectionSlug)?.title
+}
+
+interface ReferencePageInfo {
+  pathname: string
+  title: string
+  description?: string
+  ogTitle?: string
+  canonical?: boolean
+  leafName: string
+  parentCrumbs: BreadcrumbItem[]
+}
+
+async function getReferencePageInfo(slug: Array<string>): Promise<ReferencePageInfo | null> {
+  const parsedPath = parseReferencePath(slug)
+
+  switch (parsedPath.__type) {
+    case 'clientSdk': {
+      const { sdkId, maybeVersion, path } = parsedPath
+      const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
+      const displayName = REFERENCES[sdkId].name
+      const sectionTitle = await getSectionTitle(sdkId, version, path[0])
+
+      return {
+        pathname: `/reference/${sdkId}${path[0] ? `/${path[0]}` : ''}`,
+        title: `${displayName} API Reference | ${metadataTitle || 'Supabase'}`,
+        description: `API reference for the ${displayName} Supabase SDK`,
+        ogTitle: `${displayName}${sectionTitle ? `: ${sectionTitle}` : ''}`,
+        canonical: true,
+        leafName: sectionTitle ?? displayName,
+        parentCrumbs: path[0] ? [{ name: displayName, url: `/reference/${sdkId}` }] : [],
+      }
+    }
+    case 'cli':
+      return {
+        pathname: '/reference/cli',
+        title: 'CLI Reference | Supabase Docs',
+        description: 'CLI reference for the Supabase CLI',
+        leafName: 'CLI',
+        parentCrumbs: [],
+      }
+    case 'api': {
+      const operationSlug = parsedPath.path[0]
+      const sectionTitle = await getSectionTitle('api', 'latest', operationSlug)
+      const sectionSuffix = sectionTitle ? `: ${sectionTitle}` : ''
+
+      return {
+        pathname: operationSlug ? `/reference/api/${operationSlug}` : '/reference/api',
+        title: `${sectionTitle ? `${sectionTitle} | ` : ''}Management API Reference | Supabase Docs`,
+        description: `Management API reference for the Supabase API${sectionSuffix}`,
+        ogTitle: `Management API${sectionSuffix}`,
+        canonical: Boolean(operationSlug),
+        leafName: operationSlug ? (sectionTitle ?? operationSlug) : 'Management API',
+        parentCrumbs: operationSlug ? [{ name: 'Management API', url: '/reference/api' }] : [],
+      }
+    }
+    case 'self-hosting': {
+      const name = REFERENCES[parsedPath.servicePath.replaceAll('-', '_')].name
+
+      return {
+        pathname: `/reference/${slug.join('/')}`,
+        title: 'Self-Hosting | Supabase Docs',
+        leafName: name,
+        parentCrumbs: [],
+      }
+    }
+    default:
+      return null
+  }
+}
+
 export async function generateReferenceMetadata(
   props: { params: Promise<{ slug: Array<string> }> },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
   const { slug } = await props.params
-  const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
+  const { openGraph: parentOg } = await resolvingParent
 
-  const parsedPath = parseReferencePath(slug)
-  const isClientSdkReference = parsedPath.__type === 'clientSdk'
-  const isCliReference = parsedPath.__type === 'cli'
-  const isApiReference = parsedPath.__type === 'api'
-  const isSelfHostingReference = parsedPath.__type === 'self-hosting'
-  if (isClientSdkReference) {
-    const { sdkId, maybeVersion, path } = parsedPath
-    const version = maybeVersion ?? REFERENCES[sdkId].versions[0]
+  const page = await getReferencePageInfo(slug)
+  if (!page) return {}
+  if (!page.ogTitle) return { title: page.title, description: page.description }
 
-    const flattenedSections = await getFlattenedSections(sdkId, version)
-
-    const displayName = REFERENCES[sdkId].name
-    const sectionTitle =
-      slug.length > 0
-        ? flattenedSections?.find((section) => section.slug === slug[0])?.title
-        : undefined
-    const url = [BASE_PATH, 'reference', sdkId, path[0]].filter(Boolean).join('/')
-
-    const images = generateOpenGraphImageMeta({
-      type: 'API Reference',
-      title: `${displayName}${sectionTitle ? `: ${sectionTitle}` : ''}`,
-    })
-
-    return {
-      title: `${displayName} API Reference | ${metadataTitle || 'Supabase'}`,
-      description: `API reference for the ${displayName} Supabase SDK`,
-      ...(slug.length > 0
-        ? {
-            alternates: {
-              canonical: url,
-            },
-          }
-        : {}),
-      openGraph: {
-        ...parentOg,
-        url,
-        images,
-      },
-    }
-  } else if (isCliReference) {
-    return {
-      title: 'CLI Reference | Supabase Docs',
-      description: 'CLI reference for the Supabase CLI',
-    }
-  } else if (isApiReference) {
-    const { path } = parsedPath
-    const operationSlug = path[0]
-
-    const flattenedSections = operationSlug
-      ? await getFlattenedSections('api', 'latest')
-      : undefined
-    const sectionTitle = flattenedSections?.find((section) => section.slug === operationSlug)?.title
-
-    const url = [BASE_PATH, 'reference', 'api', operationSlug].filter(Boolean).join('/')
-    const images = generateOpenGraphImageMeta({
-      type: 'API Reference',
-      title: `Management API${sectionTitle ? `: ${sectionTitle}` : ''}`,
-    })
-
-    return {
-      title: `${sectionTitle ? `${sectionTitle} | ` : ''}Management API Reference | Supabase Docs`,
-      description: `Management API reference for the Supabase API${sectionTitle ? `: ${sectionTitle}` : ''}`,
-      ...(operationSlug
-        ? {
-            alternates: {
-              canonical: url,
-            },
-          }
-        : {}),
-      openGraph: {
-        ...parentOg,
-        url,
-        images,
-      },
-    }
-  } else if (isSelfHostingReference) {
-    return {
-      title: 'Self-Hosting | Supabase Docs',
-    }
-  } else {
-    return {}
+  const url = `${BASE_PATH}${page.pathname}`
+  return {
+    title: page.title,
+    description: page.description,
+    ...(page.canonical ? { alternates: { canonical: url } } : {}),
+    openGraph: {
+      ...parentOg,
+      url,
+      images: generateOpenGraphImageMeta({ type: 'API Reference', title: page.ogTitle }),
+    },
   }
+}
+
+export async function generateReferenceJsonLd(slug: Array<string>) {
+  const page = await getReferencePageInfo(slug)
+  if (!page) return null
+
+  const pageSchema = techArticleSchema({
+    url: `${PROD_URL}${page.pathname}`,
+    headline: page.title,
+    description: page.description,
+  })
+  const breadcrumbSchema = breadcrumbListSchema({
+    pathname: page.pathname,
+    chain: [
+      { name: 'API Reference', url: '/reference' },
+      ...page.parentCrumbs,
+      { name: page.leafName, url: page.pathname },
+    ],
+  })
+
+  return breadcrumbSchema ? [pageSchema, breadcrumbSchema] : [pageSchema]
 }
 
 export async function redirectNonexistentReferenceSection(
