@@ -112,12 +112,25 @@ describe('Next router compatibility subscriptions', () => {
         '/project/other/editor/42?schema=private#selection'
       )
       expect(onRouterChange).toHaveBeenCalledTimes(2)
+      expect(onRouterChange).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          asPath: '/project/other/editor/42?schema=private#selection',
+        })
+      )
 
       await act(async () => {
         loaded.resolve()
         await navigation
       })
       expect(onRouterChange).toHaveBeenCalledTimes(3)
+      expect(onRouterChange).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          pathname: '/project/[ref]/editor/[id]',
+          query: { ref: 'other', id: '42', schema: 'private' },
+        })
+      )
       expect(screen.getByTestId('pattern')).toHaveTextContent('/project/[ref]/editor/[id]')
       expect(JSON.parse(screen.getByTestId('query').textContent ?? '')).toEqual({
         ref: 'other',
