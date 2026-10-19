@@ -1,24 +1,11 @@
 import { QueryClient } from '@tanstack/react-query'
 import { act, waitFor } from '@testing-library/react'
-import * as common from 'common'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import { useUnifiedLogsInfiniteQuery } from './unified-logs-infinite-query'
 import { compareRows, createRow, mockLogs, now, search } from './unified-logs.test-utils'
 import { deduplicateUnifiedLogs } from './unified-logs.utils'
 import { customRenderHook } from '@/tests/lib/custom-render'
-
-beforeEach(() => {
-  vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
-    configcat: { otelUnifiedLogs: false },
-    posthog: {},
-    hasLoaded: true,
-  })
-})
-
-afterEach(() => {
-  vi.restoreAllMocks()
-})
 
 describe('unified logs refresh history', () => {
   it('bounds refresh requests across retained pages and retries, preserving history until recovery', async () => {
@@ -27,7 +14,7 @@ describe('unified logs refresh history', () => {
       createRow(`old-${index}`, (timestamp - index * 1000) * 1000)
     )
     let rerender = () => {}
-    const requests = mockLogs(rows, false, () => rerender())
+    const requests = mockLogs(rows, true, () => rerender())
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: 2, retryDelay: 0 } },
     })
@@ -67,17 +54,12 @@ describe('unified logs refresh history', () => {
     expect(result.current.data?.pages).toEqual(retained?.pages)
   })
 
-  it.each([false, true])('retains loaded pages after arrivals with otel=%s', async (useOtel) => {
-    vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
-      configcat: { otelUnifiedLogs: useOtel },
-      posthog: {},
-      hasLoaded: true,
-    })
+  it('retains loaded pages after arrivals', async () => {
     const timestamp = Date.now() - 10 * 60 * 1000
     const rows = Array.from({ length: 110 }, (_, index) =>
       createRow(`old-${String(index).padStart(3, '0')}`, (timestamp - index * 1000) * 1000 + 123)
     )
-    mockLogs(rows, useOtel)
+    mockLogs(rows, true)
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     const { result } = customRenderHook(
       () => useUnifiedLogsInfiniteQuery({ projectRef: 'default', search }),
@@ -118,26 +100,14 @@ describe('unified logs refresh history', () => {
     await waitFor(() => expect(new Set(displayedIds())).toEqual(new Set(rows.map((row) => row.id))))
   })
 
-  it.each([
-    { useOtel: false, initialCount: 1 },
-    { useOtel: true, initialCount: 1 },
-    { useOtel: false, initialCount: 60 },
-    { useOtel: true, initialCount: 60 },
-    { useOtel: false, initialCount: 50 },
-    { useOtel: true, initialCount: 50 },
-  ])(
-    'refreshes late arrivals throughout an exhausted range with otel=$useOtel and $initialCount initial rows',
-    async ({ useOtel, initialCount }) => {
-      vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
-        configcat: { otelUnifiedLogs: useOtel },
-        posthog: {},
-        hasLoaded: true,
-      })
+  it.each([1, 60, 50])(
+    'refreshes late arrivals throughout an exhausted range with %s initial rows',
+    async (initialCount) => {
       const timestamp = new Date('2026-09-30T11:50:00.000Z').getTime() * 1000 + 123
       const rows = Array.from({ length: initialCount }, (_, index) =>
         createRow(`log-${String(index).padStart(3, '0')}`, timestamp)
       )
-      mockLogs(rows, useOtel)
+      mockLogs(rows, true)
       const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
       const selectedSearch = {
         ...search,
