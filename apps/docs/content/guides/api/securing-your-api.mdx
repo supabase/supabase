@@ -30,7 +30,7 @@ To apply these controls, see [Grant access explicitly](#grant-access-explicitly)
 
 ### Default privileges
 
-On existing projects, tables created in `public` receive every table privilege for `anon`, `authenticated`, and `service_role` by default. Besides `SELECT`, `INSERT`, `UPDATE`, and `DELETE`, the default grants include `TRUNCATE`, `REFERENCES`, `TRIGGER`, and, on Postgres 17, `MAINTAIN`. Functions receive `EXECUTE`, and sequences receive `USAGE`, `SELECT`, and `UPDATE`. These grants make new objects reachable through the Data API, even when you don't intend to expose them.
+On existing projects, tables created in `public` receive every table privilege for `anon`, `authenticated`, and `service_role` by default. Besides `select`, `insert`, `update`, and `delete`, the default grants include `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`. Functions receive `execute`, and sequences receive `usage`, `select`, and `update`. These grants make new objects reachable through the Data API, even when you don't intend to expose them.
 
 Supabase is changing the platform default to revoke these automatic grants so that exposure becomes opt-in. See [the platform defaults discussion](https://github.com/orgs/supabase/discussions/45329) in the Supabase GitHub discussions.
 
@@ -154,7 +154,7 @@ grant select, insert, update, delete on table public.your_table to service_role;
 grant execute on function public.your_function() to anon, authenticated;
 ```
 
-If a required grant is missing, PostgREST returns a `42501` error with a hint that names the exact `GRANT` statement you need:
+If a required grant is missing, PostgREST returns a `42501` error with a hint that names the exact `grant` statement you need:
 
 ```json
 {
@@ -192,7 +192,7 @@ order by 1, 2;
 
 Each row lists a role and the privileges it receives on new tables, sequences, or functions that the `postgres` role creates in `public`. When the query returns no rows, new objects grant nothing to the Data API roles until you grant access explicitly.
 
-The query leaves out the `EXECUTE` privilege that every new function receives through `PUBLIC`. To remove it, see [Revoke default privileges](#revoke-default-privileges).
+The query leaves out the `execute` privilege that every new function receives through `PUBLIC`. To remove it, see [Revoke default privileges](#revoke-default-privileges).
 
 ### Revoke default privileges
 
@@ -217,7 +217,7 @@ Revoke automatic grants when you want new objects in `public` to remain inaccess
 
 After you run the statements, new tables and sequences require explicit grants before Data API roles can read or write them.
 
-The statements revoke only the privileges the Data API uses. New tables still grant `TRUNCATE`, `REFERENCES`, `TRIGGER`, and `MAINTAIN`, and new sequences still grant `UPDATE`. The Data API never uses them, but SQL that runs as `anon` or `authenticated` can, such as a database function. To revoke every privilege on new tables and sequences, run these statements as well:
+The statements revoke only the privileges the Data API uses. New tables still grant `truncate`, `references`, `trigger`, and `maintain`, and new sequences still grant `update`. The Data API never uses them, but SQL that runs as `anon` or `authenticated` can, such as a database function. To revoke every privilege on new tables and sequences, run these statements as well:
 
 ```sql
 alter default privileges for role postgres in schema public
@@ -229,9 +229,9 @@ alter default privileges for role postgres in schema public
 
 <Admonition type="caution">
 
-New functions in `public` stay callable through the Data API after you revoke default privileges. Postgres grants `EXECUTE` on every new function to `PUBLIC`, which includes `anon` and `authenticated`. A revoke limited to one schema can't remove that grant, so `revoke execute on functions from public` has no effect. For more information, see [`ALTER DEFAULT PRIVILEGES`](https://www.postgresql.org/docs/current/sql-alterdefaultprivileges.html) in the Postgres documentation.
+New functions in `public` stay callable through the Data API after you revoke default privileges. Postgres grants `execute` on every new function to `PUBLIC`, which includes `anon` and `authenticated`. A revoke limited to one schema can't remove that grant, so `revoke execute on functions from public` has no effect. For more information, see [`alter default privileges`](https://www.postgresql.org/docs/current/sql-alterdefaultprivileges.html) in the Postgres documentation.
 
-After you create a function, revoke `EXECUTE` from `PUBLIC`, and grant it to the roles that should call the function:
+After you create a function, revoke `execute` from `PUBLIC`, and grant it to the roles that should call the function:
 
 ```sql
 revoke execute on function public.your_function() from public;
@@ -253,7 +253,7 @@ With the Data API disabled, none of the auto-generated REST endpoints respond, r
 
 <Admonition type="danger">
 
-Tables and views exposed through the Data API without RLS can be accessed by any role with matching grants. Enable RLS or add equivalent controls to prevent unauthorized access. RLS doesn't apply to functions, so grant `EXECUTE` only to the roles that need to call them. Review every `SECURITY DEFINER` function carefully.
+Tables and views exposed through the Data API without RLS can be accessed by any role with matching grants. Enable RLS or add equivalent controls to prevent unauthorized access. RLS doesn't apply to functions, so grant `execute` only to the roles that need to call them. Review every `security definer` function carefully.
 
 </Admonition>
 
