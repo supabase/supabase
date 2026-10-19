@@ -25,6 +25,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusLabels } from '../jwt.constants'
+import { CopyableKey } from './copyable-key'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
@@ -129,7 +130,7 @@ export const SigningKeyRow = ({
       <p className={cn(signingKey.status !== 'in_use' && 'text-foreground-lighter')}>
         {statusLabels[signingKey.status]}
       </p>
-      <p className="font-mono text-foreground-lighter text-xs mt-1">{signingKey.id}</p>
+      <CopyableKey keyId={signingKey.id} />
     </TableCell>
 
     <TableCell>
