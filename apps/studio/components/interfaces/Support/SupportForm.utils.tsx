@@ -8,7 +8,7 @@ import {
 } from 'common'
 import dayjs from 'dayjs'
 import { partition } from 'lodash'
-import { Book, Github, Hash, MessageSquare } from 'lucide-react'
+import { BookIcon, HashIcon, MessageSquareIcon } from 'lucide-react'
 import {
   createLoader,
   createParser,
@@ -17,6 +17,7 @@ import {
   type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
+import { GithubIcon } from 'ui'
 
 import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
@@ -74,9 +75,9 @@ export function getPageIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <BookIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <GithubIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -87,9 +88,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <HashIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <MessageSquareIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

@@ -1,5 +1,13 @@
 import { noop } from 'lodash'
-import { Calendar, Check, ExternalLink, Hash, ListPlus, ToggleRight, Type } from 'lucide-react'
+import {
+  CalendarIcon,
+  CheckIcon,
+  ExternalLinkIcon,
+  HashIcon,
+  ListPlusIcon,
+  ToggleRightIcon,
+  TypeIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import {
@@ -102,11 +110,11 @@ const ColumnType = ({
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
-        return <Hash size={14} className="text-foreground" strokeWidth={1.5} />
+        return <HashIcon size={14} className="text-foreground" strokeWidth={1.5} />
       case 'time':
-        return <Calendar size={14} className="text-foreground" strokeWidth={1.5} />
+        return <CalendarIcon size={14} className="text-foreground" strokeWidth={1.5} />
       case 'text':
-        return <Type size={14} className="text-foreground" strokeWidth={1.5} />
+        return <TypeIcon size={14} className="text-foreground" strokeWidth={1.5} />
       case 'json':
         return (
           <div className="text-foreground" style={{ padding: '0px 1px' }}>
@@ -120,9 +128,9 @@ const ColumnType = ({
           </div>
         )
       case 'bool':
-        return <ToggleRight size={14} className="text-foreground" strokeWidth={1.5} />
+        return <ToggleRightIcon size={14} className="text-foreground" strokeWidth={1.5} />
       default:
-        return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+        return <ListPlusIcon size={16} className="text-foreground" strokeWidth={1.5} />
     }
   }
 
@@ -232,7 +240,7 @@ const ColumnType = ({
                           <span className="text-foreground-lighter">{option.description}</span>
                         </div>
                         <span className="absolute right-3 top-2">
-                          {isSelected ? <Check className="text-primary" size={14} /> : ''}
+                          {isSelected ? <CheckIcon className="text-primary" size={14} /> : ''}
                         </span>
                       </CommandItem>
                     )
@@ -261,7 +269,11 @@ const ColumnType = ({
                           >
                             <div className="flex items-center gap-2">
                               <div>
-                                <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+                                <ListPlusIcon
+                                  size={16}
+                                  className="text-foreground"
+                                  strokeWidth={1.5}
+                                />
                               </div>
                               <span className="text-foreground">
                                 {option.format.replaceAll('"', '')}
@@ -276,7 +288,7 @@ const ColumnType = ({
                               )}
                               {isSelected && (
                                 <span className="absolute right-3 top-2">
-                                  <Check className="text-primary" size={14} />
+                                  <CheckIcon className="text-primary" size={14} />
                                 </span>
                               )}
                             </div>
@@ -307,7 +319,7 @@ const ColumnType = ({
               specific use case.
             </p>
             <div className="flex items-center space-x-2 mt-3">
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <Link href={recommendation.reference} target="_blank" rel="noreferrer">
                   Read more
                 </Link>

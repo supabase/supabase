@@ -129,6 +129,30 @@ type PublicationUpdateParams = {
   tables?: string[] | null
 }
 
+/**
+ * Splits a `schema.table` (or bare `table`) entry of `tables` into its schema
+ * and table name. A bare name has no schema, so it resolves via the search path.
+ * Mirrors how the entries were previously quoted: the first `.` separates the
+ * schema, and any further `.` stay part of the table name.
+ */
+function splitPublicationTable(t: string): { schema: string | null; name: string } {
+  if (!t.includes('.')) return { schema: null, name: t }
+  const [schema, ...rest] = t.split('.')
+  return { schema, name: rest.join('.') }
+}
+
+function textArray(values: Array<string | null>): SafeSqlFragment {
+  return safeSql`array[${joinSqlFragments(
+    values.map((v) => literal(v)),
+    ', '
+  )}]::text[]`
+}
+
+// The `execute` statements in the function body below follow the same rules as
+// the ones in `pg-meta-table-privileges.ts`: no parentheses around the payload,
+// and `format()` strings made only of `%I`/`%L` conversions (never `%s`), so a
+// server that statically checks `DO` blocks (such as Multigres) can prove they
+// build fixed statements.
 function update(
   id: number,
   {
@@ -141,91 +165,86 @@ function update(
     tables,
   }: PublicationUpdateParams
 ): { sql: SafeSqlFragment } {
+  // 'keep' leaves the tables alone, 'all' publishes all tables, 'list' replaces
+  // the published tables with the given ones.
+  const tablesMode = tables === undefined ? 'keep' : tables === null ? 'all' : 'list'
+  const tableEntries = (tables ?? []).map(splitPublicationTable)
+
   const sql = safeSql`
 do $$
 declare
   id oid := ${literal(id)};
   old record;
+  r record;
+  i int;
   new_name text := ${name === undefined ? literal(null) : literal(name)};
   new_owner text := ${owner === undefined ? literal(null) : literal(owner)};
   new_publish_insert bool := ${literal(publish_insert ?? null)};
   new_publish_update bool := ${literal(publish_update ?? null)};
   new_publish_delete bool := ${literal(publish_delete ?? null)};
   new_publish_truncate bool := ${literal(publish_truncate ?? null)};
-  new_tables text := ${
-    tables === undefined
-      ? literal(null)
-      : literal(
-          tables === null
-            ? 'all tables'
-            : tables
-                .map((t) => {
-                  if (!t.includes('.')) {
-                    return ident(t)
-                  }
-
-                  const [schema, ...rest] = t.split('.')
-                  const table = rest.join('.')
-                  return safeSql`${ident(schema)}.${ident(table)}`
-                })
-                .join(',')
-        )
-  };
+  tables_mode text := ${literal(tablesMode)};
+  new_table_schemas text[] := ${textArray(tableEntries.map((t) => t.schema))};
+  new_table_names text[] := ${textArray(tableEntries.map((t) => t.name))};
 begin
   select * into old from pg_publication where oid = id;
   if old is null then
     raise exception 'Cannot find publication with id %', id;
   end if;
 
-  if new_tables is null then
+  if tables_mode = 'keep' then
     null;
-  elsif new_tables = 'all tables' then
+  elsif tables_mode = 'all' then
     if old.puballtables then
       null;
     else
       -- Need to recreate because going from list of tables <-> all tables with alter is not possible.
-      execute(format('drop publication %1$I; create publication %1$I for all tables;', old.pubname));
+      execute format('drop publication %1$I; create publication %1$I for all tables;', old.pubname);
     end if;
   else
     if old.puballtables then
       -- Need to recreate because going from list of tables <-> all tables with alter is not possible.
-      execute(format('drop publication %1$I; create publication %1$I;', old.pubname));
-    elsif exists(select from pg_publication_rel where prpubid = id) then
-      execute(
-        format(
-          'alter publication %I drop table %s',
-          old.pubname,
-          (select string_agg(prrelid::regclass::text, ', ') from pg_publication_rel where prpubid = id)
-        )
-      );
+      execute format('drop publication %1$I; create publication %1$I;', old.pubname);
+    else
+      for r in
+        select n.nspname as schema_name, c.relname as table_name
+        from pg_publication_rel pr
+        join pg_class c on c.oid = pr.prrelid
+        join pg_namespace n on n.oid = c.relnamespace
+        where pr.prpubid = id
+      loop
+        execute format('alter publication %I drop table %I.%I', old.pubname, r.schema_name, r.table_name);
+      end loop;
     end if;
 
     -- At this point the publication must have no tables.
 
-    if new_tables != '' then
-      execute(format('alter publication %I add table %s', old.pubname, new_tables));
-    end if;
+    for i in 1 .. coalesce(cardinality(new_table_names), 0) loop
+      if new_table_schemas[i] is null then
+        execute format('alter publication %I add table %I', old.pubname, new_table_names[i]);
+      else
+        execute format('alter publication %I add table %I.%I', old.pubname, new_table_schemas[i], new_table_names[i]);
+      end if;
+    end loop;
   end if;
 
-  execute(
-    format(
-      'alter publication %I set (publish = %L);',
-      old.pubname,
-      concat_ws(
-        ', ',
-        case when coalesce(new_publish_insert, old.pubinsert) then 'insert' end,
-        case when coalesce(new_publish_update, old.pubupdate) then 'update' end,
-        case when coalesce(new_publish_delete, old.pubdelete) then 'delete' end,
-        case when coalesce(new_publish_truncate, old.pubtruncate) then 'truncate' end
-      )
+  execute format(
+    'alter publication %I set (publish = %L);',
+    old.pubname,
+    concat_ws(
+      ', ',
+      case when coalesce(new_publish_insert, old.pubinsert) then 'insert' end,
+      case when coalesce(new_publish_update, old.pubupdate) then 'update' end,
+      case when coalesce(new_publish_delete, old.pubdelete) then 'delete' end,
+      case when coalesce(new_publish_truncate, old.pubtruncate) then 'truncate' end
     )
   );
 
-  execute(format('alter publication %I owner to %I;', old.pubname, coalesce(new_owner, old.pubowner::regrole::name)));
+  execute format('alter publication %I owner to %I;', old.pubname, coalesce(new_owner, old.pubowner::regrole::name));
 
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if new_name is not null and new_name != old.pubname then
-    execute(format('alter publication %I rename to %I;', old.pubname, coalesce(new_name, old.pubname)));
+    execute format('alter publication %I rename to %I;', old.pubname, coalesce(new_name, old.pubname));
   end if;
 
   -- We need to retrieve the publication later, so we need a way to uniquely identify which publication this is.

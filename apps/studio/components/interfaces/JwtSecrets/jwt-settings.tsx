@@ -7,18 +7,18 @@ import {
 } from '@supabase/shared-types/out/events'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
-  AlertCircle,
-  ChevronDown,
-  CloudOff,
-  ExternalLink,
-  Hourglass,
-  Key,
-  Lightbulb,
-  Loader2,
-  PenTool,
-  Power,
-  RefreshCw,
-  TriangleAlert,
+  AlertCircleIcon,
+  ChevronDownIcon,
+  CloudOffIcon,
+  ExternalLinkIcon,
+  HourglassIcon,
+  KeyIcon,
+  LightbulbIcon,
+  Loader2Icon,
+  PenToolIcon,
+  PowerIcon,
+  RefreshCwIcon,
+  TriangleAlertIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState, type Dispatch, type SetStateAction } from 'react'
@@ -167,7 +167,7 @@ export const JWTSettings = () => {
           <div className="space-y-6">
             {isError ? (
               <div className="flex items-center justify-center py-8 space-x-2">
-                <AlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircleIcon size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">Failed to retrieve JWT settings</p>
               </div>
             ) : (
@@ -196,7 +196,7 @@ export const JWTSettings = () => {
                       </p>
                     )}
 
-                    <Button asChild icon={<ExternalLink />} className="mt-2">
+                    <Button asChild icon={<ExternalLinkIcon />} className="mt-2">
                       <Link href={`/project/${projectRef}/settings/api-keys`}>Go to API keys</Link>
                     </Button>
                   </Admonition>
@@ -250,7 +250,7 @@ export const JWTSettings = () => {
             <>
               {isUpdatingJwtSecret && (
                 <div className="flex items-center space-x-2">
-                  <Loader2 className="animate-spin" size={14} />
+                  <Loader2Icon className="animate-spin" size={14} />
                   <p className="text-sm">Updating JWT secret: {jwtSecretUpdateProgressMessage}</p>
                 </div>
               )}
@@ -271,7 +271,7 @@ export const JWTSettings = () => {
                       ? 'How to migrate to the new API keys?'
                       : 'How to change your JWT secret?'}
                   </p>
-                  <ChevronDown size={14} className="transition-transform duration-200" />
+                  <ChevronDownIcon size={14} className="transition-transform duration-200" />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="border-t p-4">
                   <p className="text-sm text-foreground-light text-balance mb-2">
@@ -364,7 +364,7 @@ export const JWTSettings = () => {
 
                   <div className="flex flex-row gap-x-2 mt-4">
                     {disableLegacyJwtSecretRotation ? (
-                      <Button icon={<ExternalLink className="size-4" />} asChild>
+                      <Button icon={<ExternalLinkIcon className="size-4" />} asChild>
                         <Link
                           href={`${DOCS_URL}/guides/auth/signing-keys#getting-started`}
                           target="_blank"
@@ -378,7 +378,7 @@ export const JWTSettings = () => {
                         <DropdownMenuTrigger asChild>
                           <ButtonTooltip
                             disabled={!canGenerateNewJWTSecret}
-                            iconRight={<ChevronDown size={14} />}
+                            iconRight={<ChevronDownIcon size={14} />}
                             loading={isUpdatingJwtSecret}
                             tooltip={{
                               content: {
@@ -397,7 +397,7 @@ export const JWTSettings = () => {
                             className="space-x-2"
                             onClick={() => setIsGeneratingKey(true)}
                           >
-                            <RefreshCw size={16} />
+                            <RefreshCwIcon size={16} />
                             <p>Generate a random secret</p>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -405,7 +405,7 @@ export const JWTSettings = () => {
                             className="space-x-2"
                             onClick={() => setIsCreatingKey(true)}
                           >
-                            <PenTool size={16} />
+                            <PenToolIcon size={16} />
                             <p>Create my own secret</p>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -436,7 +436,7 @@ export const JWTSettings = () => {
       >
         <ul className="space-y-4 text-sm">
           <li className="flex gap-2 bg border rounded-md p-4">
-            <Lightbulb size={24} className="shrink-0 text-primary" />
+            <LightbulbIcon size={24} className="shrink-0 text-primary" />
 
             <div className="flex flex-col gap-2">
               <p>Use new JWT Signing Keys and API Keys instead</p>
@@ -451,7 +451,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <CloudOff size={24} className="text-foreground-light shrink-0" />
+            <CloudOffIcon size={24} className="text-foreground-light shrink-0" />
 
             <div className="flex flex-col gap-2">
               <p>Your application will experience significant downtime</p>
@@ -476,7 +476,7 @@ export const JWTSettings = () => {
           </li>
 
           <li className="flex gap-2 px-4">
-            <Power size={24} className="text-foreground-light shrink-0" />
+            <PowerIcon size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Your project and database will be restarted</p>
               <p className="text-foreground-light">
@@ -488,7 +488,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <Hourglass size={24} className="text-foreground-light shrink-0" />
+            <HourglassIcon size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>20-minute cooldown period</p>
               <p className="text-foreground-light">
@@ -498,7 +498,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <TriangleAlert size={24} className="text-foreground-light shrink-0" />
+            <TriangleAlertIcon size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Irreversible change! This cannot be undone!</p>
               <p className="text-foreground-light">
@@ -551,7 +551,13 @@ export const JWTSettings = () => {
                       description="Minimally 32 characters long, '@' and '$' are not allowed."
                     >
                       <FormControl>
-                        <Input copy reveal icon={<Key />} className="w-full text-left" {...field} />
+                        <Input
+                          copy
+                          reveal
+                          icon={<KeyIcon />}
+                          className="w-full text-left"
+                          {...field}
+                        />
                       </FormControl>
                     </FormItemLayout>
                   )}

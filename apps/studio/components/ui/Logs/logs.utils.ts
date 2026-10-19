@@ -23,3 +23,9 @@ export const CHART_INTERVALS: ChartIntervals[] = [
     format: 'MMM D',
   },
 ]
+
+export function getDaysRequired(startValue: number, startUnit: string): number {
+  if (startUnit === 'day') return startValue
+  if (startUnit === 'hour') return startValue / 24
+  return 0
+}

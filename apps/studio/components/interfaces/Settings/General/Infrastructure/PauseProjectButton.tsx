@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { CirclePause } from 'lucide-react'
+import { CirclePauseIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -97,7 +97,7 @@ export const PauseProjectButton = () => {
   return (
     <>
       <ButtonTooltip
-        icon={<CirclePause />}
+        icon={<CirclePauseIcon />}
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}
         disabled={buttonDisabled}

@@ -24,6 +24,8 @@ import {
   NOTEBOOKS_PROMPT,
   SECURITY_PROMPT,
 } from '@/lib/ai/prompts'
+import type { contract as renameChatContract } from '@/lib/ai/tools/rename-chat'
+import type { ToolContractInput } from '@/lib/ai/tools/types'
 
 const { streamText: tracedStreamText } = wrapAISDK(ai)
 
@@ -126,6 +128,7 @@ export async function generateAssistantResponse({
         schemasString,
         supportMode,
         includesLogsSnippets,
+        aiOptInLevel,
       }),
       ...(await convertToModelMessages(messages)),
     ]
@@ -158,7 +161,7 @@ export async function generateAssistantResponse({
           for (const step of steps) {
             for (const toolCall of step.toolCalls) {
               if (toolCall.toolName === 'rename_chat') {
-                const { newName } = toolCall.input as { newName: string }
+                const { newName } = toolCall.input as ToolContractInput<typeof renameChatContract>
                 metadata.chatName = newName
               }
             }

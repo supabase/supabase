@@ -1,17 +1,15 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 
+import { getAuthHeaders } from './auth-headers'
+import type { ToolContext } from './types'
 import { getDatabasePolicies } from '@/data/database-policies/database-policies-query'
 
 export const getSchemaTools = ({
   projectRef,
   connectionString,
   authorization,
-}: {
-  projectRef: string
-  connectionString: string
-  authorization?: string
-}) => ({
+}: ToolContext & { projectRef: string; connectionString: string }) => ({
   list_policies: tool({
     description: 'Get existing RLS policies for a given schema',
     inputSchema: z.object({
@@ -25,7 +23,7 @@ export const getSchemaTools = ({
           schemas,
         },
         abortSignal,
-        authorization ? { Authorization: authorization } : undefined
+        getAuthHeaders(authorization)
       )
 
       const formattedPolicies = data

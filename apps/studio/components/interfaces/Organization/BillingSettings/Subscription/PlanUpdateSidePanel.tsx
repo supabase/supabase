@@ -7,13 +7,8 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } fro
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { CancellationFlow } from './CancellationFlow'
-import {
-  isFullScreenPresentation,
-  isPlanChangeEligible,
-  usePlanPresentationExperiment,
-} from './plan-presentation'
 import { PlanCards } from './PlanCards'
-import { PlanUpdateFullScreenShell, PlanUpdateSheetShell } from './PlanUpdatePanelShell'
+import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
 import { STRIPE_PROJECTS_DOCS_URL } from '@/components/interfaces/Billing/Payment/PaymentMethods/StripePaymentConnection'
@@ -182,23 +177,6 @@ export const PlanUpdateSidePanel = () => {
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
 
-  // Only orgs that can actually act on the panel enter the experiment, and only once it is open
-  const isPlanPresentationEligible =
-    visible &&
-    isPlanChangeEligible({
-      managedBy: selectedOrganization?.managed_by,
-      billingPartner: selectedOrganization?.billing_partner,
-      currentPlanId: subscription?.plan?.id,
-      canUpdateSubscription,
-    })
-
-  const { variant: presentation, isResolved: isPresentationResolved } =
-    usePlanPresentationExperiment({ eligible: isPlanPresentationEligible })
-  const isFullScreen = isFullScreenPresentation(presentation)
-
-  // The fullscreen variant swaps the shell, so hold the panel closed until the variant is known
-  const isPanelOpen = visible && isPresentationResolved
-
   const onPanelOpened = useEffectEvent(
     (properties: StudioPricingSidePanelOpenedEvent['properties']) => {
       track('studio_pricing_side_panel_opened', properties)
@@ -265,15 +243,14 @@ export const PlanUpdateSidePanel = () => {
       isPartnerBilledOrganization={isPartnerBilledOrganization}
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
-      variant={presentation}
-      entryDelay={isFullScreen ? contentDelay : undefined}
+      entryDelay={contentDelay}
       onSelectTier={setSelectedTier}
     />
   )
 
   return (
     <>
-      {isFullScreen && isPanelOpen && (
+      {visible && (
         <PlanUpdateFullScreenShell
           organizationName={selectedOrganization?.name}
           notice={notice}
@@ -285,17 +262,6 @@ export const PlanUpdateSidePanel = () => {
         </PlanUpdateFullScreenShell>
       )}
 
-      {!isFullScreen && (
-        <PlanUpdateSheetShell
-          visible={isPanelOpen}
-          organizationName={selectedOrganization?.name}
-          notice={notice}
-          onClose={onClose}
-        >
-          {planCards}
-        </PlanUpdateSheetShell>
-      )}
-
       <CancellationFlow
         visible={selectedTier === 'tier_free'}
         onCancel={() => setSelectedTier(undefined)}
@@ -305,7 +271,7 @@ export const PlanUpdateSidePanel = () => {
       <SubscriptionPlanUpdateDialog
         selectedTier={selectedTier}
         onClose={() => setSelectedTier(undefined)}
-        onSuccess={isFullScreen ? onClose : undefined}
+        onSuccess={onClose}
         planMeta={planMeta}
         subscriptionPreviewQueryResult={subscriptionPreviewData}
         projects={orgProjects}

@@ -448,8 +448,12 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
 /**
  * Unified logs row query — flat SELECT, no subquery wrapper.
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+export const getUnifiedLogsQuery = (
+  search: QuerySearchParamsType,
+  paginationFilter?: SafeLogSqlFragment
+): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
+  if (paginationFilter) conditions.push(paginationFilter)
   return safeSql`-- unified logs: row list
 SELECT ${ROW_PROJECTION}
 FROM logs

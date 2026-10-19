@@ -1,6 +1,6 @@
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
 import { isEqual } from 'lodash'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { getForeignKeyCascadeAction } from '../ColumnEditor/ColumnEditor.utils'
@@ -88,7 +88,7 @@ export const generateCascadeActionDescription = (
           <span className="text-foreground-light">{actionName}</span>
           <Tooltip>
             <TooltipTrigger className="translate-y-[3px] mx-1">
-              <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+              <HelpCircleIcon className="text-foreground-light" size={16} strokeWidth={1.5} />
             </TooltipTrigger>
             <TooltipContent side="bottom" className="w-80">
               This is similar to no action, but the restrict check cannot be deferred till later in
