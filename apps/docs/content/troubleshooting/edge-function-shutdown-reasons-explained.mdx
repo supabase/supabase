@@ -92,7 +92,7 @@ These events are surfaced through logs and observability tools, allowing you to 
 - If you're seeing `EarlyDrop` but expected more work to happen, check for:
   - Promises that weren't properly awaited
   - Event listeners or timers that weren't cleaned up
-  - Background tasks that should have completed but didn't
+  - [Background tasks](/docs/guides/functions/background-tasks) that should have completed but didn't
 - If you intentionally have background work that should continue after the response, make sure those promises are awaited before the function returns
 
 ### TerminationRequested
