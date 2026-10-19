@@ -16,14 +16,19 @@ import {
   WarehouseReplicatedTablesSection,
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
+import { WAREHOUSE_PUBLICATION_NAME } from '@/lib/warehouse'
 
 export const WarehouseSetupPanel = () => {
   const { ref: projectRef } = useParams()
   const track = useTrack()
+  const isOrioleDb = useIsOrioleDb()
+  const { isPending: isProjectPending, error: projectError } = useSelectedProjectQuery()
 
   const { data, isPending, isFetching, isError, error, refetch } = useWarehouseSetupStatusQuery(
     { projectRef },
@@ -31,6 +36,15 @@ export const WarehouseSetupPanel = () => {
       refetchInterval: (query) =>
         isWarehouseSettingUp(query.state.data?.setup_status) ? 3000 : false,
     }
+  )
+
+  const {
+    data: destinations,
+    isPending: isDestinationsPending,
+    error: destinationsError,
+  } = useReplicationDestinationsQuery(
+    { projectRef },
+    { enabled: data?.setup_status === 'not_started' && !!isOrioleDb }
   )
 
   // Rendered inline by the picker rather than as a toast: a setup failure is something the user
@@ -88,6 +102,29 @@ export const WarehouseSetupPanel = () => {
   const status = data.setup_status
 
   if (status === 'not_started') {
+    if (isProjectPending) return <GenericSkeletonLoader />
+    if (projectError) return <AlertError subject="Failed to load project" error={projectError} />
+    if (isOrioleDb) {
+      if (isDestinationsPending) return <GenericSkeletonLoader />
+      if (destinationsError) {
+        return (
+          <AlertError subject="Failed to load Warehouse destination" error={destinationsError} />
+        )
+      }
+      // Existing destinations may use another project's catalog; the API validates that project.
+      const hasWarehouseDestination = destinations?.destinations.some(
+        (destination) => destination.name === WAREHOUSE_PUBLICATION_NAME
+      )
+      if (!hasWarehouseDestination) {
+        return (
+          <Admonition
+            type="warning"
+            title="This project cannot host a Warehouse catalog"
+            description="Warehouse setup uses this project for its metadata catalog. OrioleDB is not supported. Set up Warehouse with a catalog on a project using standard Postgres."
+          />
+        )
+      }
+    }
     return (
       <WarehouseSchemaTablePicker
         onSubmit={handleSetup}

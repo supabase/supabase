@@ -69,6 +69,7 @@ import { useReplicationPublicationNamesQuery } from '@/data/replication/publicat
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsOrioleDb } from '@/hooks/misc/useSelectedProject'
 
 const formId = 'destination-editor'
 
@@ -92,6 +93,7 @@ export const DestinationForm = ({
   onCancel = onClose,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
+  const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -228,7 +230,7 @@ export const DestinationForm = ({
             addRequiredFieldError(path, message)
           })
         } else if (selectedType === 'DuckLake') {
-          getDucklakeValidationIssues(data, { secretsOptional: editMode }).forEach(
+          getDucklakeValidationIssues(data, { secretsOptional: editMode, isOrioleDb }).forEach(
             ({ path, message }) => {
               addRequiredFieldError(path, message)
             }
