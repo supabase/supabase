@@ -14,7 +14,7 @@ const BRAND_MARK_BY_TYPE: Partial<Record<DestinationType, ThemedIconSrc>> = {
 }
 
 const SIZE_CLASS_NAME = {
-  tiny: { frame: 'h-6 w-6 rounded-md', mark: 'h-3 w-3', icon: 12 },
+  tiny: { frame: 'h-7 w-7 rounded-md', mark: 'h-3.5 w-3.5', icon: 14 },
   small: { frame: 'h-8 w-8 rounded-md', mark: 'h-4 w-4', icon: 16 },
   large: { frame: 'h-14 w-14 rounded-lg', mark: 'h-8 w-8', icon: 32 },
 } as const

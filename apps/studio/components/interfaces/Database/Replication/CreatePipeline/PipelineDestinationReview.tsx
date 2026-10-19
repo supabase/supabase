@@ -151,7 +151,7 @@ export const PipelineDestinationReview = ({
           label="Type"
           description={`Destination type cannot be changed after creation. ${type === 'Analytics Bucket' ? 'Analytics Bucket is deprecated.' : `${type} support is in public alpha.`}`}
         >
-          <div className="flex h-9 min-w-0 items-center gap-2 rounded-md border bg-surface-200 px-3">
+          <div className="flex h-11 min-w-0 items-center gap-2 rounded-md border bg-surface-200 px-3">
             <DestinationLogo type={type} size="tiny" />
             <span className="text-sm text-foreground">{type}</span>
           </div>
