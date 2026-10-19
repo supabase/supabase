@@ -498,8 +498,8 @@ export const SubscriptionPlanUpdateDialog = ({
                           Infrastructure settings
                           <ExternalLinkIcon size={12} />
                         </Link>
-                        . Additional projects with Micro Compute cost{' '}
-                        <span translate="no">$10</span>+/mo each.{' '}
+                        . Each additional project costs <span translate="no">$10</span>+/mo,
+                        regardless of compute size.{' '}
                         <Link
                           href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
                           target="_blank"
