@@ -222,7 +222,7 @@ Agents can't use the Dashboard. For any change a reader makes there, also give a
 path, such as `psql`, the Supabase CLI, or the Management API. Put paths with separate
 steps in [tabs](#tabs).
 
-#### For every "run this query" step
+#### For every "run the following SQL" step
 
 Paste this standard snippet before the SQL block:
 
