@@ -14,7 +14,7 @@ export const postgresToWarehouse: GoPageInput = {
     title: 'Move Postgres data into your warehouse',
     subtitle: 'Supabase Pipelines · Public alpha',
     description:
-      'Stream Supabase Postgres data to BigQuery, ClickHouse, DuckLake, or Snowflake for reporting and analytics. Requires a paid plan; alpha access varies by organization.',
+      'Stream Supabase Postgres data to BigQuery, ClickHouse, DuckLake, or Snowflake for reporting and analytics.',
     ctas: [
       {
         label: 'Start your project',
@@ -27,6 +27,10 @@ export const postgresToWarehouse: GoPageInput = {
         variant: 'secondary',
       },
     ],
+    supportingLink: {
+      label: 'Check availability and requirements →',
+      href: 'https://supabase.com/docs/guides/database/replication/pipelines-faq',
+    },
   },
   sections: [
     {
@@ -94,10 +98,6 @@ export const postgresToWarehouse: GoPageInput = {
               </a>
             </Button>
           </div>
-          <p className="max-w-xl text-sm text-foreground-light">
-            Pipelines requires Pro, Team, or Enterprise. Public alpha access varies by organization.
-            Pipelines usage and destination-provider charges apply separately.
-          </p>
           <a
             href="https://supabase.com/docs/guides/database/replication/pipelines-faq"
             className="text-sm text-foreground-light underline underline-offset-4 hover:text-foreground"
