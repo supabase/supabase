@@ -116,9 +116,9 @@ const selectPublication = async () => {
 const back = () => fireEvent.click(screen.getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
-  const reachReview = async (onClose = vi.fn()) => {
+  const reachReview = async (onClose = vi.fn(), onUrlUpdate = vi.fn()) => {
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
-      nuqs: { hasMemory: true },
+      nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
     })
     next()
     fillConnection()
@@ -234,6 +234,34 @@ describe('PipelineCreationFlow', () => {
       expect(unload.defaultPrevented).toBe(false)
     }
   )
+
+  it('edits each section from Review without losing values', async () => {
+    const onUrlUpdate = vi.fn()
+    const waitForReview = () =>
+      waitFor(() =>
+        expect(onUrlUpdate).toHaveBeenLastCalledWith(
+          expect.objectContaining({ queryString: '?step=review' })
+        )
+      )
+    await reachReview(vi.fn(), onUrlUpdate)
+    await waitForReview()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
+    await screen.findByText(/Step 2 of 4/)
+    expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
+    next()
+    await screen.findByText(/Step 3 of 4/)
+    next()
+    await waitForReview()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit data' }))
+    await screen.findByText(/Step 3 of 4/)
+    next()
+    await waitForReview()
+    fireEvent.click(screen.getByRole('button', { name: 'Edit destination' }))
+    await screen.findByText(/Step 1 of 4/)
+    next()
+    await screen.findByText(/Step 2 of 4/)
+    expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
+  })
 
   it('preserves reviewed values when creation fails and retries safely', async () => {
     const { requests, starts } = mockCreation({ failCreate: true })

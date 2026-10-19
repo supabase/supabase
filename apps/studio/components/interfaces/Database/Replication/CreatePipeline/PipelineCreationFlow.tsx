@@ -185,12 +185,18 @@ export const PipelineCreationFlow = ({
               )}
               {accessibleStep === 'review' && (
                 <>
-                  <PipelineDestinationReview type={type} control={form.control} />
+                  <PipelineDestinationReview
+                    type={type}
+                    control={form.control}
+                    onEditDestination={() => void setStep('destination')}
+                    onEditConnection={() => void setStep('connection')}
+                  />
                   <Separator />
                   <PipelineDataReview
                     type={type}
                     control={form.control}
                     publication={publication}
+                    onEdit={() => void setStep('data')}
                   />
                   <Separator />
                   <PipelineReviewCosts control={form.control} publication={publication} />
