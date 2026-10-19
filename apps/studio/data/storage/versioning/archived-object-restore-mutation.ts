@@ -45,15 +45,15 @@ export const useArchivedObjectRestoreMutation = ({
 
   return useMutation<void, ResponseError, ArchivedObjectRestoreVariables>({
     mutationFn: restoreArchivedObject,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.archivedObjects(variables.projectRef, variables.bucketId),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) toast.error(`Failed to restore file: ${error.message}`)
-      else onError(error, variables, context)
+      else onError(error, variables, context, mutationContext)
     },
     ...options,
   })
