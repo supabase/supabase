@@ -1,4 +1,4 @@
-import { Globe, Trash } from 'lucide-react'
+import { GlobeIcon, TrashIcon } from 'lucide-react'
 import { Button, Checkbox } from 'ui'
 
 import { ValueContainer } from './ValueContainer'
@@ -77,7 +77,7 @@ export const RedirectUrlList = ({
                     : undefined,
                 },
               }}
-              icon={<Trash />}
+              icon={<TrashIcon />}
               onClick={() => (selectedUrls.length > 0 ? onSelectRemoveURLs() : null)}
             >
               Remove ({selectedUrls.length})
@@ -119,7 +119,7 @@ export const RedirectUrlList = ({
                   <div className="w-5 h-5 flex items-center justify-center">
                     <Checkbox checked={isSelected} onChange={(e) => onClickUrl(e, url)} />
                   </div>
-                  <Globe strokeWidth={2} size={14} className="text-foreground-lighter" />
+                  <GlobeIcon strokeWidth={2} size={14} className="text-foreground-lighter" />
                   <span className="text-sm grow">{url}</span>
                 </div>
               </ValueContainer>

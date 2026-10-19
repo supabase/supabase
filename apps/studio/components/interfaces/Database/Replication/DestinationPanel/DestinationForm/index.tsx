@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { RefObject, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -9,6 +9,12 @@ import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 
 import { Admonition } from 'ui-patterns/Admonition'
 import * as z from 'zod'
 
+import { PipelineConnectionSection } from '../../CreatePipeline/PipelineConnectionSection'
+import { PipelineDataReview } from '../../CreatePipeline/PipelineDataReview'
+import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
+import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinationReview'
+import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
+import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -52,6 +58,7 @@ import { TableCopySelection } from './TableCopySelection'
 import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -107,6 +114,8 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
+  const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
+  const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
@@ -182,10 +191,9 @@ export const DestinationForm = ({
         pipelineData,
         catalogToken,
         region: projectSettings?.region,
-        projectRef,
         editMode,
       }),
-    [destinationData, pipelineData, catalogToken, projectSettings, projectRef, editMode]
+    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -455,6 +463,30 @@ export const DestinationForm = ({
     }
   }, [visible, defaultValues, form, isDirty, resetValidation])
 
+  const destinationFields = (
+    <>
+      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+        <BigQueryFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
+        <AnalyticsBucketFields
+          form={form}
+          editMode={editMode}
+          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+        />
+      )}
+      {selectedType === 'DuckLake' && etlEnableDucklake && (
+        <DuckLakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+        <SnowflakeFields form={form} editMode={editMode} />
+      )}
+      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+        <ClickHouseFields form={form} editMode={editMode} />
+      )}
+    </>
+  )
+
   return (
     <>
       <SheetSection className="grow overflow-auto px-0 py-0">
@@ -465,63 +497,84 @@ export const DestinationForm = ({
           <Form {...form}>
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <fieldset disabled={!isExistingConfigReady} className="contents">
-                <div className="p-5 flex flex-col gap-y-6">
-                  {isErrorExistingConfig && (
-                    <Admonition type="warning">
-                      <p className="leading-normal!">
-                        The existing destination or pipeline settings could not be loaded. Refresh
-                        before applying changes.
-                      </p>
-                    </Admonition>
-                  )}
-                  <p className="text-sm font-medium text-foreground">Destination details</p>
-
-                  <div className="flex flex-col gap-y-4">
-                    <DestinationNameInput form={form} destinationType={selectedType} />
-                    <PublicationSelection
-                      form={form}
-                      onSelectNewPublication={() => setPublicationPanelVisible(true)}
-                    />
-                    <TableCopySelection form={form} editMode={editMode} />
-                    <PipelineRegionField destinationType={selectedType} />
-                  </div>
-                </div>
-
-                <DialogSectionSeparator />
-
-                {selectedType === 'BigQuery' && etlEnableBigQuery && (
-                  <BigQueryFields form={form} editMode={editMode} />
+                {shouldShowConnectionSection && (
+                  <>
+                    <PipelineConnectionSection type={selectedType} form={form}>
+                      {destinationFields}
+                    </PipelineConnectionSection>
+                    <DialogSectionSeparator />
+                  </>
                 )}
-                {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-                  <AnalyticsBucketFields
+                {shouldShowConnectionSection ? (
+                  <PipelineDataSection
+                    type={selectedType}
                     form={form}
-                    editMode={editMode}
-                    onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+                    onSelectNewPublication={() => setPublicationPanelVisible(true)}
                   />
-                )}
-                {selectedType === 'DuckLake' && etlEnableDucklake && (
-                  <DuckLakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'Snowflake' && etlEnableSnowflake && (
-                  <SnowflakeFields form={form} editMode={editMode} />
-                )}
-                {selectedType === 'ClickHouse' && etlEnableClickHouse && (
-                  <ClickHouseFields form={form} editMode={editMode} />
+                ) : (
+                  <>
+                    <div className="p-5 flex flex-col gap-y-6">
+                      {isErrorExistingConfig && (
+                        <Admonition type="warning">
+                          <p className="leading-normal!">
+                            The existing destination or pipeline settings could not be loaded.
+                            Refresh before applying changes.
+                          </p>
+                        </Admonition>
+                      )}
+                      <p className="text-sm font-medium text-foreground">Destination details</p>
+
+                      <div className="flex flex-col gap-y-4">
+                        <DestinationNameInput form={form} destinationType={selectedType} />
+                        <PublicationSelection
+                          form={form}
+                          onSelectNewPublication={() => setPublicationPanelVisible(true)}
+                        />
+                        <TableCopySelection form={form} editMode={editMode} />
+                        <PipelineRegionField destinationType={selectedType} />
+                      </div>
+                    </div>
+
+                    <DialogSectionSeparator />
+                    {destinationFields}
+
+                    <DialogSectionSeparator />
+
+                    <AdvancedSettings type={selectedType} form={form} group="all" />
+                  </>
                 )}
 
-                <DialogSectionSeparator />
-
-                <AdvancedSettings type={selectedType} form={form} />
+                {shouldShowConnectionSection && (
+                  <>
+                    <DialogSectionSeparator />
+                    <PipelineDestinationReview type={selectedType} control={form.control} />
+                    <DialogSectionSeparator />
+                    <PipelineDataReview
+                      type={selectedType}
+                      control={form.control}
+                      publication={selectedPublication}
+                    />
+                    <DialogSectionSeparator />
+                    <PipelineReviewCosts control={form.control} publication={selectedPublication} />
+                  </>
+                )}
 
                 {!editMode && hasRunValidation && !isValidating && (
                   <>
                     <DialogSectionSeparator />
 
                     <div ref={validationSectionRef}>
-                      <ValidationFailuresSection
-                        destinationFailures={destinationValidationFailures}
-                        pipelineFailures={pipelineValidationFailures}
-                      />
+                      {shouldShowConnectionSection ? (
+                        <PipelineValidationAdmonition
+                          failures={allValidationFailures}
+                          hint="Check credentials and Advanced settings above. Some issues may require changes to the project’s database settings."
+                        />
+                      ) : (
+                        <ValidationFailuresSection
+                          destinationFailures={destinationValidationFailures}
+                          pipelineFailures={pipelineValidationFailures}
+                        />
+                      )}
                     </div>
                   </>
                 )}
@@ -541,7 +594,7 @@ export const DestinationForm = ({
               exit={{ opacity: 0, y: 5 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              <Loader2 className="animate-spin" size={14} />
+              <Loader2Icon className="animate-spin" size={14} />
               <p className="text-foreground-light text-sm">{getSavingMessage()}</p>
             </motion.div>
           ) : (

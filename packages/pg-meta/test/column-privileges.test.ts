@@ -432,3 +432,107 @@ withTestDatabase('scoped list matches the legacy path row-for-row', async ({ exe
     normalize(legacyByIds.zod.parse(await executeQuery(legacyByIds.sql)))
   )
 })
+
+const columnGrants = async (
+  executeQuery: <T = any>(query: string) => Promise<T>,
+  schema: string,
+  table: string,
+  grantees: string[]
+) => {
+  const rows = await executeQuery<
+    { grantee: string; column_name: string; privilege_type: string; is_grantable: string }[]
+  >(`
+    select grantee, column_name, privilege_type, is_grantable
+    from information_schema.column_privileges
+    where table_schema = '${schema.replaceAll("'", "''")}'
+      and table_name = '${table.replaceAll("'", "''")}'
+      and grantee in (${grantees.map((g) => `'${g.replaceAll("'", "''")}'`).join(', ')})
+    order by grantee, column_name, privilege_type
+  `)
+  return rows.map((r) => `${r.grantee}:${r.column_name}:${r.privilege_type}:${r.is_grantable}`)
+}
+
+withTestDatabase(
+  'grant & revoke column privileges in a schema, table and column that need quoting',
+  async ({ executeQuery }) => {
+    const role = `cp_quoted_${Date.now()}`
+    await executeQuery(
+      `create role ${role}; create schema "My Schema"; create table "My Schema"."Weird Table"("Col A" int, b int);`
+    )
+    try {
+      const { sql: listSql, zod: listZod } = await pgMeta.columnPrivileges.list()
+      const rows = listZod.parse(await executeQuery(listSql))
+      const columnIdFor = (columnName: string) =>
+        rows.find(
+          ({ relation_schema, relation_name, column_name }) =>
+            relation_schema === 'My Schema' &&
+            relation_name === 'Weird Table' &&
+            column_name === columnName
+        )!.column_id
+
+      await executeQuery(
+        pgMeta.columnPrivileges.grant([
+          { columnId: columnIdFor('Col A'), grantee: role, privilegeType: 'SELECT' },
+          {
+            columnId: columnIdFor('Col A'),
+            grantee: role,
+            privilegeType: 'UPDATE',
+            isGrantable: true,
+          },
+          { columnId: columnIdFor('b'), grantee: 'PUBLIC', privilegeType: 'INSERT' },
+        ]).sql
+      )
+      expect(
+        await columnGrants(executeQuery, 'My Schema', 'Weird Table', [role, 'PUBLIC'])
+      ).toEqual([`PUBLIC:b:INSERT:NO`, `${role}:Col A:SELECT:NO`, `${role}:Col A:UPDATE:YES`])
+
+      await executeQuery(
+        pgMeta.columnPrivileges.revoke([
+          { columnId: columnIdFor('Col A'), grantee: role, privilegeType: 'UPDATE' },
+          { columnId: columnIdFor('b'), grantee: 'public', privilegeType: 'INSERT' },
+        ]).sql
+      )
+      expect(
+        await columnGrants(executeQuery, 'My Schema', 'Weird Table', [role, 'PUBLIC'])
+      ).toEqual([`${role}:Col A:SELECT:NO`])
+    } finally {
+      await executeQuery(`drop owned by ${role}; drop role ${role};`)
+    }
+  }
+)
+
+withTestDatabase(
+  'grant & revoke column privileges for a role whose name has quotes',
+  async ({ executeQuery }) => {
+    const role = `it's a "role" ${Date.now()}`
+    const quotedRole = `"${role.replaceAll('"', '""')}"`
+    await executeQuery(`create role ${quotedRole};`)
+    try {
+      const { sql: listSql, zod: listZod } = await pgMeta.columnPrivileges.list()
+      const { column_id } = listZod
+        .parse(await executeQuery(listSql))
+        .find(
+          ({ relation_schema, relation_name, column_name }) =>
+            relation_schema === 'public' && relation_name === 'todos' && column_name === 'id'
+        )!
+
+      await executeQuery(
+        pgMeta.columnPrivileges.grant([
+          { columnId: column_id, grantee: role, privilegeType: 'SELECT', isGrantable: true },
+        ]).sql
+      )
+      expect(await columnGrants(executeQuery, 'public', 'todos', [role])).toEqual([
+        `${role}:id:SELECT:YES`,
+      ])
+
+      await executeQuery(
+        pgMeta.columnPrivileges.revoke([
+          { columnId: column_id, grantee: role, privilegeType: 'SELECT' },
+        ]).sql
+      )
+      expect(await columnGrants(executeQuery, 'public', 'todos', [role])).toEqual([])
+    } finally {
+      await executeQuery(`drop owned by ${quotedRole}; drop role ${quotedRole};`)
+    }
+  }
+)

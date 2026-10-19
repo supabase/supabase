@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { isNaN, noop } from 'lodash'
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -90,7 +90,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
           }`,
         ].join(' ')}
       >
-        <Clock className="text-foreground-light" size={18} strokeWidth={1.5} />
+        <ClockIcon className="text-foreground-light" size={18} strokeWidth={1.5} />
         <Tooltip>
           <TooltipTrigger className="w-1/4" tabIndex={-1}>
             <input

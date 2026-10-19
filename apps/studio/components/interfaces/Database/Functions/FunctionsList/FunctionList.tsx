@@ -1,6 +1,13 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Copy, Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
+import {
+  CopyIcon,
+  Edit2Icon,
+  EditIcon,
+  FileTextIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -159,7 +166,7 @@ export const FunctionList = ({
                             <Button
                               aria-label={`${x.name} actions`}
                               className="px-1"
-                              icon={<MoreVertical />}
+                              icon={<MoreVerticalIcon />}
                             />
                           </DropdownMenuTrigger>
                         </TooltipTrigger>
@@ -176,14 +183,14 @@ export const FunctionList = ({
                                 )
                               }
                             >
-                              <FileText size={14} />
+                              <FileTextIcon size={14} />
                               <p>Client API docs</p>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                           </>
                         )}
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
-                          <Edit2 size={14} />
+                          <Edit2Icon size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
                         <DropdownMenuItem
@@ -216,19 +223,19 @@ export const FunctionList = ({
                             })
                           }}
                         >
-                          <Edit size={14} />
+                          <EditIcon size={14} />
                           <p>Edit function with Assistant</p>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => duplicateFunction(x)}
                         >
-                          <Copy size={14} />
+                          <CopyIcon size={14} />
                           <p>Duplicate function</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
-                          <Trash size={14} className="text-destructive" />
+                          <TrashIcon size={14} className="text-destructive" />
                           <p>Delete function</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -236,7 +243,7 @@ export const FunctionList = ({
                   ) : (
                     <ButtonTooltip
                       disabled
-                      icon={<MoreVertical />}
+                      icon={<MoreVerticalIcon />}
                       className="px-1"
                       tooltip={{
                         content: {

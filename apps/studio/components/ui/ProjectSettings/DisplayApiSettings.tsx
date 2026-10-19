@@ -1,6 +1,6 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircleIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
@@ -98,12 +98,12 @@ export const DisplayApiSettings = ({
     >
       {isLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader2Icon className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">Retrieving API keys</p>
         </div>
       ) : !canReadAPIKeys ? (
         <div className="flex items-center py-8 px-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             You don't have permission to view API keys. These keys restricted to users with higher
             access levels.
@@ -111,14 +111,14 @@ export const DisplayApiSettings = ({
         </div>
       ) : isProjectSettingsError || isJwtSecretUpdateStatusError ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <AlertCircle size={16} strokeWidth={1.5} />
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsError ? 'Failed to retrieve API keys' : 'Failed to update JWT secret'}
           </p>
         </div>
       ) : isApiKeysEmpty || isProjectSettingsLoading || isJwtSecretUpdateStatusLoading ? (
         <div className="flex items-center justify-center py-8 space-x-2">
-          <Loader2 className="animate-spin" size={16} strokeWidth={1.5} />
+          <Loader2Icon className="animate-spin" size={16} strokeWidth={1.5} />
           <p className="text-sm text-foreground-light">
             {isProjectSettingsLoading || isApiKeysEmpty
               ? 'Retrieving API keys'

@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -298,7 +298,7 @@ const DatabaseUsage = () => {
               <Button
                 aria-label="Refresh report"
                 disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
                 className="w-7"
                 onClick={onRefreshReport}
               />
@@ -326,7 +326,7 @@ const DatabaseUsage = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
@@ -520,7 +520,7 @@ const renderDatabaseSizeAdditionalInfo = () => {
               is used when installing extensions, even if those extensions are inactive.
             </p>
 
-            <Button asChild icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <Link
                 href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                 target="_blank"

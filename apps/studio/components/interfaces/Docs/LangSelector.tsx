@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { EyeOff, Key } from 'lucide-react'
+import { EyeOffIcon, KeyIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Button,
@@ -82,9 +82,9 @@ export const LangSelector = ({
             <DropdownMenuTrigger asChild>
               <Button size="tiny" className="p-0 h-7 w-7">
                 {selectedApiKey.key === DEFAULT_KEY.key ? (
-                  <EyeOff size={12} strokeWidth={1.5} />
+                  <EyeOffIcon size={12} strokeWidth={1.5} />
                 ) : (
-                  <Key size={12} strokeWidth={1.5} />
+                  <KeyIcon size={12} strokeWidth={1.5} />
                 )}
               </Button>
             </DropdownMenuTrigger>

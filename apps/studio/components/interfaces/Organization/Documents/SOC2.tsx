@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -77,7 +77,7 @@ export const SOC2 = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button icon={<Download />} onClick={handleDownloadClick} disabled={!slug}>
+            <Button icon={<DownloadIcon />} onClick={handleDownloadClick} disabled={!slug}>
               Download SOC2 Type 2 Report
             </Button>
           </div>

@@ -1,15 +1,24 @@
-import { AlertTriangle, Book, Github, Loader2 } from 'lucide-react'
+import { BookIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { extensions } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Badge,
+  Button,
+  GithubIcon,
+  Switch,
+  TableCell,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'
 import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
@@ -65,18 +74,17 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               {extension.name}
             </span>
             {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
-              <ButtonTooltip
-                variant="warning"
-                icon={<AlertTriangle />}
-                className="rounded-full"
-                tooltip={{
-                  content: {
-                    text: `The extension is deprecated and will be removed in ${extensionMeta.deprecated.join(', ')}.`,
-                  },
-                }}
-              >
-                Deprecated
-              </ButtonTooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge variant="warning" className="cursor-default" tabIndex={0}>
+                    Deprecated
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  The extension is deprecated and will be removed in{' '}
+                  {extensionMeta.deprecated.join(', ')}
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </TableCell>
@@ -120,7 +128,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell>
           <div className="flex gap-2 items-center">
             {extensionMeta?.github_url && (
-              <Button asChild icon={<Github />} className="rounded-full">
+              <Button asChild icon={<GithubIcon />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -132,7 +140,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               </Button>
             )}
             {docsUrl !== undefined && (
-              <Button asChild icon={<Book />} className="rounded-full">
+              <Button asChild icon={<BookIcon />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -147,13 +155,13 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         </TableCell>
 
         {/*
-          [Joshen] The div child here and all these classes is to properly add a left border
-          to make the sticky column more distinct
+          Left border on the absolute child makes the sticky column more distinct.
+          Sticky positioning/background come from ShadowScrollArea's stickyLastColumn.
         */}
-        <TableCell className="w-20 sticky bg-surface-100 right-0 relative">
+        <TableCell className="w-20 relative">
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">
             {isDisabling ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2Icon className="animate-spin" size={16} />
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>

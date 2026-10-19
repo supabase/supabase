@@ -1,4 +1,4 @@
-import { Key } from 'lucide-react'
+import { KeyIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
@@ -67,7 +67,7 @@ export function useApiKeysCommands() {
               <Badge>{publishableKey.type}</Badge>
             </span>
           ),
-          icon: () => <Key />,
+          icon: () => <KeyIcon />,
         },
       ...(project && allSecretKeys
         ? allSecretKeys.map((key) => ({
@@ -86,7 +86,7 @@ export function useApiKeysCommands() {
                 <Badge>{key.type}</Badge>
               </span>
             ),
-            icon: () => <Key />,
+            icon: () => <KeyIcon />,
           }))
         : []),
       project &&
@@ -107,7 +107,7 @@ export function useApiKeysCommands() {
               <Badge>{anonKey.type}</Badge>
             </span>
           ),
-          icon: () => <Key />,
+          icon: () => <KeyIcon />,
         },
       project &&
         serviceKey && {
@@ -127,13 +127,13 @@ export function useApiKeysCommands() {
               <Badge>{serviceKey.type}</Badge>
             </span>
           ),
-          icon: () => <Key />,
+          icon: () => <KeyIcon />,
         },
       !(anonKey || serviceKey) && {
         id: 'api-keys-project-settings',
         name: 'See API keys in Project Settings',
         route: `/project/${ref}/settings/api-keys`,
-        icon: () => <Key />,
+        icon: () => <KeyIcon />,
       },
     ].filter(Boolean) as ICommand[]
   }, [canReadAPIKeys, apiKeysData, isHighAvailability, project, ref, resetCommandMenu, setIsOpen])
@@ -160,7 +160,7 @@ export function useApiKeysCommands() {
         id: 'api-keys',
         name: 'Get API keys...',
         action: () => setPage(API_KEYS_PAGE_NAME),
-        icon: () => <Key />,
+        icon: () => <KeyIcon />,
       },
     ],
     {
@@ -177,7 +177,7 @@ export function useApiKeysCommands() {
         id: 'nav-api-keys',
         name: 'Go to API Keys',
         route: `/project/${ref}/settings/api-keys`,
-        icon: () => <Key />,
+        icon: () => <KeyIcon />,
       },
     ],
     { enabled: !!project }

@@ -1,5 +1,5 @@
 import { differenceInDays } from 'date-fns'
-import { MoreVertical, TrashIcon } from 'lucide-react'
+import { MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -60,7 +60,7 @@ export const StorageCredItem = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                icon={<MoreVertical size={14} strokeWidth={1} />}
+                icon={<MoreVerticalIcon size={14} strokeWidth={1} />}
                 variant="text"
                 className="px-1.5 text-foreground-lighter hover:text-foreground"
               />

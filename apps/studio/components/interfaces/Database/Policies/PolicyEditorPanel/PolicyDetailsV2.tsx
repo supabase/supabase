@@ -4,7 +4,7 @@ import {
   safeSql,
   type SafeSqlFragment,
 } from '@supabase/pg-meta/src/pg-format'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -158,7 +158,7 @@ export const PolicyDetailsV2 = ({
                           disabled={!canUpdatePolicies}
                           className="w-full [&>span]:w-full h-[38px] text-sm"
                           iconRight={
-                            <ChevronsUpDown
+                            <ChevronsUpDownIcon
                               className="text-foreground-muted"
                               strokeWidth={2}
                               size={14}
@@ -199,7 +199,7 @@ export const PolicyDetailsV2 = ({
                                     }}
                                   >
                                     <span className="flex items-center gap-1.5">
-                                      {field.value === table.name ? <Check size={13} /> : ''}
+                                      {field.value === table.name ? <CheckIcon size={13} /> : ''}
                                       {table.name}
                                     </span>
                                   </CommandItem>

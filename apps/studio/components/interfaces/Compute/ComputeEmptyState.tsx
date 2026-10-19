@@ -1,5 +1,5 @@
 import { BoxPlus } from 'icons'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -23,7 +23,7 @@ export const ComputeEmptyState = ({ onDeploy }: ComputeEmptyStateProps) => {
       <ButtonTooltip
         variant="primary"
         size="tiny"
-        icon={<Plus size={14} />}
+        icon={<PlusIcon size={14} />}
         disabled={!canDeployInstances}
         onClick={onDeploy}
         tooltip={{

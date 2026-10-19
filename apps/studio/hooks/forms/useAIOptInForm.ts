@@ -9,7 +9,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '../misc/useCheckPer
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { getAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+import { getAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from '@/lib/constants'
 import type { ResponseError } from '@/types'
@@ -27,7 +27,7 @@ export type AIOptInFormValues = z.infer<typeof AIOptInSchema>
  * Hook to manage the AI Opt-In form state and submission logic.
  * Optionally takes an onSuccess callback (e.g., to close a modal).
  */
-export const useAIOptInForm = (onSuccessCallback?: () => void) => {
+export const useAIOptInForm = (onSuccessCallback?: (level: AiOptInLevel) => void) => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
@@ -91,7 +91,7 @@ export const useAIOptInForm = (onSuccessCallback?: () => void) => {
           invalidateOrganizationsQuery(queryClient)
           toast.success('Successfully updated AI opt-in settings')
           setUpdatedOptInSinceMCP(true)
-          onSuccessCallback?.() // Call optional callback on success
+          onSuccessCallback?.(values.aiOptInLevel)
         },
         onError: (error: ResponseError) => {
           toast.error(`Failed to update settings: ${error.message}`)

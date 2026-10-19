@@ -5,16 +5,15 @@ import type { OrganizationRolesResponse } from '@/data/organization-members/orga
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 import type { OrganizationBase } from '@/data/organizations/organizations-query'
 import { PermissionsV2Data } from '@/data/permissions/permissions-query-v2'
-import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import type { Permission } from '@/types'
 
 type TeamSettingsDataContextValue = {
   members: OrganizationMember[]
   roles: OrganizationRolesResponse | undefined
   isLoadingRoles: boolean
-  orgProjects: OrgProject[]
   permissions: Permission[] | undefined
   permissionsV2: PermissionsV2Data | undefined
+  totalNumOrgProjects: number
   selectedOrganization: OrganizationBase | undefined
   organizationMembersDeletionEnabled: boolean
   onManageAccess: (member: OrganizationMember) => void
@@ -35,9 +34,9 @@ export const TeamSettingsDataProvider = ({
   members,
   roles,
   isLoadingRoles,
-  orgProjects,
   permissions,
   permissionsV2,
+  totalNumOrgProjects,
   selectedOrganization,
   organizationMembersDeletionEnabled,
   onManageAccess,
@@ -47,9 +46,9 @@ export const TeamSettingsDataProvider = ({
       members,
       roles,
       isLoadingRoles,
-      orgProjects,
       permissions,
       permissionsV2,
+      totalNumOrgProjects,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,
@@ -58,9 +57,9 @@ export const TeamSettingsDataProvider = ({
       members,
       roles,
       isLoadingRoles,
-      orgProjects,
       permissions,
       permissionsV2,
+      totalNumOrgProjects,
       selectedOrganization,
       organizationMembersDeletionEnabled,
       onManageAccess,

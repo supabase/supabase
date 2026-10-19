@@ -130,6 +130,13 @@ describe('DestinationForm.utils table copy selection', () => {
     ).toEqual({ type: mode, table_ids: [202, 101] })
   })
 
+  it.each([
+    ['include_tables', 'Select at least one table for the initial sync.'],
+    ['skip_tables', 'Select at least one table to exclude from the initial sync.'],
+  ] as const)('explains the empty selection for %s', (mode, message) => {
+    expect(() => buildTableSyncCopyConfig({ mode, selectedTableIds: [] })).toThrow(message)
+  })
+
   it('rejects an invalid selected table id', () => {
     expect(() =>
       buildTableSyncCopyConfig({
@@ -504,13 +511,11 @@ describe('DestinationForm.utils DuckLake', () => {
 const baseDucklakeSupabaseFormData = {
   ...baseDucklakeFormData,
   ducklakeMode: 'supabase' as const,
-  ducklakeCatalogProjectRef: 'catalog-ref',
-  ducklakeStorageProjectRef: 'storage-ref',
   ducklakeStorageBucket: 'ducklake-data',
 }
 
-describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
-  it('builds DuckLake validation config from project refs in supabase mode', () => {
+describe('DestinationForm.utils DuckLake (managed)', () => {
+  it('uses the current project for the catalog and storage during validation', () => {
     const config = buildDestinationConfigForValidation({
       projectRef: 'project-ref',
       selectedType: 'DuckLake',
@@ -519,8 +524,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -528,7 +533,7 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     })
   })
 
-  it('builds DuckLake submit config from project refs in supabase mode', async () => {
+  it('uses the current project for the catalog and storage during submission', async () => {
     const createS3AccessKey = vi.fn()
     const resolveNamespace = vi.fn()
 
@@ -542,8 +547,8 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
 
     expect(config).toEqual({
       ducklake: {
-        catalogProjectRef: 'catalog-ref',
-        storageProjectRef: 'storage-ref',
+        catalogProjectRef: 'project-ref',
+        storageProjectRef: 'project-ref',
         bucket: 'ducklake-data',
         poolSize: 4,
         metadataSchema: 'ducklake_metadata',
@@ -553,11 +558,9 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
     expect(resolveNamespace).not.toHaveBeenCalled()
   })
 
-  it('returns required-field errors for missing supabase selections, ignoring custom fields', () => {
+  it('requires a bucket and ignores connection fields', () => {
     const issues = getDucklakeValidationIssues({
       ducklakeMode: 'supabase',
-      ducklakeCatalogProjectRef: '',
-      ducklakeStorageProjectRef: '',
       ducklakeStorageBucket: '',
       // Custom-mode fields are intentionally blank and must not be validated in supabase mode
       ducklakeCatalogUrl: '',
@@ -569,19 +572,13 @@ describe('DestinationForm.utils DuckLake (Use Supabase)', () => {
       ducklakeMetadataSchema: '',
     })
 
-    expect(issues).toEqual([
-      { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-      { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
-      { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
-    ])
+    expect(issues).toEqual([{ path: 'ducklakeStorageBucket', message: 'Bucket is required.' }])
   })
 
-  it('accepts a complete supabase configuration', () => {
+  it('accepts a complete managed configuration', () => {
     expect(
       getDucklakeValidationIssues({
         ducklakeMode: 'supabase',
-        ducklakeCatalogProjectRef: 'catalog-ref',
-        ducklakeStorageProjectRef: 'storage-ref',
         ducklakeStorageBucket: 'ducklake-data',
         ducklakeCatalogUrl: '',
         ducklakeDataPath: '',

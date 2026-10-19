@@ -1,9 +1,9 @@
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { compact, get, sum, uniqBy } from 'lodash'
-import { Upload } from 'lucide-react'
+import { UploadIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { DragEventHandler, useCallback, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Checkbox, cn } from 'ui'
@@ -79,7 +79,7 @@ const DragOverOverlay = ({
                 className="w-3/4 h-32 border-2 border-dashed border-muted rounded-md flex flex-col items-center justify-center p-6 pointer-events-none"
                 style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
               >
-                <Upload className="text-white pointer-events-none" size={20} strokeWidth={2} />
+                <UploadIcon className="text-white pointer-events-none" size={20} strokeWidth={2} />
                 <p className="text-center text-sm text-white mt-2 pointer-events-none">
                   Drop your files to upload to this folder
                 </p>

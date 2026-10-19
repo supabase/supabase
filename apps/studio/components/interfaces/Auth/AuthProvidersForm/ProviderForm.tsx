@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
 import { useCallback, useEffect, useId, useMemo, useState } from 'react'
@@ -8,6 +7,7 @@ import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   Form,
   Sheet,
@@ -186,18 +186,9 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
           />
         }
         meta={
-          isActive ? (
-            <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-primary">
-              <span className="rounded-full bg-brand-default p-0.5 text-xs text-brand-200">
-                <Check strokeWidth={2} size={12} />
-              </span>
-              <span className="px-1">Enabled</span>
-            </div>
-          ) : (
-            <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
-              Disabled
-            </div>
-          )
+          <Badge variant={isActive ? 'success' : 'default'}>
+            {isActive ? 'Enabled' : 'Disabled'}
+          </Badge>
         }
       >
         {provider.title}

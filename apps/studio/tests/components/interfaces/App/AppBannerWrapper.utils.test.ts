@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
-import { isLogsOrObservabilityPath } from '@/components/interfaces/App/AppBannerWrapper.utils'
+import {
+  isLogsOrObservabilityPath,
+  isOrganizationLandingPath,
+} from '@/components/interfaces/App/AppBannerWrapper.utils'
 
 describe('isLogsOrObservabilityPath', () => {
   test.each([
@@ -24,5 +27,24 @@ describe('isLogsOrObservabilityPath', () => {
     '/org/abc/logs',
   ])('does not match %s', (pathname) => {
     expect(isLogsOrObservabilityPath(pathname)).toBe(false)
+  })
+})
+
+describe('isOrganizationLandingPath', () => {
+  test.each(['/org', '/organizations', '/org/my-org', '/org/my-org/'])('matches %s', (pathname) => {
+    expect(isOrganizationLandingPath(pathname)).toBe(true)
+  })
+
+  test.each([
+    undefined,
+    null,
+    '',
+    '/',
+    '/sign-in',
+    '/project/abc',
+    '/org/abc/general',
+    '/organizations/new',
+  ])('does not match %s', (pathname) => {
+    expect(isOrganizationLandingPath(pathname)).toBe(false)
   })
 })

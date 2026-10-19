@@ -13,7 +13,7 @@ import {
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-// FormMessage animates via framer-motion, which relies on the Web Animations API.
+// FormMessage animates via Motion, which relies on the Web Animations API.
 mockAnimationsApi()
 
 vi.mock('@/lib/constants', async (importOriginal) => {

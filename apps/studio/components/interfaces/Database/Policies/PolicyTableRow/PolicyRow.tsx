@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Edit, MoreVertical, Trash } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -124,7 +124,7 @@ export const PolicyRow = ({
                 <DropdownMenuTrigger asChild>
                   <Button
                     className="px-1.5"
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     data-testid={`policy-${policy.name}-actions-button`}
                     aria-label={`${policy.name} actions`}
                   />
@@ -134,7 +134,7 @@ export const PolicyRow = ({
             </Tooltip>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
-                <Edit size={14} />
+                <EditIcon size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -166,7 +166,7 @@ export const PolicyRow = ({
                   })
                 }}
               >
-                <Edit size={14} />
+                <EditIcon size={14} />
                 <p>Edit policy with Assistant</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -181,7 +181,7 @@ export const PolicyRow = ({
                   },
                 }}
               >
-                <Trash size={14} />
+                <TrashIcon size={14} />
                 <p>Delete policy</p>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>

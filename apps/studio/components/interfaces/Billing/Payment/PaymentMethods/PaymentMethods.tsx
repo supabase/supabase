@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
+import { CreditCardIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
@@ -114,7 +114,7 @@ const PaymentMethods = () => {
                           <Button
                             asChild
                             key="stripe-projects-billing-docs"
-                            iconRight={<ExternalLink size={14} />}
+                            iconRight={<ExternalLinkIcon size={14} />}
                           >
                             <a
                               href="https://docs.stripe.com/projects#manage-billing"
@@ -151,7 +151,7 @@ const PaymentMethods = () => {
                             <div />
                           )}
                           <Button
-                            icon={<Plus />}
+                            icon={<PlusIcon />}
                             disabled={!canUpdatePaymentMethods}
                             onClick={() => setShowAddPaymentMethodModal(true)}
                           >

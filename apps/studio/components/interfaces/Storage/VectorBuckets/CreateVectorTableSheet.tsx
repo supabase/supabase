@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { literal, safeSql } from '@supabase/pg-meta'
-import { Plus, Trash2 } from 'lucide-react'
+import { PlusIcon, Trash2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
@@ -26,7 +26,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import { inverseValidBucketNameRegex } from '../CreateBucketModal.utils'
+import { inverseValidBucketNameRegex } from '../Storage.utils'
 import { useS3VectorsWrapperInstance } from './useS3VectorsWrapperInstance'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -203,7 +203,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
           size="tiny"
           variant="primary"
           className="w-fit"
-          icon={<Plus size={14} />}
+          icon={<PlusIcon size={14} />}
           disabled={!canCreateBuckets}
           onClick={() => setVisible(true)}
           tooltip={{
@@ -377,7 +377,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                       variant="text"
                       className="w-[34px] h-[34px]" // Match the height of the input
                       size="tiny"
-                      icon={<Trash2 size={12} />}
+                      icon={<Trash2Icon size={12} />}
                       onClick={() => remove(index)}
                     />
                   </div>

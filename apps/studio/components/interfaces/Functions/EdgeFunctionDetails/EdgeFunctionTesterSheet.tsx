@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { BookOpen, Loader2, Send } from 'lucide-react'
+import { BookOpenIcon, Loader2Icon, SendIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -326,7 +326,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                                   asChild
                                   variant="text"
                                   size="tiny"
-                                  icon={<BookOpen size={14} />}
+                                  icon={<BookOpenIcon size={14} />}
                                 >
                                   <a
                                     href={errorDocs.href}
@@ -364,12 +364,12 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     </div>
                   ) : isPending ? (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
-                      <Loader2 size={24} className="text-foreground-muted animate-spin" />
+                      <Loader2Icon size={24} className="text-foreground-muted animate-spin" />
                       <p className="text-sm text-foreground-light">Sending request...</p>
                     </div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
-                      <Send size={24} className="text-foreground-muted" />
+                      <SendIcon size={24} className="text-foreground-muted" />
                       <p className="text-sm text-foreground-light">Send your first test request</p>
                     </div>
                   )}

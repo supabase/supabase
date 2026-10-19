@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Download, MoreVertical, Trash } from 'lucide-react'
+import { DownloadIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -101,7 +101,7 @@ export const PauseFailedState = () => {
                 </SupportLink>
               </Button>
               <ButtonTooltip
-                icon={<Download />}
+                icon={<DownloadIcon />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
                 tooltip={{
@@ -116,7 +116,7 @@ export const PauseFailedState = () => {
               </ButtonTooltip>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="px-1.5" icon={<MoreVertical />} />
+                  <Button className="px-1.5" icon={<MoreVerticalIcon />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -133,7 +133,7 @@ export const PauseFailedState = () => {
                     }}
                   >
                     <div className="translate-y-0.5">
-                      <Trash size={14} />
+                      <TrashIcon size={14} />
                     </div>
                     <div className="">
                       <p>Delete project</p>

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -87,7 +87,7 @@ export const PublicationsTables = () => {
         <Input
           size="tiny"
           ref={searchInputRef}
-          icon={<Search />}
+          icon={<SearchIcon />}
           className="w-48"
           placeholder="Search for a table"
           value={filterString}

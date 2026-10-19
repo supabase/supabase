@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -129,7 +129,7 @@ const CustomDomainSidePanel = () => {
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
               <Alert variant="default" className="mb-2">
-                <AlertCircle className="h-4 w-4" />
+                <AlertCircleIcon className="h-4 w-4" />
                 <AlertTitle>Adding new custom domains temporarily disabled</AlertTitle>
                 <AlertDescription className="flex flex-col gap-3">
                   We are working with our upstream DNS provider before we are able to sign up new

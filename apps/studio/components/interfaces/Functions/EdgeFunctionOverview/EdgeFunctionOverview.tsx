@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -145,7 +145,7 @@ export const EdgeFunctionOverview = () => {
         href: `/project/${projectRef}/functions/${functionSlug}/${
           isUnifiedLogsEnabled ? 'logs' : 'invocations'
         }`,
-        icon: <ExternalLink size={12} />,
+        icon: <ExternalLinkIcon size={12} />,
       },
     ],
     [functionSlug, isUnifiedLogsEnabled, projectRef]

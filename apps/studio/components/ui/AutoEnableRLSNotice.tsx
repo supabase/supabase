@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ShieldCheck, X } from 'lucide-react'
+import { ShieldCheckIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -67,7 +67,7 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
         <>
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
-            icon={<X />}
+            icon={<XIcon />}
             variant="text"
             className="w-6"
             tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
@@ -115,7 +115,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       <DialogTrigger asChild>
         {iconOnly ? (
           <ButtonTooltip
-            icon={<ShieldCheck />}
+            icon={<ShieldCheckIcon />}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />

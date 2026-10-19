@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -152,7 +152,7 @@ export const EdgeFunctionSecrets = () => {
                     placeholder="Search for a secret"
                     value={searchString}
                     onChange={(e) => setSearchString(e.target.value)}
-                    icon={<Search />}
+                    icon={<SearchIcon />}
                   />
                 </div>
 

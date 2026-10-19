@@ -1,12 +1,15 @@
 import { IS_PLATFORM, useParams } from 'common'
 import { isEqual } from 'lodash'
-import { AlertCircle, CornerDownLeft, Loader2 } from 'lucide-react'
+import { AlertCircleIcon, CornerDownLeftIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
 import { DeployEdgeFunctionWarningModal } from '@/components/interfaces/EdgeFunctions/DeployEdgeFunctionWarningModal'
-import { formatFunctionBodyToFiles } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+} from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -74,6 +77,12 @@ const CodePage = () => {
         })
       : []
   }, [functionBody, selectedFunction?.entrypoint_path])
+
+  const [selectedFileId, setSelectedFileId] = useState<number>()
+  const defaultSelectedFileId = getDefaultSelectedFileId(
+    initialFiles,
+    functionBody?.metadata?.deno2_entrypoint_path ?? selectedFunction?.entrypoint_path
+  )
 
   const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
     onSuccess: () => {
@@ -159,7 +168,7 @@ const CodePage = () => {
       {isErrorLoadingFiles && (
         <div className="flex flex-col items-center justify-center h-full bg-surface-200">
           <div className="flex flex-col items-center text-center gap-3 max-w-md">
-            <AlertCircle size={24} strokeWidth={1.5} className="text-amber-900" />
+            <AlertCircleIcon size={24} strokeWidth={1.5} className="text-amber-900" />
             <h3 className="text-md mt-4">Failed to load function code</h3>
             <p className="text-sm text-foreground-light">
               {filesError?.message ||
@@ -191,6 +200,8 @@ const CodePage = () => {
         <>
           <FileExplorerAndEditor
             files={files}
+            selectedFileId={selectedFileId ?? defaultSelectedFileId}
+            setSelectedFileId={setSelectedFileId}
             onFilesChange={(files) => {
               const formattedFiles: FileData[] = files.map((f) => {
                 const originalFile = initialFiles.find((x) => x.id === f.id)
@@ -222,10 +233,10 @@ const CodePage = () => {
                 onClick={handleDeployClick}
                 iconRight={
                   isDeploying ? (
-                    <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+                    <Loader2Icon className="animate-spin" size={10} strokeWidth={1.5} />
                   ) : (
                     <div className="flex items-center space-x-1">
-                      <CornerDownLeft size={10} strokeWidth={1.5} />
+                      <CornerDownLeftIcon size={10} strokeWidth={1.5} />
                     </div>
                   )
                 }

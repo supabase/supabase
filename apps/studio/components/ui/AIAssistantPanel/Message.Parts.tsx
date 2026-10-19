@@ -1,6 +1,6 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { isToolUIPart, type TextUIPart, type ToolUIPart } from 'ai'
-import { BrainIcon, CheckIcon, CircleStop, Loader2, XIcon } from 'lucide-react'
+import { BrainIcon, CheckIcon, CircleStopIcon, Loader2Icon, XIcon } from 'lucide-react'
 import { memo, type ReactNode } from 'react'
 import { cn } from 'ui'
 import { Markdown } from 'ui-patterns/Markdown'
@@ -23,17 +23,16 @@ import {
   type CompactPart,
   type CompactPartStatus,
 } from './Message.Parts.utils'
-import {
-  deployEdgeFunctionInputSchema,
-  deployEdgeFunctionOutputSchema,
-  parseExecuteSqlChartResult,
-} from './Message.utils'
+import { deployEdgeFunctionInputSchema, parseExecuteSqlChartResult } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
 import { MessagePartQueryLogs } from './MessagePartQueryLogs'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
 import { NotebookRunRenderer } from './NotebookRunRenderer'
+import { OptInRequest } from './OptInRequest'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
+import { storedUpdateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import { contract as deployEdgeFunctionContract } from '@/lib/ai/tools/deploy-edge-function'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -60,7 +59,7 @@ function MessagePartText({ textPart }: { textPart: TextUIPart }) {
 }
 
 const COMPACT_STATUS_ICONS: Record<CompactPartStatus, ReactNode> = {
-  running: <Loader2 strokeWidth={1.5} size={12} className="animate-spin" />,
+  running: <Loader2Icon strokeWidth={1.5} size={12} className="animate-spin" />,
   done: <CheckIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />,
   failed: <XIcon strokeWidth={1.5} size={12} className="text-destructive" />,
 }
@@ -93,7 +92,7 @@ function MessagePartCompact({ part, isActive }: { part: CompactPart; isActive?: 
 function ToolDisplayExecuteSqlLoading({ label = 'Writing SQL...' }: { label?: string }) {
   return (
     <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-      <Loader2 className="w-4 h-4 animate-spin" />
+      <Loader2Icon className="w-4 h-4 animate-spin" />
       {label}
     </div>
   )
@@ -169,7 +168,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   if (state === 'input-streaming') {
     return (
       <div className="my-4 rounded-lg border bg-surface-75 heading-meta h-9 px-3 text-foreground-light flex items-center gap-2">
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader2Icon className="w-4 h-4 animate-spin" />
         Writing Edge Function...
       </div>
     )
@@ -180,7 +179,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const parsedInput = deployEdgeFunctionInputSchema.safeParse(input)
   if (!parsedInput.success) return null
 
-  const parsedOutput = deployEdgeFunctionOutputSchema.safeParse(output)
+  const parsedOutput = deployEdgeFunctionContract.outputSchema.safeParse(output)
   const isInitiallyDeployed =
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 
@@ -272,6 +271,31 @@ function MessagePartNotebookRun({ toolPart }: { toolPart: ToolUIPart }) {
   )
 }
 
+function MessagePartUpdateOptInLevel({ toolPart }: { toolPart: ToolUIPart }) {
+  const { state, input, output } = toolPart
+  const { addToolApprovalResponse } = useMessageActionsContext()
+
+  const parsedInput = storedUpdateOptInLevelInputSchema.safeParse(input)
+  if (state === 'input-streaming' || !parsedInput.success) return null
+
+  const { confirmState, onApprove, onDeny } = getManualToolApprovalHandlers({
+    state,
+    approval: toolPart.approval,
+    addToolApprovalResponse,
+  })
+
+  return (
+    <OptInRequest
+      requiredLevel={parsedInput.data.requiredLevel}
+      levelWhenAsked={parsedInput.data.levelWhenAsked}
+      output={output}
+      confirmState={confirmState}
+      onApprove={onApprove}
+      onDeny={onDeny}
+    />
+  )
+}
+
 const MessagePart = {
   Text: MessagePartText,
   Compact: MessagePartCompact,
@@ -280,6 +304,7 @@ const MessagePart = {
   DeployEdgeFunction: MessagePartDeployEdgeFunction,
   NotebookProposal: MessagePartNotebookProposal,
   NotebookRun: MessagePartNotebookRun,
+  UpdateOptInLevel: MessagePartUpdateOptInLevel,
 } as const
 
 // Wide parts share the default width for now; the split stays so a part can diverge again.
@@ -338,7 +363,7 @@ export const MessagePartSwitcher = memo(
     if (!isActiveMessage && isIncompletePart) {
       return (
         <Tool
-          icon={<CircleStop strokeWidth={1.5} size={12} className="text-foreground-muted" />}
+          icon={<CircleStopIcon strokeWidth={1.5} size={12} className="text-foreground-muted" />}
           label={INTERRUPTED_LABEL}
         >
           {part.type === 'reasoning' ? part.text : undefined}
@@ -379,6 +404,9 @@ export const MessagePartSwitcher = memo(
         }
         case 'tool-run_notebook': {
           return <MessagePart.NotebookRun toolPart={part} />
+        }
+        case 'tool-update_opt_in_level': {
+          return <MessagePart.UpdateOptInLevel toolPart={part} />
         }
 
         case 'source-url':

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { DatabaseBackup, Info } from 'lucide-react'
+import { DatabaseBackupIcon, InfoIcon } from 'lucide-react'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -89,7 +89,7 @@ const ScheduledBackups = () => {
   if (isHighAvailability) {
     return (
       <HighAvailabilityDisabledEmptyState
-        icon={DatabaseBackup}
+        icon={DatabaseBackupIcon}
         title="Scheduled backups unavailable on High Availability projects"
         description="We're working to bring scheduled backups to High Availability projects. Contact support if this is blocking your work."
         className="max-w-none mx-0"
@@ -116,7 +116,7 @@ const ScheduledBackups = () => {
             <InformationBox
               hideCollapse
               defaultVisibility
-              icon={<Info strokeWidth={2} />}
+              icon={<InfoIcon strokeWidth={2} />}
               title="Point-In-Time-Recovery (PITR) enabled"
               description={
                 <div>

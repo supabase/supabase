@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronRight, ExternalLink } from 'lucide-react'
+import { ChevronRightIcon, ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -148,7 +148,7 @@ export const SpendCapSidePanel = () => {
       <SheetContent showClose={false} size="lg" className="flex flex-col gap-0">
         <SheetHeader className="flex items-center justify-between w-full">
           <SheetTitle>Spend cap</SheetTitle>
-          <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
+          <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
             <Link
               href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
@@ -169,7 +169,7 @@ export const SpendCapSidePanel = () => {
             <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
               <CollapsibleTrigger asChild>
                 <div className="flex items-center space-x-2 cursor-pointer">
-                  <ChevronRight
+                  <ChevronRightIcon
                     strokeWidth={1.5}
                     size={16}
                     className={showUsageCosts ? 'rotate-90' : ''}

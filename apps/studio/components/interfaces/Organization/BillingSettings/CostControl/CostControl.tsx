@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -76,7 +76,7 @@ export const CostControl = () => {
                 >
                   <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                     <p className="text-sm m-0">Spend cap</p>
-                    <ExternalLink size={16} strokeWidth={1.5} />
+                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
                   </div>
                 </Link>
               </div>

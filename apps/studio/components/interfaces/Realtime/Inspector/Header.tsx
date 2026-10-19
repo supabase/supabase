@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { PlayCircle, StopCircle } from 'lucide-react'
+import { PlayCircleIcon, StopCircleIcon } from 'lucide-react'
 import { Dispatch, SetStateAction, useCallback } from 'react'
 import { Button } from 'ui'
 
@@ -66,7 +66,7 @@ export const Header = ({
       variant={config.enabled ? 'warning' : 'primary'}
       className="rounded-l-none border-l-0"
       disabled={!canToggleListening}
-      icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
+      icon={config.enabled ? <StopCircleIcon size="16" /> : <PlayCircleIcon size="16" />}
       onClick={handleToggleListening}
     >
       {config.enabled ? `Stop listening` : `Start listening`}
@@ -93,7 +93,7 @@ export const Header = ({
             variant={config.enabled ? 'warning' : 'primary'}
             className="rounded-l-none border-l-0"
             disabled
-            icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
+            icon={config.enabled ? <StopCircleIcon size="16" /> : <PlayCircleIcon size="16" />}
             onClick={handleToggleListening}
             tooltip={{
               content: {

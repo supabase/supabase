@@ -1,11 +1,9 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState, type PropsWithChildren } from 'react'
-import { Button } from 'ui'
 
-import { BRANCHING_GITHUB_DISCUSSION_LINK } from '@/components/interfaces/BranchManagement/BranchManagement.constants'
+import { CreateBranchButton } from '@/components/interfaces/BranchManagement/CreateBranchButton'
 import { DeleteBranchModal } from '@/components/interfaces/BranchManagement/DeleteBranchModal'
 import { Overview } from '@/components/interfaces/BranchManagement/Overview'
 import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
@@ -13,7 +11,6 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
@@ -68,13 +65,11 @@ const BranchesPage: NextPageWithLayout = () => {
   )
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const isGithubConnected = githubConnection !== undefined
   const repo = githubConnection?.repository.name ?? ''
 
-  const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
   const isSuccess = isSuccessConnections && isSuccessBranches
-
-  const isGithubConnected = githubConnection !== undefined
 
   const generateCreatePullRequestURL = (branch?: string) => {
     if (githubConnection === undefined) return 'https://github.com'
@@ -108,19 +103,17 @@ const BranchesPage: NextPageWithLayout = () => {
                     />
                   )}
 
-                  {!isError && (
-                    <Overview
-                      isGithubConnected={isGithubConnected}
-                      isLoading={isLoading}
-                      isSuccess={isSuccess}
-                      repo={repo}
-                      mainBranch={mainBranch}
-                      previewBranches={previewBranches}
-                      onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
-                      onSelectDeleteBranch={setSelectedBranchToDelete}
-                      generateCreatePullRequestURL={generateCreatePullRequestURL}
-                    />
-                  )}
+                  <Overview
+                    isGithubConnected={isGithubConnected}
+                    isLoading={isLoading}
+                    isSuccess={isSuccess}
+                    repo={repo}
+                    mainBranch={mainBranch}
+                    previewBranches={previewBranches}
+                    onSelectCreateBranch={() => snap.setShowCreateBranchModal(true)}
+                    onSelectDeleteBranch={setSelectedBranchToDelete}
+                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                  />
                 </>
               )}
             </div>
@@ -154,50 +147,12 @@ const BranchesPage: NextPageWithLayout = () => {
 // directly. Same shape and identical body as before — accepts the page
 // content as `children` instead of capturing it from a closure.
 export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
-  const snap = useAppStateSnapshot()
-  const { can: canCreateBranches } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_CREATE
-  )
-
-  const primaryActions = (
-    <ButtonTooltip
-      variant="primary"
-      disabled={!canCreateBranches}
-      onClick={() => snap.setShowCreateBranchModal(true)}
-      tooltip={{
-        content: {
-          side: 'bottom',
-          text: !canCreateBranches
-            ? 'You need additional permissions to create branches'
-            : undefined,
-        },
-      }}
-    >
-      Create branch
-    </ButtonTooltip>
-  )
-
-  const secondaryActions = (
-    <div className="flex items-center gap-x-2">
-      <Button
-        asChild
-        variant="text"
-        icon={<MessageCircle className="text-muted" strokeWidth={1} />}
-      >
-        <a target="_blank" rel="noreferrer" href={BRANCHING_GITHUB_DISCUSSION_LINK}>
-          Branching feedback
-        </a>
-      </Button>
-      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-    </div>
-  )
-
   return (
     <PageLayout
       title="Branches"
       subtitle="Manage your database preview branches and deployments"
-      primaryActions={primaryActions}
-      secondaryActions={secondaryActions}
+      primaryActions={<CreateBranchButton />}
+      secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
     >
       {children}
     </PageLayout>

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
-import { Loader, Shield, Wrench } from 'lucide-react'
+import { LoaderIcon, ShieldIcon, WrenchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -126,7 +126,7 @@ export const TransferProjectButton = () => {
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Loader />
+                <LoaderIcon />
               </span>
               <div>
                 <p className="font-bold">Possible downtime</p>
@@ -139,7 +139,7 @@ export const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Shield />
+                <ShieldIcon />
               </span>
               <div>
                 <p className="font-bold">Permissions</p>
@@ -152,7 +152,7 @@ export const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={24} className="shrink-0" />
+                <WrenchIcon size={24} className="shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>

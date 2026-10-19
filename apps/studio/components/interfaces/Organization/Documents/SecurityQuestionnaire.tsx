@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button } from 'ui'
@@ -76,7 +76,7 @@ export const SecurityQuestionnaire = () => {
           </div>
         ) : (
           <div className="@lg:flex items-center justify-center h-full">
-            <Button icon={<Download />} onClick={handleDownloadClick} disabled={!slug}>
+            <Button icon={<DownloadIcon />} onClick={handleDownloadClick} disabled={!slug}>
               Download Questionnaire
             </Button>
           </div>

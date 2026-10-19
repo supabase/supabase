@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Calendar } from 'lucide-react'
+import { CalendarIcon } from 'lucide-react'
 import Link from 'next/link'
 
 import { getPITRRetentionDuration } from './PITR.utils'
@@ -46,7 +46,7 @@ export const PITRNotice = () => {
     >
       <div className="flex p-6 space-x-6">
         <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-border-strong">
-          <Calendar strokeWidth={2} />
+          <CalendarIcon strokeWidth={2} />
         </div>
         <div className="space-y-2">
           <p className="text-sm">Recovery retention period</p>

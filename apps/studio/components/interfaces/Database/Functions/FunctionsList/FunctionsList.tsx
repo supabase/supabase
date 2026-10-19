@@ -1,5 +1,5 @@
 import { safeSql } from '@supabase/pg-meta'
-import { Database, Plus, Search } from 'lucide-react'
+import { DatabaseIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -273,7 +273,7 @@ export const FunctionsList = () => {
               ref={searchInputRef}
               placeholder="Search for a function"
               size="tiny"
-              icon={<Search />}
+              icon={<SearchIcon />}
               value={filterString}
               className="w-full lg:w-52"
               onChange={(e) => setFilterString(e.target.value)}
@@ -331,7 +331,7 @@ export const FunctionsList = () => {
         {functions.length === 0 ? (
           <>
             <EmptyStatePresentational
-              icon={Database}
+              icon={DatabaseIcon}
               title="Add your first function"
               description="PostgreSQL functions are a set of SQL and procedural commands such as declarations, assignments, loops, or flow-of-control."
             >
@@ -436,7 +436,7 @@ const CreateFunctionButton = ({
           variant={variant}
           className="grow"
           onClick={() => createFunction()}
-          icon={hideIcon ? null : <Plus />}
+          icon={hideIcon ? null : <PlusIcon />}
         >
           New function
         </Button>
@@ -448,7 +448,7 @@ const CreateFunctionButton = ({
         disabled
         variant={variant}
         className="grow"
-        icon={hideIcon ? null : <Plus />}
+        icon={hideIcon ? null : <PlusIcon />}
         tooltip={{
           content: {
             side: 'bottom',

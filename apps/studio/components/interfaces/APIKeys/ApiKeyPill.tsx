@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -112,7 +112,7 @@ export function ApiKeyPill({
               aria-label={show ? 'Hide API key' : 'Reveal API key'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
-              icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+              icon={show ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
               onClick={onToggleShow}
               disabled={isRestricted}
             />

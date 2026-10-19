@@ -1,4 +1,4 @@
-import { Edit2, MoreVertical, Trash } from 'lucide-react'
+import { Edit2Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -66,7 +66,7 @@ export const ObservabilityMenuItem = ({
                 aria-label="More actions"
                 variant="text"
                 className="px-0.5 h-[20px] opacity-50 hover:opacity-100"
-                icon={<MoreVertical size={12} strokeWidth={2} />}
+                icon={<MoreVerticalIcon size={12} strokeWidth={2} />}
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
@@ -82,7 +82,7 @@ export const ObservabilityMenuItem = ({
                   onSelectEdit()
                 }}
               >
-                <Edit2 size={12} />
+                <Edit2Icon size={12} />
                 <div>Rename report</div>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -94,7 +94,7 @@ export const ObservabilityMenuItem = ({
                   onSelectDelete()
                 }}
               >
-                <Trash size={12} />
+                <TrashIcon size={12} />
                 <div>Delete report</div>
               </DropdownMenuItem>
             </DropdownMenuContent>

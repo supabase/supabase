@@ -1,4 +1,4 @@
-import { ChevronDown, Mail, UserPlus } from 'lucide-react'
+import { ChevronDownIcon, MailIcon, UserPlusIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 
@@ -34,7 +34,7 @@ export const AddUserDropdown = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="primary" iconRight={<ChevronDown size={14} strokeWidth={1.5} />}>
+          <Button variant="primary" iconRight={<ChevronDownIcon size={14} strokeWidth={1.5} />}>
             Add user
           </Button>
         </DropdownMenuTrigger>
@@ -50,7 +50,7 @@ export const AddUserDropdown = () => {
                 content: { side: 'left', text: 'You need additional permissions to invite users' },
               }}
             >
-              <Mail size={14} className="shrink-0" />
+              <MailIcon size={14} className="shrink-0" />
               <p className="flex-1 min-w-0">Send invitation</p>
               {canInviteUsers && (
                 <ShortcutBadge
@@ -71,7 +71,7 @@ export const AddUserDropdown = () => {
               content: { side: 'left', text: 'You need additional permissions to create users' },
             }}
           >
-            <UserPlus size={14} className="shrink-0" />
+            <UserPlusIcon size={14} className="shrink-0" />
             <p className="flex-1 min-w-0">Create new user</p>
             {canCreateUsers && (
               <ShortcutBadge

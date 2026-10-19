@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Lock, Table } from 'lucide-react'
+import { LockIcon, TableIcon } from 'lucide-react'
 import { AiIconAnimation, Badge, CardTitle } from 'ui'
 
 import type { PolicyTable } from './PolicyTableRow.types'
@@ -49,7 +49,7 @@ export const PolicyTableRowHeader = ({
           id={String(table.id)}
           className="flex items-center gap-3 flex-wrap"
         >
-          <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
+          <TableIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
           <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
         </EditorTablePageLink>
         <div className="flex items-center gap-x-1">
@@ -66,7 +66,7 @@ export const PolicyTableRowHeader = ({
           {isTableLocked && (
             <Badge className="h-5">
               <span className="flex gap-x-1 items-center text-foreground-lighter">
-                <Lock size={10} /> Locked
+                <LockIcon size={10} /> Locked
               </span>
             </Badge>
           )}

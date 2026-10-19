@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
+import { ChevronRightIcon, EditIcon, ExternalLinkIcon, Table2Icon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Badge, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -83,12 +83,16 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                     {target}
                   </TooltipContent>
                 </Tooltip>
-                <ChevronRight size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
+                <ChevronRightIcon
+                  size={12}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter/50"
+                />
               </Badge>
 
               <Link href={`/project/${ref}/editor/${tableId}`}>
                 <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-xs tracking-tight border-l-0">
-                  <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
+                  <Table2Icon size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                   <Tooltip>
                     <TooltipTrigger className="truncate max-w-28">
                       {table.schema}.{table.table_name}
@@ -116,7 +120,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               className="transition text-foreground-light hover:text-foreground flex items-center gap-x-2"
             >
               <span title={`View ${metadata.label} in Vault`}>{metadata.label}</span>
-              <ExternalLink size={14} strokeWidth={1.5} />
+              <ExternalLinkIcon size={14} strokeWidth={1.5} />
             </Link>
           </div>
         ))}
@@ -125,7 +129,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
         <div className="flex items-center gap-x-2">
           <ButtonTooltip
             disabled={!canManageWrappers}
-            icon={<Edit strokeWidth={1.5} />}
+            icon={<EditIcon strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToEdit(wrapper.id.toString())}
             tooltip={{
@@ -137,7 +141,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           />
           <ButtonTooltip
             disabled={!canManageWrappers}
-            icon={<Trash strokeWidth={1.5} />}
+            icon={<TrashIcon strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToDelete(wrapper.id.toString())}
             tooltip={{

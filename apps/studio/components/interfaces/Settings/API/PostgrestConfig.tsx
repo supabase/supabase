@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { safeSql } from '@supabase/pg-meta'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -511,14 +511,12 @@ export const PostgrestConfig = () => {
                               description="Grants privileges to Data API roles by default, exposing new tables. We recommend disabling this to control access manually."
                             >
                               <FormControl>
-                                <div>
-                                  <Switch
-                                    size="large"
-                                    disabled={!canUpdateExposedEntities}
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </div>
+                                <Switch
+                                  size="large"
+                                  disabled={!canUpdateExposedEntities}
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
                               </FormControl>
                             </FormItemLayout>
                           </FormItem>
@@ -679,7 +677,7 @@ export const PostgrestConfig = () => {
                 description="Expose a custom schema instead of the public schema"
               >
                 <div className="flex gap-2 items-center justify-end">
-                  <Button icon={<Lock />} onClick={() => setShowModal(true)}>
+                  <Button icon={<LockIcon />} onClick={() => setShowModal(true)}>
                     Harden Data API
                   </Button>
                 </div>

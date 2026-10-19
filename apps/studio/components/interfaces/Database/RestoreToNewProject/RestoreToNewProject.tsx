@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
@@ -269,7 +269,7 @@ export const RestoreToNewProject = () => {
       />
       {isRestoring ? (
         <Alert className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
-          <Loader2 className="animate-spin" />
+          <Loader2Icon className="animate-spin" />
           <AlertTitle>Restoration in progress</AlertTitle>
           <AlertDescription>
             <p>

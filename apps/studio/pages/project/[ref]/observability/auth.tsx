@@ -1,6 +1,6 @@
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, LogsIcon, RefreshCwIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -231,7 +231,7 @@ const AuthUsage = () => {
               >
                 <Button
                   disabled={isRefreshing}
-                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -258,7 +258,7 @@ const AuthUsage = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}

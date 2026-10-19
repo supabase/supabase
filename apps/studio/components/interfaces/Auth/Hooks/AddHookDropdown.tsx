@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Button,
@@ -85,7 +85,7 @@ export const AddHookDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} iconRight={<ChevronDown />}>
+        <Button variant={variant} iconRight={<ChevronDownIcon />}>
           {buttonText}
         </Button>
       </DropdownMenuTrigger>

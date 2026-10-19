@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Card, CardContent, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -84,7 +84,7 @@ export const ComplianceConfig = () => {
             </div>
             <div className="flex items-center justify-end space-x-2">
               {(isLoading || isSubmitting) && (
-                <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+                <Loader2Icon className="animate-spin" strokeWidth={1.5} size={16} />
               )}
               {isError && (
                 <AlertError error={error} subject="Failed to retrieve project settings" />

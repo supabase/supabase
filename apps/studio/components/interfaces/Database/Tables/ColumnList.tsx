@@ -1,20 +1,20 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
-  Braces,
-  Calendar,
+  BracesIcon,
+  CalendarIcon,
   DiamondIcon,
-  Fingerprint,
-  Hash,
-  Key,
-  Link as LinkIcon,
-  ListPlus,
-  MoreVertical,
-  Plus,
-  Search,
-  ToggleRight,
-  Trash,
-  Type,
+  FingerprintIcon,
+  HashIcon,
+  KeyIcon,
+  LinkIcon,
+  ListPlusIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  SearchIcon,
+  ToggleRightIcon,
+  TrashIcon,
+  TypeIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -65,32 +65,32 @@ const getColumnTypeAffordancePresentation = (column: SafePostgresColumn) => {
   switch (kind) {
     case 'number':
       return {
-        icon: <Hash size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <HashIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'time':
       return {
-        icon: <Calendar size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <CalendarIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'text':
       return {
-        icon: <Type size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <TypeIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'json':
       return {
-        icon: <Braces size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <BracesIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'bool':
       return {
-        icon: <ToggleRight size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <ToggleRightIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     default:
       return {
-        icon: <ListPlus size={16} className={iconClassName} strokeWidth={1.5} />,
+        icon: <ListPlusIcon size={16} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
   }
@@ -151,12 +151,12 @@ export const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search />}
+            icon={<SearchIcon />}
           />
         </div>
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
-            icon={<Plus />}
+            icon={<PlusIcon />}
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{
@@ -240,14 +240,14 @@ export const ColumnList = ({
 
               {isSuccess &&
                 columns.map((column) => {
-                  const { icon: TypeIcon, label: typeLabel } =
+                  const { icon: typeIcon, label: typeLabel } =
                     getColumnTypeAffordancePresentation(column)
 
                   const constraintTokens = [
                     primaryKeyColumns.has(column.name) ? (
                       <ConstraintToken
                         key="primary"
-                        icon={<Key size={12} strokeWidth={1.7} className="shrink-0" />}
+                        icon={<KeyIcon size={12} strokeWidth={1.7} className="shrink-0" />}
                         label="Primary"
                         variant="primary"
                       />
@@ -269,7 +269,7 @@ export const ColumnList = ({
                       <ConstraintToken
                         key="unique"
                         icon={
-                          <Fingerprint
+                          <FingerprintIcon
                             size={12}
                             strokeWidth={1.7}
                             className="shrink-0 text-foreground-light"
@@ -282,7 +282,7 @@ export const ColumnList = ({
                       <ConstraintToken
                         key="identity"
                         icon={
-                          <Hash
+                          <HashIcon
                             size={12}
                             strokeWidth={1.7}
                             className="shrink-0 text-foreground-lighter"
@@ -311,7 +311,7 @@ export const ColumnList = ({
                       <TableCell className="w-0 pl-5! pr-1!">
                         <Tooltip>
                           <TooltipTrigger asChild className="cursor-default" aria-label={typeLabel}>
-                            <div className="flex w-4 justify-center">{TypeIcon}</div>
+                            <div className="flex w-4 justify-center">{typeIcon}</div>
                           </TooltipTrigger>
                           <TooltipContent side="bottom">
                             <div className="flex flex-col">
@@ -380,7 +380,7 @@ export const ColumnList = ({
                                       // Tooltip repeats the label; screen readers would read it twice
                                       aria-describedby={undefined}
                                       className="px-1"
-                                      icon={<MoreVertical />}
+                                      icon={<MoreVerticalIcon />}
                                     />
                                   </DropdownMenuTrigger>
                                 </TooltipTrigger>
@@ -396,7 +396,7 @@ export const ColumnList = ({
                                   onClick={() => onDeleteColumn(column)}
                                   className="gap-x-2"
                                 >
-                                  <Trash size={12} />
+                                  <TrashIcon size={12} />
                                   <p>Delete column</p>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>

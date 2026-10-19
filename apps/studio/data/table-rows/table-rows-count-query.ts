@@ -114,7 +114,7 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
   const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
     queryKey: tableRowKeys.tableRowsCount(projectRef, {

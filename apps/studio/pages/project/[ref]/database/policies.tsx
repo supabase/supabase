@@ -1,7 +1,7 @@
 import type { PGTable } from '@supabase/pg-meta'
 import { ident, safeSql } from '@supabase/pg-meta'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Search, X } from 'lucide-react'
+import { SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -304,7 +304,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
                   setSearchString(str)
                 }}
                 onKeyDown={onSearchInputEscape(searchString || '', setSearchString)}
-                icon={<Search size={14} />}
+                icon={<SearchIcon size={14} />}
                 actions={
                   searchString ? (
                     <Button
@@ -312,7 +312,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
                       variant="text"
                       aria-label="Clear filter"
                       className="p-0 h-5 w-5"
-                      icon={<X />}
+                      icon={<XIcon />}
                       onClick={() => setSearchString('')}
                     />
                   ) : null

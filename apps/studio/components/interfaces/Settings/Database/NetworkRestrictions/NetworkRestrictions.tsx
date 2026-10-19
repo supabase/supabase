@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertCircle, ChevronDown, Globe, Lock } from 'lucide-react'
+import { AlertCircleIcon, ChevronDownIcon, GlobeIcon, LockIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
@@ -148,7 +148,7 @@ export const NetworkRestrictions = () => {
                   <Button
                     variant="primary"
                     disabled={isSectionDisabled}
-                    iconRight={<ChevronDown size={14} />}
+                    iconRight={<ChevronDownIcon size={14} />}
                   >
                     Add restriction
                   </Button>
@@ -205,7 +205,7 @@ export const NetworkRestrictions = () => {
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center space-x-2">
-                        <AlertCircle
+                        <AlertCircleIcon
                           size={20}
                           strokeWidth={1.5}
                           className="text-foreground-light"
@@ -259,7 +259,7 @@ export const NetworkRestrictions = () => {
                 ) : isDisallowedAll ? (
                   <CardContent className="flex items-center justify-between">
                     <div className="flex items-start space-x-4">
-                      <Lock size={20} className="text-foreground-light" strokeWidth={1.5} />
+                      <LockIcon size={20} className="text-foreground-light" strokeWidth={1.5} />
                       <div className="space-y-1">
                         <p className="text-foreground-light text-sm">
                           Your database <span className="text-amber-900 opacity-80">cannot</span> be
@@ -316,7 +316,7 @@ export const NetworkRestrictions = () => {
                           return (
                             <div key={ip} className="py-4 flex items-center justify-between">
                               <div className="flex items-center space-x-5">
-                                <Globe size={16} className="text-foreground-lighter" />
+                                <GlobeIcon size={16} className="text-foreground-lighter" />
                                 <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
                                 <p className="text-sm font-mono">{ip}</p>
                               </div>

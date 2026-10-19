@@ -1,4 +1,4 @@
-import { Check, Plus } from 'lucide-react'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Alert,
@@ -190,7 +190,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                         >
                           <span>All schemas</span>
                           {selectedSchemaName === '*' && (
-                            <Check className="text-primary" strokeWidth={2} size={16} />
+                            <CheckIcon className="text-primary" strokeWidth={2} size={16} />
                           )}
                         </CommandItem>
                       )}
@@ -209,7 +209,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                         >
                           <span>{schema.name}</span>
                           {selectedSchemaName === schema.name && (
-                            <Check className="text-primary" strokeWidth={2} size={16} />
+                            <CheckIcon className="text-primary" strokeWidth={2} size={16} />
                           )}
                         </CommandItem>
                       ))}
@@ -230,7 +230,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                             setOpen(false)
                           }}
                         >
-                          <Plus size={12} />
+                          <PlusIcon size={12} />
                           Create a new schema
                         </CommandItem>
                       </CommandGroup>

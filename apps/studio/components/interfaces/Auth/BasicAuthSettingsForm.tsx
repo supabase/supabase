@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -277,7 +277,7 @@ export const BasicAuthSettingsForm = () => {
                             </Link>{' '}
                             to ensure that access to your data is restricted where required.
                           </p>
-                          <Button asChild className="w-min" icon={<ExternalLink />}>
+                          <Button asChild className="w-min" icon={<ExternalLinkIcon />}>
                             <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                               View access control docs
                             </Link>

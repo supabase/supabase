@@ -1,13 +1,12 @@
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
-import { AlertCircle, Search } from 'lucide-react'
+import { AlertCircleIcon, SearchIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   Card,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
-  ShadowScrollArea,
   Table,
   TableBody,
   TableCell,
@@ -89,14 +88,14 @@ export const Extensions = () => {
             onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
           <InputGroupAddon>
-            <Search />
+            <SearchIcon />
           </InputGroupAddon>
         </InputGroup>
       </div>
 
       {isPermissionsLoaded && !canUpdateExtensions && (
         <InformationBox
-          icon={<AlertCircle className="text-foreground-light" size={18} strokeWidth={2} />}
+          icon={<AlertCircleIcon className="text-foreground-light" size={18} strokeWidth={2} />}
           title="You need additional permissions to update database extensions"
         />
       )}
@@ -105,51 +104,43 @@ export const Extensions = () => {
         <GenericSkeletonLoader />
       ) : (
         <Card>
-          <ShadowScrollArea stickyLastColumn>
-            <Table>
-              <TableHeader>
+          <Table containerProps={{ stickyLastColumn: true }}>
+            <TableHeader>
+              <TableRow>
+                <TableHead key="name">Name</TableHead>
+                <TableHead key="version" className="w-28">
+                  Version
+                </TableHead>
+                <TableHead key="schema">Schema</TableHead>
+                <TableHead key="description" className="min-w-80">
+                  Description
+                </TableHead>
+                <TableHead key="used-by">Used by</TableHead>
+                <TableHead key="links">Links</TableHead>
+                <TableHead key="enabled" className="px-0">
+                  <div className="bg-200! px-4 w-full h-full flex items-center border-l">
+                    Enabled
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {[...enabledExtensions, ...disabledExtensions].map((extension) => (
+                <ExtensionRow key={extension.name} extension={extension} />
+              ))}
+              {extensions.length === 0 && (
                 <TableRow>
-                  <TableHead key="name">Name</TableHead>
-                  <TableHead key="version" className="w-28">
-                    Version
-                  </TableHead>
-                  <TableHead key="schema">Schema</TableHead>
-                  <TableHead key="description" className="min-w-80">
-                    Description
-                  </TableHead>
-                  <TableHead key="used-by">Used by</TableHead>
-                  <TableHead key="links">Links</TableHead>
-                  {/*
-                    [Joshen] All these classes are just to make the last column sticky
-                    I reckon we can pull these out into the Table component where we can declare
-                    sticky columns via props, but we can do that if we start to have more tables
-                    in the dashboard with sticky columns
-                  */}
-                  <TableHead key="enabled" className="px-0">
-                    <div className="bg-200! px-4 w-full h-full flex items-center border-l">
-                      Enabled
-                    </div>
-                  </TableHead>
+                  <TableCell colSpan={7}>
+                    <NoSearchResults
+                      className="border-none p-0! bg-transparent"
+                      searchString={filterString}
+                      onResetFilter={() => setFilterString('')}
+                    />
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {[...enabledExtensions, ...disabledExtensions].map((extension) => (
-                  <ExtensionRow key={extension.name} extension={extension} />
-                ))}
-                {extensions.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7}>
-                      <NoSearchResults
-                        className="border-none p-0! bg-transparent"
-                        searchString={filterString}
-                        onResetFilter={() => setFilterString('')}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </ShadowScrollArea>
+              )}
+            </TableBody>
+          </Table>
         </Card>
       )}
     </>

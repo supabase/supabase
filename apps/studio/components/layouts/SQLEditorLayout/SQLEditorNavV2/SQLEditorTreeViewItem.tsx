@@ -2,16 +2,16 @@ import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import {
-  Copy,
-  Download,
-  Edit,
-  ExternalLink,
-  Heart,
-  Lock,
-  Move,
-  Plus,
-  Share,
-  Trash,
+  CopyIcon,
+  DownloadIcon,
+  EditIcon,
+  ExternalLinkIcon,
+  HeartIcon,
+  LockIcon,
+  MoveIcon,
+  PlusIcon,
+  ShareIcon,
+  TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -298,7 +298,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectCreate()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Plus size={14} />
+                  <PlusIcon size={14} />
                   Create new snippet
                 </ContextMenuItem>
               )}
@@ -308,7 +308,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectRename()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Edit size={14} />
+                  <EditIcon size={14} />
                   Rename folder
                 </ContextMenuItem>
               )}
@@ -320,7 +320,7 @@ export const SQLEditorTreeViewItem = ({
                     onSelect={() => onSelectDelete()}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     Delete folder
                   </ContextMenuItem>
                 </>
@@ -334,7 +334,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectMove()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Move size={14} />
+                  <MoveIcon size={14} />
                   Move selected queries
                 </ContextMenuItem>
               )}
@@ -345,7 +345,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectDelete()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Trash size={14} />
+                  <TrashIcon size={14} />
                   Delete selected queries
                 </ContextMenuItem>
               )}
@@ -362,7 +362,7 @@ export const SQLEditorTreeViewItem = ({
                   rel="noreferrer"
                   href={`/project/${projectRef}/sql/${element.id}`}
                 >
-                  <ExternalLink size={14} />
+                  <ExternalLinkIcon size={14} />
                   Open in new tab
                 </Link>
               </ContextMenuItem>
@@ -373,7 +373,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectRename()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Edit size={14} />
+                  <EditIcon size={14} />
                   Rename query
                 </ContextMenuItem>
               )}
@@ -383,7 +383,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectMove()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Move size={14} />
+                  <MoveIcon size={14} />
                   Move query
                 </ContextMenuItem>
               )}
@@ -396,7 +396,7 @@ export const SQLEditorTreeViewItem = ({
                     onSelect={() => onSelectShare()}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
-                    <Share size={14} />
+                    <ShareIcon size={14} />
                     Share query with team
                   </ContextMenuItem>
                 )}
@@ -406,7 +406,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectUnshare()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Lock size={14} />
+                  <LockIcon size={14} />
                   Unshare query with team
                 </ContextMenuItem>
               )}
@@ -416,7 +416,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onSelectDuplicate()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Copy size={14} />
+                  <CopyIcon size={14} />
                   Duplicate query
                 </ContextMenuItem>
               )}
@@ -426,7 +426,7 @@ export const SQLEditorTreeViewItem = ({
                   onSelect={() => onToggleFavorite()}
                   onFocusCapture={(e) => e.stopPropagation()}
                 >
-                  <Heart
+                  <HeartIcon
                     size={14}
                     className={cn(
                       isFavorite
@@ -445,7 +445,7 @@ export const SQLEditorTreeViewItem = ({
                     onSelect={() => onSelectDownload()}
                     onFocusCapture={(e) => e.stopPropagation()}
                   >
-                    <Download size={14} />
+                    <DownloadIcon size={14} />
                     Export query
                   </ContextMenuItem>
                 )}
@@ -453,7 +453,7 @@ export const SQLEditorTreeViewItem = ({
                 <>
                   <ContextMenuSeparator />
                   <ContextMenuItem className="gap-x-2" onSelect={() => onSelectDelete()}>
-                    <Trash size={14} />
+                    <TrashIcon size={14} />
                     Delete query
                   </ContextMenuItem>
                 </>
