@@ -75,7 +75,7 @@ from
         select
           oid,
           (string_to_array(unnest(proconfig), '='))[1] as param,
-          (string_to_array(unnest(proconfig), '='))[2] as value
+          array_to_string((string_to_array(unnest(proconfig), '='))[2:], '=') as value
         from
           functions
       ) as t
