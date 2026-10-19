@@ -1,21 +1,25 @@
 // NOTE: patch pushState before TanStack createBrowserHistory copies it, which is
-// why _app and __root import this module. popstate also fires before the page chunk loads.
+// why _app and __root import this module. the installed flag lives on window
+// because TanStack then replaces pushState with an unmarked wrapper. popstate
+// also fires before the page chunk loads.
 
-const PATCHED_PUSH_STATE = '__studioHistoryTraversePatched'
 const TRAVERSE_STATE = '__studioHistoryTraverseState'
 
 type TraverseState = {
+  isInstalled: boolean
   isTraverseNavigation: boolean
   hasClientPush: boolean
 }
-
-type PatchedPushState = History['pushState'] & { [PATCHED_PUSH_STATE]?: true }
 
 function getTraverseState(): TraverseState {
   const host = window as Window & { [TRAVERSE_STATE]?: TraverseState }
 
   if (!host[TRAVERSE_STATE]) {
-    host[TRAVERSE_STATE] = { isTraverseNavigation: false, hasClientPush: false }
+    host[TRAVERSE_STATE] = {
+      isInstalled: false,
+      isTraverseNavigation: false,
+      hasClientPush: false,
+    }
   }
 
   return host[TRAVERSE_STATE]
@@ -26,30 +30,32 @@ export function installHistoryTraverseListener(): void {
     return
   }
 
-  const currentPushState = history.pushState as PatchedPushState
-  const isAlreadyPatched = currentPushState[PATCHED_PUSH_STATE] === true
+  const state = getTraverseState()
+  const isAlreadyInstalled = state.isInstalled
 
-  if (isAlreadyPatched) {
+  if (isAlreadyInstalled) {
     return
   }
+
+  state.isInstalled = true
 
   window.addEventListener('popstate', () => {
     getTraverseState().isTraverseNavigation = true
   })
 
   const originalPushState = history.pushState.bind(history)
-  const patchedPushState: PatchedPushState = (data, unused, url) => {
-    const state = getTraverseState()
-    state.isTraverseNavigation = false
-    state.hasClientPush = true
+  history.pushState = (data, unused, url) => {
+    const nextState = getTraverseState()
+    nextState.isTraverseNavigation = false
+    nextState.hasClientPush = true
     return originalPushState(data, unused, url)
   }
-  patchedPushState[PATCHED_PUSH_STATE] = true
-  history.pushState = patchedPushState
 }
 
 export function isHistoryTraverseNavigation(): boolean {
-  installHistoryTraverseListener()
+  if (typeof window === 'undefined') {
+    return false
+  }
 
   const { isTraverseNavigation, hasClientPush } = getTraverseState()
 

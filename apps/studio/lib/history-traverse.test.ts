@@ -1,6 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { isHistoryTraverseNavigation, resetHistoryTraverseState } from './history-traverse'
+import {
+  installHistoryTraverseListener,
+  isHistoryTraverseNavigation,
+  resetHistoryTraverseState,
+} from './history-traverse'
 
 describe('isHistoryTraverseNavigation', () => {
   beforeEach(() => {
@@ -49,6 +53,27 @@ describe('isHistoryTraverseNavigation', () => {
     expect(isHistoryTraverseNavigation()).toBe(true)
 
     history.pushState(null, '', '/project/default/sql')
+    expect(isHistoryTraverseNavigation()).toBe(false)
+  })
+
+  test('does not install again after pushState is replaced', () => {
+    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([])
+    const addEventListener = vi.spyOn(window, 'addEventListener')
+    const savedPushState = history.pushState.bind(history)
+    history.pushState = (data, unused, url) => savedPushState(data, unused, url)
+
+    isHistoryTraverseNavigation()
+    installHistoryTraverseListener()
+
+    const popstateListeners = addEventListener.mock.calls.filter(
+      ([eventName]) => eventName === 'popstate'
+    )
+    expect(popstateListeners).toHaveLength(0)
+
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    history.pushState(null, '', '/project/default/editor')
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
