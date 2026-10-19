@@ -1,7 +1,7 @@
 'use client'
 
 import { detectBrowser, isBrowser } from 'common'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 

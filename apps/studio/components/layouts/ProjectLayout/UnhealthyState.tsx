@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangleIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -54,7 +54,7 @@ export const UnhealthyState = () => {
           <div className="space-y-6 py-6">
             <div className="flex px-8 space-x-8">
               <div className="mt-1">
-                <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+                <AlertTriangleIcon className="text-warning" size={18} strokeWidth={1.5} />
               </div>
               <div className="flex flex-col gap-3">
                 <div className="space-y-1">

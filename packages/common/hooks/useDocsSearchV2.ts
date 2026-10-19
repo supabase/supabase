@@ -3,6 +3,8 @@
 import { compact, debounce } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
+import { useMountEffect } from './useMountEffect'
+
 // This app's own base path, set only for apps deployed under a path prefix (docs' is '/docs').
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 // Public URL of the docs deployment, which hosts the search API routes.
@@ -21,7 +23,7 @@ interface DocsSearchV2Result {
 
 type SearchState =
   | { status: 'initial'; key: number }
-  | { status: 'loading'; key: number; staleResults: DocsSearchV2Result[] }
+  | { status: 'loading'; key: number; staleResults: DocsSearchV2Result[]; staleQuery: string }
   | { status: 'results'; key: number; results: DocsSearchV2Result[]; query: string }
   | { status: 'noResults'; key: number; query: string }
   | { status: 'error'; key: number; message: string }
@@ -74,6 +76,8 @@ function reducer(state: SearchState, action: Action): SearchState {
         key: action.key,
         staleResults:
           'results' in state ? state.results : 'staleResults' in state ? state.staleResults : [],
+        // keep highlighted query while loading
+        staleQuery: 'query' in state ? state.query : 'staleQuery' in state ? state.staleQuery : '',
       }
     case 'reset':
       return { status: 'initial', key: action.key }
@@ -121,6 +125,9 @@ const useDocsSearchV2 = () => {
   const debounceCancel = useCallback(() => {
     debouncedSearch.cancel()
   }, [debouncedSearch])
+
+  // the dialog unmounts on close, so cancel any pending search instead of fetching after it's gone
+  useMountEffect(() => debounceCancel)
 
   const resetSearch = useCallback(() => {
     debounceCancel()

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
@@ -87,7 +87,7 @@ export const QueuesTab = () => {
               size="tiny"
               className="w-52"
               placeholder="Search for a queue"
-              icon={<Search />}
+              icon={<SearchIcon />}
               value={search ?? ''}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -102,7 +102,7 @@ export const QueuesTab = () => {
                         key="clear"
                         size="tiny"
                         variant="text"
-                        icon={<X />}
+                        icon={<XIcon />}
                         onClick={clearSearch}
                         className="p-0 h-5 w-5"
                         aria-label="Clear search"
@@ -117,7 +117,7 @@ export const QueuesTab = () => {
             />
 
             <div className="flex items-center gap-x-2">
-              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
+              <Button icon={<RefreshCwIcon />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <Button variant="primary" onClick={() => setCreateQueueSheetShown(true)}>

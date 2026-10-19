@@ -1,6 +1,13 @@
 import { useParams } from 'common'
 import { Auth, Realtime, Storage } from 'icons'
-import { ChevronDown, Database, Network, Plus, RefreshCw, X } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  DatabaseIcon,
+  NetworkIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  XIcon,
+} from 'lucide-react'
 import { ComponentProps, useCallback, useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
 import {
@@ -57,7 +64,7 @@ const PRODUCT_FILTERS = [
     filterKey: 'request.path',
     filterValue: '/rest',
     label: 'Data API (PostgREST)',
-    icon: Database,
+    icon: DatabaseIcon,
   },
   {
     key: 'auth',
@@ -239,7 +246,7 @@ const ReportFilterBar = ({
           >
             <Button
               disabled={isLoading}
-              icon={<RefreshCw className={isLoading ? 'animate-spin' : ''} />}
+              icon={<RefreshCwIcon className={isLoading ? 'animate-spin' : ''} />}
               className="w-7"
               onClick={() => onRefresh()}
             />
@@ -265,7 +272,7 @@ const ReportFilterBar = ({
               <DropdownMenuTrigger asChild>
                 <Button
                   className="inline-flex flex-row gap-2"
-                  iconRight={<ChevronDown size={14} />}
+                  iconRight={<ChevronDownIcon size={14} />}
                 >
                   <span>
                     {currentProductFilter === null ? 'All Requests' : currentProductFilter.label}
@@ -275,7 +282,7 @@ const ReportFilterBar = ({
             </ShortcutTooltip>
             <DropdownMenuContent side="bottom" align="start">
               <DropdownMenuItem onClick={() => handleProductFilterChange(null)}>
-                <Network size={14} strokeWidth={1.5} className="mr-2" />
+                <NetworkIcon size={14} strokeWidth={1.5} className="mr-2" />
                 All Requests
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -329,7 +336,7 @@ const ReportFilterBar = ({
               size="tiny"
               className="p-0! space-x-0!"
               onClick={() => onRemoveFilters([filter])}
-              icon={<X className="text-foreground-light" />}
+              icon={<XIcon className="text-foreground-light" />}
             >
               <span className="sr-only">Remove</span>
             </Button>
@@ -342,7 +349,7 @@ const ReportFilterBar = ({
             open={showAdder ? false : undefined}
           >
             <PopoverTrigger asChild>
-              <Button size="tiny" icon={<Plus className={`text-foreground-light `} />}>
+              <Button size="tiny" icon={<PlusIcon className={`text-foreground-light `} />}>
                 Add filter
               </Button>
             </PopoverTrigger>

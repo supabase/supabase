@@ -1,7 +1,7 @@
 // End of third-party imports
 
 import { compact } from 'lodash'
-import { FileCode, Plus, X } from 'lucide-react'
+import { FileCodeIcon, PlusIcon, XIcon } from 'lucide-react'
 import {
   useCallback,
   useEffect,
@@ -28,7 +28,7 @@ const removeAttachmentButtonClassName = cn(
 )
 
 const RemoveAttachmentIcon = () => (
-  <X
+  <XIcon
     aria-hidden="true"
     strokeWidth={3}
     className="pointer-events-none absolute left-1/2 top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 text-contrast"
@@ -211,7 +211,7 @@ export function AttachmentUploadDisplay({
                 <Tooltip>
                   <TooltipTrigger className="cursor-default" onClick={(e) => e.preventDefault()}>
                     <div className="flex flex-col items-center justify-center gap-y-1">
-                      <FileCode className="text-foreground-light" size={16} />
+                      <FileCodeIcon className="text-foreground-light" size={16} />
                       <p className="text-[10px] font-mono text-foreground-light tracking-wide leading-none">
                         HAR
                       </p>
@@ -263,7 +263,7 @@ export function AttachmentUploadDisplay({
             )}
             onClick={addFile}
           >
-            <Plus strokeWidth={2} size={20} />
+            <PlusIcon strokeWidth={2} size={20} />
           </button>
         )}
       </div>

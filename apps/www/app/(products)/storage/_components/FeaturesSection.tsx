@@ -69,7 +69,7 @@ function InteroperableSkeleton() {
           ))}
         </div>
 
-        <div className="absolute left-0 top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-xl border border-border bg-surface-100/95 shadow-[0_2px_10px_hsl(var(--background-default)/0.15)]">
+        <div className="absolute left-0 top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-xl border border-border bg-surface-100/95 shadow-[0_2px_10px_oklch(from_var(--background-default)_l_c_h/0.15)]">
           <div className="absolute inset-3 rounded-full border border-foreground-muted/15" />
           <div className="absolute inset-5 rounded-full border border-foreground-muted/10" />
           <svg
@@ -88,7 +88,7 @@ function InteroperableSkeleton() {
           </svg>
         </div>
 
-        <div className="absolute left-1/2 top-1/2 flex h-[92px] w-[108px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl border border-border bg-surface-100/95 shadow-[0_6px_18px_hsl(var(--background-default)/0.16)]">
+        <div className="absolute left-1/2 top-1/2 flex h-[92px] w-[108px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-2xl border border-border bg-surface-100/95 shadow-[0_6px_18px_oklch(from_var(--background-default)_l_c_h/0.16)]">
           <div className="absolute inset-3 rounded-[14px] border border-foreground-muted/10" />
           <div className="absolute size-12 rounded-full border border-foreground-muted/15" />
           <div className="absolute size-16 rounded-full border border-foreground-muted/8" />
@@ -110,7 +110,7 @@ function InteroperableSkeleton() {
           </svg>
         </div>
 
-        <div className="absolute right-0 top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-xl border border-border bg-surface-100/95 shadow-[0_2px_10px_hsl(var(--background-default)/0.15)]">
+        <div className="absolute right-0 top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-xl border border-border bg-surface-100/95 shadow-[0_2px_10px_oklch(from_var(--background-default)_l_c_h/0.15)]">
           <div className="absolute inset-3 rounded-full border border-foreground-muted/15" />
           <div className="absolute inset-5 rounded-full border border-foreground-muted/10" />
           <svg
@@ -171,12 +171,12 @@ function CDNSkeleton() {
 
       <div className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
         <div className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2">
-          <div className="absolute -left-[70px] top-1/2 h-[88px] w-[122px] -translate-y-1/2 rounded-[20px] border border-border bg-surface-100 shadow-[0_2px_10px_hsl(var(--background-default)/0.18)]" />
-          <div className="absolute -right-[70px] top-1/2 h-[88px] w-[122px] -translate-y-1/2 rounded-[20px] border border-border bg-surface-100 shadow-[0_2px_10px_hsl(var(--background-default)/0.18)]" />
+          <div className="absolute -left-[70px] top-1/2 h-[88px] w-[122px] -translate-y-1/2 rounded-[20px] border border-border bg-surface-100 shadow-[0_2px_10px_oklch(from_var(--background-default)_l_c_h/0.18)]" />
+          <div className="absolute -right-[70px] top-1/2 h-[88px] w-[122px] -translate-y-1/2 rounded-[20px] border border-border bg-surface-100 shadow-[0_2px_10px_oklch(from_var(--background-default)_l_c_h/0.18)]" />
         </div>
 
-        <div className="relative flex h-[116px] w-[116px] items-center justify-center rounded-[24px] border border-foreground/15 bg-surface-200/95 shadow-[0_8px_28px_hsl(var(--background-default)/0.24)]">
-          <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_0_hsl(var(--foreground-default)/0.06)]" />
+        <div className="relative flex h-[116px] w-[116px] items-center justify-center rounded-[24px] border border-foreground/15 bg-surface-200/95 shadow-[0_8px_28px_oklch(from_var(--background-default)_l_c_h/0.24)]">
+          <div className="absolute inset-0 rounded-[24px] shadow-[inset_0_1px_0_oklch(from_var(--foreground-default)_l_c_h/0.06)]" />
           <div className="absolute size-10 rounded-full bg-brand-default/15 blur-xl" />
           <svg
             width="48"

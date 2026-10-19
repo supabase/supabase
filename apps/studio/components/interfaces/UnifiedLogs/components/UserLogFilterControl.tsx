@@ -1,7 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Loader2, Search, X } from 'lucide-react'
+import { Loader2Icon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { AccordionContent, AccordionItem, AccordionTrigger, Button, Checkbox, cn, Label } from 'ui'
@@ -60,7 +60,7 @@ export const UserLogFilterControl = () => {
           <Button
             type="button"
             variant="outline"
-            icon={<X />}
+            icon={<XIcon />}
             className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
             aria-label="Clear user filter"
             onClick={(e) => {
@@ -76,10 +76,10 @@ export const UserLogFilterControl = () => {
         <div className="p-1 grid gap-2">
           <InputWithAddons
             placeholder="Search by email or id"
-            leading={<Search size={14} className="text-foreground-lighter" />}
+            leading={<SearchIcon size={14} className="text-foreground-lighter" />}
             containerClassName="h-8 rounded-sm"
             value={search}
-            trailing={isFetching ? <Loader2 size={12} className="animate-spin" /> : undefined}
+            trailing={isFetching ? <Loader2Icon size={12} className="animate-spin" /> : undefined}
             onChange={(e) => setSearch(e.target.value)}
           />
 

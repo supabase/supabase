@@ -23,7 +23,7 @@ Vault is now available on every Supabase project. [Check it out](https://supabas
 
 </div>
 
-[Transparent Column Encryption with Postgres](https://supabase.com/blog/transparent-column-encryption-with-postgres) is a blog post that describes the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
+Transparent Column Encryption with Postgres is a blog post that describes the technology behind Vault - [libsodium](https://doc.libsodium.org/) and
 [pgsodium](https://doc.libsodium.org/). Now, we will go through a quick example of storing a secret, like a service access token, into the Vault.
 
 ## Background
@@ -68,7 +68,7 @@ We take the pain out of key management by pre-generating a unique, per-database 
 accessibly only internally in the Postgres server by the libsodium library. This root key is managed by the [pgsodium](https://github.com/michelp/pgsodium) Postgres extension
 when the server boots using [Server Key Management.](https://github.com/michelp/pgsodium#server-key-management)
 
-pgsodium provides an Encryption and Key Derivation API based on the [libsodium library](https://libsodium.gitbook.io/doc/) and can get it's root key from a
+[pgsodium](/docs/guides/database/extensions/pgsodium) provides an Encryption and Key Derivation API based on the [libsodium library](https://libsodium.gitbook.io/doc/) and can get it's root key from a
 variety of sources depending on how you configure it. Supabase generates and preserves your project's root key behind the scenes, so you don't have to worry about it.
 If you install pgsodium locally the default is to generate a random root key from the `/dev/urandom` device which is then saved in a file in your Postgres data directory.
 
@@ -186,4 +186,4 @@ optionally creating new keys, and select them from the view when you want to use
 The Vault is good for a reasonable amount of secure data, like API keys, access tokens, or environment variables.
 But if you have a lot more sensitive information, like personally Identifiable Information (PII),
 you may want to break them out into side-tables using pgsodium's
-[Transparent Column Encryption](https://supabase.com/blog/transparent-column-encryption-with-postgres) which we will describe soon in a follow-up blog post. Stay tuned!
+Transparent Column Encryption which we will describe soon in a follow-up blog post. Stay tuned!

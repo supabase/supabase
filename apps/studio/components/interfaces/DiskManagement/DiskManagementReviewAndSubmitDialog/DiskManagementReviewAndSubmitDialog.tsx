@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AlertTriangle, ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Alert,
@@ -84,7 +84,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
     anyDiskAttributeChange,
     showThroughputRow,
     hasAnyBreakdownRows,
-    hasExtendedDowntimeRisk,
     oldComputeLabel,
     newComputeLabel,
   } = useDiskManagementReviewChanges(form, numReplicas)
@@ -141,7 +140,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
               <div className="animate-badge-pulse absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-dash-sidebar border border-brand-500 flex items-center justify-center z-10 overflow-hidden">
                 <span className="absolute inset-0 bg-brand-default/10 rounded-full" />
                 <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand-default/20 to-transparent blur-md" />
-                <ArrowRight size={16} className="text-brand-600 relative z-10" strokeWidth={2.5} />
+                <ArrowRightIcon
+                  size={16}
+                  className="text-brand-600 relative z-10"
+                  strokeWidth={2.5}
+                />
               </div>
 
               <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
@@ -266,20 +269,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
               </div>
             )}
           </div>
-        )}
-
-        {hasExtendedDowntimeRisk && (
-          <>
-            <DialogSectionSeparator />
-            <DialogSection>
-              <Alert variant="warning">
-                <AlertTriangle />
-                <AlertTitle>
-                  Resizes may require more downtime than normal on this project.
-                </AlertTitle>
-              </Alert>
-            </DialogSection>
-          </>
         )}
 
         <DialogFooter className="px-5 py-4">
