@@ -25,6 +25,12 @@ import { handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
+const REFRESH_REQUESTS_PER_RETAINED_PAGE = 2
+const REFRESH_EXTRA_REQUESTS = 10
+const createRefreshBudget = (retainedPageCount = 1) => ({
+  remaining: retainedPageCount * REFRESH_REQUESTS_PER_RETAINED_PAGE + REFRESH_EXTRA_REQUESTS,
+})
+const refreshBudgets = new WeakMap<AbortSignal, { remaining: number }>()
 
 type RowCursor = Pick<UnifiedLogsQueryRow, 'id' | 'timestamp'>
 type RefreshBoundary = { row: RowCursor; hasMore: true } | { hasMore: false }
@@ -79,10 +85,12 @@ export async function getUnifiedLogs(
     pageParam,
     useOtel = false,
     refreshThrough = pageParam?.refreshThrough,
+    refreshBudget = createRefreshBudget(),
   }: UnifiedLogsVariables & {
     pageParam: UnifiedLogsPageParam
     useOtel?: boolean
     refreshThrough?: RefreshBoundary
+    refreshBudget?: { remaining: number }
   },
   signal?: AbortSignal,
   headersInit?: HeadersInit
@@ -125,6 +133,10 @@ export async function getUnifiedLogs(
     return timestamp
   }
   const fetchPage = async (cursor?: RowCursor) => {
+    signal?.throwIfAborted()
+    if (refreshThrough && refreshBudget.remaining-- <= 0) {
+      throw new Error('Too many logs to refresh. Narrow the time range or filters and try again.')
+    }
     let paginationFilter
     if (cursor) {
       const timestamp = cursorTimestamp(cursor)
@@ -219,15 +231,20 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
       const isRefreshingFirstPage =
         direction !== 'backward' &&
         (effectivePageParam === null || effectivePageParam === undefined)
+      const refreshThrough = isRefreshingFirstPage
+        ? getRefreshBoundary(getLoadedPages(), 0)
+        : effectivePageParam?.refreshThrough
+      if (refreshThrough && !refreshBudgets.has(signal)) {
+        refreshBudgets.set(signal, createRefreshBudget(getLoadedPages().length))
+      }
       return getUnifiedLogs(
         {
           projectRef,
           search,
           pageParam: effectivePageParam,
           useOtel,
-          refreshThrough: isRefreshingFirstPage
-            ? getRefreshBoundary(getLoadedPages(), 0)
-            : effectivePageParam?.refreshThrough,
+          refreshThrough,
+          refreshBudget: refreshBudgets.get(signal),
         },
         signal
       )

@@ -21,6 +21,52 @@ afterEach(() => {
 })
 
 describe('unified logs refresh history', () => {
+  it('bounds refresh requests across retained pages and retries, preserving history until recovery', async () => {
+    const timestamp = Date.now() - 10 * 60 * 1000
+    const rows = Array.from({ length: 110 }, (_, index) =>
+      createRow(`old-${index}`, (timestamp - index * 1000) * 1000)
+    )
+    let rerender = () => {}
+    const requests = mockLogs(rows, false, () => rerender())
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: 2, retryDelay: 0 } },
+    })
+    const rendered = customRenderHook(
+      () => useUnifiedLogsInfiniteQuery({ projectRef: 'default', search }),
+      { queryClient }
+    )
+    rerender = rendered.rerender
+    const { result } = rendered
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    await act(async () => {
+      await result.current.fetchNextPage()
+    })
+    const retained = result.current.data
+    const requestCount = requests.length
+    rows.push(
+      ...Array.from({ length: 60 }, (_, index) =>
+        createRow(`new-${index}`, (timestamp + 1000) * 1000)
+      ),
+      ...Array.from({ length: 600 }, (_, index) =>
+        createRow(`late-${index}`, (timestamp - 49_500) * 1000)
+      )
+    )
+    await act(async () => {
+      await result.current.refetch()
+    })
+    expect(requests.length - requestCount).toBe(14)
+    expect(result.current.isError).toBe(true)
+    expect(result.current.error?.message).toContain('Narrow the time range or filters')
+    expect(result.current.data).toBe(retained)
+    expect(result.current.hasNextPage).toBe(true)
+    rows.splice(110)
+    await act(async () => {
+      await result.current.refetch()
+    })
+    expect(result.current.isSuccess).toBe(true)
+    expect(result.current.data?.pages).toEqual(retained?.pages)
+  })
+
   it.each([false, true])('retains loaded pages after arrivals with otel=%s', async (useOtel) => {
     vi.spyOn(common, 'useFeatureFlags').mockReturnValue({
       configcat: { otelUnifiedLogs: useOtel },
