@@ -119,7 +119,6 @@ export const WarehouseDisableCard = () => {
                   Disabling Warehouse stops replication and connections to its endpoint. Its
                   pipeline, publication, catalog access, and foreign tables are removed.
                 </p>
-                <p>By default, copied data remains in DuckLake storage.</p>
               </div>
             </AlertDialogDescription>
             {disableMutation.error && (
@@ -129,31 +128,32 @@ export const WarehouseDisableCard = () => {
                 error={disableMutation.error}
               />
             )}
-            <Form {...form}>
-              <FormField
-                control={form.control}
-                name="shouldDeleteData"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="Also delete copied Warehouse data"
-                    description="Permanently deletes the managed DuckLake catalog and Storage bucket. Source tables are preserved. This cannot be undone."
-                    className="mt-4"
-                  >
-                    <FormControl>
-                      <Checkbox
-                        name={field.name}
-                        ref={field.ref}
-                        onBlur={field.onBlur}
-                        checked={field.value}
-                        onCheckedChange={(checked) => field.onChange(checked === true)}
-                        disabled={disableMutation.isPending}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </Form>
+            <div className="border-t px-5 py-4">
+              <Form {...form}>
+                <FormField
+                  control={form.control}
+                  name="shouldDeleteData"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex-row-reverse"
+                      label="Also delete copied Warehouse data"
+                      description="Permanently deletes the managed DuckLake catalog and Storage bucket. Source tables are preserved. This cannot be undone."
+                    >
+                      <FormControl>
+                        <Checkbox
+                          name={field.name}
+                          ref={field.ref}
+                          onBlur={field.onBlur}
+                          checked={field.value}
+                          onCheckedChange={(checked) => field.onChange(checked === true)}
+                          disabled={disableMutation.isPending}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </Form>
+            </div>
           </AlertDialogBody>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
