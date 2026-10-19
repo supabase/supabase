@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { Fragment, useId, useState, useSyncExternalStore } from 'react'
 import {
   cn,
@@ -299,19 +299,11 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
               'sm:flex-row sm:items-center sm:gap-8 sm:py-0'
             )}
           >
-            <span className="flex-1 text-sm font-medium tracking-body text-foreground">
+            <span className="min-w-0 flex-1 text-sm font-medium tracking-body text-foreground">
               {guide.title}
             </span>
-            <span className="text-sm tracking-body text-foreground-lighter sm:w-42.5 sm:shrink-0">
+            <span className="text-sm tracking-body text-foreground-lighter sm:max-w-1/2 sm:shrink-0 sm:truncate sm:text-right">
               {guide.topics.join(', ')}
-            </span>
-            <span className="hidden w-26 shrink-0 items-center justify-end gap-2 text-sm font-medium text-foreground-light transition-colors group-hover:text-foreground sm:flex">
-              Read guide
-              <ArrowRight
-                aria-hidden
-                className="size-3.5 text-foreground-muted transition-transform group-hover:translate-x-0.5"
-                strokeWidth={2.25}
-              />
             </span>
           </a>
         </li>
