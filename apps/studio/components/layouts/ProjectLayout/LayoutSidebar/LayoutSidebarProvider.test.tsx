@@ -102,13 +102,17 @@ const renderWithSidebarParam = (
 }
 
 describe('LayoutSidebarProvider sidebar deep link', () => {
+  let releaseProject = () => {}
+
   beforeEach(() => {
+    resetSidebarManagerState()
     routerMock.setCurrentUrl(`/project/${PROJECT_REF}`)
     localStorage.clear()
+    releaseProject = () => {}
   })
 
   afterEach(() => {
-    resetSidebarManagerState()
+    releaseProject()
     localStorage.clear()
   })
 
@@ -146,8 +150,27 @@ describe('LayoutSidebarProvider sidebar deep link', () => {
     }
   )
 
+  test('does not clear ?sidebar= when the open sidebar unregisters', async () => {
+    const { urlUpdates } = renderWithSidebarParam(SIDEBAR_KEYS.AI_ASSISTANT, { project: PROJECT })
+
+    await waitFor(() => {
+      expect(sidebarManagerState.activeSidebar?.id).toBe(SIDEBAR_KEYS.AI_ASSISTANT)
+    })
+
+    act(() => {
+      sidebarManagerState.unregisterSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
+    })
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    })
+
+    expect(sidebarManagerState.activeSidebar).toBeUndefined()
+    expect(screen.getByTestId('sidebar-param').textContent).toBe(SIDEBAR_KEYS.AI_ASSISTANT)
+    expect(urlUpdates).toEqual([])
+  })
+
   test('clears ?sidebar= when the sidebar closes before the project loads', async () => {
-    let releaseProject = () => {}
     const projectReleased = new Promise<void>((resolve) => {
       releaseProject = resolve
     })
@@ -177,12 +200,10 @@ describe('LayoutSidebarProvider sidebar deep link', () => {
       ])
     })
     expect(screen.getByTestId('sidebar-param').textContent).toBe('')
-
-    releaseProject()
   })
 
+  // guards opened-sidebar tracking being recorded above the !project guard. a later close still has to clear ?sidebar=.
   test('clears ?sidebar= on close when the panel opened before the project loaded', async () => {
-    let releaseProject = () => {}
     const projectReleased = new Promise<void>((resolve) => {
       releaseProject = resolve
     })

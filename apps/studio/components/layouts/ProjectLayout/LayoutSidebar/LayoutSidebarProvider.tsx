@@ -88,15 +88,18 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     }
   )
 
-  const hasOpenedSidebarRef = useRef(false)
+  const previousSidebarIdRef = useRef<string | undefined>(undefined)
 
   useEffect(() => {
-    if (activeSidebar) {
-      hasOpenedSidebarRef.current = true
-    }
+    const previousSidebarId = previousSidebarIdRef.current
+    previousSidebarIdRef.current = activeSidebar?.id
 
-    const shouldClearSidebarUrlParam = !activeSidebar && hasOpenedSidebarRef.current
-    if (shouldClearSidebarUrlParam) {
+    // unregistering (e.g. project switch) isn't a user close
+    const isClosedByUser =
+      !activeSidebar &&
+      previousSidebarId !== undefined &&
+      previousSidebarId in sidebarManagerState.sidebars
+    if (isClosedByUser) {
       setSidebarUrlParam(null)
     }
 
