@@ -15,8 +15,5 @@ This issue occurs when the `cron.runid_seq` sequence is out of sync with the `cr
 
 To resolve this, you need to reset the `cron.job_run_details` table. If data preservation is required, ensure you back up its contents before proceeding.
 
-Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
-
-```sql
-TRUNCATE cron.job_run_details;
-```
+Execute the following SQL command via the [SQL editor](/dashboard/project/_/sql/new):
+`TRUNCATE cron.job_run_details;`

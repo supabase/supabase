@@ -44,9 +44,7 @@ npx supabase login
 npx supabase --experimental --project-ref <PROJECT REF> postgres-config update --config max_connections=<INTEGER VALUE>
 ```
 
-Then you could check whether the changes went through.
-
-Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+Then you could run the following SQL in the SQL Editor to see if the changes went through:
 
 ```sql
 SHOW max_connections;
