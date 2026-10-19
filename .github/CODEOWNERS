@@ -12,6 +12,7 @@
 /apps/docs/ @supabase/docs
 
 /apps/kb/ @supabase/docs
+/apps/kb/src/content @supabase/docs @supabase/marketing
 
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
