@@ -227,7 +227,7 @@ steps in [tabs](#tabs).
 After SQL the reader runs against their project, paste:
 
 ```mdx
-You can run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard, or with `psql` if you're [connecting directly to the database](/docs/guides/database/connecting-to-postgres#direct-connection).
+You can run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard, or with `psql` over a direct connection. For more information about connecting with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 ```
 
 ### Code blocks
