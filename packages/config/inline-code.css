@@ -13,11 +13,11 @@
       .cm-editor *
     )
   ) {
-    @apply text-code-inline;
+    @apply break-all text-xs tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
   }
 }
 
-/* Override legacy prose decoration only in apps importing these defaults. */
+/* Match prose typography while keeping local utility overrides effective. */
 @utility prose {
   :where(code):not(
     :where(
@@ -33,7 +33,7 @@
       .not-prose *
     )
   ) {
-    @apply text-code-inline;
+    @apply break-all text-xs tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
 
     &::before,
     &::after {

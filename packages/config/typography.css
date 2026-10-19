@@ -1,5 +1,3 @@
-@import './inline-code-utility.css';
-
 /* Heading */
 @utility heading-title {
   @apply scroll-m-20 text-2xl tracking-tight;

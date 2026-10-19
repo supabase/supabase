@@ -1,5 +1,4 @@
 @import 'config/tailwind.config.css';
-@import 'config/inline-code-utility.css';
 @import 'config/inline-code.css';
 @import './code-block.css';
 @import './reference.css';
@@ -222,13 +221,6 @@ pre[class*='language-'] {
   }
 }
 
-.method-list-item-validation {
-  code {
-    @apply text-xs bg-control rounded-sm;
-    padding: 1px 6px;
-  }
-}
-
 .method-list-group {
   @apply p-0 m-0 list-none border-b;
 }
@@ -286,20 +278,11 @@ pre[class*='language-'] {
   }
 }
 
-/* format <code> inside <p> */
 h2 code,
 h3 code,
 h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
-  padding: 0.1rem 0.35rem !important;
-
-  &:before {
-    display: none;
-  }
-  &::after {
-    display: none;
-  }
 }
 
 article p strong {
@@ -309,15 +292,6 @@ article p strong {
 /* fix box shadow when <code> is inside <a> */
 a:has(code) {
   box-shadow: none !important;
-}
-
-/* fix code line wrapping */
-/* need to set this to happen from medium onwards, otherwise the would cause horizontal scroll */
-article p code {
-  &::before,
-  &::after {
-    display: none !important;
-  }
 }
 
 .short-inline-codeblock {

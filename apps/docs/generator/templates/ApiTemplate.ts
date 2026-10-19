@@ -46,7 +46,7 @@ toc_max_heading_level: 3
         <span className="method-list-item-label-badge">
         <%- parameter.required ? 'required' : 'optional' %>
         </span>
-        <span className="method-list-item-validation" data-code-style="plain">
+        <span className="method-list-item-validation">
         <%- parameter.type %>
         </span>
     </h4>
@@ -79,7 +79,7 @@ toc_max_heading_level: 3
         <span className="method-list-item-label-badge">
         <%- parameter.required ? 'required' : 'optional' %>
         </span>
-        <span className="method-list-item-validation" data-code-style="plain">
+        <span className="method-list-item-validation">
         <%- parameter.type %>
         </span>
     </h4>

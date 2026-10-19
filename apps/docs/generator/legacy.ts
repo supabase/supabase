@@ -170,7 +170,7 @@ const methodListItemLabel = ({ name, isOptional, type, description }, subContent
     <span className="method-list-item-label-badge ${!isOptional && 'required'}">
       ${isOptional ? 'optional' : 'required'}
     </span>
-    <span className="method-list-item-validation" data-code-style="plain">
+    <span className="method-list-item-validation">
       ${type}
     </span>
   </h4>

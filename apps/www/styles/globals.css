@@ -1,5 +1,4 @@
 @import 'config/tailwind.config.css';
-@import 'config/inline-code-utility.css';
 @import 'config/inline-code.css';
 
 @source '../_blog/*.mdx';
