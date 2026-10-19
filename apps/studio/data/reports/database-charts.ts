@@ -30,7 +30,8 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections?: number,
   isSpendCapEnabled?: boolean,
   showDiskIOBurstBalanceChart?: boolean,
-  showMemoryCommitmentChart?: boolean
+  showMemoryCommitmentChart?: boolean,
+  showMemoryCommitmentRiskZones?: boolean
 ) => ReportAttributes[] = (
   entitledFeatures,
   project,
@@ -39,7 +40,8 @@ export const getReportAttributesV2: (
   pgBouncerMaxConnections,
   isSpendCapEnabled,
   showDiskIOBurstBalanceChart,
-  showMemoryCommitmentChart
+  showMemoryCommitmentChart,
+  showMemoryCommitmentRiskZones = true
 ) => {
   const computeVariantId = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
   // High Availability projects run Multigres, whose dedicated pooler is multipooler rather
@@ -140,48 +142,51 @@ export const getReportAttributesV2: (
         width: 75,
         tickFormatter: (value: number) => formatBytesMinMB(value, 2),
       },
-      titleTooltip:
-        'Risk thresholds estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.',
-      thresholdZoneAttribute: 'ram_commit_used',
-      thresholdZones: [
-        {
-          label: 'Acknowledgment',
-          badgeLabel: 'Warning',
-          tooltipLabel: '50% threshold',
-          color: 'var(--color-yellow-900)',
-          textColor: 'var(--color-yellow-1100)',
-          tooltip:
-            'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
-          getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
-        },
-        {
-          label: 'Problematic',
-          badgeLabel: 'Problematic',
-          tooltipLabel: '80% threshold',
-          color: 'var(--color-orange-900)',
-          textColor: 'var(--color-orange-1100)',
-          tooltip:
-            'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
-          getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
-        },
-        {
-          label: 'Severe',
-          badgeLabel: 'Severe',
-          tooltipLabel: '90% threshold',
-          color: 'hsl(var(--destructive-600))',
-          tooltip:
-            'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
-          getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
-        },
-        {
-          label: 'Full commitment capacity',
-          color: 'var(--chart-reference)',
-          isAlwaysVisible: true,
-          tooltip:
-            'Estimated physical RAM plus 1 GiB of swap, based on the infrastructure capacity at each timestamp.',
-          getRanges: (data) => getMemoryCommitmentRanges(data, 1, 1),
-        },
-      ],
+      titleTooltip: showMemoryCommitmentRiskZones
+        ? 'Risk thresholds estimate memory commitment risk from physical RAM plus 1 GiB of swap and do not predict when the database will run out of memory.'
+        : undefined,
+      thresholdZoneAttribute: showMemoryCommitmentRiskZones ? 'ram_commit_used' : undefined,
+      thresholdZones: showMemoryCommitmentRiskZones
+        ? [
+            {
+              label: 'Acknowledgment',
+              badgeLabel: 'Warning',
+              tooltipLabel: '50% threshold',
+              color: 'var(--color-yellow-900)',
+              textColor: 'var(--color-yellow-1100)',
+              tooltip:
+                'Above 50% of physical RAM plus 1 GiB: monitor memory usage and enable memory investigation tools to understand what your database has promised to operations.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.5, 0.8),
+            },
+            {
+              label: 'Problematic',
+              badgeLabel: 'Problematic',
+              tooltipLabel: '80% threshold',
+              color: 'var(--color-orange-900)',
+              textColor: 'var(--color-orange-1100)',
+              tooltip:
+                'Above 80% of physical RAM plus 1 GiB: optimize memory usage or upgrade compute, since using idle memory commitments at once can exhaust resources and trigger recovery.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.8, 0.9),
+            },
+            {
+              label: 'Severe',
+              badgeLabel: 'Severe',
+              tooltipLabel: '90% threshold',
+              color: 'hsl(var(--destructive-600))',
+              tooltip:
+                'Above 90% of physical RAM plus 1 GiB: simultaneous use of promised memory creates a high risk of an unexpected crash and recovery, so optimize memory usage or upgrade compute.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 0.9),
+            },
+            {
+              label: 'Full commitment capacity',
+              color: 'var(--chart-reference)',
+              isAlwaysVisible: true,
+              tooltip:
+                'Estimated physical RAM plus 1 GiB of swap, based on the infrastructure capacity at each timestamp.',
+              getRanges: (data) => getMemoryCommitmentRanges(data, 1, 1),
+            },
+          ]
+        : undefined,
       attributes: [
         {
           attribute: 'ram_commit_used',

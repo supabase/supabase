@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
+import { getThresholdZoneChart } from '@/components/ui/Charts/ComposedChartThresholdZones.utils'
 import { RESOURCE_WARNING_MESSAGES } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
 import { Project } from '@/data/projects/project-detail-query'
 
@@ -164,6 +165,39 @@ describe('resource warning metrics chart IDs', () => {
 })
 
 describe('getReportAttributesV2 memory commitment chart', () => {
+  it.each([true, false])(
+    'controls risk guidance without hiding the commitment chart when risk zones are %s',
+    (showMemoryCommitmentRiskZones) => {
+      const chart = getReportAttributesV2(
+        ENTITLED_FEATURES,
+        buildProject(),
+        undefined,
+        undefined,
+        undefined,
+        false,
+        false,
+        true,
+        showMemoryCommitmentRiskZones
+      ).find((chart) => chart.id === 'memory-commitment')
+      if (!chart) throw new Error('Expected the memory commitment chart')
+
+      const GIB = 1024 ** 3
+      const guidance = getThresholdZoneChart(
+        [{ ram_commit_limit: 5 * GIB, ram_commit_used: 8.5 * GIB }],
+        chart.thresholdZones,
+        chart.thresholdZoneAttribute
+      )
+
+      expect(chart.hide).toBe(false)
+      expect(guidance.selectedZone?.badgeLabel).toBe(
+        showMemoryCommitmentRiskZones ? 'Severe' : undefined
+      )
+      expect(guidance.zones.map((zone) => zone.label)).toEqual(
+        showMemoryCommitmentRiskZones ? ['Severe', 'Full commitment capacity'] : []
+      )
+    }
+  )
+
   it('keeps capacity tied to compute size so overcommitment cannot raise the reference', () => {
     const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
       (chart) => chart.id === 'memory-commitment'

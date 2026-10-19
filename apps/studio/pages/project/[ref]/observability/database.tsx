@@ -221,6 +221,7 @@ const DatabaseUsage = () => {
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
+  const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
   const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
   const memoryCommitmentPreviewData = getMemoryCommitmentPreviewData(
     memoryCommitmentPreview,
@@ -236,7 +237,8 @@ const DatabaseUsage = () => {
     defaultMaxClientConn,
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
-    showMemoryCommitmentChart
+    showMemoryCommitmentChart,
+    showMemoryCommitmentRiskZones
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
