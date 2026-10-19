@@ -42,16 +42,17 @@ test('back after switching schema with a table open stays on the list', async ({
 
   await page.goBack()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
-  await expect(
-    page.getByRole('button', { name: `View ${tableName}`, exact: true }),
-    'public table list should be visible after Back'
-  ).toBeVisible()
+  await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
 
-  const redirectedIntoTable = await page
-    .waitForURL(/\/editor\/\d+/, { timeout: 1500 })
-    .then(() => true)
-    .catch(() => false)
+  const remountedGridLoad = waitForGridDataToLoad(page, ref)
+  await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+  await page.waitForURL(/\/editor\/\d+\?schema=public/)
+  await remountedGridLoad
+  await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
 
-  expect(redirectedIntoTable, 'Back should stay on the schema list').toBe(false)
+  await page.goBack()
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
 })

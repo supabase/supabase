@@ -77,6 +77,7 @@ describe('TableEditorMenu schema switch', () => {
     localStorage.clear()
     mockRouter.setCurrentUrl('/project/default/editor/25837?schema=public')
     vi.spyOn(mockRouter, 'replace').mockClear()
+    vi.spyOn(mockRouter, 'push').mockClear()
   })
 
   test('replaces the open table with the schema list', async () => {
@@ -113,11 +114,17 @@ describe('TableEditorMenu schema switch', () => {
     mockMenuApis()
     mockRouter.setCurrentUrl('/project/default/editor?schema=public')
     const replace = vi.spyOn(mockRouter, 'replace')
+    const onUrlUpdate = vi.fn()
 
-    customRender(<TableEditorMenu />, { nuqs: { searchParams: '?schema=public' } })
+    customRender(<TableEditorMenu />, {
+      nuqs: { hasMemory: true, searchParams: '?schema=public', onUrlUpdate },
+    })
     await openSchemaList()
     await userEvent.click(screen.getByRole('option', { name: 'auth' }))
 
     expect(replace).not.toHaveBeenCalled()
+    expect(onUrlUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ queryString: '?schema=auth' })
+    )
   })
 })

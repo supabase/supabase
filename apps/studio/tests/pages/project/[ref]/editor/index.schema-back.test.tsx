@@ -4,10 +4,18 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { resetHistoryTraverseState } from '@/lib/history-traverse'
+import { isHistoryTraverseNavigation, resetHistoryTraverseState } from '@/lib/history-traverse'
 import TableEditorPage from '@/pages/project/[ref]/editor/index'
 import { TabsStateContextProvider } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
+
+vi.mock('@/lib/history-traverse', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/history-traverse')>()
+  return {
+    ...actual,
+    isHistoryTraverseNavigation: vi.fn(actual.isHistoryTraverseNavigation),
+  }
+})
 
 vi.mock('@/components/layouts/Tabs/NewTab', () => ({ NewTab: () => null }))
 vi.mock('@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor', () => ({
@@ -64,6 +72,12 @@ const waitForHistory = async (queryClient: QueryClient) => {
   })
 }
 
+const waitForRedirectDecision = async () => {
+  await waitFor(() => {
+    expect(isHistoryTraverseNavigation).toHaveBeenCalled()
+  })
+}
+
 describe('Table Editor index schema and history', () => {
   beforeEach(() => {
     localStorage.clear()
@@ -114,6 +128,7 @@ describe('Table Editor index schema and history', () => {
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
+    await waitForRedirectDecision()
 
     expect(replace).not.toHaveBeenCalled()
     expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
@@ -128,6 +143,7 @@ describe('Table Editor index schema and history', () => {
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
+    await waitForRedirectDecision()
 
     expect(replace).not.toHaveBeenCalled()
     expect(mockRouter.asPath).toBe('/project/default/editor?schema=public')
@@ -140,6 +156,7 @@ describe('Table Editor index schema and history', () => {
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
+    await waitForRedirectDecision()
 
     expect(replace).not.toHaveBeenCalled()
   })
@@ -152,7 +169,10 @@ describe('Table Editor index schema and history', () => {
 
     const queryClient = renderIndex()
     await waitForHistory(queryClient)
+    await waitForRedirectDecision()
     expect(replace).not.toHaveBeenCalled()
+
+    const decisionsBeforeSchemaChange = vi.mocked(isHistoryTraverseNavigation).mock.calls.length
 
     await act(async () => {
       mockRouter.setCurrentUrl('/project/default/editor?schema=auth')
@@ -161,6 +181,9 @@ describe('Table Editor index schema and history', () => {
     await waitFor(() => {
       expect(mockRouter.query.schema).toBe('auth')
     })
+    expect(vi.mocked(isHistoryTraverseNavigation).mock.calls.length).toBe(
+      decisionsBeforeSchemaChange
+    )
     expect(replace).not.toHaveBeenCalled()
   })
 })
