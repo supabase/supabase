@@ -5,7 +5,6 @@ import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
 } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
-import { areValidationFailuresEqual } from '../DestinationPanel/DestinationForm/DestinationForm.utils'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 
@@ -66,21 +65,18 @@ export const usePipelineCreationSubmission = ({
   }
   const handleSubmit = () =>
     runSubmission(async () => {
-      const previousWarnings = failures.filter(({ failure_type }) => failure_type === 'warning')
-      const hadOnlyWarnings = failures.length > 0 && previousWarnings.length === failures.length
+      const data = form.getValues()
+      if (warningSnapshot.current === configurationSnapshot) {
+        await createPipeline(data)
+        return
+      }
       resetValidation()
       if (!(await validateData())) return
-      const data = form.getValues()
       const result = await validateConfiguration({ data, onValidationFail: () => {} })
       if (!result.canContinue) return
       if (result.warnings.length > 0) {
-        const snapshot = JSON.stringify([type, data])
-        const warningsUnchanged =
-          hadOnlyWarnings &&
-          warningSnapshot.current === snapshot &&
-          areValidationFailuresEqual(previousWarnings, result.warnings)
-        warningSnapshot.current = snapshot
-        if (!warningsUnchanged) return
+        warningSnapshot.current = configurationSnapshot
+        return
       }
       await createPipeline(data)
     })

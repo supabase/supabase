@@ -5,9 +5,7 @@ import PipelineCreationPage from '@/pages/project/[ref]/database/pipelines/new'
 import { customRender } from '@/tests/lib/custom-render'
 
 const state = vi.hoisted(() => ({
-  navigate: vi.fn(),
   push: vi.fn(),
-  isTanStack: false,
   enabled: false,
   loading: false,
   flagsLoaded: true,
@@ -15,11 +13,8 @@ const state = vi.hoisted(() => ({
   isHighAvailability: false,
   canUseReplication: true,
 }))
-vi.mock('@tanstack/react-router', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  useRouter: () => (state.isTanStack ? { navigate: state.navigate } : undefined),
-}))
-vi.mock('next/compat/router', () => ({
+vi.mock('next/router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/router')>()),
   useRouter: () => ({ push: state.push, events: { on: vi.fn(), off: vi.fn() } }),
 }))
 vi.mock('common', async (importOriginal) => ({
@@ -56,7 +51,6 @@ vi.mock('./PipelineCreationFlow', () => ({
 
 beforeEach(() => {
   Object.assign(state, {
-    isTanStack: false,
     enabled: true,
     loading: false,
     flagsLoaded: true,
@@ -101,14 +95,8 @@ it('falls back when the preview is off even if organisation and project queries 
   expect(screen.getByRole('status')).toHaveTextContent('Returning to Pipelines')
 })
 
-it.each([false, true])('returns without reloading the toast host (TanStack: %s)', (isTanStack) => {
-  state.isTanStack = isTanStack
+it('returns through the shared router without reloading the toast host', () => {
   customRender(<PipelineCreationPage />)
   fireEvent.click(screen.getByRole('button', { name: 'Wizard form' }))
-  if (isTanStack)
-    expect(state.navigate).toHaveBeenCalledWith({
-      to: '/project/$ref/database/pipelines',
-      params: { ref: 'default' },
-    })
-  else expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
 })

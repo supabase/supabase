@@ -1,7 +1,6 @@
-import { useRouter as useTanStackRouter } from '@tanstack/react-router'
 import { useFeatureFlags, useParams } from 'common'
-import { useRouter as useNextRouter } from 'next/compat/router'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -23,8 +22,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const { ref } = useParams()
-  const router = useTanStackRouter({ warn: false })
-  const nextRouter = useNextRouter()
+  const router = useRouter()
   const { hasLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
   const { isEnabled, isLoading } = usePipelineCreationPreview()
@@ -61,9 +59,7 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
         ]}
         onClose={() => {
           if (!ref) return
-          if (router)
-            void router.navigate({ to: '/project/$ref/database/pipelines', params: { ref } })
-          else void nextRouter?.push(`/project/${ref}/database/pipelines`)
+          void router.push(`/project/${ref}/database/pipelines`)
         }}
       />
     </>
