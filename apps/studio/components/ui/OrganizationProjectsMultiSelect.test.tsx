@@ -244,7 +244,6 @@ describe('OrganizationProjectsMultiSelect', () => {
     await openDropdown()
 
     await screen.findByRole('option', { name: /Project 000/ })
-    // Only the first server page (96) is fetched/rendered up front, not all 120 at once
     expect(screen.getAllByRole('option')).toHaveLength(96)
     expect(screen.queryByRole('option', { name: /Project 119/ })).not.toBeInTheDocument()
   })
