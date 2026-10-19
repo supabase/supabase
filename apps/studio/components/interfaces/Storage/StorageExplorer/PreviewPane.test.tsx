@@ -237,5 +237,17 @@ describe('PreviewPane', () => {
       // The next write will version it, so the history has to be on offer.
       expect(await screen.findByText('Versions')).toBeInTheDocument()
     })
+
+    it('displays the file base name when it is not a deep path', async () => {
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+      renderPane({ name: 'photo.png' })
+      expect(await screen.findByText('photo.png')).toBeInTheDocument()
+    })
+
+    it('displays the file base name when it is a deep path', async () => {
+      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+      renderPane({ name: 'nested/deep/photo.png' })
+      expect(await screen.findByText('photo.png')).toBeInTheDocument()
+    })
   })
 })
