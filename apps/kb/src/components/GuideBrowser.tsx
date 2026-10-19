@@ -1,7 +1,6 @@
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { Fragment, useId, useState, useSyncExternalStore } from 'react'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -23,7 +22,7 @@ import {
   type GuideSummary,
 } from '../lib/guides'
 import { bindRevealOnce, REVEAL_GROUP_CLASS, REVEAL_ITEM_CLASS, revealStyle } from '../lib/reveal'
-import { FORMAT_TOPICS, TOPICS, type Topic } from '../lib/topics'
+import { FORMAT_TOPICS, isKnownTopic, TOPICS, type Topic } from '../lib/topics'
 import { AsciiHoverText } from './AsciiHoverText'
 
 export interface GuideBrowserProps {
@@ -54,9 +53,6 @@ interface GuideListProps {
 const TOPIC_CHANGE_EVENT = 'kb:topicchange'
 const PAGE_SIZE = 16
 const INLINE_TOPIC_COUNT = 7
-const VISIBLE_TOPICS = TOPICS.filter((topic) => topic.visible).map((topic) => topic.name)
-
-const ALL_TOPICS_VALUE = 'all'
 
 // css can't animate between two auto heights. the panel copies the measured content height into an explicit height
 const bindPanelHeight = (content: HTMLDivElement | null) => {
@@ -69,9 +65,7 @@ const bindPanelHeight = (content: HTMLDivElement | null) => {
   return () => observer.disconnect()
 }
 
-const toTabValue = (topic: Topic | null) => topic ?? ALL_TOPICS_VALUE
-
-const fromTabValue = (value: string) => TOPICS.find((topic) => topic.name === value)?.name ?? null
+const toTabValue = (topic: Topic | null) => topic ?? 'all'
 
 const subscribeToTopic = (onChange: () => void) => {
   window.addEventListener('popstate', onChange)
@@ -102,7 +96,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
     window.history.replaceState(null, '', `${pathname}${nextSearch}${hash}`)
     window.dispatchEvent(new Event(TOPIC_CHANGE_EVENT))
   }
-  const handleTabChange = (value: string) => setTopicInUrl(fromTabValue(value))
+  const handleTabChange = (value: string) => setTopicInUrl(isKnownTopic(value) ? value : null)
   const handleLoadMore = () => setPaging({ filterKey, count: shownCount + PAGE_SIZE })
   const handleTopicClear = () => setTopicInUrl(null)
 
@@ -124,9 +118,9 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
       >
         <div className="relative flex items-end">
           <TopicTabs
-            topics={VISIBLE_TOPICS.filter((topic) =>
-              guides.some((guide) => guide.topics.includes(topic))
-            )}
+            topics={TOPICS.filter(
+              (topic) => topic.visible && guides.some((guide) => guide.topics.includes(topic.name))
+            ).map((topic) => topic.name)}
             activeTopic={activeTopic}
             onTopicSelect={setTopicInUrl}
             className="flex-1"
@@ -160,9 +154,19 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
             />
             {hasMore ? (
               <div className="flex justify-center py-6">
-                <Button variant="default" size="small" onClick={handleLoadMore}>
+                <button
+                  type="button"
+                  onClick={handleLoadMore}
+                  className={cn(
+                    'inline-flex cursor-pointer items-center gap-1.5 rounded-full py-1 pl-2.5 pr-3 text-xs text-foreground',
+                    'bg-surface-200/90 shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm',
+                    'transition-[background-color,scale] duration-200 ease-out',
+                    'hover:bg-surface-300 active:scale-[0.96] focus-ring'
+                  )}
+                >
+                  <ChevronDown aria-hidden className="size-3.5" />
                   Load more
-                </Button>
+                </button>
               </div>
             ) : null}
           </div>
