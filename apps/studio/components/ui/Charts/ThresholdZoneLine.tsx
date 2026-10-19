@@ -9,13 +9,12 @@ export const ThresholdZoneLine = ({
   strokeOpacity,
   clipPath,
   label,
-}: RectangleProps & { label?: string }) => (
-  <line
+  isRising = false,
+}: RectangleProps & { label?: string; isRising?: boolean }) => (
+  <path
     clipPath={clipPath}
-    x1={x}
-    x2={x + width}
-    y1={y + height}
-    y2={y + height}
+    d={`M ${x} ${isRising ? y + height : y} V ${isRising ? y : y + height} H ${x + width}`}
+    fill="none"
     stroke={stroke}
     strokeOpacity={strokeOpacity}
     strokeWidth={1}
@@ -23,5 +22,5 @@ export const ThresholdZoneLine = ({
     strokeDasharray="4 4"
   >
     {label && <title>{label}</title>}
-  </line>
+  </path>
 )

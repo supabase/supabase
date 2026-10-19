@@ -43,7 +43,11 @@ import {
   resolveChartColor,
   ThresholdZone,
 } from './ComposedChart.utils'
-import { getThresholdZoneChart, getThresholdZoneXBounds } from './ComposedChartThresholdZones.utils'
+import {
+  getThresholdZoneChart,
+  getThresholdZoneXBounds,
+  getThresholdZoneYBounds,
+} from './ComposedChartThresholdZones.utils'
 import NoDataPlaceholder from './NoDataPlaceholder'
 import { ThresholdZoneLine } from './ThresholdZoneLine'
 import { ChartHighlight } from './useChartHighlight'
@@ -620,18 +624,21 @@ export function ComposedChart({
                 />
               ))}
           {thresholdZoneChart.zones.flatMap((zone) =>
-            zone.runs.map((run) => {
+            zone.runs.map((run, index) => {
+              const yBounds = getThresholdZoneYBounds(run, zone.runs[index - 1])
               const hasVisibleBars = chartStyle === 'bar' && visibleAttributes.length > 0
               return (
                 <ReferenceArea
                   key={`${zone.label}-${run.startIndex}`}
                   {...getThresholdZoneXBounds(run, data, hasVisibleBars, _XAxisProps.dataKey)}
-                  y1={run.lower}
-                  y2={run.lower}
+                  {...yBounds}
                   fill="none"
                   stroke={zone.color}
                   shape={
-                    <ThresholdZoneLine label={zone.isAlwaysVisible ? zone.label : undefined} />
+                    <ThresholdZoneLine
+                      isRising={yBounds.y1 > yBounds.y2}
+                      label={zone.isAlwaysVisible ? zone.label : undefined}
+                    />
                   }
                 />
               )

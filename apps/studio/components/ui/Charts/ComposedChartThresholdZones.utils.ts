@@ -48,6 +48,13 @@ export function getThresholdZoneXBounds(
   }
 }
 
+export function getThresholdZoneYBounds(run: ThresholdZoneRun, previousRun?: ThresholdZoneRun) {
+  if (!previousRun || previousRun.endIndex !== run.startIndex - 1) {
+    return { y1: run.lower, y2: run.lower }
+  }
+  return { y1: run.lower, y2: previousRun.lower }
+}
+
 export function getHighestCrossedThresholdZone(
   data: Datum[],
   zones: { runs: ThresholdZoneRun[]; isAlwaysVisible?: boolean }[],

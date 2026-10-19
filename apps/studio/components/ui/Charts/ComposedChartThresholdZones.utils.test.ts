@@ -8,6 +8,7 @@ import {
   getThresholdZoneRuns,
   getThresholdZoneValues,
   getThresholdZoneXBounds,
+  getThresholdZoneYBounds,
   type ThresholdZoneRun,
 } from './ComposedChartThresholdZones.utils'
 
@@ -217,4 +218,26 @@ describe('values for a single sample', () => {
       ])
     }
   )
+})
+
+describe('threshold connections at infrastructure changes', () => {
+  it.each([
+    { before: 8, after: 2 },
+    { before: 2, after: 8 },
+  ])(
+    'connects adjacent capacity levels from $before to $after so resizing stays visible',
+    ({ before, after }) => {
+      const previous = { startIndex: 0, endIndex: 1, lower: before, upper: before }
+      const current = { startIndex: 2, endIndex: 3, lower: after, upper: after }
+
+      expect(getThresholdZoneYBounds(current, previous)).toEqual({ y1: after, y2: before })
+    }
+  )
+
+  it('leaves a real gap disconnected instead of implying continuous capacity history', () => {
+    const previous = { startIndex: 0, endIndex: 1, lower: 8, upper: 8 }
+    const current = { startIndex: 3, endIndex: 4, lower: 2, upper: 2 }
+
+    expect(getThresholdZoneYBounds(current, previous)).toEqual({ y1: 2, y2: 2 })
+  })
 })
