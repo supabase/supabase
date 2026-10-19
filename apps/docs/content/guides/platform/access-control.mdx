@@ -275,12 +275,12 @@ The following table shows the actions each role can take on project resources.
 
 [^2]: Sending anonymous data to OpenAI is opt-in and can improve Studio AI Assistant's responses.
 
-[^3]: Only an SSO account from the same identity provider can accept an invite sent from an SSO account. This security measure prevents accidental invites to accounts that your company's enterprise systems don't manage.
+[^3]: Only a SAML SSO account from the same identity provider can accept an invite sent from a SAML SSO account. This security measure prevents accidental invites to accounts that your enterprise's identity provider doesn't manage.
 
-[^5]: The **Read-only** role can access secrets.
+[^5]: The **Read-only** role can view secrets.
 
-[^6]: Listed permissions are for the API and Dashboard.
+[^6]: Listed permissions are for the API and the Supabase Dashboard.
 
-[^7]: Limited to running `select` queries. SQL snippets that the **Read-only** role runs use the `supabase_read_only_user` database role. This role has the `pg_read_all_data` role. For more information, see the Postgres documentation on [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html).
+[^7]: Limited to running `select` queries. SQL snippets that a **Read-only** member runs use the `supabase_read_only_user` database role. This role has the `pg_read_all_data` role. For more information, see the Postgres documentation on [predefined roles](https://www.postgresql.org/docs/current/predefined-roles.html).
 
-[^8]: When using dashboard branching without a GitHub integration, the first branch creation also registers the project's production branch. This one-time step requires the **Owner** or **Administrator** role. After that, Developers can create, update, and delete branches. For more information, see [Branching via the dashboard](/docs/guides/deployment/branching/dashboard).
+[^8]: If you create branches in the Supabase Dashboard without a GitHub integration, the first branch you create also registers the project's production branch. This one-time step requires the **Owner** or **Administrator** role. After that, members with the **Developer** role can create, update, and delete branches. For more information, see [Branching via the dashboard](/docs/guides/deployment/branching/dashboard).
