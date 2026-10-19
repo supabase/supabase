@@ -69,7 +69,8 @@ export function applyAutoLimit(
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
     !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
-    !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
+    !cleanedSql.match(/limit [0-9]*\s*[;]?$/i) &&
+    !cleanedSql.match(/limit (all|null)( offset [0-9]+)?\s*[;]?$/i)
 
   if (!appendAutoLimit) return { sql, appendAutoLimit: false }
 

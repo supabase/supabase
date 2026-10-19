@@ -1,4 +1,4 @@
-import { safeSql } from '@supabase/pg-meta'
+import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { describe, expect, it, test } from 'vitest'
 
 import { applyAutoLimit, getSqlErrorLines, trimTrailingSemicolons } from '../utils'
@@ -117,6 +117,18 @@ describe('applyAutoLimit', () => {
     const limit = 100
     const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
+  })
+  test.each([
+    'select * from countries limit all;',
+    'select * from countries limit all',
+    'SELECT * FROM countries LIMIT ALL ;',
+    'select * from countries limit null;',
+    'select * from countries limit all offset 5;',
+    'select * from countries offset 5 limit null',
+  ])('Should return false if query already has LIMIT ALL / LIMIT NULL: %s', (query) => {
+    const { sql, appendAutoLimit } = applyAutoLimit(query as SafeSqlFragment, 100)
+    expect(appendAutoLimit).toBe(false)
+    expect(sql).toBe(query)
   })
   test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
     const sql = safeSql`SELECT * FROM countries LIMIT 10;`
