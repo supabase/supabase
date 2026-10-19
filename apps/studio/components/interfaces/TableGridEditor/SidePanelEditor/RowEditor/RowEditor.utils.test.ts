@@ -350,6 +350,9 @@ describe('isValueTruncated', () => {
     expect(isValueTruncated('[["item1","item2"],["item3","item4"]]', '_text')).toBe(false)
     expect(isValueTruncated('[["item"]]', '_jsonb')).toBe(false)
     expect(isValueTruncated('[["item"', '_jsonb')).toBe(false)
+    // empty trailing entries have no marker
+    expect(isValueTruncated('[["a"],[]]', '_text')).toBe(false)
+    expect(isValueTruncated('[["a"],[[]]]', '_text')).toBe(false)
     // exactly MAX_ARRAY_SIZE entries, but complete
     const rows = Array.from({ length: MAX_ARRAY_SIZE }, (_, i) => [`a${i}`, 'b'])
     expect(isValueTruncated(JSON.stringify(rows), '_text')).toBe(false)

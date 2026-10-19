@@ -288,9 +288,12 @@ const isTruncatedMultiDimArray = (value: string) => {
     if (!Array.isArray(parsed) || !Array.isArray(parsed[0])) return false
 
     const lastEntry: unknown = parsed[parsed.length - 1]
+    if (!Array.isArray(lastEntry)) return false
+
+    // `every` is vacuously true for empty arrays (e.g. `[[1],[]]`), so require at least one marker
+    const flattened = lastEntry.flat(Infinity)
     return (
-      Array.isArray(lastEntry) &&
-      lastEntry.flat(Infinity).every((x) => x === '...' || isEqual(x, { truncated: true }))
+      flattened.length > 0 && flattened.every((x) => x === '...' || isEqual(x, { truncated: true }))
     )
   } catch {
     return false
