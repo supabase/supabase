@@ -51,7 +51,10 @@ describe('unified logs refresh history', () => {
       await result.current.refetch()
     })
     expect(result.current.isSuccess).toBe(true)
-    expect(result.current.data?.pages).toEqual(retained?.pages)
+    expect(result.current.data?.pages.map((page) => page.data)).toEqual(
+      retained?.pages.map((page) => page.data)
+    )
+    expect(result.current.hasNextPage).toBe(true)
   })
 
   it('retains loaded pages after arrivals', async () => {
