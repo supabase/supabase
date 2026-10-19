@@ -11,9 +11,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const state = vi.hoisted(() => ({
   hasProjectRef: true,
-  navigate: vi.fn(),
   push: vi.fn(),
-  isTanStack: false,
   enabled: false,
   loading: false,
   flagsLoaded: true,
@@ -21,11 +19,8 @@ const state = vi.hoisted(() => ({
   isHighAvailability: false,
   canUseReplication: true,
 }))
-vi.mock('@tanstack/react-router', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
-  useRouter: () => (state.isTanStack ? { navigate: state.navigate } : undefined),
-}))
-vi.mock('next/compat/router', () => ({
+vi.mock('next/router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/router')>()),
   useRouter: () => ({ push: state.push, events: { on: vi.fn(), off: vi.fn() } }),
 }))
 vi.mock('common', async (importOriginal) => ({
@@ -82,7 +77,6 @@ beforeEach(() => {
   ])
   Object.assign(state, {
     hasProjectRef: true,
-    isTanStack: false,
     enabled: true,
     loading: false,
     flagsLoaded: true,
@@ -127,20 +121,11 @@ it('falls back when the preview is off even if organisation and project queries 
   expect(screen.getByRole('status')).toHaveTextContent('Returning to Pipelines')
 })
 
-it.each([false, true])(
-  'returns without reloading the toast host (TanStack: %s)',
-  async (isTanStack) => {
-    state.isTanStack = isTanStack
-    customRender(<PipelineCreationPage />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
-    if (isTanStack)
-      expect(state.navigate).toHaveBeenCalledWith({
-        to: '/project/$ref/database/pipelines',
-        params: { ref: 'default' },
-      })
-    else expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
-  }
-)
+it('returns through the shared router without reloading the toast host', async () => {
+  customRender(<PipelineCreationPage />)
+  fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
+  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+})
 
 it.each(['disabled', 'error'])(
   'returns direct entry to Pipelines when enablement is %s',
