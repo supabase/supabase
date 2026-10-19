@@ -383,10 +383,9 @@ describe('PipelineCreationFlow', () => {
     )
     expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
     await continueToData()
-    fireEvent.click(withinRegion('Data').getByRole('button', { name: /Advanced settings/ }))
-    expect(withinRegion('Data').getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(
-      750
-    )
+    const dataAfterReturn = withinRegion('Data')
+    fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
+    expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
   })
 
   it('preserves data values across steps and reaches Review', async () => {
