@@ -5,11 +5,15 @@ import { notFound } from 'next/navigation'
 
 import CategoryClient from './CategoryClient'
 import { canonicalAlternates } from '@/lib/canonical'
-import { startCase } from '@/lib/helpers'
+import { decodeRouteParam, startCase } from '@/lib/helpers'
 import { getAllCategories, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
 type Params = { category: string }
+
+// Category list is fixed per deploy, so read it once per process instead of per request.
+let knownCategories: string[] | undefined
+const getKnownCategories = (): string[] => (knownCategories ??= getAllCategories('_blog'))
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -17,15 +21,16 @@ export async function generateMetadata({
   params: Promise<Params>
 }): Promise<Metadata> {
   const params = await paramsPromise
+  const category = decodeRouteParam(params.category)
 
-  const categoryLabel = startCase(params?.category.replaceAll('-', ' '))
+  const categoryLabel = startCase(category.replaceAll('-', ' '))
   // The page calls notFound() for unknown categories, so no canonical for them.
-  const isKnownCategory = getAllCategories('_blog').includes(params.category)
+  const isKnownCategory = getKnownCategories().includes(category)
   return {
     title: `Blog | ${categoryLabel}`,
     description: `Blog posts in ${categoryLabel}.`,
     alternates: isKnownCategory
-      ? canonicalAlternates(`/blog/categories/${encodeURIComponent(params.category)}`)
+      ? canonicalAlternates(`/blog/categories/${encodeURIComponent(category)}`)
       : undefined,
   }
 }
@@ -36,8 +41,9 @@ export default async function CategoriesPage({
   params: Promise<Params>
 }) {
   const params = await paramsPromise
+  const category = decodeRouteParam(params.category)
 
-  if (!getAllCategories('_blog').includes(params.category)) {
+  if (!getKnownCategories().includes(category)) {
     notFound()
   }
 
@@ -50,11 +56,11 @@ export default async function CategoriesPage({
   const staticPosts = getSortedPosts({
     directory: '_blog',
     limit: 0,
-    categories: [params.category],
+    categories: [category],
   })
   const blogs = [...staticPosts] as PostTypes[]
 
   // Key by category so state (search term, view) resets when switching between
   // category pages rather than persisting across the reused page component.
-  return <CategoryClient key={params.category} posts={blogs} initialView={initialView} />
+  return <CategoryClient key={category} posts={blogs} initialView={initialView} />
 }
