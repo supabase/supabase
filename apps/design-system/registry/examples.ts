@@ -68,12 +68,6 @@ export const examples: Registry = [
     files: ['example/alert-demo.tsx'],
   },
   {
-    name: 'collapsible-alert-demo',
-    type: 'components:example',
-    registryDependencies: ['collapsible-alert'],
-    files: ['example/collapsible-alert-demo.tsx'],
-  },
-  {
     name: 'collapsible-card-section-demo',
     type: 'components:example',
     registryDependencies: ['collapsible-card-section'],
@@ -552,6 +546,12 @@ export const examples: Registry = [
     files: ['example/dialog-demo.tsx'],
   },
   {
+    name: 'dialog-disclosure-demo',
+    type: 'components:example',
+    registryDependencies: ['dialog', 'collapsible', 'button'],
+    files: ['example/dialog-disclosure-demo.tsx'],
+  },
+  {
     name: 'dialog-close-button',
     type: 'components:example',
     registryDependencies: ['dialog', 'button'],
@@ -879,6 +879,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['separator'],
     files: ['example/separator-demo.tsx'],
+  },
+  {
+    name: 'sidebar-demo',
+    type: 'components:example',
+    registryDependencies: ['sidebar'],
+    files: ['example/sidebar-demo.tsx'],
   },
   {
     name: 'sheet-confirm-on-close-demo',

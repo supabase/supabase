@@ -20,13 +20,13 @@ describe('formatHeadingPath', () => {
 
 function renderHighlight(text: string, query: string) {
   const result = highlightMatches(text, query)
-  if (typeof result === 'string') return { html: result, strongTexts: [] as string[] }
+  if (typeof result === 'string') return { html: result, markTexts: [] as string[] }
 
   const html = renderToStaticMarkup(<>{result}</>)
   const $ = load(html)
   return {
     html: $.root().text(),
-    strongTexts: $('strong')
+    markTexts: $('mark')
       .map((_, el) => $(el).text())
       .get(),
   }
@@ -37,19 +37,19 @@ describe('highlightMatches', () => {
     const result = highlightMatches('Bring your own MCP', 'mcp server')
     expect(typeof result).not.toBe('string')
 
-    const { strongTexts, html } = renderHighlight('Bring your own MCP', 'mcp server')
-    expect(strongTexts).toEqual(['MCP'])
+    const { markTexts, html } = renderHighlight('Bring your own MCP', 'mcp server')
+    expect(markTexts).toEqual(['MCP'])
     expect(html).toBe('Bring your own MCP')
   })
 
   it('highlights multiple non-overlapping token matches independently', () => {
-    const { strongTexts } = renderHighlight('MCP servers for your server', 'mcp server')
-    expect(strongTexts).toEqual(['MCP', 'server', 'server'])
+    const { markTexts } = renderHighlight('MCP servers for your server', 'mcp server')
+    expect(markTexts).toEqual(['MCP', 'server', 'server'])
   })
 
   it('merges overlapping/adjacent matches into a single run', () => {
-    const { strongTexts } = renderHighlight('server', 'server serv')
-    expect(strongTexts).toEqual(['server'])
+    const { markTexts } = renderHighlight('server', 'server serv')
+    expect(markTexts).toEqual(['server'])
   })
 
   it('returns the original string unchanged when there is no match', () => {
@@ -58,8 +58,8 @@ describe('highlightMatches', () => {
   })
 
   it('is case-insensitive but preserves the original casing of the matched text', () => {
-    const { strongTexts } = renderHighlight('Bring your own MCP', 'MCP')
-    expect(strongTexts).toEqual(['MCP'])
+    const { markTexts } = renderHighlight('Bring your own MCP', 'MCP')
+    expect(markTexts).toEqual(['MCP'])
   })
 
   it('returns the text unchanged for an empty or whitespace-only query', () => {
@@ -68,8 +68,8 @@ describe('highlightMatches', () => {
   })
 
   it('excludes common prepositions/articles/conjunctions from highlighting', () => {
-    const { strongTexts } = renderHighlight('The best MCP server for you', 'the mcp server')
-    expect(strongTexts).toEqual(['MCP', 'server'])
+    const { markTexts } = renderHighlight('The best MCP server for you', 'the mcp server')
+    expect(markTexts).toEqual(['MCP', 'server'])
   })
 
   it('returns the text unchanged when the query is made up entirely of ignored words', () => {

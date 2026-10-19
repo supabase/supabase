@@ -8,8 +8,8 @@ import {
 } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Plus, X } from 'lucide-react'
+import { PlusIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { ReactNode, useState } from 'react'
 import {
@@ -247,7 +247,7 @@ export const EditorTabs = ({
                       'hover:bg-surface-300 dark:hover:bg-surface-100'
                     )}
                   >
-                    <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+                    <PlusIcon size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
                     <div className="flex items-center gap-0">
                       <span>New</span>
                     </div>
@@ -279,7 +279,7 @@ export const EditorTabs = ({
                       'cursor-pointer'
                     )}
                   >
-                    <X size={12} className="text-foreground-light" />
+                    <XIcon size={12} className="text-foreground-light" />
                   </button>
                 </div>
               )}
@@ -298,7 +298,7 @@ export const EditorTabs = ({
                       animate={{ opacity: 1, scale: 1, x: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Plus
+                      <PlusIcon
                         size={16}
                         strokeWidth={1.5}
                         className="text-foreground-lighter hover:text-foreground-light"

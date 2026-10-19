@@ -1,6 +1,6 @@
 import { AuthError, AuthMFARecoveryCodesGenerateResponseData } from '@supabase/auth-js'
 import { UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import { Check, Copy, Download } from 'lucide-react'
+import { CheckIcon, CopyIcon, DownloadIcon } from 'lucide-react'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
   Button,
@@ -130,7 +130,13 @@ export const RecoveryCodesModal = <T = unknown,>({
 
                 <div className="flex items-center gap-x-2">
                   <Button
-                    icon={copiedToClipboard ? <Check className="text-brand-default" /> : <Copy />}
+                    icon={
+                      copiedToClipboard ? (
+                        <CheckIcon className="text-brand-default" />
+                      ) : (
+                        <CopyIcon />
+                      )
+                    }
                     className="ml-auto w-min"
                     onClick={() =>
                       copyToClipboard(
@@ -141,7 +147,7 @@ export const RecoveryCodesModal = <T = unknown,>({
                   >
                     {copiedToClipboard ? 'Copied' : 'Copy'}
                   </Button>
-                  <Button icon={<Download />} onClick={downloadCodes}>
+                  <Button icon={<DownloadIcon />} onClick={downloadCodes}>
                     Download
                   </Button>
                 </div>

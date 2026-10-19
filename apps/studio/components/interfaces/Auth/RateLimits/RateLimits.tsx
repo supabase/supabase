@@ -132,6 +132,10 @@ export const RateLimits = () => {
       .number()
       .min(0, 'Must be not be lower than 0')
       .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
+    SMTP_MAX_FREQUENCY: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 seconds'),
   })
 
   const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
@@ -144,6 +148,7 @@ export const RateLimits = () => {
       RATE_LIMIT_ANONYMOUS_USERS: 0,
       RATE_LIMIT_OTP: 0,
       RATE_LIMIT_WEB3: 0,
+      SMTP_MAX_FREQUENCY: 60,
     },
   })
 
@@ -153,9 +158,15 @@ export const RateLimits = () => {
   })
   const rateLimitVerify = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_VERIFY' })
   const rateLimitOtp = useWatch({ control: rateLimitForm.control, name: 'RATE_LIMIT_OTP' })
+  const { dirtyFields: rateLimitDirtyFields } = rateLimitForm.formState
 
   const onSubmitRateLimitForm = (data: z.infer<typeof RateLimitFormSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
+
+    if (rateLimitDirtyFields.SMTP_MAX_FREQUENCY && data.SMTP_MAX_FREQUENCY < 1) {
+      rateLimitForm.setError('SMTP_MAX_FREQUENCY', { message: 'Must be more than 0' })
+      return
+    }
 
     const payload: Partial<z.infer<typeof RateLimitFormSchema>> = {}
     const params = [
@@ -166,6 +177,7 @@ export const RateLimits = () => {
       'RATE_LIMIT_ANONYMOUS_USERS',
       'RATE_LIMIT_OTP',
       'RATE_LIMIT_WEB3',
+      'SMTP_MAX_FREQUENCY',
     ] as (keyof typeof payload)[]
     params.forEach((param) => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
@@ -187,6 +199,7 @@ export const RateLimits = () => {
         RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
         RATE_LIMIT_OTP: authConfig.RATE_LIMIT_OTP,
         RATE_LIMIT_WEB3: authConfig.RATE_LIMIT_WEB3 ?? 0,
+        SMTP_MAX_FREQUENCY: authConfig.SMTP_MAX_FREQUENCY,
       })
 
       ipForwardingForm.reset({
@@ -589,6 +602,70 @@ export const RateLimits = () => {
                                   </Link>
                                 </Button>
                               </div>
+                            </TooltipContent>
+                          ) : null}
+                        </Tooltip>
+                      </FormItemLayout>
+                    )}
+                  />
+                </CardContent>
+
+                <CardContent>
+                  <FormField
+                    control={rateLimitForm.control}
+                    name="SMTP_MAX_FREQUENCY"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label="Minimum interval per user"
+                        description="Minimum time between emails sent to the same user. Only applies when Custom SMTP is configured."
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <FormControl>
+                              <InputGroup>
+                                <FormInputGroupInput
+                                  type="number"
+                                  min={0}
+                                  {...field}
+                                  disabled={!canUpdateConfig || !isSmtpEnabled(authConfig)}
+                                />
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>seconds</InputGroupText>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormControl>
+                          </TooltipTrigger>
+                          {!canUpdateConfig || !isSmtpEnabled(authConfig) ? (
+                            <TooltipContent side="left" className="w-80 p-4">
+                              {!canUpdateConfig ? (
+                                <>
+                                  <p className="font-medium">
+                                    You don't have permission to update this setting
+                                  </p>
+                                  <p className="mt-1">
+                                    You need additional permissions to update auth configuration
+                                    settings
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p className="font-medium">
+                                    Custom SMTP is required to update this setting
+                                  </p>
+                                  <p className="mt-1">
+                                    This setting only applies when a custom SMTP provider is
+                                    configured
+                                  </p>
+                                  <div className="mt-3">
+                                    <Button asChild size="tiny">
+                                      <Link href={`/project/${projectRef}/auth/smtp`}>
+                                        View SMTP settings
+                                      </Link>
+                                    </Button>
+                                  </div>
+                                </>
+                              )}
                             </TooltipContent>
                           ) : null}
                         </Tooltip>

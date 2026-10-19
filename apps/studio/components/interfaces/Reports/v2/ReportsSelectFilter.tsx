@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Button,
@@ -85,7 +85,7 @@ export const ReportsSelectFilter = ({
             { 'border-solid': isActive },
             className
           )}
-          iconRight={<ChevronDown size={14} />}
+          iconRight={<ChevronDownIcon size={14} />}
         >
           <span>
             {label}

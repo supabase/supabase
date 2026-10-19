@@ -448,8 +448,12 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
 /**
  * Unified logs row query — flat SELECT, no subquery wrapper.
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+export const getUnifiedLogsQuery = (
+  search: QuerySearchParamsType,
+  paginationFilter?: SafeLogSqlFragment
+): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
+  if (paginationFilter) conditions.push(paginationFilter)
   return safeSql`-- unified logs: row list
 SELECT ${ROW_PROJECTION}
 FROM logs
@@ -501,6 +505,7 @@ SELECT ${lit(facet)} AS facet, (${facetExpr}) AS value, count() AS count
 FROM logs
 ${whereClause(conditions)}
 GROUP BY value
+ORDER BY count DESC
 LIMIT ${lit(MAX_FACETS_QUANTITY)}
 `
 }
@@ -560,10 +565,6 @@ HAVING value != ''
     else baseFacets.push(facet)
   }
   blocks.push(scanBlock(baseFacets, whereFor()))
-
-  // pathname is high-cardinality, so it needs its own LIMIT (the endpoint
-  // rejects LIMIT BY inside the shared arrayJoin).
-  blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
 
   return safeSql`-- unified logs: sidebar facet counts
 ${joinSqlFragments(blocks, ' UNION ALL ')}`

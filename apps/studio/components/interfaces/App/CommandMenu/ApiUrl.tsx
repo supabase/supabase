@@ -1,4 +1,4 @@
-import { Link } from 'lucide-react'
+import { LinkIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Badge, copyToClipboard } from 'ui'
 import {
@@ -39,7 +39,7 @@ export function useApiUrlCommand() {
           setIsOpen(false)
           resetCommandMenu()
         },
-        icon: () => <Link />,
+        icon: () => <LinkIcon />,
         badge: () => <Badge>Project: {project?.name}</Badge>,
       },
     ],

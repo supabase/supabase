@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { CircleHelpIcon, Undo2, X } from 'lucide-react'
+import { CircleHelpIcon, Undo2Icon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Badge, Button, cn } from 'ui'
 
@@ -56,7 +56,7 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
           </p>
           <ButtonTooltip
             className="shrink-0 px-1.5"
-            icon={<Undo2 />}
+            icon={<Undo2Icon />}
             onClick={onSwitchBack}
             tooltip={{ content: { side: 'bottom', text: 'Switch back' } }}
           />
@@ -72,7 +72,7 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
         <Button
           variant="text"
           size="tiny"
-          icon={<X size={14} strokeWidth={1.5} />}
+          icon={<XIcon size={14} strokeWidth={1.5} />}
           onClick={() => setIsDismissed(true)}
           className="opacity-75 hover:opacity-100 -mt-1 -mr-1 px-1"
           aria-label="Dismiss banner"

@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, X } from 'lucide-react'
+import { GripVerticalIcon, XIcon } from 'lucide-react'
 import { memo } from 'react'
 import { Button, Switch, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -42,7 +42,7 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
         type="button"
         tabIndex={0}
       >
-        <GripVertical size={16} strokeWidth={1.5} />
+        <GripVerticalIcon size={16} strokeWidth={1.5} />
       </button>
       <div className="grow">
         <span className="flex grow items-center gap-1 truncate text-sm text-foreground">
@@ -63,7 +63,7 @@ const SortRow = ({ index, columnName, sort, onDelete, onToggle }: SortRowProps) 
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            icon={<X strokeWidth={1.5} />}
+            icon={<XIcon strokeWidth={1.5} />}
             size="tiny"
             variant="text"
             className="w-7"

@@ -1,8 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { motion } from 'framer-motion'
 import { Key } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -610,7 +610,7 @@ function BroadcastSkeleton() {
           <g key={i}>
             <path
               d={line.d}
-              stroke="hsl(var(--foreground-muted))"
+              stroke="var(--foreground-muted)"
               strokeWidth="2"
               strokeLinecap="round"
               opacity="0.15"
