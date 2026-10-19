@@ -32,6 +32,7 @@ import vercelShipSydneyContestThankYou from './events/vercel-ship-sydney-2026/co
 import askSupabaseSelect from './lead-gen/ask-supabase-select'
 import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
+import { managedPostgres } from './lead-gen/managed-postgres'
 import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
@@ -41,6 +42,7 @@ import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-t
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
+  managedPostgres,
   askSupabaseSelect, // maintain forever
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
