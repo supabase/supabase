@@ -323,7 +323,7 @@ describe('PipelineCreationFlow', () => {
     }
   )
 
-  it('preserves connection values across destination changes', async () => {
+  it('preserves connection and data values across destination changes', async () => {
     const onUrlUpdate = vi.fn()
     customRender(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
@@ -340,6 +340,11 @@ describe('PipelineCreationFlow', () => {
     fillConnection()
     await continueToData()
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 3 of 4')
+    const data = withinRegion('Data')
+    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
+      target: { value: '750' },
+    })
     // Wait for the URL write, not just the optimistic step render, before going back.
     await waitFor(() =>
       expect(onUrlUpdate).toHaveBeenLastCalledWith(
@@ -377,6 +382,11 @@ describe('PipelineCreationFlow', () => {
       )
     )
     expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
+    await continueToData()
+    fireEvent.click(withinRegion('Data').getByRole('button', { name: /Advanced settings/ }))
+    expect(withinRegion('Data').getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(
+      750
+    )
   })
 
   it('preserves data values across steps and reaches Review', async () => {
