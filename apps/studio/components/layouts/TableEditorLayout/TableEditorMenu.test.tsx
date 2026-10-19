@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -7,12 +7,13 @@ import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { TableEditorMenu } from './TableEditorMenu'
+import { type Entity } from '@/data/entity-types/entity-types-infinite-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type SchemaListRow = { id: number; name: string }
-type EntityTypesPage = { data: { entities: []; count: number } }
+type EntityTypesPage = { data: { entities: Entity[]; count: number } }
 
 const PROJECT: ProjectDetailResponse = {
   cloud_provider: 'localhost',
@@ -137,8 +138,10 @@ describe('TableEditorMenu schema switch', () => {
     await userEvent.click(screen.getByRole('option', { name: 'auth' }))
 
     expect(replace).not.toHaveBeenCalled()
-    expect(onUrlUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ queryString: '?schema=auth' })
-    )
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ queryString: '?schema=auth' })
+      )
+    })
   })
 })

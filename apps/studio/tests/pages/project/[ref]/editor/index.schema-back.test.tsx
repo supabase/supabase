@@ -72,9 +72,9 @@ const waitForHistory = async (queryClient: QueryClient) => {
   })
 }
 
-const waitForRedirectDecision = async () => {
+const waitForRedirectDecision = async (callCount = 1) => {
   await waitFor(() => {
-    expect(isHistoryTraverseNavigation).toHaveBeenCalled()
+    expect(isHistoryTraverseNavigation).toHaveBeenCalledTimes(callCount)
   })
 }
 
@@ -84,6 +84,7 @@ describe('Table Editor index schema and history', () => {
     sessionStorage.clear()
     resetHistoryTraverseState()
     vi.restoreAllMocks()
+    vi.mocked(isHistoryTraverseNavigation).mockClear()
     mockRouter.setCurrentUrl('/project/default/editor')
   })
 
