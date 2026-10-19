@@ -1,4 +1,3 @@
-// useCheckPermissionsV2.ts
 import { permissions } from '@supabase/shared-types'
 import { useIsLoggedIn, useParams } from 'common'
 import { useMemo } from 'react'
@@ -22,8 +21,7 @@ export const FGA_PERMISSIONS = Object.fromEntries(
 ) as ExtractIds<typeof permissions.FgaPermissions>
 
 type DeepValue<T> = T extends object ? DeepValue<T[keyof T]> : T
-export type ExistingFgaPermissions = DeepValue<typeof FGA_PERMISSIONS>
-export type FgaPermissions = ExistingFgaPermissions
+export type FgaPermissions = DeepValue<typeof FGA_PERMISSIONS>
 
 /**
  * Checks an FGA permission against the v2 permissions response.

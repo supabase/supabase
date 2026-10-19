@@ -1,6 +1,6 @@
 import { useIsLoggedIn, useParams } from 'common'
 import { MoreVerticalIcon, Redo2Icon, TrashIcon } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -70,13 +70,8 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     canManageRole(orgRole, roleNameFor(id))
   )
 
-  const canManageTargetRole = useMemo(() => {
-    if (!IS_PLATFORM) return true
-    if (!isLoggedIn) return false
-    if (!permissionsV2) return false
-    return canManageRole(orgRole, roleNameFor(roleId))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoggedIn, permissionsV2, orgRole, roleId])
+  const canManageTargetRole =
+    !IS_PLATFORM || (isLoggedIn && !!permissionsV2 && canManageRole(orgRole, roleNameFor(roleId)))
 
   const canResendInvite = canManageTargetRole && hasOrgRole
   const canRevokeInvite = canManageTargetRole && hasOrgRole
