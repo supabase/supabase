@@ -36,10 +36,6 @@ export const usePipelineCreationSubmission = ({
     name: DestinationPanelFormSchema.keyof().options,
   })
   const configurationSnapshot = JSON.stringify([type, values])
-  useLayoutEffect(() => {
-    resetValidation()
-    warningSnapshot.current = undefined
-  }, [configurationSnapshot, resetValidation])
   const failures = [...destinationValidationFailures, ...pipelineValidationFailures]
 
   const createPipeline = async (data: DestinationPanelSchemaType) => {
@@ -88,6 +84,11 @@ export const usePipelineCreationSubmission = ({
       }
       await createPipeline(data)
     })
+
+  useLayoutEffect(() => {
+    resetValidation()
+    warningSnapshot.current = undefined
+  }, [configurationSnapshot, resetValidation])
 
   return {
     handleSubmit,
