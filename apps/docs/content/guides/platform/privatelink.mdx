@@ -104,11 +104,16 @@ In your AWS account, you have two options to establish connectivity:
    - AWS will provision a private ENI for you in each selected subnet
    - IP address type should be set to IPv4
 9. Choose the security group you created in Step 3.
-10. Click **Create endpoint**
-11. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
-12. For connectivity:
+10. Optionally, select **Enable private DNS name** to use a Supabase hostname instead of the endpoint DNS name
+    - The private DNS name is `db.[project_ref].privatelink.supabase.co`
+    - It resolves only to the endpoint from within the selected VPC
+    - Your VPC must have **DNS resolution** and **DNS hostnames** enabled
+11. Click **Create endpoint**
+12. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
+13. For connectivity:
     - The IP addresses of the endpoint will be listed in the **Subnets** section of the endpoint details
     - The DNS record will be in the **Associations** section of the endpoint details in the **DNS Name** field
+    - If you enabled a private DNS name, use `db.[project_ref].privatelink.supabase.co`
 
 #### Option B: Attach resource configuration to an existing VPC lattice service network
 
@@ -160,12 +165,18 @@ postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
 # After (private)
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:5432/postgres
 
+# After (private, with private DNS name enabled)
+postgresql://user:pass@db.[project-ref].privatelink.supabase.co:5432/postgres
+
 # PgBouncer connection
 # Before (public)
 postgresql://user:pass@db.[project-ref].supabase.co:6543/postgres
 
 # After (private)
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:6543/postgres
+
+# After (private, with private DNS name enabled)
+postgresql://user:pass@db.[project-ref].privatelink.supabase.co:6543/postgres
 ```
 
 ### Step 7: Restrict public database access (optional)

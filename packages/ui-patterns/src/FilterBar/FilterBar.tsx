@@ -22,6 +22,8 @@ export type FilterBarProps = {
   isLoading?: boolean
   className?: string
   supportsOperators?: boolean
+  /** Logical operator for groups created via "New Group". Defaults to 'AND'. */
+  defaultGroupOperator?: FilterGroupType['logicalOperator']
   variant?: FilterBarVariant
   icon?: React.ReactNode
   /**
@@ -141,6 +143,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
     isLoading,
     className,
     supportsOperators = false,
+    defaultGroupOperator,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -159,6 +162,7 @@ export const FilterBar = forwardRef<FilterBarHandle, FilterBarProps>(function Fi
       actions={actions}
       isLoading={isLoading}
       supportsOperators={supportsOperators}
+      defaultGroupOperator={defaultGroupOperator}
       variant={variant}
       icon={icon}
       freeformDefaultProperty={freeformDefaultProperty}

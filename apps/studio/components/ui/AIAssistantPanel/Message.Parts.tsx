@@ -23,11 +23,7 @@ import {
   type CompactPart,
   type CompactPartStatus,
 } from './Message.Parts.utils'
-import {
-  deployEdgeFunctionInputSchema,
-  deployEdgeFunctionOutputSchema,
-  parseExecuteSqlChartResult,
-} from './Message.utils'
+import { deployEdgeFunctionInputSchema, parseExecuteSqlChartResult } from './Message.utils'
 import { MessageMarkdown } from './MessageMarkdown'
 import { MessagePartQueryLogs } from './MessagePartQueryLogs'
 import { NotebookProposalRenderer, type NotebookProposalMode } from './NotebookProposalRenderer'
@@ -36,6 +32,7 @@ import { OptInRequest } from './OptInRequest'
 import { parseSupportRequestMessage, SupportRequestMessage } from './SupportRequestMessage'
 import { useMinimumDisplayTime } from '@/hooks/misc/useMinimumDisplayTime'
 import { storedUpdateOptInLevelInputSchema } from '@/lib/ai/tool-filter'
+import { contract as deployEdgeFunctionContract } from '@/lib/ai/tools/deploy-edge-function'
 
 function MessagePartText({ textPart }: { textPart: TextUIPart }) {
   const { id, isLoading, readOnly, isUserMessage, state } = useMessageInfoContext()
@@ -182,7 +179,7 @@ function MessagePartDeployEdgeFunction({ toolPart }: { toolPart: ToolUIPart }) {
   const parsedInput = deployEdgeFunctionInputSchema.safeParse(input)
   if (!parsedInput.success) return null
 
-  const parsedOutput = deployEdgeFunctionOutputSchema.safeParse(output)
+  const parsedOutput = deployEdgeFunctionContract.outputSchema.safeParse(output)
   const isInitiallyDeployed =
     state === 'output-available' && parsedOutput.success && parsedOutput.data.success === true
 

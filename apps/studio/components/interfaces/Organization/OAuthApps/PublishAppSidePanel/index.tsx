@@ -44,6 +44,7 @@ import {
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -113,7 +114,7 @@ export const PublishAppSidePanel = ({
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
-  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants')
+  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants') && USE_MOCKS
 
   const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
