@@ -491,12 +491,12 @@ export const SubscriptionPlanUpdateDialog = ({
                       <div className="text-sm prose">
                         After upgrading to Pro, switch one project to Micro for free in{' '}
                         <Link
-                          href={getInfrastructurePath()}
+                          href={getInfrastructurePath(projects[0]?.ref)}
                           target="_blank"
                           className="underline inline-flex items-center gap-1"
                         >
                           Infrastructure settings
-                          <ExternalLinkIcon size={12} />
+                          <ExternalLinkIcon size={12} aria-hidden="true" />
                         </Link>
                         . Each additional project costs <span translate="no">$10</span>+/mo,
                         regardless of compute size.{' '}
