@@ -8,6 +8,7 @@ import { getRowTimestampMs } from '../../UnifiedLogs.utils'
 import { postgresDetailsFields, postgresPrimaryFields } from '../config/serviceFlowFields'
 import { BlockFieldConfig } from '../types'
 import { DetailRow } from './shared/DetailRow'
+import { resolveTraceIds, TraceRequestRow } from './TraceRequestRow'
 import { DataTableFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 
@@ -19,6 +20,7 @@ interface PostgresFlowDetailProps {
   filterFields: DataTableFilterField<any>[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches ServiceFlow types convention
   table: Table<any>
+  onOpenTrace?: () => void
 }
 
 const FieldDetailRow = ({
@@ -60,9 +62,11 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
   isLoading,
   filterFields,
   table,
+  onOpenTrace,
 }: PostgresFlowDetailProps) {
   const timestampMs = getRowTimestampMs(data)
   const formattedTime = timestampMs ? new Date(timestampMs).toLocaleString() : null
+  const { traceId, requestId } = resolveTraceIds(data, enrichedData)
 
   const severity: string | undefined =
     enrichedData?.error_severity ??
@@ -75,6 +79,12 @@ export const PostgresFlowDetail = memo(function PostgresFlowDetail({
         className="border-b"
         icon={ClockIcon}
         summary={formattedTime ?? undefined}
+      />
+      <TraceRequestRow
+        traceId={traceId}
+        requestId={requestId}
+        table={table}
+        onOpenTrace={onOpenTrace}
       />
 
       <Collapsible defaultOpen className="border-b">

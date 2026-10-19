@@ -18,6 +18,10 @@ export const LOCAL_STORAGE_KEYS = {
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
   HOME_CHART_INTERVAL: (ref: string) => `home-chart-interval-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
+  UNIFIED_LOGS_TRACE_PROTOTYPE: 'supabase-unified-logs-trace-prototype',
+
+  // DEPR-705 "Debug mode" prototype (front-end only, throwaway)
+  DEBUG_MODE_STATE: (ref: string) => `debug-mode-state-${ref}`,
 
   UI_TIMEZONE: 'supabase-ui-timezone',
   UI_THEME_OVERRIDES: 'supabase-ui-theme-overrides',

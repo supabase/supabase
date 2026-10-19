@@ -12,6 +12,9 @@ import {
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
+import { getFixtureLogsCount } from '@/lib/debug-mode/trace-fixtures'
+import { useTracePrototypeEnabled } from '@/lib/debug-mode/trace-prototype-flag'
+import { useDebugMode } from '@/state/debug-mode'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // Trimmed client-side because the OTEL endpoint rejects LIMIT BY, so the count
@@ -91,9 +94,18 @@ export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   }: UseCustomQueryOptions<UnifiedLogsCountData, UnifiedLogsCountError, TData> = {}
 ) => {
   const useOtel = useUnifiedLogsBackend()
+  const tracePrototypeEnabled = useTracePrototypeEnabled()
+  const { state: debugState } = useDebugMode(projectRef)
+
   return useQuery<UnifiedLogsCountData, UnifiedLogsCountError, TData>({
-    queryKey: [...logsKeys.unifiedLogsCount(projectRef, search), { otel: useOtel }],
-    queryFn: ({ signal }) => getUnifiedLogsCount({ projectRef, search, useOtel }, signal),
+    queryKey: [
+      ...logsKeys.unifiedLogsCount(projectRef, search),
+      { otel: useOtel, tracePrototype: tracePrototypeEnabled, debugLevel: debugState.level },
+    ],
+    queryFn: ({ signal }) =>
+      tracePrototypeEnabled
+        ? Promise.resolve(getFixtureLogsCount(debugState.level, search))
+        : getUnifiedLogsCount({ projectRef, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,

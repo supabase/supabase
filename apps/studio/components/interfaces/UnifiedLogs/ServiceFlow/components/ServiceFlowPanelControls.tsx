@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
+import type { TraceStep } from '../Trace/trace-view.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -23,20 +24,44 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 interface ServiceFlowPanelControlsProps {
   dock: 'bottom' | 'right'
   setDock: (value: 'bottom' | 'right') => void
+  activeTab?: string
+  traceSteps?: TraceStep[]
+  traceSelectedId?: string | null
+  onTraceSelectedIdChange?: (id: string | null) => void
 }
 
 export const ServiceFlowPanelControls = ({
   dock = 'bottom',
   setDock,
+  activeTab = 'overview',
+  traceSteps = [],
+  traceSelectedId = null,
+  onTraceSelectedIdChange,
 }: ServiceFlowPanelControlsProps) => {
   const { table, openRowId, setOpenRowId, onSelectRow } = useDataTable()
   const rows = table.getRowModel().rows
   const index = rows.findIndex((row) => row.id === openRowId)
-  const prevId = rows[index - 1]?.id
-  const nextId = rows[index + 1]?.id
+  const listPrevId = rows[index - 1]?.id
+  const listNextId = rows[index + 1]?.id
+
+  // While the Trace tab is active, up/down step through spans + log lines in
+  // tree/chronological order instead of the main list — see ServiceFlowPanel,
+  // which owns traceSteps/traceSelectedId so this and the Trace tab agree.
+  const isTraceMode = activeTab === 'trace'
+  const traceIndex =
+    traceSelectedId !== null ? traceSteps.findIndex((step) => step.id === traceSelectedId) : -1
+  const tracePrevId = traceIndex > 0 ? traceSteps[traceIndex - 1].id : undefined
+  const traceNextId = traceIndex === -1 ? traceSteps[0]?.id : traceSteps[traceIndex + 1]?.id
+
+  const prevId = isTraceMode ? tracePrevId : listPrevId
+  const nextId = isTraceMode ? traceNextId : listNextId
 
   const handleNavigate = (id: string | undefined, shiftKey = false) => {
     if (!id) return
+    if (isTraceMode) {
+      onTraceSelectedIdChange?.(id)
+      return
+    }
     if (onSelectRow) onSelectRow(id, { shiftKey })
     else setOpenRowId(id)
     const row = document.getElementById(id)
@@ -47,11 +72,11 @@ export const ServiceFlowPanelControls = ({
   const onNext = () => handleNavigate(nextId)
   const onClose = () => setOpenRowId(undefined)
 
-  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW, () => handleNavigate(prevId, true), {
-    enabled: !!prevId,
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW, () => handleNavigate(listPrevId, true), {
+    enabled: !isTraceMode && !!listPrevId,
   })
-  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW, () => handleNavigate(nextId, true), {
-    enabled: !!nextId,
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW, () => handleNavigate(listNextId, true), {
+    enabled: !isTraceMode && !!listNextId,
   })
 
   return (

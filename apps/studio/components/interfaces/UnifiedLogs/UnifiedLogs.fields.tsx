@@ -143,4 +143,23 @@ export const filterFields = [
       )
     },
   },
+  {
+    // FDBKIN-36185 / DEBUG-242: set only via the Overview tab's "Filter logs
+    // by trace" action, never browsed as a facet list — hidden from the left
+    // sidebar the same way event_message is.
+    label: 'Trace ID',
+    value: 'trace_id',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
+    hidden: true,
+    component: (props: Option) => {
+      return (
+        <span className="truncate block w-full font-mono text-xs" title={props.value as string}>
+          {props.value}
+        </span>
+      )
+    },
+  },
 ] satisfies DataTableFilterField<ColumnSchema>[]

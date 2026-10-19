@@ -11,6 +11,9 @@ import {
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { getFixtureLogsChart } from '@/lib/debug-mode/trace-fixtures'
+import { useTracePrototypeEnabled } from '@/lib/debug-mode/trace-prototype-flag'
+import { useDebugMode } from '@/state/debug-mode'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
@@ -167,9 +170,18 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
   const useOtel = useUnifiedLogsBackend()
+  const tracePrototypeEnabled = useTracePrototypeEnabled()
+  const { state: debugState } = useDebugMode(projectRef)
+
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
-    queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
-    queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
+    queryKey: [
+      ...logsKeys.unifiedLogsChart(projectRef, search),
+      { otel: useOtel, tracePrototype: tracePrototypeEnabled, debugLevel: debugState.level },
+    ],
+    queryFn: ({ signal }) =>
+      tracePrototypeEnabled
+        ? Promise.resolve(getFixtureLogsChart(debugState.level, search))
+        : getUnifiedLogsChart({ projectRef, search, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     ...UNIFIED_LOGS_QUERY_OPTIONS,

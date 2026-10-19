@@ -17,6 +17,9 @@ import {
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
+import { getFixtureLogsPage } from '@/lib/debug-mode/trace-fixtures'
+import { useTracePrototypeEnabled } from '@/lib/debug-mode/trace-prototype-flag'
+import { useDebugMode } from '@/state/debug-mode'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
@@ -167,10 +170,18 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
   > = {}
 ) => {
   const useOtel = useUnifiedLogsBackend()
+  const tracePrototypeEnabled = useTracePrototypeEnabled()
+  const { state: debugState } = useDebugMode(projectRef)
+
   return useInfiniteQuery({
-    queryKey: [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }],
+    queryKey: [
+      ...logsKeys.unifiedLogsInfinite(projectRef, search),
+      { otel: useOtel, tracePrototype: tracePrototypeEnabled, debugLevel: debugState.level },
+    ],
     queryFn: ({ signal, pageParam }) =>
-      getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal),
+      tracePrototypeEnabled
+        ? Promise.resolve(getFixtureLogsPage(debugState.level, search))
+        : getUnifiedLogs({ projectRef, search, pageParam, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     placeholderData: keepPreviousData,
     getPreviousPageParam: (firstPage) => {

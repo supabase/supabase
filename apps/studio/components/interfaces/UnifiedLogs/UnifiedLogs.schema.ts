@@ -21,6 +21,13 @@ export const columnSchema = z.object({
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+  // FDBKIN-36185: surfaced generically from whatever metadata/log_attributes a
+  // row happens to carry — see mapUnifiedLogRow. Only populated for sources
+  // that forward their attributes today (compute logs, and the DEBUG-242
+  // trace-prototype fixtures); other sources will pick this up for free once
+  // the backend forwards attributes more broadly.
+  trace_id: z.string().nullable().optional(),
+  request_id: z.string().nullable().optional(),
 })
 
 export type ColumnSchema = z.infer<typeof columnSchema>

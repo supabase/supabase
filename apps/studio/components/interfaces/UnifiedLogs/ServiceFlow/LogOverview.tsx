@@ -13,16 +13,19 @@ import {
   MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
 } from './components/ServiceBlocks'
+import { resolveTraceIds, TraceRequestRow } from './components/TraceRequestRow'
 import type { ServiceFlowBlockProps } from './types'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
   data: ColumnSchema
   rawData: unknown
+  onOpenTrace?: () => void
 }
 
 function RequestOverview({ children, ...props }: LogOverviewProps & { children: ReactNode }) {
   const timestamp = getRowTimestampMs(props.data)
+  const { traceId, requestId } = resolveTraceIds(props.data, props.enrichedData)
   return (
     <>
       <DetailSectionHeader
@@ -30,6 +33,12 @@ function RequestOverview({ children, ...props }: LogOverviewProps & { children: 
         className="border-b"
         icon={ClockIcon}
         summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
+      />
+      <TraceRequestRow
+        traceId={traceId}
+        requestId={requestId}
+        table={props.table}
+        onOpenTrace={props.onOpenTrace}
       />
       <MemoizedNetworkBlock {...props} />
       {children}

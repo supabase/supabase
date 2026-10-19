@@ -83,6 +83,11 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
     log_count: row.log_count ?? null,
     logs: row.logs ?? [],
     auth_user: isComputeLog ? null : row.auth_user || null,
+    // FDBKIN-36185: read generically off whatever metadata the row carries,
+    // rather than special-casing a log type — today that's only compute logs
+    // (metadata is forwarded for every source once the backend catches up).
+    trace_id: typeof row.metadata?.trace_id === 'string' ? row.metadata.trace_id : null,
+    request_id: typeof row.metadata?.request_id === 'string' ? row.metadata.request_id : null,
   }
 
   if (isComputeLog) return { ...mappedRow, metadata: row.metadata ?? null }

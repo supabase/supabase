@@ -20,10 +20,12 @@ export function LogDetail({
   row,
   tab,
   searchParameters,
+  onOpenTrace,
 }: {
   row: ColumnSchema
   tab: string
   searchParameters: QuerySearchParamsType
+  onOpenTrace?: () => void
 }) {
   const { ref: projectRef } = useParams()
   const { table, filterFields } = useDataTable<ColumnSchema, unknown>()
@@ -91,6 +93,7 @@ export function LogDetail({
         isLoading={isLoading}
         filterFields={filterFields}
         table={table}
+        onOpenTrace={onOpenTrace}
       />
     </div>
   )

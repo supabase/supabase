@@ -22,6 +22,8 @@ import {
 } from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { LOG_TYPE_TO_SOURCE } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { getFixtureLogInspection } from '@/lib/debug-mode/trace-fixtures'
+import { useTracePrototypeEnabled } from '@/lib/debug-mode/trace-prototype-flag'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
@@ -160,6 +162,11 @@ export interface UnifiedLogInspectionEntry {
 
   // Raw data
   raw_log_data?: any
+
+  // FDBKIN-36185: present when the row's log_attributes map carries these
+  // keys (spread onto the entry by flattenOtelInspectionRow).
+  trace_id?: string
+  request_id?: string
 }
 
 export async function getUnifiedLogInspection(
@@ -302,10 +309,20 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) => {
   const useOtel = useUnifiedLogsBackend()
+  const tracePrototypeEnabled = useTracePrototypeEnabled()
+
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
-    queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
+    queryKey: [
+      ...logsKeys.serviceFlow(projectRef, search, logId),
+      { otel: useOtel, tracePrototype: tracePrototypeEnabled },
+    ],
     queryFn: ({ signal }) =>
-      getUnifiedLogInspection({ projectRef, logId, type, search, useOtel, logTimestampMs }, signal),
+      tracePrototypeEnabled
+        ? Promise.resolve(getFixtureLogInspection(logId))
+        : getUnifiedLogInspection(
+            { projectRef, logId, type, search, useOtel, logTimestampMs },
+            signal
+          ),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,

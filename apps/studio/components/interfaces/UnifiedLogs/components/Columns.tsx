@@ -1,4 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table'
+import { WaypointsIcon } from 'lucide-react'
 import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
@@ -9,6 +10,7 @@ import { LogLevelDot } from './LogLevelDot'
 import { LogTypeIcon } from './LogTypeIcon'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { getTraceSummary } from '@/lib/debug-mode/trace-fixtures'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -220,6 +222,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
           logType,
           value
         )
+        const traceSummary = getTraceSummary(row.original.trace_id)
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -232,6 +235,16 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 </TooltipTrigger>
                 <TooltipContent>
                   {logCount} {logCount === 1 ? 'log' : 'logs'} for this execution
+                </TooltipContent>
+              </Tooltip>
+            )}
+            {traceSummary && (
+              <Tooltip>
+                <TooltipTrigger>
+                  <WaypointsIcon size={12} strokeWidth={1.5} className="text-foreground-lighter" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Trace · {traceSummary.spanCount} spans, {traceSummary.logCount} logs
                 </TooltipContent>
               </Tooltip>
             )}
@@ -255,6 +268,26 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         // fill remaining space once shown.
         cellClassName: 'font-mono tracking-tight hidden lg:table-cell',
         headerClassName: 'hidden lg:table-cell',
+      },
+    },
+    // Filter-only column — never rendered. Exists so "Filter logs by trace"
+    // (ServiceFlow Overview tab) has a table column to call
+    // `table.getColumn('trace_id')?.setFilterValue(...)` on, the same
+    // mechanism every other column filter in this table uses.
+    {
+      accessorKey: 'trace_id',
+      header: '',
+      cell: () => null,
+      filterFn: () => true,
+      enableHiding: false,
+      enableResizing: false,
+      enableSorting: false,
+      size: 0,
+      minSize: 0,
+      maxSize: 0,
+      meta: {
+        cellClassName: 'hidden',
+        headerClassName: 'hidden',
       },
     },
   ]

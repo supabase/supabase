@@ -28,6 +28,7 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
+import { DebugModeBanner } from './components/DebugModeBanner'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
@@ -71,6 +72,7 @@ import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-q
 import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useTracePrototypeEnabled } from '@/lib/debug-mode/trace-prototype-flag'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -97,6 +99,7 @@ export const UnifiedLogs = () => {
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
+  const tracePrototypeEnabled = useTracePrototypeEnabled()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
   const computeAvailability = getComputeLogsAvailability({
@@ -479,6 +482,8 @@ export const UnifiedLogs = () => {
                   ) : null}
                 </div>
               </div>
+
+              {tracePrototypeEnabled && <DebugModeBanner />}
 
               {isLoading ? (
                 <div className="h-[60px] flex items-center justify-center">

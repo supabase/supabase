@@ -702,6 +702,10 @@
       "import": "./src/Toc/types.ts",
       "types": "./src/Toc/types.ts"
     },
+    "./Trace": {
+      "import": "./src/Trace/index.ts",
+      "types": "./src/Trace/index.ts"
+    },
     "./TweetCard": {
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
@@ -761,6 +765,7 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
+    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",
