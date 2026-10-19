@@ -117,7 +117,8 @@ jobs:
       - name: Pre-start diagnostics
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 54322 || echo "54322 free"
+          echo "ip_local_reserved_ports=$(cat /proc/sys/net/ipv4/ip_local_reserved_ports)"
+          sudo ss -tanp 'sport = :54322' || true
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
@@ -152,8 +153,10 @@ jobs:
         if: failure()
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 54322 || echo "54322 not listening"
-          docker logs $(docker ps -aq) 2>&1 || true
+          sudo ss -tanp 'sport = :54322' || true
+          for id in $(docker ps -aq); do
+            docker logs "$id" 2>&1 || true
+          done
 
       - name: Write runtime env
         if: steps.filter.outputs.studio == 'true'
