@@ -9,6 +9,7 @@ import {
   PromptMarkdown,
   PromptPanel,
   PromptTitle,
+  type PromptPanelTelemetry,
 } from './PromptPanel'
 
 type AiPromptProps = {
@@ -16,6 +17,8 @@ type AiPromptProps = {
   id: AiPromptId | string
   /** Includes the prompt body in generated guide Markdown. */
   includeInMarkdown?: boolean
+  /** Surface reported when the prompt is copied. */
+  telemetry: Omit<PromptPanelTelemetry, 'promptId'>
 }
 
 /**
@@ -27,14 +30,14 @@ type AiPromptProps = {
  * Prompt text lives in `~/data/ai-prompts.data`. Markdown export is opt-in so
  * existing quickstarts do not duplicate their instructions in bulk exports.
  */
-function AiPrompt({ id }: AiPromptProps) {
+function AiPrompt({ id, telemetry }: AiPromptProps) {
   const prompt = aiPrompts[id as AiPromptId]
   if (!prompt) {
     throw new Error(`Unknown AiPrompt id: ${id}`)
   }
 
   return (
-    <PromptPanel>
+    <PromptPanel telemetry={{ ...telemetry, promptId: id }}>
       <Prompt value="prompt" expandable>
         <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{prompt}</PromptCopy>

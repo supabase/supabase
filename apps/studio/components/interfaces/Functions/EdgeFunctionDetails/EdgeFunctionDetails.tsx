@@ -322,7 +322,7 @@ export const EdgeFunctionDetails = () => {
                         description: 'Download the function to your local machine',
                         jsx: () => (
                           <>
-                            <span className="text-brand">supabase</span> functions download{' '}
+                            <span className="text-primary">supabase</span> functions download{' '}
                             {selectedFunction?.slug}
                           </>
                         ),

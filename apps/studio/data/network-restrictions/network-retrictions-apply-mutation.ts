@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { networkRestrictionKeys } from './keys'
+import { configKeys } from '@/data/config/keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -51,7 +52,10 @@ export const useNetworkRestrictionsApplyMutation = ({
     mutationFn: (vars) => applyNetworkRestrictions(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: networkRestrictionKeys.list(projectRef) })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: networkRestrictionKeys.list(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

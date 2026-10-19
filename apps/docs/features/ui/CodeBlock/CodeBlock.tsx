@@ -59,7 +59,8 @@ export async function CodeBlock({
       className={cn(
         'shiki',
         'group',
-        'relative',
+        'relative has-[.code-scroll:focus-visible]:z-1',
+        'has-[.code-scroll:focus-visible]:outline-2 has-[.code-scroll:focus-visible]:outline-ring',
         'not-prose',
         'w-full',
         compact ? 'border-0 my-0!' : 'border border-default rounded-lg shadow-codeblock',
@@ -73,7 +74,7 @@ export async function CodeBlock({
           'code-scroll',
           'w-full overflow-x-auto overscroll-x-none',
           !compact && 'rounded-lg',
-          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring'
+          'focus-visible:outline-hidden'
         )}
         role="group"
         aria-roledescription="code block"

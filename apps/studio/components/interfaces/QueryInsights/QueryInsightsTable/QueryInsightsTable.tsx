@@ -1,12 +1,12 @@
 import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useParams } from 'common'
-import { Search, TextSearch, X } from 'lucide-react'
+import { SearchIcon, TextSearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
-import { Button, cn, Tabs, TabsList, TabsTrigger } from 'ui'
+import { Button, cn, FloatingPlate, Tabs, TabsList, TabsTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -384,7 +384,7 @@ export const QueryInsightsTable = ({
               <Input
                 size="tiny"
                 autoComplete="off"
-                icon={<Search className="h-4 w-4" />}
+                icon={<SearchIcon className="h-4 w-4" />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 name="search"
@@ -397,7 +397,7 @@ export const QueryInsightsTable = ({
                       key="clear"
                       size="tiny"
                       variant="text"
-                      icon={<X className="h-4 w-4" />}
+                      icon={<XIcon className="h-4 w-4" />}
                       onClick={() => setSearchQuery('')}
                       className="p-0 h-5 w-5"
                     />
@@ -422,13 +422,15 @@ export const QueryInsightsTable = ({
               : 'opacity-0 translate-y-4 pointer-events-none',
           ].join(' ')}
         >
-          <Button
-            size="tiny"
-            className="rounded-full shadow-md"
-            onClick={() => onCurrentSelectQuery?.(null)}
-          >
-            Clear query
-          </Button>
+          <FloatingPlate rounded="full">
+            <Button
+              size="tiny"
+              className="rounded-full shadow-md"
+              onClick={() => onCurrentSelectQuery?.(null)}
+            >
+              Clear query
+            </Button>
+          </FloatingPlate>
         </div>
         {isLoading ? (
           <div className="px-6 py-4">
@@ -476,7 +478,7 @@ export const QueryInsightsTable = ({
                 },
                 noRowsFallback: (
                   <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                    <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                    <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                     <div className="text-center">
                       <p className="text-foreground">No issues found</p>
                       <p className="text-foreground-light">
@@ -532,7 +534,7 @@ export const QueryInsightsTable = ({
                 },
                 noRowsFallback: (
                   <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                    <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                    <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                     <div className="text-center">
                       <p className="text-foreground">No queries found</p>
                       <p className="text-foreground-light">

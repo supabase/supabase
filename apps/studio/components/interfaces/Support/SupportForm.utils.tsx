@@ -8,7 +8,7 @@ import {
 } from 'common'
 import dayjs from 'dayjs'
 import { partition } from 'lodash'
-import { Book, Github, Hash, MessageSquare } from 'lucide-react'
+import { BookIcon, HashIcon, MessageSquareIcon } from 'lucide-react'
 import {
   createLoader,
   createParser,
@@ -17,6 +17,7 @@ import {
   type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
+import { GithubIcon } from 'ui'
 
 import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import { getProjectDetail } from '@/data/projects/project-detail-query'
@@ -74,9 +75,9 @@ export function getPageIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <BookIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <GithubIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -87,9 +88,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <HashIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
+      return <MessageSquareIcon strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -149,7 +150,8 @@ const supportFormUrlState = {
   category: parseAsCategoryOption,
   subject: parseAsString.withDefault(''),
   message: parseAsString.withDefault(''),
-  error: parseAsString,
+  // Not `error`: auth-js treats `?error=` in any URL as a failed auth redirect
+  errorMessage: parseAsString,
   /** Sentry event ID */
   sid: parseAsString,
 } satisfies UseQueryStatesKeysMap
@@ -195,25 +197,27 @@ export async function selectInitialOrgAndProject({
   if (projectRef) {
     try {
       const projectDetails = await getProjectDetail({ ref: projectRef })
-      if (projectDetails?.organization_id) {
-        const org = orgs.find((o) => o.id === projectDetails.organization_id)
-        if (org?.slug) {
-          return {
-            projectRef,
-            orgSlug: org.slug,
-          }
+      const projectOrg = orgs.find((o) => o.id === projectDetails?.organization_id)
+      if (projectOrg?.slug) {
+        return {
+          projectRef,
+          orgSlug: projectOrg.slug,
         }
       }
     } catch {
-      // Can safely ignore, consider provided project ref invalid
+      // Can safely ignore, fall through to the orgSlug fallback below
     }
   }
 
+  // Reached when there's no projectRef, or the project lookup above failed to
+  // resolve a known org (e.g. the Management API request errored). Returning
+  // `projectRef` here (rather than hardcoding `null`) preserves it when we
+  // still have one, instead of silently discarding it.
   if (orgSlug) {
     const org = orgs.find((o) => o.slug === orgSlug)
     if (org?.slug) {
       return {
-        projectRef: null,
+        projectRef,
         orgSlug: org.slug,
       }
     }

@@ -46,3 +46,32 @@ describe('middleware markdown negotiation', () => {
     expect(response.headers.get('x-middleware-rewrite')).toBeNull()
   })
 })
+
+describe('middleware homepage negotiation', () => {
+  const HOME_URL = 'https://supabase.com/library'
+
+  it('rewrites the homepage to the index markdown route when Accept prefers markdown', () => {
+    const response = middleware(request(HOME_URL, { accept: 'text/markdown' }))
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://supabase.com/library/api/index-md'
+    )
+  })
+
+  it('serves the index markdown at /index.md regardless of Accept', () => {
+    const response = middleware(request(`${HOME_URL}/index.md`, { accept: 'text/html' }))
+
+    expect(response.headers.get('x-middleware-rewrite')).toBe(
+      'https://supabase.com/library/api/index-md'
+    )
+  })
+
+  it('serves the homepage as html to browsers', () => {
+    const response = middleware(
+      request(`${HOME_URL}/`, { accept: 'text/html,application/xhtml+xml,*/*;q=0.8' })
+    )
+
+    expect(response.status).toBe(200)
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull()
+  })
+})

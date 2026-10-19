@@ -259,7 +259,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-csharp',
             href: '/reference/csharp' as `/${string}`,
             level: 'reference_csharp',
-            community: true,
             enabled: sdkCsharpEnabled,
           },
           {
@@ -537,18 +536,6 @@ export const gettingstarted: NavMenuConstant = {
           enabled: sdkSwiftEnabled,
         },
       ],
-    },
-  ],
-}
-
-export const cli = {
-  title: 'CLI',
-  items: [
-    { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
-    {
-      name: 'Using environment variables in config.toml',
-      url: '/guides/cli/using-environment-variables-in-config',
     },
   ],
 }
@@ -884,6 +871,7 @@ export const auth: NavMenuConstant = {
         { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
         { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
         { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
+        { name: 'Custom OIDC', url: '/guides/auth/third-party/custom-oidc' },
       ],
     },
     {
@@ -1104,6 +1092,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/functions' as `/${string}`,
         },
         {
+          name: 'Debugging database functions',
+          url: '/guides/database/debugging-functions' as `/${string}`,
+        },
+        {
           name: 'Managing database triggers',
           url: '/guides/database/postgres/triggers' as `/${string}`,
         },
@@ -1258,19 +1250,19 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'BigQuery',
-              url: '/guides/database/replication/bigquery' as `/${string}`,
+              url: '/guides/database/replication/pipelines/bigquery' as `/${string}`,
             },
             {
               name: 'ClickHouse',
-              url: '/guides/database/replication/clickhouse' as `/${string}`,
+              url: '/guides/database/replication/pipelines/clickhouse' as `/${string}`,
             },
             {
               name: 'DuckLake',
-              url: '/guides/database/replication/ducklake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/ducklake' as `/${string}`,
             },
             {
               name: 'Snowflake',
-              url: '/guides/database/replication/snowflake' as `/${string}`,
+              url: '/guides/database/replication/pipelines/snowflake' as `/${string}`,
             },
             {
               name: 'Monitoring',
@@ -2538,8 +2530,20 @@ export const local_development: NavMenuConstant = {
       items: [
         { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
         {
+          name: 'Running multiple local projects',
+          url: '/guides/local-development/running-multiple-local-projects' as `/${string}`,
+        },
+        {
+          name: 'Docker and native runtimes',
+          url: '/guides/local-development/docker-and-native-runtimes' as `/${string}`,
+        },
+        {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
+        },
+        {
+          name: 'Diff engines',
+          url: '/guides/local-development/diff-engines' as `/${string}`,
         },
         {
           name: 'Seeding your database',
@@ -2681,6 +2685,7 @@ export const security: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Platform configuration', url: '/guides/security/platform-security' },
+        { name: 'TLS for project APIs', url: '/guides/security/tls' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Platform Audit Logs', url: '/guides/security/platform-audit-logs' },
@@ -2853,6 +2858,15 @@ export const platform: NavMenuConstant = {
               name: 'Enterprise-Managed Authentication for MCP',
               url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
             },
+          ],
+        },
+        {
+          name: 'Platform Webhooks',
+          url: '/guides/platform/webhooks',
+          enabled: fullPlatformEnabled,
+          items: [
+            { name: 'Overview', url: '/guides/platform/webhooks' as `/${string}` },
+            { name: 'Events', url: '/guides/platform/webhooks/events' as `/${string}` },
           ],
         },
       ],
@@ -3107,17 +3121,16 @@ export const telemetry: NavMenuConstant = {
       ],
     },
     {
-      name: 'Hire an agent',
+      name: 'Agent prompts',
       items: [
-        { name: 'Set up an agent', url: '/guides/observability/automate-with-agents' },
-        { name: 'Generalist', url: '/guides/observability/automate-with-agents/all' },
-        { name: 'Health monitor', url: '/guides/observability/automate-with-agents/health' },
-        { name: 'Security monitor', url: '/guides/observability/automate-with-agents/security' },
+        { name: 'Overview', url: '/guides/observability/automate-with-agents' },
+        { name: 'Health', url: '/guides/observability/automate-with-agents/health' },
+        { name: 'Security', url: '/guides/observability/automate-with-agents/security' },
         {
-          name: 'Performance monitor',
+          name: 'Performance',
           url: '/guides/observability/automate-with-agents/performance',
         },
-        { name: 'Capacity monitor', url: '/guides/observability/automate-with-agents/usage' },
+        { name: 'Resources', url: '/guides/observability/automate-with-agents/usage' },
       ],
     },
     {
@@ -3516,7 +3529,7 @@ export const reference_csharp_v0 = {
   parent: '/reference',
   pkg: {
     name: 'supabase',
-    repo: 'https://github.com/supabase-community/supabase-csharp',
+    repo: 'https://github.com/supabase/supabase-csharp',
   },
 }
 
@@ -3527,7 +3540,7 @@ export const reference_csharp_v1 = {
   parent: '/reference',
   pkg: {
     name: 'supabase',
-    repo: 'https://github.com/supabase-community/supabase-csharp',
+    repo: 'https://github.com/supabase/supabase-csharp',
   },
 }
 
@@ -3538,7 +3551,7 @@ export const reference_csharp_v8 = {
   parent: '/reference',
   pkg: {
     name: 'supabase',
-    repo: 'https://github.com/supabase-community/supabase-csharp',
+    repo: 'https://github.com/supabase/supabase-csharp',
   },
 }
 

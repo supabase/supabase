@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Check, Plus } from 'lucide-react'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
@@ -132,7 +132,7 @@ export const PublicationsComboBox = ({
                     >
                       <span>{pub.name}</span>
                       {selectedPublication === pub.name && (
-                        <Check className="text-brand" strokeWidth={2} size={13} />
+                        <CheckIcon className="text-primary" strokeWidth={2} size={13} />
                       )}
                     </CommandItem>
                   ))}
@@ -148,7 +148,7 @@ export const PublicationsComboBox = ({
                 onSelect={onNewPublicationClick}
                 onClick={onNewPublicationClick}
               >
-                <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                <PlusIcon size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
               </CommandItem>
             </CommandGroup>

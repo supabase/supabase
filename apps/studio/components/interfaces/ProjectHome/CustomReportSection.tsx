@@ -11,7 +11,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Plus, RefreshCw } from 'lucide-react'
+import { PlusIcon, RefreshCwIcon } from 'lucide-react'
 import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -375,7 +375,7 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
               tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
@@ -386,7 +386,7 @@ export function CustomReportSection() {
             <SnippetDropdown
               projectRef={ref}
               onSelect={handleSelectSnippet}
-              trigger={<Button icon={<Plus />}>Add block</Button>}
+              trigger={<Button icon={<PlusIcon />}>Add block</Button>}
               side="bottom"
               align="end"
               autoFocus
@@ -396,7 +396,7 @@ export function CustomReportSection() {
       </div>
       <div className="relative">
         {isDraggingOver && (
-          <div className="absolute inset-0 rounded-sm bg-brand/10 pointer-events-none z-10" />
+          <div className="absolute inset-0 rounded-sm bg-primary-bright/10 pointer-events-none z-10" />
         )}
         {layout.length === 0 ? (
           <div
@@ -413,7 +413,7 @@ export function CustomReportSection() {
               <SnippetDropdown
                 projectRef={ref}
                 onSelect={handleSelectSnippet}
-                trigger={<Button iconRight={<Plus size={14} />}>Add your first block</Button>}
+                trigger={<Button iconRight={<PlusIcon size={14} />}>Add your first block</Button>}
                 side="bottom"
                 align="center"
                 autoFocus

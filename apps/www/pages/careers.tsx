@@ -134,7 +134,7 @@ const CareerPage = ({
       <DefaultLayout>
         <header>
           <SectionContainer className="pt-12 pb-8! lg:pt-24 py-0 text-center space-y-4">
-            <h1 className="text-sm text-brand md:text-base">
+            <h1 className="text-sm text-primary md:text-base">
               <span className="sr-only">Supabase </span>Careers
             </h1>
             <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
@@ -155,9 +155,9 @@ const CareerPage = ({
               return (
                 <div
                   key={i}
-                  className="border-t mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
+                  className="border-t mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand-default w-[134px] md:max-w-none"
                 >
-                  <div className="hidden md:block border-t lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
+                  <div className="hidden md:block border-t lg:border-t-2 border-brand-default w-[60px] lg:w-[100px]"></div>
                   <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1px]">{company.number}</h2>
 
                   <div className="text-foreground-light text-sm lg:text-base">
@@ -194,7 +194,7 @@ const CareerPage = ({
                   to stay connected to our team, and our community.
                 </p>
                 <div className="max-w-[300px] sm:max-w-md md:max-w-md mt-20">
-                  <div className="border-t-2 border-brand w-4/12"></div>
+                  <div className="border-t-2 border-brand-default w-4/12"></div>
                   <h2 className="text-2xl sm:text-3xl md:text-4xl pt-2 tracking-[-1px]">
                     We deeply believe in the efficacy of collaborative open source
                   </h2>

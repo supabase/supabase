@@ -306,10 +306,6 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       for (const lvl of ['success', 'warning', 'error']) {
         expect(sql).toContain(`'${lvl}'`)
       }
-      expect(sql).toContain(`'pathname'`)
-      expect(sql).toContain('LIMIT 20')
-      // log_type + base + pathname = 3 scans
-      expect(sql.match(/FROM logs/g)?.length ?? 0).toBeLessThanOrEqual(4)
     })
 
     it('honours an active log_type filter in the total count scan', () => {

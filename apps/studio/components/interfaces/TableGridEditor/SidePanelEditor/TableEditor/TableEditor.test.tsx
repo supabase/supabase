@@ -5,11 +5,11 @@ import { describe, expect, it, vi } from 'vitest'
 import { TableRealtimeToggle } from './TableEditor'
 
 describe('TableRealtimeToggle', () => {
-  it('disables Realtime and shows the HA-specific description for HA projects', () => {
+  it('disables Realtime and shows the HA-specific description when Realtime is unavailable', () => {
     render(
       <TableRealtimeToggle
         checked={false}
-        isHighAvailability
+        isRealtimeUnavailable
         isPending={false}
         onCheckedChange={vi.fn()}
       />
@@ -24,11 +24,11 @@ describe('TableRealtimeToggle', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('keeps Realtime available with the standard description for non-HA projects', () => {
+  it('keeps Realtime available with the standard description when Realtime is available', () => {
     render(
       <TableRealtimeToggle
         checked={false}
-        isHighAvailability={false}
+        isRealtimeUnavailable={false}
         isPending={false}
         onCheckedChange={vi.fn()}
       />
@@ -49,7 +49,7 @@ describe('TableRealtimeToggle', () => {
     const { rerender } = render(
       <TableRealtimeToggle
         checked={false}
-        isHighAvailability={false}
+        isRealtimeUnavailable={false}
         isPending
         onCheckedChange={onCheckedChange}
       />
@@ -63,7 +63,7 @@ describe('TableRealtimeToggle', () => {
     rerender(
       <TableRealtimeToggle
         checked={false}
-        isHighAvailability={false}
+        isRealtimeUnavailable={false}
         isPending={false}
         onCheckedChange={onCheckedChange}
       />

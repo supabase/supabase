@@ -1,8 +1,9 @@
 'use client'
 
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import Image from 'next/image'
 import { useCallback, useEffect, useRef, useState } from 'react'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 // All available images from Supabase Select event

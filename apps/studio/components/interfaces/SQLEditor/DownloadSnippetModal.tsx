@@ -1,5 +1,5 @@
 import { snakeCase } from 'lodash'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
@@ -153,14 +153,14 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
         <DialogSection>
           <div className="flex items-center justify-start gap-x-2">
             {selectedSnippet.docLink && (
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <Link href={selectedSnippet.docLink.href} target="_blank" rel="noreferrer">
                   {selectedSnippet.docLink.label}
                 </Link>
               </Button>
             )}
 
-            <Button asChild icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <Link href={CLI_DOCS_URL} target="_blank" rel="noreferrer">
                 About CLI
               </Link>

@@ -2,7 +2,15 @@ import { components } from 'api-types'
 import { useParams } from 'common'
 import { SqlEditor, TableEditor } from 'icons'
 import { uniq } from 'lodash'
-import { Eye, Loader2, MoreVertical, Pause, Play, Table2, Trash } from 'lucide-react'
+import {
+  EyeIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  PauseIcon,
+  PlayIcon,
+  Table2Icon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -303,7 +311,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
         <TableCell className="min-w-[120px]">
           <div className="flex items-center gap-x-3">
             <div className="w-5 flex justify-center items-center">
-              <Table2 size={16} />
+              <Table2Icon size={16} />
             </div>
             <p>{table.name}</p>
           </div>
@@ -315,7 +323,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-x-2">
                     {isLoadingPipelineStatus ? (
-                      <Loader2 size={12} className="animate-spin text-foreground-lighter" />
+                      <Loader2Icon size={12} className="animate-spin text-foreground-lighter" />
                     ) : isPipelineRunning ? (
                       <DotPing
                         animate={isReplicating}
@@ -348,7 +356,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button className="w-7" icon={<MoreVertical />} />
+                  <Button className="w-7" icon={<MoreVerticalIcon />} />
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent side="bottom" align="end" className="w-fit min-w-[180px]">
@@ -357,9 +365,9 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                       {!!inferredPostgresTable && (
                         <DropdownMenuItem asChild className="flex items-center gap-x-2">
                           <Link
-                            href={`/project/${projectRef}/database/replication/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
+                            href={`/project/${projectRef}/database/pipelines/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
                           >
-                            <Eye size={12} className="text-foreground-lighter" />
+                            <EyeIcon size={12} className="text-foreground-lighter" />
                             <p>View pipeline</p>
                           </Link>
                         </DropdownMenuItem>
@@ -369,7 +377,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                           className="flex items-center gap-x-2"
                           onClick={() => setShowStopReplicationModal(true)}
                         >
-                          <Pause size={12} className="text-foreground-lighter" />
+                          <PauseIcon size={12} className="text-foreground-lighter" />
                           <p>Disable replication</p>
                         </DropdownMenuItem>
                       ) : (
@@ -377,7 +385,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                           className="flex items-center gap-x-2"
                           onClick={() => setShowStartReplicationModal(true)}
                         >
-                          <Play size={12} className="text-foreground-lighter" />
+                          <PlayIcon size={12} className="text-foreground-lighter" />
                           <p>Enable replication</p>
                         </DropdownMenuItem>
                       )}
@@ -396,7 +404,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                       },
                     }}
                   >
-                    <Trash size={12} className="text-foreground-lighter" />
+                    <TrashIcon size={12} className="text-foreground-lighter" />
                     <p>Delete table</p>
                   </DropdownMenuItemTooltip>
                 </DropdownMenuContent>
@@ -411,7 +419,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                 <Button
                   loading={isDeletingNamespaceTable}
                   className="w-7"
-                  icon={<MoreVertical />}
+                  icon={<MoreVerticalIcon />}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-fit min-w-[180px]">
@@ -419,7 +427,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                   className="flex items-center gap-x-2"
                   onClick={() => setShowRemoveTableModal(true)}
                 >
-                  <Trash size={12} className="text-foreground-lighter" />
+                  <TrashIcon size={12} className="text-foreground-lighter" />
                   <p>Delete table</p>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -451,7 +459,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
             <InsertDataDialog table={table.name} fdwTable={x} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="w-7" icon={<MoreVertical />} />
+                <Button className="w-7" icon={<MoreVerticalIcon />} />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-fit min-w-[180px]" align="end">
                 <DropdownMenuItem asChild className="flex items-center gap-x-2">

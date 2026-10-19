@@ -13,7 +13,7 @@ toc_depth: 3
 video: https://www.youtube.com/v/QA2qC5F-4OU
 ---
 
-Today we're releasing [Supabase Wrappers](https://github.com/supabase/wrappers), a framework for building Postgres Foreign Data Wrappers (FDW) which connects Postgres to external systems.
+Today we're releasing [Supabase Wrappers](https://github.com/supabase/wrappers), a framework for building Postgres [Foreign Data Wrappers](/docs/guides/database/extensions/wrappers/overview) (FDW) which connects Postgres to external systems.
 
 Foreign Data Wrappers are a core feature of PostgreSQL. We've extended this feature to query other databases or any other external system (including third-party APIs), using SQL.
 
@@ -151,7 +151,7 @@ from
 where order_history.event = 'purchase' and order_history.user_id = '<some_user_id>';
 ```
 
-We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)), and materialize the data into a local table.
+We can either run these queries on demand or, for better query performance, we can run them in the background (using something like [pg_cron](https://supabase.com/docs/guides/database/extensions/pg_cron)), and materialize the data into a local table.
 
 ![QETL](/images/blog/launch-week-6/wrappers/qetl.png)
 

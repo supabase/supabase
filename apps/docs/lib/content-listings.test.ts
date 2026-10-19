@@ -257,6 +257,17 @@ describe('serializeContentListingGroupToMarkdown', () => {
 })
 
 describe('ContentListings markdown handler', () => {
+  it.each([
+    'getting-started-use-cases',
+    'getting-started-framework-quickstarts',
+    'getting-started-web-app-demos',
+    'getting-started-mobile-tutorials',
+  ])('renders %s as a second-level section under the page title', (id) => {
+    const markdown = ContentListingsMarkdownHandler({ props: { id } })
+
+    expect(markdown).toMatch(/^## [^\n]+\n/)
+  })
+
   it('serializes the group looked up by id', () => {
     const markdown = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
 
@@ -353,20 +364,5 @@ describe('contentListingItemSchema icon', () => {
       icon: { kind: 'not-a-real-kind', color: '#632CA6', bg: 'rgba(99,44,166,0.1)' },
     })
     expect(result.success).toBe(false)
-  })
-})
-
-describe('TelemetryEvent union', () => {
-  it('includes docs_content_listing_clicked', () => {
-    const event = {
-      action: 'docs_content_listing_clicked' as const,
-      properties: {
-        targetPath: '/guides/storage',
-        linkTitle: 'Storage',
-      },
-    }
-
-    const _typeCheck: import('common/telemetry-constants').TelemetryEvent = event
-    expect(_typeCheck.action).toBe('docs_content_listing_clicked')
   })
 })

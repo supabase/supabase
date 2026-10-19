@@ -86,8 +86,6 @@ Inviting a user is an admin action, so it must be performed from a trusted serve
 2. Click **Add user** and select **Send invitation**.
 3. Enter the user's email address and click **Invite user**.
 
-{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
-
 ### Using the Auth Admin API
 
 Call [`inviteUserByEmail()`](/docs/reference/javascript/auth-admin-inviteuserbyemail) from the SDK's Auth Admin API in a server-side environment. This is part of Supabase Auth (accessed via `supabase.auth.admin` with your project's [secret key](/docs/guides/getting-started/api-keys)), and is distinct from the [Management API](/docs/reference/api/introduction) used to configure your project. You can optionally attach custom `user_metadata` and a redirect URL for the invite link.

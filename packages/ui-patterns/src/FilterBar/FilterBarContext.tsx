@@ -40,6 +40,7 @@ export type FilterBarContextValue = {
   isLoading: boolean
   error: string | null
   highlightedConditionPath: number[] | null
+  setHighlightedConditionPath: (path: number[] | null) => void
 
   onFilterChange: (filters: FilterGroup) => void
   commitFilters: (filters: FilterGroup) => void
@@ -97,6 +98,8 @@ export type FilterBarRootProps = {
   actions?: FilterBarAction[]
   isLoading?: boolean
   supportsOperators?: boolean
+  /** Logical operator for groups created via "New Group". Defaults to 'AND'. */
+  defaultGroupOperator?: FilterGroup['logicalOperator']
   variant?: FilterBarVariant
   icon?: React.ReactNode
   freeformDefaultProperty?: string
@@ -120,6 +123,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     actions,
     isLoading: externalLoading,
     supportsOperators = false,
+    defaultGroupOperator,
     variant = 'default',
     icon,
     freeformDefaultProperty,
@@ -204,6 +208,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     handleOperatorChange,
     newPathRef,
     setIsCommandMenuVisible,
+    defaultGroupOperator,
   })
 
   const { handleKeyDown } = useKeyboardNavigation({
@@ -370,6 +375,7 @@ export const FilterBarRoot = forwardRef<FilterBarHandle, FilterBarRootProps>(fun
     isLoading: loading,
     error,
     highlightedConditionPath,
+    setHighlightedConditionPath,
 
     onFilterChange,
     commitFilters,

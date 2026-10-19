@@ -150,7 +150,7 @@ function CaseStudyPage(props: any) {
                   <div className="flex flex-col gap-4 sm:gap-8 max-w-xxl">
                     <Link
                       href="/customers"
-                      className="text-brand hover:text-brand-600 sm:mb-2 mt-0"
+                      className="text-primary hover:text-brand-600 sm:mb-2 mt-0"
                     >
                       Customer Stories
                     </Link>

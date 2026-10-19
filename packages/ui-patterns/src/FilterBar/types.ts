@@ -58,6 +58,10 @@ export type FilterProperty = {
   type: 'string' | 'number' | 'date' | 'boolean'
   options?: FilterOption[] | AsyncOptionsFunction | SyncOptionsFunction | CustomOptionObject
   operators?: FilterOperator[]
+  /** Whether this property can be added or selected when changing a filter. Defaults to true. */
+  isAvailable?: boolean
+  /** Display a readable label while preserving the underlying value for editing. */
+  formatValue?: (value: FilterCondition['value']) => string
 }
 
 export type FilterCondition = {

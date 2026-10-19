@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
@@ -27,6 +27,43 @@ const pipeline: PipelineResponse = {
   source_id: 2,
   source_name: 'main-db',
   tenant_id: 'default',
+}
+
+const mockPipelineQueries = ({
+  tableStatuses = [],
+}: {
+  tableStatuses?: PipelineReplicationStatusResponse['table_statuses']
+} = {}) => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id',
+    response: () => HttpResponse.json<PipelineResponse>(pipeline),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+    response: () =>
+      HttpResponse.json<PipelineStatusResponse>({
+        pipeline_id: 42,
+        status: { name: 'started' },
+      }),
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+    response: () =>
+      HttpResponse.json<PipelineReplicationStatusResponse>({
+        pipeline_id: 42,
+        apply_lag: {
+          active: true,
+          wal_status: 'reserved',
+          restart_lsn_bytes: 0,
+          confirmed_flush_lsn_bytes: 0,
+          safe_wal_size_bytes: null,
+        },
+        table_statuses: tableStatuses,
+      }),
+  })
 }
 
 describe('ReplicationPipelineStatus', () => {
@@ -91,5 +128,62 @@ describe('ReplicationPipelineStatus', () => {
 
     expect(await screen.findByText('No table data yet')).toBeVisible()
     expect(screen.getByRole('status')).toHaveTextContent('')
+  })
+
+  test('defaults to sorting replicated tables by schema and name', async () => {
+    // API order is reverse of schema.name, and statuses would reorder differently if status
+    // were the default (error before copying before live).
+    mockPipelineQueries({
+      tableStatuses: [
+        {
+          id: 3,
+          schema: 'public',
+          name: 'zebra',
+          table_id: 3,
+          table_name: 'public.zebra',
+          state: {
+            name: 'error',
+            reason: 'sync failed',
+            retry_policy: { policy: 'manual_retry' },
+          },
+        },
+        {
+          id: 2,
+          schema: 'public',
+          name: 'alpha',
+          table_id: 2,
+          table_name: 'public.alpha',
+          state: { name: 'following_wal' },
+        },
+        {
+          id: 1,
+          schema: 'auth',
+          name: 'users',
+          table_id: 1,
+          table_name: 'auth.users',
+          state: { name: 'copying_table' },
+        },
+      ],
+    })
+
+    customRender(
+      <PipelineRequestStatusProvider>
+        <ReplicationPipelineStatus />
+      </PipelineRequestStatusProvider>
+    )
+
+    expect(await screen.findByText('zebra')).toBeVisible()
+    expect(screen.getByRole('columnheader', { name: 'Table' })).toHaveAttribute(
+      'aria-sort',
+      'ascending'
+    )
+
+    const table = screen.getByRole('table')
+    const tableNames = within(table)
+      .getAllByRole('row')
+      .map((row) => within(row).queryAllByRole('cell')[0]?.textContent)
+      .filter((name): name is string => Boolean(name))
+
+    expect(tableNames).toEqual(['auth.users', 'public.alpha', 'public.zebra'])
   })
 })

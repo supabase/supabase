@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
+import { ChevronDownIcon, FolderOpenIcon, SettingsIcon, ShieldIcon, Trash2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -25,11 +25,12 @@ import {
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 
-import { DeleteBucketModal } from '@/components/interfaces/Storage/DeleteBucketModal'
-import { EditBucketModal } from '@/components/interfaces/Storage/EditBucketModal'
-import { EmptyBucketModal } from '@/components/interfaces/Storage/EmptyBucketModal'
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
+import { DeleteBucketModal } from '@/components/interfaces/Storage/FilesBuckets/DeleteBucketModal'
+import { EditBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EditBucketModal'
+import { EmptyBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EmptyBucketModal'
+import { PublicBucketWarning } from '@/components/interfaces/Storage/FilesBuckets/PublicBucketWarning'
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
-import { PublicBucketWarning } from '@/components/interfaces/Storage/PublicBucketWarning'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
@@ -78,11 +79,12 @@ const BucketPage: NextPageWithLayout = () => {
         <PageBreadcrumbs
           actions={
             <PageBreadcrumbsActions>
+              <BucketVersioningPill bucket={bucket} />
               <Button
                 asChild
                 variant="outline"
                 size="tiny"
-                icon={<Shield size={14} />}
+                icon={<ShieldIcon size={14} />}
                 iconRight={
                   policyCount > 0 ? (
                     <span className="w-4 h-4 bg-surface-200 text-foreground-light text-xs rounded-full flex items-center justify-center font-medium">
@@ -99,7 +101,7 @@ const BucketPage: NextPageWithLayout = () => {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
+                  <Button variant="outline" size="tiny" iconRight={<ChevronDownIcon size={14} />}>
                     Edit bucket
                   </Button>
                 </DropdownMenuTrigger>
@@ -108,7 +110,7 @@ const BucketPage: NextPageWithLayout = () => {
                     className="flex items-center space-x-2"
                     onClick={() => setShowEditModal(true)}
                   >
-                    <Settings size={12} />
+                    <SettingsIcon size={12} />
                     <p>Bucket settings</p>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -116,14 +118,14 @@ const BucketPage: NextPageWithLayout = () => {
                     className="flex items-center space-x-2"
                     onClick={() => setShowEmptyModal(true)}
                   >
-                    <FolderOpen size={12} />
+                    <FolderOpenIcon size={12} />
                     <p>Empty bucket</p>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="flex items-center space-x-2"
                     onClick={() => setShowDeleteModal(true)}
                   >
-                    <Trash2 size={12} />
+                    <Trash2Icon size={12} />
                     <p>Delete bucket</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>

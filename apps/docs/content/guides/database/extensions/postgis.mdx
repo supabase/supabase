@@ -29,7 +29,7 @@ You can get started with PostGIS by enabling the PostGIS extension in your Supab
 1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
 3. Search for `postgis` and enable the extension.
-4. In the confirmation prompt select "Create a new schema" and name it `gis` for example.
+4. In the confirmation dialog, review the default `extensions` schema and click **Enable**.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -88,15 +88,11 @@ You can insert geographical data through SQL or through our API.
 
 <h4>Restaurants</h4>
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-
 | id  | name        | location                         |
 | --- | ----------- | -------------------------------- |
 | 1   | Supa Burger | lat: 40.807416, long: -73.946823 |
 | 2   | Supa Pizza  | lat: 40.807475, long: -73.94581  |
 | 3   | Supa Taco   | lat: 40.80629, long: -73.945826  |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">

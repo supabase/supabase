@@ -1,7 +1,7 @@
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe, PaymentIntentResult, StripeElementsOptions } from '@stripe/stripe-js'
 import { useParams } from 'common'
-import { Check, InfoIcon } from 'lucide-react'
+import { CheckIcon, InfoIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef, useState } from 'react'
@@ -436,7 +436,7 @@ export const SubscriptionPlanUpdateDialog = ({
                             {' '}
                             <Link
                               href={`/org/${selectedOrganization?.slug}/billing#breakdown`}
-                              className="text-sm text-brand hover:text-brand-600 transition"
+                              className="text-sm text-primary hover:text-primary-hover transition"
                               target="_blank"
                             >
                               + current spend
@@ -565,7 +565,7 @@ export const SubscriptionPlanUpdateDialog = ({
                           className="flex items-center gap-2"
                         >
                           <div className="w-4">
-                            <Check className="h-3 w-3 text-brand" strokeWidth={3} />
+                            <CheckIcon className="h-3 w-3 text-primary" strokeWidth={3} />
                           </div>
                           <div className="text-sm">
                             <p>{typeof feature === 'string' ? feature : feature[0]}</p>
