@@ -1951,7 +1951,7 @@ By default, overwriting or deleting an object in Supabase Storage removes the pr
     icon: FileStack,
     products: [PRODUCT_SHORTNAMES.STORAGE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/storage/object-versioning',
+    docsUrl: 'https://supabase.com/docs/guides/storage/buckets/object-versioning',
     slug: 'object-versioning',
     status: {
       stage: PRODUCT_STAGES.PRIVATE_ALPHA,
