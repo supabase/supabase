@@ -222,7 +222,7 @@ using (
 );
 ```
 
-With this policy, users can't restore a version with `copy` or `move`, because those calls read the source version.
+With this policy, users can't restore a version with `copy` or `move`, because those calls read the source version. For the other permissions those calls need, see [Copy and move permissions](/docs/guides/storage/management/copy-move-objects#permissions).
 
 Your `delete` policy governs deletes with and without a version ID. A delete without a version ID adds a delete marker, and needs `delete` permission on the object's path.
 
