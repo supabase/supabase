@@ -1,8 +1,11 @@
 import { fireEvent, screen } from '@testing-library/react'
+import type { components } from 'api-types'
+import { HttpResponse } from 'msw'
 import { beforeEach, expect, it, vi } from 'vitest'
 
 import PipelineCreationPage from '@/pages/project/[ref]/database/pipelines/new'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const state = vi.hoisted(() => ({
   navigate: vi.fn(),
@@ -54,7 +57,26 @@ vi.mock('./PipelineCreationFlow', () => ({
   ),
 }))
 
+const mockSources = (sources: components['schemas']['SourcesResponse_Output']['sources']) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: () => HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources }),
+  })
 beforeEach(() => {
+  mockSources([
+    {
+      id: 42,
+      name: 'default',
+      tenant_id: 'tenant',
+      config: {
+        host: 'localhost',
+        port: 5432,
+        name: 'postgres',
+        username: 'postgres',
+      },
+    },
+  ])
   Object.assign(state, {
     isTanStack: false,
     enabled: true,
@@ -65,9 +87,9 @@ beforeEach(() => {
     canUseReplication: true,
   })
 })
-it('renders the page body when the preview and project allow access', () => {
+it('renders the page body when the preview and project allow access', async () => {
   customRender(<PipelineCreationPage />)
-  expect(screen.getByText('Wizard form')).toBeInTheDocument()
+  expect(await screen.findByText('Wizard form')).toBeInTheDocument()
 })
 it.each(['loading', 'orgPending'] as const)('waits while %s', (key) => {
   state[key] = true
@@ -101,14 +123,37 @@ it('falls back when the preview is off even if organisation and project queries 
   expect(screen.getByRole('status')).toHaveTextContent('Returning to Pipelines')
 })
 
-it.each([false, true])('returns without reloading the toast host (TanStack: %s)', (isTanStack) => {
-  state.isTanStack = isTanStack
-  customRender(<PipelineCreationPage />)
-  fireEvent.click(screen.getByRole('button', { name: 'Wizard form' }))
-  if (isTanStack)
-    expect(state.navigate).toHaveBeenCalledWith({
-      to: '/project/$ref/database/pipelines',
-      params: { ref: 'default' },
-    })
-  else expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
-})
+it.each([false, true])(
+  'returns without reloading the toast host (TanStack: %s)',
+  async (isTanStack) => {
+    state.isTanStack = isTanStack
+    customRender(<PipelineCreationPage />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
+    if (isTanStack)
+      expect(state.navigate).toHaveBeenCalledWith({
+        to: '/project/$ref/database/pipelines',
+        params: { ref: 'default' },
+      })
+    else expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+  }
+)
+
+it.each(['disabled', 'error'])(
+  'returns direct entry to Pipelines when enablement is %s',
+  async (status) => {
+    if (status === 'disabled') mockSources([])
+    else
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/:ref/sources',
+        response: () =>
+          HttpResponse.json<APIErrorBody>(
+            { message: 'replication API URL is not configured' },
+            { status: 503 }
+          ),
+      })
+    customRender(<PipelineCreationPage />)
+    expect(await screen.findByRole('status')).toHaveTextContent('Returning to Pipelines')
+    expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+  }
+)

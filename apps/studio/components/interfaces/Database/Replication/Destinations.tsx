@@ -1,6 +1,8 @@
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useRouter as useTanStackRouter } from '@tanstack/react-router'
+import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
+import { useRouter as useNextRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -32,6 +34,7 @@ import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -47,6 +50,7 @@ import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -89,6 +93,11 @@ const compareStatusNames = (
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
+  const router = useTanStackRouter({ warn: false })
+  const nextRouter = useNextRouter()
+  const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
+  const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
+  const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
 
@@ -213,20 +222,33 @@ export const Destinations = () => {
   const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
   const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
 
-  const canCreate = isSourcesSuccess
-  const isCheckingPipelineStatus = !isSourcesSuccess && !isSourcesError
+  const canCreate = isSourcesSuccess && !isCreationGateLoading
+  const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
   const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
 
-  const openDestinationPanel = () => {
+  const openCreation = (type: DestinationType) => {
+    if (isWizardEnabled && projectRef) {
+      if (router)
+        void router.navigate({
+          to: '/project/$ref/database/pipelines/new',
+          params: { ref: projectRef },
+        })
+      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+    } else {
+      setDestinationType(type)
+    }
+  }
+
+  const handleAddPipeline = () => {
     if (!canCreate) return
     if (replicationNotEnabled) {
       pendingCreationTypeRef.current = 'BigQuery'
       setShowEnablePipelinesDialog(true)
       return
     }
-    setDestinationType('BigQuery')
+    openCreation('BigQuery')
   }
 
   const handleEnableDialogOpenChange = (open: boolean) => {
@@ -241,7 +263,7 @@ export const Destinations = () => {
       type &&
       queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
     ) {
-      setDestinationType(type)
+      openCreation(type)
     }
   }
 
@@ -352,7 +374,7 @@ export const Destinations = () => {
           <Shortcut
             id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
             label="Add pipeline"
-            onTrigger={openDestinationPanel}
+            onTrigger={handleAddPipeline}
             options={{ enabled: canCreate }}
             side="bottom"
             tooltipOpen={canCreate ? undefined : false}
@@ -365,7 +387,7 @@ export const Destinations = () => {
               icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
-              onClick={openDestinationPanel}
+              onClick={handleAddPipeline}
             >
               Add pipeline
             </ButtonTooltip>
@@ -463,7 +485,7 @@ export const Destinations = () => {
               icon={<PlusIcon />}
               loading={isCheckingPipelineStatus}
               disabled={!canCreate}
-              onClick={openDestinationPanel}
+              onClick={handleAddPipeline}
             >
               Add pipeline
             </ButtonTooltip>
