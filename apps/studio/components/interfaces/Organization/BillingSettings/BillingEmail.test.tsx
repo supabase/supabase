@@ -31,9 +31,9 @@ vi.mock('common', async (importOriginal) => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
   useAsyncCheckPermissionsV2: (permission: string) => mockCheckPermissions(permission),
-  FGA_PERMISSIONS: {},
 }))
 
 vi.mock('react-intersection-observer', () => ({

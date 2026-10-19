@@ -34,7 +34,8 @@ vi.mock('@/data/organizations/organization-payment-methods-query', () => ({
   useOrganizationPaymentMethodsQuery: () => mockPaymentMethodsQuery(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
   useAsyncCheckPermissionsV2: () => ({ can: true, isSuccess: true }),
 }))
 

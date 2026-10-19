@@ -5,6 +5,7 @@ import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
 import { InviteMemberButton } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
@@ -17,7 +18,7 @@ type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_
 type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
 type CreateInvitationResponse =
   operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
-type AccessControlPermission = components['schemas']['AccessControlPermission']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const ORG_SLUG = 'test-org'
 
@@ -78,16 +79,16 @@ const buildMember = (overrides: Partial<Member>): Member => ({
   ...overrides,
 })
 
-const buildPermission = (resource: string): AccessControlPermission => ({
-  actions: ['write:Create', 'write:Delete'],
-  condition: null,
-  organization_id: 1,
-  organization_slug: ORG_SLUG,
-  project_ids: [],
-  project_refs: [],
-  resources: [resource],
-  restrictive: false,
-})
+const PERMISSIONS_RESPONSE: PermissionsV2Response = {
+  organizations: [
+    {
+      slug: ORG_SLUG,
+      role: 'owner',
+      permissions: [FGA_PERMISSIONS.ORGANIZATION.MEMBERS_WRITE],
+      projects: [],
+    },
+  ],
+}
 
 function setupMocks(members: Member[] = [buildMember({})]) {
   const invitePayloads: unknown[] = []
@@ -103,12 +104,8 @@ function setupMocks(members: Member[] = [buildMember({})]) {
 
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    response: () =>
-      HttpResponse.json<AccessControlPermission[]>([
-        buildPermission('user_invites'),
-        buildPermission('auth.subject_roles'),
-      ]),
+    path: '/platform/profile/permissions/v2',
+    response: () => HttpResponse.json<PermissionsV2Response>(PERMISSIONS_RESPONSE),
   })
 
   addAPIMock({

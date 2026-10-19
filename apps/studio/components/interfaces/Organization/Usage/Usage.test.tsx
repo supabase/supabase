@@ -21,9 +21,9 @@ vi.mock('common', async (importOriginal) => ({
   useParams: () => ({ slug: 'test-org' }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
   useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
-  FGA_PERMISSIONS: {},
 }))
 
 vi.mock('@/data/analytics/org-daily-stats-query', async (importOriginal) => ({
