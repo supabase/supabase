@@ -489,16 +489,21 @@ export const SubscriptionPlanUpdateDialog = ({
                   <div className="pb-2">
                     <Admonition type="note" title="Micro Compute included for one project">
                       <div className="text-sm prose">
-                        After upgrading to Pro, switch one project to Micro for free in{' '}
-                        <Link
-                          href={getInfrastructurePath(projects[0]?.ref)}
-                          target="_blank"
-                          className="underline inline-flex items-center gap-1"
-                        >
-                          Infrastructure settings
-                          <ExternalLinkIcon size={12} aria-hidden="true" />
-                        </Link>
-                        . Each additional project costs <span translate="no">$10</span>+/mo,
+                        {projects[0]?.ref && (
+                          <>
+                            After upgrading to Pro, switch one project to Micro for free in{' '}
+                            <Link
+                              href={getInfrastructurePath(projects[0].ref)}
+                              target="_blank"
+                              className="underline inline-flex items-center gap-1"
+                            >
+                              Infrastructure settings
+                              <ExternalLinkIcon size={12} aria-hidden="true" />
+                            </Link>
+                            .{' '}
+                          </>
+                        )}
+                        Each additional project costs <span translate="no">$10</span>+/mo,
                         regardless of compute size.{' '}
                         <Link
                           href={`${DOCS_URL}/guides/platform/manage-your-usage/compute`}
