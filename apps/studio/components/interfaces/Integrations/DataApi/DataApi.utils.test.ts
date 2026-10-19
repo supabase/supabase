@@ -164,4 +164,24 @@ describe('buildEntityMaps', () => {
     expect(Object.keys(result.resources)).toEqual(['users', 'posts'])
     expect(Object.keys(result.rpcs)).toEqual(['hello', 'goodbye'])
   })
+
+  it('derives camelCase from the bare entity name for schema-qualified ids', () => {
+    const paths = {
+      '/api.users': { get: {} as ProjectJsonSchemaPaths[string]['get'] },
+      '/rpc/api.now_utc_api': { post: {} as ProjectJsonSchemaPaths[string]['post'] },
+    } as ProjectJsonSchemaPaths
+
+    const result = buildEntityMaps(paths)
+
+    expect(result.resources['api.users']).toEqual({
+      id: 'api.users',
+      displayName: 'api.users',
+      camelCase: 'users',
+    })
+    expect(result.rpcs['api.now_utc_api']).toEqual({
+      id: 'api.now_utc_api',
+      displayName: 'api.now utc api',
+      camelCase: 'nowUtcApi',
+    })
+  })
 })

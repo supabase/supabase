@@ -5,7 +5,9 @@ import { Badge } from 'ui'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import { getSchemaQualifiedEntity } from '@/components/interfaces/Docs/Snippets'
 import Table from '@/components/to-be-cleaned/Table'
+import { useExposedSchemasQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
 import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -13,14 +15,29 @@ import { useAppStateSnapshot } from '@/state/app-state'
 export const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
-
-  const { data: jsonSchema, refetch: refetchJsonSchema } = useProjectJsonSchemaQuery({
+  const { data: exposedSchemas = ['public'], isSuccess: areSchemasReady } = useExposedSchemasQuery({
     projectRef: ref,
   })
-  const { data, refetch: refetchOpenAPISpec } = useOpenAPISpecQuery({ projectRef: ref })
+
+  const { data: jsonSchema, refetch: refetchJsonSchema } = useProjectJsonSchemaQuery(
+    {
+      projectRef: ref,
+      schemas: exposedSchemas,
+    },
+    { enabled: areSchemasReady }
+  )
+  const { data, refetch: refetchOpenAPISpec } = useOpenAPISpecQuery(
+    {
+      projectRef: ref,
+      schemas: exposedSchemas,
+    },
+    { enabled: areSchemasReady }
+  )
   const functions = data?.functions ?? []
 
   const rpcName = snap.activeDocsSection[1]
+  const { name: bareRpcName, schema: rpcSchema } =
+    rpcName !== undefined ? getSchemaQualifiedEntity(rpcName) : { name: '', schema: 'public' }
   const rpc = functions.find((fn) => fn.name === rpcName)
 
   const {
@@ -91,7 +108,8 @@ export const RPC = ({ language }: ContentProps) => {
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.rpcSingle}
         codeSnippets={DOCS_RESOURCE_CONTENT.rpcSingle.code({
-          rpcName,
+          rpcName: bareRpcName,
+          schema: rpcSchema,
           rpcParams: parameters,
           endpoint: 'endpoint',
           apiKey: 'apiKey',
