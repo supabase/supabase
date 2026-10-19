@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Loader } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon, LoaderIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 export interface PaginationProps {
@@ -28,10 +28,10 @@ const Pagination = ({
 
   return (
     <div className="flex items-center gap-2">
-      {isLoading && <Loader size={14} className="animate-spin" />}
+      {isLoading && <LoaderIcon size={14} className="animate-spin" />}
 
       <Button
-        icon={<ArrowLeft />}
+        icon={<ArrowLeftIcon />}
         variant="outline"
         disabled={page <= 1 || isLoading}
         onClick={onPreviousPage}
@@ -40,7 +40,7 @@ const Pagination = ({
       />
 
       <Button
-        icon={<ArrowRight />}
+        icon={<ArrowRightIcon />}
         variant="outline"
         disabled={hasRunOutOfRows || isLoading}
         onClick={onNextPage}

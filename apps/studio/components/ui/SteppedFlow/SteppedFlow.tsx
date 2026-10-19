@@ -110,7 +110,10 @@ export const SteppedFlow = ({
         >
           {children}
           <CardFooter
-            className={cn(currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end')}
+            className={cn(
+              'border-t',
+              currentIndex > 0 || showCancel ? 'justify-between' : 'justify-end'
+            )}
           >
             {currentIndex > 0 ? (
               <Button

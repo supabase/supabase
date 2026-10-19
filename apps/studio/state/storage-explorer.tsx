@@ -32,17 +32,28 @@ import {
 } from '@/components/interfaces/Storage/Storage.types'
 import {
   calculateTotalRemainingTime,
+  describeUploadFailure,
   EMPTY_FOLDER_PLACEHOLDER_FILE_NAME,
   formatFolderItems,
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
+  getReplaceableFileNames,
+  getStorageItemPath,
+  getUploadNameConflicts,
   sanitizeNameForDuplicateInColumn,
   validateFolderName,
+  type UploadConflictResolution,
+  type UploadConflicts,
 } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
 import { fetchFileUrl } from '@/components/interfaces/Storage/StorageExplorer/useFetchFileUrlQuery'
 import { getStoragePreference } from '@/components/interfaces/Storage/StorageExplorer/useStoragePreference'
 import { convertFromBytes } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
+import {
+  getBucketVersioningState,
+  hasVersioningHistory,
+  isVersioningActive,
+} from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { getOrRefreshTemporaryApiKey } from '@/data/api-keys/temp-api-keys-utils'
 import { configKeys } from '@/data/config/keys'
@@ -54,7 +65,9 @@ import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
+import { storageKeys } from '@/data/storage/keys'
 import { moveStorageObject } from '@/data/storage/object-move-mutation'
+import { archivedObjectNamesQueryOptions } from '@/data/storage/versioning/archived-object-names-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { lookupMime } from '@/lib/mime'
@@ -167,6 +180,12 @@ export function createStorageExplorerState({
     selectedItemsToDelete: [] as StorageItemWithColumn[],
     setSelectedItemsToDelete: (items: StorageItemWithColumn[]) => {
       state.selectedItemsToDelete = items
+    },
+
+    // Separate from `selectedItemsToDelete`, which only archives on a versioned bucket.
+    itemsToPurge: [] as StorageItemWithColumn[],
+    setItemsToPurge: (items: StorageItemWithColumn[]) => {
+      state.itemsToPurge = items
     },
 
     selectedItemsToMove: [] as StorageItemWithColumn[],
@@ -436,6 +455,12 @@ export function createStorageExplorerState({
       } else {
         await state.fetchFoldersByPath({ paths })
       }
+
+      // The archived overlay is part of what the explorer shows, and an archive or a
+      // restore moves an object across that boundary, so both halves refresh together.
+      await getQueryClient().invalidateQueries({
+        queryKey: storageKeys.archivedObjects(state.projectRef, state.selectedBucket?.id),
+      })
     },
 
     refreshAll: async () => {
@@ -580,7 +605,10 @@ export function createStorageExplorerState({
       } catch (error) {}
     },
 
-    deleteFolder: async (folder: StorageItemWithColumn) => {
+    deleteFolder: async (
+      folder: StorageItemWithColumn,
+      { isArchive = false }: { isArchive?: boolean } = {}
+    ) => {
       try {
         const isDeleteFolder = true
         const files = await state.getAllItemsAlongFolder(folder)
@@ -594,7 +622,7 @@ export function createStorageExplorerState({
             prefix: folder.path,
           })
         } else {
-          await state.deleteFiles({ files: files as any[], isDeleteFolder })
+          await state.deleteFiles({ files: files as any[], isDeleteFolder, isArchive })
         }
 
         state.popColumnAtIndex(folder.columnIndex)
@@ -611,9 +639,15 @@ export function createStorageExplorerState({
 
         await state.refetchAllOpenedFolders()
         state.setSelectedItemsToDelete([])
-        toast.success(`Successfully deleted ${folder.name}`)
+        toast.success(
+          isArchive ? `Successfully archived ${folder.name}` : `Successfully deleted ${folder.name}`
+        )
       } catch (error: any) {
-        toast.error(`Failed to delete folder: ${error.message}`)
+        toast.error(
+          isArchive
+            ? `Failed to archive folder: ${error.message}`
+            : `Failed to delete folder: ${error.message}`
+        )
       }
     },
 
@@ -1037,10 +1071,17 @@ export function createStorageExplorerState({
       files,
       columnIndex,
       isDrop = false,
+      onConflict,
     }: {
       files: FileList | DataTransferItemList
       columnIndex: number
       isDrop?: boolean
+      /**
+       * Offered the names an upload would land on, when the bucket's versioning state makes
+       * the choice meaningful. Without it — or on a bucket where it isn't offered — the
+       * upload falls back to renaming, which is what every caller did before the prompt.
+       */
+      onConflict?: (conflicts: UploadConflicts) => Promise<UploadConflictResolution>
     }) => {
       const queryClient = getQueryClient()
       const storageConfiguration = queryClient
@@ -1053,13 +1094,35 @@ export function createStorageExplorerState({
       const t1 = new Date()
 
       const autofix = true
+      // Resolved before the awaits below so the destination can be checked for drift
+      // afterwards: the user is free to navigate while a drop is being read and prompted on.
+      const derivedColumnIndex = columnIndex === -1 ? state.getLatestColumnIndex() : columnIndex
+      const bucketIdAtStart = state.selectedBucket.id
+      const destinationPath = state.columns?.[derivedColumnIndex]?.path ?? ''
+
+      const canPromptOnConflict =
+        onConflict !== undefined && hasVersioningHistory(state.selectedBucket)
+      const archivedNamesRequest = canPromptOnConflict
+        ? queryClient
+            .fetchQuery({
+              ...archivedObjectNamesQueryOptions({
+                projectRef: state.projectRef,
+                bucketId: bucketIdAtStart,
+                path: destinationPath,
+              }),
+              staleTime: 0,
+            })
+            // An auxiliary check never blocks an upload; without it the clash just goes
+            // unannounced, which is the behavior that shipped before.
+            .catch(() => [] as string[])
+        : Promise.resolve([] as string[])
+
       // We filter out any folders which are just '#' until we can properly encode such characters in the URL
       const filesToUpload: (File & { path?: string })[] = isDrop
         ? (await getFilesDataTransferItems(files as DataTransferItemList)).filter(
             (file) => !file.path.includes('#/')
           )
         : Array.from(files as FileList)
-      const derivedColumnIndex = columnIndex === -1 ? state.getLatestColumnIndex() : columnIndex
 
       const filesWithinUploadLimit =
         fileSizeLimit !== undefined
@@ -1134,6 +1197,77 @@ export function createStorageExplorerState({
           return file
         })
 
+      // Asked before anything is written, because the answer changes where the bytes land: a
+      // replace overwrites the object in place, which on a versioned bucket turns the file it
+      // lands on into a previous version. Only the top level of a drop can clash — a folder
+      // upload merges into its destination — and only against files, since a name that belongs
+      // to a folder has nothing to overwrite.
+      const topLevelFileNames = formattedFilesToUpload
+        .filter((file) => (file.path ?? '').split('/').length <= 1)
+        .map((file) => file.name)
+      const existingFileNames = (state.columns?.[derivedColumnIndex]?.items ?? [])
+        .filter(
+          (item) =>
+            item.type === STORAGE_ROW_TYPES.FILE && item.status !== STORAGE_ROW_STATUS.EDITING
+        )
+        .map((item) => item.name)
+
+      const versioningState = getBucketVersioningState(state.selectedBucket)
+      const replaceableNames = getReplaceableFileNames({
+        items: state.columns?.[derivedColumnIndex]?.items ?? [],
+        versioningState,
+      })
+      const liveNames = getUploadNameConflicts({
+        fileNames: topLevelFileNames,
+        existingNames: replaceableNames,
+      })
+      // A delete marker can outlive the delete it recorded, so anything the archived listing
+      // reports that is also live belongs to the live half, where replacing is what it says.
+      const takenLiveNames = new Set(existingFileNames.map((name) => name.toLowerCase()))
+      const archivedFolderNames = (await archivedNamesRequest).filter(
+        (name) => !takenLiveNames.has(name.toLowerCase())
+      )
+      const archivedNames = getUploadNameConflicts({
+        fileNames: topLevelFileNames,
+        existingNames: archivedFolderNames,
+      })
+
+      const existingNameByLowercase = new Map(
+        [...replaceableNames, ...archivedFolderNames].map((name) => [name.toLowerCase(), name])
+      )
+
+      const conflicts: UploadConflicts = {
+        liveNames: canPromptOnConflict ? liveNames : [],
+        archivedNames: canPromptOnConflict ? archivedNames : [],
+        isVersioningSuspended: versioningState === 'suspended',
+      }
+
+      let shouldReplaceConflicts = false
+      if (
+        onConflict !== undefined &&
+        conflicts.liveNames.length + conflicts.archivedNames.length > 0
+      ) {
+        const resolution = await onConflict(conflicts)
+        if (resolution === 'cancel') return
+        shouldReplaceConflicts = resolution === 'replace'
+      }
+
+      const destinationColumn = state.columns?.[derivedColumnIndex]
+      if (
+        destinationColumn === undefined ||
+        destinationColumn.path !== destinationPath ||
+        state.selectedBucket.id !== bucketIdAtStart
+      ) {
+        toast.error('Upload cancelled: the folder you dropped into is no longer open')
+        return
+      }
+
+      const conflictingNames = [...conflicts.liveNames, ...conflicts.archivedNames]
+      const archivedConflictNames = new Set(conflicts.archivedNames)
+
+      /** Overwritten paths, whose cached preview bytes and version list go stale. */
+      const replacedPaths: string[] = []
+
       state.uploadProgresses = new Array(formattedFilesToUpload.length).fill({
         percentage: 0,
         elapsed: 0,
@@ -1163,9 +1297,23 @@ export function createStorageExplorerState({
         const fileOptions = { cacheControl: '3600', contentType: metadata.mimetype }
 
         const isWithinFolder = (file?.path ?? '').split('/').length > 1
-        const fileName = !isWithinFolder
-          ? sanitizeNameForDuplicateInColumn(state, { name: file.name, autofix })
-          : file.name
+        const isReplacingExisting =
+          shouldReplaceConflicts && !isWithinFolder && conflictingNames.includes(file.name)
+        const isReplacingArchived = isReplacingExisting && archivedConflictNames.has(file.name)
+
+        const getUploadName = () => {
+          if (isWithinFolder) return file.name
+          if (isReplacingExisting) {
+            return existingNameByLowercase.get(file.name.toLowerCase()) ?? file.name
+          }
+          return sanitizeNameForDuplicateInColumn(state, {
+            name: file.name,
+            autofix,
+            columnIndex: derivedColumnIndex,
+            reservedNames: archivedFolderNames,
+          })
+        }
+        const fileName = getUploadName()
         const unsanitizedFormattedFileName =
           has(file, ['path']) && isWithinFolder ? file.path : fileName
         /**
@@ -1195,7 +1343,19 @@ export function createStorageExplorerState({
             })
             uploadedTopLevelFolders.push(topLevelFolder)
           }
+        } else if (isReplacingExisting && !isReplacingArchived) {
+          replacedPaths.push(formattedPathToFile)
+          // The row is already in the column, so a temp row would duplicate it until the refetch.
+          state.updateRowStatus({
+            name: fileName!,
+            status: STORAGE_ROW_STATUS.LOADING,
+            columnIndex: derivedColumnIndex,
+          })
         } else {
+          // An archived row lives in the rendered overlay rather than the column, so it needs
+          // a temp row like any new file — which also hides the overlay's copy of it, since
+          // the overlay skips names the column already holds.
+          if (isReplacingArchived) replacedPaths.push(formattedPathToFile)
           state.addTempRow({
             type: STORAGE_ROW_TYPES.FILE,
             name: fileName!,
@@ -1236,9 +1396,10 @@ export function createStorageExplorerState({
             const upload = new tus.Upload(file, {
               endpoint: state.resumableUploadUrl,
               retryDelays: [0, 200, 500, 1500, 3000, 5000],
-              headers: {
-                'x-source': 'supabase-dashboard',
-              },
+              // Without upsert the write is rejected as a conflict, since the path exists.
+              headers: isReplacingExisting
+                ? { 'x-source': 'supabase-dashboard', 'x-upsert': 'true' }
+                : { 'x-source': 'supabase-dashboard' },
               uploadDataDuringCreation: uploadDataDuringCreation,
               removeFingerprintOnSuccess: true,
               metadata: {
@@ -1396,6 +1557,24 @@ export function createStorageExplorerState({
 
         await state.refetchAllOpenedFolders()
 
+        // The preview URL is cached against the path for a week, so without this the panel
+        // keeps rendering the bytes from before the replace, and the version list stays short.
+        await Promise.all(
+          replacedPaths.flatMap((path) => [
+            queryClient.invalidateQueries({
+              queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
+            }),
+            queryClient.invalidateQueries({
+              queryKey: storageKeys.fileUrl({
+                projectRef: state.projectRef,
+                isBucketPublic: state.selectedBucket.public,
+                bucketId: state.selectedBucket.id,
+                path,
+              }),
+            }),
+          ])
+        )
+
         if (
           numberOfFilesToUpload === 0 ||
           (numberOfFilesUploadedSuccess === 0 && numberOfFilesUploadedFail === 0)
@@ -1497,12 +1676,99 @@ export function createStorageExplorerState({
       state.setSelectedItemsToMove([])
     },
 
+    /**
+     * Overwrites an object in place, which on a versioned bucket is what creates a new
+     * version. Not `uploadFiles`: that renames rather than overwrites on a name clash.
+     */
+    replaceFile: async ({ file, item }: { file: File; item: StorageItemWithColumn }) => {
+      const path = getStorageItemPath(state, item)
+      // Mirrors the action label the user clicked, which follows the bucket rather than
+      // whether this particular write happens to retain a version.
+      const copy = isVersioningActive(state.selectedBucket)
+        ? {
+            loading: `Uploading a new version of ${item.name}...`,
+            success: `Uploaded a new version of ${item.name}`,
+          }
+        : { loading: `Replacing ${item.name}...`, success: `Replaced ${item.name}` }
+      const toastId = toast.loading(copy.loading)
+
+      state.updateRowStatus({
+        name: item.name,
+        status: STORAGE_ROW_STATUS.LOADING,
+        columnIndex: item.columnIndex,
+      })
+
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const upload = new tus.Upload(file, {
+            endpoint: state.resumableUploadUrl,
+            retryDelays: [0, 200, 500, 1500, 3000, 5000],
+            // Without upsert the write is rejected as a conflict: the path exists.
+            headers: { 'x-source': 'supabase-dashboard', 'x-upsert': 'true' },
+            uploadDataDuringCreation: true,
+            removeFingerprintOnSuccess: true,
+            metadata: {
+              bucketName: state.selectedBucket.name,
+              objectName: path,
+              contentType: file.type || 'application/octet-stream',
+              cacheControl: '3600',
+            },
+            onBeforeRequest: async (req) => {
+              const { apiKey } = await getOrRefreshTemporaryApiKey(state.projectRef)
+              req.setHeader('apikey', apiKey)
+              if (!IS_PLATFORM) req.setHeader('Authorization', `Bearer ${apiKey}`)
+            },
+            onError: (error) => reject(error),
+            onSuccess: () => resolve(),
+          })
+
+          // No `findPreviousUploads`: a resumed upload would write the wrong file's bytes.
+          upload.start()
+        })
+
+        toast.success(copy.success, { id: toastId })
+        await state.refetchAllOpenedFolders()
+        await Promise.all([
+          getQueryClient().invalidateQueries({
+            queryKey: storageKeys.objectVersions(state.projectRef, state.selectedBucket.id, path),
+          }),
+          // The preview URL is cached for a week against the path, so without this the
+          // panel keeps rendering the bytes from before the replace.
+          getQueryClient().invalidateQueries({
+            queryKey: storageKeys.fileUrl({
+              projectRef: state.projectRef,
+              isBucketPublic: state.selectedBucket.public,
+              bucketId: state.selectedBucket.id,
+              path,
+            }),
+          }),
+        ])
+      } catch (error) {
+        const status =
+          error instanceof tus.DetailedError ? error.originalResponse?.getStatus() : undefined
+        const reason = describeUploadFailure({
+          status,
+          fallback: error instanceof Error ? error.message : 'the upload failed.',
+          allowedMimeTypes: state.selectedBucket.allowed_mime_types,
+        })
+        toast.error(`Failed to upload a new version of ${item.name}: ${reason}`, { id: toastId })
+        state.updateRowStatus({
+          name: item.name,
+          status: STORAGE_ROW_STATUS.READY,
+          columnIndex: item.columnIndex,
+        })
+      }
+    },
+
     deleteFiles: async ({
       files,
       isDeleteFolder = false,
+      isArchive = false,
     }: {
       files: (StorageItemWithColumn & { prefix?: string })[]
       isDeleteFolder?: boolean
+      /** On a versioned bucket the object survives behind a delete marker, so the copy says archive. */
+      isArchive?: boolean
     }) => {
       state.setSelectedFilePreview(undefined)
 
@@ -1522,7 +1788,19 @@ export function createStorageExplorerState({
 
       state.clearSelectedItems()
 
-      const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
+      const copy = isArchive
+        ? {
+            loading: `Archiving ${prefixes.length} file(s)...`,
+            success: `Successfully archived ${prefixes.length} file(s)`,
+            error: `Failed to archive ${prefixes.length} file(s)`,
+          }
+        : {
+            loading: `Deleting ${prefixes.length} file(s)...`,
+            success: `Successfully deleted ${prefixes.length} file(s)`,
+            error: `Failed to delete ${prefixes.length} file(s)`,
+          }
+
+      const toastId = toast.loading(copy.loading)
 
       try {
         await deleteBucketObject({
@@ -1543,7 +1821,7 @@ export function createStorageExplorerState({
             parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
           )
 
-          toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+          toast.success(copy.success, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
@@ -1556,7 +1834,7 @@ export function createStorageExplorerState({
         }
       } catch (err) {
         if (!isDeleteFolder) {
-          toast.error(`Failed to delete ${prefixes.length} file(s)`, {
+          toast.error(copy.error, {
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
@@ -1764,8 +2042,12 @@ export function createStorageExplorerState({
 
     // ======== UI Helper functions ========
 
-    selectRangeItems: (columnIndex: number, toItemIndex: number) => {
+    selectRangeItems: (columnIndex: number, toItemId: string | null) => {
       const columnItems = state.columns[columnIndex].items
+      // Addressed by id, not by the row's own position: the rendered column can carry
+      // archived rows this list has never held, which shifts every index below them.
+      const toItemIndex = toItemId === null ? -1 : findIndex(columnItems, { id: toItemId })
+      if (toItemIndex === -1) return
       const toItem = columnItems[toItemIndex]
       const selectedItemIds = state.selectedItems.map((item) => item.id)
       const lastSelectedItemId = selectedItemIds[selectedItemIds.length - 1]
@@ -1778,6 +2060,8 @@ export function createStorageExplorerState({
       // Get the range to select and reverse the order if necessary
       const rangeToSelect = columnItems
         .slice(start, end + 1)
+        // An archived row has no live object, so the bulk actions have nothing to act on.
+        .filter((item) => item.archived === undefined)
         // we need `columnIndex` in all item of `selectedItems`
         .map((item) => ({ ...item, columnIndex }))
       if (toItemIndex < lastSelectedItemIndex) {
