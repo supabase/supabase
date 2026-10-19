@@ -59,12 +59,19 @@ export function applyAutoLimit(
   const hasMultipleQueries =
     queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleanedSql.length - 1)
 
+  // A CTE query can end in a write (`with x as (...) insert/update/delete ...`), where a trailing
+  // limit is invalid, so only treat `with` as a select if no write keyword appears anywhere
+  const lowerSql = cleanedSql.toLowerCase()
+  const isSelectLike =
+    lowerSql.startsWith('select') ||
+    (/^with\b/.test(lowerSql) && !/\b(insert|update|delete|merge|into)\b/.test(lowerSql))
+
   // Check if need to auto limit rows
   const appendAutoLimit =
     limit > 0 &&
     !hasComments &&
     !hasMultipleQueries &&
-    cleanedSql.toLowerCase().startsWith('select') &&
+    isSelectLike &&
     !cleanedSql.toLowerCase().match(/fetch\s+(first|next)/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
