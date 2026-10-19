@@ -5,7 +5,6 @@ import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { WarehouseOverviewTab } from './OverviewTab'
@@ -19,7 +18,7 @@ type PublicationDetailsResponse = components['schemas']['PublicationDetailsRespo
 type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
 type RunQueryBody = components['schemas']['RunQueryBody']
 type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusResponse_Output']
-type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
+type WarehouseDeleteResponse = components['schemas']['WarehouseDeleteResponse_Output']
 type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
 // Both integration shells are live, and the flag reads a context plus ConfigCat that
@@ -395,40 +394,109 @@ describe('WarehouseOverviewTab', () => {
     expect(mockTrack).not.toHaveBeenCalledWith('warehouse_enabled', expect.anything())
   })
 
-  test('disables Warehouse with an empty target list after confirmation', async () => {
+  test('preserves copied Warehouse data by default after confirmation', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     mockReplicatedTableQueries()
-    const setupRequests: WarehouseSetupBody[] = []
+    const deleteRequests: (string | null)[] = []
     addAPIMock({
-      method: 'post',
-      path: '/platform/warehouse/:ref/setup',
+      method: 'delete',
+      path: '/platform/warehouse/:ref',
       response: async ({ request }) => {
-        setupRequests.push((await request.json()) as WarehouseSetupBody)
-        return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] })
+        deleteRequests.push(new URL(request.url).searchParams.get('delete_data'))
+        return HttpResponse.json<WarehouseDeleteResponse>({ status: 'accepted' }, { status: 202 })
       },
     })
 
     customRender(<WarehouseOverviewTab />)
 
     await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
-    expect(setupRequests).toEqual([])
+    expect(deleteRequests).toEqual([])
 
     const dialog = await screen.findByRole('alertdialog')
-    expect(dialog).toHaveTextContent('Copied data remains in DuckLake storage until deleted')
+    expect(dialog).toHaveTextContent('This cannot be undone')
+    expect(within(dialog).getByRole('checkbox')).not.toBeChecked()
     expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
 
     fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
 
-    await waitFor(() => expect(setupRequests).toEqual([{ targets: [] }]))
+    await waitFor(() => expect(deleteRequests).toEqual(['false']))
   })
+
+  test('resets the copied data option when the confirmation is reopened', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    mockReplicatedTableQueries()
+    customRender(<WarehouseOverviewTab />)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
+    const dialog = await screen.findByRole('alertdialog')
+    await userEvent.click(within(dialog).getByRole('checkbox'))
+    expect(within(dialog).getByRole('checkbox')).toBeChecked()
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('button', { name: 'Disable Warehouse' }))
+    expect(within(await screen.findByRole('alertdialog')).getByRole('checkbox')).not.toBeChecked()
+  })
+
+  test('shows disable progress and polls until Warehouse can be enabled again', async () => {
+    let status: WarehouseSetupStatusResponse['setup_status'] = 'disabling'
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/setup-status',
+      response: () =>
+        HttpResponse.json<WarehouseSetupStatusResponse>({
+          setup_status: status,
+          fdw_status: null,
+          tables: [],
+          steps: [],
+        }),
+    })
+    customRender(<WarehouseOverviewTab />)
+    expect(await screen.findByText('Warehouse is being disabled')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
+    status = 'disabled'
+    expect(
+      await screen.findByText('Replicated tables picker', {}, { timeout: 5000 })
+    ).toBeInTheDocument()
+  })
+
+  test.each([false, true])(
+    'retries failed cleanup with the saved delete_data option (%s)',
+    async (shouldDeleteData) => {
+      mockProject()
+      mockSetupStatus({
+        setup_status: 'deletion_failed',
+        error: 'Storage cleanup failed',
+        delete_data: shouldDeleteData,
+      })
+      const deleteRequests: (string | null)[] = []
+      addAPIMock({
+        method: 'delete',
+        path: '/platform/warehouse/:ref',
+        response: ({ request }) => {
+          deleteRequests.push(new URL(request.url).searchParams.get('delete_data'))
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Cleanup retry failed' },
+            { status: 500 }
+          )
+        },
+      })
+      customRender(<WarehouseOverviewTab />)
+      expect(await screen.findByText('Storage cleanup failed')).toBeInTheDocument()
+      await userEvent.click(screen.getByRole('button', { name: 'Retry' }))
+      expect(await screen.findByText('Cleanup retry failed')).toBeInTheDocument()
+      expect(deleteRequests).toEqual([String(shouldDeleteData)])
+    }
+  )
 
   test('tracks how much was being replicated when Warehouse is disabled', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     const { publicationRequests } = mockReplicatedTableQueries()
     addAPIMock({
-      method: 'post',
-      path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      method: 'delete',
+      path: '/platform/warehouse/:ref',
+      response: () =>
+        HttpResponse.json<WarehouseDeleteResponse>({ status: 'accepted' }, { status: 202 }),
     })
 
     customRender(<WarehouseOverviewTab />)
@@ -450,11 +518,13 @@ describe('WarehouseOverviewTab', () => {
   test('shows a disable error and allows retrying from the open confirmation', async () => {
     mockSetupStatus({ setup_status: 'complete' })
     mockReplicatedTableQueries()
+    const deleteRequests: (string | null)[] = []
     let attempts = 0
     addAPIMock({
-      method: 'post',
-      path: '/platform/warehouse/:ref/setup',
-      response: () => {
+      method: 'delete',
+      path: '/platform/warehouse/:ref',
+      response: ({ request }) => {
+        deleteRequests.push(new URL(request.url).searchParams.get('delete_data'))
         attempts += 1
         if (attempts === 1) {
           return HttpResponse.json<APIErrorBody>(
@@ -462,7 +532,7 @@ describe('WarehouseOverviewTab', () => {
             { status: 500 }
           )
         }
-        return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] })
+        return HttpResponse.json<WarehouseDeleteResponse>({ status: 'accepted' }, { status: 202 })
       },
     })
 
@@ -471,20 +541,21 @@ describe('WarehouseOverviewTab', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
     const dialog = await screen.findByRole('alertdialog')
     const confirm = within(dialog).getByRole('button', { name: 'Disable Warehouse' })
+    await userEvent.click(
+      within(dialog).getByRole('checkbox', { name: 'Also delete copied Warehouse data' })
+    )
 
     fireEvent.click(confirm)
 
-    await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        'Failed to disable Warehouse: Disable request failed'
-      )
-    )
+    expect(await within(dialog).findByText('Disable request failed')).toBeInTheDocument()
     expect(dialog).toBeVisible()
     expect(confirm).toBeEnabled()
+    expect(within(dialog).getByRole('checkbox')).toBeChecked()
 
     fireEvent.click(confirm)
 
     await waitFor(() => expect(attempts).toBe(2))
+    expect(deleteRequests).toEqual(['true', 'true'])
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
   })
 
