@@ -1,7 +1,10 @@
-import { useRef, useState } from 'react'
-import type { UseFormReturn } from 'react-hook-form'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { useWatch, type UseFormReturn } from 'react-hook-form'
 
-import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
+import {
+  DestinationPanelFormSchema,
+  type DestinationPanelSchemaType,
+} from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import { areValidationFailuresEqual } from '../DestinationPanel/DestinationForm/DestinationForm.utils'
 import { useDestinationForm } from '../DestinationPanel/DestinationForm/useDestinationForm'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
@@ -28,6 +31,15 @@ export const usePipelineCreationSubmission = ({
   const isSubmittingRef = useRef(false)
   const hasCreated = useRef(false)
   const warningSnapshot = useRef<string | undefined>(undefined)
+  const values = useWatch({
+    control: form.control,
+    name: DestinationPanelFormSchema.keyof().options,
+  })
+  const configurationSnapshot = JSON.stringify([type, values])
+  useLayoutEffect(() => {
+    resetValidation()
+    warningSnapshot.current = undefined
+  }, [configurationSnapshot, resetValidation])
   const failures = [...destinationValidationFailures, ...pipelineValidationFailures]
 
   const createPipeline = async (data: DestinationPanelSchemaType) => {

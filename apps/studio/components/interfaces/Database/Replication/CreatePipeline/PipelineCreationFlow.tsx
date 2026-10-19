@@ -60,7 +60,8 @@ export const PipelineCreationFlow = ({
   const initialTypeRef = useRef(type)
   const { isDirty } = form.formState
   const { requestNavigation, completeNavigation, modalProps } = usePipelineNavigationGuard(
-    isDirty || type !== initialTypeRef.current
+    isDirty || type !== initialTypeRef.current,
+    () => isSubmitting
   )
   const handleClose = () => {
     if (!isSubmitting) requestNavigation(onClose)
