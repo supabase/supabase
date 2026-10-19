@@ -30,6 +30,15 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
   return sql.replace(/;+\s*$/, '') as SafeSqlFragment
 }
 
+// Quoted text and comments, matched left to right so a quote inside a comment (or the reverse)
+// can't desync the scan: E'..' strings, '..' strings, "..." identifiers, $tag$..$tag$ bodies,
+// -- line comments and /* */ block comments
+const LITERALS_AND_COMMENTS =
+  /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$[a-z_]*\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//gi
+
+/** Keeps only the SQL tokens, so keywords inside literals and comments aren't mistaken for syntax. */
+export const stripLiteralsAndComments = (sql: string) => sql.replace(LITERALS_AND_COMMENTS, ' ')
+
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
 // This is to prevent dashboard from accidentally appending limit to the end of a query
 // thats not supposed to have any, since there's too many cases to cover.
@@ -60,11 +69,12 @@ export function applyAutoLimit(
     queries.length > 1 || (indexSemiColon > 0 && indexSemiColon !== cleanedSql.length - 1)
 
   // A CTE query can end in a write (`with x as (...) insert/update/delete ...`), where a trailing
-  // limit is invalid, so only treat `with` as a select if no write keyword appears anywhere
+  // limit is invalid, so only treat `with` as a select if no write keyword appears outside literals
   const lowerSql = cleanedSql.toLowerCase()
   const isSelectLike =
     lowerSql.startsWith('select') ||
-    (/^with\b/.test(lowerSql) && !/\b(insert|update|delete|merge|into)\b/.test(lowerSql))
+    (/^with\b/.test(lowerSql) &&
+      !/\b(insert|update|delete|merge|into)\b/.test(stripLiteralsAndComments(lowerSql)))
 
   // Check if need to auto limit rows
   const appendAutoLimit =

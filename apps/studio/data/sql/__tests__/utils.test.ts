@@ -146,6 +146,10 @@ describe('applyAutoLimit', () => {
     const sql = safeSql`with t as (select 1) select * from t limit 10`
     expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(false)
   })
+  test('Should append the limit to a read-only CTE whose literals or identifiers contain write keywords', () => {
+    const sql = safeSql`with t as (select 'update' as "delete") select * from t`
+    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(true)
+  })
   test.each([
     'with d as (delete from t returning *) select * from d',
     'with s as (select 1) insert into t select * from s',
