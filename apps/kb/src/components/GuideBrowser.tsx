@@ -99,6 +99,13 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
   const handleTabChange = (value: string) => setTopicInUrl(isKnownTopic(value) ? value : null)
   const handleLoadMore = () => setPaging({ filterKey, count: shownCount + PAGE_SIZE })
   const handleTopicClear = () => setTopicInUrl(null)
+  const filterTopics = TOPICS.filter(
+    (topic) =>
+      topic.visible &&
+      guides.some((guide) => guide.topics.includes(topic.name)) &&
+      // a topic that every guide has would list the same guides as all
+      !guides.every((guide) => guide.topics.includes(topic.name))
+  ).map((topic) => topic.name)
 
   return (
     <section
@@ -118,9 +125,7 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
       >
         <div className="relative flex items-end">
           <TopicTabs
-            topics={TOPICS.filter(
-              (topic) => topic.visible && guides.some((guide) => guide.topics.includes(topic.name))
-            ).map((topic) => topic.name)}
+            topics={filterTopics}
             activeTopic={activeTopic}
             onTopicSelect={setTopicInUrl}
             className="flex-1"
