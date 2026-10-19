@@ -88,10 +88,6 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     }
   )
 
-  // initial null means nothing has opened this visit. clearing ?sidebar= from
-  // that state queues a replace that drops a deep link before the url can open it.
-  // url clear cannot wait for the project query: this effect only reruns when
-  // activeSidebar changes, so a close before the project loads would leave ?sidebar=.
   const hasOpenedSidebarRef = useRef(false)
 
   useEffect(() => {
