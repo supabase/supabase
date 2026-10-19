@@ -182,4 +182,4 @@ parameters:
     required: true
     # default: '5432'
     description: |
-      An key for encryting/decrypting secrets.
+      A key for encrypting/decrypting secrets.
