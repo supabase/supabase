@@ -84,7 +84,7 @@ export const Hero = ({
     <section
       className={cn(
         'relative isolate flex justify-center',
-        isWarp ? 'mt-6.5 pt-32.5 pb-78' : 'pt-39 pb-39 max-sm:pt-19.5 max-sm:pb-19.5',
+        isWarp ? 'mt-6.5 pt-32.5 pb-78' : 'pt-32.5 pb-39 max-sm:pt-19.5 max-sm:pb-19.5',
         'overflow-hidden bg-background',
         className
       )}
@@ -112,7 +112,13 @@ export const Hero = ({
             )}
           />
         ) : null}
-        <div ref={copyRef} className="flex flex-col items-center gap-5 py-16 text-center">
+        <div
+          ref={copyRef}
+          className={cn(
+            'flex flex-col items-center gap-5 text-center',
+            isWarp ? 'py-16' : 'pt-12 pb-9.5'
+          )}
+        >
           {breadcrumb}
           <h1 className="m-0 text-5xl tracking-display text-foreground sm:text-6xl">
             <AsciiHoverText text={title} glyphClassName="after:text-foreground" />
