@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   return {
     title: `${partner.title} | Works With Supabase`,
     description: partner.description,
-    alternates: canonicalAlternates(`/partners/catalog/${partner.slug}`),
+    alternates: canonicalAlternates(`/partners/catalog/${encodeURIComponent(partner.slug)}`),
     openGraph: {
       title: `${partner.title} | Works With Supabase`,
       description: partner.description,

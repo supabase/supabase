@@ -25,7 +25,7 @@ export async function generateMetadata({
     title: `Blog | ${categoryLabel}`,
     description: `Blog posts in ${categoryLabel}.`,
     alternates: isKnownCategory
-      ? canonicalAlternates(`/blog/categories/${params.category}`)
+      ? canonicalAlternates(`/blog/categories/${encodeURIComponent(params.category)}`)
       : undefined,
   }
 }

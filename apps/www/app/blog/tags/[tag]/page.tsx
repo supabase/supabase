@@ -32,7 +32,9 @@ export async function generateMetadata({
   return {
     title: `Blog | ${tagLabel}`,
     description: `Blog posts tagged ${tagLabel}.`,
-    alternates: isKnownTag ? canonicalAlternates(`/blog/tags/${params.tag}`) : undefined,
+    alternates: isKnownTag
+      ? canonicalAlternates(`/blog/tags/${encodeURIComponent(params.tag)}`)
+      : undefined,
   }
 }
 

@@ -73,7 +73,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
       title: blogPost.title,
       description: blogPost.description,
       alternates: {
-        ...canonicalAlternates(`/blog/${slug}`),
+        ...canonicalAlternates(`/blog/${encodeURIComponent(slug)}`),
         ...mdAlternates(`blog/${slug}`),
       },
       openGraph: {
