@@ -2,11 +2,14 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
-import { readExplicitSchemaQueryParam, shouldOpenLastTableOnEditorIndex } from './index.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
+import {
+  readExplicitSchemaQueryParam,
+  shouldOpenLastTableOnEditorIndex,
+} from '@/components/layouts/TableEditorLayout/TableEditorIndex.utils'
 import { TableEditorLayout } from '@/components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from '@/components/layouts/Tabs/NewTab'

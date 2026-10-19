@@ -3,7 +3,7 @@ import { describe, expect, test } from 'vitest'
 import {
   readExplicitSchemaQueryParam,
   shouldOpenLastTableOnEditorIndex,
-} from '@/pages/project/[ref]/editor/index.utils'
+} from './TableEditorIndex.utils'
 
 describe('readExplicitSchemaQueryParam', () => {
   test('returns a schema query value', () => {
