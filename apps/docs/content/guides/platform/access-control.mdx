@@ -24,8 +24,8 @@ When you create an account, Supabase creates a default organization and makes yo
 The rest of this guide has three parts:
 
 - [Organization scoped roles vs project scoped roles](#organization-scoped-roles-vs-project-scoped-roles) explains how a role's scope decides which projects a member can access. Read it before you invite someone.
-- [Manage organization members](#manage-organization-members) covers inviting members, listing them with the Management API, and transferring ownership.
-- [Permissions across roles](#permissions-across-roles) lists the actions each role can take.
+- [Manage organization members](#manage-organization-members) covers inviting members, listing them with the Management API, and transferring ownership. Use it when someone joins your organization or an owner leaves.
+- [Permissions across roles](#permissions-across-roles) lists the actions each role can take. Use it to pick the right role.
 
 ## Organization scoped roles vs project scoped roles
 
@@ -40,7 +40,7 @@ You can give each member a role scoped to the entire organization or to specific
 - If a member has an organization-level role, they have its permissions in all current and future projects in the organization.
 - If a member has a project-scoped role, they can access only the projects they're assigned to. In the Supabase Dashboard, they can't see the organization's other projects.
 
-To give a member no project access by default and grant access project by project, assign them the organization-level **No-access** role. Then grant project-scoped roles on the projects they need. The permission tables leave out **No-access**, because it has none of the listed permissions by default.
+To give a member no project access by default and grant access project by project, assign them the organization-level **No-access** role. Then grant project-scoped roles on the projects they need.
 
 ## Manage organization members
 
@@ -78,7 +78,7 @@ If you're the only owner, make another member an **Owner** before you leave. Eit
 
 ## Permissions across roles
 
-A role grants different actions on organization resources than on project resources, so each has its own table.
+A role grants different actions on organization resources than on project resources, so each has its own table. The tables leave out **No-access** because it has none of the listed permissions by default.
 
 ### Organization permissions across roles
 
