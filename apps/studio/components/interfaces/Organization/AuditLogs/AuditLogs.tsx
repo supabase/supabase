@@ -189,6 +189,7 @@ export const AuditLogs = () => {
       options: { component: DateRangeOption },
       formatValue: formatDateRangeValue,
       isAvailable: !hasDateFilter,
+      topLevelOnly: true,
     },
   ]
 

@@ -277,6 +277,40 @@ describe('buildPropertyItems', () => {
     expect(items).toEqual([{ value: 'name', label: 'Name' }])
   })
 
+  it('hides topLevelOnly properties in nested groups only', () => {
+    const withTopLevelOnly: FilterProperty[] = [
+      ...properties,
+      { label: 'Date', name: 'date', type: 'date', operators: ['='], topLevelOnly: true },
+    ]
+
+    const rootItems = buildPropertyItems({ filterProperties: withTopLevelOnly, inputValue: '' })
+    const nestedItems = buildPropertyItems({
+      filterProperties: withTopLevelOnly,
+      inputValue: '',
+      isNested: true,
+    })
+
+    expect(rootItems.map((item) => item.value)).toEqual(['name', 'status', 'date'])
+    expect(nestedItems.map((item) => item.value)).toEqual(['name', 'status'])
+  })
+
+  it('hides topLevelOnly properties when changing a nested condition property', () => {
+    const withTopLevelOnly: FilterProperty[] = [
+      ...properties,
+      { label: 'Date', name: 'date', type: 'date', operators: ['='], topLevelOnly: true },
+    ]
+    const params = {
+      filterProperties: withTopLevelOnly,
+      currentPropertyName: 'name',
+      inputValue: '',
+    }
+
+    expect(buildPropertyChangeItems(params).map((item) => item.value)).toEqual(['status', 'date'])
+    expect(
+      buildPropertyChangeItems({ ...params, isNested: true }).map((item) => item.value)
+    ).toEqual(['status'])
+  })
+
   it('uses a sentinel value for the "New Group" action when supportsOperators is true', () => {
     const items = buildPropertyItems({
       filterProperties: properties,

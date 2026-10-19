@@ -105,6 +105,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
         actions,
         supportsOperators,
         freeformDefaultProperty: resolvedFreeformDefaultProperty,
+        isNested: path.length > 0,
       }),
     [
       filterProperties,
@@ -114,6 +115,7 @@ export function FilterGroup({ group, path }: FilterGroupProps) {
       actions,
       supportsOperators,
       resolvedFreeformDefaultProperty,
+      path.length,
     ]
   )
 

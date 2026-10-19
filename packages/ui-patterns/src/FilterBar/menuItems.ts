@@ -73,10 +73,20 @@ export function buildPropertyItems(params: {
   supportsOperators?: boolean
   actions?: FilterBarAction[]
   freeformDefaultProperty?: FilterProperty
+  /** Whether the menu belongs to a nested group, which hides `topLevelOnly` properties */
+  isNested?: boolean
 }): MenuItem[] {
-  const { filterProperties, inputValue, supportsOperators, actions, freeformDefaultProperty } =
-    params
-  const availableProperties = filterProperties.filter((property) => property.isAvailable !== false)
+  const {
+    filterProperties,
+    inputValue,
+    supportsOperators,
+    actions,
+    freeformDefaultProperty,
+    isNested = false,
+  } = params
+  const availableProperties = filterProperties.filter(
+    (property) => property.isAvailable !== false && !(isNested && property.topLevelOnly)
+  )
   const items: MenuItem[] = []
 
   const trimmedInput = inputValue.trim()
@@ -124,11 +134,14 @@ export function buildPropertyChangeItems(params: {
   filterProperties: FilterProperty[]
   currentPropertyName: string
   inputValue: string
+  /** Whether the condition is inside a nested group, which hides `topLevelOnly` properties */
+  isNested?: boolean
 }): MenuItem[] {
-  const { filterProperties, currentPropertyName, inputValue } = params
+  const { filterProperties, currentPropertyName, inputValue, isNested = false } = params
 
   return filterProperties
     .filter((property) => property.isAvailable !== false)
+    .filter((property) => !(isNested && property.topLevelOnly))
     .filter((prop) => prop.name !== currentPropertyName)
     .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
     .map((prop) => ({ value: prop.name, label: prop.label }))
