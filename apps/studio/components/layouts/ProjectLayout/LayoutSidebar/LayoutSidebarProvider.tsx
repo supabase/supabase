@@ -2,7 +2,7 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useEffectEvent, type PropsWithChildren } from 'react'
+import { useEffect, useEffectEvent, useRef, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -88,16 +88,34 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     }
   )
 
+  // initial null means nothing has opened this visit. clearing ?sidebar= here
+  // queues a replace that drops a deep link before the url can open it.
+  // set even while the project is still loading, so a later close still clears.
+  const hasOpenedSidebarRef = useRef(false)
+
   useEffect(() => {
-    if (!!project) {
-      if (activeSidebar) {
-        onSidebarChanged(activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS])
-        setSidebarLocalStorage(activeSidebar.id)
-      } else {
-        setSidebarLocalStorage('')
-        setSidebarUrlParam(null)
-      }
+    if (activeSidebar) {
+      hasOpenedSidebarRef.current = true
     }
+
+    if (!project) {
+      return
+    }
+
+    if (activeSidebar) {
+      onSidebarChanged(activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS])
+      setSidebarLocalStorage(activeSidebar.id)
+      return
+    }
+
+    setSidebarLocalStorage('')
+
+    const shouldClearSidebarUrlParam = hasOpenedSidebarRef.current
+    if (!shouldClearSidebarUrlParam) {
+      return
+    }
+
+    setSidebarUrlParam(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSidebar])
 
