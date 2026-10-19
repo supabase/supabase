@@ -15,7 +15,7 @@ import { SITE_ORIGIN } from '@/lib/constants'
 import { parseFrontmatter } from '@/lib/frontmatter.mjs'
 import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { mdAlternates } from '@/lib/md-alternates'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
+import { getAllPostSlugs, getPostdata, getSortedPosts, resolveBlogSlug } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
 function resolveBlogAuthors(authorField: string | undefined) {
@@ -68,12 +68,14 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     const parsedContent = parseFrontmatter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
     const metaImageUrl = getAbsoluteBlogSocialImage(blogPost, SITE_ORIGIN)
+    // Aliases (e.g. `/blog/postgres-13`) render the same post, so the canonical is the resolved slug.
+    const canonicalSlug = resolveBlogSlug(slug) ?? slug
 
     return {
       title: blogPost.title,
       description: blogPost.description,
       alternates: {
-        ...canonicalAlternates(`/blog/${encodeURIComponent(slug)}`),
+        ...canonicalAlternates(`/blog/${encodeURIComponent(canonicalSlug)}`),
         ...mdAlternates(`blog/${slug}`),
       },
       openGraph: {
