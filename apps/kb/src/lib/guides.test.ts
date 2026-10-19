@@ -8,7 +8,7 @@ import {
   withTopicParam,
   type GuideSummary,
 } from './guides'
-import { TOPICS, topicToSlug, type Topic } from './topics'
+import { isInTopic, TOPICS, topicToSlug, type Topic } from './topics'
 
 const guide = (id: string, title: string, topics: Topic[]): GuideSummary => ({
   id,
@@ -127,5 +127,25 @@ describe('relatedGuides', () => {
 
   it('returns null when no other guide shares a topic', () => {
     expect(relatedGuides({ guide: firebaseAuth, guides: [firebaseAuth] })).toBeNull()
+  })
+})
+
+describe('isInTopic', () => {
+  it('lists guides under the topics they carry', () => {
+    const topics = ['Migration', 'Database']
+    expect(isInTopic({ collection: 'guides', topics, topic: 'Migration' })).toBe(true)
+    expect(isInTopic({ collection: 'guides', topics, topic: 'Troubleshooting' })).toBe(false)
+  })
+
+  it('lists every troubleshooting entry under Troubleshooting, tagged or not', () => {
+    expect(isInTopic({ collection: 'troubleshooting', topics: [], topic: 'Troubleshooting' })).toBe(
+      true
+    )
+  })
+
+  it('lists troubleshooting under feature topics, never under other type topics', () => {
+    const topics = ['Migration', 'Platform']
+    expect(isInTopic({ collection: 'troubleshooting', topics, topic: 'Platform' })).toBe(true)
+    expect(isInTopic({ collection: 'troubleshooting', topics, topic: 'Migration' })).toBe(false)
   })
 })

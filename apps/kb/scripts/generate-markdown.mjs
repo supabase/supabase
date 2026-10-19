@@ -15,7 +15,7 @@ import { visit } from 'unist-util-visit'
 import YAML from 'yaml'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
-import { TOPICS, topicToSlug } from '../src/lib/topics.ts'
+import { isInTopic, TOPICS, topicToSlug } from '../src/lib/topics.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
@@ -166,8 +166,6 @@ async function writeFileEnsuringDir(outputPath, contents) {
 async function main() {
   const files = await findContentFiles(CONTENT_DIR)
 
-  // Only entries with a `topics` array (currently just the `guides`
-  // collection) feed the per-topic index pages below.
   const guidesByTopic = new Map(TOPICS.map((topic) => [topic.name, []]))
 
   await Promise.all(
@@ -180,10 +178,12 @@ async function main() {
       const outputPath = path.join(OUTPUT_DIR, toMdExtension(relativePath))
       await writeFileEnsuringDir(outputPath, markdown)
 
-      if (!Array.isArray(data.topics)) return
+      // the first folder under src/content is the collection, e.g. guides or troubleshooting
+      const collection = relativePath.split(path.sep)[0]
+      const topics = Array.isArray(data.topics) ? data.topics : []
       const guide = { title: data.title, url: toGuideUrl(relativePath) }
-      for (const topicName of data.topics) {
-        guidesByTopic.get(topicName)?.push(guide)
+      for (const { name } of TOPICS) {
+        if (isInTopic({ collection, topics, topic: name })) guidesByTopic.get(name).push(guide)
       }
     })
   )

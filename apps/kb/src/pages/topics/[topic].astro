@@ -7,7 +7,7 @@ import { Hero } from '../../components/Hero'
 import Layout from '../../layouts/Layout.astro'
 import { toSummary, toTroubleshootingSummary } from '../../lib/guides'
 import { breadcrumbListSchema, KB_BASE_URL } from '../../lib/json-ld'
-import { TOPICS, topicToSlug } from '../../lib/topics'
+import { isInTopic, TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
 	const guides = (await getCollection('guides')).map(toSummary)
@@ -20,11 +20,12 @@ export async function getStaticPaths() {
 		props: {
 			topic: topic.name,
 			description: topic.description,
-			guides: guides.filter((guide) => guide.topics.includes(topic.name)),
-			troubleshooting:
-				topic.name === 'Troubleshooting'
-					? troubleshooting
-					: troubleshooting.filter((entry) => entry.topics.includes(topic.name)),
+			guides: guides.filter((guide) =>
+				isInTopic({ collection: 'guides', topics: guide.topics, topic: topic.name })
+			),
+			troubleshooting: troubleshooting.filter((entry) =>
+				isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
+			),
 		},
 	}))
 }

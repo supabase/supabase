@@ -87,11 +87,18 @@ export const TOPICS = [
 
 export type Topic = (typeof TOPICS)[number]['name']
 
+type ContentCollection = 'guides' | 'troubleshooting'
+
+interface IsInTopicParams {
+  collection: ContentCollection
+  topics: readonly string[]
+  topic: Topic
+}
+
 // zod's `enum()` needs a literal non-empty tuple of strings, which `.map()`
 // can't preserve on its own — this cast is safe because TOPICS is `as const`.
 export const TOPIC_NAMES = TOPICS.map((topic) => topic.name) as [Topic, ...Topic[]]
 
-// these say what kind of guide it is, the rest say what it's about
 export const FORMAT_TOPICS: Topic[] = [
   'Migration',
   'Comparison',
@@ -103,6 +110,14 @@ export const FORMAT_TOPICS: Topic[] = [
 // the kind of guide picks the cover before its subject does
 export const pickCoverTopic = (topics: Topic[]): Topic | null =>
   topics.find((topic) => FORMAT_TOPICS.includes(topic)) ?? topics[0] ?? null
+
+// the topic pages and scripts/generate-markdown.mjs both use this, so they list the same entries
+export const isInTopic = ({ collection, topics, topic }: IsInTopicParams): boolean => {
+  if (collection !== 'troubleshooting') return topics.includes(topic)
+  // troubleshooting is a content type. other type topics never list it
+  if (topic === 'Troubleshooting') return true
+  return !FORMAT_TOPICS.includes(topic) && topics.includes(topic)
+}
 
 // federated collections tag with their own vocabulary, which may not match kb's topics
 export const isKnownTopic = (topic: string): topic is Topic =>
