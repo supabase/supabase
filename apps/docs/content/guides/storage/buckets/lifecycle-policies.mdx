@@ -70,15 +70,18 @@ await supabase.storage.deleteBucketLifecycle('avatars')
 
 ## Rule options
 
-A policy holds 1 to 1,000 rules. Each rule has the following fields. Set `noncurrentDays` and `newerNoncurrentVersions` inside `noncurrentVersionExpiration`.
+A policy holds 1 to 1,000 rules. Each rule has the following fields.
 
-| Field                     | Required | Description                                                                                                               |
-| ------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `id`                      | No       | A unique name for the rule, up to 255 characters. Storage generates one if you omit it.                                   |
-| `status`                  | Yes      | Enabled runs the rule. Disabled keeps the rule stored without running it.                                                 |
-| `filter`                  | Yes      | Must be an empty object. Prefix, tag, and size filters aren't supported, so a rule applies to every object in the bucket. |
-| `noncurrentDays`          | Yes      | The number of days a version must be noncurrent before it expires. Must be 1 or more.                                     |
-| `newerNoncurrentVersions` | No       | The number of the newest noncurrent versions to keep whatever their age. Accepts 1 to 100.                                |
+| Field                         | Type    | Required | Description                                                                                |
+| ----------------------------- | ------- | -------- | ------------------------------------------------------------------------------------------ |
+| `id`                          | String  | No       | A unique name for the rule, up to 255 characters. Storage generates one if you omit it.    |
+| `status`                      | String  | Yes      | `Enabled` runs the rule. `Disabled` keeps the rule stored without running it.              |
+| `filter`                      | Object  | Yes      | Must be `{}`. A rule applies to every object in the bucket.                                |
+| `noncurrentVersionExpiration` | Object  | Yes      | Holds `noncurrentDays` and `newerNoncurrentVersions`.                                      |
+| `noncurrentDays`              | Integer | Yes      | The number of days a version must be noncurrent before it expires. Must be 1 or more.      |
+| `newerNoncurrentVersions`     | Integer | No       | The number of the newest noncurrent versions to keep whatever their age. Accepts 1 to 100. |
+
+Storage rejects any other `filter` value. Prefix, tag, and size filters aren't supported.
 
 Expiring noncurrent versions is the only action a rule supports.
 
