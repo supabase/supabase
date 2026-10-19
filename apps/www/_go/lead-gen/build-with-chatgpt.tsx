@@ -13,7 +13,7 @@ export const buildWithChatgpt: GoPageInput = {
   hero: {
     title: 'Build your app with ChatGPT and Supabase',
     description:
-      'Give your app user accounts, saved data, file uploads, and live updates. Build with ChatGPT, with Supabase powering your app.',
+      'Give your app a backend. Supabase brings together a Postgres database, user accounts, file uploads, and live updates in one project.',
     ctas: [
       {
         label: 'Start your project',
@@ -30,25 +30,28 @@ export const buildWithChatgpt: GoPageInput = {
   sections: [
     {
       type: 'feature-grid',
-      title: 'Why build with Supabase?',
+      title: 'Your app’s backend, in one project',
       columns: 2,
       items: [
         {
           title: 'Postgres Database',
-          description: 'Store and query your app data in a full Postgres database.',
+          description:
+            'Save your app’s data in a Postgres database. Store and query everything from user profiles to project records.',
         },
         {
           title: 'Authentication',
           description:
-            'Add signup and login with Supabase Auth. Control which data each user can access.',
+            'Let people sign up and sign in to your app. Control which data each user can access.',
         },
         {
           title: 'Storage',
-          description: 'Upload and serve images, documents, and other files.',
+          description:
+            'Let users upload images, documents, and other files. Store them and make them available in your app.',
         },
         {
           title: 'Realtime',
-          description: 'Keep users updated as app data changes, without refreshing.',
+          description:
+            'Show updates as your app’s data changes. Keep dashboards, notifications, and collaborative features current without refreshing.',
         },
       ],
     },
@@ -56,7 +59,7 @@ export const buildWithChatgpt: GoPageInput = {
       type: 'single-column',
       title: 'Connect Supabase directly to ChatGPT',
       description:
-        'Use the Supabase app to create tables, update your database, and deploy backend functions directly from your ChatGPT conversation.',
+        'You can also use the Supabase app in ChatGPT to create tables, update your database, and deploy backend functions from your conversation.',
       children: (
         <div className="flex flex-col items-center gap-4 text-center">
           <Button asChild variant="default" size="medium">
@@ -65,21 +68,21 @@ export const buildWithChatgpt: GoPageInput = {
             </a>
           </Button>
           <p className="max-w-xl text-sm text-foreground-light">
-            Connecting is optional. Check availability for your ChatGPT plan before connecting.
+            Connecting is optional. Check availability for your ChatGPT plan.
           </p>
           <a
             href="https://supabase.com/blog/supabase-is-now-an-official-chatgpt-app"
             className="text-sm text-foreground-light underline underline-offset-4 hover:text-foreground"
           >
-            Integration details
+            Integration details →
           </a>
         </div>
       ),
     },
     {
       type: 'single-column',
-      title: 'Put your next idea to work',
-      description: 'Bring your app idea to ChatGPT. Build it with Supabase.',
+      title: 'Give your app a backend',
+      description: 'Start a Supabase project for the app you’re building.',
       children: (
         <div className="flex justify-center">
           <Button asChild variant="primary" size="medium">
