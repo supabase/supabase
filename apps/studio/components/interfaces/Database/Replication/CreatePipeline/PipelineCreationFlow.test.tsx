@@ -274,18 +274,21 @@ describe('PipelineCreationFlow', () => {
   })
 
   it('blocks critical final validation and requires confirmation for warnings', async () => {
-    const { requests } = mockCreation()
+    const { requests, destinationRequests } = mockCreation()
     const onClose = vi.fn()
     await reachReview(onClose)
+    let validationRequests = 0
     let failure_type: 'critical' | 'warning' = 'critical'
     let reason = 'Check the publication.'
     addAPIMock({
       method: 'post',
       path: '/platform/replication/:ref/pipelines/validate',
-      response: () =>
-        HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+      response: () => {
+        validationRequests++
+        return HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
           validation_failures: [{ name: 'Publication issue', reason, failure_type }],
-        }),
+        })
+      },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
     expect(await screen.findByText('Check the publication.')).toBeInTheDocument()
@@ -316,16 +319,14 @@ describe('PipelineCreationFlow', () => {
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
     )
-    reason = 'The publication has changed.'
+    const validatedDestinations = destinationRequests.length
+    const validatedPipelines = validationRequests
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline anyway' }))
-    expect(await screen.findByText('The publication has changed.')).toBeInTheDocument()
-    expect(requests).toHaveLength(0)
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
-    )
-    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline anyway' }))
+    expect(screen.getByText('Check the publication.')).toBeInTheDocument()
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(requests).toHaveLength(1)
+    expect(destinationRequests).toHaveLength(validatedDestinations)
+    expect(validationRequests).toBe(validatedPipelines)
   })
 
   it('retains Review and retries after a final validation request fails', async () => {
