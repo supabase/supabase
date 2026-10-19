@@ -11,6 +11,9 @@ import {
 } from './tool-filter'
 import { contract as createNotebookContract } from './tools/create-notebook'
 import { contract as deleteNotebookContract } from './tools/delete-notebook'
+import { contract as getNotebookContract } from './tools/get-notebook'
+import { contract as listDatabasesContract } from './tools/list-databases'
+import { contract as listNotebooksContract } from './tools/list-notebooks'
 import { contract as runNotebookContract } from './tools/run-notebook'
 import { contract as updateNotebookContract } from './tools/update-notebook'
 
@@ -18,7 +21,7 @@ describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
     expect(TOOL_CATEGORY_MAP['search_docs']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
-    expect(TOOL_CATEGORY_MAP['list_notebooks']).toBe(TOOL_CATEGORIES.SCHEMA)
+    expect(TOOL_CATEGORY_MAP['list_reports']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
 })
 
@@ -26,6 +29,9 @@ describe('tools with a contract', () => {
   const contracts = {
     create_notebook: createNotebookContract,
     delete_notebook: deleteNotebookContract,
+    get_notebook: getNotebookContract,
+    list_databases: listDatabasesContract,
+    list_notebooks: listNotebooksContract,
     run_notebook: runNotebookContract,
     update_notebook: updateNotebookContract,
   }

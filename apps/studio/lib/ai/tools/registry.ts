@@ -5,6 +5,9 @@ import { contract as createNotebook } from './create-notebook'
 import { contract as deleteNotebook } from './delete-notebook'
 import { contract as deployEdgeFunction } from './deploy-edge-function'
 import { contract as executeSql } from './execute-sql'
+import { contract as getNotebook } from './get-notebook'
+import { contract as listDatabases } from './list-databases'
+import { contract as listNotebooks } from './list-notebooks'
 import { contract as loadKnowledge } from './load-knowledge'
 import { contract as renameChat } from './rename-chat'
 import { contract as runNotebook } from './run-notebook'
@@ -21,6 +24,9 @@ export const TOOL_CONTRACTS = {
   delete_notebook: deleteNotebook,
   deploy_edge_function: deployEdgeFunction,
   execute_sql: executeSql,
+  get_notebook: getNotebook,
+  list_databases: listDatabases,
+  list_notebooks: listNotebooks,
   load_knowledge: loadKnowledge,
   rename_chat: renameChat,
   run_notebook: runNotebook,
