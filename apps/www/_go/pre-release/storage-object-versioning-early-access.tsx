@@ -77,7 +77,7 @@ const page: GoPageInput = {
       submitLabel: 'Request access',
       successRedirect: '/go/storage-object-versioning-early-access/thank-you',
       disclaimer:
-        'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy).',
+        'By submitting this form, I confirm that I have read and understood the [Privacy Policy](https://supabase.com/privacy) and that my use of the Storage Object Versioning and Lifecycle Policies private alpha is a Beta Release, as defined in the Terms of Service, and is subject to the [Terms of Service](https://supabase.com/terms#c-beta-releases).',
       crm: {
         hubspot: {
           // TODO(storage-versioning): replace with the real HubSpot form GUID before launch.
