@@ -135,6 +135,14 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
       payload.PASSWORD_REQUIRED_CHARACTERS = ''
     }
 
+    // [Fix] Support newlines in SMS templates for WebOTP support (Issue #6435)
+    if (typeof payload.SMS_TEMPLATE === 'string') {
+      payload.SMS_TEMPLATE = payload.SMS_TEMPLATE.replace(/\\n/g, '\n')
+    }
+    if (typeof payload.MFA_PHONE_TEMPLATE === 'string') {
+      payload.MFA_PHONE_TEMPLATE = payload.MFA_PHONE_TEMPLATE.replace(/\\n/g, '\n')
+    }
+
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
