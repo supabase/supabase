@@ -146,6 +146,41 @@ describe('LayoutSidebarProvider sidebar deep link', () => {
     }
   )
 
+  test('clears ?sidebar= when the sidebar closes before the project loads', async () => {
+    let releaseProject = () => {}
+    const projectReleased = new Promise<void>((resolve) => {
+      releaseProject = resolve
+    })
+
+    const { queryClient, urlUpdates } = renderWithSidebarParam(SIDEBAR_KEYS.ADVISOR_PANEL, {
+      projectResponse: async () => {
+        await projectReleased
+        return HttpResponse.json<ProjectDetailResponse>(PROJECT)
+      },
+    })
+
+    await waitFor(() => {
+      expect(sidebarManagerState.activeSidebar?.id).toBe(SIDEBAR_KEYS.ADVISOR_PANEL)
+    })
+    expect(queryClient.getQueryData(projectKeys.detail(PROJECT_REF))).toBeUndefined()
+
+    act(() => {
+      sidebarManagerState.closeActive()
+    })
+
+    await waitFor(() => {
+      expect(urlUpdates).toEqual([
+        expect.objectContaining({
+          queryString: '',
+          options: expect.objectContaining({ history: 'replace' }),
+        }),
+      ])
+    })
+    expect(screen.getByTestId('sidebar-param').textContent).toBe('')
+
+    releaseProject()
+  })
+
   test('clears ?sidebar= on close when the panel opened before the project loaded', async () => {
     let releaseProject = () => {}
     const projectReleased = new Promise<void>((resolve) => {

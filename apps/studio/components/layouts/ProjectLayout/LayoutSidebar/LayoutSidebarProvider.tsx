@@ -88,14 +88,20 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     }
   )
 
-  // initial null means nothing has opened this visit. clearing ?sidebar= here
-  // queues a replace that drops a deep link before the url can open it.
-  // set even while the project is still loading, so a later close still clears.
+  // initial null means nothing has opened this visit. clearing ?sidebar= from
+  // that state queues a replace that drops a deep link before the url can open it.
+  // url clear cannot wait for the project query: this effect only reruns when
+  // activeSidebar changes, so a close before the project loads would leave ?sidebar=.
   const hasOpenedSidebarRef = useRef(false)
 
   useEffect(() => {
     if (activeSidebar) {
       hasOpenedSidebarRef.current = true
+    }
+
+    const shouldClearSidebarUrlParam = !activeSidebar && hasOpenedSidebarRef.current
+    if (shouldClearSidebarUrlParam) {
+      setSidebarUrlParam(null)
     }
 
     if (!project) {
@@ -109,13 +115,6 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     }
 
     setSidebarLocalStorage('')
-
-    const shouldClearSidebarUrlParam = hasOpenedSidebarRef.current
-    if (!shouldClearSidebarUrlParam) {
-      return
-    }
-
-    setSidebarUrlParam(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeSidebar])
 
