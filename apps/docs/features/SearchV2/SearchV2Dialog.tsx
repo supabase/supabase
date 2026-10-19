@@ -120,18 +120,6 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
     }
   }
 
-  function trackResultClicked(path: string) {
-    sendTelemetryEvent({
-      action: 'docs_search_v2_result_clicked',
-      properties: { resultPath: path, query: highlightQuery },
-    })
-  }
-
-  function handleSelect(path: string) {
-    trackResultClicked(path)
-    onResultSelect(path)
-  }
-
   // Announced via the aria-live region below — a sighted user sees the spinner/list update,
   // but a screen reader user gets no equivalent signal unless we say so explicitly. Also covers
   // the result count, which isn't reliably announced by the listbox/option roles alone.
@@ -201,8 +189,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
                 key={result.path}
                 result={result}
                 highlightQuery={highlightQuery}
-                onResultSelect={handleSelect}
-                onResultClick={trackResultClicked}
+                onResultSelect={onResultSelect}
                 onResultOpen={onResultOpen}
               />
             ))}
