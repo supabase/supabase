@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -371,7 +371,7 @@ export const SSOConfig = () => {
                       {!!ssoConfig && (
                         <Button
                           variant="danger"
-                          icon={<Trash />}
+                          icon={<TrashIcon />}
                           onClick={() => setIsDeleteModalVisible(true)}
                           disabled={isCreating || isUpdating || isDeleting}
                         >

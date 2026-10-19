@@ -59,14 +59,18 @@ export const SmoothstepEdge = ({
     }
   }, [pipelineStatusData?.status, requestStatus])
 
+  const edgeTargetX = shiftEdgeEnd ? targetX - 8 : targetX
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
     sourcePosition,
-    targetX: shiftEdgeEnd ? targetX - 8 : targetX,
+    targetX: edgeTargetX,
     targetY,
     targetPosition,
   })
+  // Branched paths label their shared vertical bend, so move the chip onto each final segment.
+  const chipX = shiftEdgeEnd ? (labelX + edgeTargetX) / 2 : labelX
+  const chipY = shiftEdgeEnd ? targetY : labelY
 
   const visual = getEdgeVisual(replicationState)
 
@@ -91,7 +95,7 @@ export const SmoothstepEdge = ({
         <div
           style={{
             position: 'absolute',
-            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+            transform: `translate(-50%, -50%) translate(${chipX}px,${chipY}px)`,
             pointerEvents: 'all',
           }}
           className="nodrag nopan"

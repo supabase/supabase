@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
   Button,
@@ -61,7 +61,7 @@ export const UsageBranchFilter = ({
           aria-label="Filter by branch"
           aria-expanded={isOpen}
           aria-controls={listboxId}
-          iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+          iconRight={<ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
         >
           <span className="truncate">{selectedBranch?.name}</span>
         </Button>
@@ -101,7 +101,9 @@ export const UsageBranchFilter = ({
                 >
                   <div className="w-full flex items-center justify-between gap-x-2">
                     <span className="truncate">{branch.name}</span>
-                    {branch.project_ref === selectedRef && <Check size={16} className="shrink-0" />}
+                    {branch.project_ref === selectedRef && (
+                      <CheckIcon size={16} className="shrink-0" />
+                    )}
                   </div>
                 </CommandItem>
               ))}

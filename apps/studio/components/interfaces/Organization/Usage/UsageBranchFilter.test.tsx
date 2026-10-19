@@ -125,7 +125,8 @@ describe('UsageBranchFilter', () => {
       )
 
       await user.click(screen.getByLabelText('Filter by branch'))
-      await user.type(await screen.findByPlaceholderText('Find branch...'), search)
+      await user.click(await screen.findByPlaceholderText('Find branch...'))
+      await user.paste(search)
 
       expect(screen.getAllByRole('option').length).toBeLessThan(200)
       expect(screen.getAllByRole('option')[0]).toHaveTextContent('release-candidate-199')

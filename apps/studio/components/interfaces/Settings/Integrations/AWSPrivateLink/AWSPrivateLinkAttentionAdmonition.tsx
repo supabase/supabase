@@ -1,4 +1,4 @@
-import { SquareArrowOutUpRight } from 'lucide-react'
+import { SquareArrowOutUpRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -26,7 +26,7 @@ export function AWSPrivateLinkAttentionAdmonition({
       className={className}
       actions={
         copy.shouldShowAcceptLink && (
-          <Button className="w-min" icon={<SquareArrowOutUpRight />} asChild>
+          <Button className="w-min" icon={<SquareArrowOutUpRightIcon />} asChild>
             <Link
               target="_blank"
               rel="noopener noreferrer"

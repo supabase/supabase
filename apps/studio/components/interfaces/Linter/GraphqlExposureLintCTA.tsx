@@ -1,6 +1,6 @@
 import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQueryClient } from '@tanstack/react-query'
-import { EyeOff, Lock } from 'lucide-react'
+import { EyeOffIcon, LockIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button } from 'ui'
@@ -128,7 +128,11 @@ export const GraphqlExposureLintCTA = ({
 
         <div className="space-y-5">
           <div className="flex gap-3">
-            <Lock className="text-foreground-light shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
+            <LockIcon
+              className="text-foreground-light shrink-0 mt-0.5"
+              size={20}
+              strokeWidth={1.5}
+            />
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-sm text-foreground">Data API access removed</p>
@@ -142,7 +146,11 @@ export const GraphqlExposureLintCTA = ({
           </div>
 
           <div className="flex gap-3">
-            <EyeOff className="text-foreground-light shrink-0 mt-0.5" size={20} strokeWidth={1.5} />
+            <EyeOffIcon
+              className="text-foreground-light shrink-0 mt-0.5"
+              size={20}
+              strokeWidth={1.5}
+            />
             <div>
               <p className="text-sm text-foreground">Schema hidden from GraphQL</p>
               <p className="text-sm text-foreground-light mt-1">

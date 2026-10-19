@@ -1,4 +1,4 @@
-import { Info } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
@@ -33,7 +33,7 @@ export const UsageFilterNotice = ({
                 size="tiny"
                 className="px-1"
                 aria-label="About usage totals"
-                icon={<Info size={14} />}
+                icon={<InfoIcon size={14} />}
               />
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">

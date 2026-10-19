@@ -36,8 +36,8 @@ import amoe from './legal/amoe'
 import amoeThankYou from './legal/amoe-thankyou'
 import contestRules from './legal/contest-rules'
 import byocEarlyAccess from './pre-release/byoc-early-access'
-import supabasePipelinesNewDestinations from './pre-release/supabase-pipelines-new-destinations'
-import supabasePipelinesNewDestinationsThankYou from './pre-release/supabase-pipelines-new-destinations-thank-you'
+import multigresEarlyAccess from './pre-release/multigres-early-access'
+import multigresEarlyAccessThankYou from './pre-release/multigres-early-access-thank-you'
 import supabaseStripeProjects from './stripe-projects/supabase-stripe-projects'
 
 const pages: GoPageInput[] = [
@@ -45,8 +45,8 @@ const pages: GoPageInput[] = [
   awsActivateOffer, // maintain forever
   exampleLeadGen, // sample lead gen page
   byocEarlyAccess, // maintain until PM says to remove
-  supabasePipelinesNewDestinations, // maintain while Pipelines destination early access is active
-  supabasePipelinesNewDestinationsThankYou, // maintain while Pipelines destination early access is active
+  multigresEarlyAccess, // maintain while the Multigres private alpha is active
+  multigresEarlyAccessThankYou, // maintain while the Multigres private alpha is active
   amoe, // maintain forever
   amoeThankYou, // maintain forever
   contestRules, // maintain forever

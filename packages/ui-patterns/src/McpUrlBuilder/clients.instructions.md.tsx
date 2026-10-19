@@ -210,6 +210,39 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  windsurf: {
+    primary: ({ url }) => (
+      <>
+        <paragraph>
+          These instructions use the Devin Local agent in Devin Desktop or Devin CLI. Add the
+          Supabase MCP server to your user configuration:
+        </paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['windsurf'].install!(url)} />
+      </>
+    ),
+    alternate: ({ isPlatform }) => (
+      <>
+        <paragraph>
+          On Windows, the configuration file is{' '}
+          <inlineCode value="%APPDATA%\devin\mcp_config.json" /> instead.
+        </paragraph>
+        {isPlatform && (
+          <>
+            <paragraph>
+              If you skipped the browser sign-in or need to re-authenticate, run:
+            </paragraph>
+            <code lang="bash" value={MCP_CLI_COMMANDS['windsurf'].authenticate!} />
+            <paragraph>Complete the authorization flow in your browser.</paragraph>
+          </>
+        )}
+        <paragraph>Check the server configuration:</paragraph>
+        <code lang="bash" value="devin mcp list" />
+        <paragraph>
+          Start a new Devin Local or Devin CLI session to load the server's tools.
+        </paragraph>
+      </>
+    ),
+  },
   goose: {
     primary: ({ url }) => (
       <>

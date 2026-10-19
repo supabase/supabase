@@ -1,6 +1,6 @@
 import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RefreshCw, RotateCcw, X } from 'lucide-react'
+import { RefreshCwIcon, RotateCcwIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -212,7 +212,7 @@ export const WithStatements = ({
               <Button
                 aria-label="Refresh"
                 size="tiny"
-                icon={<RefreshCw />}
+                icon={<RefreshCwIcon />}
                 onClick={handleRefresh}
                 className="w-[26px]"
               />
@@ -225,7 +225,7 @@ export const WithStatements = ({
               <Button
                 aria-label="Reset report"
                 size="tiny"
-                icon={<RotateCcw />}
+                icon={<RotateCcwIcon />}
                 onClick={() => setShowResetgPgStatStatements(true)}
                 className="w-[26px]"
               />
@@ -266,7 +266,7 @@ export const WithStatements = ({
           size="tiny"
           onClick={() => setShowBottomSection(false)}
         >
-          <X size="14" />
+          <XIcon size="14" />
         </Button>
         <div className="w-[33%] flex flex-col gap-y-1 text-sm">
           <p>Reset report</p>

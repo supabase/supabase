@@ -24,6 +24,9 @@ jobs:
     env:
       SEARCH_V2_SUPABASE_PROJECT_ID: ${{ secrets.SEARCH_V2_SUPABASE_PROJECT_ID }}
       SEARCH_V2_SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_V2_SUPABASE_SECRET_KEY }}
+      DOCS_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
+      DOCS_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
+      DOCS_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
 
     steps:
       - name: Check out repo
@@ -47,6 +50,10 @@ jobs:
 
       - name: Download dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Fetch federated content
+        working-directory: ./apps/docs
+        run: pnpm run build:federated-content
 
       - name: Ingest content
         working-directory: ./apps/docs

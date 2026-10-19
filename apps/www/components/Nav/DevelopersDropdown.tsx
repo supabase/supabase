@@ -3,6 +3,8 @@ import { data as DevelopersData } from 'data/Developers'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 type LinkProps = {
   text: string
   description?: string
@@ -23,12 +25,9 @@ export const DevelopersDropdown = () => {
               {column.label}
             </label>
             <ul className="flex flex-col gap-4">
-              {column.links.map(({ icon: Icon, ...link }: LinkProps) => (
-                <li key={link.text}>
-                  <Link
-                    href={link.url!}
-                    className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
-                  >
+              {column.links.map(({ icon: Icon, ...link }: LinkProps) => {
+                const label = (
+                  <>
                     {Icon && <Icon size={16} strokeWidth={1.3} />}
                     <span>{link.text}</span>
                     {link.text === 'Careers' && jobsCount > 0 && (
@@ -40,9 +39,28 @@ export const DevelopersDropdown = () => {
                       strokeWidth={2}
                       className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
                     />
-                  </Link>
-                </li>
-              ))}
+                  </>
+                )
+                return (
+                  <li key={link.text}>
+                    {isCrossZoneHref(link.url!) ? (
+                      <a
+                        href={link.url!}
+                        className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
+                      >
+                        {label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.url!}
+                        className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-ring rounded-sm"
+                      >
+                        {label}
+                      </Link>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </div>
         ))}

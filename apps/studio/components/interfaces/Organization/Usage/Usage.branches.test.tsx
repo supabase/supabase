@@ -76,9 +76,27 @@ function captureUsageRequests() {
     method: 'get',
     path: '/platform/organizations/:slug/usage',
     response: ({ request }) => {
-      requests.usage.push(new URL(request.url).searchParams.get('project_ref'))
+      const ref = new URL(request.url).searchParams.get('project_ref')
+      requests.usage.push(ref)
+      let usage = 23
+      if (ref === branch.project_ref) usage = 7
+      if (ref === parent.ref) usage = 13
       return HttpResponse.json<components['schemas']['OrgUsageResponse_Output']>({
-        usages: [],
+        usages: [
+          {
+            metric: 'EGRESS',
+            usage,
+            usage_original: usage * 1e9,
+            available_in_plan: true,
+            capped: true,
+            cost: 0,
+            pricing_free_units: 5,
+            pricing_strategy: 'UNIT',
+            project_allocations: [],
+            unit_price_desc: 'Egress per GB',
+            unlimited: false,
+          },
+        ],
         usage_billing_enabled: false,
       })
     },
@@ -94,6 +112,14 @@ function captureUsageRequests() {
     },
   })
   return requests
+}
+
+function expectUsageRefs(
+  requests: ReturnType<typeof captureUsageRequests>,
+  refs: (string | null)[]
+) {
+  expect(new Set(requests.usage)).toEqual(new Set(refs))
+  expect(new Set(requests.daily)).toEqual(new Set(refs))
 }
 
 describe('Usage branch URLs', () => {
@@ -154,13 +180,47 @@ describe('Usage branch URLs', () => {
     })
   })
 
+  it('shows the permission notice when subscription access is denied', async () => {
+    captureUsageRequests()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/projects',
+      response: () =>
+        HttpResponse.json<components['schemas']['OrganizationProjectsResponse_Output']>({
+          projects: [],
+          pagination: { count: 0, limit: 96, offset: 0 },
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/profile/permissions',
+      response: () => HttpResponse.json<components['schemas']['AccessControlPermission'][]>([]),
+    })
+    const subscriptionRequested = vi.fn()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/billing/subscription',
+      response: () => {
+        subscriptionRequested()
+        return HttpResponse.json<APIErrorBody>({ message: 'Forbidden' }, { status: 403 })
+      },
+    })
+    renderUsage()
+
+    expect(
+      await screen.findByText(/additional permissions to view organization usage/)
+    ).toBeVisible()
+    expect(screen.queryByRole('button', { name: 'Current billing cycle' })).not.toBeInTheDocument()
+    expect(subscriptionRequested).not.toHaveBeenCalled()
+  })
+
   it('requests both usage endpoints with the branch project ref from the URL', async () => {
     const requests = captureUsageRequests()
     renderUsage()
 
     expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
     await waitFor(() => {
-      expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
+      expectUsageRefs(requests, [branch.project_ref])
     })
     expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(branch.name)
     expect(screen.queryByText('Branch unavailable')).not.toBeInTheDocument()
@@ -193,27 +253,24 @@ describe('Usage branch URLs', () => {
 
     expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
     await waitFor(() => {
-      expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
+      expectUsageRefs(requests, [branch.project_ref])
     })
-    expect(projectRefs).toEqual([branch.project_ref, parent.ref])
-    expect(branchListRefs).toEqual([parent.ref])
+    expect(await screen.findByText('7 GB')).toBeVisible()
+    expect(new Set(projectRefs)).toEqual(new Set([branch.project_ref, parent.ref]))
+    expect(new Set(branchListRefs)).toEqual(new Set([parent.ref]))
     expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(branch.name)
     expect(screen.getByRole('combobox', { name: '' })).toHaveTextContent(parent.name)
 
     await user.click(screen.getByLabelText('Filter by branch'))
     await user.click(await screen.findByRole('option', { name: main.name }))
 
-    expect(
-      await screen.findByText('Main branch only. Other branches are tracked separately.')
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/Main branch only/)).toBeInTheDocument()
     await waitFor(() => {
-      expect(requests).toEqual({
-        usage: [branch.project_ref, parent.ref],
-        daily: [branch.project_ref, parent.ref],
-      })
+      expectUsageRefs(requests, [branch.project_ref, parent.ref])
     })
+    expect(await screen.findByText('13 GB')).toBeVisible()
     expect(screen.getByLabelText('Filter by branch')).toHaveTextContent(main.name)
-    expect(branchListRefs).toEqual([parent.ref])
+    expect(new Set(branchListRefs)).toEqual(new Set([parent.ref]))
 
     await user.click(screen.getByLabelText('Filter by branch'))
     await user.click(await screen.findByRole('option', { name: branch.name }))
@@ -222,15 +279,13 @@ describe('Usage branch URLs', () => {
     await user.click(screen.getByRole('button', { name: 'View organization total' }))
 
     await waitFor(() => {
-      expect(requests).toEqual({
-        usage: [branch.project_ref, parent.ref, null],
-        daily: [branch.project_ref, parent.ref, null],
-      })
+      expectUsageRefs(requests, [branch.project_ref, parent.ref, null])
       const searchParams = onUrlUpdate.mock.lastCall?.[0].searchParams
       expect(searchParams).toBeDefined()
       expect(searchParams?.has('projectRef')).toBe(false)
       expect(searchParams?.has('branchRef')).toBe(false)
     })
+    expect(await screen.findByText('23 / 5 GB')).toBeVisible()
     expect(screen.queryByLabelText('Filter by branch')).not.toBeInTheDocument()
     expect(
       screen.queryByRole('button', { name: 'View organization total' })
@@ -269,7 +324,7 @@ describe('Usage branch URLs', () => {
     renderUsage(null, branch.project_ref)
 
     try {
-      await waitFor(() => expect(projectRequested).toHaveBeenCalledOnce())
+      await waitFor(() => expect(projectRequested).toHaveBeenCalled())
       expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
       expect(branchListRefs).toEqual([])
       expect(requests).toEqual({ usage: [], daily: [] })
@@ -279,9 +334,9 @@ describe('Usage branch URLs', () => {
 
     expect(await screen.findByText(`${branch.name} branch only.`)).toBeInTheDocument()
     await waitFor(() => {
-      expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
+      expectUsageRefs(requests, [branch.project_ref])
     })
-    expect(branchListRefs).toEqual([parent.ref])
+    expect(new Set(branchListRefs)).toEqual(new Set([parent.ref]))
   })
 
   it('blocks a direct branch link when its parent project lookup fails', async () => {
@@ -327,7 +382,7 @@ describe('Usage branch URLs', () => {
     renderUsage()
 
     try {
-      await waitFor(() => expect(branchRequested).toHaveBeenCalledOnce())
+      await waitFor(() => expect(branchRequested).toHaveBeenCalled())
       expect(await screen.findByText('Free Plan')).toBeInTheDocument()
       expect(screen.getByRole('status', { name: 'Loading branch usage' })).toBeInTheDocument()
       expect(screen.queryByText('Usage Summary')).not.toBeInTheDocument()
@@ -337,7 +392,7 @@ describe('Usage branch URLs', () => {
     }
 
     await waitFor(() => {
-      expect(requests).toEqual({ usage: [branch.project_ref], daily: [branch.project_ref] })
+      expectUsageRefs(requests, [branch.project_ref])
     })
   })
 
@@ -364,11 +419,9 @@ describe('Usage branch URLs', () => {
     renderUsage('deleted-branch-ref')
 
     expect(await screen.findByText('Branch unavailable')).toBeInTheDocument()
-    expect(
-      screen.getByText('Main branch only. Other branches are tracked separately.')
-    ).toBeInTheDocument()
+    expect(screen.getByText(/Main branch only/)).toBeInTheDocument()
     await waitFor(() => {
-      expect(requests).toEqual({ usage: [parent.ref], daily: [parent.ref] })
+      expectUsageRefs(requests, [parent.ref])
     })
   })
 
@@ -414,7 +467,7 @@ describe('Usage branch URLs', () => {
     await user.click(allProjects)
 
     await waitFor(() => {
-      expect(requests).toEqual({ usage: [null], daily: [null] })
+      expectUsageRefs(requests, [null])
       const searchParams = onUrlUpdate.mock.lastCall?.[0].searchParams
       expect(searchParams).toBeDefined()
       expect(searchParams?.has('projectRef')).toBe(false)

@@ -103,7 +103,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          zero_rules=$(jq -r '.rules | to_entries | map(select(.value == 0) | .key) | join(", ")' apps/studio/.github/eslint-rule-baselines.json)
+          zero_rules=$(jq -r '.rules | to_entries | map(select(.value == 0 and (.key | startswith("shadcn/") | not)) | .key) | join(", ")' apps/studio/.github/eslint-rule-baselines.json)
 
           if [ -z "$zero_rules" ]; then
             echo "No rules dropped to a baseline of 0; nothing to notify."

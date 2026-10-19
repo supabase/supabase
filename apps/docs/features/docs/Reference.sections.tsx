@@ -297,15 +297,21 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     .filter((code) => code.startsWith('2'))
     .sort()[0]
 
+  const stabilityLabel = endpointDetails.deprecated
+    ? 'deprecated'
+    : endpointDetails['x-scalar-stability'] === 'experimental'
+      ? 'experimental'
+      : undefined
+
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader
         title={
           <>
             {endpointDetails.summary}
-            {endpointDetails.deprecated && (
+            {stabilityLabel && (
               <Badge variant="warning" className="ml-2">
-                deprecated
+                {stabilityLabel}
               </Badge>
             )}
           </>

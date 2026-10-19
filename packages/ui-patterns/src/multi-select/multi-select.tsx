@@ -48,7 +48,7 @@ const DROPDOWN_GAP = 8
 const DROPDOWN_BORDER_HEIGHT = 2
 
 const commandItemClass = cn(
-  'relative text-foreground-light text-left px-2 py-1.5 rounded-xs',
+  'relative text-foreground-light text-left px-2 py-1.5 rounded-item',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
   'peer-data-[value=true]:bg-overlay-hover'
 )

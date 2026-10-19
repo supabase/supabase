@@ -1,4 +1,4 @@
-import { Pointer } from 'lucide-react'
+import { PointerIcon } from 'lucide-react'
 import { cn, TreeViewItemVariant } from 'ui'
 import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 
@@ -18,7 +18,7 @@ export const TableMenuEmptyState = () => {
             <div className="absolute inset-0 bg-linear-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />
           </div>
           <div className="absolute left-[150px] bottom-[21px] text-foreground-muted z-10 pointer-events-none">
-            <Pointer size={16} className="text-foreground-light" strokeWidth={1.5} />
+            <PointerIcon size={16} className="text-foreground-light" strokeWidth={1.5} />
           </div>
           {[...Array(4)].map((_, i) => (
             <div className="border-l pointer-events-none" key={`some-${i}`}>

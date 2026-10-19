@@ -1,3 +1,4 @@
+import { MAX_ARRAY_SIZE } from '@supabase/pg-meta/src/query/table-row-query'
 import { describe, expect, it, vi } from 'vitest'
 
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
@@ -335,14 +336,26 @@ describe('isValueTruncated', () => {
     const jsonArrayTruncated = `[${Array(5).fill('{"key":"value"}').join(',')},{"truncated":true}]`
     expect(isValueTruncated(jsonArrayTruncated)).toBe(true)
 
-    // Pattern 4: Multi-dimensional array (lines 211-212)
-    // column[1:50]::type[] - no special marker, just detect by [[ pattern
-    expect(isValueTruncated('[["item"]]', '_text')).toBe(true)
-    expect(isValueTruncated('[["item1","item2"]]', '_text')).toBe(true)
+    // Pattern 4: Multi-dimensional array
+    // column[1:50]::type[] + an extra entry filled with '...'
   })
 
-  it('should detect multidimensional arrays', () => {
-    expect(isValueTruncated('[["item1", "item2"]]', '_text')).toBe(true)
+  it('should detect multidimensional arrays with the truncation marker row', () => {
+    expect(isValueTruncated('[["a","b"],["c","d"],["...","..."]]', '_text')).toBe(true)
+    expect(isValueTruncated('[[["a","b"]],[["...","..."]]]', '_text')).toBe(true)
+    expect(isValueTruncated('[[{"k":1}],[{"truncated":true}]]', '_jsonb')).toBe(true)
+  })
+
+  it('should not flag multidimensional arrays or 1D arrays of JSON arrays that are not truncated', () => {
+    expect(isValueTruncated('[["item1","item2"],["item3","item4"]]', '_text')).toBe(false)
+    expect(isValueTruncated('[["item"]]', '_jsonb')).toBe(false)
+    expect(isValueTruncated('[["item"', '_jsonb')).toBe(false)
+    // empty trailing entries have no marker
+    expect(isValueTruncated('[["a"],[]]', '_text')).toBe(false)
+    expect(isValueTruncated('[["a"],[[]]]', '_text')).toBe(false)
+    // exactly MAX_ARRAY_SIZE entries, but complete
+    const rows = Array.from({ length: MAX_ARRAY_SIZE }, (_, i) => [`a${i}`, 'b'])
+    expect(isValueTruncated(JSON.stringify(rows), '_text')).toBe(false)
   })
 
   it('should detect truncated JSON arrays with truncated flag', () => {

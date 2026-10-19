@@ -2,7 +2,7 @@
 
 import { useParams } from 'common'
 import { Auth } from 'icons'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useMemo } from 'react'
 
 import {
@@ -85,7 +85,7 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
       <div className="flex items-center gap-x-2">
         {isLoadingPolicies ? (
           <span className="flex items-center gap-2">
-            <Loader2 size={14} className="animate-spin" /> Loading...
+            <Loader2Icon size={14} className="animate-spin" /> Loading...
           </span>
         ) : (
           <span>

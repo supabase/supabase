@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { UserPlus } from 'lucide-react'
+import { UserPlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -288,7 +288,7 @@ export const InviteMemberButton = () => {
           <ButtonTooltip
             variant="primary"
             disabled={isInviteDisabled}
-            icon={<UserPlus size={14} />}
+            icon={<UserPlusIcon size={14} />}
             className="pointer-events-auto grow md:grow-0"
             onClick={() => setIsOpen(true)}
             tooltip={{
@@ -358,12 +358,20 @@ export const InviteMemberButton = () => {
                           const canAssignRole = rolesAddable.includes(role.id)
                           const isOwnerRole = role.name === 'Owner'
                           const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                          const disabled = !canAssignRole || disabledForStripe
+
+                          const isNoAccessRole = role.name === 'No-access'
+                          const isApplyingProjectRole = !applyToOrg
+                          const disabledForProjectRole = isApplyingProjectRole && isNoAccessRole
+
+                          const disabled =
+                            !canAssignRole || disabledForStripe || disabledForProjectRole
                           const disabledReason = disabledForStripe
                             ? 'Cannot be assigned in Stripe Projects organizations'
-                            : !canAssignRole
-                              ? 'Additional permissions required to assign role'
-                              : undefined
+                            : disabledForProjectRole
+                              ? 'Cannot assign No-access role to project-scoped members'
+                              : !canAssignRole
+                                ? 'Additional permissions required to assign role'
+                                : undefined
 
                           return (
                             <FormItem asChild key={role.id}>

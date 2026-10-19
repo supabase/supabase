@@ -6,7 +6,7 @@ const ComponentStatus = z.enum([
   'partial_outage',
   'full_outage',
 ])
-const WorstImpact = z.enum(['degraded_performance', 'partial_outage', 'full_outage'])
+export const WorstImpactSchema = z.enum(['degraded_performance', 'partial_outage', 'full_outage'])
 
 export const AffectedComponentSchema = z.object({
   id: z.string(),
@@ -27,7 +27,7 @@ const Base = {
 export const WidgetIncidentSchema = z.object({
   ...Base,
   status: z.enum(['investigating', 'identified', 'monitoring']).catch('investigating'),
-  current_worst_impact: WorstImpact.catch('full_outage'),
+  current_worst_impact: WorstImpactSchema.catch('full_outage'),
 })
 
 export const WidgetInProgressMaintenanceSchema = z.object({
@@ -94,3 +94,4 @@ export const StatusPageResponseSchema = WidgetResponseSchema.extend({
 export type WidgetResponse = z.infer<typeof WidgetResponseSchema>
 export type StatusPageResponse = z.infer<typeof StatusPageResponseSchema>
 export type AffectedComponent = z.infer<typeof AffectedComponentSchema>
+export type WorstImpact = z.infer<typeof WorstImpactSchema>

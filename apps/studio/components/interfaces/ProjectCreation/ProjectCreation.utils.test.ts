@@ -6,13 +6,18 @@ import {
   HIGH_AVAILABILITY_POSTGRES_ENGINE,
   HIGH_AVAILABILITY_RELEASE_CHANNEL,
 } from './ProjectCreation.constants'
+import type { AvailableRegions } from './ProjectCreation.utils'
 import {
+  extractPostgresVersionDetails,
   filterHighAvailabilityRegions,
   getAvailableRegions,
+  getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
+  getRegionSelectionType,
   resolveDefaultDbRegion,
-  resolveSelectedRegionOptionType,
+  resolvePostgresVersion,
 } from './ProjectCreation.utils'
+import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 
 describe('resolveDefaultDbRegion', () => {
   const base = {
@@ -70,55 +75,6 @@ describe('resolveDefaultDbRegion', () => {
   })
 })
 
-describe('resolveSelectedRegionOptionType', () => {
-  const smartGroupRegions = [{ name: 'Americas' }, { name: 'APAC' }]
-  const specificRegions = [{ name: 'ap-southeast-1' }, { name: 'us-east-1' }]
-
-  it('returns general when the "Best available region" shortcut was used', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: true,
-        dbRegion: 'ap-southeast-1',
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBe('general')
-  })
-
-  it('returns general when the region was picked from the smart group list', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: false,
-        dbRegion: 'Americas',
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBe('general')
-  })
-
-  it('returns specific when the region was picked from the specific regions list', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: false,
-        dbRegion: 'ap-southeast-1',
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBe('specific')
-  })
-
-  it('returns undefined when the region matches neither list', () => {
-    expect(
-      resolveSelectedRegionOptionType({
-        isBestAvailableSelected: false,
-        dbRegion: undefined,
-        smartGroupRegions,
-        specificRegions,
-      })
-    ).toBeUndefined()
-  })
-})
-
 describe('getAvailableRegions', () => {
   it.each(['local', 'staging', 'prod'])('returns all AWS regions for AWS on %s', (environment) => {
     expect(getAvailableRegions('AWS', environment)).toEqual(AWS_REGIONS)
@@ -164,4 +120,183 @@ describe('High Availability project creation constraints', () => {
       expect(filterHighAvailabilityRegions(regions, false, environment)).toEqual(regions)
     }
   )
+})
+
+describe('getFreeTierGeneralRegionExperimentVariant', () => {
+  const base = {
+    isFreePlan: true,
+    smartRegionEnabled: true,
+    enrollmentFlag: true,
+    selectionFlag: true,
+  }
+
+  it('returns test when in the experiment and the selection flag is on', () => {
+    expect(getFreeTierGeneralRegionExperimentVariant(base)).toBe('test')
+  })
+
+  it('returns control when in the experiment and the selection flag is off', () => {
+    expect(getFreeTierGeneralRegionExperimentVariant({ ...base, selectionFlag: false })).toBe(
+      'control'
+    )
+  })
+
+  it('returns undefined for a paid plan', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, isFreePlan: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when smart regions are disabled (AWS_NIMBUS)', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, smartRegionEnabled: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when the enrollment flag is off', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
+    ).toBeUndefined()
+  })
+
+  it('returns undefined when the enrollment flag is off even if the selection flag is on', () => {
+    expect(
+      getFreeTierGeneralRegionExperimentVariant({
+        ...base,
+        enrollmentFlag: false,
+        selectionFlag: true,
+      })
+    ).toBeUndefined()
+  })
+})
+
+describe('getRegionSelectionType', () => {
+  const availableRegions: AvailableRegions = {
+    smartGroup: [{ code: 'americas', name: 'Americas', type: 'smartGroup' }],
+    specific: [
+      { code: 'us-east-1', name: 'East US (North Virginia)', provider: 'AWS', type: 'specific' },
+    ],
+  }
+
+  it('classifies a smart group region as general', () => {
+    expect(getRegionSelectionType({ dbRegion: 'Americas', availableRegions })).toBe('general')
+  })
+
+  it('classifies a specific region as specific', () => {
+    expect(getRegionSelectionType({ dbRegion: 'East US (North Virginia)', availableRegions })).toBe(
+      'specific'
+    )
+  })
+
+  it('returns undefined when the region matches neither list', () => {
+    expect(getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions })).toBeUndefined()
+  })
+
+  it('returns undefined when dbRegion is undefined', () => {
+    expect(getRegionSelectionType({ dbRegion: undefined, availableRegions })).toBeUndefined()
+  })
+
+  it('returns undefined when availableRegions is undefined', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
+    ).toBeUndefined()
+  })
+
+  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'East US (North Virginia)',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBe('auto')
+  })
+
+  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: 'Nonexistent',
+        availableRegions,
+        isDbRegionDirty: false,
+      })
+    ).toBeUndefined()
+  })
+
+  it('classifies a touched field normally', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
+    ).toBe('general')
+  })
+})
+
+describe('extractPostgresVersionDetails', () => {
+  it('splits engine and release channel', () => {
+    expect(extractPostgresVersionDetails('17|ga')).toEqual({
+      postgresEngine: '17',
+      releaseChannel: 'ga',
+    })
+  })
+
+  it('returns undefined fields for an empty value', () => {
+    expect(extractPostgresVersionDetails('')).toEqual({
+      postgresEngine: undefined,
+      releaseChannel: undefined,
+    })
+  })
+})
+
+describe('resolvePostgresVersion', () => {
+  const availableOrioleVersion: {
+    postgres_engine: PostgresEngine
+    release_channel: ReleaseChannel
+  } = { postgres_engine: '17-oriole', release_channel: 'preview' }
+
+  it('uses the selection for OrioleDB when it is an OrioleDB version', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17-oriole|ga',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'ga' })
+  })
+
+  it('falls back to the available OrioleDB image when there is no selection', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'preview' })
+  })
+
+  it('falls back to the available OrioleDB image when the selection is a stale Postgres version', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17|ga',
+        useOrioleDb: true,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17-oriole', releaseChannel: 'preview' })
+  })
+
+  it('uses the selection for Postgres', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17|ga',
+        useOrioleDb: false,
+        availableOrioleVersion,
+      })
+    ).toEqual({ postgresEngine: '17', releaseChannel: 'ga' })
+  })
+
+  it('ignores a stale OrioleDB selection when OrioleDB is off', () => {
+    expect(
+      resolvePostgresVersion({
+        postgresVersionSelection: '17-oriole|ga',
+        useOrioleDb: false,
+        availableOrioleVersion,
+      })
+    ).toEqual({})
+  })
 })

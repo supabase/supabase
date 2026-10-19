@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -51,7 +51,7 @@ export const IntrospectionDisabledNotice = ({
             <Button
               variant="text"
               size="tiny"
-              icon={<ChevronDown />}
+              icon={<ChevronDownIcon />}
               onClick={() => setIsCollapsed(false)}
               aria-label="Show introspection notice details"
             />
@@ -82,7 +82,7 @@ export const IntrospectionDisabledNotice = ({
             className="absolute right-2 top-2"
             variant="text"
             size="tiny"
-            icon={<ChevronUp />}
+            icon={<ChevronUpIcon />}
             onClick={() => setIsCollapsed(true)}
             aria-label="Collapse introspection notice"
           />

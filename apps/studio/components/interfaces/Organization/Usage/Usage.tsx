@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ChartArea, Check, ChevronDown } from 'lucide-react'
+import { ChartAreaIcon, CheckIcon, ChevronDownIcon } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
@@ -121,7 +121,7 @@ export const Usage = () => {
   const {
     data: subscription,
     error: subscriptionError,
-    isPending: isLoadingSubscription,
+    isLoading: isLoadingSubscription,
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery(
@@ -191,7 +191,7 @@ export const Usage = () => {
     return (
       <div className="flex flex-1 items-center justify-center p-6">
         <HighAvailabilityDisabledEmptyState
-          icon={ChartArea}
+          icon={ChartAreaIcon}
           title="Usage unavailable on High Availability projects"
           description="Usage insights for High Availability projects are coming soon."
         />
@@ -258,7 +258,9 @@ export const Usage = () => {
                           aria-expanded={open}
                           aria-controls={listboxId}
                           className="justify-between w-[180px]"
-                          iconRight={<ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                          iconRight={
+                            <ChevronDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          }
                         >
                           {selectedProject?.name ?? selectedProjectRef ?? 'All projects'}
                         </Button>
@@ -271,7 +273,7 @@ export const Usage = () => {
                           <span className={cn('truncate', isSelected ? 'max-w-60' : 'max-w-64')}>
                             {project.name}
                           </span>
-                          {isSelected && <Check size={16} />}
+                          {isSelected && <CheckIcon size={16} />}
                         </div>
                       )
                     }}
@@ -289,7 +291,7 @@ export const Usage = () => {
                           }}
                         >
                           All projects
-                          {!selectedProjectRef && <Check size={16} />}
+                          {!selectedProjectRef && <CheckIcon size={16} />}
                         </CommandItem>
                       </CommandGroup>
                     )}
