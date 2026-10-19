@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList } from './helpers'
+import { filterByList, relationIdentArgs } from './helpers'
 import {
   ident,
   joinSqlFragments,
@@ -185,20 +185,6 @@ type TablePrivilegesGrant = {
     | 'TRIGGER'
     | 'MAINTAIN'
   isGrantable?: boolean
-}
-/**
- * The `%I.%I` arguments of a `format()` call that name a relation: the schema
- * and name of the relation with the given oid.
- *
- * The statements below deliberately avoid `format('… %s …', <oid>::regclass)`:
- * `%s` substitutes raw text, so a PL/pgSQL body using it can't be proven to
- * build a fixed statement. Servers that statically check `DO` blocks (such as
- * Multigres) reject those. A format string made only of `%I`/`%L` conversions
- * can be checked, and builds the same statement.
- */
-function relationIdentArgs(relationId: number): SafeSqlFragment {
-  const id = literal(relationId)
-  return safeSql`(select n.nspname from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = ${id}), (select relname from pg_class where oid = ${id})`
 }
 
 function granteeSql(grantee: string): SafeSqlFragment {

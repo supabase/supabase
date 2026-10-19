@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
-import { filterByList } from './helpers'
+import { filterByList, relationIdentArgs } from './helpers'
 import { ident, keyword, literal, rawSql, safeSql, type SafeSqlFragment } from './pg-format'
 import { COLUMNS_SQL } from './sql/columns'
 
@@ -321,7 +321,7 @@ BEGIN
       AND conrelid = ${literal(old.table_id)}
       AND conkey[1] = ${literal(old.ordinal_position)}
   LOOP
-    EXECUTE ${literal(`ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT `)} || quote_ident(r.conname);
+    EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I', ${relationIdentArgs(old.table_id)}, r.conname);
   END LOOP;
 END
 $$;`
@@ -361,7 +361,7 @@ BEGIN
     LIMIT 1;
 
   IF v_conname IS NOT NULL THEN
-    EXECUTE format('ALTER TABLE ${ident(old.schema)}.${ident(old.table)} DROP CONSTRAINT %I', v_conname);
+    EXECUTE format('ALTER TABLE %I.%I DROP CONSTRAINT %I', ${relationIdentArgs(old.table_id)}, v_conname);
   END IF;
   ${addCheckSql}
 END
