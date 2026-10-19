@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import mockRouter from 'next-router-mock'
@@ -8,6 +9,30 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import { TableEditorMenu } from './TableEditorMenu'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
+type SchemaListRow = { id: number; name: string }
+type EntityTypesPage = { data: { entities: []; count: number } }
+
+const PROJECT: ProjectDetailResponse = {
+  cloud_provider: 'localhost',
+  connectionString: null,
+  db_host: 'localhost',
+  high_availability: false,
+  id: 1,
+  inserted_at: '2021-08-02T06:40:40.646Z',
+  integration_source: null,
+  is_branch_enabled: false,
+  is_physical_backups_enabled: false,
+  name: 'Default Project',
+  organization_id: 1,
+  ref: 'default',
+  region: 'local',
+  restUrl: 'http://localhost:8000',
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: '2021-08-02T06:40:40.646Z',
+}
 
 mockAnimationsApi()
 
@@ -28,18 +53,7 @@ const mockMenuApis = () => {
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref',
-    // @ts-expect-error partial project response
-    response: {
-      cloud_provider: 'localhost',
-      id: 1,
-      inserted_at: '2021-08-02T06:40:40.646Z',
-      name: 'Default Project',
-      organization_id: 1,
-      ref: 'default',
-      region: 'local',
-      status: 'ACTIVE_HEALTHY',
-      high_availability: false,
-    },
+    response: PROJECT,
   })
 
   addAPIMock({
@@ -49,7 +63,7 @@ const mockMenuApis = () => {
       const key = new URL(request.url).searchParams.get('key') ?? ''
 
       if (key === 'schemas') {
-        return HttpResponse.json([
+        return HttpResponse.json<SchemaListRow[]>([
           { id: 1, name: 'public' },
           { id: 2, name: 'auth' },
           { id: 3, name: 'extensions' },
@@ -57,10 +71,10 @@ const mockMenuApis = () => {
       }
 
       if (key.startsWith('entity-types')) {
-        return HttpResponse.json([{ data: { entities: [], count: 0 } }])
+        return HttpResponse.json<EntityTypesPage[]>([{ data: { entities: [], count: 0 } }])
       }
 
-      return HttpResponse.json([])
+      return HttpResponse.json<unknown[]>([])
     },
   })
 }

@@ -6,10 +6,8 @@ import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
-import {
-  readExplicitSchemaQueryParam,
-  shouldOpenLastTableOnEditorIndex,
-} from '@/components/layouts/TableEditorLayout/TableEditorIndex.utils'
+import { getFirstQueryParam } from '@/components/layouts/TableEditorLayout/getFirstQueryParam'
+import { shouldOpenLastTableOnEditorIndex } from '@/components/layouts/TableEditorLayout/TableEditorIndex.utils'
 import { TableEditorLayout } from '@/components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from '@/components/layouts/Tabs/NewTab'
@@ -26,7 +24,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
   const hasDecidedRedirectRef = useRef(false)
-  const explicitSchema = readExplicitSchemaQueryParam(router.query.schema)
+  const explicitSchema = getFirstQueryParam(router.query.schema)
 
   const onTableCreated = (table: { id: number }) => {
     router.push(
@@ -74,11 +72,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       lastTableSchema: tableSchema,
     })
 
-    if (!shouldRedirect) {
-      return
-    }
-
-    if (tableId === undefined) {
+    if (!shouldRedirect || tableId === undefined) {
       return
     }
 

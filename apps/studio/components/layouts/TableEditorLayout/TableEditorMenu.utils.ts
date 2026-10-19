@@ -1,13 +1,3 @@
-export function readSidebarQueryParam(sidebar: string | string[] | undefined): string | undefined {
-  const value = Array.isArray(sidebar) ? sidebar[0] : sidebar
-
-  if (typeof value !== 'string' || value.length === 0) {
-    return undefined
-  }
-
-  return value
-}
-
 export function shouldLeaveOpenTableForSchema({
   entityId,
   nextSchema,

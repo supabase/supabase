@@ -1,20 +1,4 @@
-export function readExplicitSchemaQueryParam(
-  schema: string | string[] | undefined
-): string | undefined {
-  const value = Array.isArray(schema) ? schema[0] : schema
-
-  if (typeof value !== 'string' || value.length === 0) {
-    return undefined
-  }
-
-  return value
-}
-
-/**
- * Open the last table only on a fresh visit. Back/Forward must stay where
- * history landed, and an explicit schema only redirects when that table
- * belongs to it.
- */
+// open the last table only on a fresh visit, and only when it belongs to an explicit schema
 export function shouldOpenLastTableOnEditorIndex({
   isHistoryTraverse,
   hasLastTable,

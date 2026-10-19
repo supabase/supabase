@@ -2,7 +2,6 @@ import { describe, expect, test } from 'vitest'
 
 import {
   buildTableEditorSchemaListPath,
-  readSidebarQueryParam,
   shouldLeaveOpenTableForSchema,
 } from './TableEditorMenu.utils'
 
@@ -69,20 +68,5 @@ describe('buildTableEditorSchemaListPath', () => {
     expect(buildTableEditorSchemaListPath({ projectRef: 'default', schema: 'custom schema' })).toBe(
       '/project/default/editor?schema=custom+schema'
     )
-  })
-})
-
-describe('readSidebarQueryParam', () => {
-  test('returns a sidebar value', () => {
-    expect(readSidebarQueryParam('ai-assistant')).toBe('ai-assistant')
-  })
-
-  test('returns the first repeated value', () => {
-    expect(readSidebarQueryParam(['advisor-panel', 'help-panel'])).toBe('advisor-panel')
-  })
-
-  test('ignores a missing or empty value', () => {
-    expect(readSidebarQueryParam(undefined)).toBeUndefined()
-    expect(readSidebarQueryParam('')).toBeUndefined()
   })
 })

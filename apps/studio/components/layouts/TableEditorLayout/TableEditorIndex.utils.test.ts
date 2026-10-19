@@ -1,25 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  readExplicitSchemaQueryParam,
-  shouldOpenLastTableOnEditorIndex,
-} from './TableEditorIndex.utils'
-
-describe('readExplicitSchemaQueryParam', () => {
-  test('returns a schema query value', () => {
-    expect(readExplicitSchemaQueryParam('public')).toBe('public')
-  })
-
-  test('returns the first value when the query repeats the key', () => {
-    expect(readExplicitSchemaQueryParam(['auth', 'public'])).toBe('auth')
-  })
-
-  test('treats a missing or empty value as no explicit schema', () => {
-    expect(readExplicitSchemaQueryParam(undefined)).toBeUndefined()
-    expect(readExplicitSchemaQueryParam('')).toBeUndefined()
-    expect(readExplicitSchemaQueryParam([])).toBeUndefined()
-  })
-})
+import { shouldOpenLastTableOnEditorIndex } from './TableEditorIndex.utils'
 
 describe('shouldOpenLastTableOnEditorIndex', () => {
   test('opens the last table on a fresh visit with no schema param', () => {
