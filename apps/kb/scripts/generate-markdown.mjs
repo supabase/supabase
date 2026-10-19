@@ -28,9 +28,8 @@ const SITE_ORIGIN = 'https://supabase.com'
 // Single processor reused for every file: parses GFM markdown to an mdast
 // tree and serializes it back, same extensions on both ends so nothing
 // (tables, strikethrough, alert blockquotes) gets mangled in the round trip.
-// `emphasis`/`rule` match the markers content already uses (see
-// src/content/guides/sample-guide.mdx) so the round trip doesn't normalize
-// authors' `_italic_`/`---` into the serializer's own `*italic*`/`***`.
+// `emphasis`/`rule` match the markers content already uses, so the round trip
+// doesn't normalize authors' `_italic_`/`---` into the serializer's own `*italic*`/`***`.
 const processor = unified()
   .use(remarkParse)
   .use(remarkGfm)
