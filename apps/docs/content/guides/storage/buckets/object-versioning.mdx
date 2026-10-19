@@ -70,7 +70,7 @@ await supabase.storage.updateBucket('avatars', { public: false, versioningStatus
 
 <Admonition type="caution">
 
-Changing the versioning status with `updateBucket` can also change who can read the bucket. Pass the bucket's existing `public` value to keep it unchanged.
+The JavaScript SDK requires `public` when you call `updateBucket`. To keep the bucket's visibility unchanged, pass its current `public` value, which `getBucket` returns.
 
 </Admonition>
 
