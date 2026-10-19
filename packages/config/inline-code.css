@@ -15,7 +15,7 @@
   ) {
     @apply break-all tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
 
-    font-size: calc(1em - 2px);
+    font-size: max(0.75rem, calc(1em - 2px));
     line-height: inherit;
   }
 }
@@ -38,7 +38,7 @@
   ) {
     @apply break-all tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground font-medium;
 
-    font-size: calc(1em - 2px);
+    font-size: max(0.75rem, calc(1em - 2px));
     line-height: inherit;
 
     &::before,

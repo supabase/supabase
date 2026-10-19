@@ -22,11 +22,12 @@ to use each green.
 
 Inline `code` elements use shared styles by default in Studio, docs, www, and design-system.
 The shared defaults live in [`inline-code.css`](https://github.com/supabase/supabase/blob/master/packages/config/inline-code.css).
-No class is required. Inline code uses `font-size: calc(1em - 2px)` and inherits line height.
-For example, code in 16px text is 14px; code in 14px text is 12px. This applies inside and outside `prose`.
+No class is required. Inline code uses `font-size: max(0.75rem, calc(1em - 2px))` and inherits line height.
+It is 2px smaller than the surrounding text, with a minimum of `0.75rem` (12px at the standard 16px root size).
+For example, code in 13px text is 12px; code in 16px text is 14px. This applies inside and outside `prose`.
 
-A size class on the `code` element, such as `text-sm`, replaces the calculation. The 2px reduction
-is not applied again. To change the surrounding size and keep the reduction, put the size class
+A size class on the `code` element, such as `text-sm`, replaces the calculation, including the minimum.
+The 2px reduction is not applied again. To change the surrounding size and keep the reduction, put the size class
 on a parent instead:
 
 ```tsx
