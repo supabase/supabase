@@ -191,6 +191,7 @@ export const PipelineCreationFlow = ({
                     control={form.control}
                     publication={publication}
                   />
+                  <Separator />
                   <PipelineReviewCosts control={form.control} publication={publication} />
                   <PipelineValidationAdmonition failures={submissionFailures} />
                 </>
