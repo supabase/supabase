@@ -1,3 +1,4 @@
+import { EditIcon } from 'lucide-react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -116,7 +117,13 @@ export const PipelineDataReview = ({
       <div className="flex items-center justify-between gap-2">
         <h3 className="text-sm font-medium text-foreground">Data</h3>
         {onEdit && (
-          <Button type="button" variant="text" size="tiny" aria-label="Edit data" onClick={onEdit}>
+          <Button
+            type="button"
+            icon={<EditIcon />}
+            size="tiny"
+            aria-label="Edit data"
+            onClick={onEdit}
+          >
             Edit
           </Button>
         )}

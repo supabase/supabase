@@ -1,4 +1,4 @@
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
@@ -153,7 +153,7 @@ export const PipelineDestinationReview = ({
           {onEditDestination && (
             <Button
               type="button"
-              variant="text"
+              icon={<EditIcon />}
               size="tiny"
               aria-label="Edit destination"
               onClick={onEditDestination}
@@ -181,7 +181,7 @@ export const PipelineDestinationReview = ({
           {onEditConnection && (
             <Button
               type="button"
-              variant="text"
+              icon={<EditIcon />}
               size="tiny"
               aria-label="Edit connection"
               onClick={onEditConnection}
