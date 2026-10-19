@@ -413,7 +413,7 @@ describe('WarehouseOverviewTab', () => {
     expect(deleteRequests).toEqual([])
 
     const dialog = await screen.findByRole('alertdialog')
-    expect(dialog).toHaveTextContent('This cannot be undone')
+    expect(dialog).toHaveTextContent('Deletes the copied data and its storage permanently')
     expect(within(dialog).getByRole('checkbox')).not.toBeChecked()
     expect(screen.queryByPlaceholderText('Type the project ref to confirm')).not.toBeInTheDocument()
 

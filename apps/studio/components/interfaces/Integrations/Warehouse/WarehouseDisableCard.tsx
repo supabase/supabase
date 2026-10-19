@@ -116,8 +116,8 @@ export const WarehouseDisableCard = () => {
             <AlertDialogDescription asChild>
               <div className="space-y-2">
                 <p>
-                  Disabling Warehouse stops replication and connections to its endpoint. Its
-                  pipeline, publication, catalog access, and foreign tables are removed.
+                  Stops replication and disconnects the Warehouse endpoint. Removes its pipeline,
+                  publication, catalog access, and foreign tables.
                 </p>
               </div>
             </AlertDialogDescription>
@@ -137,7 +137,7 @@ export const WarehouseDisableCard = () => {
                     <FormItemLayout
                       layout="flex"
                       label="Also delete copied Warehouse data"
-                      description="Permanently deletes the managed DuckLake catalog and Storage bucket. Source tables are preserved. This cannot be undone."
+                      description="Deletes the copied data and its storage permanently. Source tables are preserved."
                     >
                       <FormControl>
                         <Checkbox
