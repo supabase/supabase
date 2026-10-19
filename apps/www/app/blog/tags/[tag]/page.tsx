@@ -27,10 +27,12 @@ export async function generateMetadata({
   const params = await paramsPromise
 
   const tagLabel = toTagLabel(params.tag)
+  // Unknown tags still render (200), so skip the canonical rather than point it at a thin page.
+  const isKnownTag = getAllTags('_blog').includes(params.tag)
   return {
     title: `Blog | ${tagLabel}`,
     description: `Blog posts tagged ${tagLabel}.`,
-    alternates: canonicalAlternates(`/blog/tags/${params.tag}`),
+    alternates: isKnownTag ? canonicalAlternates(`/blog/tags/${params.tag}`) : undefined,
   }
 }
 

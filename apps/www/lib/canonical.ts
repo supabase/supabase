@@ -18,7 +18,8 @@ export function canonicalAlternates(path: string): Metadata['alternates'] {
  * never emitted.
  */
 export function getPagesCanonicalHref(asPath: string): string | undefined {
-  const cleanPath = asPath.split('?')[0].split('#')[0].replace(/\/$/, '') || '/'
+  // Root becomes '' so the canonical is the bare origin, matching the home page.
+  const cleanPath = asPath.split('?')[0].split('#')[0].replace(/\/+$/, '')
   if (cleanPath.includes('[')) return undefined
   return `${CANONICAL_ORIGIN}${cleanPath}`
 }

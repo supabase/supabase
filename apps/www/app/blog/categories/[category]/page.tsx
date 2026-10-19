@@ -19,10 +19,14 @@ export async function generateMetadata({
   const params = await paramsPromise
 
   const categoryLabel = startCase(params?.category.replaceAll('-', ' '))
+  // The page calls notFound() for unknown categories, so no canonical for them.
+  const isKnownCategory = getAllCategories('_blog').includes(params.category)
   return {
     title: `Blog | ${categoryLabel}`,
     description: `Blog posts in ${categoryLabel}.`,
-    alternates: canonicalAlternates(`/blog/categories/${params.category}`),
+    alternates: isKnownCategory
+      ? canonicalAlternates(`/blog/categories/${params.category}`)
+      : undefined,
   }
 }
 
