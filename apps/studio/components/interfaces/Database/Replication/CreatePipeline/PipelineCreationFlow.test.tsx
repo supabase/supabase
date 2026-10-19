@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
@@ -94,26 +94,45 @@ beforeEach(() => {
       }),
   })
 })
-const next = () => fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
+const next = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
 const fillConnection = () => {
-  for (const [name, value] of [
+  const fields = [
     ['Pipeline name', 'Warehouse'],
     ['Project ID', 'my-project'],
     ['Dataset ID', 'dataset'],
     ['Service account key', '{}'],
-  ]) {
-    fireEvent.change(screen.getByRole('textbox', { name }), { target: { value } })
-  }
+  ] as const
+
+  fields.forEach(([name, value]) => {
+    fireEvent.change(screen.getByLabelText(name), { target: { value } })
+  })
 }
+const stepStatus = () => screen.getByText(/^Step \d of 4/)
+const isHtmlElement = (value: unknown): value is HTMLElement => value instanceof HTMLElement
+const stepCard = () => {
+  const card = stepStatus().nextElementSibling
+  const isCard = isHtmlElement(card)
+
+  if (!isCard) {
+    throw new Error('step status is not followed by the step card')
+  }
+
+  return card
+}
+const waitForStep = (step: number) =>
+  waitFor(() => expect(stepStatus()).toHaveTextContent(`Step ${step} of 4`))
+const withinRegion = (name: string) => within(screen.getByRole('region', { name }))
+const destinationType = () => within(screen.getByRole('radiogroup', { name: 'Destination type' }))
 const continueToData = async () => {
   next()
-  await screen.findByText(/Step 3 of 4/)
+  await waitForStep(3)
 }
 const selectPublication = async () => {
   fireEvent.click(screen.getByText('Select publication'))
-  fireEvent.click(await screen.findByText('analytics'))
+  await waitFor(() => expect(screen.queryByText('analytics')).toBeInTheDocument())
+  fireEvent.click(screen.getByText('analytics'))
 }
-const back = () => fireEvent.click(screen.getByRole('button', { name: 'Back' }))
+const back = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
   const reachReview = async (onClose = vi.fn()) => {
@@ -364,21 +383,24 @@ describe('PipelineCreationFlow', () => {
       nuqs: { hasMemory: true },
     })
     next()
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+    const connection = withinRegion('Destination connection')
+    fireEvent.click(connection.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(connection.getByRole('spinbutton', { name: 'Connection pool size' }), {
       target: { value: '-1' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect((await screen.findAllByText(/Project ID is required\./)).length).toBeGreaterThan(0)
-    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.click(connection.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    await waitFor(() =>
+      expect(screen.queryAllByText(/Project ID is required\./).length).toBeGreaterThan(0)
+    )
+    expect(connection.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.click(connection.getByRole('button', { name: /Advanced settings/ }))
     expect(
-      screen.queryByRole('spinbutton', { name: 'Connection pool size' })
+      connection.queryByRole('spinbutton', { name: 'Connection pool size' })
     ).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(screen.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Connection pool size' }), {
+    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    expect(connection.getByRole('spinbutton', { name: 'Connection pool size' })).toBeVisible()
+    fireEvent.change(connection.getByRole('spinbutton', { name: 'Connection pool size' }), {
       target: { value: '5' },
     })
     expect(screen.queryByText('Check connection settings')).not.toBeInTheDocument()
@@ -415,34 +437,36 @@ describe('PipelineCreationFlow', () => {
     )
     next()
     fillConnection()
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
-    expect(await screen.findByText('Try again')).toBeInTheDocument()
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    expect(within(stepCard()).getByRole('button', { name: 'Back' })).toBeDisabled()
+    await waitFor(() => expect(screen.queryByText('Try again')).toBeInTheDocument())
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'retry-project' },
     })
     expect(screen.getByText('Try again')).toBeInTheDocument()
     back()
-    fireEvent.click(screen.getByRole('radio', { name: /Snowflake/ }))
+    fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
     next()
     expect(screen.queryByText('Try again')).not.toBeInTheDocument()
     back()
-    fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
+    fireEvent.click(destinationType().getByRole('radio', { name: /BigQuery/ }))
     next()
     expect(screen.queryByText('Try again')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    expect(await screen.findByText('Check credentials')).toBeInTheDocument()
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled())
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    await waitFor(() => expect(screen.queryByText('Check credentials')).toBeInTheDocument())
+    await waitFor(() =>
+      expect(within(stepCard()).queryByRole('button', { name: 'Continue' })).not.toBeDisabled()
+    )
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'edited-project' },
     })
     expect(screen.getByText('Check credentials')).toBeInTheDocument()
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'retry-project' },
     })
     expect(screen.getByText('Check credentials')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    await screen.findByText(/Replication can start/)
+    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    await waitFor(() => expect(screen.queryByText(/Replication can start/)).toBeInTheDocument())
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
     expect(requests[2]).not.toHaveProperty('pipeline_config')
     expect(requests[2]).not.toHaveProperty('source_id')
@@ -467,17 +491,19 @@ describe('PipelineCreationFlow', () => {
     next()
     fillConnection()
     next()
-    await screen.findByText(/Replication can start/)
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    await waitFor(() => expect(screen.queryByText(/Replication can start/)).toBeInTheDocument())
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'changed' },
     })
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(within(stepCard()).getByRole('button', { name: 'Continue' })).toBeInTheDocument()
     expect(screen.queryByText('Check credentials')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Continue' }))
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    fireEvent.click(within(stepCard()).getByRole('button', { name: 'Continue' }))
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'changed-during-test' },
     })
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).not.toBeDisabled())
+    await waitFor(() =>
+      expect(within(stepCard()).queryByRole('button', { name: 'Continue' })).not.toBeDisabled()
+    )
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
     expect(screen.queryByText(/Replication can start/)).not.toBeInTheDocument()
   })
@@ -491,7 +517,7 @@ describe('PipelineCreationFlow', () => {
     )
     next()
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'history-project' },
     })
     fillConnection()
@@ -504,7 +530,7 @@ describe('PipelineCreationFlow', () => {
       })
     })
     expect(screen.getByText(/Step 2 of 4/)).toBeInTheDocument()
-    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
+    expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
     await act(async () => {
       await new Promise<void>((resolve) => {
         window.addEventListener('popstate', () => resolve(), { once: true })
@@ -519,8 +545,8 @@ describe('PipelineCreationFlow', () => {
       })
     })
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
-    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'changed-project' },
     })
     await act(async () => {
@@ -530,7 +556,7 @@ describe('PipelineCreationFlow', () => {
       })
     })
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeInTheDocument()
+    expect(within(stepCard()).getByRole('button', { name: 'Continue' })).toBeInTheDocument()
   })
 
   it.each(['connection', 'data', 'review', 'invalid'])(
@@ -547,45 +573,99 @@ describe('PipelineCreationFlow', () => {
     }
   )
 
-  it('preserves connection and data values across steps and destination changes', async () => {
+  it('preserves connection values across destination changes', async () => {
+    const onUrlUpdate = vi.fn()
     customRender(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
-      { nuqs: { hasMemory: true } }
+      { nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate } }
     )
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 1 of 4')
     next()
-    fireEvent.change(screen.getByRole('textbox', { name: 'Pipeline name' }), {
+    fireEvent.change(screen.getByLabelText('Pipeline name'), {
       target: { value: 'Warehouse' },
     })
-    fireEvent.change(screen.getByRole('textbox', { name: 'Project ID' }), {
+    fireEvent.change(screen.getByLabelText('Project ID'), {
       target: { value: 'my-project' },
     })
     fillConnection()
     await continueToData()
     expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 3 of 4')
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
-      target: { value: '750' },
-    })
+    // Wait for the URL write, not just the optimistic step render, before going back.
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=data' })
+      )
+    )
     back()
-    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=connection' })
+      )
+    )
+    expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
     back()
-    fireEvent.click(screen.getByRole('radio', { name: /Snowflake/ }))
-    next()
-    expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
-    back()
-    fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
-    next()
-    expect(screen.getByRole('textbox', { name: 'Project ID' })).toHaveValue('my-project')
-    await continueToData()
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
-    await selectPublication()
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ queryString: '' }))
+    )
+    fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
     next()
     await waitFor(() =>
-      expect(screen.getByText(/Step [1-4] of 4/)).toHaveTextContent('Step 4 of 4')
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=connection' })
+      )
     )
-    expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    expect(screen.getByLabelText('Pipeline name')).toHaveValue('Warehouse')
+    back()
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(expect.objectContaining({ queryString: '' }))
+    )
+    fireEvent.click(destinationType().getByRole('radio', { name: /BigQuery/ }))
+    next()
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=connection' })
+      )
+    )
+    expect(screen.getByLabelText('Project ID')).toHaveValue('my-project')
+  })
+
+  it('preserves data values across steps and reaches Review', async () => {
+    const onUrlUpdate = vi.fn()
+    customRender(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />,
+      { nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate } }
+    )
+    next()
+    fireEvent.change(screen.getByLabelText('Pipeline name'), {
+      target: { value: 'Warehouse' },
+    })
+    fillConnection()
+    await continueToData()
+    const data = withinRegion('Data')
+    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
+      target: { value: '750' },
+    })
+    // Wait for the URL write, not just the optimistic step render, before going back.
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=data' })
+      )
+    )
+    back()
+    await waitFor(() =>
+      expect(onUrlUpdate).toHaveBeenLastCalledWith(
+        expect.objectContaining({ queryString: '?step=connection' })
+      )
+    )
+    await continueToData()
+    const dataAfterReturn = withinRegion('Data')
+    fireEvent.click(dataAfterReturn.getByRole('button', { name: /Advanced settings/ }))
+    expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
+    await selectPublication()
+    next()
+    await waitForStep(4)
+    expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
@@ -598,22 +678,25 @@ describe('PipelineCreationFlow', () => {
     fillConnection()
     await continueToData()
     next()
-    expect(await screen.findByText('Select an available publication.')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByText('Select an available publication.')).toBeInTheDocument()
+    )
     await selectPublication()
     await waitFor(() =>
       expect(screen.queryByText('Select an available publication.')).not.toBeInTheDocument()
     )
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
+    const data = withinRegion('Data')
+    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
       target: { value: '-1' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
     next()
     await waitFor(() =>
-      expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toBeVisible()
+      expect(data.queryByRole('spinbutton', { name: 'Batch wait time' })).toBeVisible()
     )
     expect(screen.getByText('Check data settings')).toBeInTheDocument()
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
+    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
       target: { value: '750' },
     })
     expect(screen.queryByText('Check data settings')).not.toBeInTheDocument()
@@ -629,14 +712,14 @@ describe('PipelineCreationFlow', () => {
             }),
     })
     next()
-    expect(
-      await screen.findByText(
-        'Publication tables could not be loaded. Click Continue to try again.'
-      )
-    ).toBeInTheDocument()
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Publication tables could not be loaded. Click Continue to try again.')
+      ).toBeInTheDocument()
+    )
     shouldFail = false
     next()
-    await waitFor(() => expect(screen.getByText(/Step 4 of 4/)).toBeInTheDocument())
+    await waitForStep(4)
     // Wait for the URL write, not just the optimistic step render, before going back.
     await waitFor(() =>
       expect(onUrlUpdate).toHaveBeenLastCalledWith(
@@ -644,8 +727,19 @@ describe('PipelineCreationFlow', () => {
       )
     )
     await act(async () => back())
-    fireEvent.click(await screen.findByRole('button', { name: /Advanced settings/ }))
-    expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
+    const dataAfterReturn = withinRegion('Data')
+    const advancedSettings = await waitFor(() => {
+      const button = dataAfterReturn.queryByRole('button', { name: /Advanced settings/ })
+      expect(button).toBeInTheDocument()
+
+      if (!isHtmlElement(button)) {
+        throw new Error('advanced settings button is missing')
+      }
+
+      return button
+    })
+    fireEvent.click(advancedSettings)
+    expect(dataAfterReturn.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(750)
   })
 
   it('blocks browser Forward to Review after data changes', async () => {
@@ -659,7 +753,7 @@ describe('PipelineCreationFlow', () => {
     await waitFor(() => expect(window.location.search).toBe('?step=connection'))
     fillConnection()
     await continueToData()
-    await screen.findByText('Select publication')
+    await waitFor(() => expect(screen.queryByText('Select publication')).toBeInTheDocument())
     await selectPublication()
     next()
     await waitFor(() => expect(window.location.search).toBe('?step=review'))
@@ -669,8 +763,9 @@ describe('PipelineCreationFlow', () => {
         window.history.back()
       })
     })
-    fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    fireEvent.change(screen.getByRole('spinbutton', { name: 'Batch wait time' }), {
+    const data = withinRegion('Data')
+    fireEvent.click(data.getByRole('button', { name: /Advanced settings/ }))
+    fireEvent.change(data.getByRole('spinbutton', { name: 'Batch wait time' }), {
       target: { value: '-1' },
     })
     await act(async () => {
@@ -680,7 +775,9 @@ describe('PipelineCreationFlow', () => {
       })
     })
     await waitFor(() => expect(window.location.search).toBe('?step=data'))
-    expect(screen.getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(-1)
+    expect(withinRegion('Data').getByRole('spinbutton', { name: 'Batch wait time' })).toHaveValue(
+      -1
+    )
   })
 
   it('confirms destination-only changes and treats a reverted selection as pristine', async () => {
@@ -688,12 +785,12 @@ describe('PipelineCreationFlow', () => {
     customRender(
       <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={onClose} />
     )
-    fireEvent.click(screen.getByRole('radio', { name: /Snowflake/ }))
+    fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeInTheDocument())
     expect(onClose).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
-    fireEvent.click(screen.getByRole('radio', { name: /BigQuery/ }))
+    fireEvent.click(destinationType().getByRole('radio', { name: /BigQuery/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(onClose).toHaveBeenCalledOnce()
   })
@@ -704,23 +801,33 @@ describe('PipelineCreationFlow', () => {
       nuqs: { hasMemory: true },
     })
     next()
-    fireEvent.change(screen.getByRole('textbox', { name: 'Pipeline name' }), {
+    fireEvent.change(screen.getByLabelText('Pipeline name'), {
       target: { value: 'Keep me' },
     })
     const unload = new Event('beforeunload', { cancelable: true })
     window.dispatchEvent(unload)
     expect(unload.defaultPrevented).toBe(true)
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeInTheDocument())
     fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
     expect(onClose).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('link', { name: 'Supabase home' }))
-    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeInTheDocument())
     expect(onClose).not.toHaveBeenCalled()
     fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
-    expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Keep me')
+    expect(screen.getByLabelText('Pipeline name')).toHaveValue('Keep me')
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-    fireEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))
+    const discardChanges = await waitFor(() => {
+      const button = screen.queryByRole('button', { name: 'Discard changes' })
+      expect(button).toBeInTheDocument()
+
+      if (!isHtmlElement(button)) {
+        throw new Error('discard changes button is missing')
+      }
+
+      return button
+    })
+    fireEvent.click(discardChanges)
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     const confirmedUnload = new Event('beforeunload', { cancelable: true })
     window.dispatchEvent(confirmedUnload)
@@ -730,7 +837,7 @@ describe('PipelineCreationFlow', () => {
   it('closes a pristine form and blocks progression without destinations', () => {
     const onClose = vi.fn()
     customRender(<PipelineCreationFlow availableDestinations={[]} onClose={onClose} />)
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+    expect(within(stepCard()).getByRole('button', { name: 'Continue' })).toBeDisabled()
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(onClose).toHaveBeenCalledOnce()
   })
