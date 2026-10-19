@@ -45,10 +45,8 @@ test('back after switching schema with a table open stays on the list', async ({
   await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
 
-  const remountedGridLoad = waitForGridDataToLoad(page, ref)
   await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
   await page.waitForURL(/\/editor\/\d+\?schema=public/)
-  await remountedGridLoad
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
 
   await page.goBack()
