@@ -42,8 +42,10 @@ Then:
 #    in supabase/config.toml (names are DNS labels: a-z, 0-9, hyphen)
 supabase compute new <name> --runtime node --size 2gb --exposure public
 
-# 2. deploy: packages the directory AS-IS (node needs node_modules vendored —
-#    there is no server-side install), uploads, deploys, waits, prints the URL
+# 2. deploy: packages the directory AS-IS (for node, vendor node_modules unless
+#    `exclude = ["node_modules"]` is set; then Compute installs dependencies
+#    before first boot, see Dependency management), uploads, deploys, waits,
+#    prints the URL
 supabase compute push <name> --project-ref <ref>
 
 # 3. invoke
