@@ -252,10 +252,6 @@ export function referenceJsonLdType(pathname: string) {
   )
 }
 
-/**
- * Builds the JSON-LD for a reference page, or `null` for paths that aren't
- * reference pages. `pathname` is relative to the docs base path.
- */
 export async function generateReferenceJsonLd(slug: Array<string>) {
   const parsedPath = parseReferencePath(slug)
   let pathname: string
