@@ -24,6 +24,7 @@ jobs:
           persist-credentials: false
           sparse-checkout: |
             apps/docs
+            examples
             packages
             patches
 
