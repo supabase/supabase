@@ -55,7 +55,7 @@ Supabase යනු [hosted platform](https://supabase.com/dashboard). ඔබට 
 - [PostgreSQL](https://www.postgresql.org/) යනු අවුරුදු 30 වඩා කාලයක් ක්‍රියාත්මක වෙමින් පවතින object-relational database system එකක් වන අතර එය විශ්වාසනීයත්වයට,ක්‍රියාකාරීත්වයට හා feature robustness බවට කීර්තියක් අත්පත්කරගෙන සිටියි
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) යනු PostgreSQL database කෙලින්ම RESTful API එකක් බවට පරිවර්තනය කරන web server එකකි.
-- [GoTrue](https://github.com/netlify/gotrue) JWT tokens භාවිත කරන්නන්ව හැසිරවීමට JWT ආශ්‍රිත APi එකකි.
+- [GoTrue](https://github.com/supabase/gotrue) JWT tokens භාවිත කරන්නන්ව හැසිරවීමට JWT ආශ්‍රිත APi එකකි.
 - [Storage](https://github.com/supabase/storage-api) S3 වල ගබඩා කර ඇති files හසුරවන්න RESTful interface එකක් ලබාදීම, Postgres භාවිත කරමින් අවසරයන් හැසිරවීමට
 - [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API
 - [postgres-meta](https://github.com/supabase/postgres-meta) Postgres හැසිරවීමට RESTful API එකක් ලබාදෙන අතර table වල දත්ත ලබාගැනීමට,roles add කිරීමට හා queries run කිරීම කර දෙයි
