@@ -6,23 +6,30 @@ import { GuideBrowser } from '../components/GuideBrowser'
 import { HomeHero } from '../components/Hero'
 import Layout from '../layouts/Layout.astro'
 import { padFeatured, toSummary, toTroubleshootingSummary, type FeaturedItem } from '../lib/guides'
-import { TOPICS, topicToSlug } from '../lib/topics'
+import { isInTopic, TOPICS, topicToSlug } from '../lib/topics'
 
 const guides = await getCollection('guides')
 const summaries = guides.map(toSummary)
 const troubleshooting = (await getCollection('troubleshooting')).map(toTroubleshootingSummary)
-const toTopicItem = (topic: (typeof TOPICS)[number]): Omit<FeaturedItem, 'slot'> => ({
-	id: `topic-${topicToSlug(topic.name)}`,
-	title: topic.name,
-	description: topic.description,
-	topics: [topic.name],
-	href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
-})
-const visibleTopics = TOPICS.filter((topic) => topic.visible).map(toTopicItem)
-const featuredTopics = padFeatured({
-	featured: TOPICS.filter((topic) => topic.visible && topic.pinned).map(toTopicItem),
-	fallback: visibleTopics,
-})
+const listedTopics = TOPICS.filter(
+	(topic) =>
+		topic.visible &&
+		(summaries.some((guide) => isInTopic({ collection: 'guides', topics: guide.topics, topic: topic.name })) ||
+			troubleshooting.some((entry) =>
+				isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
+			))
+)
+const pinnedTopics = listedTopics.filter((topic) => topic.pinned)
+const featuredTopics: FeaturedItem[] = (pinnedTopics.length > 0 ? pinnedTopics : listedTopics.slice(0, 3)).map(
+	(topic) => ({
+		id: `topic-${topicToSlug(topic.name)}`,
+		slot: `topic-${topicToSlug(topic.name)}`,
+		title: topic.name,
+		description: topic.description,
+		topics: [topic.name],
+		href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic.name)}`,
+	})
+)
 const featuredGuides = padFeatured({
 	featured: guides.filter((guide) => guide.data.pinned).map(toSummary),
 	fallback: summaries,
