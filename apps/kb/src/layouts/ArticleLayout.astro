@@ -41,8 +41,8 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 ---
 
 <Layout title={title} description={description} jsonLd={jsonLd}>
-	<div class="section-container lg:flex lg:gap-12">
-		<article class="prose prose-img:rounded-lg mx-auto max-w-3xl min-w-0 flex-1 py-16 lg:ml-(--nav-inset)">
+	<div class="section-container lg:grid lg:grid-cols-3 lg:gap-6">
+		<article class="prose prose-img:rounded-lg max-w-none min-w-0 py-16 lg:col-span-2">
 			<Breadcrumb className="not-prose mb-6">
 				<BreadcrumbList>
 					<BreadcrumbItem>
@@ -114,7 +114,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 				)
 			}
 		</article>
-		<aside class="sticky top-(--header-height) hidden max-h-[calc(100vh-var(--header-height))] w-60 shrink-0 self-start overflow-y-auto py-16 xl:block">
+		<aside class="sticky top-(--header-height) hidden justify-self-end max-h-[calc(100vh-var(--header-height))] w-60 self-start overflow-y-auto py-16 lg:block">
 			<GuideSidebar
 				client:load
 				items={toc}
