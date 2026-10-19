@@ -29,18 +29,13 @@ export const SLOT_LAG_FIELDS: SlotLagField[] = [
     key: 'safe_wal_size_bytes',
     label: 'WAL retention remaining',
     type: 'bytes',
-    description: (
-      <>
-        How much more WAL can accumulate before the slot risks losing changes, controlled by{' '}
-        <code className="text-code-inline">max_slot_wal_keep_size</code>
-      </>
-    ),
+    description: 'How much more WAL can accumulate before the slot risks losing changes',
   },
   {
     key: 'reply_time_lag',
     label: 'Last check-in',
     type: 'duration',
-    description: 'Time since the pipeline sent its last feedback message, affected by clock skew',
+    description: 'Time since the pipeline last checked in with the source database',
     zeroLabel: 'Just now',
     // reply_time_lag is "milliseconds ago", so the absolute time is now minus that, in local time.
     getValueTooltip: (ms) => dayjs().subtract(ms, 'millisecond').format('MMM D, YYYY, h:mm:ss A'),
