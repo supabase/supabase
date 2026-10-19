@@ -10,29 +10,24 @@ import dayjs from 'dayjs'
 import { RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
-import {
-  FilterBar,
-  isGroup,
-  type CustomOptionProps,
-  type FilterCondition,
-  type FilterGroup,
-  type FilterProperty,
-} from 'ui-patterns/FilterBar'
+import { FilterBar, type FilterGroup, type FilterProperty } from 'ui-patterns/FilterBar'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { findMatchingDateHelper, formatDateRange } from '../Settings/Logs/Logs.datePickerHelpers'
-import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
 import { parseTimeRange, serializeTimeRange } from '../Settings/Logs/Logs.timeRange'
-import { createAuditLogsProjectOption } from './AuditLogsProjectOption'
 import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
 import { getAuditLogColumns } from '@/components/interfaces/AuditLogs/AuditLogs.columns'
 import {
-  AUDIT_LOG_DATEPICKER_HELPERS,
   DATE_FILTER_PROPERTY,
   filterByFilterGroup,
+  findDateCondition,
   getDefaultAuditLogRange,
   PROJECT_FILTER_PROPERTY,
 } from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import {
+  DateRangeOption,
+  formatDateRangeValue,
+} from '@/components/interfaces/AuditLogs/AuditLogsDateRangeOption'
+import { createAuditLogsProjectOption } from '@/components/interfaces/AuditLogs/AuditLogsProjectOption'
 import { AuditLogsSelectionHeader } from '@/components/interfaces/AuditLogs/AuditLogsSelectionHeader'
 import { AuditLogsTable } from '@/components/interfaces/AuditLogs/AuditLogsTable'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -44,41 +39,6 @@ import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-quer
 import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
 
 const CONTENT_PADDING = 'w-full px-6 xl:px-10'
-
-const DateRangeOption = ({ onChange }: CustomOptionProps) => {
-  const defaultHelper =
-    AUDIT_LOG_DATEPICKER_HELPERS.find((helper) => helper.default) ?? AUDIT_LOG_DATEPICKER_HELPERS[0]
-  return (
-    <LogsDatePicker
-      hideWarnings
-      variant="inline"
-      value={{
-        from: defaultHelper.calcFrom(),
-        to: defaultHelper.calcTo(),
-        text: defaultHelper.text,
-        isHelper: true,
-      }}
-      helpers={AUDIT_LOG_DATEPICKER_HELPERS}
-      onSubmit={(value: DatePickerValue) =>
-        onChange(serializeTimeRange([new Date(value.from), new Date(value.to)]))
-      }
-    />
-  )
-}
-
-const formatDateRangeValue = (value: unknown): string => {
-  const range = parseTimeRange(value)
-  if (!range) return String(value ?? '')
-  const [from, to] = range
-  const helper = findMatchingDateHelper(from, to, AUDIT_LOG_DATEPICKER_HELPERS)
-  return helper?.text ?? formatDateRange(from.toISOString(), to.toISOString())
-}
-
-const findDateCondition = (group: FilterGroup) =>
-  group.conditions.find(
-    (condition): condition is FilterCondition =>
-      !isGroup(condition) && condition.propertyName === DATE_FILTER_PROPERTY
-  )
 
 export const AuditLogs = () => {
   const [dateRange, setDateRange] = useState(getDefaultAuditLogRange)
