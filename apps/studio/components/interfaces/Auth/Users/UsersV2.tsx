@@ -318,6 +318,10 @@ export const UsersV2 = () => {
     authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
     indexWorkerStatus?.is_in_progress === true
 
+  // Avoids refetching an identical query when only the filter column changes (column is part of the query key).
+  const shouldUseColumnSearch =
+    filterKeywords.length > 0 && (improvedSearchEnabled || specificFilterColumn !== 'freeform')
+
   const {
     data,
     error,
@@ -336,14 +340,14 @@ export const UsersV2 = () => {
       connectionString: project?.connectionString,
       keywords: filterKeywords,
       filter:
-        (specificFilterColumn !== 'freeform' && !improvedSearchEnabled) || filterUserType === 'all'
+        (shouldUseColumnSearch && !improvedSearchEnabled) || filterUserType === 'all'
           ? undefined
           : filterUserType,
       providers: selectedProviders,
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
       // improved search will always have a column specified
-      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
+      ...(shouldUseColumnSearch
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
 
