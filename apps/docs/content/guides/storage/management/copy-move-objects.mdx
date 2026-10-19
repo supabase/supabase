@@ -95,9 +95,9 @@ Moving a version copies it and then permanently deletes the source version. To r
 
 ## Permissions
 
-To **copy** objects, users need `select` permission on the source object and `insert` permission on the destination object. If the user also has `update` permission, the copy can be performed as an upsert, which will overwrite the destination object if it already exists.
+To **copy** objects, users need `select` permission on the source object and `insert` permission on the destination object. To copy over an existing object or delete marker, users also need `update` permission. With [object versioning](/docs/guides/storage/buckets/object-versioning) turned on, the replaced object is kept as a noncurrent version.
 
-To **move** objects, users need `select` and `update` permissions on the object.
+To **move** objects, users need `select` and `update` permissions on the object. If either bucket has versioning turned on, a move copies the object and then deletes the source version, so users need the copy permissions and `delete` permission on the source object.
 
 For example:
 
