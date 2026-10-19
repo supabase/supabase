@@ -224,10 +224,10 @@ steps in [tabs](#tabs).
 
 #### For every "run this query" step
 
-Paste this standard snippet inline:
+Paste this standard snippet before the SQL block:
 
 ```mdx
-Run this query using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 ```
 
 ### Code blocks
