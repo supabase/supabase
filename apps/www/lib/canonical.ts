@@ -12,14 +12,21 @@ export function canonicalAlternates(path: string): Metadata['alternates'] {
 }
 
 /**
- * Canonical href for a pages-router route, from `router.asPath`. Strips query,
- * hash, and trailing slash. Returns undefined for unresolved dynamic routes
- * (e.g. `/changelog/[slug]` before params are known) so a literal `[slug]` is
- * never emitted.
+ * Normalizes a pages-router `asPath`: drops the query, the hash, and every
+ * trailing slash. The root becomes '' so callers can pick their own fallback.
+ */
+export function normalizePagesPath(asPath: string): string {
+  return asPath.split('?')[0].split('#')[0].replace(/\/+$/, '')
+}
+
+/**
+ * Canonical href for a pages-router route, from `router.asPath`. Returns
+ * undefined for unresolved dynamic routes (e.g. `/changelog/[slug]` before
+ * params are known) so a literal `[slug]` is never emitted.
  */
 export function getPagesCanonicalHref(asPath: string): string | undefined {
   // Root becomes '' so the canonical is the bare origin, matching the home page.
-  const cleanPath = asPath.split('?')[0].split('#')[0].replace(/\/+$/, '')
+  const cleanPath = normalizePagesPath(asPath)
   if (cleanPath.includes('[')) return undefined
   return `${CANONICAL_ORIGIN}${cleanPath}`
 }
