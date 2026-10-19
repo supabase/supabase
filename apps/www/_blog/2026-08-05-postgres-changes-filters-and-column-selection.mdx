@@ -91,7 +91,7 @@ Realtime [bills on messages](https://supabase.com/docs/guides/realtime/pricing) 
 ## Things to know
 
 - Column selection requires `@supabase/supabase-js` 2.109.0 or newer. The filter changes work with the client library you already have.
-- The columns you list must be selectable by the subscribing role. Row Level Security still applies.
+- The columns you list must be selectable by the subscribing role. [Row Level Security](/docs/guides/database/postgres/row-level-security) still applies.
 - DELETE events only carry the row's primary key, so column filters can't be evaluated on deletes.
 - Only AND composition shipped in this release. OR is not supported.
 

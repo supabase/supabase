@@ -17,7 +17,7 @@ toc_depth: 2
 
 Today we're releasing Supabase Agent Skills, an open-source set of instructions that teach AI coding agents how to build on Supabase correctly. If you use Claude Code, Codex, GitHub Copilot, Cursor, or any of the agents that support [Agent Skills Open Standard](https://agentskills.io/), you can install the skill in one command and get better results on every Supabase task.
 
-AI agents already know a lot about Supabase. We hit [100k stars on GitHub](https://supabase.com/blog/100000-github-stars), and most models have seen plenty of Supabase code in their training data. But knowing about Supabase and using it correctly are two different things. We kept seeing agents skip RLS policies on exposed schemas, hallucinate CLI commands that don't exist (like `supabase db execute`), create views without `security_invoker = true` (which silently bypasses RLS), and ignore the docs entirely, relying on training data that may be months out of date.
+AI agents already know a lot about Supabase. We hit [100k stars on GitHub](https://supabase.com/blog/100000-github-stars), and most models have seen plenty of Supabase code in their training data. But knowing about Supabase and using it correctly are two different things. We kept seeing agents skip [RLS](/docs/guides/database/postgres/row-level-security) policies on exposed schemas, hallucinate CLI commands that don't exist (like `supabase db execute`), create views without `security_invoker = true` (which silently bypasses RLS), and ignore the docs entirely, relying on training data that may be months out of date.
 
 This is a follow-up to our earlier work on [Postgres best practices for AI agents](https://supabase.com/blog/postgres-best-practices-for-ai-agents). That release focused on general Postgres patterns. Supabase Agent Skills goes further: it covers all Supabase products, encodes security requirements inline, and teaches agents to check the docs before implementing anything.
 
@@ -91,7 +91,7 @@ Supabase enables agents to access databases through both the MCP server and the 
 
 To address this, the skill introduces an opinionated approach to schema management. Instead of relying on migration-based workflows for every change, agents are encouraged to modify the schema directly using the `execute_sql` MCP tool or the `supabase db query` CLI command. This avoids creating a new migration entry for every DDL operation and enables faster iteration during development.
 
-Once the agent determines that the schema has stabilized, it should run the [Supabase database advisors](https://supabase.com/docs/guides/database/database-advisors) to catch potential security or performance issues early. Only after passing these checks should the agent formalize the changes by committing a migration.
+Once the agent determines that the schema has stabilized, it should run the [Supabase database advisors](https://supabase.com/docs/guides/observability/advisors) to catch potential security or performance issues early. Only after passing these checks should the agent formalize the changes by committing a migration.
 
 <Admonition type="caution">
 
@@ -202,7 +202,7 @@ Claude Code users can also install as a plugin:
 claude plugin marketplace add supabase/agent-skills
 ```
 
-- [Supabase Agent Skills Docs](https://supabase.com/docs/guides/getting-started/ai-skills)
+- [Supabase Agent Skills Docs](https://supabase.com/docs/guides/ai-tools/ai-skills)
 - [GitHub repo](https://github.com/supabase/agent-skills)
 
 Found something the skill should cover? [Open an issue](https://github.com/supabase/agent-skills/issues) on the repo. We read each one.

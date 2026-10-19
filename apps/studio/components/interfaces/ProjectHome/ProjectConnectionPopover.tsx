@@ -1,5 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DatabaseIcon,
+  KeyRoundIcon,
+  Link2Icon,
+  TerminalIcon,
+} from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -103,7 +111,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           ? 'Loading project URL...'
           : (projectUrl ?? 'Project URL unavailable'),
         disabled: isLoadingApiUrl || !projectUrl,
-        icon: Link2,
+        icon: Link2Icon,
       },
       ...(showPublishableKey
         ? [
@@ -121,7 +129,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 isLoadingKeys ||
                 !canReadAPIKeys ||
                 !publishableKey?.api_key,
-              icon: KeyRound,
+              icon: KeyRoundIcon,
             },
           ]
         : []),
@@ -134,14 +142,14 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 ? 'Loading connection string...'
                 : directConnectionString || 'Connection string unavailable',
               disabled: isLoadingDatabases || !directConnectionString,
-              icon: Database,
+              icon: DatabaseIcon,
             },
             {
               label: 'CLI setup commands',
               value: cliCommands,
               displayValue: cliCommands.replace(/\n/g, ' - '),
               disabled: !projectRef,
-              icon: Terminal,
+              icon: TerminalIcon,
             },
           ]
         : []),
@@ -183,7 +191,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             <Button
               size="tiny"
               iconRight={
-                <ChevronDown
+                <ChevronDownIcon
                   size={14}
                   className={cn('transition-transform', open && 'rotate-180')}
                 />
@@ -228,7 +236,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                       copiedItem === item.label && 'opacity-100 text-primary'
                     )}
                   >
-                    {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}
+                    {copiedItem === item.label ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
                   </div>
                 </DropdownMenuItem>
               )

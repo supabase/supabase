@@ -8,7 +8,6 @@ import { isLogsOrObservabilityPath, isOrganizationLandingPath } from './AppBanne
 import { ClockSkewBanner } from '@/components/layouts/AppLayout/ClockSkewBanner'
 import { NoticeBanner } from '@/components/layouts/AppLayout/NoticeBanner'
 import { StatusBanner } from '@/components/layouts/AppLayout/StatusBanner'
-import { StatusPageBanner } from '@/components/layouts/AppLayout/StatusPageBanner'
 import { BannerLogsAllDeprecation } from '@/components/ui/BannerStack/Banners/BannerLogsAllDeprecation'
 import { BannerTermsOfServiceUpdate } from '@/components/ui/BannerStack/Banners/BannerTermsOfServiceUpdate'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
@@ -28,7 +27,6 @@ export const AppBannerWrapper = ({
 }: PropsWithChildren<{ signedOut?: boolean }>) => {
   const showNoticeBanner = useFlag('showNoticeBanner')
   const clockSkewBanner = useFlag('clockSkewBanner')
-  const useStatusPageWidget = useFlag('incidentIoStatusPage')
 
   const { addBanner, dismissBanner } = useBannerStack()
   const pathname = usePathname()
@@ -118,7 +116,7 @@ export const AppBannerWrapper = ({
   return (
     <div className="flex flex-col">
       <div className="shrink-0">
-        {useStatusPageWidget ? <StatusBanner signedOut={signedOut} /> : <StatusPageBanner />}
+        <StatusBanner signedOut={signedOut} />
         {showNoticeBanner && <NoticeBanner />}
         <OrganizationResourceBanner />
         {clockSkewBanner && <ClockSkewBanner />}

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlertCircle, XIcon } from 'lucide-react'
+import { AlertCircleIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -242,7 +242,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
             <>
               {!diffWarningDismissed && (
                 <Alert variant="warning">
-                  <AlertCircle strokeWidth={2} />
+                  <AlertCircleIcon strokeWidth={2} />
                   <AlertTitle>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-code-inline">supabase db diff</code>.
@@ -267,7 +267,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
               {!selectStarWarningDismissed && (
                 <Alert variant="warning">
-                  <AlertCircle strokeWidth={2} />
+                  <AlertCircleIcon strokeWidth={2} />
                   <AlertTitle>Changing column privileges can break existing queries.</AlertTitle>
                   <AlertDescription>
                     If you remove a column privilege for a role, that role will lose all access to
