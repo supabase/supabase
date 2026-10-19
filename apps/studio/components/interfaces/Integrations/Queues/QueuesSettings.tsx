@@ -222,7 +222,7 @@ export const QueuesSettings = () => {
                             </p>
                             <p className="mt-2">
                               <code>send</code>, <code>send_batch</code>, <code>read</code>,{' '}
-                              <code>pop</code>,<code>archive</code>, and <code>delete</code>
+                              <code>pop</code>, <code>archive</code>, and <code>delete</code>
                             </p>
                             {!IS_PLATFORM ? (
                               <div className="mt-6 max-w-2xl">
