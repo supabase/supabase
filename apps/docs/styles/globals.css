@@ -352,14 +352,6 @@ th code {
   @apply break-normal break-words whitespace-normal;
 }
 
-/*
- * Other columns: prevents very long code lines (checksums, URLs, etc.) from
- * breaking table widths.
- */
-.prose :where(td:not(:first-child)) code {
-  @apply break-all;
-}
-
 .prose table td:first-child,
 .prose table th:first-child {
   min-width: 12rem;
