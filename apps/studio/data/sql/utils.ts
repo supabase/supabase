@@ -47,6 +47,13 @@ function isLimitableSelect(cleanedSql: string): boolean {
   if (lower.startsWith('select')) return true
   if (!lower.startsWith('with')) return false
 
+  // Dollar-quoted strings (`$$...$$`), `E''` escape strings and block comments
+  // cannot be masked reliably with a regex: a quote inside one dollar-quoted
+  // literal pairs with a quote in the next, which can hide a write keyword
+  // between them. Rather than risk limiting a statement that writes, leave
+  // anything containing those constructs alone.
+  if (/\$\w*\$|(^|[^a-z0-9_$])e'|\/\*/i.test(cleanedSql)) return false
+
   const withoutLiterals = cleanedSql
     .replace(/'(?:[^']|'')*'/g, "''")
     .replace(/"(?:[^"]|"")*"/g, '""')
