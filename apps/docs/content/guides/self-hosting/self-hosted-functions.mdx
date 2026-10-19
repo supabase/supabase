@@ -208,6 +208,59 @@ For more details, see:
 - [Quick start - Download edge functions](/docs/guides/functions/quickstart-dashboard#download-edge-functions)
 - [CLI commands - Download a function](/docs/reference/cli/supabase-functions-download)
 
+## Memory management
+
+The functions service has two memory limits: a shared container budget and a per-worker limit. Idle-worker cleanup responds to usage of the container budget.
+
+### Container memory budget
+
+`FUNCTIONS_MEMORY_LIMIT` defaults to `2g`, or 2 GiB, in the main `docker/.env` file. All user workers, the main worker, and other memory charged to the container share this budget, including page cache.
+
+Docker Compose applies this setting through `mem_limit`. The monitor reads the applied cgroup limit. This is a service resource setting, separate from custom environment variables that function code reads through `Deno.env.get()`.
+
+To change the container budget:
+
+1. In the main `docker/.env` file, set the limit for your host and functions' memory requirements:
+
+   ```dotenv
+   FUNCTIONS_MEMORY_LIMIT=2g
+   ```
+
+2. From the `docker/` directory, recreate the functions container:
+
+   ```sh
+   sh run.sh recreate functions
+   ```
+
+A restart alone does not apply a changed container limit.
+
+Choose a budget that leaves memory available for the other services on your host. The limit does not reserve host RAM. A 2 GiB budget does not guarantee capacity for 8 workers using 256 MiB each, because workers share the container with other memory consumers.
+
+### Per-worker memory limit
+
+`memoryLimitMb` in `volumes/functions/main/index.ts` defaults to 256 MiB per worker. A worker can reach its own limit while the container still has memory available. Increasing this limit allows each worker to consume more of the shared container budget.
+
+To change the per-worker limit:
+
+1. Edit `memoryLimitMb` in `volumes/functions/main/index.ts`.
+2. From the `docker/` directory, restart the functions service:
+
+   ```sh
+   sh run.sh restart functions
+   ```
+
+### Idle-worker cleanup
+
+The main worker samples container memory usage every second while usage is below 80% of the limit. At or above 80%, it asks eligible idle workers to retire and requests allocator memory collection. Cleanup skips workers with active requests or pending tasks, including tasks registered with `EdgeRuntime.waitUntil()`.
+
+The monitor waits 5 seconds after each cleanup attempt before sampling again, even when no workers acknowledge retirement. Logs report retirement acknowledgments. An acknowledgment does not mean worker shutdown or memory reclamation has finished. Retiring workers can cause cold starts on later requests.
+
+Monitoring requires cgroup v2 mounted at `/sys/fs/cgroup`, with readable `memory.current` and `memory.max` files and a finite limit. An unlimited limit or missing or inaccessible files disable monitoring with a warning. Requests continue to use the per-worker limits. After correcting the configuration, restart the functions service to reinitialize the monitor.
+
+For other failures, the monitor retries after 5 seconds and warns once until a cycle succeeds. The monitor does not fall back to host memory measurements or support cgroup v1 or alternative mount paths.
+
+Cleanup cannot guarantee immediate memory reclamation or prevent every out-of-memory error. Active function requests and background tasks can still exhaust available memory and interrupt requests. Stricter parent cgroup limits and host memory shortages can also interrupt requests. Restarting the container does not recover interrupted requests.
+
 ## Troubleshooting
 
 ### 404 `NOT_FOUND`
@@ -252,13 +305,12 @@ Use the following command to recreate the container:
 sh run.sh recreate functions
 ```
 
-### Memory or timeout errors
+### Timeout errors
 
-The default limits in `volumes/functions/main/index.ts` apply to each worker:
+The default timeouts in `volumes/functions/main/index.ts` apply to each worker:
 
 | Setting                  | Default    | Description                                                                                 |
 | ------------------------ | ---------- | ------------------------------------------------------------------------------------------- |
-| `memoryLimitMb`          | 150 MB     | Maximum memory usage.                                                                       |
 | `workerTimeoutMs`        | 400,000 ms | Maximum worker lifetime.                                                                    |
 | `requestAbsentTimeoutMs` | 60,000 ms  | Allows the worker to shut down after 60 seconds without requests when no tasks are pending. |
 
