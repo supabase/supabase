@@ -135,7 +135,7 @@ export const WarehouseDisableCard = () => {
                   name="shouldDeleteData"
                   render={({ field }) => (
                     <FormItemLayout
-                      layout="flex-row-reverse"
+                      layout="flex"
                       label="Also delete copied Warehouse data"
                       description="Permanently deletes the managed DuckLake catalog and Storage bucket. Source tables are preserved. This cannot be undone."
                     >
