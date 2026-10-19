@@ -120,6 +120,9 @@ describe('markdown alternate drift', () => {
       return
     }
     const source = await fs.readFile(appPagePath, 'utf-8')
+    // Accept the spread form too: pages that also set a canonical merge both
+    // helpers into one `alternates` object (`...mdAlternates(...)`), since a
+    // second `alternates` key would be a duplicate-property error.
     const wiring = 'alternates: mdAlternates(`' + urlPrefix + '/${slug}`)'
     const spreadWiring = '...mdAlternates(`' + urlPrefix + '/${slug}`)'
     expect(
