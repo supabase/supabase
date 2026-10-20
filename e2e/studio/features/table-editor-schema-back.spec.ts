@@ -26,24 +26,44 @@ test('back after switching schema with a table open stays on the list', async ({
   await gridLoad
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
 
+  const historyLength = () => page.evaluate(() => history.length)
+
+  const historyBeforeLeavingTable = await historyLength()
   await page.getByTestId('schema-selector').click()
   await page.getByPlaceholder('Find schema...').fill('auth')
   const authLoad = waitForTableToLoad(page, ref, 'auth')
   await page.getByRole('option', { name: 'auth', exact: true }).click()
   await authLoad
   await expect(page).toHaveURL(/\/editor\?schema=auth$/)
+  await expect(page.getByRole('combobox', { name: 'Schema auth' })).toBeVisible()
+  expect(await historyLength()).toBe(historyBeforeLeavingTable)
 
+  const historyBeforeNextSchema = await historyLength()
   await page.getByTestId('schema-selector').click()
   await page.getByPlaceholder('Find schema...').fill('extensions')
   const extensionsLoad = waitForTableToLoad(page, ref, 'extensions')
   await page.getByRole('option', { name: 'extensions', exact: true }).click()
   await extensionsLoad
   await expect(page).toHaveURL(/\/editor\?schema=extensions$/)
+  await expect(page.getByRole('combobox', { name: 'Schema extensions' })).toBeVisible()
+  expect(await historyLength()).toBe(historyBeforeNextSchema + 1)
 
   await page.goBack()
+  await expect(page).toHaveURL(/\/editor\?schema=auth$/)
+  await expect(page.getByRole('combobox', { name: 'Schema auth' })).toBeVisible()
+  await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toHaveCount(0)
+  await expect(page).toHaveURL(/\/editor\?schema=auth$/)
+
+  await page.goForward()
+  await expect(page).toHaveURL(/\/editor\?schema=extensions$/)
+  await expect(page.getByRole('combobox', { name: 'Schema extensions' })).toBeVisible()
+
+  await page.goBack()
+  await expect(page).toHaveURL(/\/editor\?schema=auth$/)
+  await page.goBack()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
   await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
-  await expect(page).toHaveURL(/\/editor\?schema=public/)
 
   await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
   await page.waitForURL(/\/editor\/\d+\?schema=public/)
@@ -52,5 +72,6 @@ test('back after switching schema with a table open stays on the list', async ({
   await page.goBack()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
   await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
+  await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
   await expect(page).toHaveURL(/\/editor\?schema=public/)
 })

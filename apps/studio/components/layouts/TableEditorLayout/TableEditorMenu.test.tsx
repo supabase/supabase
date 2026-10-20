@@ -122,7 +122,7 @@ describe('TableEditorMenu schema switch', () => {
     )
   })
 
-  test('does not navigate when no table is open', async () => {
+  test('pushes a history entry when switching schema from the list', async () => {
     params.id = undefined
     mockRouter.setCurrentUrl('/project/default/editor?schema=public')
     const onUrlUpdate = vi.fn()
@@ -134,9 +134,13 @@ describe('TableEditorMenu schema switch', () => {
     await userEvent.click(screen.getByRole('option', { name: 'auth' }))
 
     expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(mockRouter.push).not.toHaveBeenCalled()
     await waitFor(() => {
       expect(onUrlUpdate).toHaveBeenCalledWith(
-        expect.objectContaining({ queryString: '?schema=auth' })
+        expect.objectContaining({
+          queryString: '?schema=auth',
+          options: expect.objectContaining({ history: 'push' }),
+        })
       )
     })
   })

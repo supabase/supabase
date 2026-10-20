@@ -191,7 +191,9 @@ export const TableEditorMenu = () => {
                   return
                 }
 
-                setSelectedSchema(name)
+                // From the list, push so Back returns to the previous schema.
+                // Re-selecting the current schema keeps the default replace.
+                setSelectedSchema(name, { history: isSchemaChange ? 'push' : 'replace' })
               }}
               onSelectCreateSchema={() => {
                 snap.onAddSchema()
