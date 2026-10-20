@@ -47,7 +47,7 @@ export const getTablesPaginatedSql = ({
       : safeSql``
 
   const columnsCte = includeColumns
-    ? safeSql`, columns as (${getColumnsSql({
+    ? safeSql`, columns as materialized (${getColumnsSql({
         filter: { column: 'oid', predicate: safeSql`in (select oid from page)` },
       })})`
     : safeSql``

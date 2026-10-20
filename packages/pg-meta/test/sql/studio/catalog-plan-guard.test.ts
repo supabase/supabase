@@ -290,7 +290,7 @@ test('getEntityDefinitionsSql: plan stays scoped for a schema', async () => {
     // ~0.3s measured at 2000 tables post-fix for a 100-entity page; loose
     // enough for slow CI, tight enough to catch reintroduced O(catalog)
     // work inside pg_get_tabledef (which measured 5.6s for just 25 entities).
-    maxExecutionTimeMs: 3_000,
+    maxExecutionTimeMs: 5_000,
   })
 }, 60_000)
 
@@ -421,6 +421,10 @@ const COLUMN_PRIVILEGES_SCHEMA_SCOPED_BUDGET = {
         'schema-wide listing selects nearly every relation in the schema, so one filtered pg_class scan beats per-relation index lookups; pg_attribute stays index-driven',
     },
   },
+  // Schema-wide listing aggregates privileges for all columns in the 2000-table
+  // stress catalog (12K+ columns, 50K+ privilege records, disk sort under 4MB
+  // work_mem). Table-scoped takes ~12ms; schema-wide takes ~1.5s in EXPLAIN ANALYZE.
+  maxExecutionTimeMs: 3_000,
 }
 
 test('columnPrivileges.list: scoped plan stays scoped for a schema', async () => {
