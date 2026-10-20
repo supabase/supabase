@@ -6,8 +6,7 @@ import { cn } from '../../../lib/utils'
 import { buttonVariants } from '../../Button'
 import { StatusIcon } from './../../StatusIcon'
 
-export const SONNER_DEFAULT_DURATION = Infinity
-// export const SONNER_DEFAULT_DURATION = 4000
+export const SONNER_DEFAULT_DURATION = 4000
 
 type ToasterProps = React.ComponentProps<typeof Sonner> & { theme: 'light' | 'dark' | 'system' }
 
