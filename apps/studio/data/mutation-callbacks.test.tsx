@@ -69,7 +69,7 @@ describe('mutation callback contracts', () => {
     queryClient.setQueryData(key, [])
     addAPIMock({
       method: 'post',
-      path: '/platform/projects/:ref/privatelink/associations/aws-account',
+      path: '/v2/projects/:ref/private-link/associations',
       response: () =>
         failure
           ? HttpResponse.json<APIErrorBody>({ message: 'Mutation failed' }, { status: 500 })
