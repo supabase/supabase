@@ -17,7 +17,7 @@ import {
   type Lattice,
   type PixelRect,
 } from '../lib/ascii/field'
-import { createGrainPattern, punchGrain } from '../lib/ascii/grain'
+import { loadGrain, punchGrain } from '../lib/ascii/grain'
 import { easeOutCubic } from '../lib/ascii/warp'
 import { ColorProbes, readProbeColor } from './ColorProbes'
 
@@ -133,7 +133,11 @@ export const AsciiCanvas = ({
     const probeRoot = canvas.nextElementSibling
     if (!(probeRoot instanceof HTMLElement)) return
 
-    const grain = createGrainPattern(ctx)
+    let grain: CanvasPattern | null = null
+    loadGrain(ctx).then((pattern) => {
+      grain = pattern
+      draw()
+    })
     let palette = readPalette(probeRoot, host)
     let lattice: Lattice = { xs: [0], ys: [0] }
     let base: Float32Array = new Float32Array(0)
@@ -198,7 +202,7 @@ export const AsciiCanvas = ({
       }
       ctx.stroke()
       if (grain) {
-        punchGrain({ ctx, pattern: grain, rect: { left: 0, top: 0, right: width, bottom: height } })
+        punchGrain({ ctx, pattern: grain, width, height })
       }
 
       ctx.fillStyle = palette.background

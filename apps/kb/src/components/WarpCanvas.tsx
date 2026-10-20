@@ -12,7 +12,7 @@ import {
   rampGlyph,
   type PixelRect,
 } from '../lib/ascii/field'
-import { createGrainPattern, punchGrain } from '../lib/ascii/grain'
+import { loadGrain, punchGrain } from '../lib/ascii/grain'
 import { createInfall } from '../lib/ascii/infall'
 import { createLayer } from '../lib/ascii/layer'
 import {
@@ -194,7 +194,11 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
     const revealStartedAt = performance.now()
     const revealAt = (now: number) =>
       isReducedMotion ? 1 : Math.min(1, (now - revealStartedAt) / 600)
-    const grain = createGrainPattern(grid)
+    let grain: CanvasPattern | null = null
+    loadGrain(grid).then((pattern) => {
+      grain = pattern
+      draw()
+    })
     let palette = readPalette(probeRoot)
     let baseShape: WarpShape = { cx: 0, rimY: 0, throatY: 0, r0: THROAT_RADIUS }
     let baseRadii: number[] = []
@@ -299,11 +303,7 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
         })
         grid.stroke()
         if (grain) {
-          punchGrain({
-            ctx: grid,
-            pattern: grain,
-            rect: { left: 0, top: 0, right: width, bottom: height },
-          })
+          punchGrain({ ctx: grid, pattern: grain, width, height })
         }
         grid.restore()
       }

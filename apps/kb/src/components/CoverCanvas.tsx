@@ -12,7 +12,7 @@ import {
   rampGlyph,
   uniformEdges,
 } from '../lib/ascii/field'
-import { createGrainPattern, punchGrain } from '../lib/ascii/grain'
+import { loadGrain, punchGrain } from '../lib/ascii/grain'
 import { createLayer } from '../lib/ascii/layer'
 import { easeInOutCubic } from '../lib/ascii/warp'
 import {
@@ -181,7 +181,11 @@ export const CoverCanvas = ({
       const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
       const sorted = paintOrder(boxes)
       const lifts = sorted.map(() => ({ from: 0, to: 0, startedAt: 0, delay: 0 }))
-      const grain = createGrainPattern(ctx)
+      let grain: CanvasPattern | null = null
+      loadGrain(ctx).then((pattern) => {
+        grain = pattern
+        draw()
+      })
       // the fluid paints after the grain so the grain's holes stay on the lines only
       const fluidLayer = createLayer()
       let palette = readPalette(probeRoot)
@@ -309,12 +313,7 @@ export const CoverCanvas = ({
           ctx.stroke()
           ctx.restore()
         })
-        if (grain)
-          punchGrain({
-            ctx,
-            pattern: grain,
-            rect: { left: 0, top: 0, right: width, bottom: height },
-          })
+        if (grain) punchGrain({ ctx, pattern: grain, width, height })
         if (fluidLayer) ctx.drawImage(fluidLayer.canvas, 0, 0, width, height)
       }
 
