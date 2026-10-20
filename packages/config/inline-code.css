@@ -20,7 +20,7 @@
     font-size: max(0.75rem, calc(1em - 2px));
     line-height: inherit;
     font-weight: inherit;
-    color: inherit;
+    color: var(--foreground-default);
   }
 }
 
@@ -47,7 +47,7 @@
     font-size: max(0.75rem, calc(1em - 2px));
     line-height: inherit;
     font-weight: inherit;
-    color: inherit;
+    color: var(--foreground-default);
 
     &::before,
     &::after {
