@@ -9,7 +9,7 @@ const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
 const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const url = new URL(request.url)
   const { pathname } = url
 
