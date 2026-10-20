@@ -5,7 +5,7 @@
     "preinstall": "npx only-allow pnpm",
     "build:icons": "node ./scripts/validateIcons.mjs && build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts",
     "test": "node --test ./scripts/validateIcons.test.mjs",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo",
     "validate:icons": "node ./scripts/validateIcons.mjs",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo"
   },

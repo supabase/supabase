@@ -6,7 +6,7 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc",
+    "typecheck": "react-router typegen && tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo",
     "clean": "rimraf build .react-router .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {

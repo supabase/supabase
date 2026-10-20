@@ -48,7 +48,7 @@
     "test:local": "vitest --exclude \"**/*.smoke.test.ts\"",
     "test:local:unwatch": "vitest --exclude \"**/*.smoke.test.ts\" --run",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo"
   },
   "dependencies": {
     "@har-sdk/openapi-sampler": "^2.2.0",

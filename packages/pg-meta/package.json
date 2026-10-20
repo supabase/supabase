@@ -11,7 +11,7 @@
     "test": "test/run-tests.sh vitest run --coverage",
     "test:update": "test/run-tests.sh vitest run --update",
     "lint": "tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo"
   },
   "dependencies": {
     "zod": "catalog:"

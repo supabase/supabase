@@ -9,7 +9,7 @@
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },
   "exports": {
