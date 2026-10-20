@@ -1498,9 +1498,6 @@ importers:
       '@types/zxcvbn':
         specifier: ^4.4.1
         version: 4.4.2
-      '@typescript/native':
-        specifier: 'catalog:'
-        version: typescript@7.0.2
       '@vercel/config':
         specifier: ^0.2.1
         version: 0.2.1
