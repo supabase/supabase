@@ -1,14 +1,18 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { HelpCircleIcon } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import {
   Checkbox,
   cn,
+  Command,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -41,6 +45,8 @@ export interface OrganizationProjectsMultiSelectProps {
   error?: string
   searchPlaceholder?: string
   triggerLabel?: string
+  /** Replaces the default combobox/badge trigger with a custom one (e.g. a plain "Add new" button). */
+  renderTrigger?: () => ReactNode
 }
 
 export const OrganizationProjectsMultiSelect = ({
@@ -54,6 +60,7 @@ export const OrganizationProjectsMultiSelect = ({
   error,
   searchPlaceholder = 'Search project...',
   triggerLabel = 'Select projects...',
+  renderTrigger,
 }: OrganizationProjectsMultiSelectProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const slug = _slug ?? organization?.slug
@@ -220,6 +227,36 @@ export const OrganizationProjectsMultiSelect = ({
     fetchNextPage,
   ])
 
+  const popoverBody = (
+    <>
+      <CommandInput
+        showResetIcon
+        value={search}
+        onValueChange={setSearch}
+        placeholder={searchPlaceholder}
+        handleReset={() => setSearch('')}
+        className="text-base sm:text-sm"
+      />
+      <CommandList className="max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden">
+        <CommandGroup>{renderListContent()}</CommandGroup>
+      </CommandList>
+    </>
+  )
+
+  if (renderTrigger) {
+    return (
+      <div className="flex flex-col gap-2">
+        <Popover open={open} onOpenChange={setOpen} modal>
+          <PopoverTrigger asChild>{renderTrigger()}</PopoverTrigger>
+          <PopoverContent className="p-0" side="bottom" align="end">
+            <Command shouldFilter={false}>{popoverBody}</Command>
+          </PopoverContent>
+        </Popover>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
+    )
+  }
+
   return (
     <div className="flex w-full flex-col gap-2">
       <MultiSelector
@@ -230,19 +267,7 @@ export const OrganizationProjectsMultiSelect = ({
         disabled={disabled}
       >
         <MultiSelectorTrigger label={triggerLabel} badgeLimit={4} renderValue={getProjectName} />
-        <MultiSelectorContent>
-          <CommandInput
-            showResetIcon
-            value={search}
-            onValueChange={setSearch}
-            placeholder={searchPlaceholder}
-            handleReset={() => setSearch('')}
-            className="text-base sm:text-sm"
-          />
-          <CommandList className="max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden">
-            <CommandGroup>{renderListContent()}</CommandGroup>
-          </CommandList>
-        </MultiSelectorContent>
+        <MultiSelectorContent>{popoverBody}</MultiSelectorContent>
       </MultiSelector>
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>

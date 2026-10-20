@@ -1,11 +1,12 @@
 import { useParams } from 'common'
-import { XIcon } from 'lucide-react'
+import { PlusIcon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Alert,
   AlertDescription,
   AlertTitle,
   Button,
+  Card,
   cn,
   Select,
   SelectContent,
@@ -190,13 +191,29 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
             <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
               {isOptedIntoProjectLevelPermissions && (
-                <div className="flex items-center gap-x-4">
-                  <Switch
-                    disabled={cannotAddAnyRoles}
-                    checked={isApplyingRoleToAllProjects}
-                    onCheckedChange={onToggleApplyToAllProjects}
-                  />
-                  <p className="text-sm">Apply roles to all projects in the organization</p>
+                <div className="flex items-center justify-between gap-x-4">
+                  <div className="flex items-center gap-x-4">
+                    <Switch
+                      disabled={cannotAddAnyRoles}
+                      checked={isApplyingRoleToAllProjects}
+                      onCheckedChange={onToggleApplyToAllProjects}
+                    />
+                    <p className="text-sm">Apply roles to all projects in the organization</p>
+                  </div>
+                  {isSuccessRoles && !isApplyingRoleToAllProjects && (
+                    <OrganizationProjectsMultiSelect
+                      selectedRefs={selectedRefs}
+                      onChange={onProjectSelectionChange}
+                      knownProjects={knownProjects}
+                      disabledRefs={disabledRefs}
+                      disabledTooltip="Additional permission required to remove role from member"
+                      renderTrigger={() => (
+                        <Button type="button" variant="primary" icon={<PlusIcon size={14} />}>
+                          Add new
+                        </Button>
+                      )}
+                    />
+                  )}
                 </div>
               )}
 
@@ -222,120 +239,111 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   </Admonition>
                 )}
 
-              {isSuccessRoles && !isApplyingRoleToAllProjects && (
-                <OrganizationProjectsMultiSelect
-                  selectedRefs={selectedRefs}
-                  onChange={onProjectSelectionChange}
-                  knownProjects={knownProjects}
-                  disabledRefs={disabledRefs}
-                  disabledTooltip="Additional permission required to remove role from member"
-                  triggerLabel="Add projects..."
-                />
-              )}
+              <Card className="overflow-hidden">
+                <div className="flex flex-col divide-y divide-border">
+                  {projectsRoleConfiguration.map((project) => {
+                    const name = project.ref === undefined ? 'All projects' : project.name
+                    const role = getRoleForProject(project)
+                    const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
 
-              <div className="flex flex-col divide-y divide-border">
-                {projectsRoleConfiguration.map((project) => {
-                  const name = project.ref === undefined ? 'All projects' : project.name
-                  const role = getRoleForProject(project)
-                  const canRemoveRole = rolesRemovable.includes(role?.id ?? 0)
+                    return (
+                      <div
+                        key={`${project.ref}-${project.roleId}`}
+                        className="flex items-center justify-between px-4 py-3"
+                      >
+                        <p className="text-sm">{name}</p>
 
-                  return (
-                    <div
-                      key={`${project.ref}-${project.roleId}`}
-                      className="flex items-center justify-between py-2"
-                    >
-                      <p className="text-sm">{name}</p>
-
-                      <div className="flex items-center gap-x-2">
-                        {cannotAddAnyRoles ? (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
-                                {role?.name ?? 'Unknown'}
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                              Additional permissions required to update role
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          <Select
-                            value={(project?.baseRoleId ?? project.roleId).toString()}
-                            onValueChange={(value) => onSelectRole(value, project)}
-                          >
-                            <SelectTrigger
-                              className={cn(
-                                ' w-40',
-                                role?.name === undefined && 'text-foreground-light'
-                              )}
+                        <div className="flex items-center gap-x-2">
+                          {cannotAddAnyRoles ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <div className="flex items-center justify-between rounded-md border border-button bg-button px-3 py-2 text-sm h-10 w-56 text-foreground-light">
+                                  {role?.name ?? 'Unknown'}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                Additional permissions required to update role
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <Select
+                              value={(project?.baseRoleId ?? project.roleId).toString()}
+                              onValueChange={(value) => onSelectRole(value, project)}
                             >
-                              {role?.name ?? 'Please select a role'}
-                            </SelectTrigger>
-                            <SelectContent align="end">
-                              <SelectGroup>
-                                {(orgScopedRoles ?? []).map((role) => {
-                                  const canAssignRole = rolesAddable.includes(role.id)
-                                  const isOwnerRole = role.name === 'Owner'
-                                  const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                              <SelectTrigger
+                                className={cn(
+                                  ' w-40',
+                                  role?.name === undefined && 'text-foreground-light'
+                                )}
+                              >
+                                {role?.name ?? 'Please select a role'}
+                              </SelectTrigger>
+                              <SelectContent align="end" className="max-h-[32rem]">
+                                <SelectGroup>
+                                  {(orgScopedRoles ?? []).map((role) => {
+                                    const canAssignRole = rolesAddable.includes(role.id)
+                                    const isOwnerRole = role.name === 'Owner'
+                                    const disabledForStripe = isStripeProjectsOrg && isOwnerRole
 
-                                  const isNoAccessRole = role.name === 'No-access'
-                                  const disabledForProjectRole =
-                                    !isApplyingRoleToAllProjects && isNoAccessRole
-                                  const disabled =
-                                    !canAssignRole || disabledForStripe || disabledForProjectRole
-                                  const disabledReason = disabledForStripe
-                                    ? 'Cannot be assigned in Stripe Projects organizations'
-                                    : disabledForProjectRole
-                                      ? 'Cannot assign No-access role to project-scoped members'
-                                      : !canAssignRole
-                                        ? 'Additional permissions required to assign role'
-                                        : undefined
+                                    const isNoAccessRole = role.name === 'No-access'
+                                    const disabledForProjectRole =
+                                      !isApplyingRoleToAllProjects && isNoAccessRole
+                                    const disabled =
+                                      !canAssignRole || disabledForStripe || disabledForProjectRole
+                                    const disabledReason = disabledForStripe
+                                      ? 'Cannot be assigned in Stripe Projects organizations'
+                                      : disabledForProjectRole
+                                        ? 'Cannot assign No-access role to project-scoped members'
+                                        : !canAssignRole
+                                          ? 'Additional permissions required to assign role'
+                                          : undefined
 
-                                  return (
-                                    <SelectItem
-                                      key={role.id}
-                                      value={role.id.toString()}
-                                      className="text-sm hover:bg-selection cursor-pointer"
-                                      disabled={disabled}
-                                    >
-                                      <div className="flex flex-col gap-0.5 max-w-xs">
-                                        <span>{role.name}</span>
-                                        <span className="text-xs text-foreground-lighter">
-                                          {ROLE_DESCRIPTIONS[role.name] ??
-                                            'Permissions are based on the configured organization role.'}
-                                          {disabledReason && ` ${disabledReason}`}
-                                        </span>
-                                      </div>
-                                    </SelectItem>
-                                  )
-                                })}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        )}
+                                    return (
+                                      <SelectItem
+                                        key={role.id}
+                                        value={role.id.toString()}
+                                        className="text-sm hover:bg-selection cursor-pointer"
+                                        disabled={disabled}
+                                      >
+                                        <div className="flex flex-col gap-0.5 max-w-xs">
+                                          <span>{role.name}</span>
+                                          <span className="text-xs text-foreground-lighter">
+                                            {ROLE_DESCRIPTIONS[role.name] ??
+                                              'Permissions are based on the configured organization role.'}
+                                            {disabledReason && ` ${disabledReason}`}
+                                          </span>
+                                        </div>
+                                      </SelectItem>
+                                    )
+                                  })}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          )}
 
-                        {!isApplyingRoleToAllProjects && (
-                          <ButtonTooltip
-                            variant="text"
-                            disabled={!canRemoveRole}
-                            className="px-1"
-                            icon={<XIcon />}
-                            onClick={() => onRemoveProject(project?.ref)}
-                            tooltip={{
-                              content: {
-                                side: 'bottom',
-                                text: !canRemoveRole
-                                  ? 'Additional permission required to remove role from member'
-                                  : 'Remove access to project',
-                              },
-                            }}
-                          />
-                        )}
+                          {!isApplyingRoleToAllProjects && (
+                            <ButtonTooltip
+                              variant="text"
+                              disabled={!canRemoveRole}
+                              className="px-1"
+                              icon={<XIcon />}
+                              onClick={() => onRemoveProject(project?.ref)}
+                              tooltip={{
+                                content: {
+                                  side: 'bottom',
+                                  text: !canRemoveRole
+                                    ? 'Additional permission required to remove role from member'
+                                    : 'Remove access to project',
+                                },
+                              }}
+                            />
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
+                    )
+                  })}
+                </div>
+              </Card>
             </SheetSection>
 
             <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
