@@ -1077,4 +1077,9 @@ module.exports = [
     source: '/changelog/rss.xml',
     destination: '/changelog-rss.xml',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/sso/enterprise-mcp-authentication',
+    destination: '/docs/guides/platform/sso/enterprise-mcp-authorization',
+  },
 ]
