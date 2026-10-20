@@ -62,7 +62,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const CONTENT_PADDING = 'w-full px-6 xl:px-10'
+const CONTENT_PADDING = 'w-full px-6 xl:px-9'
 const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
 export const AuditLogs = () => {
@@ -304,7 +304,7 @@ export const AuditLogs = () => {
           {isSuccess && (
             <>
               {showFilters && (
-                <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row md:items-center justify-between">
+                <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row justify-between">
                   <FilterBar
                     supportsOperators
                     variant="pill"
@@ -328,7 +328,7 @@ export const AuditLogs = () => {
               )}
 
               {logs.length === 0 ? (
-                <div className={CONTENT_PADDING}>
+                <div className={cn(CONTENT_PADDING, 'border-t pt-4')}>
                   <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       Your organization does not have any audit logs available yet
@@ -336,7 +336,7 @@ export const AuditLogs = () => {
                   </div>
                 </div>
               ) : logs.length > 0 && filteredLogs.length === 0 ? (
-                <div className={CONTENT_PADDING}>
+                <div className={cn(CONTENT_PADDING, 'border-t pt-4')}>
                   <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
                     <p className="prose text-sm">
                       No audit logs found based on the filters applied

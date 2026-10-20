@@ -382,10 +382,6 @@
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"
     },
-    "./FilterBar/useCommandMenu": {
-      "import": "./src/FilterBar/useCommandMenu.ts",
-      "types": "./src/FilterBar/useCommandMenu.ts"
-    },
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
       "types": "./src/FilterBar/useKeyboardNavigation.ts"

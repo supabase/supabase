@@ -1,3 +1,5 @@
+import { ParenthesesIcon } from 'lucide-react'
+
 import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   collectConditions,
@@ -111,7 +113,11 @@ export function buildPropertyItems(params: {
   )
 
   if (supportsOperators) {
-    items.push({ value: '__new_group__', label: 'New Group' })
+    items.push({
+      icon: <ParenthesesIcon size={14} />,
+      value: '__new_group__',
+      label: 'New filter group',
+    })
   }
 
   if (actions && trimmedInput.length > 0) {

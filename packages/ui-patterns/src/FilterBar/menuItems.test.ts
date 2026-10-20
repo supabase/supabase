@@ -311,26 +311,26 @@ describe('buildPropertyItems', () => {
     ).toEqual(['status'])
   })
 
-  it('uses a sentinel value for the "New Group" action when supportsOperators is true', () => {
+  it('uses a sentinel value for the "New filter group" action when supportsOperators is true', () => {
     const items = buildPropertyItems({
       filterProperties: properties,
       inputValue: '',
       supportsOperators: true,
     })
 
-    const groupItem = items.find((item) => item.label === 'New Group')
+    const groupItem = items.find((item) => item.label === 'New filter group')
     expect(groupItem).toBeDefined()
     expect(groupItem?.value).toBe('__new_group__')
   })
 
-  it('does not include "New Group" when supportsOperators is false', () => {
+  it('does not include "New filter group" when supportsOperators is false', () => {
     const items = buildPropertyItems({
       filterProperties: properties,
       inputValue: '',
       supportsOperators: false,
     })
 
-    expect(items.find((item) => item.label === 'New Group')).toBeUndefined()
+    expect(items.find((item) => item.label === 'New filter group')).toBeUndefined()
   })
 
   it('does not collide with a property named "group"', () => {
@@ -346,7 +346,7 @@ describe('buildPropertyItems', () => {
     })
 
     const groupPropertyItem = items.find((item) => item.label === 'group')
-    const newGroupItem = items.find((item) => item.label === 'New Group')
+    const newGroupItem = items.find((item) => item.label === 'New filter group')
 
     expect(groupPropertyItem).toBeDefined()
     expect(groupPropertyItem?.value).toBe('group')
