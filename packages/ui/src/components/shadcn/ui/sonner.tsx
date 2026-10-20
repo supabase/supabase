@@ -6,7 +6,8 @@ import { cn } from '../../../lib/utils'
 import { buttonVariants } from '../../Button'
 import { StatusIcon } from './../../StatusIcon'
 
-export const SONNER_DEFAULT_DURATION = 4000
+export const SONNER_DEFAULT_DURATION = Infinity
+// export const SONNER_DEFAULT_DURATION = 4000
 
 type ToasterProps = React.ComponentProps<typeof Sonner> & { theme: 'light' | 'dark' | 'system' }
 
@@ -33,9 +34,10 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'rounded-md',
             'py-3',
             'px-5',
+            'pr-10',
             'flex',
             'gap-2',
-            'items-start',
+            'items-center',
             'font-normal',
             'text-sm',
             'data-[expanded=false]:overflow-hidden',
@@ -54,20 +56,19 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
           closeButton: cn(
             // unset all styles set from sonner
-            'absolute right-2 top-2 size-6 flex items-center justify-center rounded-md text-foreground-light opacity-0 transition-opacity',
-            'hover:text-foreground hover:bg-surface-200 focus-visible:opacity-100 focus-ring group-hover:opacity-100',
-            'group-[.destructive]:text-destructive-300 group-[.destructive]:hover:text-destructive-50',
-            'group-[.destructive]:focus-visible:ring-destructive-400 group-[.destructive]:focus-visible:ring-offset-destructive-600',
-            'left-auto transform-none border-0 border-transparent'
+            'absolute! right-2! top-1/2! -translate-y-1/2! size-6! flex! items-center! justify-center! rounded-md! bg-transparent! transition-opacity!',
+            'hover:!text-foreground hover:!bg-surface-200 focus-visible:!opacity-100 !focus-ring',
+            'group-[.destructive]:!text-destructive-300 group-[.destructive]:!hover:text-destructive-50',
+            'group-[.destructive]:!focus-visible:ring-destructive-400 group-[.destructive]:!focus-visible:ring-offset-destructive-600',
+            '!left-auto !transform-none !border-0 !border-transparent'
           ),
+          loader: 'top-1/2! -translate-y-1/2! left-2!',
           content: 'grow',
-          //group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay
         },
         duration: SONNER_DEFAULT_DURATION,
         closeButton: true,
         ...toastOptions,
       }}
-      cn={cn}
       {...props}
     />
   )
