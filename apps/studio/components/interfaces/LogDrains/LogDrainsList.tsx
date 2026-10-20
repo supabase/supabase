@@ -150,7 +150,7 @@ export function LogDrainsList({
                           variant="default"
                           className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
                           icon={<MoreVerticalIcon />}
-                          tooltip={{ content: { side: 'bottom', text: 'More options`' } }}
+                          tooltip={{ content: { side: 'bottom', text: 'More options' } }}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[160px]" align="end">

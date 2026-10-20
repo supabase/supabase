@@ -63,7 +63,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const postUrl = new URL(baseUrl)
       postUrl.pathname = '/api/backends'
-      const postResult = await fetch(postUrl, {
+      const postUpstream = await fetch(postUrl, {
         body: JSON.stringify({
           ...parsedBody.data,
           metadata: {
@@ -76,7 +76,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      }).then(async (r) => await r.json())
+      })
+
+      if (!postUpstream.ok) {
+        return res
+          .status(500)
+          .json({ error: { message: 'Failed to create log drain in upstream' } })
+      }
+
+      const postResult = await postUpstream.json()
 
       const sourcesGetUrl = new URL(baseUrl)
       sourcesGetUrl.pathname = '/api/sources'

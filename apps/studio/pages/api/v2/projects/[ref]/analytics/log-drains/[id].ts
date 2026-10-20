@@ -33,38 +33,54 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
       const putUrl = new URL(baseUrl)
       putUrl.pathname = `/api/backends/${id}`
-      const putResult = await fetch(putUrl, {
-        body: JSON.stringify(parsedBody.data),
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      })
-        .then(async (r) => await r.json())
-        .catch((err) => {
-          console.error('error updating log drain', err)
-          return res.status(500).json({ error: { message: 'Error updating log drain' } })
+      try {
+        const putUpstream = await fetch(putUrl, {
+          body: JSON.stringify(parsedBody.data),
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
         })
-      return res.status(200).json({ data: asLogDrainResource(putResult) })
+
+        if (!putUpstream.ok) {
+          return res
+            .status(500)
+            .json({ error: { message: 'Failed to update log drain in upstream' } })
+        }
+
+        const putResult = await putUpstream.json()
+        return res.status(200).json({ data: asLogDrainResource(putResult) })
+      } catch (err) {
+        console.error('error updating log drain', err)
+        return res.status(500).json({ error: { message: 'Error updating log drain' } })
+      }
 
     case 'DELETE':
       // delete the log drain
       const deleteUrl = new URL(baseUrl)
       deleteUrl.pathname = `/api/backends/${id}`
 
-      await fetch(deleteUrl, {
-        headers: {
-          Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        method: 'DELETE',
-      }).catch((err) => {
+      try {
+        const deleteUpstream = await fetch(deleteUrl, {
+          headers: {
+            Authorization: `Bearer ${process.env.LOGFLARE_PRIVATE_ACCESS_TOKEN}`,
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          method: 'DELETE',
+        })
+
+        if (!deleteUpstream.ok) {
+          return res
+            .status(500)
+            .json({ error: { message: 'Failed to delete log drain in upstream' } })
+        }
+      } catch (err) {
         console.error('error deleting log drain', err)
         return res.status(500).json({ error: { message: 'Error deleting log drain' } })
-      })
+      }
       return res.status(204).end()
     default:
       res.setHeader('Allow', ['PUT', 'DELETE'])
