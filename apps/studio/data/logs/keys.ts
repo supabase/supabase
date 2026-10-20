@@ -1,6 +1,8 @@
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 
 export const logsKeys = {
+  unifiedLogsLive: (projectRef: string | undefined, search: QuerySearchParamsType, otel: boolean) =>
+    ['projects', projectRef, 'unified-logs-live', search, { otel }] as const,
   otelLogKeys: (projectRef: string | undefined, source: string | undefined) =>
     ['projects', projectRef, 'otel-log-keys', source] as const,
   unifiedLogsInfinite: (

@@ -1,4 +1,3 @@
-import type { FetchPreviousPageOptions } from '@tanstack/react-query'
 import { CirclePauseIcon, CirclePlayIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect } from 'react'
@@ -13,10 +12,11 @@ const REFRESH_INTERVAL = 10_000
 
 interface LiveButtonProps {
   searchParamsParser: any
-  fetchPreviousPage?: (options?: FetchPreviousPageOptions | undefined) => Promise<unknown>
+  onPoll: () => Promise<{ isCatchingUp: boolean }>
+  isCatchingUp?: boolean
 }
 
-export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButtonProps) {
+export function LiveButton({ onPoll, isCatchingUp, searchParamsParser }: LiveButtonProps) {
   const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
   const { table } = useDataTable()
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick, { registerInCommandMenu: false })
@@ -28,9 +28,9 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
     let timeoutId: ReturnType<typeof setTimeout> | undefined
 
     async function fetchData() {
-      await fetchPreviousPage?.().catch(() => undefined)
+      const result = await onPoll().catch(() => ({ isCatchingUp: false }))
       if (isActive) {
-        timeoutId = setTimeout(fetchData, REFRESH_INTERVAL)
+        timeoutId = setTimeout(fetchData, result.isCatchingUp ? 250 : REFRESH_INTERVAL)
       }
     }
 
@@ -40,7 +40,7 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
       isActive = false
       clearTimeout(timeoutId)
     }
-  }, [live, fetchPreviousPage])
+  }, [live, onPoll])
 
   useEffect(() => {
     if ((date || sort) && live) {
@@ -73,7 +73,7 @@ export function LiveButton({ fetchPreviousPage, searchParamsParser }: LiveButton
           live ? <CirclePauseIcon className="h-4 w-4" /> : <CirclePlayIcon className="h-4 w-4" />
         }
       >
-        Live
+        {live && isCatchingUp ? 'Catching up' : 'Live'}
       </Button>
     </ShortcutTooltip>
   )

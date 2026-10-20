@@ -69,6 +69,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+import { mergeUnifiedLogs, useUnifiedLogsLiveQuery } from '@/data/logs/unified-logs-live-query'
 import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -186,14 +187,22 @@ export const UnifiedLogs = () => {
     error,
     isError,
     isLoading,
+    isPlaceholderData,
     isFetching,
     isFetchingNextPage,
     isFetchingPreviousPage,
     hasNextPage,
     refetch: refetchLogs,
     fetchNextPage,
-    fetchPreviousPage,
   } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+
+  const canSeedLiveQuery = !isLoading && !isPlaceholderData && !isError
+  const liveQuery = useUnifiedLogsLiveQuery({
+    projectRef,
+    search: searchParameters,
+    isLive: search.live,
+    seed: canSeedLiveQuery ? unifiedLogsData?.pages[0]?.prevCursor : undefined,
+  })
 
   const {
     data: counts,
@@ -228,7 +237,10 @@ export const UnifiedLogs = () => {
   const rawFlatData = useMemo(() => {
     return unifiedLogsData?.pages?.flatMap((page) => page.data ?? []) ?? []
   }, [unifiedLogsData?.pages])
-  const flatData = useMemo(() => deduplicateUnifiedLogs(rawFlatData), [rawFlatData])
+  const flatData = useMemo(() => {
+    const rows = [...rawFlatData, ...(liveQuery.data?.rows ?? [])]
+    return search.sort ? deduplicateUnifiedLogs(rows) : mergeUnifiedLogs(rows)
+  }, [liveQuery.data?.rows, rawFlatData, search.sort])
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -449,6 +461,13 @@ export const UnifiedLogs = () => {
                   projectRef={projectRef}
                 />
               )}
+              {liveQuery.isError && (
+                <AlertError
+                  error={liveQuery.error}
+                  subject="Failed to load live logs"
+                  projectRef={projectRef}
+                />
+              )}
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS} side="bottom">
                   <Button
@@ -479,12 +498,11 @@ export const UnifiedLogs = () => {
                   />
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
-                  {fetchPreviousPage ? (
-                    <LiveButton
-                      fetchPreviousPage={fetchPreviousPage}
-                      searchParamsParser={SEARCH_PARAMS_PARSER}
-                    />
-                  ) : null}
+                  <LiveButton
+                    onPoll={liveQuery.onPoll}
+                    isCatchingUp={liveQuery.isCatchingUp}
+                    searchParamsParser={SEARCH_PARAMS_PARSER}
+                  />
                 </div>
               </div>
 
