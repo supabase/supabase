@@ -62,9 +62,7 @@ export const OrganizationProjectsMultiSelect = ({
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 500)
 
-  const scrollRootRef = useRef<HTMLDivElement | null>(null)
   const [sentinelRef, entry] = useIntersectionObserver({
-    root: scrollRootRef.current,
     threshold: 0,
     rootMargin: '0px',
   })
