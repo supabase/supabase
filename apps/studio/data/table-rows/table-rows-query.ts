@@ -5,7 +5,7 @@ import {
   getTableRowsSql,
 } from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 
 import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
@@ -14,10 +14,7 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { handleError } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import {
-  PG_META_SCOPED_INTROSPECTION_FLAG,
-  prefetchTableEditor,
-} from '@/data/table-editor/table-editor-query'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
 import { timeout } from '@/lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -31,7 +28,6 @@ interface GetTableRowsArgs {
   limit?: number
   page?: number
   roleImpersonationState?: RoleImpersonationState
-  scoped?: boolean
 }
 
 /**
@@ -336,7 +332,6 @@ async function getTableRows(
     limit,
     page,
     preflightCheck = false,
-    scoped,
   }: TableRowsVariables,
   signal?: AbortSignal
 ) {
@@ -344,7 +339,6 @@ async function getTableRows(
     projectRef,
     connectionString,
     id: tableId,
-    scoped,
   })
   if (!entity) {
     throw new Error('Table not found')
@@ -405,7 +399,6 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 ) => {
   const queryClient = useQueryClient()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
-  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   // [Ali] Exclude preflightCheck from query key — it controls how the query
   // executes (whether an EXPLAIN guard runs first), not what data is returned.
@@ -416,10 +409,9 @@ export const useTableRowsQuery = <TData = TableRowsData>(
       table: { id: tableId },
       readReplicaIdentifier,
       ...queryKeyArgs,
-      scoped,
     }),
     queryFn: ({ signal }) =>
-      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args, scoped }, signal),
+      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
