@@ -16,7 +16,7 @@ vi.mock('@/state/storage-explorer', () => ({
 vi.mock('./useStoragePreference', () => ({
   useStoragePreference: () => mockUseStoragePreference(),
 }))
-// The columns themselves are irrelevant here — only the scroll container's geometry is.
+// The columns themselves are irrelevant here — only the scroll container's geometry is
 vi.mock('./FileExplorerColumn', () => ({
   FileExplorerColumn: () => <div data-testid="column" />,
 }))
