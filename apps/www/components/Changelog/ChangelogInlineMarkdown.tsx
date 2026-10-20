@@ -9,7 +9,6 @@ import remarkGfm from 'remark-gfm'
 const INLINE_COMPONENTS: Components = {
   p: ({ children }) => <>{children}</>,
   a: ({ children }) => <>{children}</>,
-  code: ({ children }) => <code className="text-[0.85em] font-normal">{children}</code>,
 }
 
 export function ChangelogInlineMarkdown({ children }: { children: string }) {

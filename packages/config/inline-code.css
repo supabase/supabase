@@ -13,13 +13,14 @@
       .cm-editor *
     )
   ) {
-    @apply tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground;
+    @apply bg-surface-200 border border-muted rounded-sm px-1 py-0.25;
 
     word-break: normal;
     overflow-wrap: anywhere;
     font-size: max(0.75rem, calc(1em - 2px));
     line-height: inherit;
     font-weight: inherit;
+    color: inherit;
   }
 }
 
@@ -39,13 +40,14 @@
       .not-prose *
     )
   ) {
-    @apply tracking-tight bg-surface-200 border border-muted rounded-sm px-1 py-0.25 text-foreground;
+    @apply bg-surface-200 border border-muted rounded-sm px-1 py-0.25;
 
     word-break: normal;
     overflow-wrap: anywhere;
     font-size: max(0.75rem, calc(1em - 2px));
     line-height: inherit;
     font-weight: inherit;
+    color: inherit;
 
     &::before,
     &::after {
