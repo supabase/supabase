@@ -23,3 +23,16 @@
     radial-gradient(circle at 100% 0, var(--tab-flare-ring)),
     radial-gradient(circle at 100% 0, var(--tab-flare-fill));
 }
+
+@utility grain-mask {
+  mask: url('../assets/grain.webp') 0 0 / 132px 132px;
+}
+
+@utility grain-mask-flank {
+  mask:
+    url('../assets/grain.webp') 0 0 / 132px 132px,
+    linear-gradient(#000 0 0) top / 100% 100vh no-repeat,
+    linear-gradient(#000, transparent 12rem) bottom / 100% 100vh no-repeat,
+    linear-gradient(#000 0 0) top left / calc(100% - 20rem) calc(100% - 100vh) no-repeat;
+  mask-composite: intersect, add, add, add;
+}

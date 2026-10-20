@@ -11,10 +11,12 @@ import {
   type Lattice,
 } from '../lib/ascii/field'
 import type { GuideSummary } from '../lib/guides'
+import type { Topic } from '../lib/topics'
 import { useQueryVariant } from '../lib/use-query-variant'
 import { AsciiCanvas, type CanvasSize } from './AsciiCanvas'
 import { AsciiHoverText } from './AsciiHoverText'
 import { GuideSearchDialog } from './GuideSearchDialog'
+import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
 export interface HeroProps {
@@ -22,9 +24,26 @@ export interface HeroProps {
   description: string
   guides: GuideSummary[]
   breadcrumb?: ReactNode
-  variant?: 'grid' | 'warp'
+  variant?: 'grid' | 'warp' | 'construction'
+  topic?: Topic
   children?: ReactNode
   className?: string
+}
+
+export interface TopicHeroProps {
+  topic: Topic
+  description: string
+  guides: GuideSummary[]
+  breadcrumb?: ReactNode
+  className?: string
+}
+
+interface CopyFrameProps {
+  lines: { id: string; className: string }[]
+}
+
+interface HeroFlanksProps {
+  topic: Topic
 }
 
 export interface HomeHeroProps {
@@ -38,6 +57,17 @@ interface HeroSearchProps {
 
 // hidden for launch. preview with ?search=on, flip the fallback to ship it
 const SEARCH_FLAG = ['off', 'on'] as const
+
+const DRAW_OUT = 'motion-safe:animate-[draw-out_700ms_cubic-bezier(0.65,0,0.35,1)_both]'
+
+const FLANK_BOX = cn(
+  'grain-mask-flank absolute -top-[100vh] h-[calc(100%+200vh)] w-[50vw]',
+  'pointer-events-none py-[100vh] pl-12 pr-92 max-lg:hidden'
+)
+
+const ACROSS = 'left-1/2 h-px w-screen -translate-x-1/2 bg-border'
+const UPRIGHT =
+  'inset-y-0 w-px origin-top bg-linear-to-b from-border via-border via-70% to-transparent'
 
 const getHeroLattice = ({ width, height }: CanvasSize): Lattice => {
   const contentLeft = Math.max(0, (width - 1152) / 2) + 24
@@ -64,10 +94,12 @@ export const Hero = ({
   guides,
   breadcrumb,
   variant = 'warp',
+  topic,
   children,
   className,
 }: HeroProps) => {
   const isWarp = variant === 'warp'
+  const isGrid = variant === 'grid'
   const copyRef = useRef<HTMLDivElement>(null)
   const ingestWords = [
     ...new Set(
@@ -84,14 +116,21 @@ export const Hero = ({
     <section
       className={cn(
         'relative isolate flex justify-center',
-        isWarp ? 'mt-6.5 pt-32.5 pb-78' : 'pt-32.5 pb-39 max-sm:pt-19.5 max-sm:pb-19.5',
+        isWarp ? 'mt-6.5 pt-32.5 pb-78' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5',
         'overflow-hidden bg-background',
         className
       )}
     >
-      {isWarp ? (
-        <WarpCanvas anchorRef={copyRef} />
-      ) : (
+      {isWarp ? <WarpCanvas anchorRef={copyRef} /> : null}
+      {variant === 'construction' ? (
+        <CopyFrame
+          lines={[
+            { id: 'left', className: cn('right-[calc(50%+20rem)]', UPRIGHT, DRAW_OUT) },
+            { id: 'right', className: cn('left-[calc(50%+20rem)]', UPRIGHT, DRAW_OUT) },
+          ]}
+        />
+      ) : null}
+      {isGrid ? (
         <AsciiCanvas
           getLattice={getHeroLattice}
           getField={heroField}
@@ -100,7 +139,7 @@ export const Hero = ({
           words={ingestWords}
           decay={0.985}
         />
-      )}
+      ) : null}
       <div className="relative z-10 w-full max-w-6xl px-6">
         {isWarp ? (
           <div
@@ -115,7 +154,7 @@ export const Hero = ({
         <div
           ref={copyRef}
           className={cn(
-            'flex flex-col items-center gap-5 text-center',
+            'relative flex flex-col items-center gap-5 text-center',
             isWarp ? 'py-16' : 'pt-12 pb-9.5'
           )}
         >
@@ -127,14 +166,15 @@ export const Hero = ({
             {description}
           </p>
           {children}
+          {variant === 'construction' && topic ? <HeroFlanks topic={topic} /> : null}
         </div>
       </div>
-      {isWarp ? null : (
+      {isGrid ? (
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-b from-transparent to-background"
         />
-      )}
+      ) : null}
     </section>
   )
 }
@@ -154,6 +194,63 @@ export const HomeHero = ({ guides, className }: HomeHeroProps) => {
     </Hero>
   )
 }
+
+export const TopicHero = ({
+  topic,
+  description,
+  guides,
+  breadcrumb,
+  className,
+}: TopicHeroProps) => {
+  // grid hero stays reachable with ?hero=grid, in case we go back to it
+  const variant = useQueryVariant({
+    key: 'hero',
+    options: ['construction', 'grid'],
+    fallback: 'construction',
+  })
+
+  return (
+    <Hero
+      variant={variant}
+      topic={topic}
+      title={topic}
+      description={description}
+      guides={guides}
+      breadcrumb={breadcrumb}
+      className={className}
+    />
+  )
+}
+
+// every topic draws the auth guides, so the grid stays the same from one topic page to the next
+const HeroFlanks = ({ topic }: HeroFlanksProps) => (
+  <>
+    <TopicShape topic="Auth" layer="guides" className={cn('right-1/2', FLANK_BOX)} />
+    <TopicShape topic="Auth" layer="guides" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <TopicShape topic={topic} layer="shape" className={cn('right-1/2', FLANK_BOX)} />
+    <TopicShape topic={topic} layer="shape" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <CopyFrame
+      lines={[
+        { id: 'top', className: cn('top-0', ACROSS, DRAW_OUT) },
+        { id: 'band', className: cn('-top-[calc(var(--spacing)*32.5/2)]', ACROSS, DRAW_OUT) },
+        { id: 'bottom', className: cn('bottom-0', ACROSS, DRAW_OUT) },
+        {
+          id: 'stem',
+          className: cn('bottom-full left-1/2 h-screen w-px origin-bottom bg-border', DRAW_OUT),
+        },
+      ]}
+    />
+  </>
+)
+
+const CopyFrame = ({ lines }: CopyFrameProps) =>
+  lines.map(({ id, className }) => (
+    <span
+      key={id}
+      aria-hidden
+      className={cn('grain-mask pointer-events-none absolute max-lg:hidden', className)}
+    />
+  ))
 
 const HeroSearch = ({ guides }: HeroSearchProps) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
