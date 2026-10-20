@@ -131,7 +131,9 @@ export const DeleteProjectModal = ({
           : 'This action cannot be undone.',
         description: (
           <>
-            {shouldShowExitSurvey && 'All project data will be lost, and cannot be undone. '}
+            {shouldShowExitSurvey
+              ? 'All project data will be lost, and cannot be undone. '
+              : `This will permanently delete the ${project?.name} project and all of its data. `}
             Read the{' '}
             <InlineLink href={`${DOCS_URL}/guides/platform/delete-project`}>
               documentation
@@ -140,11 +142,6 @@ export const DeleteProjectModal = ({
           </>
         ),
       }}
-      text={
-        shouldShowExitSurvey
-          ? undefined
-          : `This will permanently delete the ${project?.name} project and all of its data.`
-      }
       confirmPlaceholder="Type the project name in here"
       confirmString={project?.name || ''}
       confirmLabel="I understand, delete this project"
