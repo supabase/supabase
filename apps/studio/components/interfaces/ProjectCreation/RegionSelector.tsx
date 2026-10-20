@@ -117,11 +117,11 @@ export const RegionSelector = ({
   const smartRegions = highAvailability ? [] : allSmartRegions
 
   const recommendedSmartRegions = new Set(
-    [availableRegionsData?.recommendations.smartGroup.code].filter(Boolean)
+    [availableRegionsData?.recommendations.smartGroup?.code].filter(Boolean)
   )
 
   const recommendedSpecificRegions = new Set(
-    availableRegionsData?.recommendations.specific.map((region) => region.code)
+    availableRegionsData?.recommendations.specific?.map((region) => region.code)
   )
 
   const availableRegions = getAvailableRegions(cloudProvider)

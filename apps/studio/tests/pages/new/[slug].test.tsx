@@ -19,7 +19,7 @@ import type { Permission } from '@/types'
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
-type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type RegionsInfo = components['schemas']['RegionsInfoPlatform_Output']
 type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
@@ -497,6 +497,25 @@ describe('project creation wizard', () => {
 
       expect(await screen.findByText('Please select a region.')).toBeInTheDocument()
       expect(onRequest).not.toHaveBeenCalled()
+
+      await selectRegion(/Americas/)
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ name: 'Americas' })
+    })
+
+    test('allows manual region selection when recommendations are absent', async () => {
+      mockWizardEndpoints({
+        availableRegions: { ...DEFAULT_AVAILABLE_REGIONS, recommendations: {} },
+      })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Manual Region Project')
+      await generateAndWaitForStrongPassword()
+      expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Select a region')
 
       await selectRegion(/Americas/)
 

@@ -318,7 +318,7 @@ export const ProjectCreationForm = ({
         )
       : undefined
   const recommendedSmartRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
+    ? availableRegionsData?.recommendations.smartGroup?.name
     : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
