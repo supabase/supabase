@@ -25,7 +25,7 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AddRestrictionModal from './AddRestrictionModal'
+import { AddRestrictionModal } from './AddRestrictionModal'
 import AllowAllModal from './AllowAllModal'
 import DisallowAllModal from './DisallowAllModal'
 import RemoveRestrictionModal from './RemoveRestrictionModal'
