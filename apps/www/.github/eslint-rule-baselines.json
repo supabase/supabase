@@ -2,7 +2,7 @@
   "rules": {
     "shadcn/no-arbitrary-values": 527,
     "shadcn/no-unknown-classes": 112,
-    "shadcn/no-raw-colors": 212
+    "shadcn/no-raw-colors": 210
   },
   "ruleFiles": {
     "shadcn/no-arbitrary-values": {
@@ -220,7 +220,7 @@
       "app/(home)/_components/logos/PublicityLogos.tsx": 12,
       "app/(products)/auth/_components/FeaturesSection.tsx": 9,
       "app/(products)/database/_components/FeaturesSection.tsx": 4,
-      "app/(products)/realtime/_components/FeaturesSection.tsx": 4,
+      "app/(products)/realtime/_components/FeaturesSection.tsx": 3,
       "app/state-of-startups/StateOfStartups2026Content.tsx": 2,
       "components/AIDemo/Panel.tsx": 1,
       "components/CaseStudies/benchmark.tsx": 1,
@@ -240,7 +240,6 @@
       "components/Nav/ProductDropdown.tsx": 1,
       "components/OpenSource/RepoCard.tsx": 2,
       "components/Panel/Panel.tsx": 1,
-      "components/Partners/BackgroundPattern.tsx": 1,
       "components/Pricing/PricingIcons.tsx": 1,
       "components/Pricing/PricingTableRow.tsx": 1,
       "components/Products/DatabaseVisual.tsx": 3,
