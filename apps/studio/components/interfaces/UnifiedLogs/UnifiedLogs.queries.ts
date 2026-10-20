@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
+import { LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
@@ -138,13 +138,6 @@ const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`nullIf(CASE
       WHEN source = 'edge_logs' THEN log_attributes['request.sb.jwt.authorization.payload.subject']
       ELSE null
     END, '')`
-
-const logTypeWhereCondition = (logTypes: string[]): SafeLogSqlFragment => {
-  const effective = logTypes.filter((t) => t in LOG_TYPE_CONDITION)
-  const types = effective.length ? effective : [...DEFAULT_LOG_TYPES]
-  const branches = types.map((t) => safeSql`(${LOG_TYPE_CONDITION[t]})`)
-  return safeSql`(${joinSqlFragments(branches, ' OR ')})`
-}
 
 /**
  * Translates one (column, values, operator) group from the parsed `filter` URL
@@ -313,23 +306,28 @@ const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     null AS logs
 `
 
+const availableSourcesCondition = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+  const sources = Object.entries(LOG_TYPE_TO_SOURCE)
+    .filter(([type]) => type !== 'multigres' || search.logTypeVisibility?.multigres !== false)
+    .map(([, source]) => lit(source))
+  const sourceCondition = safeSql`source IN (${joinSqlFragments(sources, ',')})`
+  return search.logTypeVisibility?.compute === false
+    ? sourceCondition
+    : safeSql`(${sourceCondition} OR ${WORKER_LOG_SOURCE_CONDITION})`
+}
+
 const buildBaseWhere = (
   search: QuerySearchParamsType,
   excludeField?: string
 ): SafeLogSqlFragment[] => {
   const grouped = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter))
-  const parts: SafeLogSqlFragment[] = []
+  const parts: SafeLogSqlFragment[] = [availableSourcesCondition(search)]
 
   if (excludeField !== 'log_type') {
     const logTypeFilter = grouped.log_type
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
-    } else if (!userFilterValue(search)) {
-      // Skip the default (postgres|edge) source restriction while the user filter is
-      // active — the user clause governs which sources are eligible (auth + postgres),
-      // and the default would otherwise exclude auth_logs, the primary attributable source.
-      parts.push(logTypeWhereCondition([...DEFAULT_LOG_TYPES]))
     }
   }
 
@@ -553,8 +551,6 @@ HAVING value != ''
 `
   }
 
-  // log_type always scans alone: excluding it also drops the default-types
-  // filter, so its counts differ from the base scan even when unfiltered.
   const blocks = [scanBlock(['log_type'], whereFor('log_type'))]
 
   // A filtered facet gets its own scan so it can exclude its own filter and

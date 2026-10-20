@@ -168,6 +168,10 @@ export const UnifiedLogs = () => {
           compute: computeAvailability.canQueryCompute,
         }) ?? null
     }
+    parameters.logTypeVisibility = {
+      multigres: showMultigresLogs,
+      compute: computeAvailability.canQueryCompute,
+    }
     return parameters
   }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])

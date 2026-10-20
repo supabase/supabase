@@ -12,7 +12,9 @@ export type LogsMeta = {
 export type PageParam = { cursor: number; direction: 'next' | 'prev' } | undefined
 
 export type SearchParamsType = inferParserType<typeof SEARCH_PARAMS_PARSER>
-export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'>
+export type QuerySearchParamsType = Omit<SearchParamsType, 'uuid' | 'live'> & {
+  logTypeVisibility?: Partial<Record<'compute' | 'multigres', boolean>>
+}
 
 /** ----------------------------------------- */
 
