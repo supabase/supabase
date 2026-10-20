@@ -192,7 +192,7 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const revealStartedAt = performance.now()
     const revealAt = (now: number) =>
-      isReducedMotion ? 1 : Math.min(1, (now - revealStartedAt) / 1000)
+      isReducedMotion ? 1 : Math.min(1, (now - revealStartedAt) / 600)
     const grain = createGrainPattern(grid)
     let palette = readPalette(probeRoot)
     let baseShape: WarpShape = { cx: 0, rimY: 0, throatY: 0, r0: THROAT_RADIUS }
@@ -266,28 +266,31 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       }
 
       const t = revealAt(performance.now())
-      const across = drawStep(phase({ t, start: 0, length: 0.5 }))
-      const down = drawStep(phase({ t, start: 0.25, length: 0.5 }))
-      if (gridKey !== `${expandStep}:${flatten}:${across}:${down}`) {
-        gridKey = `${expandStep}:${flatten}:${across}:${down}`
+      // bending pulls the rings past the boundary up to it, so they would show inside the slack
+      const ringCount = boundaryRing < 0 ? radii.length : boundaryRing + 1
+      // rings that fit inside the copy are hidden behind its fade, so they show at once
+      const copyHalfWidth = anchorBox ? (anchorBox.right - anchorBox.left) / 2 : 0
+      const firstSweptRing = Math.max(
+        0,
+        radii.findIndex((r) => r > copyHalfWidth)
+      )
+      const shownRings =
+        firstSweptRing +
+        Math.ceil((ringCount - firstSweptRing) * phase({ t, start: 0, length: 0.6 }))
+      const down = drawStep(phase({ t, start: 0.35, length: 0.65 }))
+      if (gridKey !== `${expandStep}:${flatten}:${shownRings}:${down}`) {
+        gridKey = `${expandStep}:${flatten}:${shownRings}:${down}`
         grid.clearRect(0, 0, width, height)
         grid.save()
         clipToBoundary(grid)
         grid.lineWidth = 1
         grid.strokeStyle = palette.line
-        // bending pulls the rings past the boundary up to it, so they would show inside the slack
-        const ringCount = boundaryRing < 0 ? radii.length : boundaryRing + 1
-        grid.save()
         grid.beginPath()
-        grid.rect(0, 0, width * across, height)
-        grid.clip()
-        grid.beginPath()
-        radii.slice(0, ringCount).forEach((r, i) => {
+        radii.slice(0, shownRings).forEach((r, i) => {
           const points = RING_ANGLES.map((angle) => project(r, angle))
           strokePolyline({ ctx: grid, points, visible: ringVisible[i], isClosed: true })
         })
         grid.stroke()
-        grid.restore()
         grid.beginPath()
         SPOKE_ANGLES.forEach((angle, s) => {
           const points = spokeRadii
@@ -404,7 +407,7 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       if (!isRunning()) return
       const dt = lastTime ? Math.min(0.05, (time - lastTime) / 1000) : 0
       lastTime = time
-      if (revealAt(time) >= 0.4 && time - lastSpawn > 450 && pulses.length < 10) {
+      if (revealAt(time) >= 1 && time - lastSpawn > 450 && pulses.length < 10) {
         lastSpawn = time
         spawn()
       }
