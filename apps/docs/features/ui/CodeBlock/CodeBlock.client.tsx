@@ -136,9 +136,7 @@ function Annotation({ annotation }: { annotation: CodeAnnotation }) {
   const { text, docs, tags } = annotation
   return (
     <div data-code-style="plain" className="flex flex-col gap-2">
-      <code
-        className={cn('block bg-200 p-2', (docs || tags) && 'border-b border-default')}
-      >
+      <code className={cn('block bg-200 p-2', (docs || tags) && 'border-b border-default')}>
         {text}
       </code>
       {docs && <p className={cn('p-2', tags && 'border-b border-default')}>{docs}</p>}
