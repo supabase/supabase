@@ -42,7 +42,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
             }}
           >
             <p className="truncate py-1">
-              <code className="text-code-inline">{secret.name}</code>
+              <code>{secret.name}</code>
             </p>
           </TooltipTrigger>
           <TooltipContent side="bottom">Click to copy</TooltipContent>
@@ -50,7 +50,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
       </TableCell>
       <TableCell>
         <p className="max-w-96 truncate" title={secret.value}>
-          <code className="text-code-inline text-foreground-light!">{secret.value}</code>
+          <code className="text-foreground-light!">{secret.value}</code>
         </p>
       </TableCell>
       <TableCell>

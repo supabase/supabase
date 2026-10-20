@@ -188,8 +188,8 @@ export const JWTSettings = () => {
                     {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
                       <p className="leading-normal!">
                         <em className="text-warning not-italic">
-                          This includes the <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline">service_role</code> JWT based API keys.
+                          This includes the <code>anon</code> and <code>service_role</code> JWT
+                          based API keys.
                         </em>{' '}
                         Consider switching to publishable and secret API keys to disable them.
                       </p>
@@ -302,10 +302,10 @@ export const JWTSettings = () => {
                             API Keys
                           </InlineLink>
                           , create a publishable key and secret key, then swap them into your apps
-                          in place of <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline break-keep!">service_role</code>{' '}
-                          respectively. Watch the "Last used" indicators to confirm no traffic still
-                          depends on the legacy keys.
+                          in place of <code>anon</code> and{' '}
+                          <code className="break-keep!">service_role</code> respectively. Watch the
+                          "Last used" indicators to confirm no traffic still depends on the legacy
+                          keys.
                         </p>
                       </li>
                       <li>
@@ -317,13 +317,10 @@ export const JWTSettings = () => {
                           to start signing new JWTs with the standby key.
                         </p>
                         <p className="text-foreground-lighter">
-                          Existing <code className="text-code-inline">anon</code>,{' '}
-                          <code className="text-code-inline">service_role</code>, and active user
+                          Existing <code>anon</code>, <code>service_role</code>, and active user
                           JWTs stay valid. Before rotating, switch any code that verifies JWTs
-                          directly against the legacy secret (e.g.{' '}
-                          <code className="text-code-inline">jose</code>,{' '}
-                          <code className="text-code-inline">jsonwebtoken</code>) to{' '}
-                          <code className="text-code-inline">supabase.auth.getClaims()</code> or a
+                          directly against the legacy secret (e.g. <code>jose</code>,{' '}
+                          <code>jsonwebtoken</code>) to <code>supabase.auth.getClaims()</code> or a
                           JWKS-based verifier, and disable the "Verify JWT" setting on any affected
                           Edge Functions.
                         </p>
@@ -356,7 +353,7 @@ export const JWTSettings = () => {
                       </li>
                       <li>
                         Improve app's performance by using public keys to verify JWTs instead of
-                        calling <code className="text-code-inline">getUser()</code>.
+                        calling <code>getUser()</code>.
                       </li>
                     </ul>
                   )}

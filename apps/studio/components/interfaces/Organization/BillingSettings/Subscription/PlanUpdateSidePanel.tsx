@@ -63,8 +63,7 @@ const PartnerManagedPlanNotice = ({
         title="Organization plans are managed through Stripe."
         details={
           <>
-            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
-            project directory.
+            Run <code>{stripeProjectsUpgradeCommand}</code> in your project directory.
           </>
         }
         cta={{
