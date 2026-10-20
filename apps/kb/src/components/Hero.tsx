@@ -16,6 +16,7 @@ import { useQueryVariant } from '../lib/use-query-variant'
 import { AsciiCanvas, type CanvasSize } from './AsciiCanvas'
 import { AsciiHoverText } from './AsciiHoverText'
 import { GuideSearchDialog } from './GuideSearchDialog'
+import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
@@ -117,7 +118,7 @@ export const Hero = ({
     <section
       className={cn(
         'relative isolate flex justify-center',
-        isWarp ? 'pt-39 pb-60' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5',
+        isWarp ? 'pt-39 pb-60' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5 lg:pb-40',
         'overflow-hidden bg-background',
         className
       )}
@@ -227,13 +228,20 @@ export const TopicHero = ({
   )
 }
 
-// every topic draws the auth guides, so the grid stays the same from one topic page to the next
 const HeroFlanks = ({ topic }: HeroFlanksProps) => (
   <>
-    <TopicShape topic="Auth" layer="guides" className={cn('right-1/2', FLANK_BOX)} />
-    <TopicShape topic="Auth" layer="guides" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
-    <TopicShape topic={topic} layer="shape" className={cn('right-1/2', FLANK_BOX)} />
-    <TopicShape topic={topic} layer="shape" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <HeroGrid axis="rows" className={cn('right-1/2', FLANK_BOX)} />
+    <HeroGrid axis="rows" className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
+    <HeroGrid
+      axis="columns"
+      className={cn('right-1/2 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
+    />
+    <HeroGrid
+      axis="columns"
+      className={cn('left-1/2 -scale-x-100 [--flank-span:calc(100%_-_20rem)]', FLANK_BOX)}
+    />
+    <TopicShape topic={topic} className={cn('right-1/2', FLANK_BOX)} />
+    <TopicShape topic={topic} className={cn('left-1/2 -scale-x-100', FLANK_BOX)} />
     <CopyFrame
       lines={[
         { id: 'top', className: cn('top-0', ACROSS, DRAW_OUT) },
@@ -242,6 +250,13 @@ const HeroFlanks = ({ topic }: HeroFlanksProps) => (
         {
           id: 'stem',
           className: cn('bottom-full left-1/2 h-screen w-px origin-bottom bg-border', DRAW_OUT),
+        },
+        {
+          id: 'tail',
+          className: cn(
+            'top-full left-1/2 h-40 w-px origin-top bg-linear-to-b from-border to-transparent',
+            DRAW_OUT
+          ),
         },
       ]}
     />
