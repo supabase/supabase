@@ -8,7 +8,7 @@ sidebar_label: 'Snowflake'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-[Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines replicates each Postgres table to Snowflake as an append-only history of changes. For tables with a supported primary key, it also creates and maintains a companion view that returns the current rows, including values preserved across partial updates.
+[Snowflake](https://www.snowflake.com/) is a managed data platform. Supabase Pipelines replicates each Postgres table to Snowflake as an append-only history of changes. It also creates and maintains companion views that return the current rows, including values preserved across partial updates.
 
 To replicate data to Snowflake:
 
@@ -24,9 +24,9 @@ An upgrade can fail if the Pipelines role lacks `CREATE VIEW` on the destination
 
 ## Source table requirements
 
-Every source table needs a stable, nondeferrable primary key, including with `FULL`. Publish every key column.
+Every source table needs a stable, nondeferrable primary key, even with replica identity `FULL`. Publish every key column.
 
-Postgres uses The Oversized-Attribute Storage Technique (TOAST) to store large values. The following replica identities support partial updates and the companion view:
+Postgres uses the Oversized-Attribute Storage Technique (TOAST) to store large values. The following replica identities support the companion view:
 
 | Replica identity                                   | Stored updates                                                                                  | Tradeoff                                                                                       |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ alter table public.your_table replica identity full;
 
 Supported primary-key types are `smallint`, `integer`, `bigint`, `oid`, `boolean`, `text`, `varchar`, Postgres `"char"`, `char(n)`, `name`, `uuid`, `bytea`, `numeric`, `date`, `timestamp`, and `timestamptz`.
 
-Tables without a supported primary key and identity indexes on different columns are unsupported. Pipelines creates no companion view for a table with a source column whose name begins with `_cdc_`. Before you rely on the results as a replica, see [Requirements for current-state queries](#requirements-for-current-state-queries).
+Tables without a supported primary key are unsupported, as are identity indexes that don't match the primary-key columns. Pipelines creates no companion view for a table with a source column whose name begins with `_cdc_`. Before you rely on the results as a replica, see [Requirements for current-state queries](#requirements-for-current-state-queries).
 
 If a table with a companion view stops meeting these requirements, the view becomes unavailable and Pipelines reports an error.
 
@@ -393,13 +393,13 @@ To upgrade a pipeline whose history tables have only the `_cdc_operation` and `_
    grant create view on schema PIPELINES_DB.REPLICATED to role PIPELINES_ROLE;
    ```
 
-   The role must also retain ownership of its existing history tables so Pipelines can alter them. Pipelines does not grant privileges automatically. Missing privileges or conflicting objects stop startup or setup; it does not silently skip a required companion view.
+   The role must also retain ownership of its existing history tables so Pipelines can alter them. Pipelines does not grant privileges automatically. Missing privileges or conflicting objects stop startup or setup. Pipelines does not silently skip a required companion view.
 
-2. If the source can emit partial updates, pause consumers and derived-data jobs that assume complete rows before upgrading. Leaving them running can expose omitted values as `NULL` as soon as replication resumes. Consumers can keep their latest-event queries running if all relevant history is complete and the source remains on `FULL`.
+2. For each table that can emit partial updates, pause consumers and derived-data jobs that assume complete rows before upgrading. Leaving them running might expose omitted values as `NULL` as soon as replication resumes. Consumers of tables that stay on `FULL` with complete history can keep their latest-event queries running.
 
 3. In the Supabase Dashboard, open the pipeline's actions menu and select **Update available**. For a running or failed pipeline, click **Update and restart**. For a stopped pipeline, click **Update version**, then **Start pipeline**. See [Managing your pipeline](/docs/guides/database/replication/pipelines#managing-your-pipeline).
 
-4. After the pipeline restarts, grant consumers `SELECT` on each companion view and switch their current-state queries to it. Then resume paused consumers and jobs. Latest-event queries are safe only for [complete-row history](#query-complete-row-history). The upgrade doesn't change your own queries or derived objects.
+4. After the pipeline restarts, grant consumers `SELECT` on each companion view and switch their current-state queries to it. Update jobs that read CDC events directly to [interpret `_cdc_missing_columns`](#use-streams-and-tasks). Then resume paused consumers and jobs. The upgrade doesn't change your own queries or derived objects.
 
 The managed update restarts the replicator using its saved progress. On startup, Pipelines validates owned tables in the supported previous format and adds the nullable `_cdc_missing_columns ARRAY` column. Existing `NULL` metadata means complete within the replicated schema at the time of the event; no backfill is required.
 
