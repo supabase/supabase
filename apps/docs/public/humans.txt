@@ -135,6 +135,7 @@ Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
 Gonzalo Servat
+Graeme Gillies
 Greg Kress
 Greg P
 Greg Richardson
@@ -248,6 +249,7 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mikaël Francoeur
 Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
@@ -262,6 +264,7 @@ Nick Nowlan
 Nicola Ferraro
 Nicolas Nosenzo
 Nik Richers
+Nikita Sivukhin
 Noah Moss
 Nyannyacha
 Oli R
@@ -286,6 +289,7 @@ Rafael Chacón
 Raminder Singh
 Rand Arete
 Raúl Barroso
+Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
@@ -294,6 +298,7 @@ Rodrigo Mansueli
 Román Cuellar
 Roman Hernandez
 Ronan Lehane
+Rory Hunter
 Rory Wilding
 Ryan Goulet
 Ryan Senior

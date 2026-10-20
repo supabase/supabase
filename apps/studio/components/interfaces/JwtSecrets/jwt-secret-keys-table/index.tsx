@@ -65,9 +65,9 @@ const JWTSecretKeysTableHeader = ({
   return (
     <TableHeader>
       <TableRow>
-        <TableHead className="w-[80px]">Status</TableHead>
-        <TableHead className="w-[315px]">Key ID</TableHead>
+        <TableHead className="w-[315px]">Key</TableHead>
         <TableHead className="w-[200px]">Type</TableHead>
+        <TableHead className="text-right w-[160px] hidden xl:table-cell">Created at</TableHead>
         {IS_PLATFORM && showApiKeysLastUsed && (
           <TableHead className="text-right w-[160px]">Last used</TableHead>
         )}

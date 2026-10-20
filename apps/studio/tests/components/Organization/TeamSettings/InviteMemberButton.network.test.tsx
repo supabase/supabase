@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components, operations } from 'api-types'
+import { mockIntersectionObserver } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
@@ -16,9 +17,14 @@ type Member = components['schemas']['Member_Output']
 type InvitationResponse = components['schemas']['InvitationResponse_Output']
 type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse_Output']
 type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
+type OrgProject = OrganizationProjectsResponse['projects'][number]
 type CreateInvitationResponse =
   operations['InvitationsController_createInvitation']['responses']['201']['content']['application/json']
 type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
+
+// The project multi-select's infinite-scroll sentinel uses IntersectionObserver, which jsdom lacks
+mockIntersectionObserver()
 
 const ORG_SLUG = 'test-org'
 
@@ -90,7 +96,35 @@ const PERMISSIONS_RESPONSE: PermissionsV2Response = {
   ],
 }
 
-function setupMocks(members: Member[] = [buildMember({})]) {
+const PROJECTS: OrgProject[] = [
+  {
+    cloud_provider: 'AWS',
+    databases: [],
+    inserted_at: '2026-01-01T00:00:00.000Z',
+    integration_source: null,
+    is_branch: false,
+    ref: 'project-alpha',
+    name: 'Alpha',
+    region: 'us-east-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+  {
+    cloud_provider: 'AWS',
+    databases: [],
+    inserted_at: '2026-01-01T00:00:00.000Z',
+    integration_source: null,
+    is_branch: false,
+    ref: 'project-beta',
+    name: 'Beta',
+    region: 'us-east-1',
+    status: 'ACTIVE_HEALTHY',
+  },
+]
+
+function setupMocks(
+  members: Member[] = [buildMember({})],
+  { projectScoped = false }: { projectScoped?: boolean } = {}
+) {
   const invitePayloads: unknown[] = []
 
   addAPIMock({
@@ -148,10 +182,35 @@ function setupMocks(members: Member[] = [buildMember({})]) {
       ),
   })
 
+  // Empty entitlements => project-level permissions are off, so the panel
+  // renders the org-scoped role flow (no "all projects" toggle or selector). When
+  // projectScoped is true, both appear.
   addAPIMock({
     method: 'get',
     path: '/platform/organizations/:slug/entitlements',
-    response: () => HttpResponse.json<ListEntitlementsResponse>({ entitlements: [] }),
+    response: () =>
+      HttpResponse.json<ListEntitlementsResponse>({
+        entitlements: projectScoped
+          ? [
+              {
+                config: { enabled: true },
+                feature: { key: 'project_scoped_roles', type: 'boolean' },
+                hasAccess: true,
+                type: 'boolean',
+              },
+            ]
+          : [],
+      }),
+  })
+
+  addAPIMock({
+    method: 'get',
+    path: '/platform/organizations/:slug/projects',
+    response: () =>
+      HttpResponse.json<OrganizationProjectsResponse>({
+        pagination: { count: PROJECTS.length, limit: 96, offset: 0 },
+        projects: PROJECTS,
+      }),
   })
 
   addAPIMock({
@@ -255,6 +314,51 @@ describe('InviteMemberButton (network)', () => {
     expect(invitePayloads[0]).toEqual({
       emails: ['new@example.com', 'second@example.com'],
       role_id: ROLE_IDS.developer,
+    })
+  })
+
+  describe('project-scoped access', () => {
+    test('requires at least one project when "Grant this role on all projects" is off', async () => {
+      const { invitePayloads } = setupMocks(undefined, { projectScoped: true })
+      customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
+      await openDialog()
+
+      const toggle = await screen.findByRole('switch')
+      expect(toggle).toBeChecked()
+      await userEvent.click(toggle)
+      expect(toggle).not.toBeChecked()
+
+      fireEvent.change(screen.getByPlaceholderText(/name@example\.com/i), {
+        target: { value: 'new@example.com' },
+      })
+      fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
+
+      expect(await screen.findByText('Select at least one project')).toBeInTheDocument()
+      expect(invitePayloads).toHaveLength(0)
+    })
+
+    test('sends the selected projects as role_scoped_projects when multiple are chosen', async () => {
+      const { invitePayloads } = setupMocks(undefined, { projectScoped: true })
+      customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
+      await openDialog()
+
+      await userEvent.click(await screen.findByRole('switch'))
+
+      await userEvent.click(screen.getByRole('combobox'))
+      await userEvent.click(await screen.findByRole('option', { name: /Alpha/ }))
+      await userEvent.click(await screen.findByRole('option', { name: /Beta/ }))
+
+      fireEvent.change(screen.getByPlaceholderText(/name@example\.com/i), {
+        target: { value: 'new@example.com' },
+      })
+      fireEvent.click(screen.getByRole('button', { name: /send invitation/i }))
+
+      await waitFor(() => expect(invitePayloads).toHaveLength(1))
+      expect(invitePayloads[0]).toEqual({
+        emails: ['new@example.com'],
+        role_id: ROLE_IDS.developer,
+        role_scoped_projects: ['project-alpha', 'project-beta'],
+      })
     })
   })
 })

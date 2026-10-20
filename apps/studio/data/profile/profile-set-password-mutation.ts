@@ -30,20 +30,20 @@ export const useSetPasswordMutation = ({
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (vars) => setPassword(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       // logout all other sessions after setting a password
       await auth.signOut({ scope: 'others' })
       await Promise.all([
         auth.refreshSession(),
         queryClient.invalidateQueries({ queryKey: profileKeys.identities() }),
       ])
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to add password: ${error.message}`)
       } else {
-        onError(error, variables, context)
+        onError(error, variables, context, mutationContext)
       }
     },
     ...options,
