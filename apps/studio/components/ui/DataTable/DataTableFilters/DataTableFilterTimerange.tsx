@@ -5,7 +5,10 @@ import type { DataTableTimerangeFilterField } from '../DataTable.types'
 import { isArrayOfDates } from '../DataTable.utils'
 import { useDataTable } from '../providers/DataTableProvider'
 import { REPORTS_DATEPICKER_HELPERS } from '@/components/interfaces/Reports/Reports.constants'
-import { findMatchingDateHelper } from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
+import {
+  findMatchingDateHelper,
+  formatRelativeDuration,
+} from '@/components/interfaces/Settings/Logs/Logs.datePickerHelpers'
 import {
   DatePickerValue,
   LogsDatePicker,
@@ -68,7 +71,7 @@ export function DataTableFilterTimerange<TData>({
       return {
         from: new Date(end - durationSeconds * 1000).toISOString(),
         to: new Date(end).toISOString(),
-        text: `Last ${durationSeconds} ${durationSeconds === 1 ? 'second' : 'seconds'}`,
+        text: formatRelativeDuration(durationSeconds),
         isHelper: true,
       }
     }

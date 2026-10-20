@@ -8,9 +8,12 @@ import {
 } from '@tanstack/react-table'
 import { act, cleanup, fireEvent, screen } from '@testing-library/react'
 import { useState } from 'react'
+import { ResizablePanelGroup } from 'ui'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { DataTableFilterResetButton } from './DataTableFilters/DataTableFilterResetButton'
 import { DataTableFilterTimerange } from './DataTableFilters/DataTableFilterTimerange'
+import { FilterSideBar } from './FilterSideBar'
 import { LiveButton } from './LiveButton'
 import { DataTableProvider } from './providers/DataTableProvider'
 import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
@@ -25,10 +28,12 @@ function LiveTable({
   fetchPreviousPage,
   hasDateControls = false,
   durationSeconds,
+  onReset,
 }: {
   fetchPreviousPage: () => Promise<PollResult>
   hasDateControls?: boolean
   durationSeconds?: number
+  onReset?: () => void
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     hasDateControls ? [{ id: 'date', value: '2025' }] : []
@@ -59,6 +64,25 @@ function LiveTable({
       isLoadingCounts={false}
     >
       <LiveButton onPoll={fetchPreviousPage} searchParamsParser={searchParamsParser} />
+      {onReset && (
+        <>
+          <ResizablePanelGroup orientation="horizontal">
+            <FilterSideBar
+              isFilterBarOpen
+              setIsFilterBarOpen={() => {}}
+              hasAdditionalFilters={durationSeconds !== undefined}
+              onReset={onReset}
+            />
+          </ResizablePanelGroup>
+          <DataTableFilterResetButton
+            type="timerange"
+            value="date"
+            label="Time range"
+            durationSeconds={durationSeconds}
+            onClear={onReset}
+          />
+        </>
+      )}
       {durationSeconds !== undefined && (
         <DataTableFilterTimerange
           type="timerange"
@@ -160,6 +184,27 @@ describe('LiveButton', () => {
     )
     expect(screen.getByRole('button', { name: label })).toBeInTheDocument()
     expect(fetchPreviousPage).not.toHaveBeenCalled()
+  })
+
+  it('exposes reset for duration-only filters and forwards mouse and keyboard clears', () => {
+    const reset = vi.fn()
+    customRender(
+      <LiveTable fetchPreviousPage={fetchPreviousPage} durationSeconds={10} onReset={reset} />,
+      {
+        nuqs: { hasMemory: true, searchParams: '?durationSeconds=10' },
+      }
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Reset' }))
+    expect(reset).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button', { name: 'Clear time range' }))
+    expect(reset).toHaveBeenCalledTimes(2)
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Clear time range' }), {
+      key: 'Enter',
+      code: 'Enter',
+    })
+    expect(reset).toHaveBeenCalledTimes(3)
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape', ctrlKey: true })
+    expect(reset).toHaveBeenCalledTimes(4)
   })
 
   it('continues catching up after 250ms and returns to the idle interval when caught up', async () => {

@@ -4,32 +4,40 @@ import { Button } from 'ui'
 import type { DataTableFilterField } from '../DataTable.types'
 import { useDataTable } from '../providers/DataTableProvider'
 
-export function DataTableFilterResetButton<TData>({ value: _value }: DataTableFilterField<TData>) {
+export function DataTableFilterResetButton<TData>(field: DataTableFilterField<TData>) {
   const { columnFilters, table } = useDataTable()
-  const value = _value as string
+  const value = field.value as string
   const column = table.getColumn(value)
   const filterValue = columnFilters.find((f) => f.id === value)?.value
   const filters = filterValue ? (Array.isArray(filterValue) ? filterValue : [filterValue]) : []
 
-  if (filters.length === 0) return null
+  const hasDuration = field.type === 'timerange' && field.durationSeconds != null
+  if (filters.length === 0 && !hasDuration) return null
+  const clear = () => {
+    column?.setFilterValue(undefined)
+    if (field.type === 'timerange') field.onClear?.()
+  }
 
   return (
     <Button
       variant="outline"
+      aria-label={`Clear ${field.label.toLowerCase()}`}
       icon={<XIcon />}
       className="h-5 rounded-full px-1.5 py-1 font-mono text-[10px] [&>span]:translate-y-[-0.6px] space-x-1"
       onClick={(e) => {
         e.stopPropagation()
-        column?.setFilterValue(undefined)
+        clear()
       }}
       onKeyDown={(e) => {
         e.stopPropagation()
         if (e.code === 'Enter' || e.code === 'NumpadEnter') {
-          column?.setFilterValue(undefined)
+          clear()
         }
       }}
     >
-      {(column?.columnDef.meta as Record<string, string>)?.dataType === 'date' ? 1 : filters.length}
+      {hasDuration || (column?.columnDef.meta as Record<string, string>)?.dataType === 'date'
+        ? 1
+        : filters.length}
     </Button>
   )
 }

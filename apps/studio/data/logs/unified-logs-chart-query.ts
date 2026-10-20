@@ -3,6 +3,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import { getUnifiedLogsChartBucket } from './unified-logs-chart.utils'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -107,20 +108,14 @@ export async function getUnifiedLogsChart(
   const startTimeMs = startTime.getTime()
   const endTimeMs = endTime.getTime()
 
-  // Calculate appropriate bucket size from the time range
-  const timeRangeHours = (endTimeMs - startTimeMs) / (1000 * 60 * 60)
-
-  let bucketSizeMs: number
-  if (timeRangeHours >= 48) {
-    bucketSizeMs = 24 * 60 * 60 * 1000
-  } else if (timeRangeHours > 12) {
-    bucketSizeMs = 60 * 60 * 1000
-  } else {
-    bucketSizeMs = 60 * 1000
-  }
+  const { sizeMs: bucketSizeMs } = getUnifiedLogsChartBucket({ date: [startTime, endTime] })
 
   // Fill in any missing buckets
-  for (let t = startTimeMs; t <= endTimeMs; t += bucketSizeMs) {
+  for (
+    let t = Math.floor(startTimeMs / bucketSizeMs) * bucketSizeMs;
+    t <= endTimeMs;
+    t += bucketSizeMs
+  ) {
     // Round to the nearest bucket boundary
     const bucketTime = Math.floor(t / bucketSizeMs) * bucketSizeMs
 

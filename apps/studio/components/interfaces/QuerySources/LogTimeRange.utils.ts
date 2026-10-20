@@ -19,7 +19,7 @@ export type RelativeTimeUnit = Extract<TimeRange, { _tag: 'relative_time_range' 
  */
 const PICKER_TIME_UNITS: readonly Unit[] = ['minute', 'hour', 'day']
 
-const isPickerUnit = (unit: RelativeTimeUnit): unit is Unit =>
+const isPickerUnit = (unit: RelativeTimeUnit): unit is Extract<Unit, RelativeTimeUnit> =>
   (PICKER_TIME_UNITS as readonly RelativeTimeUnit[]).includes(unit)
 
 /** `toISOString()` is valid ISO-8601 by construction, so it needs no re-validation. */
