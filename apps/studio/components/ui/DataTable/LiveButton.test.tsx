@@ -22,12 +22,13 @@ const searchParamsParser = {
 }
 const columns = [{ accessorKey: 'date' }]
 const data = [{ date: '2025-01-01' }, { date: '2026-01-01' }]
+type PollResult = { isCatchingUp: boolean }
 
 function LiveTable({
   fetchPreviousPage,
   hasDateControls = false,
 }: {
-  fetchPreviousPage: () => Promise<void>
+  fetchPreviousPage: () => Promise<PollResult>
   hasDateControls?: boolean
 }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -58,7 +59,7 @@ function LiveTable({
       isLoading={false}
       isLoadingCounts={false}
     >
-      <LiveButton fetchPreviousPage={fetchPreviousPage} searchParamsParser={searchParamsParser} />
+      <LiveButton onPoll={fetchPreviousPage} searchParamsParser={searchParamsParser} />
       <ul aria-label="Log dates">
         {table.getRowModel().rows.map((row) => (
           <li key={row.id}>{row.original.date}</li>
@@ -69,11 +70,11 @@ function LiveTable({
 }
 
 describe('LiveButton', () => {
-  const fetchPreviousPage = vi.fn<() => Promise<void>>()
+  const fetchPreviousPage = vi.fn<() => Promise<PollResult>>()
 
   beforeEach(() => {
     vi.useFakeTimers()
-    fetchPreviousPage.mockReset().mockResolvedValue(undefined)
+    fetchPreviousPage.mockReset().mockResolvedValue({ isCatchingUp: false })
   })
 
   afterEach(() => {
@@ -117,38 +118,52 @@ describe('LiveButton', () => {
     expect(fetchPreviousPage).toHaveBeenCalledTimes(1)
   })
 
+  it('continues catching up after 250ms and returns to the idle interval when caught up', async () => {
+    fetchPreviousPage.mockResolvedValueOnce({ isCatchingUp: true })
+    renderLiveTable()
+    await act(async () => {})
+    await act(() => vi.advanceTimersByTimeAsync(249))
+    expect(fetchPreviousPage).toHaveBeenCalledTimes(1)
+    await act(() => vi.advanceTimersByTimeAsync(1))
+    expect(fetchPreviousPage).toHaveBeenCalledTimes(2)
+    await act(() => vi.advanceTimersByTimeAsync(9_999))
+    expect(fetchPreviousPage).toHaveBeenCalledTimes(2)
+    await act(() => vi.advanceTimersByTimeAsync(1))
+    expect(fetchPreviousPage).toHaveBeenCalledTimes(3)
+  })
+
   it('does not resume polling when a pending request settles after disabling live mode', async () => {
-    const pendingRequest = Promise.withResolvers<void>()
+    const pendingRequest = Promise.withResolvers<PollResult>()
     fetchPreviousPage.mockReturnValueOnce(pendingRequest.promise)
     renderLiveTable()
 
     fireEvent.click(screen.getByRole('button', { name: 'Live' }))
-    await act(async () => pendingRequest.resolve())
+    await act(async () => pendingRequest.resolve({ isCatchingUp: false }))
     await act(() => vi.advanceTimersByTimeAsync(30_000))
 
     expect(fetchPreviousPage).toHaveBeenCalledTimes(1)
   })
 
   it('does not resume polling when a pending request settles after unmounting', async () => {
-    const pendingRequest = Promise.withResolvers<void>()
+    const pendingRequest = Promise.withResolvers<PollResult>()
     fetchPreviousPage.mockReturnValueOnce(pendingRequest.promise)
     const { unmount } = renderLiveTable()
 
     unmount()
-    await act(async () => pendingRequest.resolve())
+    await act(async () => pendingRequest.resolve({ isCatchingUp: false }))
     await act(() => vi.advanceTimersByTimeAsync(30_000))
 
     expect(fetchPreviousPage).toHaveBeenCalledTimes(1)
   })
 
   it('starts only one polling loop when live mode is re-enabled during a pending request', async () => {
-    const pendingRequest = Promise.withResolvers<void>()
+    const pendingRequest = Promise.withResolvers<PollResult>()
     fetchPreviousPage.mockReturnValueOnce(pendingRequest.promise)
     renderLiveTable()
 
     fireEvent.click(screen.getByRole('button', { name: 'Live' }))
     fireEvent.click(screen.getByRole('button', { name: 'Live' }))
-    await act(async () => pendingRequest.resolve())
+    await act(async () => pendingRequest.resolve({ isCatchingUp: false }))
 
     expect(fetchPreviousPage).toHaveBeenCalledTimes(2)
     await act(() => vi.advanceTimersByTimeAsync(30_000))
@@ -156,7 +171,7 @@ describe('LiveButton', () => {
   })
 
   it('retries after a rejected poll at the next interval', async () => {
-    const pendingRequest = Promise.withResolvers<void>()
+    const pendingRequest = Promise.withResolvers<PollResult>()
     fetchPreviousPage.mockReturnValueOnce(pendingRequest.promise)
     renderLiveTable()
 
