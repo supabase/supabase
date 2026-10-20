@@ -238,6 +238,7 @@ export const CoverCanvas = ({
               now: isReducedMotion ? 0 : now,
               color: palette.fluid,
               beam: palette.beam,
+              flow: box.fillFlow ?? 'up',
             })
           }
           if (lift <= 0) return

@@ -9,6 +9,7 @@ export interface IsoBox {
   h: number
   inset?: 'front' | 'top'
   fillFace?: IsoFace
+  fillFlow?: 'up' | 'down'
   // a cylinder fills the box footprint, so keep w equal to d
   shape?: 'box' | 'cylinder'
   alsoLifts?: IsoBox[]

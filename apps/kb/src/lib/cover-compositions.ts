@@ -37,7 +37,7 @@ const QUEUE_CUBES: IsoBox[] = [0, 1, 2, 3, 4].map((i) => ({
   fillFace: 'right',
 }))
 
-const MIGRATION_SOURCE: IsoBox = { ...cube(0, 0, 0, 1), fillFace: 'right' }
+const MIGRATION_SOURCE: IsoBox = { ...cube(0, 0, 0, 1), fillFace: 'right', fillFlow: 'down' }
 const MIGRATION_TARGET: IsoBox = { ...cube(2.3, -2.3, 0, 1), fillFace: 'left' }
 
 const COMPARISON_TALL: IsoBox = { ...cube(0, 0, 0, 0.9), h: 2.2, fillFace: 'right' }
