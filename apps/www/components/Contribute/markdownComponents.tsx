@@ -10,7 +10,7 @@ export const markdownComponents: Components = {
   pre: ({ node, ...props }) => (
     <pre
       {...props}
-      className="bg-surface-200 text-foreground p-4 rounded-lg mb-3 w-full min-w-0 overflow-x-auto"
+      className="bg-surface-200 text-foreground p-4 rounded-lg mb-3 w-full min-w-0 overflow-x-auto font-mono text-sm whitespace-pre"
     />
   ),
   a: ({ node, ...props }) => (
