@@ -3,13 +3,15 @@ import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import '../styles/globals.css'
+import { serializeJsonLd } from '../lib/json-ld'
 
 interface Props {
 	title: string
 	description?: string
+	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
-const { title, description } = Astro.props
+const { title, description, jsonLd } = Astro.props
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 // Canonicals always resolve against the production site, so a preview URL is never indexed in place of the live page.
 // Trailing slashes are dropped so the index and every other route share one form.
@@ -49,6 +51,7 @@ const canonicalHref = new URL(canonicalPath, Astro.site).href
 		<link rel="canonical" href={canonicalHref} />
 		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
 		<title>{title} | Supabase Knowledge Base</title>
+		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
 	</head>
 	<body>
 		<Header client:load />
