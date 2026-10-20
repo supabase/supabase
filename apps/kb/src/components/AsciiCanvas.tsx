@@ -5,7 +5,6 @@ import {
   BLOCK_GLYPHS,
   buildMask,
   cellRange,
-  clamp,
   createRng,
   decayEnergy,
   drawStep,
@@ -18,8 +17,9 @@ import {
   type PixelRect,
 } from '../lib/ascii/field'
 import { loadGrain, punchGrain } from '../lib/ascii/grain'
+import { sizeLayers } from '../lib/ascii/layer'
 import { easeOutCubic } from '../lib/ascii/warp'
-import { ColorProbes, readProbeColor } from './ColorProbes'
+import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
 
 export interface CanvasSize {
   width: number
@@ -39,7 +39,6 @@ export interface AsciiCanvasProps {
   keepOutMargin?: number
   words?: string[]
   decay?: number
-  isActive?: boolean
   className?: string
 }
 
@@ -120,7 +119,6 @@ export const AsciiCanvas = ({
   keepOutMargin = 1,
   words = [],
   decay = 0.92,
-  isActive = true,
   className,
 }: AsciiCanvasProps) => {
   const setupCanvas = useCallback((canvas: HTMLCanvasElement | null) => {
@@ -153,8 +151,7 @@ export const AsciiCanvas = ({
     const observed = new Set<HTMLElement>()
     const revealStartedAt = performance.now()
 
-    const isRunning = () =>
-      isVisible && document.visibilityState === 'visible' && canvas.dataset.active === 'true'
+    const isRunning = () => isVisible && document.visibilityState === 'visible'
 
     const revealProgress = () =>
       isReducedMotion ? 1 : Math.min(1, (performance.now() - revealStartedAt) / 1000)
@@ -294,9 +291,7 @@ export const AsciiCanvas = ({
       if (key === measuredKey) return
       measuredKey = key
 
-      canvas.width = Math.round(width * dpr)
-      canvas.height = Math.round(height * dpr)
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      sizeLayers({ contexts: [ctx], width, height })
       lattice = getLattice({ width, height })
       cutouts = nextCutouts
       runs.clear()
@@ -341,17 +336,10 @@ export const AsciiCanvas = ({
     })
     intersectionObserver.observe(canvas)
 
-    const themeObserver = new MutationObserver(() => {
+    const unobserveTheme = observeTheme(() => {
       palette = readPalette(probeRoot, host)
       draw()
     })
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
-    })
-
-    const activeObserver = new MutationObserver(wake)
-    activeObserver.observe(canvas, { attributes: true, attributeFilter: ['data-active'] })
 
     host.addEventListener('pointerdown', typeWordAt)
     document.addEventListener('visibilitychange', wake)
@@ -363,8 +351,7 @@ export const AsciiCanvas = ({
       cancelAnimationFrame(frame)
       resizeObserver.disconnect()
       intersectionObserver.disconnect()
-      themeObserver.disconnect()
-      activeObserver.disconnect()
+      unobserveTheme()
       host.removeEventListener('pointerdown', typeWordAt)
       document.removeEventListener('visibilitychange', wake)
     }
@@ -375,7 +362,6 @@ export const AsciiCanvas = ({
       <canvas
         ref={setupCanvas}
         aria-hidden
-        data-active={isActive}
         className={cn('pointer-events-none absolute inset-0 size-full', className)}
       />
       <ColorProbes probes={PROBES} />

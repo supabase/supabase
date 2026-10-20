@@ -7,6 +7,13 @@ export const readProbeColor = (probeRoot: HTMLElement, role: string): string => 
   return probe ? getComputedStyle(probe).color : 'transparent'
 }
 
+// the probes' colors change with the theme, so a canvas reads them again and redraws
+export const observeTheme = (onChange: () => void): (() => void) => {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+  return () => observer.disconnect()
+}
+
 export const ColorProbes = ({ probes }: ColorProbesProps) => (
   <span aria-hidden className="hidden">
     {Object.entries(probes).map(([role, probeClass]) => (

@@ -1,19 +1,10 @@
 import { useCallback, type RefObject } from 'react'
 import { cn } from 'ui'
 
-import {
-  BEAM_ALPHA,
-  CELL_HEIGHT,
-  CELL_WIDTH,
-  clamp,
-  fitEdges,
-  hash,
-  isBeamAt,
-  rampGlyph,
-  uniformEdges,
-} from '../lib/ascii/field'
+import { CELL_HEIGHT, CELL_WIDTH, clamp, fitEdges, uniformEdges } from '../lib/ascii/field'
+import { drawFluid, FLUID_RISE_MS } from '../lib/ascii/fluid'
 import { loadGrain, punchGrain } from '../lib/ascii/grain'
-import { createLayer } from '../lib/ascii/layer'
+import { createLayer, sizeLayers, tracePolygon } from '../lib/ascii/layer'
 import { easeInOutCubic } from '../lib/ascii/warp'
 import {
   compositionBounds,
@@ -27,7 +18,7 @@ import {
   type IsoRing,
   type IsoView,
 } from '../lib/iso-shapes'
-import { ColorProbes, readProbeColor } from './ColorProbes'
+import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
 
 export interface CoverCanvasProps {
   boxes: IsoBox[]
@@ -51,16 +42,6 @@ interface Palette {
   beam: string
 }
 
-interface DrawFluidParams {
-  ctx: CanvasRenderingContext2D
-  area: IsoPoint[]
-  // 0 is empty, 1 is full
-  level: number
-  now: number
-  color: string
-  beam: string
-}
-
 const PROBES = {
   line: 'text-border-muted',
   fluid: 'text-foreground-muted',
@@ -72,9 +53,6 @@ const LIFT_MS = 700
 const CARD_HOVER_MS = 500
 // stable default so the canvas setup isn't redone on every render
 const NO_RINGS: IsoRing[] = []
-const FLUID_COLUMN = 8
-const FLUID_ROW = 10
-const FLUID_RISE_MS = 200
 
 // a box lifts together with every box stacked on its footprint, lowest first
 const stackFrom = (boxes: IsoBox[], index: number): number[] => {
@@ -104,49 +82,11 @@ const isInside = ({ x, y }: Point, polygon: IsoPoint[]) => {
   return isIn
 }
 
-const tracePolygon = (ctx: CanvasRenderingContext2D, polygon: IsoPoint[]) => {
-  ctx.beginPath()
-  for (const [x, y] of polygon) ctx.lineTo(x, y)
-  ctx.closePath()
-}
-
 const clearPath = (ctx: CanvasRenderingContext2D) => {
   ctx.save()
   ctx.globalCompositeOperation = 'destination-out'
   ctx.fillStyle = '#000'
   ctx.fill()
-  ctx.restore()
-}
-
-const drawFluid = ({ ctx, area, level, now, color, beam }: DrawFluidParams) => {
-  if (level <= 0) return
-  const ys = area.map(([, y]) => y)
-  const xs = area.map(([x]) => x)
-  const left = Math.min(...xs)
-  const right = Math.max(...xs)
-  const bottom = Math.max(...ys)
-  const surface = bottom - (bottom - Math.min(...ys)) * level
-  const drift = Math.floor(now / FLUID_RISE_MS)
-  ctx.save()
-  tracePolygon(ctx, area)
-  ctx.clip()
-  ctx.font = '12px ui-monospace, SFMono-Regular, Menlo, monospace'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  for (let row = 0; bottom - row * FLUID_ROW > surface; row++) {
-    const y = bottom - row * FLUID_ROW
-    const depth = 1 - (bottom - y) / Math.max(1, bottom - surface)
-    for (let col = 0; left + col * FLUID_COLUMN < right; col++) {
-      const cell = row - drift
-      const density = hash(col, cell) * (0.35 + 0.65 * depth)
-      const glyph = rampGlyph(density)
-      if (glyph === ' ') continue
-      const isBeam = isBeamAt({ col, row: cell, now })
-      ctx.fillStyle = isBeam ? beam : color
-      ctx.globalAlpha = isBeam ? BEAM_ALPHA : 1
-      ctx.fillText(glyph, left + col * FLUID_COLUMN, y)
-    }
-  }
   ctx.restore()
 }
 
@@ -342,13 +282,7 @@ export const CoverCanvas = ({
       const measure = () => {
         const width = host.clientWidth
         const height = host.clientHeight
-        const dpr = window.devicePixelRatio || 1
-        for (const target of [{ canvas, ctx }, fluidLayer]) {
-          if (!target) continue
-          target.canvas.width = Math.round(width * dpr)
-          target.canvas.height = Math.round(height * dpr)
-          target.ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-        }
+        sizeLayers({ contexts: fluidLayer ? [ctx, fluidLayer.ctx] : [ctx], width, height })
         table = {
           xs: fitEdges({ size: width, target: CELL_WIDTH }),
           ys: uniformEdges({ size: height, step: CELL_HEIGHT }),
@@ -433,13 +367,9 @@ export const CoverCanvas = ({
       resizeObserver.observe(host)
       if (keepOutRef?.current) resizeObserver.observe(keepOutRef.current)
 
-      const themeObserver = new MutationObserver(() => {
+      const unobserveTheme = observeTheme(() => {
         palette = readPalette(probeRoot)
         draw()
-      })
-      themeObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-theme'],
       })
 
       host.addEventListener('pointermove', handlePointerMove)
@@ -448,7 +378,7 @@ export const CoverCanvas = ({
       return () => {
         cancelAnimationFrame(frame)
         resizeObserver.disconnect()
-        themeObserver.disconnect()
+        unobserveTheme()
         host.removeEventListener('pointermove', handlePointerMove)
         host.removeEventListener('pointerleave', handlePointerLeave)
       }

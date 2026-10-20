@@ -14,7 +14,7 @@ import {
 } from '../lib/ascii/field'
 import { loadGrain, punchGrain } from '../lib/ascii/grain'
 import { createInfall } from '../lib/ascii/infall'
-import { createLayer } from '../lib/ascii/layer'
+import { createLayer, sizeLayers } from '../lib/ascii/layer'
 import {
   easeInOutCubic,
   easeOutCubic,
@@ -27,7 +27,7 @@ import {
   type WarpPoint,
   type WarpShape,
 } from '../lib/ascii/warp'
-import { ColorProbes, readProbeColor } from './ColorProbes'
+import { ColorProbes, observeTheme, readProbeColor } from './ColorProbes'
 
 export interface WarpCanvasProps {
   anchorRef: RefObject<HTMLElement | null>
@@ -462,12 +462,7 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
     const measure = () => {
       const width = host.clientWidth
       const height = host.clientHeight
-      const dpr = window.devicePixelRatio || 1
-      for (const target of [ctx, grid]) {
-        target.canvas.width = Math.round(width * dpr)
-        target.canvas.height = Math.round(height * dpr)
-        target.setTransform(dpr, 0, 0, dpr, 0, 0)
-      }
+      sizeLayers({ contexts: [ctx, grid], width, height })
       gridKey = ''
 
       if (anchorRef.current && !isAnchorObserved) {
@@ -517,14 +512,10 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
     })
     intersectionObserver.observe(canvas)
 
-    const themeObserver = new MutationObserver(() => {
+    const unobserveTheme = observeTheme(() => {
       palette = readPalette(probeRoot)
       gridKey = ''
       draw()
-    })
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['data-theme'],
     })
 
     window.addEventListener('scroll', requestDraw, { passive: true })
@@ -537,7 +528,7 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       cancelAnimationFrame(frame)
       resizeObserver.disconnect()
       intersectionObserver.disconnect()
-      themeObserver.disconnect()
+      unobserveTheme()
       window.removeEventListener('scroll', requestDraw)
       host.removeEventListener('pointermove', handlePointerMove)
       host.removeEventListener('pointerleave', handlePointerLeave)
