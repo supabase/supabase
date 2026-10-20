@@ -3830,4 +3830,9 @@ module.exports = [
     source: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password',
     destination: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/sso/enterprise-mcp-authentication',
+    destination: '/docs/guides/platform/sso/enterprise-mcp-authorization',
+  },
 ]
