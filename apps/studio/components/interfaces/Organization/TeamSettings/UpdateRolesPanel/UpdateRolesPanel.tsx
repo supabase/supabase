@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { isEqual } from 'lodash'
 import { XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
@@ -31,6 +30,7 @@ import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
   formatMemberRoleToProjectRoleConfiguration,
+  hasRoleConfigurationChanges,
   ProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -96,7 +96,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const numberOfProjectsWithAccess = projectsRoleConfiguration.filter(
     (p) => p.ref !== undefined
   ).length
-  const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
+  const hasNoChanges = !hasRoleConfigurationChanges(
+    originalConfiguration,
+    projectsRoleConfiguration
+  )
 
   const getRoleForProject = (project: ProjectRoleConfiguration) =>
     orgScopedRoles.find((r) => r.id === (project.baseRoleId ?? project.roleId))
