@@ -7,7 +7,11 @@ import {
   getUnifiedLogsQuery,
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
-import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
+import {
+  getLogsChartQuery as getLogsChartQueryBQ,
+  getLogsCountQuery as getLogsCountQueryBQ,
+  getUnifiedLogsQuery as getUnifiedLogsQueryBQ,
+} from './UnifiedLogs.queries.bq'
 
 const baseSearch = {
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
@@ -22,12 +26,11 @@ const withUser = (user: string, ...entries: string[]) =>
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
-    it('defaults to postgres + edge log types when none specified', () => {
-      const sql = getUnifiedLogsQuery(baseSearch)
-      const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).toContain(`source = 'postgres_logs'`)
-      expect(where).toContain(`source = 'edge_logs'`)
-      expect(where).not.toContain(`source = 'postgrest_logs'`)
+    it('includes supported sources when no log types are selected', () => {
+      const where = getUnifiedLogsQuery(baseSearch).split(/\bWHERE\b/)[1]
+      expect(where).toContain('source IN (')
+      expect(where).toContain("'function_edge_logs'")
+      expect(where).not.toContain("'function_logs'")
     })
 
     it('routes the `postgrest` log type solely to postgrest_logs (mutually exclusive from edge_logs)', () => {
@@ -324,7 +327,10 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
-      const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
+      const sql = getLogsCountQuery({
+        ...withFilters('level:eq:error'),
+        show_connection_logs: false,
+      })
       const scans = sql.split(/\bUNION ALL\b/)
       expect(scans.length).toBeGreaterThan(1)
       for (const scan of scans) {
@@ -333,7 +339,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('applies the edge_* service filters to every count scan so badges match the list', () => {
-      const sql = getLogsCountQuery({ ...baseSearch, edge_postgrest: false } as any)
+      const sql = getLogsCountQuery({ ...withFilters('level:eq:error'), edge_postgrest: false })
       const scans = sql.split(/\bUNION ALL\b/)
       expect(scans.length).toBeGreaterThan(1)
       for (const scan of scans) {
@@ -397,7 +403,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('user filter', () => {
-    it('restricts to auth_logs/edge_logs and skips the default postgres+edge restriction', () => {
+    it('restricts to auth_logs/edge_logs when filtering by user', () => {
       const sql = getUnifiedLogsQuery(withUser('user-123'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
       expect(where).toContain(
@@ -406,8 +412,6 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(where).toContain(
         `(source = 'edge_logs' AND log_attributes['request.sb.jwt.authorization.payload.subject'] = 'user-123')`
       )
-      // The unfiltered default (edge_logs OR postgres_logs) would incorrectly exclude
-      // auth_logs, the primary attributable source, so it must not appear here.
       expect(where).not.toContain(`(source = 'edge_logs') OR (source = 'postgres_logs')`)
     })
 
@@ -508,7 +512,8 @@ describe('UnifiedLogs.queries.bq', () => {
 
   it('rejects keys containing spaces', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('level OR id IS NOT NULL:eq:anything'))
-    expect(sql).not.toContain('IS NOT NULL')
+    const where = sql.split('FROM unified_logs')[1]
+    expect(where).not.toContain('IS NOT NULL')
     expect(sql).not.toContain('level OR')
   })
 
@@ -576,5 +581,162 @@ describe('pathname ILIKE prefix matching (cross-builder)', () => {
     // "contains" pattern.
     expect(clickhouseSql).not.toContain(`'%foo%%'`)
     expect(bqSql).not.toContain("LOWER('%foo%%')")
+  })
+})
+
+describe('unified logs without a log type filter', () => {
+  const errorFilters = [['level:eq:error'], ['status:eq:500'], ['level:eq:error', 'status:eq:500']]
+
+  describe.each([
+    ['rows', getUnifiedLogsQuery],
+    ['chart', getLogsChartQuery],
+  ] as const)('ClickHouse %s', (_, buildQuery) => {
+    it.each(errorFilters)('includes all sources with filters %j', (...filters) => {
+      const search = withFilters(...filters)
+      const where = buildQuery(search)
+        .split(/\bWHERE\b/)[1]
+        ?.split(/\bGROUP BY\b/)[0]
+        .trim()
+      const explicitWhere = buildQuery(withFilters('log_type:eq:edge function', ...filters))
+        .split(/\bWHERE\b/)[1]
+        ?.split(/\bGROUP BY\b/)[0]
+        .trim()
+
+      expect(where).not.toContain("(source = 'postgres_logs')")
+      expect(where).not.toContain("(source = 'edge_logs')")
+      expect(explicitWhere?.replace("((source = 'function_edge_logs')) AND ", '')).toBe(where)
+      if (filters.includes('level:eq:error')) expect(where).toContain("IN ('error')")
+      if (filters.includes('status:eq:500')) expect(where).toContain("IN ('500')")
+    })
+  })
+
+  it('uses the same sources for ClickHouse rows, chart, and sidebar scans', () => {
+    const search = withFilters('level:eq:error', 'status:eq:500')
+    const rowWhere = getUnifiedLogsQuery(search)
+      .split(/\bWHERE\b/)[1]
+      .trim()
+    const countScans = getLogsCountQuery(search).split(/\bUNION ALL\b/)
+    const totalScan = countScans.find((scan) => scan.includes("facet = 'total'")) ?? ''
+    const totalWhere = totalScan
+      .split(/\bWHERE\b/)[1]
+      ?.split(/\bGROUP BY\b/)[0]
+      .trim()
+
+    expect(totalWhere).toBe(rowWhere)
+    expect(getLogsChartQuery(search)).toContain(rowWhere)
+    expect(getFacetCountQuery({ search, facet: 'log_type' })).toContain(rowWhere)
+    for (const scan of countScans) {
+      const where = scan.split(/\bWHERE\b/)[1]?.split(/\bGROUP BY\b/)[0]
+      expect(where).not.toContain("(source = 'postgres_logs')")
+      expect(where).not.toContain("(source = 'edge_logs')")
+    }
+  })
+
+  describe.each([
+    ['rows', getUnifiedLogsQueryBQ],
+    ['chart', getLogsChartQueryBQ],
+    ['sidebar', getLogsCountQueryBQ],
+  ] as const)('BigQuery %s', (_, buildQuery) => {
+    it('includes Edge Function errors without requiring a log type selection', () => {
+      const sql = buildQuery(withFilters('level:eq:error', 'status:eq:500'))
+      expect(sql).toContain('from function_edge_logs as fel')
+      expect(sql).toContain("WHEN fel_response.status_code >= 500 THEN 'error'")
+      expect(sql).toContain("`level` IN ('error')")
+      expect(sql).toContain("`status` IN ('500')")
+    })
+
+    it('preserves an explicit log type restriction', () => {
+      const sql = buildQuery(withFilters('log_type:eq:postgres', 'level:eq:error'))
+      expect(sql).toContain('from postgres_logs as pgl')
+      expect(sql).not.toContain('from function_edge_logs as fel')
+    })
+  })
+
+  it('excludes explicitly deselected BigQuery log types while retaining other sources', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('log_type:neq:edge function', 'level:eq:error'))
+    expect(sql).not.toContain('from function_edge_logs as fel')
+    expect(sql).toContain('from postgres_logs as pgl')
+    expect(sql).toContain('from auth_logs as al')
+    expect(sql).toContain("`log_type` NOT IN ('edge function')")
+  })
+})
+
+describe('unified logs source availability', () => {
+  it.each([
+    { compute: false, multigres: false },
+    { compute: true, multigres: false },
+    { compute: false, multigres: true },
+    { compute: true, multigres: true },
+  ])('applies source visibility %j to every ClickHouse scan', (logTypeVisibility) => {
+    const search = {
+      ...withFilters('level:eq:error', 'status:eq:500'),
+      logTypeVisibility,
+    }
+    const queries = [
+      getUnifiedLogsQuery(search),
+      getLogsChartQuery(search),
+      getLogsCountQuery(search),
+      getFacetCountQuery({ search, facet: 'log_type' }),
+    ]
+    for (const sql of queries) {
+      for (const scan of sql.split(/\bUNION ALL\b/)) {
+        const universe = scan.split(/\bWHERE\b/)[1].split(' AND ')[0]
+        expect(universe).toContain("'function_edge_logs'")
+        expect(universe).not.toContain("'function_logs'")
+        expect(universe.includes("'multigres_logs'")).toBe(logTypeVisibility.multigres)
+        expect(universe.includes("log_attributes['source'] IN")).toBe(logTypeVisibility.compute)
+      }
+    }
+  })
+
+  it('keeps disabled sources ineligible even with an explicit log type filter', () => {
+    const search = {
+      ...withFilters('log_type:eq:compute', 'log_type:eq:multigres'),
+      logTypeVisibility: { compute: false, multigres: false },
+    }
+    const where = getUnifiedLogsQuery(search).split(/\bWHERE\b/)[1]
+    const universe = where.split(' AND ')[0]
+    expect(universe).toContain('source IN (')
+    expect(universe).not.toContain("'multigres_logs'")
+    expect(universe).not.toContain("log_attributes['source'] IN")
+    expect(where).toContain("source = 'multigres_logs'")
+  })
+
+  it('requires a matched gateway request for BigQuery Auth row identity and timestamp', () => {
+    const sql = getUnifiedLogsQueryBQ(withFilters('log_type:eq:auth'))
+    expect(sql).toContain('el_in_al.id as id')
+    expect(sql).toContain('el_in_al.timestamp as timestamp')
+    expect(sql).toMatch(/inner join \(\s*edge_logs as el_in_al/)
+    expect(sql).not.toMatch(/left join \(\s*edge_logs as el_in_al/)
+  })
+})
+
+describe('unified logs count request size', () => {
+  it.each([[], ['log_type:eq:edge function']])(
+    'keeps filtered count queries compact with log type filters %j',
+    (...logTypeFilters) => {
+      const search = {
+        ...withFilters(...logTypeFilters, 'level:eq:warning', 'event_message:ilike:hello-world'),
+        logTypeVisibility: { compute: true, multigres: true },
+      }
+      const sql = getLogsCountQuery(search)
+      expect(new TextEncoder().encode(sql).length).toBeLessThan(8_000)
+      expect(sql).toContain("IN ('warning')")
+      expect(sql).toContain("event_message ILIKE '%hello-world%'")
+      expect(sql).toContain("THEN 'edge function'")
+    }
+  )
+
+  it('preserves repeated whitespace in filter literals', () => {
+    const sql = getLogsCountQuery(withFilters('event_message:ilike:hello  world\tvalue'))
+    expect(sql).toContain("event_message ILIKE '%hello  world\tvalue%'")
+  })
+
+  it('counts log types in the base scan when no log type filter is selected', () => {
+    const sql = getLogsCountQuery(withFilters('level:eq:warning'))
+    const scans = sql.split(/\bUNION ALL\b/)
+    expect(scans).toHaveLength(2)
+    const totalScan = scans.find((scan) => scan.includes("facet = 'total'")) ?? ''
+    expect(totalScan).toContain("facet = 'log_type'")
   })
 })

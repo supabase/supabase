@@ -6,7 +6,6 @@
 
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
 import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
@@ -27,14 +26,9 @@ const NOT_LIKE_OP = safeSql`NOT LIKE`
 
 const ALL_LOG_TYPES = ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']
 
-/**
- * Computes the log_type set that the CTE should union. With no filter, defaults
- * to the cheap two-source set. With `=` filters, narrows to those values. With
- * `<>` filters, excludes them from the full set.
- */
 export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] => {
   const filters = parseLogsFilterUrlParams(search.filter).filter((f) => f.column === 'log_type')
-  if (filters.length === 0) return [...DEFAULT_LOG_TYPES]
+  if (filters.length === 0) return [...ALL_LOG_TYPES]
   const included = filters.filter((f) => f.operator === '=').map((f) => f.value)
   const excluded = new Set(filters.filter((f) => f.operator === '<>').map((f) => f.value))
   const base = included.length > 0 ? included : ALL_LOG_TYPES
@@ -314,7 +308,7 @@ const getAuthLogsQuery = (): SafeLogSqlFragment => safeSql`
       null as logs
     from auth_logs as al
     cross join unnest(metadata) as al_metadata
-    left join (
+    inner join (
     edge_logs as el_in_al
         cross join unnest (metadata) as el_in_al_metadata
         cross join unnest (el_in_al_metadata.response) as el_in_al_response
@@ -363,19 +357,12 @@ const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   storage: getSupabaseStorageLogsQuery,
 }
 
-/**
- * Combine the requested log sources to create the unified logs CTE.
- * Defaults to postgres + postgrest on first load to reduce query cost.
- */
-export const getUnifiedLogsCTE = (
-  logTypes: string[] = [...DEFAULT_LOG_TYPES]
-): SafeLogSqlFragment => {
+export const getUnifiedLogsCTE = (logTypes: string[] = [...ALL_LOG_TYPES]): SafeLogSqlFragment => {
   const queries = logTypes
     .filter((type) => type in LOG_TYPE_QUERIES)
     .map((type) => LOG_TYPE_QUERIES[type]())
 
-  const effective =
-    queries.length > 0 ? queries : DEFAULT_LOG_TYPES.map((t) => LOG_TYPE_QUERIES[t]())
+  const effective = queries.length > 0 ? queries : ALL_LOG_TYPES.map((t) => LOG_TYPE_QUERIES[t]())
 
   return safeSql`
 WITH unified_logs AS (
