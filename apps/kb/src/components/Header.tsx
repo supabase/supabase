@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { Button } from 'ui'
+import { Button, buttonVariants, cn } from 'ui'
 
 import { getNavMenus, SIGN_UP_URL } from '../lib/nav'
 import type { Topic } from '../lib/topics'
@@ -51,10 +51,14 @@ export const Header = ({ topics }: HeaderProps) => {
               aria-expanded={isMenuOpen}
               aria-controls={MOBILE_MENU_ID}
               onClick={handleMenuOpen}
-              className="inline-flex items-center justify-center rounded-md p-2 text-foreground-lighter hover:bg-overlay hover:text-foreground-light focus-ring lg:hidden"
+              className={cn(
+                buttonVariants({ variant: 'default' }),
+                'size-[30px] min-w-[30px] border-default bg-surface-100/75 px-0',
+                'text-foreground-light lg:hidden'
+              )}
             >
               <span className="sr-only">Open main menu</span>
-              <Menu aria-hidden className="size-6" strokeWidth={2} />
+              <Menu aria-hidden className="size-[18px]" strokeWidth={1} />
             </button>
           </div>
         </div>

@@ -1,9 +1,20 @@
 import { X } from 'lucide-react'
 import { type KeyboardEvent } from 'react'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Button,
+  cn,
+  singleThemes,
+  ToggleGroup,
+  ToggleGroupItem,
+} from 'ui'
 
 import { SIGN_UP_URL, type NavMenu } from '../lib/nav'
 import { revealStyle } from '../lib/reveal'
+import { EXTERNAL_LINKS, useThemeChoice } from './HeaderMenu'
 import { Logo } from './Logo'
 
 export interface MobileMenuProps {
@@ -14,6 +25,8 @@ export interface MobileMenuProps {
 }
 
 export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) => {
+  const { choice, onChoiceChange } = useThemeChoice()
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') onClose()
     if (event.key !== 'Tab') return
@@ -55,7 +68,7 @@ export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) =
         className
       )}
     >
-      <div className="flex h-(--header-height) shrink-0 items-center justify-between px-6">
+      <div className="flex h-(--header-height) shrink-0 items-center justify-between border-b border-transparent px-6">
         <Logo />
         <button
           type="button"
@@ -67,7 +80,7 @@ export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) =
           <X aria-hidden className="size-6" strokeWidth={2} />
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4">
+      <div className="flex flex-1 flex-col overflow-y-auto px-4 pb-8 pt-4">
         <Accordion type="multiple">
           {menus.map((menu, index) => (
             <AccordionItem
@@ -111,8 +124,42 @@ export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) =
             </AccordionItem>
           ))}
         </Accordion>
+        <ul className="mt-auto flex flex-col gap-3 px-2 pt-6">
+          {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
+            <li key={href}>
+              <a
+                href={href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="flex items-center gap-2 rounded-sm text-sm text-foreground-light hover:text-foreground focus-ring"
+              >
+                <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className="px-2 pt-6">
+          <ToggleGroup
+            type="single"
+            variant="segmented"
+            tone="outline"
+            size="sm"
+            allowDeselect={false}
+            value={choice}
+            onValueChange={onChoiceChange}
+            aria-label="Theme"
+            className="w-full"
+          >
+            {singleThemes.map((theme) => (
+              <ToggleGroupItem key={theme.value} value={theme.value} className="flex-1">
+                {theme.name}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
       </div>
-      <div className="flex shrink-0 items-stretch gap-4 bg-alternative p-4">
+      <div className="flex shrink-0 bg-alternative p-4">
         <Button variant="primary" block asChild>
           <a href={SIGN_UP_URL} className="h-10 py-4">
             Start your project

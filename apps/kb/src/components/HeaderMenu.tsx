@@ -22,6 +22,12 @@ export interface HeaderMenuProps {
 
 type ThemeChoice = 'system' | 'dark' | 'light'
 
+export const EXTERNAL_LINKS = [
+  { label: 'Supabase.com', href: 'https://supabase.com', Icon: House },
+  { label: 'GitHub', href: 'https://github.com/supabase/supabase', Icon: GithubIcon },
+  { label: 'Support', href: 'https://supabase.com/support', Icon: LifeBuoy },
+]
+
 const isThemeChoice = (value: string | null): value is ThemeChoice =>
   value === 'system' || value === 'dark' || value === 'light'
 
@@ -53,7 +59,7 @@ const applyTheme = (choice: ThemeChoice) => {
   }
 }
 
-export const HeaderMenu = ({ className }: HeaderMenuProps) => {
+export const useThemeChoice = () => {
   const [choice, setChoice] = useState(readStoredChoice)
 
   const handleChoiceChange = (value: string) => {
@@ -61,6 +67,12 @@ export const HeaderMenu = ({ className }: HeaderMenuProps) => {
     setChoice(value)
     applyTheme(value)
   }
+
+  return { choice, onChoiceChange: handleChoiceChange }
+}
+
+export const HeaderMenu = ({ className }: HeaderMenuProps) => {
+  const { choice, onChoiceChange } = useThemeChoice()
 
   return (
     <DropdownMenu modal={false}>
@@ -79,11 +91,7 @@ export const HeaderMenu = ({ className }: HeaderMenuProps) => {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-52">
-        {[
-          { label: 'Supabase.com', href: 'https://supabase.com', Icon: House },
-          { label: 'GitHub', href: 'https://github.com/supabase/supabase', Icon: GithubIcon },
-          { label: 'Support', href: 'https://supabase.com/support', Icon: LifeBuoy },
-        ].map(({ label, href, Icon }) => (
+        {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
           <DropdownMenuItem key={href} asChild className="gap-2">
             <a href={href} target="_blank" rel="noreferrer noopener">
               <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
@@ -94,7 +102,7 @@ export const HeaderMenu = ({ className }: HeaderMenuProps) => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={choice} onValueChange={handleChoiceChange}>
+          <DropdownMenuRadioGroup value={choice} onValueChange={onChoiceChange}>
             {singleThemes.map((theme) => (
               <DropdownMenuRadioItem key={theme.value} value={theme.value}>
                 {theme.name}
