@@ -4,10 +4,9 @@ import { fetchHeadWithTimeout } from '@/data/fetchers'
 const DEFAULT_TIMEOUT_MILLISECONDS = 2000
 
 /**
- * Ping Postgrest for health check. Default timeout in 2s.
+ * Ping Postgrest for health check. Default timeout is 2s.
  *
- * @param restUrl project rest url
- * @param apikey project internal api key
+ * @param projectRef project ref used to reach its PostgREST endpoint
  * @param options optional, include custom timeout in milliseconds
  *
  * @return true if ping is successful else false
