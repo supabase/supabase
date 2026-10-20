@@ -17,7 +17,7 @@
 
     word-break: normal;
     overflow-wrap: anywhere;
-    font-size: max(0.75rem, calc(1em - 2px));
+    font-size: max(0.75rem, calc(1em - 1.5px));
     line-height: inherit;
     font-weight: inherit;
     color: var(--foreground);
@@ -44,7 +44,7 @@
 
     word-break: normal;
     overflow-wrap: anywhere;
-    font-size: max(0.75rem, calc(1em - 2px));
+    font-size: max(0.75rem, calc(1em - 1.5px));
     line-height: inherit;
     font-weight: inherit;
     color: var(--foreground);
