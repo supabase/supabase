@@ -16,6 +16,7 @@ import { useQueryVariant } from '../lib/use-query-variant'
 import { AsciiCanvas, type CanvasSize } from './AsciiCanvas'
 import { AsciiHoverText } from './AsciiHoverText'
 import { GuideSearchDialog } from './GuideSearchDialog'
+import { InfallText } from './InfallText'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
@@ -160,10 +161,14 @@ export const Hero = ({
         >
           {breadcrumb}
           <h1 className="m-0 text-5xl tracking-display text-foreground sm:text-6xl">
-            <AsciiHoverText text={title} glyphClassName="after:text-foreground" />
+            {isWarp ? (
+              <InfallText text={title} hoverGlyphClassName="after:text-foreground" />
+            ) : (
+              <AsciiHoverText text={title} glyphClassName="after:text-foreground" />
+            )}
           </h1>
           <p className="m-0 min-h-[2lh] max-w-145 text-balance text-lg leading-7 text-foreground-light">
-            {description}
+            {isWarp ? <InfallText text={description} /> : description}
           </p>
           {children}
           {variant === 'construction' && topic ? <HeroFlanks topic={topic} /> : null}

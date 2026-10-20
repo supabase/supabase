@@ -50,6 +50,23 @@ interface RingRadiiParams {
   maxRadius: number
 }
 
+interface InvertWarpParams {
+  shape: WarpShape
+  x: number
+  y: number
+}
+
+interface TangentAngleParams {
+  shape: WarpShape
+  r: number
+  angle: number
+}
+
+interface WarpPolar {
+  r: number
+  angle: number
+}
+
 const TILT = 0.42
 const THROAT_FLATTENING = 0.6
 
@@ -110,6 +127,29 @@ export const locateCell = ({
   const angle = Math.atan2((unflattenedY - centerY) / ry, dx / radii[outer])
   const turn = (angle + Math.PI * 2) % (Math.PI * 2)
   return { ring: outer - 1, spoke: Math.floor((turn / (Math.PI * 2)) * spokeCount) % spokeCount }
+}
+
+// bisects for the ring that passes through the point. points inside the throat stay on the throat ring
+export const invertWarp = ({ shape, x, y }: InvertWarpParams): WarpPolar => {
+  const dx = x - shape.cx
+  const isOutside = (r: number) => {
+    const { centerY, ry } = ringEllipse(shape, r)
+    return (dx / r) ** 2 + ((y - centerY) / ry) ** 2 > 1
+  }
+  let inner = shape.r0
+  let outer = isOutside(inner) ? shape.r0 * 64 : inner
+  while (outer - inner > 0.01) {
+    const mid = (inner + outer) / 2
+    if (isOutside(mid)) inner = mid
+    else outer = mid
+  }
+  const { centerY, ry } = ringEllipse(shape, outer)
+  return { r: outer, angle: Math.atan2((y - centerY) / ry, dx / outer) }
+}
+
+export const tangentAngle = ({ shape, r, angle }: TangentAngleParams): number => {
+  const { ry } = ringEllipse(shape, r)
+  return Math.atan2(ry * Math.cos(angle), -r * Math.sin(angle))
 }
 
 export const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2)

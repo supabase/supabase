@@ -13,6 +13,7 @@ import {
   type PixelRect,
 } from '../lib/ascii/field'
 import { createGrainPattern, punchGrain } from '../lib/ascii/grain'
+import { measureInfall, paintInfall, paintSettle, type InfallGlyph } from '../lib/ascii/infall'
 import { createLayer } from '../lib/ascii/layer'
 import {
   easeInOutCubic,
@@ -213,6 +214,13 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
     let lastTime = 0
     let lastSpawn = 0
     let isAnchorObserved = false
+    let infallGlyphs: InfallGlyph[] = []
+    let infallKey = ''
+    let isConsumed = false
+    let infallAt = 0
+    let infallTarget = 0
+    let settleAt = 1
+    let ringdownWave = -1
     // the rings and spokes change only with scroll, size and theme, so frames reuse this layer
     let gridKey = ''
 
@@ -306,6 +314,39 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       }
       ctx.clearRect(0, 0, width, height)
       ctx.drawImage(gridLayer.canvas, 0, 0, width, height)
+      // two thresholds, so a scroll that stops near one does not start and stop the infall
+      if (progress > 0.03) {
+        infallTarget = 1
+        settleAt = 1
+      } else if (progress < 0.01 && infallTarget === 1) {
+        infallTarget = 0
+        infallAt = 0
+        settleAt = 0
+      }
+      // frames repeat while the page is still, so the glyph styles change only when they move
+      if (!isReducedMotion && infallKey !== `${infallAt}:${settleAt}:${progress}`) {
+        infallKey = `${infallAt}:${settleAt}:${progress}`
+        if (settleAt < 1) paintSettle({ glyphs: infallGlyphs, at: settleAt })
+        const remaining =
+          settleAt < 1
+            ? 1
+            : paintInfall({
+                glyphs: infallGlyphs,
+                throat: { x: shape.cx, y: lineY + (shape.throatY - lineY) * (1 - flatten) },
+                shape,
+                flatten,
+                lineY,
+                // the glyph timeline ends near 0.34, so the clock maps onto it
+                progress: infallAt * 0.34,
+              })
+        const isCopyGone = infallGlyphs.length > 0 && remaining === 0
+        // the wave owns the grid while it runs, so pulses stop and no new ones spawn
+        if (isCopyGone && !isConsumed) {
+          ringdownWave = 0
+          pulses = []
+        }
+        isConsumed = isCopyGone
+      }
 
       ctx.save()
       clipToBoundary(ctx)
@@ -329,7 +370,17 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
           if (ring <= pulse.start) paintCell({ ring, spoke: pulse.spoke }, strength * fadeIn)
         }
       }
-      if (hovered) paintCell(hovered, 1)
+      if (ringdownWave >= 0) {
+        const head = Math.floor(ringdownWave)
+        const fade = 1 - (ringdownWave / ringCount) ** 2
+        SPOKE_ANGLES.forEach((_, spoke) => {
+          for (const [offset, strength] of [1, 0.7, 0.4].entries()) {
+            const ring = head - offset
+            if (ring >= 0 && hash(spoke, ring) > 0.15) paintCell({ ring, spoke }, strength * fade)
+          }
+        })
+      }
+      if (hovered && ringdownWave < 0) paintCell(hovered, 1)
       ctx.restore()
 
       const bottomFade = ctx.createLinearGradient(0, height - 80, 0, height)
@@ -406,9 +457,16 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       if (!isRunning()) return
       const dt = lastTime ? Math.min(0.05, (time - lastTime) / 1000) : 0
       lastTime = time
-      if (revealAt(time) >= 1 && time - lastSpawn > 450 && pulses.length < 10) {
+      if (revealAt(time) >= 1 && ringdownWave < 0 && time - lastSpawn > 450 && pulses.length < 10) {
         lastSpawn = time
         spawn()
+      }
+      if (infallTarget === 1 && infallAt < 1) infallAt = Math.min(1, infallAt + dt)
+      if (settleAt < 1) settleAt = Math.min(1, settleAt + dt / 0.6)
+      if (ringdownWave >= 0) {
+        ringdownWave += 14 * dt
+        // past the last drawn ring the fade turns negative, which has no ramp glyph
+        if (ringdownWave >= (boundaryRing < 0 ? radii.length : boundaryRing + 1)) ringdownWave = -1
       }
       pulses = pulses.flatMap((pulse) => {
         const speed = 2.5 * (1 + 0.25 * (pulse.start - pulse.ringPos))
@@ -470,6 +528,14 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
         ? (throatBox.top + throatBox.bottom) / 2 - origin.top + (throatTarget ? 0 : THROAT_DROP)
         : height / 2
       baseShape = { cx: width / 2, rimY: throatY - 190, throatY, r0: THROAT_RADIUS }
+      infallGlyphs = anchorRef.current
+        ? measureInfall({
+            container: anchorRef.current,
+            origin,
+            throat: { x: width / 2, y: throatY },
+          })
+        : []
+      infallKey = ''
       baseRadii = ringRadii({ r0: THROAT_RADIUS, maxRadius: Math.hypot(width, height * 3) })
       const frontYs = baseRadii.map(
         (r) => projectWarp({ shape: baseShape, r, angle: Math.PI / 2, flatten: 0, lineY: 0 }).y
