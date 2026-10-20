@@ -3,11 +3,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  buildRetryTargets,
-  isWarehouseSettingUp,
-  type WarehouseSetupTarget,
-} from './Warehouse.utils'
+import { isWarehouseSettingUp, type WarehouseSetupTarget } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
 import { WarehouseDisableCard } from './WarehouseDisableCard'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
@@ -143,30 +139,19 @@ export const WarehouseSetupPanel = () => {
   }
 
   if (status === 'error') {
-    const retryTargets = buildRetryTargets(data.tables)
     const failingStep = data.steps.find((step) => step.status === 'error')
 
     return (
-      <AlertError
-        subject="Warehouse setup failed"
-        showErrorPrefix={false}
+      <WarehouseSchemaTablePicker
+        initialTables={data.tables}
+        onSubmit={handleSetup}
+        isSubmitting={setupMutation.isPending}
         error={{
           message:
             setupMutation.error?.message ??
             failingStep?.message ??
             'An unknown error occurred while setting up Warehouse.',
         }}
-        additionalActions={
-          retryTargets.length > 0 ? (
-            <Button
-              variant="default"
-              loading={setupMutation.isPending}
-              onClick={() => handleSetup(retryTargets)}
-            >
-              Retry
-            </Button>
-          ) : undefined
-        }
       />
     )
   }

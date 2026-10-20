@@ -121,13 +121,6 @@ export const WarehouseDisableCard = () => {
                 </p>
               </div>
             </AlertDialogDescription>
-            {disableMutation.error && (
-              <AlertError
-                subject="Failed to disable Warehouse"
-                showErrorPrefix={false}
-                error={disableMutation.error}
-              />
-            )}
             <div className="border-t px-5 py-4">
               <Form {...form}>
                 <FormField
@@ -154,6 +147,23 @@ export const WarehouseDisableCard = () => {
                 />
               </Form>
             </div>
+            {disableMutation.error && (
+              <div className="px-5 pb-4">
+                <AlertError
+                  subject="Failed to disable Warehouse"
+                  showErrorPrefix={false}
+                  showInstructions={false}
+                  hideContactSupport
+                  error={{
+                    message:
+                      disableMutation.error.message ===
+                      'Legacy Warehouse data must be retained when disabling Warehouse.'
+                        ? 'This Warehouse uses an older storage setup. Clear “Also delete copied Warehouse data” to disable it and keep the copied data.'
+                        : disableMutation.error.message,
+                  }}
+                />
+              </div>
+            )}
           </AlertDialogBody>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>

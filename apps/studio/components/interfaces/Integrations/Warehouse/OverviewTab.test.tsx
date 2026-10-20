@@ -275,7 +275,7 @@ describe('WarehouseOverviewTab', () => {
     }
   )
 
-  test('shows the setup failure and retry action', async () => {
+  test('keeps the table picker available after setup fails', async () => {
     mockProject()
     mockSetupStatus({
       setup_status: 'error',
@@ -285,9 +285,9 @@ describe('WarehouseOverviewTab', () => {
 
     customRender(<WarehouseOverviewTab />)
 
-    expect(await screen.findByText('Warehouse setup failed')).toBeInTheDocument()
-    expect(screen.getByText('Failed to copy public.orders')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument()
+    expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
+    expect(screen.getByText('Picker error: Failed to copy public.orders')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Submit initial tables' })).toBeInTheDocument()
   })
 
   test('shows the latest error when retrying setup fails', async () => {
@@ -306,10 +306,10 @@ describe('WarehouseOverviewTab', () => {
 
     customRender(<WarehouseOverviewTab />)
 
-    await userEvent.click(await screen.findByRole('button', { name: 'Retry' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Submit initial tables' }))
 
-    expect(await screen.findByText('Retry could not be started')).toBeInTheDocument()
-    expect(screen.queryByText('Initial setup failed')).not.toBeInTheDocument()
+    expect(await screen.findByText('Picker error: Retry could not be started')).toBeInTheDocument()
+    expect(screen.queryByText('Picker error: Initial setup failed')).not.toBeInTheDocument()
   })
 
   test('shows Status, Tables, Connect, then Disable once setup is complete', async () => {
@@ -557,6 +557,49 @@ describe('WarehouseOverviewTab', () => {
     await waitFor(() => expect(attempts).toBe(2))
     expect(deleteRequests).toEqual(['true', 'true'])
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
+  })
+
+  test('explains legacy storage errors below the deletion option and lets users retain data', async () => {
+    mockSetupStatus({ setup_status: 'complete' })
+    mockReplicatedTableQueries()
+    const deleteRequests: (string | null)[] = []
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/warehouse/:ref',
+      response: ({ request }) => {
+        const shouldDeleteData = new URL(request.url).searchParams.get('delete_data')
+        deleteRequests.push(shouldDeleteData)
+        if (shouldDeleteData === 'true') {
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Legacy Warehouse data must be retained when disabling Warehouse.' },
+            { status: 400 }
+          )
+        }
+        return HttpResponse.json<WarehouseDeleteResponse>({ status: 'accepted' }, { status: 202 })
+      },
+    })
+    customRender(<WarehouseOverviewTab />)
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable Warehouse' }))
+    const dialog = await screen.findByRole('alertdialog')
+    const checkbox = within(dialog).getByRole('checkbox', {
+      name: 'Also delete copied Warehouse data',
+    })
+    await userEvent.click(checkbox)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
+
+    const message = await within(dialog).findByText(
+      'This Warehouse uses an older storage setup. Clear “Also delete copied Warehouse data” to disable it and keep the copied data.'
+    )
+    expect(
+      checkbox.compareDocumentPosition(message) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
+    expect(dialog).not.toHaveTextContent('Try refreshing')
+    expect(within(dialog).queryByText(/contact support/i)).not.toBeInTheDocument()
+    expect(checkbox).toBeChecked()
+    await userEvent.click(checkbox)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument())
+    expect(deleteRequests).toEqual(['true', 'false'])
   })
 
   test('shows a status query failure without blocking an unrelated route', async () => {
