@@ -1,336 +1,143 @@
 import { useRouter } from 'next/compat/router'
+import Router from 'next/router'
 import {
   renderQueryString,
   unstable_createAdapterProvider,
   type unstable_AdapterInterface,
   type unstable_UpdateUrlFunction,
 } from 'nuqs/adapters/custom'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useSyncExternalStore, type ComponentProps } from 'react'
 
-// NOTE: the stock pages adapter leaves a flushed value queued while its router
-// update is still resolving, and it skips its own queue reset in that window.
-// after Back, parse prefers the queue over the address bar. this adapter clears
-// on flush and drops the held search on a traverse so the url wins.
+// Custom nuqs adapter for the Next.js pages router.
+//
+// The stock `nuqs/adapters/next/pages` adapter leaves a flushed update in its
+// queue until the next write, and only clears that queue on router events
+// while no nuqs `router.replace` is in flight. Pressing Back inside that
+// window leaves React state on the queued value while the address bar shows
+// the previous one. The queue isn't reachable from nuqs' public API, so this
+// adapter lets nuqs clear it on every flush (`autoResetQueueOnUpdate`) and
+// instead keeps the written search as an optimistic value for exactly as long
+// as its own router update is resolving. A navigation it didn't start —
+// Back/Forward, a `router.push` from a modal, a redirect — discards that value
+// and drops the flush that follows it, which is what the stock adapter's queue
+// reset did.
 
-export type PagesAdapterMode = 'router' | 'hold' | 'live'
+type PendingWrite = { search: URLSearchParams; target: string }
 
-export function selectPagesAdapterSearch({
-  mode,
-  hold,
-  liveSearch,
-  routerSearch,
-}: {
-  mode: PagesAdapterMode
-  hold: URLSearchParams | null
-  liveSearch: URLSearchParams
-  routerSearch: URLSearchParams
-}): URLSearchParams {
-  if (mode === 'live') {
-    return liveSearch
-  }
+// A nuqs write whose router update hasn't settled yet. Module-level, like the
+// stock adapter's mutex: the adapter hook runs once per nuqs hook, and they all
+// have to agree.
+let pendingWrite: PendingWrite | null = null
+let isForeignNavigationInFlight = false
+const ownNavigations = new Map<string, number>()
+const pendingWriteListeners = new Set<() => void>()
 
-  if (mode === 'hold' && hold) {
-    return hold
-  }
-
-  return routerSearch
+function setPendingWrite(next: PendingWrite | null) {
+  pendingWrite = next
+  pendingWriteListeners.forEach((listener) => listener())
 }
 
-// nuqs throttles url writes (50ms in chrome, up to 320ms in safari). a traverse
-// with no flush inside that window must not swallow the next edit.
-const PENDING_FLUSH_WINDOW_MS = 400
-
-// A traverse that lands before the queued flush must not be overwritten by that flush.
-export function shouldApplyNuqsUrlUpdate(hasPendingTraverse: boolean): boolean {
-  if (hasPendingTraverse) {
-    return false
-  }
-
-  return true
+function subscribeToPendingWrite(listener: () => void) {
+  pendingWriteListeners.add(listener)
+  return () => pendingWriteListeners.delete(listener)
 }
 
-export function searchReflects(source: URLSearchParams, expected: URLSearchParams): boolean {
-  const keys = [...new Set(expected.keys())]
+const getPendingWrite = () => pendingWrite
+const getServerPendingWrite = () => null
 
-  return keys.every((key) => source.getAll(key).join('\0') === expected.getAll(key).join('\0'))
+// Next runs the `as` it hands to router events through `new URL()` and prefixes
+// `basePath` (except for `routeChangeError`, which strips it). Normalize the
+// same way so the adapter recognizes its own navigations.
+function toNavigationTarget(as: string, basePath: string): string {
+  const { pathname, search, hash } = new URL(as, 'http://n')
+  const path = `${pathname}${search}${hash}`
+  return basePath && path.startsWith(basePath) ? path.slice(basePath.length) : path
 }
 
-export function sameSearch(left: URLSearchParams, right: URLSearchParams): boolean {
-  return searchReflects(left, right) && searchReflects(right, left)
+function isOwnNavigation(as: string) {
+  return ownNavigations.has(toNavigationTarget(as, Router.basePath))
 }
 
-export function queryFromAsPath(asPath: string | undefined): URLSearchParams {
-  const query = asPath?.split('?')[1]?.split('#')[0] ?? ''
-
-  return new URLSearchParams(query)
+function onRouteChangeStart(as: string) {
+  if (isOwnNavigation(as)) return
+  isForeignNavigationInFlight = true
+  // The router is about to move somewhere nuqs didn't ask for; let it decide.
+  if (pendingWrite !== null) setPendingWrite(null)
 }
 
-export function routerQueryToSearchParams(
-  query: Record<string, unknown> | undefined
-): URLSearchParams {
-  const search = new URLSearchParams()
+function onRouteChangeComplete(as: string) {
+  if (isOwnNavigation(as)) return
+  isForeignNavigationInFlight = false
+}
 
-  Object.entries(query ?? {}).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      search.set(key, value)
-      return
-    }
+function onRouteChangeError(_error: unknown, as: string) {
+  onRouteChangeComplete(as)
+}
 
-    if (!Array.isArray(value)) {
-      return
-    }
+const updateUrl: unstable_UpdateUrlFunction = (search, options) => {
+  // Writing now would cancel the navigation (Next aborts the in-flight route),
+  // bouncing the user back. The stock adapter drops these writes too, by
+  // resetting its queue on `routeChangeStart`.
+  if (isForeignNavigationInFlight) return
 
-    value.forEach((item) => {
-      if (typeof item === 'string') {
-        search.append(key, item)
-      }
-    })
+  const basePath = Router.basePath
+  const pathname = basePath ? location.pathname.slice(basePath.length) : location.pathname
+  const asPath = `${pathname}${renderQueryString(search)}${location.hash}`
+  const target = toNavigationTarget(asPath, '')
+  const write: PendingWrite = { search, target }
+
+  ownNavigations.set(target, (ownNavigations.get(target) ?? 0) + 1)
+  setPendingWrite(write)
+
+  const navigate = options.history === 'push' ? Router.push : Router.replace
+  navigate(asPath, undefined, { scroll: options.scroll, shallow: options.shallow }).finally(() => {
+    const remaining = (ownNavigations.get(target) ?? 1) - 1
+    if (remaining > 0) ownNavigations.set(target, remaining)
+    else ownNavigations.delete(target)
+    // Settled, so `router.query` reflects the outcome (or a newer write does).
+    if (pendingWrite === write) setPendingWrite(null)
   })
-
-  return search
 }
 
-export function extractDynamicUrlParams(
-  pathname: string,
-  values: Record<string, string | string[] | undefined>
-): Record<string, string | string[] | undefined> {
-  const paramNames = [...pathname.matchAll(/\[([^\]]+)\]/g)]
-    .map((match) => match[1])
-    .filter((name): name is string => Boolean(name))
-
-  const dynamicValues: Record<string, string | string[] | undefined> = Object.fromEntries(
-    Object.entries(values).filter(([key]) => paramNames.includes(key))
-  )
-
-  const catchAllKey = /\[\.{3}([^\]]+)\]$/.exec(pathname)?.[1]
-  if (catchAllKey) {
-    dynamicValues[catchAllKey] = values[catchAllKey] ?? []
-  }
-
-  const optionalCatchAllKey = /\[\[\.{3}([^\]]+)\]\]$/.exec(pathname)?.[1]
-  if (optionalCatchAllKey) {
-    dynamicValues[optionalCatchAllKey] = values[optionalCatchAllKey] ?? []
-  }
-
-  return dynamicValues
-}
-
-function getAsPathPathname(asPath: string): string {
-  return asPath.replace(/#.*$/, '').replace(/\?.*$/, '')
-}
-
-function urlSearchParamsToObject(search: URLSearchParams): Record<string, string | string[]> {
-  return Object.fromEntries(
-    [...new Set(search.keys())].flatMap((key) => {
-      const values = search.getAll(key)
-      const value = values.length > 1 ? values : values[0]
-
-      if (value === undefined) {
-        return []
-      }
-
-      return [[key, value]]
-    })
-  )
-}
-
-type PagesRouterLike = {
-  pathname: string
-  asPath: string
-  query: Record<string, string | string[] | undefined>
-  push: (
-    url: { pathname: string; query: Record<string, string | string[] | undefined> },
-    as?: string,
-    options?: { scroll?: boolean; shallow?: boolean }
-  ) => Promise<boolean>
-  replace: (
-    url: { pathname: string; query: Record<string, string | string[] | undefined> },
-    as?: string,
-    options?: { scroll?: boolean; shallow?: boolean }
-  ) => Promise<boolean>
-}
-
-function isQueryRecord(value: unknown): value is Record<string, string | string[] | undefined> {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
-    return false
-  }
-
-  return Object.values(value).every(
-    (item) =>
-      item === undefined ||
-      typeof item === 'string' ||
-      (Array.isArray(item) && item.every((entry) => typeof entry === 'string'))
-  )
-}
-
-function isPagesRouter(value: unknown): value is PagesRouterLike {
-  if (typeof value !== 'object' || value === null) {
-    return false
-  }
-
-  const router = value as Record<string, unknown>
-  const hasMethods = typeof router.push === 'function' && typeof router.replace === 'function'
-  const hasPaths = typeof router.pathname === 'string' && typeof router.asPath === 'string'
-
-  return hasMethods && hasPaths && isQueryRecord(router.query)
-}
-
-function readPagesRouter(): PagesRouterLike | null {
-  if (typeof window === 'undefined') {
-    return null
-  }
-
-  const host = window as Window & { next?: { router?: unknown } }
-  const router = host.next?.router
-
-  if (!isPagesRouter(router)) {
-    return null
-  }
-
-  return router
-}
-
-function useNuqsPagesRouterAdapter(watchKeys: string[]): unstable_AdapterInterface {
+function useNuqsNextPagesRouterAdapter(): unstable_AdapterInterface {
   const router = useRouter()
-  const [mode, setMode] = useState<PagesAdapterMode>('router')
-  const [hold, setHold] = useState<string | null>(null)
-  const [, setEpoch] = useState(0)
-  const skipNextWrite = useRef(false)
-  const writeInFlight = useRef(false)
-  const skipTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const watchKey = watchKeys.join(',')
+  const pending = useSyncExternalStore(
+    subscribeToPendingWrite,
+    getPendingWrite,
+    getServerPendingWrite
+  )
 
-  useEffect(() => {
-    const onPopState = () => {
-      if (!writeInFlight.current) {
-        skipNextWrite.current = true
-
-        if (skipTimer.current) {
-          clearTimeout(skipTimer.current)
-        }
-
-        skipTimer.current = setTimeout(() => {
-          skipNextWrite.current = false
-          skipTimer.current = null
-        }, PENDING_FLUSH_WINDOW_MS)
-      }
-
-      setHold(null)
-      setMode('live')
-      setEpoch((current) => current + 1)
+  const routerSearch = useMemo(() => {
+    const searchParams = new URLSearchParams()
+    for (const [key, value] of Object.entries(router?.query ?? {})) {
+      if (typeof value === 'string') searchParams.set(key, value)
+      else if (Array.isArray(value)) value.forEach((v) => searchParams.append(key, v))
     }
-
-    window.addEventListener('popstate', onPopState, true)
-
-    return () => {
-      window.removeEventListener('popstate', onPopState, true)
-
-      if (skipTimer.current) {
-        clearTimeout(skipTimer.current)
-      }
-    }
-  }, [])
-
-  const routerSearch = useMemo(
-    () => routerQueryToSearchParams(router?.query),
-    // router.query is a new object when the pages router navigates.
+    return searchParams
+    // router.query is a new object on every navigation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(router?.query), watchKey]
-  )
-
-  const liveSearchKey = typeof window === 'undefined' ? '' : window.location.search
-  const liveSearch = useMemo(() => new URLSearchParams(liveSearchKey), [liveSearchKey])
-  const holdSearch = useMemo(() => (hold === null ? null : new URLSearchParams(hold)), [hold])
-
-  const routerAddressSearch = useMemo(() => queryFromAsPath(router?.asPath), [router?.asPath])
-
-  useEffect(() => {
-    const shouldReleaseHold =
-      mode === 'hold' && holdSearch !== null && sameSearch(routerAddressSearch, holdSearch)
-    const shouldReleaseLive = mode === 'live' && sameSearch(routerAddressSearch, liveSearch)
-
-    if (!shouldReleaseHold && !shouldReleaseLive) {
-      return
-    }
-
-    setHold(null)
-    setMode('router')
-  }, [mode, holdSearch, routerAddressSearch, liveSearch])
-
-  const searchParams = useMemo(
-    () =>
-      selectPagesAdapterSearch({
-        mode,
-        hold: holdSearch,
-        liveSearch,
-        routerSearch,
-      }),
-    [mode, holdSearch, liveSearch, routerSearch]
-  )
-
-  const updateUrl: unstable_UpdateUrlFunction = useCallback((search, options) => {
-    const shouldApply = shouldApplyNuqsUrlUpdate(skipNextWrite.current)
-    skipNextWrite.current = false
-
-    if (skipTimer.current) {
-      clearTimeout(skipTimer.current)
-      skipTimer.current = null
-    }
-
-    if (!shouldApply) {
-      setHold(null)
-      setMode('live')
-      setEpoch((current) => current + 1)
-      return
-    }
-
-    const pagesRouter = readPagesRouter()
-
-    if (!pagesRouter) {
-      return
-    }
-
-    writeInFlight.current = true
-    setHold(search.toString())
-    setMode('hold')
-    setEpoch((current) => current + 1)
-
-    const asPath =
-      getAsPathPathname(pagesRouter.asPath) +
-      renderQueryString(search) +
-      (typeof window === 'undefined' ? '' : window.location.hash)
-    const method = options.history === 'push' ? pagesRouter.push : pagesRouter.replace
-
-    try {
-      method
-        .call(
-          pagesRouter,
-          {
-            pathname: pagesRouter.pathname,
-            query: {
-              ...urlSearchParamsToObject(search),
-              ...extractDynamicUrlParams(pagesRouter.pathname, pagesRouter.query),
-            },
-          },
-          asPath,
-          { scroll: options.scroll, shallow: options.shallow }
-        )
-        .finally(() => {
-          writeInFlight.current = false
-        })
-    } catch (error) {
-      writeInFlight.current = false
-      setHold(null)
-      setMode('router')
-      throw error
-    }
-  }, [])
+  }, [JSON.stringify(router?.query)])
 
   return {
-    searchParams,
+    searchParams: pending?.search ?? routerSearch,
     updateUrl,
     autoResetQueueOnUpdate: true,
   }
 }
 
-export const NuqsAdapter = unstable_createAdapterProvider(useNuqsPagesRouterAdapter)
+const Provider = unstable_createAdapterProvider(useNuqsNextPagesRouterAdapter)
+
+export function NuqsAdapter(props: ComponentProps<typeof Provider>) {
+  useEffect(() => {
+    Router.events.on('routeChangeStart', onRouteChangeStart)
+    Router.events.on('routeChangeComplete', onRouteChangeComplete)
+    Router.events.on('routeChangeError', onRouteChangeError)
+    return () => {
+      Router.events.off('routeChangeStart', onRouteChangeStart)
+      Router.events.off('routeChangeComplete', onRouteChangeComplete)
+      Router.events.off('routeChangeError', onRouteChangeError)
+    }
+  }, [])
+
+  return <Provider {...props} />
+}
