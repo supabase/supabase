@@ -18,13 +18,15 @@ To replicate data to Snowflake:
 
 <Admonition type="caution">
 
-An upgrade can fail if the Pipelines role lacks `CREATE VIEW` on the destination schema. Grant this permission **before upgrading an existing pipeline**. See [Upgrade an existing pipeline](#upgrade-an-existing-pipeline) for the grant and query changes.
+An upgrade can fail if the Pipelines role lacks `CREATE VIEW` on the destination schema. Grant this permission **before upgrading an existing pipeline**. For the grant and query changes, see [Upgrade an existing pipeline](#upgrade-an-existing-pipeline).
 
 </Admonition>
 
 ## Source table requirements
 
-Use a stable, nondeferrable primary key and publish every key column. The following replica identities support partial updates and the companion view:
+Use a stable, nondeferrable primary key and publish every key column.
+
+Postgres uses The Oversized-Attribute Storage Technique (TOAST) to store large values. The following replica identities support partial updates and the companion view:
 
 | Replica identity                                   | Stored updates                                                                                  | Tradeoff                                                                                       |
 | -------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -48,7 +50,9 @@ alter table public.your_table replica identity full;
 
 Supported primary-key types are `smallint`, `integer`, `bigint`, `oid`, `boolean`, `text`, `varchar`, Postgres `"char"`, `char(n)`, `name`, `uuid`, `bytea`, `numeric`, `date`, `timestamp`, and `timestamptz`.
 
-`FULL` without a supported primary key can store complete events, but Pipelines does not create a companion view for that table. An identity index on different columns does not support partial updates or the companion view. See [Requirements for current-state queries](#requirements-for-current-state-queries) before relying on the results as a replica.
+`FULL` without a supported primary key can store complete events, but Pipelines does not create a companion view for that table. Pipelines also creates no companion view for a table with a source column whose name begins with `_cdc_`. An identity index on different columns does not support partial updates or the companion view. Before you rely on the results as a replica, see [Requirements for current-state queries](#requirements-for-current-state-queries).
+
+If a table with a companion view stops meeting these requirements, the view becomes unavailable and Pipelines reports an error.
 
 ## Prepare Snowflake resources
 
@@ -176,19 +180,19 @@ Postgres schema and table names cannot start or end with `_` or contain `"` or `
 
 Each destination table contains the replicated source columns plus three change data capture (CDC) columns:
 
-| Column                 | Type               | Meaning                                                                                                                                      |
-| ---------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `_cdc_operation`       | `VARCHAR NOT NULL` | Lowercase operation: `insert`, `update`, or `delete`.                                                                                        |
-| `_cdc_sequence_number` | `VARCHAR NOT NULL` | Fixed-width hexadecimal commit log sequence number (LSN) and transaction ordinal, such as `00000000016b3740/0000000000000002`.               |
-| `_cdc_missing_columns` | Nullable `ARRAY`   | Stable column IDs for values omitted from a partial update. Complete records use an empty array; legacy `NULL` metadata also means complete. |
+| Column                 | Type               | Meaning                                                                                                                                           |
+| ---------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_cdc_operation`       | `VARCHAR NOT NULL` | Lowercase operation: `insert`, `update`, or `delete`.                                                                                             |
+| `_cdc_sequence_number` | `VARCHAR NOT NULL` | Fixed-width hexadecimal commit log sequence number (LSN) and transaction ordinal, such as `00000000016b3740/0000000000000002`.                    |
+| `_cdc_missing_columns` | Nullable `ARRAY`   | Stable column IDs for values omitted from a partial update or a key-only delete. Complete records use an empty array; `NULL` also means complete. |
 
-The three metadata names are reserved. The companion view reserves all source column names beginning with `_cdc_`. Initial-sync rows use `insert` and the shared sequence number `0000000000000000/0000000000000000`.
+The three metadata names are reserved. Initial-sync rows use `insert` and the shared sequence number `0000000000000000/0000000000000000`.
 
 Pipelines records changes as follows:
 
 - An insert appends the new row.
 - An update appends the complete or partial new row, without a before image.
-- A delete appends the old row for `FULL`, or the key columns for a primary-key identity. Other fields in a key-only delete are not the deleted row's original values.
+- A delete appends the old row for `FULL`, or the key columns for a primary-key identity. Other fields in a key-only delete are `NULL` placeholders listed in `_cdc_missing_columns`.
 - Truncating the source table also truncates the Snowflake table and resets its streaming state. It does not append a truncate event.
 
 An omitted value is stored as a `NULL` placeholder with its column ID in `_cdc_missing_columns`. The companion view carries forward its last supplied value. An explicit SQL `NULL` has no missing-column entry and replaces the previous value. Testing a cell for `NULL` alone cannot distinguish these cases.
@@ -221,7 +225,7 @@ Additional limits apply:
 
 - Multi-dimensional arrays aren't supported. Non-default lower bounds on one-dimensional arrays aren't preserved.
 - Non-finite `real` and `double precision` values are rejected. Non-finite `numeric` values are preserved as strings in `VARCHAR` columns.
-- Each compressed streaming request must fit within 4 MiB, including its framing. Large initial-copy rows and changed values must fit this limit even when partial updates are enabled.
+- Each compressed streaming request must fit within 4 MiB, including its framing. Each initial-copy row and all values supplied together in an insert or update must fit this limit. Partial updates omit only unchanged TOAST values.
 - SQL `NULL` and JSON `null` remain distinct in `json` and `jsonb` columns. Arrays of these types cannot contain SQL `NULL` elements; JSON `null` elements and a whole SQL `NULL` array are supported.
 - Source primary-key, unique, check, length, precision, and nullability constraints aren't copied. Only `_cdc_operation` and `_cdc_sequence_number` are `NOT NULL`.
 
@@ -235,11 +239,11 @@ Replicated columns remain nullable in Snowflake, and changes to existing column 
 
 Schema changes also affect stored history. A rename changes the column name in earlier events, and a drop removes its historical values. Adding a column with a supported default can populate older rows. Changing publication column selection can remove values or leave historical gaps; resync the table after such changes before relying on current-state results.
 
-For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support). Keep the primary key and its values stable. Do not alter managed destination objects manually.
+For type changes, unsupported changes, and interrupted schema changes, see the shared [schema-change behavior and recovery](/docs/guides/database/replication/pipelines#schema-change-support). Keep the primary key and its values stable. Apart from [enabling change tracking for a stream](#use-streams-and-tasks), do not alter managed destination objects manually.
 
 ## Query replicated data [#query-and-materialize-current-state]
 
-Query the automatically maintained companion view to read current rows. You don't need to generate SQL or create the view yourself. It handles complete and partial updates, explicit `NULL` values, and delete/reinsert boundaries.
+Query the automatically maintained companion view to read current rows. You don't need to generate SQL or create the view yourself. It resolves complete and partial updates, explicit `NULL` values, and deletes followed by reinserts.
 
 ### Before you start
 
@@ -268,7 +272,7 @@ select "id", "status"
 from PIPELINES_DB.REPLICATED.PUBLIC_ORDERS_CURRENT;
 ```
 
-The companion is an ordinary view: it runs a query when read and does not store results or run a background refresh. It requires a Snowflake warehouse. Query cost grows with retained history, table width, and the amount of partial-update history to resolve. The query limits per-column work to each key's latest complete record and subsequent partial updates, but it still scans history to find row boundaries.
+The companion view is an ordinary view: it runs a query when read and does not store results or run a background refresh. It requires a Snowflake warehouse. Query cost grows with retained history, table width, and the amount of partial-update history to resolve. The query limits per-column work to each key's latest complete record and subsequent partial updates, but it still scans history to find row boundaries.
 
 The view also returns diagnostic columns:
 
@@ -292,7 +296,7 @@ Investigate these rows rather than hiding them with a filter. Empty diagnostics 
 
 Both the companion view and custom current-state queries require:
 
-- A [supported primary key](#source-table-requirements) whose values and representation remain stable. Changing a key value can leave the old identity in the result, even for complete updates.
+- A [supported primary key](#source-table-requirements) whose values and representation remain stable. A complete update that changes a key value can leave the old identity in the result. Pipelines rejects a partial update that changes a key value.
 - An initial snapshot followed by uninterrupted publication coverage, including while replication is stopped. Keep publication actions, membership, and column selection unchanged, and do not use row filters.
 - All accepted history from that snapshot. Do not prune or manually edit events, or combine history from separate initial syncs.
 
@@ -300,7 +304,7 @@ After incompatible key, schema, or publication changes, or lost history, [restar
 
 ### Customize queries and materialization
 
-Use these options when you need custom SQL or separately stored results. The companion view remains the default query interface.
+When you need custom SQL or separately stored results, use these options. The companion view remains the default query interface.
 
 #### Inspect the column-ID mapping
 
@@ -325,7 +329,7 @@ Inspect the view's complete query with:
 select get_ddl('VIEW', 'PIPELINES_DB.REPLICATED.PUBLIC_ORDERS_CURRENT');
 ```
 
-Neither query requires Postgres access or an ETL binary. Update customer-owned SQL after source schema changes; Pipelines updates only its own companion view.
+Neither query requires access to the source Postgres database. After source schema changes, update your own SQL. Pipelines updates only its companion view.
 
 #### Query complete-row history
 
@@ -354,13 +358,21 @@ Create derived objects in a separate analytics schema. Choose a refresh mode sup
 
 Snowflake [streams and tasks](https://docs.snowflake.com/en/user-guide/data-pipelines-intro) can maintain a separate table through scheduled `MERGE` statements. This requires your own initialization, ordering, replay, and recovery logic.
 
-A stream on the history table sees appended CDC events, including source updates and deletes. Your merge must interpret `_cdc_operation`, `_cdc_sequence_number`, and `_cdc_missing_columns`. Carry forward a value only when its ID is marked missing; an explicit `NULL` must replace it. Rebuild derived state after a source truncate or table resync. Do not attach streams to the managed companion view: replacing its definition can make them stale.
+Before you create a stream on a history table, enable change tracking on it as `PIPELINES_ROLE`, the table's owner. Run this statement again after a table resync:
+
+```sql
+alter table PIPELINES_DB.REPLICATED.PUBLIC_ORDERS set change_tracking = true;
+```
+
+For more information, see Snowflake's documentation on [enabling change tracking](https://docs.snowflake.com/en/user-guide/streams-manage#explicitly-enable-change-tracking-on-the-underlying-tables).
+
+A stream on the history table sees appended CDC events, including source updates and deletes. Your merge must interpret `_cdc_operation`, `_cdc_sequence_number`, and `_cdc_missing_columns`. Carry forward a value only when its ID is marked missing; an explicit `NULL` must replace it. After a source truncate or table resync, rebuild derived state. Do not attach streams to the managed companion view: replacing its definition can make them stale.
 
 ### Maintain derived objects
 
 Pipelines owns the `<TABLE>_CURRENT` view and the reserved `<TABLE>_CURRENT_PENDING` recovery name. For physical table names longer than 239 characters, the view uses `_ETL_<uppercase SHA-256 of the physical table name>_CURRENT` instead. Query the `_CURRENT` view, not the recovery object.
 
-Pipelines refreshes the companion view after supported schema changes. Explicit view grants survive definition replacement and same-name table resync. Do not edit its definition or comments, transfer ownership, or attach custom policies or tags. Create separate analytics objects for custom behavior.
+Pipelines refreshes the companion view after supported schema changes. Explicit view grants survive definition replacement and same-name table resync. Do not edit its definition or comments, transfer ownership, or attach custom policies or tags. For custom behavior, create separate analytics objects.
 
 You maintain any additional queries, views, dynamic tables, or tasks:
 
@@ -373,7 +385,7 @@ You maintain any additional queries, views, dynamic tables, or tasks:
 
 ## Upgrade an existing pipeline
 
-Apply these changes before upgrading a pipeline that writes the previous two-column CDC format:
+To upgrade a pipeline whose history tables have only the `_cdc_operation` and `_cdc_sequence_number` metadata columns:
 
 1. Have a Snowflake administrator grant `CREATE VIEW` on the destination schema to the Pipelines role. Substitute the database, schema, and role from your configuration:
 
@@ -383,15 +395,15 @@ Apply these changes before upgrading a pipeline that writes the previous two-col
 
    The role must also retain ownership of its existing history tables so Pipelines can alter them. Pipelines does not grant privileges automatically. Missing privileges or conflicting objects stop startup or setup; it does not silently skip a required companion view.
 
-2. In the Supabase Dashboard, open the pipeline's actions menu and select **Update available** when this version is available. Choose **Update and restart** for a running pipeline. For a stopped pipeline, choose **Update version**, then **Start pipeline**. See [Managing your pipeline](/docs/guides/database/replication/pipelines#managing-your-pipeline).
+2. In the Supabase Dashboard, open the pipeline's actions menu and select **Update available**. For a running or failed pipeline, click **Update and restart**. For a stopped pipeline, click **Update version**, then **Start pipeline**. See [Managing your pipeline](/docs/guides/database/replication/pipelines#managing-your-pipeline).
 
-3. Grant consumers `SELECT` on each companion view and switch their queries to it before using partial updates. Existing latest-event queries are safe only for [complete-row history](#query-complete-row-history). Automatic table upgrades do not rewrite customer-owned queries or derived objects.
+3. After the pipeline restarts, grant consumers `SELECT` on each companion view and switch their current-state queries to it. Latest-event queries are safe only for [complete-row history](#query-complete-row-history). The upgrade doesn't change your own queries or derived objects.
 
 The managed update restarts the replicator using its saved progress. On startup, Pipelines validates owned tables in the supported previous format and adds the nullable `_cdc_missing_columns ARRAY` column. Existing `NULL` metadata means complete within the replicated schema at the time of the event; no backfill is required.
 
 Pipelines also creates companion views for eligible tables that finished initial sync, including idle tables. Stored history and replication offsets are preserved. This format upgrade alone does not require a resync.
 
-If startup fails because the grant is missing, apply the grant and retry startup. Do not restart the table and erase its history to fix a permissions error.
+If startup fails because the grant is missing, apply the grant, then click **Restart pipeline** in the pipeline's actions menu. Do not restart the table and erase its history to fix a permissions error.
 
 ## Troubleshooting
 
