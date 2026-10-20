@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { asLogDrainResource, parseLogDrainRequest } from '@/lib/api/self-hosted/log-drains'
 import { PROJECT_ANALYTICS_URL } from '@/lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -52,15 +53,19 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           .json({ error: { message: 'Unexpected response format from upstream' } })
       }
 
-      return res.status(200).json(resp)
+      return res.status(200).json({ data: resp.map(asLogDrainResource) })
     case 'POST':
       // create the log drain
+      const parsedBody = parseLogDrainRequest(req.body)
+      if (!parsedBody.success) {
+        return res.status(400).json({ error: { message: 'Invalid log drain request body' } })
+      }
+
       const postUrl = new URL(baseUrl)
       postUrl.pathname = '/api/backends'
       const postResult = await fetch(postUrl, {
         body: JSON.stringify({
-          ...req.body,
-          config: req.body.config,
+          ...parsedBody.data,
           metadata: {
             type: 'log-drain',
           },
@@ -116,7 +121,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           })
         )
       )
-      return res.status(201).json(postResult)
+      return res.status(201).json({ data: asLogDrainResource(postResult) })
 
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
