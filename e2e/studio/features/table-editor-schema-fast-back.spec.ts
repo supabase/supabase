@@ -69,26 +69,28 @@ const holdInFlightSchemaReplace = async (page: Page, holdMs: number) => {
   }, holdMs)
 }
 
+// Press Back in the same click that picks the schema option. The listener must
+// outlive the clicks that open the dropdown and type into it, so it removes
+// itself only once the matching option is clicked.
 const armSameTurnBack = async (page: Page, schema: string) => {
   await page.evaluate((schemaName: string) => {
-    document.addEventListener(
-      'click',
-      (event) => {
-        const target = event.target
-        if (!(target instanceof Element)) {
-          return
-        }
+    const onClick = (event: MouseEvent) => {
+      const target = event.target
+      if (!(target instanceof Element)) {
+        return
+      }
 
-        const option = target.closest('[role="option"]')
-        const label = option?.textContent?.trim()
-        if (label !== schemaName) {
-          return
-        }
+      const option = target.closest('[role="option"]')
+      const label = option?.textContent?.trim()
+      if (label !== schemaName) {
+        return
+      }
 
-        history.back()
-      },
-      { once: true }
-    )
+      document.removeEventListener('click', onClick)
+      history.back()
+    }
+
+    document.addEventListener('click', onClick)
   }, schema)
 }
 
