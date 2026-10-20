@@ -52,10 +52,6 @@ jobs:
       - name: Download dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Fetch federated content
-        working-directory: ./apps/docs
-        run: pnpm run build:federated-content
-
       - name: Ingest content
         working-directory: ./apps/docs
-        run: pnpm run search-v2:ingest
+        run: pnpm run ingest:search_v2

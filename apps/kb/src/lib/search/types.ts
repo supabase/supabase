@@ -21,7 +21,7 @@ export type Database = {
     Tables: Record<string, never>
     Views: Record<string, never>
     Functions: {
-      search_kb_sections: {
+      search_kb: {
         Args: { query_text: string; match_limit?: number }
         Returns: KbSearchRow[]
       }

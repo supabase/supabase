@@ -1,4 +1,4 @@
-create table public.kb_search_sections (
+create table public.kb_search (
   id bigint generated always as identity primary key,
   slug text not null,
   file_path text not null,
@@ -19,14 +19,14 @@ create table public.kb_search_sections (
   ) stored
 );
 
-create index kb_search_sections_fts_idx on public.kb_search_sections using gin (fts);
-create index kb_search_sections_slug_idx on public.kb_search_sections (slug);
+create index kb_search_fts_idx on public.kb_search using gin (fts);
+create index kb_search_slug_idx on public.kb_search (slug);
 
-alter table public.kb_search_sections enable row level security;
+alter table public.kb_search enable row level security;
 
-grant select, insert, delete on public.kb_search_sections to service_role;
+grant select, insert, delete on public.kb_search to service_role;
 
-create function public.search_kb_sections(query_text text, match_limit int default 10)
+create function public.search_kb(query_text text, match_limit int default 10)
 returns table (
   slug text,
   page_title text,
@@ -51,8 +51,8 @@ as $$
       t.anywhere,
       t.in_title,
       greatest(0, ln(
-        (select count(*) from public.kb_search_sections)::float
-        / (1 + (select count(*) from public.kb_search_sections s where s.fts @@ t.anywhere))
+        (select count(*) from public.kb_search)::float
+        / (1 + (select count(*) from public.kb_search s where s.fts @@ t.anywhere))
       )) as idf
     from terms t
   ),
@@ -68,7 +68,7 @@ as $$
         1000 * sum(w.idf * case when s.fts @@ w.in_title then 2 else 1 end)
         / nullif((select 2 * sum(idf) from weighted_terms), 0)
       )::int as score
-    from public.kb_search_sections s
+    from public.kb_search s
     join weighted_terms w on s.fts @@ w.anywhere
     group by s.id
   ),
@@ -84,5 +84,5 @@ as $$
   limit greatest(1, least(coalesce(match_limit, 10), 100));
 $$;
 
-revoke execute on function public.search_kb_sections(text, int) from public, anon, authenticated;
-grant execute on function public.search_kb_sections(text, int) to service_role;
+revoke execute on function public.search_kb(text, int) from public, anon, authenticated;
+grant execute on function public.search_kb(text, int) to service_role;

@@ -18,7 +18,7 @@ export async function GET(request: Request) {
   const limit = Number(searchParams.get('limit')) || 10
   if (!query) return Response.json({ error: 'Missing q parameter' }, { status: 400 })
 
-  const { data, error } = await searchClient().rpc('search_kb_sections', {
+  const { data, error } = await searchClient().rpc('search_kb', {
     query_text: query,
     match_limit: limit,
   })

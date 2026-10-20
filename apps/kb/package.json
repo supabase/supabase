@@ -12,7 +12,7 @@
     "fetch:federated-content": "tsx ./scripts/federated-content/fetch-federated-content.ts",
     "generate:markdown": "tsx ./scripts/generate-markdown.mjs",
     "presearch:ingest": "pnpm run fetch:federated-content && pnpm run generate:markdown",
-    "search:ingest": "tsx ./scripts/search-ingest.ts",
+    "search:ingest": "tsx ./scripts/search/ingest.ts",
     "sync:legacy-slugs": "tsx ./scripts/federated-content/backfill-legacy-slugs.ts",
     "sync:troubleshooting-entries": "tsx ./scripts/federated-content/sync-troubleshooting-entries.ts",
     "sync:troubleshooting-updates": "tsx ./scripts/federated-content/sync-troubleshooting-updates.ts",

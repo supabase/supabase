@@ -1,8 +1,10 @@
-import './utils/dotenv.js'
+import '../utils/dotenv.js'
 
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { ingestMarkdown } from 'docs-search/ingest'
+
+import { TABLE_NAME } from './supabase.js'
 
 const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
@@ -14,9 +16,9 @@ ingestMarkdown({
   supabase: createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
     auth: { autoRefreshToken: false, persistSession: false },
   }),
-  table: 'kb_search_sections',
+  table: TABLE_NAME,
   contentRoot: path.resolve(process.cwd(), 'public/markdown'),
-  include: ['troubleshooting/**/*.md'],
+  include: ['**/*.md'],
   slugPrefix: 'kb/',
 }).catch((err) => {
   console.error(err instanceof Error ? err.message : err)

@@ -8,7 +8,7 @@ on:
       - '.github/workflows/kb-search-ingest.yml'
       - 'apps/kb/scripts/**'
       - 'packages/docs-search/**'
-      - 'supabase/migrations/*_kb_search_*.sql'
+      - 'supabase/migrations/*_kb_search*.sql'
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
