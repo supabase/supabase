@@ -67,6 +67,9 @@ const nextConfig = {
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
+      // Next 16 creates `.next/lock` during `next build` and deletes it on exit. Routes that read
+      // `process.cwd()` get the whole app dir traced, so Vercel would try to deploy the missing file.
+      '.next/lock',
       // Static assets
       'public/**/*',
     ],
