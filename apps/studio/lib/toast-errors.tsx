@@ -10,6 +10,7 @@ type FunnelErrorProperties = { origin: FunnelOrigin } & FunnelErrorClassificatio
 // Funnel call sites register their toast id (via useTrackFunnelError) so the tracker emits a
 // single enriched event for that toast instead of an untagged duplicate.
 const funnelErrorToasts = new Map<string | number, FunnelErrorProperties>()
+const seenToastIds = new Set<string | number>()
 
 export function registerFunnelErrorToast(
   toastId: string | number,
@@ -21,12 +22,11 @@ export function registerFunnelErrorToast(
 export const ToastErrorTracker = () => {
   const track = useTrack()
   const { toasts } = useSonner()
-  const seenToastIds = useRef(new Set<string | number>())
 
   useEffect(() => {
     toasts.forEach((toast) => {
-      if (toast.type !== 'error' || seenToastIds.current.has(toast.id)) return
-      seenToastIds.current.add(toast.id)
+      if (toast.type !== 'error' || seenToastIds.has(toast.id)) return
+      seenToastIds.add(toast.id)
       const funnelProperties = funnelErrorToasts.get(toast.id)
       funnelErrorToasts.delete(toast.id)
       if (isDashboardErrorSampled()) {
