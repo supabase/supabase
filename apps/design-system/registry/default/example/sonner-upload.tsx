@@ -38,7 +38,7 @@ export default function SonnerUpload() {
       {progress >= 100 ? (
         <Check className="text-foreground mt-0.5" size={16} strokeWidth={4} />
       ) : (
-        <Loader2 className="animate-spin text-foreground-muted mt-0.5" size={16} />
+        <Loader2 className="motion-safe:animate-spin text-foreground-muted mt-0.5" size={16} />
       )}
       <div className="flex flex-col gap-2 w-full">
         <div className="flex w-full justify-between">
