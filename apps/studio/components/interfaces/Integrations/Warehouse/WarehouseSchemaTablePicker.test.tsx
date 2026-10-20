@@ -205,6 +205,35 @@ describe('WarehouseSchemaTablePicker', () => {
     )
   })
 
+  test('keeps failed tables selected for retry and allows changing them', async () => {
+    mockPickerQueries({ isEditing: false })
+    const requests: WarehouseSetupBody['targets'][] = []
+    customRender(
+      <WarehouseSchemaTablePicker
+        initialTables={[
+          { schema: 'public', name: 'orders' },
+          { schema: 'public', name: 'removed_table' },
+        ]}
+        isSubmitting={false}
+        error={{ message: 'Failed to copy orders' }}
+        onSubmit={(targets) => requests.push(targets)}
+      />
+    )
+
+    expect(await screen.findByText('1 table selected')).toBeInTheDocument()
+    expect(screen.getByText('Failed to copy orders', { exact: false })).toBeInTheDocument()
+    expect(screen.queryByText(/Try refreshing/)).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Enable Warehouse' })).toBeEnabled()
+    await userEvent.click(screen.getByRole('button', { name: 'Enable Warehouse' }))
+    expect(requests).toEqual([[{ type: 'table', schema: 'public', name: 'orders' }]])
+
+    fireEvent.click(screen.getByRole('combobox', { name: 'Select tables to replicate' }))
+    await userEvent.click(screen.getByText('customers'))
+    expect(screen.getByText('2 tables selected')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Enable Warehouse' }))
+    expect(requests[1]).toEqual([{ type: 'schema', schema: 'public' }])
+  })
+
   test('preselects replicated tables and submits a replacement after removal', async () => {
     mockPickerQueries({ isEditing: true })
     const requests = mockSetupMutation()

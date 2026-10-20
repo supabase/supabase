@@ -135,6 +135,7 @@ Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
 Gonzalo Servat
+Graeme Gillies
 Greg Kress
 Greg P
 Greg Richardson
@@ -288,6 +289,7 @@ Rafael Chacón
 Raminder Singh
 Rand Arete
 Raúl Barroso
+Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
@@ -296,6 +298,7 @@ Rodrigo Mansueli
 Román Cuellar
 Roman Hernandez
 Ronan Lehane
+Rory Hunter
 Rory Wilding
 Ryan Goulet
 Ryan Senior
