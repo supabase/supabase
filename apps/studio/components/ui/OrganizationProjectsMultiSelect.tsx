@@ -167,8 +167,10 @@ export const OrganizationProjectsMultiSelect = ({
 
           return isLocked ? (
             <Tooltip key={project.ref}>
-              <TooltipTrigger asChild>{row}</TooltipTrigger>
-              <TooltipContent side="bottom">{disabledTooltip}</TooltipContent>
+              <TooltipTrigger asChild>
+                <div>{row}</div>
+              </TooltipTrigger>
+              <TooltipContent side="right">{disabledTooltip}</TooltipContent>
             </Tooltip>
           ) : (
             row
