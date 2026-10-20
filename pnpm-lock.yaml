@@ -287,8 +287,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.1(supports-color@8.1.1)
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       ts-morph:
         specifier: ^22.0.0
         version: 22.0.0
@@ -1354,8 +1354,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/shared-data
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       sql-formatter:
         specifier: ^15.0.0
         version: 15.4.9
@@ -1670,8 +1670,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.1(supports-color@8.1.1)
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
@@ -2797,8 +2797,8 @@ importers:
         specifier: 'catalog:'
         version: 2.15.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
@@ -2987,8 +2987,8 @@ importers:
         specifier: ^1.6.1
         version: 1.9.0
       sonner:
-        specifier: ^1.5.0
-        version: 1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: ^2.0.8
+        version: 2.0.8(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       sql-formatter:
         specifier: ^15.0.0
         version: 15.4.9
@@ -17189,11 +17189,15 @@ packages:
   solid-js@1.9.13:
     resolution: {integrity: sha512-6hJeJMOcEX8ktqjpDoJZEmld3ijvcvWBDtiXBm7f4332SiFN66QeAQI1REQshvyUoISsSeJ4PHDauKYbwao9JQ==}
 
-  sonner@1.5.0:
-    resolution: {integrity: sha512-FBjhG/gnnbN6FY0jaNnqZOMmB73R+5IiyYAw8yBj7L54ER7HB3fOSE5OFiQiE2iXWxeXKvg6fIP4LtVppHEdJA==}
+  sonner@2.0.8:
+    resolution: {integrity: sha512-UM/ByIoFra8yzV75n1o0Puu0bw5U/9UNnDacrJNspekBewIfsQ3D6ez1nvlWpt7aTsO6rujQtifBpycwIivqlg==}
     peerDependencies:
-      react: ^18.0.0
-      react-dom: ^18.0.0
+      '@types/react': ^18.0.0 || ^19.0.0
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   source-map-js@1.2.2:
     resolution: {integrity: sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==}
@@ -36615,10 +36619,12 @@ snapshots:
       seroval: 1.5.4
       seroval-plugins: 1.5.4(seroval@1.5.4)
 
-  sonner@1.5.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  sonner@2.0.8(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
+    optionalDependencies:
+      '@types/react': 19.2.14
 
   source-map-js@1.2.2: {}
 
