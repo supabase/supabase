@@ -86,6 +86,7 @@ const PROBES = {
 
 const THROAT_RADIUS = 150
 const ANCHOR_MARGIN = 24
+const BOTTOM_FADE = 200
 const THROAT_DROP = 90
 const RING_ANGLES = Array.from({ length: 160 }, (_, k) => (k / 160) * Math.PI * 2)
 const SPOKE_ANGLES = Array.from({ length: 32 }, (_, s) => (s / 32) * Math.PI * 2)
@@ -350,13 +351,13 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       if (hovered && ringdownWave < 0) paintCell(hovered, 1)
       ctx.restore()
 
-      const bottomFade = ctx.createLinearGradient(0, height - 80, 0, height)
+      const bottomFade = ctx.createLinearGradient(0, height - BOTTOM_FADE, 0, height)
       bottomFade.addColorStop(0, 'rgb(0 0 0 / 0)')
       bottomFade.addColorStop(1, 'rgb(0 0 0 / 1)')
       ctx.globalCompositeOperation = 'destination-out'
       ctx.globalAlpha = 1
       ctx.fillStyle = bottomFade
-      ctx.fillRect(0, height - 80, width, 80)
+      ctx.fillRect(0, height - BOTTOM_FADE, width, BOTTOM_FADE)
       ctx.globalCompositeOperation = 'source-over'
     }
 
