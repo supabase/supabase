@@ -64,7 +64,7 @@ A handler that queries a shared table through `ctx.supabaseAdmin` without filter
 
 Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. To accept the key:
 
-1. In `supabase/config.toml`, turn off the [`verify_jwt` check](/docs/guides/functions/auth-headers) for the function:
+1. In `supabase/config.toml`, disable the [`verify_jwt` check](/docs/guides/functions/auth-headers) for the function:
 
    ```toml
    [functions.your-function]
