@@ -45,21 +45,23 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
           icon: 'mt-0.5',
           title: 'font-normal!',
           description:
-            'text-xs group-[.toast]:text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:opacity-100!',
+            'text-xs group-[.toast]:text-foreground-lighter! transition-opacity! group-data-[expanded=false]:opacity-0! group-data-[front=true]:opacity-100!',
           actionButton: cn('block', buttonVariants({ variant: 'primary', size: 'tiny' })),
           cancelButton: cn('block', buttonVariants({ variant: 'default', size: 'tiny' })),
           // success: 'group toast group-[.toaster]:!bg-brand-200 group-[.toaster]:border-brand-500',
           warning:
-            'group toast group-[.toaster]:!bg-warning-200 group-[.toaster]:!border-warning-500',
+            'group toast group-[.toaster]:bg-warning-200! group-[.toaster]:border-warning-500!',
           error:
-            'group toast group-[.toaster]:!bg-destructive-200 group-[.toaster]:!border-destructive-500',
+            'group toast group-[.toaster]:bg-destructive-200! group-[.toaster]:border-destructive-500!',
           closeButton: cn(
             // unset all styles set from sonner
             'absolute! right-2! top-1/2! -translate-y-1/2! size-6! flex! items-center! justify-center! rounded-md! bg-transparent! transition-opacity!',
-            'hover:!text-foreground hover:!bg-surface-200 focus-visible:!opacity-100 !focus-ring',
-            'group-[.destructive]:!text-destructive-300 group-[.destructive]:!hover:text-destructive-50',
-            'group-[.destructive]:!focus-visible:ring-destructive-400 group-[.destructive]:!focus-visible:ring-offset-destructive-600',
-            '!left-auto !transform-none !border-0 !border-transparent'
+            'hover:text-foreground! hover:bg-surface-200! focus-visible:opacity-100! focus-ring!',
+            'group-data-[type="error"]:hover:text-destructive-50!',
+            'group-data-[type="error"]:focus-visible:ring-destructive-400! group-data-[type="error"]:focus-visible:ring-offset-destructive-600!',
+            'group-data-[type="warning"]:hover:text-warning-50!',
+            'group-data-[type="warning"]:focus-visible:ring-warning-400! group-data-[type="warning"]:focus-visible:ring-offset-warning-600!',
+            'left-auto! transform-none! border-0! border-transparent!'
           ),
           loader: 'top-1/2! -translate-y-1/2! left-2!',
           content: 'grow',
