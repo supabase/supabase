@@ -20,5 +20,5 @@ export interface ImportContent {
   columnTypeMap: Dictionary<InferredColumnType>
   selectedHeaders: Array<string>
   emptyStringAsNullHeaders?: Array<string>
-  resolve: () => void
+  skipConflictingRows?: boolean
 }

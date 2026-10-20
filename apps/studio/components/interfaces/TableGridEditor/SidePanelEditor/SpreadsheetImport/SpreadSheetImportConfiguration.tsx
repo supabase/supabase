@@ -1,9 +1,21 @@
 import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SidePanel } from 'ui'
+import type { Control } from 'react-hook-form'
+import {
+  Button,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  FormControl,
+  FormField,
+  SidePanel,
+  Switch,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
-import type { SpreadsheetData } from './SpreadsheetImport.types'
+import type { SpreadsheetData, SpreadsheetImportSettings } from './SpreadsheetImport.types'
 
 interface SpreadSheetImportConfigurationProps {
   spreadsheetData: SpreadsheetData
@@ -11,14 +23,22 @@ interface SpreadSheetImportConfigurationProps {
   onToggleHeader: (header: string) => void
   emptyStringAsNullHeaders: string[]
   onEmptyStringAsNullHeadersChange: (headers: string[]) => void
+  control: Control<SpreadsheetImportSettings>
+  canSkipConflictingRows: boolean
+  isImporting: boolean
+  onConfigurationChange: () => void
 }
 
-const SpreadsheetImportConfiguration = ({
+export const SpreadsheetImportConfiguration = ({
   spreadsheetData,
   selectedHeaders,
   onToggleHeader,
   emptyStringAsNullHeaders,
   onEmptyStringAsNullHeadersChange,
+  control,
+  canSkipConflictingRows,
+  isImporting,
+  onConfigurationChange,
 }: SpreadSheetImportConfigurationProps) => {
   const [expandConfiguration, setExpandConfiguration] = useState(false)
   const importableHeaders = spreadsheetData.headers.filter((header) =>
@@ -105,11 +125,34 @@ const SpreadsheetImportConfiguration = ({
                 </MultiSelector.Content>
               </MultiSelector>
             </div>
+            {canSkipConflictingRows && (
+              <FormField
+                control={control}
+                name="skipConflictingRows"
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="flex"
+                    label="Skip conflicting rows"
+                    description="Skip rows that violate primary key or unique constraints. Existing rows remain unchanged."
+                  >
+                    <FormControl>
+                      <Switch
+                        aria-label="Skip conflicting rows"
+                        disabled={isImporting}
+                        checked={field.value}
+                        onCheckedChange={(value) => {
+                          field.onChange(value)
+                          onConfigurationChange()
+                        }}
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            )}
           </div>
         </SidePanel.Content>
       </CollapsibleContent>
     </Collapsible>
   )
 }
-
-export default SpreadsheetImportConfiguration

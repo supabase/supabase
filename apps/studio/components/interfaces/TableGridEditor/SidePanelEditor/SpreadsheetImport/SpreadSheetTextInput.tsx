@@ -18,7 +18,13 @@ const SpreadSheetTextInput = ({ input, onInputChange }: SpreadSheetTextInputProp
         Tip: Datetime columns should be formatted as YYYY-MM-DD HH:mm:ss
       </p>
     </div>
-    <TextArea className="font-mono" rows={15} value={input} onChange={onInputChange} />
+    <TextArea
+      aria-label="CSV text"
+      className="font-mono"
+      rows={15}
+      value={input}
+      onChange={onInputChange}
+    />
   </div>
 )
 

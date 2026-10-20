@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
-import { formatRowsForInsert, getRowFromSidePanel } from './SidePanelEditor.utils'
+import { getRowFromSidePanel } from './SidePanelEditor.utils'
+import { formatRowsForInsert } from './SpreadsheetImport/SpreadsheetImportInsert.utils'
 import type { SupaRow } from '@/components/grid/types'
 import type { SidePanel } from '@/state/table-editor'
 

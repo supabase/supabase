@@ -9,13 +9,10 @@ import pgMeta, {
   getDuplicateTableSQL,
   getEnableRLSSQL,
   getRemoveForeignKeySQL,
-  getUpdateIdentitySequenceSQL,
   type ForeignKey,
 } from '@supabase/pg-meta'
 import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
-import { Query } from '@supabase/pg-meta/src/query'
-import { chunk, find, isEmpty, isEqual } from 'lodash'
-import Papa from 'papaparse'
+import { find, isEmpty, isEqual } from 'lodash'
 import { toast } from 'sonner'
 
 import {
@@ -23,6 +20,10 @@ import {
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
 import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import {
+  insertRowsViaSpreadsheet,
+  insertTableRows,
+} from './SpreadsheetImport/SpreadsheetImportInsert.utils'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
@@ -36,7 +37,6 @@ import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
-import { executeWithRetry } from '@/data/table-rows/table-rows-query'
 import { tableKeys } from '@/data/tables/keys'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { getTable, getTableQuery, RetrieveTableResult } from '@/data/tables/table-retrieve-query'
@@ -45,16 +45,10 @@ import {
   updateTable as updateTableMutation,
 } from '@/data/tables/table-update-mutation'
 import { getTables } from '@/data/tables/tables-query'
-import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
-import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import type { SidePanel } from '@/state/table-editor'
-
-const BATCH_SIZE = 1000
-const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
 
 type Track = ReturnType<typeof useTrack>
 
@@ -566,105 +560,44 @@ export const createTable = async ({
     }
   )
 
-  // If the user is importing data via a spreadsheet
-  if (importContent !== undefined) {
-    await Sentry.startSpan(
-      { name: 'create_table.import_data', op: 'db.table.import' },
-      async (span) => {
-        const rowCount = importContent.file
-          ? importContent.rowCount
-          : (importContent.rows?.length ?? 0)
-        span.setAttribute('import.row_count', rowCount)
-        span.setAttribute('import.method', importContent.file ? 'csv' : 'paste')
-
-        if (importContent.file && importContent.rowCount > 0) {
-          // Via a CSV file
-          const { error } = await insertRowsViaSpreadsheet({
-            projectRef,
-            connectionString,
-            file: importContent.file,
-            table,
-            selectedHeaders: importContent.selectedHeaders,
-            onProgressUpdate: (progress: number) => {
-              toast.loading(
-                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                  <SparkBar
-                    value={progress}
-                    max={100}
-                    type="horizontal"
-                    barClass="bg-primary-bright"
-                    labelBottom={`Adding ${importContent.rowCount.toLocaleString()} rows to ${table.name}`}
-                    labelBottomClass=""
-                    labelTop={`${progress.toFixed(2)}%`}
-                    labelTopClass="tabular-nums"
-                  />
-                </div>,
-                { id: toastId }
-              )
-            },
-            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
-          })
-
-          if (error !== undefined) {
-            span.setAttribute('import.error', 1)
-            toast.error('Do check your spreadsheet if there are any discrepancies.')
-            const message = isObjectContainingKeys(error, ['message'])
-              ? String(error.message)
-              : 'An unknown error occurred during data import.'
-            toast.error(message)
-            console.error('Error:', { error, message })
+  const importResult =
+    importContent === undefined
+      ? undefined
+      : await Sentry.startSpan(
+          { name: 'create_table.import_data', op: 'db.table.import' },
+          async (span) => {
+            span.setAttribute('import.row_count', importContent.rowCount)
+            span.setAttribute('import.method', importContent.file ? 'csv' : 'paste')
+            const options = {
+              projectRef,
+              connectionString,
+              table,
+              selectedHeaders: importContent.selectedHeaders,
+              emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
+              onProgressUpdate: (progress: number) => {
+                toast.loading(
+                  <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
+                    <SparkBar
+                      value={progress}
+                      max={100}
+                      type="horizontal"
+                      barClass="bg-primary-bright"
+                      labelBottom={`Processing ${importContent.rowCount.toLocaleString()} rows for ${table.name}`}
+                      labelTop={`${progress.toFixed(2)}%`}
+                      labelTopClass="tabular-nums"
+                    />
+                  </div>,
+                  { id: toastId }
+                )
+              },
+            }
+            const result = importContent.file
+              ? await insertRowsViaSpreadsheet({ ...options, file: importContent.file })
+              : await insertTableRows({ ...options, rows: importContent.rows })
+            if (result.status === 'error') span.setAttribute('import.error', 1)
+            return result
           }
-        } else {
-          // Via text copy and paste
-          await insertTableRows({
-            projectRef,
-            connectionString,
-            table,
-            rows: importContent.rows,
-            selectedHeaders: importContent.selectedHeaders,
-            onProgressUpdate: (progress: number) => {
-              toast.loading(
-                <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                  <SparkBar
-                    value={progress}
-                    max={100}
-                    type="horizontal"
-                    barClass="bg-primary-bright"
-                    labelBottom={`Adding ${importContent.rows.length.toLocaleString()} rows to ${table.name}`}
-                    labelTop={`${progress.toFixed(2)}%`}
-                    labelTopClass="tabular-nums"
-                  />
-                </div>,
-                { id: toastId }
-              )
-            },
-            emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
-          })
-        }
-
-        // For identity columns, manually raise the sequences (batched for performance)
-        const identityColumns = columns.filter((column) => column.isIdentity)
-        if (identityColumns.length > 0) {
-          const updateSequenceSQL = joinSqlFragments(
-            identityColumns.map((column) =>
-              getUpdateIdentitySequenceSQL({
-                schema: table.schema,
-                table: table.name,
-                column: column.name,
-              })
-            ),
-            ';\n'
-          )
-          await executeSql({
-            projectRef,
-            connectionString,
-            sql: updateSequenceSQL,
-            queryKey: ['sequences', 'update-batch'],
-          })
-        }
-      }
-    )
-  }
+        )
 
   await Sentry.startSpan(
     { name: 'create_table.prefetch_editor', op: 'db.table.prefetch' },
@@ -680,7 +613,7 @@ export const createTable = async ({
   )
 
   // Finally, return the created table
-  return { table }
+  return { table, importResult }
 }
 
 /** TODO: Refactor to do in a single transaction */
@@ -876,273 +809,6 @@ export const updateTable = async ({
       scoped,
     }),
     hasError,
-  }
-}
-
-/**
- * Used in insertRowsViaSpreadsheet + insertTableRows
- */
-export const formatRowsForInsert = ({
-  rows,
-  headers,
-  columns = [],
-  emptyStringAsNullHeaders = headers,
-}: {
-  rows: unknown[]
-  headers: string[]
-  columns?: RetrieveTableResult['columns']
-  emptyStringAsNullHeaders?: string[]
-}) => {
-  return rows.map((row) => {
-    const formattedRow: Record<string, unknown> = {}
-    if (!isObject(row)) {
-      return formattedRow
-    }
-
-    headers.forEach((header) => {
-      const column = columns?.find((c) => c.name === header)
-
-      const originalValue = row[header]
-
-      if ((column?.format ?? '').includes('json')) {
-        formattedRow[header] = tryParseJson(originalValue)
-      } else if ((column?.data_type ?? '') === 'ARRAY') {
-        if (
-          typeof originalValue === 'string' &&
-          originalValue.startsWith('{') &&
-          originalValue.endsWith('}')
-        ) {
-          const formattedPostgresArraytoJsonArray = `[${originalValue.slice(1, originalValue.length - 1)}]`
-          formattedRow[header] = tryParseJson(formattedPostgresArraytoJsonArray)
-        } else {
-          formattedRow[header] = tryParseJson(originalValue)
-        }
-      } else if (originalValue === '') {
-        formattedRow[header] =
-          column?.is_nullable && emptyStringAsNullHeaders.includes(header) ? null : ''
-      } else {
-        formattedRow[header] = originalValue
-      }
-    })
-    return formattedRow
-  })
-}
-
-export async function insertRowsViaSpreadsheet({
-  projectRef,
-  connectionString,
-  file,
-  table,
-  selectedHeaders,
-  emptyStringAsNullHeaders = selectedHeaders,
-  roleImpersonationState,
-  onProgressUpdate,
-}: {
-  projectRef: string
-  connectionString: string | undefined | null
-  file: File
-  table: RetrieveTableResult
-  selectedHeaders: string[]
-  emptyStringAsNullHeaders?: string[]
-  roleImpersonationState?: RoleImpersonationState
-  onProgressUpdate: (progress: number) => void
-}): Promise<{ error: unknown }> {
-  let chunkNumber = 0
-  let insertError: unknown = undefined
-  const t1 = new Date()
-  return new Promise((resolve) => {
-    Papa.parse(file, {
-      header: true,
-      // dynamicTyping has to be disabled so that "00001" doesn't get parsed as 1.
-      dynamicTyping: false,
-      skipEmptyLines: true,
-      chunkSize: CHUNK_SIZE,
-      quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
-      chunk: async (results, parser) => {
-        parser.pause()
-
-        const formattedData = formatRowsForInsert({
-          rows: results.data,
-          headers: selectedHeaders,
-          columns: table.columns,
-          emptyStringAsNullHeaders,
-        })
-
-        const insertQuery = wrapWithRoleImpersonation(
-          new Query().from(table.name, table.schema).insert(formattedData).toSql(),
-          roleImpersonationState
-        )
-        try {
-          await executeWithRetry(() =>
-            executeSql({
-              projectRef,
-              connectionString,
-              sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-            })
-          )
-        } catch (error) {
-          console.warn(error)
-          insertError = error
-          parser.abort()
-        }
-
-        chunkNumber += 1
-        const progress = (chunkNumber * CHUNK_SIZE) / file.size
-        const progressPercentage = progress > 1 ? 100 : progress * 100
-        onProgressUpdate(progressPercentage)
-        parser.resume()
-      },
-      complete: () => {
-        const t2 = new Date()
-        console.log(
-          `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
-        )
-        if (insertError === undefined) {
-          const sequenceColumns = (table.columns ?? []).filter(
-            (column) =>
-              column.is_identity ||
-              (typeof column.default_value === 'string' &&
-                column.default_value.includes('nextval('))
-          )
-
-          if (sequenceColumns.length === 0) {
-            resolve({ error: insertError })
-            return
-          }
-
-          const updateSequenceSQL = joinSqlFragments(
-            sequenceColumns.map((column) =>
-              getUpdateIdentitySequenceSQL({
-                schema: table.schema,
-                table: table.name,
-                column: column.name,
-              })
-            ),
-            ';\n'
-          )
-
-          executeSql({
-            projectRef,
-            connectionString,
-            sql: updateSequenceSQL,
-            queryKey: ['sequences', 'update-batch'],
-          })
-            .then(() => resolve({ error: insertError }))
-            .catch((error) => resolve({ error }))
-          return
-        }
-
-        resolve({ error: insertError })
-      },
-    })
-  })
-}
-
-export async function insertTableRows({
-  projectRef,
-  connectionString,
-  table,
-  rows,
-  selectedHeaders,
-  emptyStringAsNullHeaders = selectedHeaders,
-  roleImpersonationState,
-  onProgressUpdate,
-}: {
-  projectRef: string
-  connectionString: string | undefined | null
-  table: RetrieveTableResult
-  rows: unknown[]
-  selectedHeaders: string[]
-  emptyStringAsNullHeaders?: string[]
-  roleImpersonationState?: RoleImpersonationState
-  onProgressUpdate: (progress: number) => void
-}): Promise<{ error: unknown }> {
-  let insertError: unknown = undefined
-  let insertProgress = 0
-
-  const formattedRows = formatRowsForInsert({
-    rows,
-    headers: selectedHeaders,
-    columns: table.columns,
-    emptyStringAsNullHeaders,
-  })
-
-  const batches = chunk(formattedRows, BATCH_SIZE)
-  const tasks = batches.map((batch) => {
-    return () => {
-      return Promise.race([
-        new Promise(async (resolve, reject) => {
-          const insertQuery = wrapWithRoleImpersonation(
-            new Query().from(table.name, table.schema).insert(batch).toSql(),
-            roleImpersonationState
-          )
-          try {
-            await executeSql({
-              projectRef,
-              connectionString,
-              sql: insertQuery,
-              isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-            })
-          } catch (error) {
-            insertError = error
-            reject(error)
-          }
-
-          insertProgress = insertProgress + batch.length / rows.length
-          resolve({})
-        }),
-        timeout(30_000),
-      ])
-    }
-  })
-
-  const batchedPromises = chunk(tasks, 10)
-  for (const batchedPromise of batchedPromises) {
-    const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-    const failedBatch = res.find((result) => result.status === 'rejected')
-    if (failedBatch?.status === 'rejected') {
-      if (insertError === undefined) insertError = failedBatch.reason
-      break
-    }
-    onProgressUpdate(insertProgress * 100)
-  }
-
-  if (insertError !== undefined) {
-    return { error: insertError }
-  }
-
-  const sequenceColumns = (table.columns ?? []).filter(
-    (column) =>
-      column.is_identity ||
-      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
-  )
-
-  if (sequenceColumns.length === 0) {
-    return { error: insertError }
-  }
-
-  const updateSequenceSQL = joinSqlFragments(
-    sequenceColumns.map((column) =>
-      getUpdateIdentitySequenceSQL({
-        schema: table.schema,
-        table: table.name,
-        column: column.name,
-      })
-    ),
-    ';\n'
-  )
-
-  try {
-    await executeSql({
-      projectRef,
-      connectionString,
-      sql: updateSequenceSQL,
-      queryKey: ['sequences', 'update-batch'],
-    })
-    return { error: insertError }
-  } catch (error) {
-    return { error }
   }
 }
 
