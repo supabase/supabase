@@ -1,5 +1,6 @@
 import { useFeatureFlags, useParams } from 'common'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -11,14 +12,18 @@ import {
   useIsETLDucklakePrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { BASE_PATH } from '@/lib/constants'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from '@/types'
 
-const PipelineCreationPage = () => {
+const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const { ref } = useParams()
+  const router = useRouter()
   const { hasLoaded } = useFeatureFlags()
   const { isPending: isOrganizationPending } = useSelectedOrganizationQuery()
   const { isEnabled, isLoading } = usePipelineCreationPreview()
@@ -28,10 +33,18 @@ const PipelineCreationPage = () => {
   const duckLake = useIsETLDucklakePrivateAlpha()
   const snowflake = useIsETLSnowflakePrivateAlpha()
   const clickHouse = useIsETLClickHousePrivateAlpha()
+  const isProjectAccessLoading =
+    isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
+  const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
+  const sources = useReplicationSourcesQuery(
+    { projectRef: ref },
+    { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
+  )
+  const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
   const listHref = `${BASE_PATH}/project/${ref}/database/pipelines`
   const isAccessLoading =
-    isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
-  const canOpenFlow = isEnabled && !isHighAvailability && canUseReplication
+    !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)
+  const canOpenFlow = canAccessFlow && sources.isSuccess && hasSource
   useEffect(() => {
     if (!isAccessLoading && !canOpenFlow) {
       const fallback = isEnabled ? listHref : `${listHref}?destinationType=BigQuery`
@@ -53,10 +66,17 @@ const PipelineCreationPage = () => {
           ...(snowflake ? ['Snowflake' as const] : []),
           ...(clickHouse ? ['ClickHouse' as const] : []),
         ]}
-        onClose={() => window.location.assign(listHref)}
+        onClose={() => {
+          if (!ref) return
+          void router.push(`/project/${ref}/database/pipelines`)
+        }}
       />
     </>
   )
 }
+
+PipelineCreationPage.getLayout = (page) => (
+  <PipelineRequestStatusProvider>{page}</PipelineRequestStatusProvider>
+)
 
 export default withAuth(PipelineCreationPage)

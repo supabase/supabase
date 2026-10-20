@@ -6,6 +6,7 @@ import { useRef, type MouseEvent } from 'react'
 import { CommandItem } from 'ui'
 
 import { formatHeadingPath, highlightMatches } from './SearchV2.utils'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 interface SearchV2ResultProps {
   result: DocsSearchV2Result
@@ -20,6 +21,7 @@ export function SearchV2Result({
   onResultSelect,
   onResultOpen,
 }: SearchV2ResultProps) {
+  const sendTelemetryEvent = useSendTelemetryEvent()
   // clicks navigate via the link and also fire onSelect, so onSelect only navigates for Enter
   const isPointerSelectRef = useRef(false)
 
@@ -30,6 +32,10 @@ export function SearchV2Result({
   }
 
   function handleSelect() {
+    sendTelemetryEvent({
+      action: 'docs_search_v2_result_clicked',
+      properties: { resultPath: result.path, query: highlightQuery },
+    })
     if (isPointerSelectRef.current) {
       isPointerSelectRef.current = false
       return

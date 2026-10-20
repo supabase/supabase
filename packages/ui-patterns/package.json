@@ -367,8 +367,8 @@
       "types": "./src/FilterBar/index.ts"
     },
     "./FilterBar/menuItems": {
-      "import": "./src/FilterBar/menuItems.ts",
-      "types": "./src/FilterBar/menuItems.ts"
+      "import": "./src/FilterBar/menuItems.tsx",
+      "types": "./src/FilterBar/menuItems.tsx"
     },
     "./FilterBar/types": {
       "import": "./src/FilterBar/types.ts",
@@ -381,10 +381,6 @@
     "./FilterBar/useCommandHandling": {
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"
-    },
-    "./FilterBar/useCommandMenu": {
-      "import": "./src/FilterBar/useCommandMenu.ts",
-      "types": "./src/FilterBar/useCommandMenu.ts"
     },
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
