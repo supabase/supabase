@@ -14,6 +14,7 @@ export interface KbSearchResult {
   heading: string
   excerpt: string
   score: number
+  content?: string | null
 }
 
 export type Database = {

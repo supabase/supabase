@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
+import { corsHeaders } from '../src/lib/search/cors'
 import type { Database, KbSearchResult } from '../src/lib/search/types'
 
 let client: SupabaseClient<Database> | undefined
@@ -12,11 +13,32 @@ function searchClient() {
   return client
 }
 
+/** Fetches the markdown export of a page (`<href>.md`); null if it can't be loaded. */
+async function fetchContent(href: string): Promise<string | null> {
+  try {
+    const response = await fetch(`${href}.md`)
+    if (!response.ok) {
+      console.warn(`Failed to fetch kb content from ${href}.md: ${response.status}`)
+      return null
+    }
+    return await response.text()
+  } catch (error) {
+    console.warn(`Failed to fetch kb content from ${href}.md:`, error)
+    return null
+  }
+}
+
+export function OPTIONS() {
+  return new Response(null, { headers: corsHeaders })
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const query = searchParams.get('q')?.trim()
   const limit = Number(searchParams.get('limit')) || 10
-  if (!query) return Response.json({ error: 'Missing q parameter' }, { status: 400 })
+  const includeContent = searchParams.get('content') === 'true'
+  if (!query)
+    return Response.json({ error: 'Missing q parameter' }, { status: 400, headers: corsHeaders })
 
   const { data, error } = await searchClient().rpc('search_kb', {
     query_text: query,
@@ -24,10 +46,13 @@ export async function GET(request: Request) {
   })
   if (error) {
     console.error('Error running kb search:', error)
-    return Response.json({ error: 'There was an error processing your request' }, { status: 500 })
+    return Response.json(
+      { error: 'There was an error processing your request' },
+      { status: 500, headers: corsHeaders }
+    )
   }
 
-  const results: KbSearchResult[] = data.map((row) => ({
+  let results: KbSearchResult[] = data.map((row) => ({
     title: row.page_title,
     href: `https://supabase.com/${row.slug.toLowerCase()}`,
     heading: row.heading,
@@ -35,7 +60,16 @@ export async function GET(request: Request) {
     score: row.score,
   }))
 
+  if (includeContent) {
+    results = await Promise.all(
+      results.map(async (result) => ({ ...result, content: await fetchContent(result.href) }))
+    )
+  }
+
   return Response.json(results, {
-    headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300' },
+    headers: {
+      ...corsHeaders,
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=300',
+    },
   })
 }
