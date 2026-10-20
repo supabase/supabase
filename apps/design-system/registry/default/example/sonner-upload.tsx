@@ -29,7 +29,7 @@ export default function SonnerUpload() {
         toast.loading(<UploadContent progress={currentProgress} files={files} />, {
           id: toastId,
         })
-      }, 2000) // Adjust the interval time as needed
+      }, 200) // Adjust the interval time as needed
     })
   }
 
