@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
  * Convert a micro timestamp from number/string to iso timestamp
  */
 export const unixMicroToIsoTimestamp = (unix: string | number): string => {
-  return dayjs.unix(Number(unix) / 1000).toISOString()
+  return dayjs.utc(Number(unix) / 1000).toISOString()
 }
 
 export const isUnixMicro = (unix: string | number): boolean => {
