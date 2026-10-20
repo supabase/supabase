@@ -268,7 +268,7 @@ For improved security, we recommend not exposing the `public` schema automatical
       alter default privileges for role postgres in schema public revoke usage, select, update on sequences from anon, authenticated, service_role;
       ```
 
-      These statements leave new tables with `truncate`, `references`, `trigger`, and `maintain`, and leave new functions callable through `PUBLIC`. To also remove those privileges, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
+      These statements leave new tables with `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`, and leave new functions callable through `PUBLIC`. To also remove those privileges, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
 
     </StepHikeCompact.Details>
 
