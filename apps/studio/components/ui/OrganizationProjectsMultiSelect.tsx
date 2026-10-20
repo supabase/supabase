@@ -85,64 +85,14 @@ export const OrganizationProjectsMultiSelect = ({
 
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) ?? [], [data?.pages])
 
-  // Accumulate ref -> name across every page we've ever seen (plus caller-provided known
-  // projects) so badges can always render a name, even for a ref that's since scrolled out
-  // of the current search results.
-  const [namesByRef, setNamesByRef] = useState<Record<string, string>>(() =>
-    Object.fromEntries(knownProjects.map((p) => [p.ref, p.name]))
-  )
-
-  useEffect(() => {
-    if (knownProjects.length === 0) return
-    setNamesByRef((prev) => {
-      let changed = false
-      const next = { ...prev }
-      for (const p of knownProjects) {
-        if (next[p.ref] !== p.name) {
-          next[p.ref] = p.name
-          changed = true
-        }
-      }
-      return changed ? next : prev
-    })
-  }, [knownProjects])
-
-  useEffect(() => {
-    if (projects.length === 0) return
-    setNamesByRef((prev) => {
-      let changed = false
-      const next = { ...prev }
-      for (const p of projects) {
-        if (next[p.ref] !== p.name) {
-          next[p.ref] = p.name
-          changed = true
-        }
-      }
-      return changed ? next : prev
-    })
-  }, [projects])
-
-  useEffect(() => {
-    if (
-      !isLoadingProjects &&
-      !isFetching &&
-      entry?.isIntersecting &&
-      hasNextPage &&
-      !isFetchingNextPage
-    ) {
-      fetchNextPage()
-    }
-  }, [
-    entry?.isIntersecting,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isLoadingProjects,
-    fetchNextPage,
-  ])
+  // Accumulate ref -> name across every page we've ever seen so badges can always render a
+  // name, even for a ref that's since scrolled out of the current search results.
+  const [seenNamesByRef, setSeenNamesByRef] = useState<Record<string, string>>({})
+  const knownNamesByRef = Object.fromEntries(knownProjects.map((p) => [p.ref, p.name]))
+  const getProjectName = (ref: string) => knownNamesByRef[ref] ?? seenNamesByRef[ref] ?? ref
 
   const toSelected = (refs: string[]): SelectedProject[] =>
-    refs.map((ref) => ({ ref, name: namesByRef[ref] ?? ref }))
+    refs.map((ref) => ({ ref, name: getProjectName(ref) }))
 
   // Badge deletion and keyboard removal go through the generic multi-select's own
   // onValuesChange, which has no concept of a non-removable ref — reinstate any that
@@ -236,6 +186,40 @@ export const OrganizationProjectsMultiSelect = ({
     )
   }
 
+  useEffect(() => {
+    if (projects.length === 0) return
+    setSeenNamesByRef((prev) => {
+      let changed = false
+      const next = { ...prev }
+      for (const p of projects) {
+        if (next[p.ref] !== p.name) {
+          next[p.ref] = p.name
+          changed = true
+        }
+      }
+      return changed ? next : prev
+    })
+  }, [projects])
+
+  useEffect(() => {
+    if (
+      !isLoadingProjects &&
+      !isFetching &&
+      entry?.isIntersecting &&
+      hasNextPage &&
+      !isFetchingNextPage
+    ) {
+      fetchNextPage()
+    }
+  }, [
+    entry?.isIntersecting,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isLoadingProjects,
+    fetchNextPage,
+  ])
+
   return (
     <div className="flex w-full flex-col gap-2">
       <MultiSelector
@@ -245,11 +229,7 @@ export const OrganizationProjectsMultiSelect = ({
         shouldFilter={false}
         disabled={disabled}
       >
-        <MultiSelectorTrigger
-          label={triggerLabel}
-          badgeLimit={4}
-          renderValue={(value) => namesByRef[value] ?? value}
-        />
+        <MultiSelectorTrigger label={triggerLabel} badgeLimit={4} renderValue={getProjectName} />
         <MultiSelectorContent>
           <CommandInput
             showResetIcon

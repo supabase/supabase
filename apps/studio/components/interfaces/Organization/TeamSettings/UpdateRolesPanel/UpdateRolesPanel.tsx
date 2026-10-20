@@ -98,20 +98,26 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   ).length
   const hasNoChanges = isEqual(projectsRoleConfiguration, originalConfiguration)
 
+  const getRoleForProject = (project: ProjectRoleConfiguration) =>
+    orgScopedRoles.find((r) => r.id === (project.baseRoleId ?? project.roleId))
+
+  const projectsWithRef = projectsRoleConfiguration.filter(
+    (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
+  )
+  const selectedRefs = projectsWithRef.map((p) => p.ref)
+  const knownProjects = projectsWithRef.map((p) => ({ ref: p.ref, name: p.name ?? p.ref }))
+  const disabledRefs = projectsWithRef
+    .filter((p) => !rolesRemovable.includes(getRoleForProject(p)?.id ?? 0))
+    .map((p) => p.ref)
+
   const onRemoveProject = (ref?: string) => {
     if (ref === undefined) return
     setProjectsRoleConfiguration(projectsRoleConfiguration.filter((p) => p.ref !== ref))
   }
 
-  const getRoleForProject = (project: ProjectRoleConfiguration) =>
-    orgScopedRoles.find((r) => r.id === (project.baseRoleId ?? project.roleId))
-
   const onProjectSelectionChange = (refs: string[], selected: { ref: string; name: string }[]) => {
-    const currentRefs = projectsRoleConfiguration
-      .filter((p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined)
-      .map((p) => p.ref)
-    const removedRefs = currentRefs.filter((ref) => !refs.includes(ref))
-    const addedProjects = selected.filter((p) => !currentRefs.includes(p.ref))
+    const removedRefs = selectedRefs.filter((ref) => !refs.includes(ref))
+    const addedProjects = selected.filter((p) => !selectedRefs.includes(p.ref))
     const roleIdToApply = lowerPermissionsRole ?? orgScopedRoles[0].id
 
     setProjectsRoleConfiguration(
@@ -215,23 +221,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
               {isSuccessRoles && !isApplyingRoleToAllProjects && (
                 <OrganizationProjectsMultiSelect
-                  selectedRefs={projectsRoleConfiguration
-                    .filter(
-                      (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
-                    )
-                    .map((p) => p.ref)}
+                  selectedRefs={selectedRefs}
                   onChange={onProjectSelectionChange}
-                  knownProjects={projectsRoleConfiguration
-                    .filter(
-                      (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
-                    )
-                    .map((p) => ({ ref: p.ref, name: p.name ?? p.ref }))}
-                  disabledRefs={projectsRoleConfiguration
-                    .filter(
-                      (p): p is ProjectRoleConfiguration & { ref: string } => p.ref !== undefined
-                    )
-                    .filter((p) => !rolesRemovable.includes(getRoleForProject(p)?.id ?? 0))
-                    .map((p) => p.ref)}
+                  knownProjects={knownProjects}
+                  disabledRefs={disabledRefs}
                   disabledTooltip="Additional permission required to remove role from member"
                   triggerLabel="Add projects..."
                 />
