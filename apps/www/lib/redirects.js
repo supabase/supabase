@@ -3830,4 +3830,96 @@ module.exports = [
     source: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password',
     destination: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
   },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-admin-mfa-deletefactor',
+    destination: '/docs/reference/javascript/auth-admin-deletefactor',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-reauthentication',
+    destination: '/docs/reference/javascript/auth-reauthenticate',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api',
+    destination: '/docs/reference/javascript/auth',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-mfa-api',
+    destination: '/docs/reference/javascript/auth-mfa',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/db-abortsignal',
+    destination: '/docs/reference/javascript/using-modifiers-abortsignal',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/schemas',
+    destination: '/docs/guides/api/using-custom-schemas',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/intro',
+    destination: '/docs/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/local-development',
+    destination: '/docs/guides/functions/development-environment',
+  },
+  {
+    permanent: true,
+    source: '/changelog/45329',
+    destination:
+      '/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically',
+  },
+  {
+    permanent: true,
+    source: '/changelog/48235-migration-of-supabase-management-api-logs-all-endpoint',
+    destination:
+      '/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-mfa/webauthn',
+    destination: '/docs/guides/auth/passkeys',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/free-plan',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/cdn/basic-cdn',
+    destination: '/docs/guides/storage/cdn/fundamentals',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-ingestion',
+    destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/terraform',
+    destination: '/docs/guides/deployment/terraform',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/local-development/seeding',
+    destination: '/docs/guides/local-development/seeding-your-database',
+  },
+  {
+    permanent: true,
+    source: '/docs/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/deployment/branching/dashboard',
+    destination: '/docs/guides/deployment/branching/dashboard',
+  },
 ]
