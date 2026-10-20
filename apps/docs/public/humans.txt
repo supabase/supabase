@@ -112,6 +112,7 @@ Douglas Hunley
 Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
+Eliot Daigneault-Mestre
 Eliot Whalan
 Emmett Folger
 Erfi Anugrah
