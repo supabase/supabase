@@ -12,6 +12,7 @@ import {
   useIsETLDucklakePrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -32,10 +33,18 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const duckLake = useIsETLDucklakePrivateAlpha()
   const snowflake = useIsETLSnowflakePrivateAlpha()
   const clickHouse = useIsETLClickHousePrivateAlpha()
+  const isProjectAccessLoading =
+    isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
+  const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
+  const sources = useReplicationSourcesQuery(
+    { projectRef: ref },
+    { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
+  )
+  const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
   const listHref = `${BASE_PATH}/project/${ref}/database/pipelines`
   const isAccessLoading =
-    isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
-  const canOpenFlow = isEnabled && !isHighAvailability && canUseReplication
+    !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)
+  const canOpenFlow = canAccessFlow && sources.isSuccess && hasSource
   useEffect(() => {
     if (!isAccessLoading && !canOpenFlow) {
       const fallback = isEnabled ? listHref : `${listHref}?destinationType=BigQuery`
