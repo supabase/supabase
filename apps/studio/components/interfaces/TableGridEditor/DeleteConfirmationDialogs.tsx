@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, Button, Checkbox } from 'ui'
@@ -303,7 +303,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertTitle>
               <AlertDescription>
-                <Button asChild size="tiny" icon={<ExternalLink />}>
+                <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -364,7 +364,7 @@ const DeleteConfirmationDialogs = ({
                 recursively.
               </AlertDescription>
               <AlertDescription className="mt-4">
-                <Button asChild size="tiny" icon={<ExternalLink />}>
+                <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
                     target="_blank"
@@ -497,7 +497,7 @@ const DropEntityConfirmationModal = ({
               recursively.
             </AlertDescription>
             <AlertDescription className="mt-4">
-              <Button asChild size="tiny" icon={<ExternalLink />}>
+              <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                 <Link
                   href="https://www.postgresql.org/docs/current/ddl-depend.html"
                   target="_blank"

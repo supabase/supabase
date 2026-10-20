@@ -10,6 +10,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { PipelineDestinationSelection } from '../CreatePipeline/PipelineDestinationSelection'
 import { DestinationLogo } from '../DestinationLogo'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
@@ -20,6 +21,7 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -35,6 +37,7 @@ interface DestinationTypeGroup {
 }
 
 export const DestinationTypeSelection = () => {
+  const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
@@ -142,6 +145,21 @@ export const DestinationTypeSelection = () => {
         {stageDescription}
       </span>
     ) : undefined
+
+  if (isCreationPreviewEnabled && !editMode) {
+    const availableDestinations = options.map(({ value }) => value)
+    return (
+      <div className="p-5">
+        <PipelineDestinationSelection
+          availableDestinations={availableDestinations}
+          value={destinationType ?? null}
+          onChange={(value) => setDestinationType(value)}
+          renderLogo={(type) => <DestinationLogo type={type} />}
+        />
+        <p className="mt-3 text-sm text-foreground-lighter">{typeDescription}</p>
+      </div>
+    )
+  }
 
   return (
     <>

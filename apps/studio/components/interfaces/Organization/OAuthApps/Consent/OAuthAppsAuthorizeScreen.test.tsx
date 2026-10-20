@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
@@ -32,6 +32,14 @@ function renderScreen({
       navigate={vi.fn()}
     />
   )
+}
+
+// The authorize button renders disabled while app details are still pending.
+// React Query 5.104 settles that query after the button is already in the document.
+async function enabledAuthorizeButton() {
+  const button = await screen.findByRole('button', { name: /Authorize Vercel/ })
+  await waitFor(() => expect(button).toBeEnabled())
+  return button
 }
 
 function selectProject(projectName: string) {
@@ -128,8 +136,8 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(screen.getByText('Permissions granted')).toBeInTheDocument()
     expect(screen.queryByText('Permissions requested')).not.toBeInTheDocument()
-    expect(screen.getByText('Database, Environment, Secrets')).toBeInTheDocument()
-    expect(screen.getByText('Projects, Edge Functions, Storage')).toBeInTheDocument()
+    expect(screen.getByText('Database, Environment, Analytics')).toBeInTheDocument()
+    expect(screen.getByText('Secrets, Projects, Edge Functions, Storage')).toBeInTheDocument()
   })
 
   test('an organization-bound app reaches the success screen with the authorizing identity', async () => {
@@ -203,7 +211,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('authorizes an app that hides the picker, with nothing selected', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects })
 
-    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(await enabledAuthorizeButton()).toBeEnabled()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     expect(
       screen.queryByText('Must select at least one project to authorize.')
@@ -216,7 +224,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       organizationSlug: 'contoso-labs',
     })
 
-    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(await enabledAuthorizeButton()).toBeEnabled()
     expect(screen.queryByText(/No projects in/)).not.toBeInTheDocument()
   })
 
@@ -226,7 +234,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       organizationSlug: 'contoso-labs',
     })
 
-    fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
+    fireEvent.click(await enabledAuthorizeButton())
 
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
     expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
@@ -331,7 +339,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       projectRef: 'northwindstorefront1',
     })
 
-    fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
+    fireEvent.click(await enabledAuthorizeButton())
 
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
     expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
@@ -357,5 +365,44 @@ describe('OAuthAppsAuthorizeScreen', () => {
 
     expect(await screen.findByText('tailspin-shop')).toBeInTheDocument()
     expect(screen.getByRole('combobox')).not.toHaveTextContent('tailspin-warehouse')
+  })
+
+  test('reconsent shows the permissions differences', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+    })
+
+    await screen.findByText('Already granted (2)')
+    await screen.findByText((_, element) => element?.textContent == 'Environment (New)', {
+      selector: 'span',
+    })
+    await screen.findByText(
+      (_, element) => element?.textContent == 'Analytics (Upgraded from Read)',
+      { selector: 'span' }
+    )
+    await screen.findByText(
+      (_, element) => element?.textContent == 'Secrets (Demoted from Read-write)',
+      { selector: 'span' }
+    )
+    await screen.findByText((_, element) => element?.textContent == 'Edge Functions (New)', {
+      selector: 'span',
+    })
+    await screen.findByText((_, element) => element?.textContent == 'Storage (New)', {
+      selector: 'span',
+    })
+    await screen.findByText((_, element) => element?.textContent == 'Rest (Read)', {
+      selector: 'span',
+    })
+  })
+
+  test('reconsent shows the previous permissions hidden by default', async () => {
+    renderScreen({
+      authId: OAUTH_APPS_MOCK_SCENARIOS.vercelReconsent,
+    })
+
+    await screen.findByText('Already granted (2)')
+    expect(screen.queryByText('Database')).toBeNull()
+    fireEvent.click(await screen.findByText('Already granted (2)'))
+    await screen.findByText('Database')
   })
 })

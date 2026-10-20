@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Check, Eye, EyeOff, Plus } from 'lucide-react'
+import { CheckIcon, EyeIcon, EyeOffIcon, PlusIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -271,7 +271,7 @@ const DuckLakeCustomFields = ({
                         <Button
                           className="w-7"
                           aria-label={showCatalogUrl ? 'Hide catalog URL' : 'Show catalog URL'}
-                          icon={showCatalogUrl ? <Eye /> : <EyeOff />}
+                          icon={showCatalogUrl ? <EyeIcon /> : <EyeOffIcon />}
                           onClick={() => setShowCatalogUrl(!showCatalogUrl)}
                         />
                       </div>
@@ -366,7 +366,7 @@ const DuckLakeCustomFields = ({
                             ? 'Hide S3 secret access key'
                             : 'Show S3 secret access key'
                         }
-                        icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                        icon={showSecretAccessKey ? <EyeIcon /> : <EyeOffIcon />}
                         onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
                       />
                     )
@@ -649,7 +649,7 @@ const BucketSelection = ({
                     >
                       <span>{bucket.name}</span>
                       {value === bucket.id && (
-                        <Check className="text-primary" strokeWidth={2} size={13} />
+                        <CheckIcon className="text-primary" strokeWidth={2} size={13} />
                       )}
                     </CommandItem>
                   ))}
@@ -666,7 +666,7 @@ const BucketSelection = ({
                   onCreateBucket()
                 }}
               >
-                <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                <PlusIcon size={14} strokeWidth={1.5} className="mr-2" />
                 New bucket
               </CommandItem>
             </CommandGroup>

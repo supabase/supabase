@@ -10,8 +10,9 @@ import {
   createAssistantMessageWithUpdateNotebookTool,
   createLongConversation,
 } from '../test-fixtures'
+import { NO_DATA_PERMISSIONS } from './execute-sql-output'
 import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE, type NotebookRunOutput } from './notebook-run-output'
-import { NO_DATA_PERMISSIONS, sanitizeMessagePart } from './tool-sanitizer'
+import { sanitizeMessagePart } from './tool-sanitizer'
 
 const notebookRunPart = {
   type: 'tool-run_notebook',
@@ -288,6 +289,25 @@ describe('execute_sql rows are shared only up to the level they ran under', () =
   ] as const)('stamp %s, current %s', (stamp, current, expected) => {
     const part = executeSqlPart({ rows, optInLevel: stamp })
     expect((sanitizeMessagePart(part, current) as ToolUIPart).output).toEqual(expected)
+  })
+
+  test('caps rows replayed to the model and notes the result is partial', () => {
+    const manyRows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
+    const part = executeSqlPart({ rows: manyRows, optInLevel: 'schema_and_log_and_data' })
+    expect((sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output).toEqual({
+      rows: manyRows.slice(0, 100),
+      note: 'Only the first 100 of 101 rows are included.',
+    })
+  })
+
+  test('does not report a total when more rows existed than were fetched', () => {
+    const part = executeSqlPart({
+      rows: Array.from({ length: 100 }, (_, i) => ({ id: i })),
+      hasMoreRows: true,
+      optInLevel: 'schema_and_log_and_data',
+    })
+    const output = (sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output
+    expect(output).toMatchObject({ note: expect.stringContaining('more than 100 rows') })
   })
 
   test('output saved before the stamp existed stays hidden', () => {

@@ -48,15 +48,15 @@ export const useArchivedObjectVersionDeleteMutation = ({
 
   return useMutation<void, ResponseError, ArchivedObjectVersionDeleteVariables>({
     mutationFn: deleteArchivedObjectVersion,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.archivedObjects(variables.projectRef, variables.bucketId),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) toast.error(`Failed to delete version: ${error.message}`)
-      else onError(error, variables, context)
+      else onError(error, variables, context, mutationContext)
     },
     ...options,
   })

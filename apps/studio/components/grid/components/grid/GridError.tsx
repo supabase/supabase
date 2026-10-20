@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -224,7 +224,7 @@ const ExpandError = ({ error }: { error: ResponseError }) => {
       <CollapsibleTrigger className="mt-2 group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
         <div className="flex items-center gap-x-2 w-full cursor-pointer">
           <span className="font-mono uppercase tracking-tight">View error</span>
-          <ChevronDown className="transition-transform" size={14} />
+          <ChevronDownIcon className="transition-transform" size={14} />
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1">

@@ -1,4 +1,4 @@
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 
@@ -21,7 +21,7 @@ export const RegenerateRecoveryCodesModal = () => {
 
   return (
     <>
-      <Button icon={<RefreshCw />} onClick={() => setShowConfirm(true)}>
+      <Button icon={<RefreshCwIcon />} onClick={() => setShowConfirm(true)}>
         Regenerate
       </Button>
       <TextConfirmModal

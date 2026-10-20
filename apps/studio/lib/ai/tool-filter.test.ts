@@ -9,13 +9,50 @@ import {
   TOOL_CATEGORY_MAP,
   toolSetValidationSchema,
 } from './tool-filter'
+import { contract as createNotebookContract } from './tools/create-notebook'
+import { contract as deleteNotebookContract } from './tools/delete-notebook'
+import { contract as getNotebookContract } from './tools/get-notebook'
+import { contract as listDatabasesContract } from './tools/list-databases'
+import { contract as listNotebooksContract } from './tools/list-notebooks'
+import { contract as runNotebookContract } from './tools/run-notebook'
+import { contract as updateNotebookContract } from './tools/update-notebook'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
-    expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
+    expect(TOOL_CATEGORY_MAP['search_docs']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
-    expect(TOOL_CATEGORY_MAP['run_notebook']).toBe(TOOL_CATEGORIES.SCHEMA)
+    expect(TOOL_CATEGORY_MAP['list_reports']).toBe(TOOL_CATEGORIES.SCHEMA)
   })
+})
+
+describe('tools with a contract', () => {
+  const contracts = {
+    create_notebook: createNotebookContract,
+    delete_notebook: deleteNotebookContract,
+    get_notebook: getNotebookContract,
+    list_databases: listDatabasesContract,
+    list_notebooks: listNotebooksContract,
+    run_notebook: runNotebookContract,
+    update_notebook: updateNotebookContract,
+  }
+
+  it.each(Object.entries(contracts))(
+    '%s is gated by the contract minOptInLevel, not the category map',
+    (name, contract) => {
+      const tools = {
+        [name]: { description: 'A notebook tool', execute: vitest.fn() },
+      } as unknown as ToolSet
+
+      expect(contract.minOptInLevel).toBe('schema')
+      expect(Object.hasOwn(TOOL_CATEGORY_MAP, name)).toBe(false)
+
+      const blocked = filterToolsByOptInLevel(tools, 'disabled')[name]
+      const allowed = filterToolsByOptInLevel(tools, 'schema')[name]
+
+      expect(blocked.description).toContain('Requires opting in')
+      expect(allowed.description).toBe('A notebook tool')
+    }
+  )
 })
 
 describe('tool allowance by opt-in level', () => {

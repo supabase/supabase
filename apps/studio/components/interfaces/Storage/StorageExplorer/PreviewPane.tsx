@@ -1,6 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
-import { AlertCircle, Archive, ChevronDown, Copy, Download, Trash2, Upload, X } from 'lucide-react'
+import {
+  AlertCircleIcon,
+  ArchiveIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DownloadIcon,
+  Trash2Icon,
+  UploadIcon,
+  XIcon,
+} from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useRef, useState, type ReactNode } from 'react'
 import { toast } from 'sonner'
@@ -16,7 +25,12 @@ import {
 import { fromLifecycleRules } from '../FilesBuckets/BucketVersioningFields/BucketVersioningFields.lifecycle'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
-import { getBucketVersioningState } from '../StorageVersioning.constants'
+import {
+  getBucketVersioningState,
+  hasVersioningHistory,
+  isVersioningActive,
+  willRetainVersionOnWrite,
+} from '../StorageVersioning.constants'
 import { FilePreview } from './FilePreview'
 import { pickFile } from './pickFile'
 import { PreviewSection } from './PreviewSection'
@@ -60,15 +74,13 @@ const FileDetails = ({ createdAt, updatedAt }: FileDetailsProps) => (
 
 interface CurrentFilePreviewProps {
   file: StorageItem
-  /** Full path within the bucket, which is what the URL endpoints address. */
   path: string
   mimeType?: string
   size: string | null
   isPublicBucket: boolean
-  isVersionedBucket: boolean
-  /** Sits beside Download. Omitted when replacing a file isn't on offer. */
+  hasVersions: boolean
+  canArchive: boolean
   replacementAction?: ReactNode
-  /** Pins the preview to the current version, so a new one busts the cached URL. */
   currentVersionId?: string
   hasCurrentVersion: boolean
   canUpdateFiles: boolean
@@ -85,7 +97,8 @@ const CurrentFilePreview = ({
   mimeType,
   size,
   isPublicBucket,
-  isVersionedBucket,
+  hasVersions,
+  canArchive,
   replacementAction,
   currentVersionId,
   hasCurrentVersion,
@@ -113,19 +126,19 @@ const CurrentFilePreview = ({
       <div className="shrink">
         {/* No `title`: the explorer rows use it as their handle, and a second
             element carrying the same one makes `getByTitle` ambiguous. */}
-        <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
+        <p className="truncate text-sm font-medium text-foreground">{getBaseFileName(file.name)}</p>
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-1.5 truncate text-xs text-foreground-light">
           {mimeType}
           {size && <>, {size}</>}
-          {isVersionedBucket && hasCurrentVersion && (
+          {hasVersions && hasCurrentVersion && (
             <Badge variant="success" className="-my-1">
               Current
             </Badge>
           )}
-        </p>
+        </div>
         {file.isCorrupted && (
           <div className="mt-1 flex items-center gap-x-1.5">
-            <AlertCircle size={12} className="shrink-0 text-foreground-light" />
+            <AlertCircleIcon size={12} className="shrink-0 text-foreground-light" />
             <p className="text-xs text-foreground-light">File is corrupted</p>
           </div>
         )}
@@ -135,7 +148,7 @@ const CurrentFilePreview = ({
         <ButtonTooltip
           variant="outline"
           className="px-2"
-          icon={<Download size={14} />}
+          icon={<DownloadIcon size={14} />}
           disabled={file.isCorrupted}
           onClick={onDownload}
           tooltip={{ content: { side: 'top', text: 'Download current' } }}
@@ -147,7 +160,7 @@ const CurrentFilePreview = ({
           <Button
             variant="outline"
             size="tiny"
-            icon={<Copy size={14} />}
+            icon={<CopyIcon size={14} />}
             disabled={file.isCorrupted}
             onClick={() => onCopyUrl(file.path!)}
           >
@@ -159,8 +172,8 @@ const CurrentFilePreview = ({
               <Button
                 variant="outline"
                 size="tiny"
-                icon={<Copy size={14} />}
-                iconRight={<ChevronDown size={14} />}
+                icon={<CopyIcon size={14} />}
+                iconRight={<ChevronDownIcon size={14} />}
                 disabled={file.isCorrupted}
                 aria-label={`Get URL for ${file.name}`}
               >
@@ -183,13 +196,13 @@ const CurrentFilePreview = ({
         )}
 
         {/* A delete in a versioned bucket is a soft delete/archive, unless specified explicitly */}
-        {canUpdateFiles && isVersionedBucket && (
+        {canUpdateFiles && canArchive && (
           <div className="flex">
             <Button
               variant="outline"
               size="tiny"
               className="rounded-r-none"
-              icon={<Archive size={14} />}
+              icon={<ArchiveIcon size={14} />}
               onClick={onDelete}
             >
               Archive
@@ -200,7 +213,7 @@ const CurrentFilePreview = ({
                   variant="outline"
                   size="tiny"
                   className="-ml-px shrink-0 rounded-l-none border-l-transparent px-1.5"
-                  icon={<ChevronDown size={14} />}
+                  icon={<ChevronDownIcon size={14} />}
                   aria-label="More delete options"
                 />
               </DropdownMenuTrigger>
@@ -210,7 +223,7 @@ const CurrentFilePreview = ({
                   onClick={onPurge}
                 >
                   <div className="flex items-center space-x-1 text-foreground">
-                    <Trash2 size={14} className="shrink-0 text-destructive" />
+                    <Trash2Icon size={14} className="shrink-0 text-destructive" />
                     <p>Delete permanently</p>
                   </div>
                   <p className="block text-foreground-light">
@@ -222,11 +235,11 @@ const CurrentFilePreview = ({
           </div>
         )}
 
-        {canUpdateFiles && !isVersionedBucket && (
+        {canUpdateFiles && !canArchive && (
           <ButtonTooltip
             variant="outline"
             size="tiny"
-            icon={<Trash2 size={14} />}
+            icon={<Trash2Icon size={14} />}
             onClick={onDelete}
             tooltip={{ content: { side: 'top', text: 'Delete file' } }}
           >
@@ -245,7 +258,7 @@ export const PreviewPane = () => {
     selectedFilePreview: file,
     openedFolders,
     setSelectedItemsToDelete,
-    setItemToPurge,
+    setItemsToPurge,
     refetchAllOpenedFolders,
     replaceFile,
     setSelectedFileCustomExpiry,
@@ -307,7 +320,19 @@ export const PreviewPane = () => {
   const updatedAt = file.updated_at ? new Date(file.updated_at).toLocaleString() : 'Unknown'
 
   const currentVersion = versions?.find((version) => version.isCurrent)
-  const isVersionedBucket = isStorageVersioningEnabled && versioningState !== 'disabled'
+  const hasVersions = isStorageVersioningEnabled && hasVersioningHistory(selectedBucket)
+  const isActivelyVersioning = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
+  // The label names the action being taken, not the retention behind it: a suspended bucket
+  // reads "Replace file" even for a file that still has one retained version coming.
+  const replaceLabel = isActivelyVersioning ? 'Upload new version' : 'Replace file'
+  // A suspended bucket only retains a copy when this particular file predates the suspension.
+  const willRetainVersion =
+    isStorageVersioningEnabled &&
+    willRetainVersionOnWrite({ versioningState, isObjectVersioned: file.is_versioned })
+
+  const hasRetainedVersions = (versions?.length ?? 0) > 0
+  const showVersionHistory = hasVersions && (willRetainVersion || hasRetainedVersions)
+
   const isComparing = previewedVersion !== undefined && !previewedVersion.isCurrent
 
   const handleRestore = () => {
@@ -325,7 +350,6 @@ export const PreviewPane = () => {
     if (newFile !== undefined) await replaceFile({ file: newFile, item: file })
   }
 
-  // The compare widget replaces the top of the panel, so scroll up to show it.
   const handlePreviewVersion = (version: ObjectVersion) => {
     setPreviewedVersion(version)
     scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
@@ -345,7 +369,7 @@ export const PreviewPane = () => {
           onClick={clearPreviewedFile}
           aria-label="Close preview"
         >
-          <X size={14} />
+          <XIcon size={14} />
         </Button>
       </div>
 
@@ -367,20 +391,17 @@ export const PreviewPane = () => {
             mimeType={mimeType}
             size={size}
             isPublicBucket={!!selectedBucket?.public}
-            isVersionedBucket={isVersionedBucket}
+            hasVersions={hasVersions}
+            canArchive={isActivelyVersioning}
             replacementAction={
               canUpdateFiles && isStorageVersioningEnabled ? (
                 <ButtonTooltip
                   variant="outline"
                   className="px-2"
-                  icon={<Upload size={14} />}
+                  icon={<UploadIcon size={14} />}
                   onClick={onReplaceFile}
-                  tooltip={{
-                    content: {
-                      side: 'top',
-                      text: isVersionedBucket ? 'Upload new version' : 'Replace file',
-                    },
-                  }}
+                  aria-label={replaceLabel}
+                  tooltip={{ content: { side: 'top', text: replaceLabel } }}
                 />
               ) : undefined
             }
@@ -391,14 +412,14 @@ export const PreviewPane = () => {
             onDownload={() => downloadFile(file)}
             onCustomExpiry={() => setSelectedFileCustomExpiry(file)}
             onDelete={() => setSelectedItemsToDelete([file])}
-            onPurge={() => setItemToPurge(file)}
+            onPurge={() => setItemsToPurge([file])}
           />
         )}
 
         <div className="space-y-3 px-4 pt-3">
           <FileDetails createdAt={createdAt} updatedAt={updatedAt} />
 
-          {isStorageVersioningEnabled && (
+          {showVersionHistory && (
             <PreviewSection title="Versions" count={versions?.length} defaultOpen>
               <VersionHistory
                 projectRef={projectRef}
@@ -406,6 +427,7 @@ export const PreviewPane = () => {
                 objectName={file.name}
                 path={filePath ?? file.name}
                 versioningState={versioningState}
+                willRetainVersionOnWrite={willRetainVersion}
                 lifecyclePolicy={lifecyclePolicy}
                 expirationMode={storedPolicy.expirationMode}
                 mimeType={mimeType}
@@ -420,4 +442,8 @@ export const PreviewPane = () => {
       </div>
     </div>
   )
+}
+
+const getBaseFileName = (name: string) => {
+  return name.split('/').filter(Boolean).pop() ?? name
 }

@@ -82,7 +82,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
     if (searchState.status === 'results' || searchState.status === 'noResults') {
       sendTelemetryEvent({
         action: 'docs_search_v2_search_submitted',
-        properties: { query: searchState.query },
+        properties: { query: searchState.query, hasResults: searchState.status === 'results' },
       })
     }
   }, [searchState, sendTelemetryEvent])
@@ -118,14 +118,6 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
     } else {
       resetSearch()
     }
-  }
-
-  function handleSelect(path: string) {
-    sendTelemetryEvent({
-      action: 'docs_search_v2_result_clicked',
-      properties: { resultPath: path, query: highlightQuery },
-    })
-    onResultSelect(path)
   }
 
   // Announced via the aria-live region below — a sighted user sees the spinner/list update,
@@ -197,7 +189,7 @@ function SearchV2Panel({ onResultSelect, onResultOpen }: SearchV2PanelProps) {
                 key={result.path}
                 result={result}
                 highlightQuery={highlightQuery}
-                onResultSelect={handleSelect}
+                onResultSelect={onResultSelect}
                 onResultOpen={onResultOpen}
               />
             ))}

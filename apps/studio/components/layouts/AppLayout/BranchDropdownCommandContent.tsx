@@ -1,4 +1,4 @@
-import { ListTree, Plus } from 'lucide-react'
+import { ListTreeIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -52,7 +52,7 @@ export function BranchDropdownCommandContent({
             size="small"
             asChild
             block
-            icon={<ListTree size={14} strokeWidth={1.5} />}
+            icon={<ListTreeIcon size={14} strokeWidth={1.5} />}
           >
             <Link
               href={`/project/${projectRef}/branches`}
@@ -71,7 +71,7 @@ export function BranchDropdownCommandContent({
               onClose()
               onCreateBranch()
             }}
-            icon={<Plus size={14} strokeWidth={1.5} />}
+            icon={<PlusIcon size={14} strokeWidth={1.5} />}
           >
             Create branch
           </Button>
@@ -126,7 +126,7 @@ export function BranchDropdownCommandContent({
             }}
           >
             <div className="w-full flex items-center gap-2">
-              <Plus size={14} strokeWidth={1.5} />
+              <PlusIcon size={14} strokeWidth={1.5} />
               <p>Create branch</p>
             </div>
           </CommandItem>
@@ -138,7 +138,7 @@ export function BranchDropdownCommandContent({
               onClose()
             }}
           >
-            <ListTree size={14} strokeWidth={1.5} />
+            <ListTreeIcon size={14} strokeWidth={1.5} />
             <p>Manage branches</p>
           </CommandItemLink>
         </CommandGroup>

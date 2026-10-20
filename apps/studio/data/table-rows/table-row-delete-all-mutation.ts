@@ -1,9 +1,9 @@
 import { Query } from '@supabase/pg-meta/src/query'
+import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { tableRowKeys } from './keys'
-import { formatFilterValue } from './utils'
 import type { Filter } from '@/components/grid/types'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { Entity } from '@/data/table-editor/table-editor-types'
@@ -28,7 +28,7 @@ export function getTableRowDeleteAllSql({
   filters
     .filter((x) => x.value && x.value !== '')
     .forEach((x) => {
-      const value = formatFilterValue(table, x)
+      const value = formatPatternMatchFilterValue(x.value, x.operator)
       queryChains = queryChains.filter(x.column, x.operator, value)
     })
 

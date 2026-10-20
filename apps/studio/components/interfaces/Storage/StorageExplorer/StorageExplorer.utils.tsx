@@ -4,6 +4,10 @@ import { copyToClipboard } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../Storage.utils'
+import {
+  willRetainVersionOnWrite,
+  type BucketVersioningState,
+} from '../StorageVersioning.constants'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'
@@ -98,10 +102,16 @@ export function sanitizeNameForDuplicateInColumn(
     name,
     columnIndex,
     autofix = false,
+    reservedNames = [],
   }: {
     name: string
     columnIndex?: number
     autofix?: boolean
+    /**
+     * Names that are taken in the destination but absent from `state.columns` — archived
+     * objects, which only exist in the rendered overlay.
+     */
+    reservedNames?: string[]
   }
 ): string | null {
   const columnIndex_ = columnIndex !== undefined ? columnIndex : state.columns.length - 1
@@ -109,7 +119,9 @@ export function sanitizeNameForDuplicateInColumn(
   const existingNames = new Set(
     currentColumn.items
       .filter((item) => item.status !== STORAGE_ROW_STATUS.EDITING)
-      .map((item) => item.name.toLowerCase())
+      .map((item) => item.name)
+      .concat(reservedNames)
+      .map((name) => name.toLowerCase())
   )
   // [Joshen] JFYI storage does support folders of the same name with different casing
   // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
@@ -141,6 +153,41 @@ export function sanitizeNameForDuplicateInColumn(
 
   return name
 }
+
+export type UploadConflictResolution = 'replace' | 'keep-both' | 'cancel'
+
+export type UploadConflicts = {
+  liveNames: string[]
+  archivedNames: string[]
+  isVersioningSuspended: boolean
+}
+
+export function getUploadNameConflicts({
+  fileNames,
+  existingNames,
+}: {
+  fileNames: string[]
+  existingNames: string[]
+}): string[] {
+  const takenNames = new Set(existingNames.map((name) => name.toLowerCase()))
+  return Array.from(new Set(fileNames.filter((name) => takenNames.has(name.toLowerCase()))))
+}
+
+export const getReplaceableFileNames = ({
+  items,
+  versioningState,
+}: {
+  items: readonly StorageItem[]
+  versioningState: BucketVersioningState
+}): string[] =>
+  items
+    .filter(
+      (item) =>
+        item.type === STORAGE_ROW_TYPES.FILE &&
+        item.status !== STORAGE_ROW_STATUS.EDITING &&
+        willRetainVersionOnWrite({ versioningState, isObjectVersioned: item.is_versioned })
+    )
+    .map((item) => item.name)
 
 /** Bucket-relative path to an item */
 export function getStoragePathForItem(

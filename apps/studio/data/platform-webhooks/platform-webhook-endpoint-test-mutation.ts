@@ -12,10 +12,11 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 export type WebhookEndpointTestVariables = {
   scope: WebhookScopeParams
   id: string
+  eventType?: string
 }
 
-async function testEndpoint({ scope, id }: WebhookEndpointTestVariables) {
-  return sendTestWebhookEvent(scope, id)
+async function testEndpoint({ scope, id, eventType }: WebhookEndpointTestVariables) {
+  return sendTestWebhookEvent(scope, id, eventType)
 }
 
 type WebhookEndpointTestData = Awaited<ReturnType<typeof testEndpoint>>
@@ -43,7 +44,7 @@ export const useWebhookEndpointTestMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         if (isWebhookRateLimitError(data)) {
-          toast.error('Too many test events — wait a minute and try again (limit: 10 per minute).')
+          toast.error('Too many requests. Wait a minute and try again (limit: 10 per minute).')
         } else {
           toast.error(`Failed to send test event: ${data.message}`)
         }

@@ -37,10 +37,10 @@ export interface StorageItem {
   created_at: string | null
   updated_at: string | null
   last_accessed_at: string | null
+  is_versioned?: boolean | null
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
-  /** Set on a row synthesized from the archived list; absent on a synthesized folder. */
   archived?: { archivedObjectId?: string }
 }
 

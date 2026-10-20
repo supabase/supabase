@@ -145,6 +145,21 @@ function list({
   }
 }
 
+/**
+ * The `%I.%I` arguments of a `format()` call that name the table of the
+ * `col` record (a `pg_attribute` row): its schema and name.
+ *
+ * `%s` with `col.attrelid::regclass` would build the same statement, but `%s`
+ * substitutes raw text, so a server that statically checks `DO` blocks (such as
+ * Multigres) can't prove the statement fixed and rejects the block. A format
+ * string made only of `%I`/`%L` conversions can be checked.
+ */
+const colRelationIdentArgs = safeSql`(select n.nspname from pg_class c join pg_namespace n on n.oid = c.relnamespace where c.oid = col.attrelid), (select relname from pg_class where oid = col.attrelid)`
+
+function granteeSql(grantee: string): SafeSqlFragment {
+  return grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+}
+
 type ColumnPrivilegesGrant = z.infer<typeof privilegeGrant>
 function grant(grants: ColumnPrivilegesGrant[]): { sql: SafeSqlFragment } {
   const sql = safeSql`
@@ -161,13 +176,11 @@ from pg_attribute a
 where a.attrelid = ${literal(relationId)}
   and a.attnum = ${literal(columnNumber)}
 into col;
-execute format(
-  'grant ${keyword(privilegeType)} (%I) on %s to ${
-    grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-  } ${isGrantable ? safeSql`with grant option` : safeSql``}',
-  col.attname,
-  col.attrelid::regclass
-);`
+execute format(${literal(
+      `grant ${keyword(privilegeType)} (%I) on %I.%I to ${granteeSql(grantee)}${
+        isGrantable ? ' with grant option' : ''
+      }`
+    )}, col.attname, ${colRelationIdentArgs});`
   }),
   '\n'
 )}
@@ -192,13 +205,9 @@ from pg_attribute a
 where a.attrelid = ${literal(relationId)}
   and a.attnum = ${literal(columnNumber)}
 into col;
-execute format(
-  'revoke ${keyword(privilegeType)} (%I) on %s from ${
-    grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
-  }',
-  col.attname,
-  col.attrelid::regclass
-);`
+execute format(${literal(
+      `revoke ${keyword(privilegeType)} (%I) on %I.%I from ${granteeSql(grantee)}`
+    )}, col.attname, ${colRelationIdentArgs});`
   }),
   '\n'
 )}
