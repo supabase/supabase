@@ -77,6 +77,10 @@ export const WarehouseDisableCard = () => {
     return disableMutation.mutateAsync({ projectRef, shouldDeleteData })
   }
 
+  const disableError = disableMutation.error
+  const isLegacyStorageError =
+    disableError?.message === 'Legacy Warehouse data must be retained when disabling Warehouse.'
+
   return (
     <PageSection className="pt-5!">
       <PageSectionMeta>
@@ -121,6 +125,17 @@ export const WarehouseDisableCard = () => {
                 </p>
               </div>
             </AlertDialogDescription>
+            {disableError && !isLegacyStorageError && (
+              <div className="px-5 pb-4">
+                <AlertError
+                  subject="Unable to disable Warehouse"
+                  showErrorPrefix={false}
+                  showInstructions={false}
+                  hideContactSupport
+                  error={disableError}
+                />
+              </div>
+            )}
             <div className="border-t px-5 py-4">
               <Form {...form}>
                 <FormField
@@ -147,19 +162,15 @@ export const WarehouseDisableCard = () => {
                 />
               </Form>
             </div>
-            {disableMutation.error && (
+            {isLegacyStorageError && (
               <div className="px-5 pb-4">
                 <AlertError
-                  subject="Failed to disable Warehouse"
+                  subject="Copied data cannot be deleted"
                   showErrorPrefix={false}
                   showInstructions={false}
                   hideContactSupport
                   error={{
-                    message:
-                      disableMutation.error.message ===
-                      'Legacy Warehouse data must be retained when disabling Warehouse.'
-                        ? 'This Warehouse uses an older storage setup. Clear “Also delete copied Warehouse data” to disable it and keep the copied data.'
-                        : disableMutation.error.message,
+                    message: 'Turn this option off to disable Warehouse and keep the copied data.',
                   }}
                 />
               </div>

@@ -547,7 +547,11 @@ describe('WarehouseOverviewTab', () => {
 
     fireEvent.click(confirm)
 
-    expect(await within(dialog).findByText('Disable request failed')).toBeInTheDocument()
+    const message = await within(dialog).findByText('Disable request failed')
+    expect(
+      message.compareDocumentPosition(within(dialog).getByRole('checkbox')) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy()
     expect(dialog).toBeVisible()
     expect(confirm).toBeEnabled()
     expect(within(dialog).getByRole('checkbox')).toBeChecked()
@@ -588,8 +592,9 @@ describe('WarehouseOverviewTab', () => {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Disable Warehouse' }))
 
     const message = await within(dialog).findByText(
-      'This Warehouse uses an older storage setup. Clear “Also delete copied Warehouse data” to disable it and keep the copied data.'
+      'Turn this option off to disable Warehouse and keep the copied data.'
     )
+    expect(within(dialog).getByText('Copied data cannot be deleted')).toBeInTheDocument()
     expect(
       checkbox.compareDocumentPosition(message) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy()
