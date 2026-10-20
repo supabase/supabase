@@ -91,7 +91,7 @@ export const ISO_COMPOSITIONS: Record<Topic, IsoComposition> = {
     titleAt: 'top',
     view: 'front',
     boxes: DATABASE_DISKS,
-    fillBoxes: DATABASE_DISKS.slice(1, 2),
+    fillBoxes: DATABASE_DISKS.slice(0, 2),
     nudgeY: -4,
     zoom: 0.805,
   },
