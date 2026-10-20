@@ -45,11 +45,16 @@ const ATTR = {
 // three so both the displayed status and the derived severity are correct
 // for those sources (which would otherwise have an empty status and fall
 // back to their `severity_text` of INFO, classifying every 4xx/5xx as success).
-const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN source = 'auth_logs' THEN log_attributes['status']
-      WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']
-      ELSE ${ATTR.status}
-    END`
+const HTTP_STATUS_EXPR: SafeLogSqlFragment = joinSqlFragments(
+  [
+    safeSql`CASE`,
+    safeSql`WHEN source = 'auth_logs' THEN log_attributes['status']`,
+    safeSql`WHEN source = 'storage_logs' THEN log_attributes['res.statusCode']`,
+    safeSql`ELSE ${ATTR.status}`,
+    safeSql`END`,
+  ],
+  ' '
+)
 
 // storage-service rows expose method/path under `req.method` / `req.url`
 // rather than the gateway's `request.method` / `request.path`.
@@ -85,29 +90,39 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
-const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN source = 'postgrest_logs' THEN 'postgrest'
-      WHEN source = 'storage_logs' THEN 'storage'
-      WHEN source = 'edge_logs' THEN 'edge'
-      WHEN source = 'postgres_logs' THEN 'postgres'
-      WHEN source = 'function_edge_logs' THEN 'edge function'
-      WHEN source = 'auth_logs' THEN 'auth'
-      WHEN source = 'realtime_logs' THEN 'realtime'
-      WHEN source = 'supavisor_logs' THEN 'supavisor'
-      WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
-      WHEN source = 'multigres_logs' THEN 'multigres'
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'compute'
-      ELSE source
-    END`
+const LOG_TYPE_EXPR: SafeLogSqlFragment = joinSqlFragments(
+  [
+    safeSql`CASE`,
+    safeSql`WHEN source = 'postgrest_logs' THEN 'postgrest'`,
+    safeSql`WHEN source = 'storage_logs' THEN 'storage'`,
+    safeSql`WHEN source = 'edge_logs' THEN 'edge'`,
+    safeSql`WHEN source = 'postgres_logs' THEN 'postgres'`,
+    safeSql`WHEN source = 'function_edge_logs' THEN 'edge function'`,
+    safeSql`WHEN source = 'auth_logs' THEN 'auth'`,
+    safeSql`WHEN source = 'realtime_logs' THEN 'realtime'`,
+    safeSql`WHEN source = 'supavisor_logs' THEN 'supavisor'`,
+    safeSql`WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'`,
+    safeSql`WHEN source = 'multigres_logs' THEN 'multigres'`,
+    safeSql`WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN 'compute'`,
+    safeSql`ELSE source`,
+    safeSql`END`,
+  ],
+  ' '
+)
 
 // Status code is sourced from the HTTP response for gateway-style rows, the
 // auth-service `status` attribute for auth rows, and the Postgres
 // `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
-const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
-      WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
-      ELSE toString((${HTTP_STATUS_EXPR}))
-    END`
+const STATUS_EXPR: SafeLogSqlFragment = joinSqlFragments(
+  [
+    safeSql`CASE`,
+    safeSql`WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null`,
+    safeSql`WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])`,
+    safeSql`ELSE toString((${HTTP_STATUS_EXPR}))`,
+    safeSql`END`,
+  ],
+  ' '
+)
 
 const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
 const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITION}, null, ${HTTP_PATH_EXPR})`
@@ -121,16 +136,21 @@ const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${WORKER_LOG_SOURCE_CONDITI
 // `severity_text` of `INFO` regardless of response code) bucket as
 // success/warning/error by status. Postgres-style severity is the
 // fallback for rows without a status code.
-const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
-      WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null
-      WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
-      WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
-      WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
-      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
-      WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
-      WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
-      ELSE 'success'
-    END`
+const LEVEL_EXPR: SafeLogSqlFragment = joinSqlFragments(
+  [
+    safeSql`CASE`,
+    safeSql`WHEN ${WORKER_LOG_SOURCE_CONDITION} THEN null`,
+    safeSql`WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'`,
+    safeSql`WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'`,
+    safeSql`WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'`,
+    safeSql`WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'`,
+    safeSql`WHEN severity_text IN ('WARN','WARNING') THEN 'warning'`,
+    safeSql`WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'`,
+    safeSql`ELSE 'success'`,
+    safeSql`END`,
+  ],
+  ' '
+)
 
 // The `auth_user` column is derived from the source-specific fields that can be attributed to a user.
 const AUTH_USER_EXPR: SafeLogSqlFragment = safeSql`nullIf(CASE
@@ -551,11 +571,13 @@ HAVING value != ''
 `
   }
 
-  const blocks = [scanBlock(['log_type'], whereFor('log_type'))]
+  const blocks: SafeLogSqlFragment[] = []
 
   // A filtered facet gets its own scan so it can exclude its own filter and
   // still count its other values; the rest share the base scan.
   const baseFacets: (keyof typeof VALUE_EXPR)[] = ['total']
+  if (grouped.log_type) blocks.push(scanBlock(['log_type'], whereFor('log_type')))
+  else baseFacets.push('log_type')
   for (const facet of ['level', 'method', 'status'] as const) {
     if (grouped[facet]) blocks.push(scanBlock([facet], whereFor(facet)))
     else baseFacets.push(facet)

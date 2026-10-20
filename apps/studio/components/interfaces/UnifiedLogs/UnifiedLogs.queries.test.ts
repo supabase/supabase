@@ -327,7 +327,10 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
-      const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
+      const sql = getLogsCountQuery({
+        ...withFilters('level:eq:error'),
+        show_connection_logs: false,
+      })
       const scans = sql.split(/\bUNION ALL\b/)
       expect(scans.length).toBeGreaterThan(1)
       for (const scan of scans) {
@@ -336,7 +339,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('applies the edge_* service filters to every count scan so badges match the list', () => {
-      const sql = getLogsCountQuery({ ...baseSearch, edge_postgrest: false } as any)
+      const sql = getLogsCountQuery({ ...withFilters('level:eq:error'), edge_postgrest: false })
       const scans = sql.split(/\bUNION ALL\b/)
       expect(scans.length).toBeGreaterThan(1)
       for (const scan of scans) {
@@ -705,5 +708,35 @@ describe('unified logs source availability', () => {
     expect(sql).toContain('el_in_al.timestamp as timestamp')
     expect(sql).toMatch(/inner join \(\s*edge_logs as el_in_al/)
     expect(sql).not.toMatch(/left join \(\s*edge_logs as el_in_al/)
+  })
+})
+
+describe('unified logs count request size', () => {
+  it.each([[], ['log_type:eq:edge function']])(
+    'keeps filtered count queries compact with log type filters %j',
+    (...logTypeFilters) => {
+      const search = {
+        ...withFilters(...logTypeFilters, 'level:eq:warning', 'event_message:ilike:hello-world'),
+        logTypeVisibility: { compute: true, multigres: true },
+      }
+      const sql = getLogsCountQuery(search)
+      expect(new TextEncoder().encode(sql).length).toBeLessThan(8_000)
+      expect(sql).toContain("IN ('warning')")
+      expect(sql).toContain("event_message ILIKE '%hello-world%'")
+      expect(sql).toContain("THEN 'edge function'")
+    }
+  )
+
+  it('preserves repeated whitespace in filter literals', () => {
+    const sql = getLogsCountQuery(withFilters('event_message:ilike:hello  world\tvalue'))
+    expect(sql).toContain("event_message ILIKE '%hello  world\tvalue%'")
+  })
+
+  it('counts log types in the base scan when no log type filter is selected', () => {
+    const sql = getLogsCountQuery(withFilters('level:eq:warning'))
+    const scans = sql.split(/\bUNION ALL\b/)
+    expect(scans).toHaveLength(2)
+    const totalScan = scans.find((scan) => scan.includes("facet = 'total'")) ?? ''
+    expect(totalScan).toContain("facet = 'log_type'")
   })
 })
