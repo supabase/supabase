@@ -7,6 +7,7 @@ import {
   HeartIcon,
   KeyboardIcon,
   MoreVerticalIcon,
+  TriangleAlertIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -85,6 +86,10 @@ export const UtilityActions = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
+  const [confirmUnsavedChanges, setConfirmUnsavedChanges] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_CONFIRM_UNSAVED_CHANGES,
+    true
+  )
   const [lastSelectedDb, setLastSelectedDb] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref as string),
     ''
@@ -123,14 +128,14 @@ export const UtilityActions = ({
               <Button
                 aria-label="More actions"
                 data-testid="sql-editor-utility-actions"
-                className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
+                className={cn('px-1', isAiOpen ? 'flex 2xl:hidden' : 'hidden')}
                 icon={<MoreVerticalIcon className="text-foreground-light" />}
               />
             </DropdownMenuTrigger>
           </TooltipTrigger>
           <TooltipContent side="bottom">More actions</TooltipContent>
         </Tooltip>
-        <DropdownMenuContent className="w-48">
+        <DropdownMenuContent className="w-56">
           <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
             <span className="flex items-center gap-x-2">
               <KeyboardIcon size={14} className="text-foreground-light" />
@@ -138,6 +143,18 @@ export const UtilityActions = ({
             </span>
             {intellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
           </DropdownMenuItem>
+          {isManualSaveEnabled && (
+            <DropdownMenuItem
+              className="justify-between"
+              onClick={() => setConfirmUnsavedChanges(!confirmUnsavedChanges)}
+            >
+              <span className="flex items-center gap-x-2">
+                <TriangleAlertIcon size={14} className="text-foreground-light" />
+                Confirm on discard
+              </span>
+              {confirmUnsavedChanges && <CheckIcon className="text-primary" size={16} />}
+            </DropdownMenuItem>
+          )}
           {IS_PLATFORM && (
             <>
               <DropdownMenuSeparator />
@@ -183,18 +200,33 @@ export const UtilityActions = ({
                 <Button
                   variant="text"
                   className="px-1"
-                  icon={<KeyboardIcon className="text-foreground-light" />}
-                  aria-label="Enable Intellisense"
+                  icon={<MoreVerticalIcon className="text-foreground-light" />}
+                  aria-label="More actions"
                 />
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent side="bottom">Enable Intellisense</TooltipContent>
+            <TooltipContent side="bottom">More actions</TooltipContent>
           </Tooltip>
-          <DropdownMenuContent className="w-48">
+          <DropdownMenuContent className="w-56">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
-              Intellisense enabled
+              <span className="flex items-center gap-x-2">
+                <KeyboardIcon size={14} className="text-foreground-light" />
+                Intellisense enabled
+              </span>
               {intellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
             </DropdownMenuItem>
+            {isManualSaveEnabled && (
+              <DropdownMenuItem
+                className="justify-between"
+                onClick={() => setConfirmUnsavedChanges(!confirmUnsavedChanges)}
+              >
+                <span className="flex items-center gap-x-2">
+                  <TriangleAlertIcon size={14} className="text-foreground-light" />
+                  Confirm on discard
+                </span>
+                {confirmUnsavedChanges && <CheckIcon className="text-primary" size={16} />}
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
