@@ -1,7 +1,10 @@
 ---
+import { getCollection } from 'astro:content'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
+import { toSummary, toTroubleshootingSummary } from '../lib/guides'
+import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
 import { serializeJsonLd } from '../lib/json-ld'
 
@@ -12,6 +15,11 @@ interface Props {
 }
 
 const { title, description, jsonLd } = Astro.props
+// the nav lists only topics with entries
+const navTopics = getListedTopics({
+	guides: (await getCollection('guides')).map(toSummary),
+	troubleshooting: (await getCollection('troubleshooting')).map(toTroubleshootingSummary),
+}).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 ---
 
@@ -56,7 +64,7 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 	</head>
 	<body>
 		<div class="sticky top-0 z-40">
-			<Header client:load />
+			<Header client:load topics={navTopics} />
 		</div>
 		<main>
 			<slot />

@@ -2,7 +2,8 @@ import { Menu } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Button } from 'ui'
 
-import { SIGN_UP_URL } from '../lib/nav'
+import { getNavMenus, SIGN_UP_URL } from '../lib/nav'
+import type { Topic } from '../lib/topics'
 import { HeaderMenu } from './HeaderMenu'
 import { Logo } from './Logo'
 import { MobileMenu } from './MobileMenu'
@@ -10,7 +11,12 @@ import { Nav } from './Nav'
 
 const MOBILE_MENU_ID = 'mobile-menu'
 
-export const Header = () => {
+export interface HeaderProps {
+  topics: Topic[]
+}
+
+export const Header = ({ topics }: HeaderProps) => {
+  const menus = getNavMenus(topics)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -32,7 +38,7 @@ export const Header = () => {
             <div className="lg:w-[calc(var(--nav-inset)-0.625rem-1px)]">
               <Logo />
             </div>
-            <Nav className="hidden lg:flex" />
+            <Nav menus={menus} className="hidden lg:flex" />
           </div>
           <div className="flex items-center gap-2">
             <Button variant="primary" asChild className="hidden lg:inline-flex">
@@ -54,7 +60,12 @@ export const Header = () => {
         </div>
       </nav>
       {isMenuOpen ? (
-        <MobileMenu id={MOBILE_MENU_ID} onClose={handleMenuClose} className="lg:hidden" />
+        <MobileMenu
+          id={MOBILE_MENU_ID}
+          menus={menus}
+          onClose={handleMenuClose}
+          className="lg:hidden"
+        />
       ) : null}
     </>
   )

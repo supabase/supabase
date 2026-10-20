@@ -12,9 +12,10 @@ import {
   NavigationMenuViewport,
 } from 'ui'
 
-import { NAV_MENUS, type NavMenu } from '../lib/nav'
+import type { NavMenu } from '../lib/nav'
 
 export interface NavProps {
+  menus: NavMenu[]
   className?: string
 }
 
@@ -22,9 +23,8 @@ interface MenuPanelProps {
   menu: NavMenu
 }
 
-const MENU_LABELS = NAV_MENUS.map((menu) => menu.label)
-
-export const Nav = ({ className }: NavProps) => {
+export const Nav = ({ menus, className }: NavProps) => {
+  const menuLabels = menus.map((menu) => menu.label)
   const [activeMenu, setActiveMenu] = useState('')
   const [visibleMenu, setVisibleMenu] = useState('')
   const [isSwitching, setIsSwitching] = useState(false)
@@ -37,7 +37,7 @@ export const Nav = ({ className }: NavProps) => {
 
   const sideOf = (label: string) => {
     if (label === visibleMenu) return 'active'
-    return MENU_LABELS.indexOf(label) < MENU_LABELS.indexOf(visibleMenu) ? 'start' : 'end'
+    return menuLabels.indexOf(label) < menuLabels.indexOf(visibleMenu) ? 'start' : 'end'
   }
 
   return (
@@ -49,7 +49,7 @@ export const Nav = ({ className }: NavProps) => {
       className={cn('relative h-full items-stretch', className)}
     >
       <NavigationMenuList className="h-full items-stretch space-x-0">
-        {NAV_MENUS.map((menu) => (
+        {menus.map((menu) => (
           <NavigationMenuItem key={menu.label} value={menu.label} className="text-sm font-medium">
             <NavigationMenuTrigger
               className={cn(

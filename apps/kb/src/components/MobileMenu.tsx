@@ -2,17 +2,18 @@ import { X } from 'lucide-react'
 import { type KeyboardEvent } from 'react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, cn } from 'ui'
 
-import { NAV_MENUS, SIGN_UP_URL } from '../lib/nav'
+import { SIGN_UP_URL, type NavMenu } from '../lib/nav'
 import { revealStyle } from '../lib/reveal'
 import { Logo } from './Logo'
 
 export interface MobileMenuProps {
   id: string
+  menus: NavMenu[]
   onClose: () => void
   className?: string
 }
 
-export const MobileMenu = ({ id, onClose, className }: MobileMenuProps) => {
+export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Escape') onClose()
     if (event.key !== 'Tab') return
@@ -68,7 +69,7 @@ export const MobileMenu = ({ id, onClose, className }: MobileMenuProps) => {
       </div>
       <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4">
         <Accordion type="multiple">
-          {NAV_MENUS.map((menu, index) => (
+          {menus.map((menu, index) => (
             <AccordionItem
               key={menu.label}
               value={menu.label}

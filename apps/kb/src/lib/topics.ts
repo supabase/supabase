@@ -89,6 +89,11 @@ export type Topic = (typeof TOPICS)[number]['name']
 
 type ContentCollection = 'guides' | 'troubleshooting'
 
+interface ListedTopicsParams {
+  guides: { topics: readonly string[] }[]
+  troubleshooting: { topics: readonly string[] }[]
+}
+
 interface IsInTopicParams {
   collection: ContentCollection
   topics: readonly string[]
@@ -118,6 +123,19 @@ export const isInTopic = ({ collection, topics, topic }: IsInTopicParams): boole
   if (topic === 'Troubleshooting') return true
   return !FORMAT_TOPICS.includes(topic) && topics.includes(topic)
 }
+
+// visible topics with at least one entry. the nav and the homepage only link to these
+export const getListedTopics = ({ guides, troubleshooting }: ListedTopicsParams) =>
+  TOPICS.filter(
+    (topic) =>
+      topic.visible &&
+      (guides.some((guide) =>
+        isInTopic({ collection: 'guides', topics: guide.topics, topic: topic.name })
+      ) ||
+        troubleshooting.some((entry) =>
+          isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
+        ))
+  )
 
 // federated collections tag with their own vocabulary, which may not match kb's topics
 export const isKnownTopic = (topic: string): topic is Topic =>

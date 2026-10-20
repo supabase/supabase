@@ -1,4 +1,4 @@
-import { FORMAT_TOPICS, TOPICS, topicToSlug, type Topic } from './topics'
+import { FORMAT_TOPICS, topicToSlug, type Topic } from './topics'
 
 interface NavLink {
   label: string
@@ -17,26 +17,25 @@ export interface NavMenu {
 
 export const SIGN_UP_URL = 'https://supabase.com/dashboard/sign-up'
 
-const VISIBLE_TOPICS = TOPICS.filter((topic) => topic.visible).map((topic) => topic.name)
-
 const toTopicLink = (topic: Topic): NavLink => ({
   label: topic,
   href: `${import.meta.env.BASE_URL}/topics/${topicToSlug(topic)}`,
 })
 
-export const NAV_MENUS: NavMenu[] = [
+// topics come from getListedTopics, so the menu only links to topics with entries
+export const getNavMenus = (topics: Topic[]): NavMenu[] => [
   {
     label: 'Topics',
     groups: [
       {
         label: 'By category',
-        links: VISIBLE_TOPICS.filter((topic) => FORMAT_TOPICS.includes(topic)).map(toTopicLink),
+        links: topics.filter((topic) => FORMAT_TOPICS.includes(topic)).map(toTopicLink),
       },
       {
         label: 'By feature',
-        links: VISIBLE_TOPICS.filter((topic) => !FORMAT_TOPICS.includes(topic)).map(toTopicLink),
+        links: topics.filter((topic) => !FORMAT_TOPICS.includes(topic)).map(toTopicLink),
       },
-    ],
+    ].filter((group) => group.links.length > 0),
   },
   {
     label: 'Resources',
