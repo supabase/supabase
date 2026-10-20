@@ -3,8 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { selfHostedSupabaseAdmin as supabase } from '@/lib/api/self-hosted-admin'
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+const route = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+export default route
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
