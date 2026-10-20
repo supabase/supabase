@@ -112,7 +112,7 @@ export function LogDrainsList({
           <TableBody>
             {logDrains
               ?.slice()
-              .sort((a, b) => b.id - a.id)
+              .sort((a, b) => a.name.localeCompare(b.name))
               .map((drain) => (
                 <TableRow key={drain.id}>
                   <TableCell className="font-medium truncate max-w-72" title={drain.name}>
