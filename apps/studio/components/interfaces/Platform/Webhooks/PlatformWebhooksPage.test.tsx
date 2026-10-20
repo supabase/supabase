@@ -61,6 +61,23 @@ const ENDPOINT_ATTRIBUTES: EndpointResource['attributes'] = {
   created_at: '2026-02-18T11:23:00.000Z',
 }
 
+const DELIVERY_ATTRIBUTES: DeliveryResource['attributes'] = {
+  id: DELIVERY_ID,
+  attempt_timestamp: '2026-02-27T08:04:00.000Z',
+  error_code: null,
+  error_message: null,
+  event: {
+    type: 'v1.project.paused',
+    timestamp: '2026-02-27T08:04:00.000Z',
+    payload: { organization_slug: 'test-org', project_ref: null },
+  },
+  event_id: 'evt_1',
+  response_body: null,
+  response_code: 500,
+  response_headers: {},
+  status: 'failure',
+}
+
 const renderPage = (endpointId?: string) =>
   customRender(<PlatformWebhooksPage scope="project" endpointId={endpointId} />)
 
@@ -283,21 +300,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
 
   test('retries a failed delivery', async () => {
     mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
-    mockDeliveriesList([
-      {
-        id: DELIVERY_ID,
-        type: 'delivery',
-        attributes: {
-          id: DELIVERY_ID,
-          attempt_timestamp: '2026-02-27T08:04:00.000Z',
-          event_id: 'evt_1',
-          response_body: null,
-          response_code: 500,
-          response_headers: null,
-          status: 'failure',
-        },
-      },
-    ])
+    mockDeliveriesList([{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }])
 
     let retryCalled = false
     addAPIMock({
@@ -321,21 +324,7 @@ describe('PlatformWebhooksPage (project scope)', () => {
 
   test('shows a friendly message when retry hits the rate limit', async () => {
     mockEndpointsList([{ id: ENDPOINT_ID, type: 'endpoint', attributes: ENDPOINT_ATTRIBUTES }])
-    mockDeliveriesList([
-      {
-        id: DELIVERY_ID,
-        type: 'delivery',
-        attributes: {
-          id: DELIVERY_ID,
-          attempt_timestamp: '2026-02-27T08:04:00.000Z',
-          event_id: 'evt_1',
-          response_body: null,
-          response_code: 500,
-          response_headers: null,
-          status: 'failure',
-        },
-      },
-    ])
+    mockDeliveriesList([{ id: DELIVERY_ID, type: 'delivery', attributes: DELIVERY_ATTRIBUTES }])
 
     addAPIMock({
       method: 'post',
