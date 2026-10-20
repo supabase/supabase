@@ -163,7 +163,7 @@ export const ActivityRow = ({
       origin,
     })
 
-    const toastId = toast.loading(`Cancelling query (ID: ${activity.pid})`)
+    const toastId = toast.loading(`Canceling query (ID: ${activity.pid})`)
     try {
       await cancelQuery({
         pid: activity.pid,
@@ -171,7 +171,7 @@ export const ActivityRow = ({
         projectRef: project?.ref,
         connectionString: project?.connectionString,
       })
-      toast.success(`Successfully cancelled query (ID: ${activity.pid})`, { id: toastId })
+      toast.success(`Successfully canceled query (ID: ${activity.pid})`, { id: toastId })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
       toast.error(`Failed to cancel query: ${errorMessage}`, { id: toastId })
@@ -497,7 +497,7 @@ export const ActivityRow = ({
                 type="warning"
                 className="border-x-0 rounded-none border-t-0"
                 title="This session is currently running a query"
-                description="Cancelling it may solve the problem without closing the connection."
+                description="Canceling it may solve the problem without closing the connection."
               />
             )}
             <AlertDialogDescription>

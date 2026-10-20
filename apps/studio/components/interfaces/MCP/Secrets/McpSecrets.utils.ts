@@ -69,7 +69,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
 
     case 'cancelled':
       return {
-        title: 'This request was cancelled',
+        title: 'This request was canceled',
         subtitle: 'Nothing was stored.',
         calloutTitle: 'Next step',
         calloutBody: 'Ask your agent to run the tool again if you still need to store the key.',
