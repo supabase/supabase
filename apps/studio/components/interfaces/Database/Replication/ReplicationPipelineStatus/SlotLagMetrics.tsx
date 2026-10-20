@@ -18,24 +18,25 @@ export interface SlotLagField {
 export const SLOT_LAG_FIELDS: SlotLagField[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    // A zero here describes ongoing replication; table copies have their own slots.
     label: 'Lag',
     type: 'bytes',
     description:
-      'WAL available for replication but not yet acknowledged on the pipeline’s main slot, including unrelated database activity; initial sync progress is shown separately',
+      'WAL available for replication but not yet acknowledged on the pipeline’s main slot, including unrelated database activity; initial sync progress is shown separately.',
+    // A zero confirmed_flush_lsn_bytes means ongoing replication is caught up.
+    // Initial table copies use separate slots.
     zeroLabel: 'Caught up',
   },
   {
     key: 'safe_wal_size_bytes',
     label: 'WAL retention remaining',
     type: 'bytes',
-    description: 'How much more WAL can accumulate before the slot risks losing changes',
+    description: 'How much more WAL can accumulate before the slot risks losing changes.',
   },
   {
     key: 'reply_time_lag',
     label: 'Last check-in',
     type: 'duration',
-    description: 'Time since the pipeline last checked in with the source database',
+    description: 'Time since the pipeline last checked in with the source database.',
     zeroLabel: 'Just now',
     // reply_time_lag is "milliseconds ago", so the absolute time is now minus that, in local time.
     getValueTooltip: (ms) => dayjs().subtract(ms, 'millisecond').format('MMM D, YYYY, h:mm:ss A'),
