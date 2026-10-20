@@ -1,4 +1,7 @@
-import enabledFeaturesRaw from './enabled-features.json' with { type: 'json' }
+// Plain JSON import on purpose. `with { type: 'json' }` binds www's ambient
+// `declare module '*.json'` (typed as `any`) under TS 7.1, and `keyof any`
+// includes `number`, which breaks `SnakeToCamelCase`.
+import enabledFeaturesRaw from './enabled-features.json'
 
 const enabledFeaturesStaticObj = enabledFeaturesRaw as Omit<typeof enabledFeaturesRaw, '$schema'>
 
