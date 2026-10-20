@@ -28,9 +28,9 @@ const LINES: Array<Array<CodeToken>> = [
     [' ', 's-f'],
     ['createClient', 's-u'],
     ['(', 's-p'],
-    ['supabaseUrl', 's-v'],
+    ["'https://your-project-id.supabase.co'", 's-s'],
     [', ', 's-p'],
-    ['supabaseKey', 's-v'],
+    ["'sb_publishable_...'", 's-s'],
     [')', 's-p'],
   ],
   [
