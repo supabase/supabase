@@ -3,9 +3,11 @@ import { getCatalogPartner, listCatalogPartnerSlugs } from '~/lib/marketplaceDb'
 import type { ListingDetail } from '~/types/partners'
 import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import type { Metadata } from 'next'
+import { unstable_cache } from 'next/cache'
 import { serialize } from 'next-mdx-remote-client/serialize'
 import { notFound } from 'next/navigation'
-import { cache, Suspense } from 'react'
+import { connection } from 'next/server'
+import { cache } from 'react'
 import remarkGfm from 'remark-gfm'
 
 import PartnerCatalogDetail from './PartnerCatalogDetail'
@@ -14,8 +16,35 @@ export const revalidate = 1800
 
 type Params = { slug: string }
 
-// Deduplicate the DB call across generateMetadata and the page component.
-const getPartner = cache(getCatalogPartner)
+const getPartner = cache(
+  unstable_cache(getCatalogPartner, ['partner-catalog-partner'], { revalidate })
+)
+
+const serializeListing = unstable_cache(
+  async (source: string) => {
+    const codeHikeOptions: CodeHikeConfig = {
+      theme: codeHikeTheme,
+      lineNumbers: true,
+      showCopyButton: true,
+      skipLanguages: [],
+      autoImport: false,
+    }
+    const result = await serialize({
+      source,
+      options: {
+        mdxOptions: {
+          remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+        },
+      },
+    })
+
+    return 'error' in result
+      ? { ...result, error: { name: result.error.name, message: result.error.message } }
+      : result
+  },
+  ['partner-catalog-mdx', JSON.stringify(codeHikeTheme)],
+  { revalidate }
+)
 
 export async function generateStaticParams() {
   const slugs = await listCatalogPartnerSlugs()
@@ -39,17 +68,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 export default async function PartnerCatalogPage({ params }: { params: Promise<Params> }) {
+  await connection()
   const { slug } = await params
   const partner = await getPartner(slug)
   if (!partner) notFound()
-
-  const codeHikeOptions: CodeHikeConfig = {
-    theme: codeHikeTheme,
-    lineNumbers: true,
-    showCopyButton: true,
-    skipLanguages: [],
-    autoImport: false,
-  }
 
   const listingsForTabs: ListingDetail[] = partner.listings?.length
     ? partner.listings
@@ -67,21 +89,8 @@ export default async function PartnerCatalogPage({ params }: { params: Promise<P
       ]
 
   const serializedListings = await Promise.all(
-    listingsForTabs.map((listing) =>
-      serialize({
-        source: listing.content,
-        options: {
-          mdxOptions: {
-            remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
-          },
-        },
-      })
-    )
+    listingsForTabs.map((listing) => serializeListing(listing.content))
   )
 
-  return (
-    <Suspense>
-      <PartnerCatalogDetail partner={partner} serializedListings={serializedListings} />
-    </Suspense>
-  )
+  return <PartnerCatalogDetail partner={partner} serializedListings={serializedListings} />
 }

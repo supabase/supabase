@@ -5,18 +5,21 @@ import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from 'u
 import type { CustomOptionProps } from 'ui-patterns/FilterBar'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  useProjectsInfiniteQuery,
-  type ProjectInfoInfinite,
-} from '@/data/projects/projects-infinite-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-query'
+
+type AuditLogsProject = { ref: string; name: string }
 
 interface AuditLogsProjectOptionProps extends CustomOptionProps {
-  onSelectProject: (project: ProjectInfoInfinite) => void
+  // Scopes the list to an organization's projects, otherwise lists all of the user's projects
+  slug?: string
+  onSelectProject: (project: AuditLogsProject) => void
 }
 
 // Select-only project list for the FilterBar. The stored value is the project ref, while the
 // chip shows the name through the property's `formatValue`.
 export const AuditLogsProjectOption = ({
+  slug,
   onChange,
   onSelectProject,
 }: AuditLogsProjectOptionProps) => {
@@ -25,8 +28,17 @@ export const AuditLogsProjectOption = ({
 
   const [sentinelRef, entry] = useIntersectionObserver({ threshold: 0, rootMargin: '0px' })
 
+  const isOrgScoped = !!slug
+  const variables = { search: search.length === 0 ? search : debouncedSearch }
+  const accountQuery = useProjectsInfiniteQuery(variables, {
+    placeholderData: keepPreviousData,
+    enabled: !isOrgScoped,
+  })
+  const orgQuery = useOrgProjectsInfiniteQuery(
+    { slug, ...variables },
+    { placeholderData: keepPreviousData, enabled: isOrgScoped }
+  )
   const {
-    data,
     error,
     isLoading,
     isError,
@@ -35,11 +47,16 @@ export const AuditLogsProjectOption = ({
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useProjectsInfiniteQuery(
-    { search: search.length === 0 ? search : debouncedSearch },
-    { placeholderData: keepPreviousData }
+  } = isOrgScoped ? orgQuery : accountQuery
+  const accountProjects = useMemo(
+    () => accountQuery.data?.pages.flatMap((page) => page.projects) ?? [],
+    [accountQuery.data?.pages]
   )
-  const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) ?? [], [data?.pages])
+  const orgProjects = useMemo(
+    () => orgQuery.data?.pages.flatMap((page) => page.projects) ?? [],
+    [orgQuery.data?.pages]
+  )
+  const projects: AuditLogsProject[] = isOrgScoped ? orgProjects : accountProjects
 
   useEffect(() => {
     if (entry?.isIntersecting && hasNextPage && !isFetching && !isFetchingNextPage) {
@@ -47,7 +64,7 @@ export const AuditLogsProjectOption = ({
     }
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, fetchNextPage])
 
-  const handleSelect = (project: ProjectInfoInfinite) => {
+  const handleSelect = (project: AuditLogsProject) => {
     onSelectProject(project)
     onChange(project.ref)
   }
@@ -105,12 +122,14 @@ export const AuditLogsProjectOption = ({
 }
 
 // FilterBar invokes `component(props)` as a plain function, so this factory returns that function
-// with `onSelectProject` bound, keeping the component itself defined at module level.
+// with `onSelectProject` (and optionally `slug`) bound, keeping the component itself defined at
+// module level.
 export const createAuditLogsProjectOption = (
-  onSelectProject: AuditLogsProjectOptionProps['onSelectProject']
+  onSelectProject: AuditLogsProjectOptionProps['onSelectProject'],
+  slug?: string
 ) => {
   const renderProjectOption = (props: CustomOptionProps) => (
-    <AuditLogsProjectOption {...props} onSelectProject={onSelectProject} />
+    <AuditLogsProjectOption {...props} slug={slug} onSelectProject={onSelectProject} />
   )
   return renderProjectOption
 }
