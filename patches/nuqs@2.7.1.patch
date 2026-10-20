@@ -1,0 +1,23 @@
+diff --git a/dist/reset-queues.d.ts b/dist/reset-queues.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..906a47402d83baaa52949ed8c52aa6d25417c321
+--- /dev/null
++++ b/dist/reset-queues.d.ts
+@@ -0,0 +1 @@
++export function resetQueues(): void
+diff --git a/package.json b/package.json
+index f99d91fcb48c49c089d09226e0bcdb8a99ec2d91..de63d4fc27e7df079c54749651d5eace30b1f840 100644
+--- a/package.json
++++ b/package.json
+@@ -71,6 +71,11 @@
+       "import": "./dist/testing.js",
+       "default": "./dist/testing.js"
+     },
++    "./reset-queues": {
++      "types": "./dist/reset-queues.d.ts",
++      "import": "./dist/reset-BTX7WJGF.js",
++      "default": "./dist/reset-BTX7WJGF.js"
++    },
+     "./adapters/react": {
+       "types": "./dist/adapters/react.d.ts",
+       "import": "./dist/adapters/react.js",

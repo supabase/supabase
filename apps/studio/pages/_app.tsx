@@ -62,6 +62,7 @@ import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 import { TimezoneProvider, useTimezone } from '@/lib/datetime'
+import { NuqsTraverseQueueReset } from '@/lib/nuqs-queue-on-traverse'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
@@ -198,6 +199,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
         <NuqsAdapter>
+          <NuqsTraverseQueueReset />
           <HydrationBoundary state={pageProps.dehydratedState}>
             <AuthProvider>
               <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
