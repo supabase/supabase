@@ -1,5 +1,5 @@
 @import 'config/tailwind.config.css';
-@import 'config/prose-code-legacy.css';
+@import 'config/inline-code.css';
 
 @source '../app/**/*.{js,ts,jsx,tsx}';
 @source '../components/**/*.{js,ts,jsx,tsx}';
