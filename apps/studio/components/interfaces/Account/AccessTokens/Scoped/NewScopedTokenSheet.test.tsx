@@ -25,6 +25,10 @@ vi.mock('common', async (importOriginal) => {
 const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 
+// Each test mounts the full sheet and walks several async steps. That takes ~1s on an idle
+// machine but approaches the default 5s limit when CI workers are saturated.
+vi.setConfig({ testTimeout: 15_000 })
+
 const user = userEvent.setup({
   writeToClipboard: true,
 })

@@ -8,7 +8,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'
 import { MEMBERS_GRID_CLASS, type MfaFilter } from './MembersList.constants'
-import { getMemberRowHeight, matchesMfaFilter } from './TeamSettings.utils'
+import { getMemberRowHeight, matchesMfaFilter, matchesOrgRole } from './TeamSettings.utils'
 import { TeamSettingsDataProvider } from './TeamSettingsDataContext'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 import { AlertError } from '@/components/ui/AlertError'
@@ -23,7 +23,6 @@ import {
   type OrganizationMember,
 } from '@/data/organizations/organization-members-query'
 import { usePermissionsQuery } from '@/data/permissions/permissions-query'
-import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useProfile } from '@/lib/profile'
@@ -37,9 +36,16 @@ const getMemberKey = (member: OrganizationMember) =>
 export interface MembersViewProps {
   searchString: string
   mfaFilter: MfaFilter
+  roleNames: string[]
+  totalNumOrgProjects: number
 }
 
-export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
+export const MembersView = ({
+  searchString,
+  mfaFilter,
+  roleNames,
+  totalNumOrgProjects,
+}: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
 
@@ -67,12 +73,6 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
     slug,
   })
 
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const orgProjects = useMemo(
-    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
-    [projectsData?.pages]
-  )
-
   const filteredMembers = useMemo(() => {
     const searchedMembers = !searchString
       ? members
@@ -88,8 +88,14 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
           return false
         })
 
-    return searchedMembers.filter((member) => matchesMfaFilter(member, mfaFilter))
-  }, [members, searchString, mfaFilter])
+    const roleIds = (roles?.org_scoped_roles ?? [])
+      .filter((role) => roleNames.includes(role.name))
+      .map((role) => role.id)
+
+    return searchedMembers.filter(
+      (member) => matchesMfaFilter(member, mfaFilter) && matchesOrgRole(member, roleIds)
+    )
+  }, [members, searchString, mfaFilter, roleNames, roles?.org_scoped_roles])
 
   const handleManageAccess = useCallback((member: OrganizationMember) => {
     setMemberForRoleUpdate(member)
@@ -131,7 +137,7 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
     [listedMembers]
   )
 
-  const isFiltering = searchString.length > 0 || mfaFilter !== 'all'
+  const isFiltering = searchString.length > 0 || mfaFilter !== 'all' || roleNames.length > 0
   const hasLimitedVisibility = isSuccessRoles && isSuccessMembers && !isOrgScopedRole
 
   return (
@@ -139,8 +145,8 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
       members={members}
       roles={roles}
       isLoadingRoles={isLoadingRoles}
-      orgProjects={orgProjects}
       permissions={permissions}
+      totalNumOrgProjects={totalNumOrgProjects}
       selectedOrganization={selectedOrganization}
       organizationMembersDeletionEnabled={organizationMembersDeletionEnabled}
       onManageAccess={handleManageAccess}
@@ -206,12 +212,12 @@ export const MembersView = ({ searchString, mfaFilter }: MembersViewProps) => {
                 <p className="text-foreground-lighter text-sm">
                   {searchString.length > 0
                     ? `No members matched the search query "${searchString}"`
-                    : 'No members match the selected MFA filter'}
+                    : 'No members match the selected filters'}
                 </p>
               </div>
             )}
 
-            <div className="px-4 py-3 text-sm text-foreground-muted border-t">
+            <div aria-live="polite" className="px-4 py-3 text-sm text-foreground-muted border-t">
               {isFiltering
                 ? `${filteredMembers.length} of ${members.length} ${members.length === 1 ? 'member' : 'members'}`
                 : `${members.length || 0} ${members.length === 1 ? 'member' : 'members'}`}

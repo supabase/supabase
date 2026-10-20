@@ -30,6 +30,8 @@
   "get_storage_config": [["storage_config_read"]],
   "update_storage_config": [["storage_config_write"]],
   "list_storage_buckets": [["storage_read"]],
+  "list_notebooks": [["project_notebooks_read"]],
+  "get_notebook": [["project_notebooks_read"]],
   "get_cost": [["organization_admin_read", "projects_read"]],
   "confirm_cost": [[]],
   "search_docs": [[]]

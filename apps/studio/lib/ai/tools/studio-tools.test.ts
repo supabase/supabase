@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createUpdateOptInLevelInputSchema, getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
+import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
@@ -189,14 +189,14 @@ describe('ai/tools/studio-tools', () => {
         {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
-          sql: 'SELECT email FROM users',
+          sql: 'SELECT email FROM users limit 101;',
         },
         undefined,
         undefined
       )
-      expect(result).toEqual({ rows, optInLevel: 'schema' })
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
-        type: 'text',
+        type: 'json',
         value: NO_DATA_PERMISSIONS,
       })
     })
@@ -226,15 +226,103 @@ describe('ai/tools/studio-tools', () => {
         {
           projectRef: 'test-project',
           connectionString: 'encrypted-connection-string',
-          sql: 'SELECT email FROM users',
+          sql: 'SELECT email FROM users limit 101;',
         },
         undefined,
         undefined
       )
-      expect(result).toEqual({ rows, optInLevel: 'schema_and_log_and_data' })
+      expect(result).toEqual({ rows, totalRows: 1, optInLevel: 'schema_and_log_and_data' })
       expect((tools.execute_sql as any).toModelOutput({ output: result })).toEqual({
         type: 'json',
         value: rows,
+      })
+    })
+
+    it('should push a row limit into read queries but leave write queries untouched', async () => {
+      vi.mocked(executeSql).mockResolvedValue({ result: [] })
+      const tools = getStudioTools({ projectRef: 'test-project' })
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const options = { toolCallId: 'test', messages: [], context: {} }
+      const base = { label: 'Query', chartConfig: { view: 'table' as const } }
+
+      await tools.execute_sql.execute(
+        { ...base, sql: 'SELECT * FROM users', isWriteQuery: false },
+        options
+      )
+      await tools.execute_sql.execute(
+        { ...base, sql: 'SELECT cron.schedule(1)', isWriteQuery: true },
+        options
+      )
+
+      const sqls = vi.mocked(executeSql).mock.calls.map(([vars]) => vars.sql)
+      expect(sqls).toEqual(['SELECT * FROM users limit 101;', 'SELECT cron.schedule(1)'])
+    })
+
+    it('should cap rows and say the total is unknown when the limit ran in the database', async () => {
+      const rows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      const truncatedOutput = {
+        rows: rows.slice(0, 100),
+        hasMoreRows: true as const,
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(truncatedOutput)
+      const modelOutput = await tools.execute_sql.toModelOutput?.({
+        toolCallId: 'test',
+        input,
+        output: truncatedOutput,
+      })
+      expect(modelOutput).toMatchObject({
+        type: 'json',
+        value: { rows: rows.slice(0, 100), note: expect.stringContaining('more than 100 rows') },
+      })
+      expect(JSON.stringify(modelOutput)).toContain('Do not state a specific total')
+    })
+
+    it('should report the real total when the query could not be limited in the database', async () => {
+      const rows = Array.from({ length: 150 }, (_, i) => ({ id: i }))
+      vi.mocked(executeSql).mockResolvedValue({ result: rows })
+      const tools = getStudioTools({ aiOptInLevel: 'schema_and_log_and_data' })
+      const input = {
+        sql: 'SELECT id FROM users; SELECT id FROM users',
+        label: 'Get ids',
+        chartConfig: { view: 'table' as const },
+        isWriteQuery: false,
+      }
+
+      if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+      const result = await tools.execute_sql.execute(input, {
+        toolCallId: 'test',
+        messages: [],
+        context: {},
+      })
+
+      const output = {
+        rows: rows.slice(0, 100),
+        totalRows: 150,
+        optInLevel: 'schema_and_log_and_data' as const,
+      }
+      expect(result).toEqual(output)
+      expect(
+        await tools.execute_sql.toModelOutput?.({ toolCallId: 'test', input, output })
+      ).toEqual({
+        type: 'json',
+        value: { rows: rows.slice(0, 100), note: 'Only the first 100 of 150 rows are included.' },
       })
     })
 
