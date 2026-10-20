@@ -230,7 +230,7 @@ If restore fails with extension errors, check that errors are only extension-rel
 
 #### Update statistics (important)
 
-After the restore completes, run `vacuum analyze` before sending application traffic to the new database. Allow time and I/O capacity for these operations; vacuuming can also generate write-ahead log (WAL) data.
+After the restore completes, run `VACUUM ANALYZE` before sending application traffic to the new database. Allow time and I/O capacity for these operations; vacuuming can also generate write-ahead log (WAL) data.
 
 `analyze` collects statistics for the query planner. `vacuum` updates the [visibility map](https://www.postgresql.org/docs/current/storage-vm.html), which helps index-only scans avoid fetching table rows. Importing planner statistics does not recreate the source database's visibility map.
 
