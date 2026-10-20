@@ -5,7 +5,7 @@ import { useFlag, useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { SonnerProgress } from 'ui'
+import { SonnerProgress, StatusIcon } from 'ui'
 
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -702,7 +702,10 @@ export const SidePanelEditor = ({
                 }
               )
 
-              toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+              toast.success(`Table ${table.name} is good to go!`, {
+                id: toastId,
+                icon: <StatusIcon variant="default" />,
+              })
 
               onTableCreated(table)
             } catch (error) {
@@ -879,6 +882,7 @@ export const SidePanelEditor = ({
     })
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
+      icon: <StatusIcon variant="default" />,
     })
     resolve()
     snap.closeSidePanel()
