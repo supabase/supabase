@@ -833,7 +833,7 @@ export const SidePanelEditor = ({
               progress={progress}
               message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
             />,
-            { id: toastId }
+            { id: toastId, icon: null }
           )
         },
       })
@@ -861,7 +861,7 @@ export const SidePanelEditor = ({
                 selectedTable.name
               }`}
             />,
-            { id: toastId }
+            { id: toastId, icon: null }
           )
         },
       })

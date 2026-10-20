@@ -5,6 +5,8 @@ import { Button, Progress } from 'ui'
 export default function SonnerUpload() {
   const uploadPromise = (files: number, toastId: number) => {
     toast.loading(<UploadContent progress={0} files={files} />, {
+      // Important, set icon to null to avoid having the default loading icon as we display it ourselves in UploadContent
+      icon: null,
       id: toastId,
     })
 
@@ -27,7 +29,7 @@ export default function SonnerUpload() {
         toast.loading(<UploadContent progress={currentProgress} files={files} />, {
           id: toastId,
         })
-      }, 200) // Adjust the interval time as needed
+      }, 2000) // Adjust the interval time as needed
     })
   }
 
