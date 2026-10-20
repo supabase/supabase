@@ -88,7 +88,7 @@ export const MobileMenu = ({ id, menus, onClose, className }: MobileMenuProps) =
               value={menu.label}
               style={revealStyle(index)}
               className={cn(
-                'border-b transition-[opacity,translate] duration-250 ease-out',
+                'border-b transition duration-250 ease-out',
                 'delay-[calc(var(--reveal-index)*50ms)] motion-reduce:transition-none',
                 'starting:translate-y-2.5 starting:opacity-0'
               )}

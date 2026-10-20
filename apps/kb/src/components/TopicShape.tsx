@@ -126,7 +126,7 @@ export const TopicShape = ({ topic, layer, className }: TopicShapeProps) => {
               y2={y2}
               pathLength={1}
               style={{ animationDelay: `${index * 22}ms` }}
-              className="[stroke-dasharray:1] motion-safe:animate-[draw-line_1.8s_linear_both]"
+              className="[stroke-dasharray:1] motion-safe:animate-draw-line"
             />
           ))}
         </g>
@@ -148,7 +148,7 @@ export const TopicShape = ({ topic, layer, className }: TopicShapeProps) => {
                   style={{
                     animationDelay: `${GUIDES_LEAD_MS + (solidRings.length + pieces.length) * PIECE_DELAY_MS}ms`,
                   }}
-                  className="motion-safe:animate-[fade-in_450ms_ease-out_both]"
+                  className="motion-safe:animate-fade-in"
                 />
               )
             })}
@@ -162,7 +162,7 @@ export const TopicShape = ({ topic, layer, className }: TopicShapeProps) => {
                 r={radius * scale}
                 pathLength={1}
                 style={{ animationDelay: `${GUIDES_LEAD_MS + index * PIECE_DELAY_MS}ms` }}
-                className="[stroke-dasharray:1] motion-safe:animate-[draw-line_850ms_cubic-bezier(0.65,0,0.35,1)_both]"
+                className="[stroke-dasharray:1] motion-safe:animate-draw-line-fast"
               />
             )
           })}
@@ -176,7 +176,7 @@ export const TopicShape = ({ topic, layer, className }: TopicShapeProps) => {
                 style={{
                   animationDelay: `${GUIDES_LEAD_MS + (solidRings.length + index) * PIECE_DELAY_MS}ms`,
                 }}
-                className="[stroke-dasharray:1] motion-safe:animate-[draw-line_850ms_cubic-bezier(0.65,0,0.35,1)_both]"
+                className="[stroke-dasharray:1] motion-safe:animate-draw-line-fast"
               />
             ))
           )}

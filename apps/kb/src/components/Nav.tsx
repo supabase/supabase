@@ -69,7 +69,7 @@ export const Nav = ({ menus, className }: NavProps) => {
                 'data-[motion^=from-]:animate-none! data-[motion^=to-]:animate-none!',
                 'data-[active=false]:pointer-events-none data-[active=false]:opacity-0',
                 'data-[side=start]:-translate-x-4 data-[side=end]:translate-x-4',
-                'motion-safe:group-data-[switching=true]/viewport:transition-[opacity,translate]',
+                'motion-safe:group-data-[switching=true]/viewport:transition',
                 'motion-safe:group-data-[switching=true]/viewport:duration-250',
                 'motion-safe:group-data-[switching=true]/viewport:ease-in-out'
               )}

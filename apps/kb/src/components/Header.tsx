@@ -41,7 +41,7 @@ export const Header = ({ topics }: HeaderProps) => {
             <Nav menus={menus} className="hidden lg:flex" />
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="primary" asChild className="hidden lg:inline-flex">
+            <Button variant="primary" asChild className="hidden h-7.5 lg:inline-flex">
               <a href={SIGN_UP_URL}>Start your project</a>
             </Button>
             <HeaderMenu className="hidden lg:inline-flex" />
@@ -53,12 +53,12 @@ export const Header = ({ topics }: HeaderProps) => {
               onClick={handleMenuOpen}
               className={cn(
                 buttonVariants({ variant: 'default' }),
-                'size-[30px] min-w-[30px] border-default bg-surface-100/75 px-0',
+                'size-7.5 min-w-7.5 border-default bg-surface-100/75 px-0',
                 'text-foreground-light lg:hidden'
               )}
             >
               <span className="sr-only">Open main menu</span>
-              <Menu aria-hidden className="size-[18px]" strokeWidth={1} />
+              <Menu aria-hidden className="size-4.5" strokeWidth={1} />
             </button>
           </div>
         </div>

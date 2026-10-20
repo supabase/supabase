@@ -81,12 +81,12 @@ export const HeaderMenu = ({ className }: HeaderMenuProps) => {
           type="button"
           className={cn(
             buttonVariants({ variant: 'default' }),
-            'size-[30px] min-w-[30px] space-x-0 border-default bg-transparent px-0 text-foreground-light',
+            'size-7.5 min-w-7.5 space-x-0 border-default bg-transparent px-0 text-foreground-light',
             'hover:border-strong hover:bg-overlay-hover/50! data-open:border-stronger data-open:bg-overlay-hover/30',
             className
           )}
         >
-          <Menu aria-hidden className="size-[18px]" strokeWidth={1} />
+          <Menu aria-hidden className="size-4.5" strokeWidth={1} />
           <span className="sr-only">Open menu</span>
         </button>
       </DropdownMenuTrigger>

@@ -58,7 +58,7 @@ interface HeroSearchProps {
 // hidden for launch. preview with ?search=on, flip the fallback to ship it
 const SEARCH_FLAG = ['off', 'on'] as const
 
-const DRAW_OUT = 'motion-safe:animate-[draw-out_700ms_cubic-bezier(0.65,0,0.35,1)_both]'
+const DRAW_OUT = 'motion-safe:animate-draw-out'
 
 const FLANK_BOX = cn(
   'grain-mask-flank absolute -top-[100vh] h-[calc(100%+200vh)] w-[50vw]',
