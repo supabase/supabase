@@ -12,7 +12,7 @@ export const HERO_SHAPES: Record<Topic, IsoBox[]> = {
   ],
   Database: [0, 0.9, 1.8].map((z) => ({ x: 0, y: 0, z, w: 2, d: 2, h: 0.38, shape: 'cylinder' })),
   Realtime: [{ ...cube(0, 0, 0, 2), inset: 'front' }, cube(2.9, -0.9, 1.5, 0.7)],
-  Storage: [0, 1, 2].map((i) => ({ ...cube(0, i * 1.6, i * 0.55, 1.1), h: 0.8, inset: 'top' })),
+  Storage: [{ ...cube(0, 0, 0, 1.1), h: 0.8, inset: 'top' }],
   'Edge Functions': [
     cube(0, 0, 0.3, 1.34),
     cube(3, 0.47, 0.9, 0.4),
