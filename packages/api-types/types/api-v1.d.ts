@@ -4253,7 +4253,7 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
-    RegionsInfoV1_Output: {
+    RegionsInfo_Output: {
       all: {
         smartGroup: {
           /** @enum {string} */
@@ -5860,44 +5860,12 @@ export interface components {
        */
       schedule_for: string
     }
-    /**
-     * Format: binary
-     * @description Raw Brotli-compressed ESZIP binary file.
-     *
-     *     **Validation requirements** - The file must start with the four magic bytes `EZBR` (hex: `45 5A 42 52`).
-     *     - The `ezbr_sha256` query parameter must contain the SHA-256 hash of the uploaded ESZIP payload.
-     *
-     *     **Example**
-     *     ```javascript
-     *     import { readFile } from 'node:fs/promises';
-     *     import { brotliCompress } from 'node:zlib';
-     *     import { promisify } from 'node:util';
-     *     import { createHash } from 'node:crypto';
-     *
-     *     const compress = promisify(brotliCompress);
-     *     const marker = Buffer.from('EZBR', 'ascii');
-     *
-     *     const file = await readFile('./function.eszip');
-     *     const compressed = await compress(file);
-     *
-     *     const payload = Buffer.concat([marker, compressed]);
-     *
-     *     const ezbr_sha256 = createHash('sha256')
-     *       .update(payload)
-     *       .digest('hex');
-     *
-     *     console.log(ezbr_sha256);
-     *     ```
-     *
-     *
-     */
-    V1UpdateFunctionBodyEszip: string
     /** @example {
      *       "name": "Hello World",
      *       "body": "Deno.serve(() => new Response('Hello again!'))",
      *       "verify_jwt": true
      *     } */
-    V1UpdateFunctionBodyJson: {
+    V1UpdateFunctionBody: {
       body?: string
       name?: string
       verify_jwt?: boolean
@@ -12374,8 +12342,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1UpdateFunctionBodyJson']
-        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBodyEszip']
+        'application/json': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': string
       }
     }
     responses: {
@@ -14457,7 +14425,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfoV1_Output']
+          'application/json': components['schemas']['RegionsInfo_Output']
         }
       }
     }
