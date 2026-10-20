@@ -90,27 +90,11 @@ const mockSetupStatus = (status: Partial<WarehouseSetupStatusResponse>) =>
       }),
   })
 
-const mockProject = () =>
-  addAPIMock({
-    method: 'get',
-    path: '/platform/projects/:ref',
-    // @ts-expect-error partial project response used by AlertError
-    response: {
-      cloud_provider: 'localhost',
-      id: 1,
-      inserted_at: '2021-08-02T06:40:40.646Z',
-      name: 'Default Project',
-      organization_id: 1,
-      ref: 'default',
-      region: 'local',
-      status: 'ACTIVE_HEALTHY',
-    },
-  })
-
-const REPLICATION_PROJECT: ProjectDetail = {
+const PROJECT: ProjectDetail = {
   cloud_provider: 'AWS',
   connectionString: 'postgresql://postgres@localhost:5432/postgres',
   db_host: 'db.default.supabase.co',
+  dbVersion: 'supabase-postgres-17.6.1.001',
   high_availability: false,
   id: 1,
   inserted_at: '2026-01-01T00:00:00.000Z',
@@ -174,10 +158,9 @@ const PUBLICATION_TABLES: PublicationDetailsResponse['tables'] = [
   { id: 3, schema: 'analytics', name: 'events', kind: 'table', partition_parent_id: null },
 ]
 
-// The disable card reads what is currently replicated from these four queries.
+// The disable card reads what is currently replicated from these queries.
 const mockReplicatedTableQueries = () => {
   const publicationRequests: string[] = []
-  addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: REPLICATION_PROJECT })
   addAPIMock({
     method: 'post',
     path: '/platform/pg-meta/:ref/query',
@@ -225,6 +208,7 @@ describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
     mockIsMarketplaceEnabled.mockReturnValue(true)
     mockTrack.mockClear()
+    addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
   })
 
   test.each([false, true])(
@@ -277,7 +261,6 @@ describe('WarehouseOverviewTab', () => {
   )
 
   test('shows the setup failure and retry action', async () => {
-    mockProject()
     mockSetupStatus({
       setup_status: 'error',
       steps: [{ name: 'warehouse_copy', status: 'error', message: 'Failed to copy public.orders' }],
@@ -292,7 +275,6 @@ describe('WarehouseOverviewTab', () => {
   })
 
   test('shows the latest error when retrying setup fails', async () => {
-    mockProject()
     mockSetupStatus({
       setup_status: 'error',
       steps: [{ name: 'warehouse_copy', status: 'error', message: 'Initial setup failed' }],
@@ -494,8 +476,6 @@ describe('WarehouseOverviewTab', () => {
       path: '/platform/warehouse/:ref/setup-status',
       response: () => HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 }),
     })
-    mockProject()
-
     customRender(<WarehouseOverviewTab />)
 
     expect(await screen.findByText('Failed to load Warehouse status')).toBeInTheDocument()
