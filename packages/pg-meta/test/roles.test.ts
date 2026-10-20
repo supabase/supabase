@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'vitest'
 
-import pgMeta from '../src/index'
+import pgMeta, { safeSql } from '../src/index'
 import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
@@ -263,4 +263,18 @@ withTestDatabase('update and remove a role whose name needs quoting', async ({ e
 
   await executeQuery(pgMeta.roles.remove({ id }).sql)
   expect(await findRole(`it's a "role"`)).toBeUndefined()
+})
+
+withTestDatabase('list role config whose values contain equals signs', async ({ executeQuery }) => {
+  await executeQuery(safeSql`
+    create role config_equals_role;
+    alter role config_equals_role set application_name to 'tenant=blue=west';
+  `)
+
+  const { sql, zod } = await pgMeta.roles.list()
+  const role = zod.parse(await executeQuery(sql)).find((r) => r.name === 'config_equals_role')
+
+  expect(role?.config).toEqual({ application_name: 'tenant=blue=west' })
+
+  await executeQuery(safeSql`drop role config_equals_role;`)
 })
