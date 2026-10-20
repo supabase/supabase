@@ -4,7 +4,7 @@ import { z } from 'astro/zod'
 
 import { TOPIC_NAMES } from './lib/topics'
 
-// Format date as "26 SEPTEMBER 2026"
+// Format date as "September 26, 2026"
 const formatDate = (date: Date): string => {
   // Adjust for timezone offset to preserve the intended date
   const adjusted = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
@@ -12,9 +12,7 @@ const formatDate = (date: Date): string => {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  })
-    .format(adjusted)
-    .toUpperCase()
+  }).format(adjusted)
 }
 
 // Every entry here is rendered through GuideLayout by

@@ -18,8 +18,8 @@ describe('ai/tools/report-tools', () => {
     it('should not require approval to read reports', () => {
       const tools = getReportTools()
 
-      expect(tools.list_reports.needsApproval).toBeUndefined()
-      expect(tools.get_report.needsApproval).toBeUndefined()
+      expect(tools.list_reports.needsApproval).toBe(false)
+      expect(tools.get_report.needsApproval).toBe(false)
     })
   })
 

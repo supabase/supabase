@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -50,7 +50,6 @@ import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constrain
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
@@ -195,7 +194,6 @@ export const SidePanelEditor = ({
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
-  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
@@ -664,7 +662,6 @@ export const SidePanelEditor = ({
                 isRLSEnabled,
                 importContent,
                 track,
-                scoped,
               })
 
               createTableSpan.setAttribute('table.created', 1)
@@ -775,7 +772,6 @@ export const SidePanelEditor = ({
           existingForeignKeyRelations,
           primaryKey,
           track,
-          scoped,
         })
 
         if (table === undefined) {
