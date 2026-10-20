@@ -36,30 +36,34 @@ beforeEach(() => {
 })
 
 describe('inline and popover date-picker state', () => {
-  test('discovers and submits a seconds helper and clears its input with Escape', async () => {
-    const user = userEvent.setup()
-    const onSubmit = vi.fn()
-    customRender(
-      <LogsDatePicker
-        variant="inline"
-        value={{ from: new Date().toISOString(), to: new Date().toISOString() }}
-        helpers={[]}
-        onSubmit={onSubmit}
-      />
-    )
-    const input = screen.getByPlaceholderText('e.g. 10s, 30m, 2h')
-    await user.type(input, '10s')
-    await user.click(screen.getByText('Last 10 seconds'))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ text: 'Last 10 seconds', isHelper: true })
-    )
-    const selected = onSubmit.mock.lastCall?.[0]
-    expect(Date.parse(selected.to) - Date.parse(selected.from)).toBe(10_000)
-    await user.click(input)
-    await user.keyboard('{Escape}')
-    expect(input).toHaveValue('')
-    expect(input).toHaveFocus()
-  })
+  test.each(['inline', 'popover'] as const)(
+    '%s submits seconds and clears its input with Escape',
+    async (variant) => {
+      const user = userEvent.setup()
+      const onSubmit = vi.fn()
+      customRender(
+        <LogsDatePicker
+          variant={variant}
+          value={{ from: new Date().toISOString(), to: new Date().toISOString() }}
+          helpers={[]}
+          onSubmit={onSubmit}
+        />
+      )
+      if (variant === 'popover') await user.click(screen.getByRole('button'))
+      const input = screen.getByPlaceholderText('e.g. 10s, 30m, 2h')
+      await user.type(input, '10s')
+      await user.keyboard('{Escape}')
+      expect(input).toHaveValue('')
+      expect(input).toHaveFocus()
+      await user.type(input, '10s')
+      await user.click(screen.getByText('Last 10 seconds'))
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ text: 'Last 10 seconds', isHelper: true })
+      )
+      const selected = onSubmit.mock.lastCall?.[0]
+      expect(Date.parse(selected.to) - Date.parse(selected.from)).toBe(10_000)
+    }
+  )
   const initialRange = {
     from: '2026-08-01T01:02:03.000Z',
     to: '2026-08-02T04:05:06.000Z',

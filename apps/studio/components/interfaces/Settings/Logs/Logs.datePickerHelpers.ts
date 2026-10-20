@@ -80,14 +80,10 @@ export const formatDateRange = (from: string, to: string): string => {
 }
 
 export const formatRelativeDuration = (seconds: number): string => {
-  const units = [
-    [86400, 'day'],
-    [3600, 'hour'],
-    [60, 'minute'],
-    [1, 'second'],
-  ] as const
-  const [scale, unit] =
-    units.find(([scale]) => seconds >= scale && seconds % scale === 0) ?? units[3]
+  const units = { day: 86400, hour: 3600, minute: 60, second: 1 }
+  const [unit, scale] =
+    Object.entries(units).find(([, scale]) => seconds >= scale && seconds % scale === 0) ??
+    (['second', 1] as const)
   const value = seconds / scale
   return `Last ${value} ${unit}${value === 1 ? '' : 's'}`
 }

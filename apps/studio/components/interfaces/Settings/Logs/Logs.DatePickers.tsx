@@ -447,6 +447,11 @@ export const LogsDatePicker = ({
         side="bottom"
         align={align}
         {...popoverContentProps}
+        onEscapeKeyDown={(event) => {
+          if (!customValue) return
+          event.preventDefault()
+          setCustomValue('')
+        }}
       >
         {content}
       </PopoverContent>
