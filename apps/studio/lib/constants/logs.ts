@@ -1,0 +1,1 @@
+export const MAX_LOG_RETENTION_DAYS = 90

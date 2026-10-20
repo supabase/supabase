@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
 import { analyticsLiteral, safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { DOCS_URL } from '@/lib/constants'
+import { MAX_LOG_RETENTION_DAYS } from '@/lib/constants/logs'
 
 export const LOGS_EXPLORER_DOCS_URL = `${DOCS_URL}/guides/platform/logs#querying-with-the-logs-explorer`
 
@@ -945,7 +946,7 @@ export const TIER_QUERY_LIMITS: {
   PRO: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   PAYG: { text: '7 days', value: 7, unit: 'day', promptUpgrade: true },
   TEAM: { text: '28 days', value: 28, unit: 'day', promptUpgrade: true },
-  ENTERPRISE: { text: '90 days', value: 90, unit: 'day', promptUpgrade: false },
+  ENTERPRISE: { text: '90 days', value: MAX_LOG_RETENTION_DAYS, unit: 'day', promptUpgrade: false },
   PLATFORM: { text: '1 day', value: 1, unit: 'day', promptUpgrade: false },
 }
 

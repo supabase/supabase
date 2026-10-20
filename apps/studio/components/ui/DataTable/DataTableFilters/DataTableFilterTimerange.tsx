@@ -18,6 +18,7 @@ export function DataTableFilterTimerange<TData>({
   value: _value,
   variant = 'popover',
   onChange,
+  durationSeconds,
 }: DataTableTimerangeFilterField<TData> & {
   variant?: 'popover' | 'inline'
   onChange?: (range: [Date, Date]) => void
@@ -62,6 +63,15 @@ export function DataTableFilterTimerange<TData>({
 
   // Get current selected DatePickerValue based on the date range
   const getCurrentDatePickerValue = (): DatePickerValue => {
+    if (!date && durationSeconds != null) {
+      const end = Date.now()
+      return {
+        from: new Date(end - durationSeconds * 1000).toISOString(),
+        to: new Date(end).toISOString(),
+        text: `Last ${durationSeconds} ${durationSeconds === 1 ? 'second' : 'seconds'}`,
+        isHelper: true,
+      }
+    }
     if (!date?.from || !date?.to) {
       // Default to last 60 minutes
       const defaultHelper =

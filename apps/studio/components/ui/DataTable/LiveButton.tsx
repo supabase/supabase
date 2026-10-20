@@ -4,20 +4,29 @@ import { useEffect } from 'react'
 import { Button } from 'ui'
 
 import { useDataTable } from './providers/DataTableProvider'
+import type { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { parseUnifiedLogsDuration } from '@/data/logs/unified-logs-time-range'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const REFRESH_INTERVAL = 10_000
 
 interface LiveButtonProps {
-  searchParamsParser: any
+  searchParamsParser: Pick<
+    typeof SEARCH_PARAMS_PARSER,
+    'live' | 'date' | 'sort' | 'durationSeconds'
+  >
   onPoll: () => Promise<{ isCatchingUp: boolean }>
   isCatchingUp?: boolean
 }
 
 export function LiveButton({ onPoll, isCatchingUp, searchParamsParser }: LiveButtonProps) {
-  const [{ live, date, sort }, setSearch] = useQueryStates(searchParamsParser)
+  const [{ live, date, sort, durationSeconds }, setSearch] = useQueryStates(searchParamsParser)
+  const selectedDuration =
+    date?.length === 2
+      ? parseUnifiedLogsDuration(String((date[1].getTime() - date[0].getTime()) / 1000))
+      : (durationSeconds ?? 3600)
   const { table } = useDataTable()
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_LIVE, handleClick, { registerInCommandMenu: false })
 
@@ -43,18 +52,22 @@ export function LiveButton({ onPoll, isCatchingUp, searchParamsParser }: LiveBut
   }, [live, onPoll])
 
   useEffect(() => {
-    if ((date || sort) && live) {
-      setSearch((prev) => ({ ...prev, live: null }))
-    }
-  }, [date, sort])
+    if (date && (live || durationSeconds !== null)) setSearch({ live: null, durationSeconds: null })
+    else if (sort && live) setSearch({ live: null })
+  }, [date, sort, live, durationSeconds, setSearch])
 
   function handleClick() {
-    setSearch((prev) => ({
-      ...prev,
-      live: !prev.live,
+    if (live) {
+      setSearch({ live: false })
+      return
+    }
+    if (selectedDuration === null) return
+    setSearch({
+      live: true,
       date: null,
       sort: null,
-    }))
+      durationSeconds: date ? selectedDuration : durationSeconds,
+    })
     table.getColumn('date')?.setFilterValue(undefined)
     table.resetSorting()
   }
@@ -67,6 +80,7 @@ export function LiveButton({ onPoll, isCatchingUp, searchParamsParser }: LiveBut
     >
       <Button
         onClick={handleClick}
+        disabled={!live && selectedDuration === null}
         variant={live ? 'primary' : 'default'}
         size="tiny"
         icon={
