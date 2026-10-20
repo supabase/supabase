@@ -169,12 +169,10 @@ withTestDatabase('analyzed table over THRESHOLD_COUNT uses estimate', async (db)
   expect(await reltuplesOf(db, 'public.big_analyzed')).toBeGreaterThan(50000)
   const table = await tableOf(db, 'public.big_analyzed', 'big_analyzed', 'public')
 
-  // Non-readonly: both return the raw reltuples estimate.
   const estimated = await runCount(db, { table })
   expect(estimated.is_estimate).toBe(true)
   expect(estimated.count).toBeGreaterThan(1000)
 
-  // Read-only: both report -1 as an estimate.
   expect(await runCount(db, { table, isReadOnlyContext: true })).toEqual({
     count: -1,
     is_estimate: true,

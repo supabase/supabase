@@ -31,12 +31,8 @@ import { cleanupRoot, createTestDatabase } from '../../db/utils'
  * unavoidable scans carrying a written justification (see test/db/plan-guard.ts
  * for THE RULE).
  *
- * Context: a real production catalog had ~267K pg_class rows. Before
- * https://github.com/supabase/supabase/pull/47894, unscoped CTEs in the Table
- * Editor query full-scanned pg_index/pg_constraint on every open -- O(catalog)
- * work regardless of which table was opened, taking 30-58s at incident scale.
- *
- * These builders are the only introspection shape Studio ships.
+ * Unscoped CTEs here once full-scanned pg_index/pg_constraint on every Table
+ * Editor open, so cost grew with the whole catalog instead of the opened table.
  */
 
 let db: Awaited<ReturnType<typeof createTestDatabase>>
