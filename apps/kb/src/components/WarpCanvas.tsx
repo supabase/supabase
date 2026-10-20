@@ -85,6 +85,7 @@ const PROBES = {
 
 const THROAT_RADIUS = 150
 const ANCHOR_MARGIN = 24
+const THROAT_DROP = 90
 const RING_ANGLES = Array.from({ length: 160 }, (_, k) => (k / 160) * Math.PI * 2)
 const SPOKE_ANGLES = Array.from({ length: 32 }, (_, s) => (s / 32) * Math.PI * 2)
 const SAMPLES_PER_CELL = RING_ANGLES.length / SPOKE_ANGLES.length
@@ -92,7 +93,6 @@ const SPOKE_STEPS = 6
 const MAX_FLATTEN = 0.15
 const EXPAND_STEPS = 60
 const FRONT_ARC_ANGLES = Array.from({ length: 81 }, (_, k) => (k / 80) * Math.PI)
-const TOP_FADE = 80
 
 const SPAWN_MIN_RING = 5
 const FADE_IN_S = 0.3
@@ -216,10 +216,6 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
     // the rings and spokes change only with scroll, size and theme, so frames reuse this layer
     let gridKey = ''
 
-    const topFade = ctx.createLinearGradient(0, 0, 0, TOP_FADE)
-    topFade.addColorStop(0, 'rgb(0 0 0 / 1)')
-    topFade.addColorStop(1, 'rgb(0 0 0 / 0)')
-
     const isRunning = () => isVisible && document.visibilityState === 'visible'
 
     const getScrollProgress = () => {
@@ -336,10 +332,13 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       if (hovered) paintCell(hovered, 1)
       ctx.restore()
 
+      const bottomFade = ctx.createLinearGradient(0, height - 80, 0, height)
+      bottomFade.addColorStop(0, 'rgb(0 0 0 / 0)')
+      bottomFade.addColorStop(1, 'rgb(0 0 0 / 1)')
       ctx.globalCompositeOperation = 'destination-out'
       ctx.globalAlpha = 1
-      ctx.fillStyle = topFade
-      ctx.fillRect(0, 0, width, TOP_FADE)
+      ctx.fillStyle = bottomFade
+      ctx.fillRect(0, height - 80, width, 80)
       ctx.globalCompositeOperation = 'source-over'
     }
 
@@ -466,8 +465,9 @@ export const WarpCanvas = ({ anchorRef, className }: WarpCanvasProps) => {
       const throatTarget = anchorRef.current
         ?.querySelector('[data-warp-throat]')
         ?.getBoundingClientRect()
-      const throatY = throatTarget
-        ? (throatTarget.top + throatTarget.bottom) / 2 - origin.top
+      const throatBox = throatTarget ?? anchorRef.current?.getBoundingClientRect()
+      const throatY = throatBox
+        ? (throatBox.top + throatBox.bottom) / 2 - origin.top + (throatTarget ? 0 : THROAT_DROP)
         : height / 2
       baseShape = { cx: width / 2, rimY: throatY - 190, throatY, r0: THROAT_RADIUS }
       baseRadii = ringRadii({ r0: THROAT_RADIUS, maxRadius: Math.hypot(width, height * 3) })

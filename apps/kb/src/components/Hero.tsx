@@ -116,7 +116,7 @@ export const Hero = ({
     <section
       className={cn(
         'relative isolate flex justify-center',
-        isWarp ? 'mt-6.5 pt-32.5 pb-78' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5',
+        isWarp ? 'pt-39 pb-60' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5',
         'overflow-hidden bg-background',
         className
       )}
