@@ -3,7 +3,7 @@ import { genFaviconLinks } from 'common/MetaFavicons/icons'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
 import '../styles/globals.css'
-import { serializeJsonLd } from '../lib/json-ld'
+import { canonicalUrl, serializeJsonLd } from '../lib/json-ld'
 
 interface Props {
 	title: string
@@ -13,10 +13,7 @@ interface Props {
 
 const { title, description, jsonLd } = Astro.props
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
-// Canonicals always resolve against the production site, so a preview URL is never indexed in place of the live page.
-// Trailing slashes are dropped so the index and every other route share one form.
-const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/'
-const canonicalHref = new URL(canonicalPath, Astro.site).href
+const canonicalHref = canonicalUrl(Astro.url.pathname)
 ---
 
 <!doctype html>
