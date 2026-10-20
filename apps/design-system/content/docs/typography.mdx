@@ -5,16 +5,45 @@ description: An overview of all available typography CSS variables.
 
 Some reusable patterns work better as CSS variables, or “shorthands”, than as components. Typography is one of these cases, since its usage and context vary widely.
 
-The shorthands below are composed of core [Tailwind utility classes](../docs/tailwind-classes). You can view the full list of shorthands in [`typography.scss`](https://github.com/supabase/supabase/blob/master/apps/studio/styles/typography.scss).
+The shorthands below are composed of core [Tailwind utility classes](../docs/tailwind-classes). You can view the full list of shorthands in [`typography.css`](https://github.com/supabase/supabase/blob/master/packages/config/typography.css).
 
 ## Shorthands
 
-| Value              | Usage                                                                      |
-| ------------------ | -------------------------------------------------------------------------- |
-| `text-code-inline` | Apply to a `code` element for inline code or similar custom inline content |
-| `text-primary`     | Accessible Supabase green for readable branded text                        |
+| Value          | Usage                                               |
+| -------------- | --------------------------------------------------- |
+| `text-primary` | Accessible Supabase green for readable branded text |
 
 `text-primary` meets WCAG AA for normal text on app surfaces: darkened in light mode,
 bright in dark mode. Focus rings and selected controls derive their brighter fill from
 the same primary hue. See [Primary and brand colors](../docs/color-usage#primary-and-brand-colors) for when
 to use each green.
+
+## Inline code
+
+Inline `code` elements use shared styles by default in all monorepo apps.
+The shared defaults live in [`inline-code.css`](https://github.com/supabase/supabase/blob/master/packages/config/inline-code.css).
+No class is required. Inline code uses `font-size: max(0.75rem, calc(1em - 2px))` and inherits color, line height, and font weight.
+It is 2px smaller than the surrounding text, with a minimum of `0.75rem` (12px at the standard 16px root size).
+For example, code in 13px text is 12px; code in 16px text is 14px. This applies inside and outside `prose`.
+
+A size class on the `code` element, such as `text-sm`, replaces the calculation, including the minimum.
+The 2px reduction is not applied again. To change the surrounding size and keep the reduction, put the size class
+on a parent instead:
+
+```tsx
+<span className="text-sm">
+  <code>project_id</code>
+</span>
+```
+
+Identifiers move intact to the next line when they fit there. Values wider than the container
+can wrap within the token to prevent overflow. Local utility classes can adjust color, spacing, and wrapping.
+
+Code inside `pre` elements and syntax-highlighting containers keeps its own styles.
+For other custom code displays, add `data-code-style="plain"` to the `code` element
+or a containing element to exclude its subtree from all default inline-code styles, including
+background, border, padding, and sizing. Use this for displays with their own presentation,
+such as command strips and syntax-colored header rows. A size override alone does not opt out
+of the other inline-code styles.
+
+<ComponentPreview name="typography-inline-code" />
