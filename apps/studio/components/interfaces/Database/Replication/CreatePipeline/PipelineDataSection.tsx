@@ -10,10 +10,12 @@ export const PipelineDataSection = ({
   type,
   form,
   onSelectNewPublication,
+  revealInvalidSettings = false,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
   onSelectNewPublication: () => void
+  revealInvalidSettings?: boolean
 }) => (
   <section aria-label="Data">
     <div className="p-5 flex flex-col gap-y-6">
@@ -23,6 +25,11 @@ export const PipelineDataSection = ({
         <TableCopySelection form={form} editMode={false} />
       </div>
     </div>
-    <AdvancedSettings type={type} form={form} group="data" />
+    <AdvancedSettings
+      type={type}
+      form={form}
+      group="data"
+      revealInvalidSettings={revealInvalidSettings}
+    />
   </section>
 )

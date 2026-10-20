@@ -3825,4 +3825,9 @@ module.exports = [
     source: '/docs/guides/platform/rate-limits',
     destination: '/docs/guides/auth/rate-limits',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password',
+    destination: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
+  },
 ]
