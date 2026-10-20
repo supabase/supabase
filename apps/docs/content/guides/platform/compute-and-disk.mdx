@@ -144,19 +144,19 @@ Compute instance size changes will not change your selected disk type or disk si
 
 The maximum number of replication slots, WAL senders, database connections, and pooler clients depends on your compute instance size, as follows:
 
-| Compute instance | Max Replication Slots | Max WAL Senders | Database Max Connections[^1] | Connection Pooler Max Clients |
-| ---------------- | --------------------- | --------------- | ---------------------------- | ----------------------------- |
-| Nano (free)      | 5                     | 5               | 60                           | 200                           |
-| Micro            | 5                     | 5               | 60                           | 200                           |
-| Small            | 5                     | 5               | 90                           | 400                           |
-| Medium           | 5                     | 5               | 120                          | 600                           |
-| Large            | 8                     | 8               | 160                          | 800                           |
-| XL               | 24                    | 24              | 240                          | 1,000                         |
-| 2XL              | 80                    | 80              | 380                          | 1,500                         |
-| 4XL              | 80                    | 80              | 480                          | 3,000                         |
-| 8XL              | 80                    | 80              | 490                          | 6,000                         |
-| 12XL             | 80                    | 80              | 500                          | 9,000                         |
-| 16XL             | 80                    | 80              | 500                          | 12,000                        |
+| Compute instance | Max Replication Slots | Max WAL Senders | Database Max Connections[^1] | Connection Pooler Max Clients | Default Pool Size |
+| ---------------- | --------------------- | --------------- | ---------------------------- | ----------------------------- | ----------------- |
+| Nano (free)      | 5                     | 5               | 60                           | 200                           | 15                |
+| Micro            | 5                     | 5               | 60                           | 200                           | 15                |
+| Small            | 5                     | 5               | 90                           | 400                           | 15                |
+| Medium           | 5                     | 5               | 120                          | 600                           | 15                |
+| Large            | 8                     | 8               | 160                          | 800                           | 20                |
+| XL               | 24                    | 24              | 240                          | 1,000                         | 20                |
+| 2XL              | 80                    | 80              | 380                          | 1,500                         | 25                |
+| 4XL              | 80                    | 80              | 480                          | 3,000                         | 32                |
+| 8XL              | 80                    | 80              | 490                          | 6,000                         | 64                |
+| 12XL             | 80                    | 80              | 500                          | 9,000                         | 96                |
+| 16XL             | 80                    | 80              | 500                          | 12,000                        | 128               |
 
 <Admonition type="caution">
 
