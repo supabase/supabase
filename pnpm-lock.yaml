@@ -2291,9 +2291,6 @@ importers:
       config:
         specifier: workspace:*
         version: link:../config
-      js-tiktoken:
-        specifier: ^1.0.10
-        version: 1.0.10
       jsonrepair:
         specifier: ^3.5.0
         version: 3.5.0
@@ -13773,9 +13770,6 @@ packages:
   js-levenshtein@1.1.6:
     resolution: {integrity: sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==}
     engines: {node: '>=0.10.0'}
-
-  js-tiktoken@1.0.10:
-    resolution: {integrity: sha512-ZoSxbGjvGyMT13x6ACo9ebhDha/0FHdKA+OsQcMOWcm1Zs7r90Rhk5lhERLzji+3rA7EKpXCgwXcM5fF3DMpdA==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -31800,10 +31794,6 @@ snapshots:
   js-cookie@3.0.8: {}
 
   js-levenshtein@1.1.6: {}
-
-  js-tiktoken@1.0.10:
-    dependencies:
-      base64-js: 1.5.1
 
   js-tokens@10.0.0: {}
 
