@@ -2420,6 +2420,7 @@ If a query waits on more than one session, the Blocked by column lists them all,
     icon: Activity,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
+    hideHero: true,
     docsUrl:
       'https://supabase.com/docs/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
     slug: 'database-connections',
@@ -3116,7 +3117,7 @@ With the MCP Server, you can:
 - Design tables, generate migrations, and manage schema.
 - Query data and run reports using SQL.
 - Manage branches, configurations, and TypeScript types.
-- Query project logs with read-only SQL through \`query_logs\`, up to 24 hours per request, and pull Security and Performance Advisor findings with \`get_advisors\`, so you can debug without leaving your AI tool.
+- Debug from the client: \`query_logs\` runs read-only SQL on up to 24 hours of logs per request, and \`get_advisors\` returns Security and Performance findings, so you find the failing request without opening the dashboard.
 - Automate repetitive tasks and streamline AI-assisted development workflows.
 
 The MCP Server simplifies the integration of AI tools with Supabase, enabling a seamless development experience without the need for custom APIs or wrappers.
