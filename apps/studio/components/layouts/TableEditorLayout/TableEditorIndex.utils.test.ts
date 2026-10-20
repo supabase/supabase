@@ -7,7 +7,6 @@ describe('shouldOpenLastTableOnEditorIndex', () => {
     expect(
       shouldOpenLastTableOnEditorIndex({
         isHistoryTraverse: false,
-        hasLastTable: true,
         lastTableSchema: 'auth',
       })
     ).toBe(true)
@@ -17,7 +16,6 @@ describe('shouldOpenLastTableOnEditorIndex', () => {
     expect(
       shouldOpenLastTableOnEditorIndex({
         isHistoryTraverse: false,
-        hasLastTable: true,
         explicitSchema: 'auth',
         lastTableSchema: 'auth',
       })
@@ -28,7 +26,6 @@ describe('shouldOpenLastTableOnEditorIndex', () => {
     expect(
       shouldOpenLastTableOnEditorIndex({
         isHistoryTraverse: false,
-        hasLastTable: true,
         explicitSchema: 'public',
         lastTableSchema: 'auth',
       })
@@ -39,7 +36,6 @@ describe('shouldOpenLastTableOnEditorIndex', () => {
     expect(
       shouldOpenLastTableOnEditorIndex({
         isHistoryTraverse: false,
-        hasLastTable: true,
         explicitSchema: 'public',
       })
     ).toBe(false)
@@ -49,7 +45,6 @@ describe('shouldOpenLastTableOnEditorIndex', () => {
     expect(
       shouldOpenLastTableOnEditorIndex({
         isHistoryTraverse: true,
-        hasLastTable: true,
         explicitSchema: 'public',
         lastTableSchema: 'public',
       })
@@ -60,25 +55,7 @@ describe('shouldOpenLastTableOnEditorIndex', () => {
     expect(
       shouldOpenLastTableOnEditorIndex({
         isHistoryTraverse: true,
-        hasLastTable: true,
         lastTableSchema: 'auth',
-      })
-    ).toBe(false)
-  })
-
-  test('stays on the list when there is no table to open', () => {
-    expect(
-      shouldOpenLastTableOnEditorIndex({
-        isHistoryTraverse: false,
-        hasLastTable: false,
-      })
-    ).toBe(false)
-
-    expect(
-      shouldOpenLastTableOnEditorIndex({
-        isHistoryTraverse: true,
-        hasLastTable: false,
-        explicitSchema: 'public',
       })
     ).toBe(false)
   })

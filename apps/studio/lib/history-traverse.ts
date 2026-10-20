@@ -40,14 +40,13 @@ export function installHistoryTraverseListener(): void {
   state.isInstalled = true
 
   window.addEventListener('popstate', () => {
-    getTraverseState().isTraverseNavigation = true
+    state.isTraverseNavigation = true
   })
 
   const originalPushState = history.pushState.bind(history)
   history.pushState = (data, unused, url) => {
-    const nextState = getTraverseState()
-    nextState.isTraverseNavigation = false
-    nextState.hasClientPush = true
+    state.isTraverseNavigation = false
+    state.hasClientPush = true
     return originalPushState(data, unused, url)
   }
 }

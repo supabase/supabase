@@ -6,7 +6,6 @@ import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
-import { getFirstQueryParam } from '@/components/layouts/TableEditorLayout/getFirstQueryParam'
 import { shouldOpenLastTableOnEditorIndex } from '@/components/layouts/TableEditorLayout/TableEditorIndex.utils'
 import { TableEditorLayout } from '@/components/layouts/TableEditorLayout/TableEditorLayout'
 import { TableEditorMenu } from '@/components/layouts/TableEditorLayout/TableEditorMenu'
@@ -19,12 +18,11 @@ import type { NextPageWithLayout } from '@/types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref: projectRef, schema: explicitSchema } = useParams()
   const tabStore = useTabsStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
   const { history, isHistoryLoaded } = useDashboardHistory()
   const hasDecidedRedirectRef = useRef(false)
-  const explicitSchema = getFirstQueryParam(router.query.schema)
 
   const onTableCreated = (table: { id: number }) => {
     router.push(
@@ -60,19 +58,21 @@ const TableEditorPage: NextPageWithLayout = () => {
             tab.metadata?.tableId === lastOpenedTableId
         )
       : undefined
-    const tableId = hasHistoryTable ? lastOpenedTableId : lastTabId
-    const tableSchema = hasHistoryTable
-      ? historyTable?.metadata?.schema
-      : lastTableTab?.metadata?.schema
-    const hasLastTable = tableId !== undefined
+    const lastTable = hasHistoryTable
+      ? { tableId: lastOpenedTableId, schema: historyTable?.metadata?.schema }
+      : { tableId: lastTabId, schema: lastTableTab?.metadata?.schema }
+
+    if (lastTable.tableId === undefined) {
+      return
+    }
+
     const shouldRedirect = shouldOpenLastTableOnEditorIndex({
       isHistoryTraverse: isHistoryTraverseNavigation(),
-      hasLastTable,
       explicitSchema,
-      lastTableSchema: tableSchema,
+      lastTableSchema: lastTable.schema,
     })
 
-    if (!shouldRedirect || tableId === undefined) {
+    if (!shouldRedirect) {
       return
     }
 
@@ -80,8 +80,8 @@ const TableEditorPage: NextPageWithLayout = () => {
     router.replace(
       buildTableEditorUrl({
         projectRef,
-        tableId,
-        schema: tableSchema,
+        tableId: lastTable.tableId,
+        schema: lastTable.schema,
       })
     )
     // router and tabStore are intentionally excluded: in the TanStack build useRouter()

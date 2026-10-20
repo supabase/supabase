@@ -7,7 +7,6 @@ const mocks = vi.hoisted(() => ({
   router: {
     push: vi.fn(),
     replace: vi.fn(),
-    query: {} as Record<string, string | string[] | undefined>,
     isReady: true,
   },
   history: { editor: undefined as string | undefined },
@@ -46,7 +45,6 @@ describe('Table Editor index', () => {
   beforeEach(() => {
     mocks.router.push.mockReset()
     mocks.router.replace.mockReset()
-    mocks.router.query = {}
     mocks.router.isReady = true
     mocks.history.editor = undefined
     mocks.tabs.openTabs = []

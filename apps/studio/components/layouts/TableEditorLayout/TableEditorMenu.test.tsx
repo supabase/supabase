@@ -40,6 +40,7 @@ mockAnimationsApi()
 const params = vi.hoisted(() => ({
   ref: 'default' as string | undefined,
   id: '25837' as string | undefined,
+  sidebar: undefined as string | undefined,
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -89,29 +90,26 @@ describe('TableEditorMenu schema switch', () => {
   beforeEach(() => {
     params.ref = 'default'
     params.id = '25837'
+    params.sidebar = undefined
     localStorage.clear()
+    mockMenuApis()
     mockRouter.setCurrentUrl('/project/default/editor/25837?schema=public')
     vi.spyOn(mockRouter, 'replace').mockClear()
     vi.spyOn(mockRouter, 'push').mockClear()
   })
 
   test('replaces the open table with the schema list', async () => {
-    mockMenuApis()
-    const replace = vi.spyOn(mockRouter, 'replace')
-    const push = vi.spyOn(mockRouter, 'push')
-
     customRender(<TableEditorMenu />, { nuqs: { searchParams: '?schema=public' } })
     await openSchemaList()
     await userEvent.click(screen.getByRole('option', { name: 'auth' }))
 
-    expect(replace).toHaveBeenCalledWith('/project/default/editor?schema=auth')
-    expect(push).not.toHaveBeenCalled()
+    expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/editor?schema=auth')
+    expect(mockRouter.push).not.toHaveBeenCalled()
   })
 
   test('keeps a sidebar param when leaving the open table', async () => {
-    mockMenuApis()
+    params.sidebar = 'ai-assistant'
     mockRouter.setCurrentUrl('/project/default/editor/25837?schema=public&sidebar=ai-assistant')
-    const replace = vi.spyOn(mockRouter, 'replace')
 
     customRender(<TableEditorMenu />, {
       nuqs: { searchParams: '?schema=public&sidebar=ai-assistant' },
@@ -119,16 +117,14 @@ describe('TableEditorMenu schema switch', () => {
     await openSchemaList()
     await userEvent.click(screen.getByRole('option', { name: 'extensions' }))
 
-    expect(replace).toHaveBeenCalledWith(
+    expect(mockRouter.replace).toHaveBeenCalledWith(
       '/project/default/editor?schema=extensions&sidebar=ai-assistant'
     )
   })
 
   test('does not navigate when no table is open', async () => {
     params.id = undefined
-    mockMenuApis()
     mockRouter.setCurrentUrl('/project/default/editor?schema=public')
-    const replace = vi.spyOn(mockRouter, 'replace')
     const onUrlUpdate = vi.fn()
 
     customRender(<TableEditorMenu />, {
@@ -137,7 +133,7 @@ describe('TableEditorMenu schema switch', () => {
     await openSchemaList()
     await userEvent.click(screen.getByRole('option', { name: 'auth' }))
 
-    expect(replace).not.toHaveBeenCalled()
+    expect(mockRouter.replace).not.toHaveBeenCalled()
     await waitFor(() => {
       expect(onUrlUpdate).toHaveBeenCalledWith(
         expect.objectContaining({ queryString: '?schema=auth' })

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import {
   installHistoryTraverseListener,
@@ -6,27 +6,27 @@ import {
   resetHistoryTraverseState,
 } from './history-traverse'
 
+const mockNavigationType = (type?: PerformanceNavigationTiming['type']) => {
+  vi.spyOn(performance, 'getEntriesByType').mockImplementation((entryType) => {
+    if (entryType !== 'navigation' || type === undefined) return []
+    return [{ type } as PerformanceNavigationTiming]
+  })
+}
+
 describe('isHistoryTraverseNavigation', () => {
   beforeEach(() => {
+    vi.restoreAllMocks()
     resetHistoryTraverseState()
-    vi.restoreAllMocks()
-  })
-
-  afterEach(() => {
-    vi.restoreAllMocks()
   })
 
   test('is false for a fresh document navigation', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type) => {
-      if (type !== 'navigation') return []
-      return [{ type: 'navigate' } as PerformanceNavigationTiming]
-    })
+    mockNavigationType('navigate')
 
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
   test('is true after a popstate and false again after a push', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([])
+    mockNavigationType()
 
     window.dispatchEvent(new PopStateEvent('popstate'))
     expect(isHistoryTraverseNavigation()).toBe(true)
@@ -36,7 +36,7 @@ describe('isHistoryTraverseNavigation', () => {
   })
 
   test('keeps a popstate traverse across replaceState', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([])
+    mockNavigationType()
 
     window.dispatchEvent(new PopStateEvent('popstate'))
     history.replaceState(null, '', '/project/default/editor?schema=public')
@@ -45,10 +45,7 @@ describe('isHistoryTraverseNavigation', () => {
   })
 
   test('treats a document back-forward load as a traverse until the next push', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type) => {
-      if (type !== 'navigation') return []
-      return [{ type: 'back_forward' } as PerformanceNavigationTiming]
-    })
+    mockNavigationType('back_forward')
 
     expect(isHistoryTraverseNavigation()).toBe(true)
 
@@ -57,7 +54,7 @@ describe('isHistoryTraverseNavigation', () => {
   })
 
   test('does not install again after pushState is replaced', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockReturnValue([])
+    mockNavigationType()
     const addEventListener = vi.spyOn(window, 'addEventListener')
     const savedPushState = history.pushState.bind(history)
     history.pushState = (data, unused, url) => savedPushState(data, unused, url)
@@ -78,10 +75,7 @@ describe('isHistoryTraverseNavigation', () => {
   })
 
   test('does not treat a reload as a traverse', () => {
-    vi.spyOn(performance, 'getEntriesByType').mockImplementation((type) => {
-      if (type !== 'navigation') return []
-      return [{ type: 'reload' } as PerformanceNavigationTiming]
-    })
+    mockNavigationType('reload')
 
     expect(isHistoryTraverseNavigation()).toBe(false)
   })

@@ -14,11 +14,7 @@ import {
 
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
-import { getFirstQueryParam } from './getFirstQueryParam'
-import {
-  buildTableEditorSchemaListPath,
-  shouldLeaveOpenTableForSchema,
-} from './TableEditorMenu.utils'
+import { buildTableEditorSchemaListPath } from './TableEditorMenu.utils'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
 import { TableMenuFilterEmptyState } from './TableMenuFilterEmptyState'
 import { ExportDialog } from '@/components/grid/components/header/ExportDialog'
@@ -49,7 +45,7 @@ type Sort = 'alphabetical' | 'grouped-alphabetical'
 
 export const TableEditorMenu = () => {
   const router = useRouter()
-  const { id: _id, ref: projectRef } = useParams()
+  const { id: _id, ref: projectRef, sidebar } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
@@ -181,14 +177,10 @@ export const TableEditorMenu = () => {
                 setSearchText('')
                 setIsSchemaDropdownOpen(false)
 
-                const shouldShowSchemaList = shouldLeaveOpenTableForSchema({
-                  entityId: id,
-                  nextSchema: name,
-                  currentSchema: selectedSchema,
-                })
+                const isViewingTable = Number.isInteger(id)
+                const isSchemaChange = name !== selectedSchema
 
-                if (shouldShowSchemaList && projectRef) {
-                  const sidebar = getFirstQueryParam(router.query.sidebar)
+                if (isViewingTable && isSchemaChange && projectRef) {
                   router.replace(
                     buildTableEditorSchemaListPath({
                       projectRef,

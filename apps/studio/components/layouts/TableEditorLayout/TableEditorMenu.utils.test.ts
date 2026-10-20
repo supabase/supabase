@@ -1,51 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import {
-  buildTableEditorSchemaListPath,
-  shouldLeaveOpenTableForSchema,
-} from './TableEditorMenu.utils'
-
-describe('shouldLeaveOpenTableForSchema', () => {
-  test('leaves the open table when the schema changes', () => {
-    expect(
-      shouldLeaveOpenTableForSchema({
-        entityId: 25837,
-        nextSchema: 'auth',
-        currentSchema: 'public',
-      })
-    ).toBe(true)
-  })
-
-  test('stays on the table when the schema is unchanged', () => {
-    expect(
-      shouldLeaveOpenTableForSchema({
-        entityId: 25837,
-        nextSchema: 'public',
-        currentSchema: 'public',
-      })
-    ).toBe(false)
-  })
-
-  test('stays on the list when no table is open', () => {
-    expect(
-      shouldLeaveOpenTableForSchema({
-        entityId: undefined,
-        nextSchema: 'auth',
-        currentSchema: 'public',
-      })
-    ).toBe(false)
-  })
-
-  test('ignores a non-numeric entity id', () => {
-    expect(
-      shouldLeaveOpenTableForSchema({
-        entityId: Number.NaN,
-        nextSchema: 'auth',
-        currentSchema: 'public',
-      })
-    ).toBe(false)
-  })
-})
+import { buildTableEditorSchemaListPath } from './TableEditorMenu.utils'
 
 describe('buildTableEditorSchemaListPath', () => {
   test('builds the schema list path', () => {

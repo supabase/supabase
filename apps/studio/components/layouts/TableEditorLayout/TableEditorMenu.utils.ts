@@ -1,17 +1,3 @@
-export function shouldLeaveOpenTableForSchema({
-  entityId,
-  nextSchema,
-  currentSchema,
-}: {
-  entityId: number | undefined
-  nextSchema: string
-  currentSchema: string | undefined
-}): boolean {
-  const isViewingEntity = entityId !== undefined && Number.isInteger(entityId)
-  const isSchemaChange = nextSchema !== currentSchema
-  return isViewingEntity && isSchemaChange
-}
-
 export function buildTableEditorSchemaListPath({
   projectRef,
   schema,
