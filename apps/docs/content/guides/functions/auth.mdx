@@ -64,6 +64,8 @@ A handler that queries a shared table through `ctx.supabaseAdmin` without filter
 
 Cron jobs, workers, `pg_net`, and other Edge Functions make calls with a secret key on the `apikey` header rather than a user JWT. Disable `verify_jwt` and use `auth: 'secret'`. The wrapper validates the key against the secret key named `default` in your [project's API keys](/dashboard/project/_/settings/api-keys), and gives your handler `ctx.supabaseAdmin` for privileged work.
 
+To call a function from Postgres with the secret key, see [Call an Edge Function](/docs/guides/database/webhooks#call-an-edge-function) for Database Webhooks and [Scheduling Edge Functions](/docs/guides/functions/schedule-functions) for `pg_cron`.
+
 ```ts
 import { withSupabase } from 'npm:@supabase/server@1'
 
