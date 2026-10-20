@@ -11,6 +11,11 @@ interface Props {
 
 const { title, description } = Astro.props
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
+// Canonicals always resolve against the production site (`site` in astro.config.mjs),
+// even on preview deployments, so a preview URL is never indexed in place of the live page.
+// Trailing slashes are dropped so the index and every other route share one form.
+const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/'
+const canonicalHref = new URL(canonicalPath, Astro.site).href
 ---
 
 <!doctype html>
@@ -42,6 +47,7 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 			rel="stylesheet"
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
 		/>
+		<link rel="canonical" href={canonicalHref} />
 		<link rel="sitemap" href={`${import.meta.env.BASE_URL}/sitemap-index.xml`} />
 		<title>{title} | Supabase Knowledge Base</title>
 	</head>
