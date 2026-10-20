@@ -1,10 +1,13 @@
 import { listCatalogPartners } from '~/lib/marketplaceDb'
 import type { Metadata } from 'next'
-import { Suspense } from 'react'
+import { unstable_cache } from 'next/cache'
+import { connection } from 'next/server'
 
 import IntegrationsContent from './IntegrationsContent'
 
-export const revalidate = 1800 // 30 minutes
+export const revalidate = 1800
+
+const getPartners = unstable_cache(listCatalogPartners, ['partner-catalog'], { revalidate })
 
 const META_TITLE = 'Partners building with Supabase'
 const META_DESCRIPTION =
@@ -22,15 +25,14 @@ export const metadata: Metadata = {
 }
 
 export default async function IntegrationPartnersPage() {
-  const partners = await listCatalogPartners()
+  await connection()
+  const partners = await getPartners()
 
   return (
-    <Suspense>
-      <IntegrationsContent
-        initialPartners={partners}
-        metaTitle={META_TITLE}
-        metaDescription={META_DESCRIPTION}
-      />
-    </Suspense>
+    <IntegrationsContent
+      initialPartners={partners}
+      metaTitle={META_TITLE}
+      metaDescription={META_DESCRIPTION}
+    />
   )
 }
