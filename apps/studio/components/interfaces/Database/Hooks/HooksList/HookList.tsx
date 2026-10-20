@@ -102,7 +102,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            className="px-1"
+                            className="w-6.5"
                             icon={<MoreVerticalIcon />}
                             aria-label={`${x.name} actions`}
                             // Tooltip repeats the label; screen readers would read it twice
