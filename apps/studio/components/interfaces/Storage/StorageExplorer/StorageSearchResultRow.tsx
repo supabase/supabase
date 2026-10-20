@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { cn } from 'ui'
 
@@ -33,15 +33,16 @@ export const StorageSearchResultRow = ({
     <div style={style} className="border-b border-default">
       <button
         type="button"
+        tabIndex={0}
         onClick={() => onSelectResult(item)}
         aria-label={`${item.name} in ${location}`}
         className={cn(
           'flex h-full w-full cursor-pointer items-center gap-x-2 px-2.5 text-left',
           'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
-          'focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[var(--ring)]'
+          'outline-none focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-primary'
         )}
       >
-        <span className="flex w-[30px] shrink-0 items-center">
+        <span className="flex w-7 shrink-0 items-center">
           <StorageRowIcon
             view={STORAGE_VIEWS.LIST}
             status={STORAGE_ROW_STATUS.READY}
@@ -57,11 +58,11 @@ export const StorageSearchResultRow = ({
         )}
         <span
           title={location}
-          className="max-w-[45%] shrink-0 truncate text-xs text-foreground-lighter"
+          className="max-w-2/5 shrink-0 truncate text-xs text-foreground-lighter"
         >
           {location}
         </span>
-        <ChevronRight size={14} className="shrink-0 text-foreground-lighter" />
+        <ChevronRightIcon size={14} className="shrink-0 text-foreground-lighter" />
       </button>
     </div>
   )

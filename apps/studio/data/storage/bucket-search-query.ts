@@ -127,15 +127,17 @@ export const bucketSearchQueryOptions = ({
   projectRef,
   bucketId,
   searchString,
-}: BucketSearchVariables) =>
-  queryOptions({
-    queryKey: storageKeys.search(projectRef, bucketId, searchString.trim()),
-    queryFn: ({ signal }) => getBucketSearchResults({ projectRef, bucketId, searchString }, signal),
+}: BucketSearchVariables) => {
+  const term = searchString.trim()
+
+  return queryOptions({
+    queryKey: storageKeys.search(projectRef, bucketId, term),
+    queryFn: ({ signal }) =>
+      getBucketSearchResults({ projectRef, bucketId, searchString: term }, signal),
     enabled:
-      typeof projectRef !== 'undefined' &&
-      typeof bucketId !== 'undefined' &&
-      searchString.trim().length > 0,
+      typeof projectRef !== 'undefined' && typeof bucketId !== 'undefined' && term.length > 0,
     // Crawling the bucket is expensive, so hold onto a term's results while the user
     // browses the matches and comes back for another look
     staleTime: 60 * 1000,
   })
+}

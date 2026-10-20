@@ -598,7 +598,7 @@ test.describe('Storage', () => {
     await deleteItem(page, fileName)
   })
 
-  test('Deleting a file preserves the current filter', async ({ page, ref }) => {
+  test('Search no longer lists a deleted file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_delete_file_filter`
     const fileName = 'test-file.txt'
 
@@ -629,18 +629,24 @@ test.describe('Storage', () => {
       path.join(import.meta.dirname, 'files', 'another-file.txt'),
       'another-file.txt'
     )
-    await page.getByPlaceholder('Search in root directory...').fill('test')
-    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
-    await expect(page.getByTitle('test-file.txt')).toHaveCount(1)
-    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+    const searchInput = page.getByPlaceholder(`Search ${bucketName}...`)
+    const searchResult = (name: string) =>
+      page.getByRole('button', { name: `${name} in ${bucketName}` })
 
-    // Delete the file
+    await searchInput.fill('test')
+    await expect(searchResult('test-file.txt')).toBeVisible({ timeout: 30_000 })
+    await expect(searchResult('test-file-2.txt')).toBeVisible()
+    await expect(searchResult('another-file.txt')).toHaveCount(0)
+
+    // Delete the file from the folder view, with the search cleared
+    await searchInput.clear()
     await deleteItem(page, fileName)
 
-    // Check the filter is still applied
-    await expect(page.getByTitle('test-file.txt')).toHaveCount(0)
-    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
-    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+    // Searching again no longer lists the deleted file
+    await searchInput.fill('test')
+    await expect(searchResult('test-file-2.txt')).toBeVisible({ timeout: 30_000 })
+    await expect(searchResult('test-file.txt')).toHaveCount(0)
+    await expect(searchResult('another-file.txt')).toHaveCount(0)
   })
 
   test('can delete a folder', async ({ page, ref }) => {
