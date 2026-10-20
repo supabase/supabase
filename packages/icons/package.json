@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "@supabase/build-icons": "workspace:*"
   },

@@ -34,6 +34,7 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",

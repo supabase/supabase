@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "tsconfig": "workspace:"
+    "tsconfig": "workspace:",
+    "tsrs": "catalog:"
   },
   "author": "",
   "license": "MIT",

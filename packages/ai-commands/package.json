@@ -35,6 +35,7 @@
     "sql-formatter": "^15.0.0",
     "tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

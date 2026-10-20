@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "shadcn": "^4.0.0",
     "tsconfig": "workspace:*",
     "typescript": "catalog:",

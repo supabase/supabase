@@ -54,6 +54,11 @@ catalog:
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
   typescript: ~6.0.2
+  # Experimental Rust port of the TypeScript 7.1 checker. Typecheck scripts
+  # call `tsrs` and write build info to node_modules/.cache/tsrs.tsbuildinfo
+  # so it cannot be read as tsc's tsconfig.tsbuildinfo (formats differ).
+  # https://blog.cloudflare.com/typescript-rust-port
+  tsrs: 0.18.0-ts7.1.0-dev.20260929
   valtio: ^2.3.2
   vite: ^8.0.16
   velite: ^0.4.0
@@ -94,6 +99,10 @@ minimumReleaseAgeExclude:
   - '@supabase-labs/*'
   - typescript
   - '@typescript/*'
+  # Temporary: tsrs (and its @tsrs/* native packages) are younger than
+  # minimumReleaseAge. Drop this once the pinned release is 72h old.
+  - tsrs
+  - '@tsrs/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
   # The following are excluded to fix vulnerablities.

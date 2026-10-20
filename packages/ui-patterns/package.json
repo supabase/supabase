@@ -815,6 +815,7 @@
     "@types/react-dom": "catalog:",
     "@types/react-syntax-highlighter": "^15.5.13",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "api-types": "workspace:*",
     "config": "workspace:*",

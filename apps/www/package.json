@@ -43,6 +43,7 @@
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "@vercel/og": "^0.6.2",
     "ai-commands": "workspace:*",
     "animejs": "^4.0.2",

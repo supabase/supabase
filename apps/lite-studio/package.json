@@ -28,6 +28,7 @@
     "@types/react-dom": "catalog:",
     "config": "workspace:*",
     "tailwindcss": "catalog:",
+    "tsrs": "catalog:",
     "tsconfig": "workspace:*",
     "vite": "^8.0.0"
   }
