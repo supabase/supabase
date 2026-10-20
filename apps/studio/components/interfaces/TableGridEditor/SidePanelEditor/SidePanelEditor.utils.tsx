@@ -599,7 +599,7 @@ export const createTable = async ({
                     labelTopClass="tabular-nums"
                   />
                 </div>,
-                { id: toastId, icon: null }
+                { id: toastId }
               )
             },
             emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
@@ -635,7 +635,7 @@ export const createTable = async ({
                     labelTopClass="tabular-nums"
                   />
                 </div>,
-                { id: toastId, icon: null }
+                { id: toastId }
               )
             },
             emptyStringAsNullHeaders: importContent.emptyStringAsNullHeaders,
