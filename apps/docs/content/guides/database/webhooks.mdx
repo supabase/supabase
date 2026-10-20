@@ -99,6 +99,8 @@ To keep the secret key out of your migration files, store it in [Supabase Vault]
 
    The trigger function is `security definer` because the roles that insert rows, such as `authenticated`, can't read Vault. Without it, their inserts fail with a permission error.
 
+<$Partial path="pg_net_queued_key.mdx" />
+
 ## Payload
 
 The payload is automatically generated from the underlying table record:
