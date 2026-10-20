@@ -6,7 +6,7 @@ import { GuideBrowser } from '../../components/GuideBrowser'
 import { TopicHero } from '../../components/Hero'
 import Layout from '../../layouts/Layout.astro'
 import { toSummary, toTroubleshootingSummary } from '../../lib/guides'
-import { breadcrumbListSchema, KB_BASE_URL } from '../../lib/json-ld'
+import { breadcrumbListSchema, canonicalUrl, KB_BASE_URL } from '../../lib/json-ld'
 import { isInTopic, TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
@@ -31,7 +31,7 @@ export async function getStaticPaths() {
 }
 
 const { topic, description, guides, troubleshooting } = Astro.props
-const url = `${KB_BASE_URL}/topics/${topicToSlug(topic)}`
+const url = canonicalUrl(Astro.url.pathname)
 const jsonLd = breadcrumbListSchema([
 	{ name: 'Knowledge Base', url: KB_BASE_URL },
 	{ name: topic, url },
