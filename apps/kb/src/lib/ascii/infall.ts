@@ -1,7 +1,7 @@
 import { hash, phase, RAMP } from './field'
 import { invertWarp, projectWarp, tangentAngle, type WarpPoint, type WarpShape } from './warp'
 
-export interface InfallGlyph {
+interface InfallGlyph {
   root: HTMLElement
   char: HTMLElement
   glyph: HTMLElement
@@ -20,6 +20,29 @@ interface PaintSettleParams {
   at: number
 }
 
+interface CreateInfallParams {
+  getAnchor: () => HTMLElement | null
+}
+
+interface InfallMeasureParams {
+  origin: DOMRect
+  throat: WarpPoint
+}
+
+interface InfallFrameParams {
+  shape: WarpShape
+  flatten: number
+  lineY: number
+  progress: number
+}
+
+interface Infall {
+  getLift: () => number
+  measure: (params: InfallMeasureParams) => void
+  advance: (dt: number) => void
+  paint: (params: InfallFrameParams) => boolean
+}
+
 interface PaintInfallParams {
   throat: WarpPoint
   glyphs: InfallGlyph[]
@@ -29,11 +52,7 @@ interface PaintInfallParams {
   progress: number
 }
 
-export const measureInfall = ({
-  container,
-  origin,
-  throat,
-}: MeasureInfallParams): InfallGlyph[] => {
+const measureInfall = ({ container, origin, throat }: MeasureInfallParams): InfallGlyph[] => {
   const roots = [...container.querySelectorAll<HTMLElement>('[data-infall]')]
   // the rest position must not include the transform of the last frame
   for (const root of roots) root.style.transform = ''
@@ -60,7 +79,7 @@ export const measureInfall = ({
   }))
 }
 
-export const paintInfall = ({
+const paintInfall = ({
   glyphs,
   throat,
   shape,
@@ -110,7 +129,7 @@ export const paintInfall = ({
   return remaining
 }
 
-export const paintSettle = ({ glyphs, at }: PaintSettleParams) => {
+const paintSettle = ({ glyphs, at }: PaintSettleParams) => {
   for (const { root, char, glyph, delay } of glyphs) {
     const settled = 1 - (1 - phase({ t: at, start: delay * 2, length: 0.6 })) ** 3
     char.style.opacity = '1'
@@ -118,5 +137,81 @@ export const paintSettle = ({ glyphs, at }: PaintSettleParams) => {
     root.style.opacity = `${settled}`
     root.style.transform = settled < 1 ? `translateY(${(1 - settled) * 6}px)` : ''
     root.style.filter = settled < 1 ? `blur(${(1 - settled) * 3}px)` : ''
+  }
+}
+
+export const createInfall = ({ getAnchor }: CreateInfallParams): Infall => {
+  let glyphs: InfallGlyph[] = []
+  let frameKey = ''
+  let isConsumed = false
+  let lift = 0
+  let fallAt = 0
+  let fallTarget = 0
+  let settleAt = 1
+  const getSearch = () => getAnchor()?.querySelector<HTMLElement>('[data-warp-throat]') ?? null
+
+  return {
+    // a risen search must not move the throat, so the canvas adds the lift back when it measures
+    getLift: () => (isConsumed ? lift : 0),
+    measure: ({ origin, throat }) => {
+      const anchor = getAnchor()
+      glyphs = anchor ? measureInfall({ container: anchor, origin, throat }) : []
+      const copy = [...(anchor?.children ?? [])]
+        .filter((child) => !child.matches('[data-warp-throat]'))
+        .map((child) => child.getBoundingClientRect())
+      // the search rises 60% of the way to the copy's center
+      lift =
+        getSearch() && copy.length > 0
+          ? 0.6 *
+            (throat.y -
+              (Math.min(...copy.map((rect) => rect.top)) +
+                Math.max(...copy.map((rect) => rect.bottom))) /
+                2 +
+              origin.top)
+          : 0
+      frameKey = ''
+    },
+    advance: (dt) => {
+      if (fallTarget === 1 && fallAt < 1) fallAt = Math.min(1, fallAt + dt)
+      if (settleAt < 1) settleAt = Math.min(1, settleAt + dt / 0.6)
+    },
+    // true on the frame the last glyph goes in
+    paint: ({ shape, flatten, lineY, progress }) => {
+      // two thresholds, so a scroll that stops near one does not start and stop the infall
+      if (progress > 0.03) {
+        fallTarget = 1
+        settleAt = 1
+      } else if (progress < 0.01 && fallTarget === 1) {
+        fallTarget = 0
+        fallAt = 0
+        settleAt = 0
+      }
+      // frames repeat while the page is still, so the glyph styles change only when they move
+      if (frameKey === `${fallAt}:${settleAt}:${progress}`) return false
+      frameKey = `${fallAt}:${settleAt}:${progress}`
+      if (settleAt < 1) paintSettle({ glyphs, at: settleAt })
+      const remaining =
+        settleAt < 1
+          ? 1
+          : paintInfall({
+              glyphs,
+              throat: { x: shape.cx, y: lineY + (shape.throatY - lineY) * (1 - flatten) },
+              shape,
+              flatten,
+              lineY,
+              // the glyph timeline ends near 0.34, so the clock maps onto it
+              progress: fallAt * 0.34,
+            })
+      const isGone = glyphs.length > 0 && remaining === 0
+      if (isGone !== isConsumed) {
+        getSearch()?.animate(
+          { translate: isGone ? `0 ${-lift}px` : '0 0' },
+          { duration: 700, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'forwards' }
+        )
+      }
+      const isJustConsumed = isGone && !isConsumed
+      isConsumed = isGone
+      return isJustConsumed
+    },
   }
 }
