@@ -2,7 +2,7 @@ import type { ToolUIPart, UIMessage } from 'ai'
 import { describe, expect, it } from 'vitest'
 
 import { prepareMessagesForModel } from './generate-assistant-response.utils'
-import { encodeNotebookToolError, NotebookToolError } from './tools/notebook-tools'
+import { encodeNotebookToolError, NotebookToolError } from './tools/notebook-tool-error'
 
 function assistantMessage(parts: UIMessage['parts']): UIMessage {
   return { id: 'msg-1', role: 'assistant', parts }

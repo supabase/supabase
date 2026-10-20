@@ -168,7 +168,7 @@ const OrganizationLayoutContent = ({
           </div>
         </Alert>
       )}
-      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
+      <main className="relative h-full w-full overflow-y-auto flex flex-col">{children}</main>
     </div>
   )
 }

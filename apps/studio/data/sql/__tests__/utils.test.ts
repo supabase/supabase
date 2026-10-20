@@ -1,4 +1,4 @@
-import { safeSql } from '@supabase/pg-meta'
+import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { describe, expect, it, test } from 'vitest'
 
 import { applyAutoLimit, getSqlErrorLines, trimTrailingSemicolons } from '../utils'
@@ -118,6 +118,46 @@ describe('applyAutoLimit', () => {
     const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
+  test.each([
+    'select * from countries limit all;',
+    'select * from countries limit all',
+    'SELECT * FROM countries LIMIT ALL ;',
+    'select * from countries limit null;',
+    'select * from countries limit all offset 5;',
+    'select * from countries offset 5 limit null',
+  ])('Should return false if query already has LIMIT ALL / LIMIT NULL: %s', (query) => {
+    const { sql, appendAutoLimit } = applyAutoLimit(query as SafeSqlFragment, 100)
+    expect(appendAutoLimit).toBe(false)
+    expect(sql).toBe(query)
+  })
+  test('Should append the limit to a CTE query', () => {
+    const sql = safeSql`WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers;`
+    const result = applyAutoLimit(sql, 100)
+    expect(result.appendAutoLimit).toBe(true)
+    expect(result.sql).toBe(
+      'WITH numbers AS (SELECT generate_series(1, 2000) AS n) SELECT n FROM numbers limit 100;'
+    )
+  })
+  test('Should append the limit to a recursive CTE query when the inner query has its own limit', () => {
+    const sql = safeSql`with recursive t as (select 1 as n limit 5) select * from t`
+    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(true)
+  })
+  test('Should return false if a CTE query already has a limit', () => {
+    const sql = safeSql`with t as (select 1) select * from t limit 10`
+    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(false)
+  })
+  test('Should append the limit to a read-only CTE whose literals or identifiers contain write keywords', () => {
+    const sql = safeSql`with t as (select 'update' as "delete") select * from t`
+    expect(applyAutoLimit(sql, 100).appendAutoLimit).toBe(true)
+  })
+  test.each([
+    'with d as (delete from t returning *) select * from d',
+    'with s as (select 1) insert into t select * from s',
+    'with s as (select 1) update t set a = 1',
+    'with t as (select 1) select * into new_t from t',
+  ])('Should return false for a CTE query that writes: %s', (query) => {
+    expect(applyAutoLimit(query as SafeSqlFragment, 100).appendAutoLimit).toBe(false)
+  })
   test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
     const sql = safeSql`SELECT * FROM countries LIMIT 10;`
     const limit = 100
@@ -171,6 +211,12 @@ describe('applyAutoLimit', () => {
     const limit = 100
     const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false if query uses `FETCH NEXT` instead of limit ', () => {
+    const sql = safeSql`select * from countries offset 5 rows FETCH NEXT 5 rows only`
+    const { sql: result, appendAutoLimit } = applyAutoLimit(sql, 100)
+    expect(appendAutoLimit).toBe(false)
+    expect(result).toBe(sql)
   })
   test('Should return false if query is not a select statement', () => {
     const sql = safeSql`create table test (id int8 primary key, name varchar);`

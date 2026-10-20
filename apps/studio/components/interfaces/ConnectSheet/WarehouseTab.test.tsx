@@ -95,7 +95,7 @@ describe('WarehouseTab', () => {
         'Some tables are ready to query. The remaining tables will become available as their backfills finish.'
       )
     ).toBeInTheDocument()
-    expect(screen.getByDisplayValue('default.warehouse.supabase.io')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('default.warehouse.supabase.co')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View progress' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'
@@ -118,7 +118,7 @@ describe('WarehouseTab', () => {
       'href',
       '/project/default/integrations/warehouse/overview'
     )
-    expect(screen.queryByDisplayValue('default.warehouse.supabase.io')).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue('default.warehouse.supabase.co')).not.toBeInTheDocument()
   })
 
   test('renders connection details and offers catalog access only for DuckDB', async () => {
@@ -134,10 +134,10 @@ describe('WarehouseTab', () => {
     expect(container.querySelector('.border-0.shadow-none')).toBeInTheDocument()
     expect(container.querySelector('[data-orientation="horizontal"]')).not.toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Connect' })).not.toBeInTheDocument()
-    expect(screen.getByDisplayValue('default.warehouse.supabase.io')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('default.warehouse.supabase.co')).toBeInTheDocument()
     expect(
       screen.getByDisplayValue(
-        'flightsql://postgres:[YOUR-PASSWORD]@default.warehouse.supabase.io:443?tls=enabled'
+        'flightsql://postgres:[YOUR-PASSWORD]@default.warehouse.supabase.co:443?tls=enabled'
       )
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Manage Warehouse' })).toHaveAttribute(

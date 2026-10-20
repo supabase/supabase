@@ -1,6 +1,6 @@
 ---
-import { ExternalLink, Github } from 'lucide-react'
-import { Badge } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Badge, GithubIcon } from 'ui'
 
 import Layout from './Layout.astro'
 import { getTopicDescription, type Topic, TOPIC_NAMES, topicToSlug } from '../lib/topics'
@@ -53,7 +53,7 @@ function isKnownTopic(topic: string): topic is Topic {
 			github_url && (
 				<p>
 					<a href={github_url} target="_blank" rel="noreferrer" class="inline-flex items-center gap-1.5">
-						<Github size={16} /> Go to the GitHub discussion
+						<GithubIcon size={16} /> Go to the GitHub discussion
 					</a>
 				</p>
 			)

@@ -1,5 +1,5 @@
-import { BookOpenIcon, GithubIcon } from 'lucide-react'
-import { Badge, Button } from 'ui'
+import { BookOpenIcon } from 'lucide-react'
+import { Badge, Button, GithubIcon } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
 

@@ -33,7 +33,6 @@ import {
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
   getRegionSelectionType,
-  getSpecificRegionsLinkVariant,
   instanceLabel,
   monthlyInstancePrice,
   resolveDefaultDbRegion,
@@ -68,6 +67,7 @@ import {
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import {
@@ -120,7 +120,16 @@ export const ProjectCreationForm = ({
   const { profile } = useProfile()
   const { slug, projectName, externalId } = useParams()
   const trackFunnelError = useTrackFunnelError()
-  const defaultProvider = useDefaultProvider()
+  const defaultProviderFromHook = useDefaultProvider()
+  const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
+  // On staging, ~50% of new projects default to v3 (AWS_K8S). Rolled once per mount; the
+  // internal-only "Cloud provider" selector can still override it.
+  const [defaultProvider] = useState<CloudProvider>(() => {
+    const canDefaultToV3 =
+      process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' &&
+      (validCloudProviders?.includes('AWS_K8S') ?? true)
+    return canDefaultToV3 && Math.random() < 0.5 ? 'AWS_K8S' : PROVIDERS[defaultProviderFromHook].id
+  })
 
   const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
@@ -173,7 +182,7 @@ export const ProjectCreationForm = ({
       instanceType: '',
       kubernetesClusterId: '',
       kubernetesClusterForce: false,
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: defaultProvider,
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
@@ -208,17 +217,7 @@ export const ProjectCreationForm = ({
   const highAvailabilityRegionCode = getHighAvailabilityRegionCode()
 
   const { isPending: isPendingOrganizationCreatedAt } = useSelectedOrganizationCreatedAtQuery()
-  // Only free-plan orgs get the specific-regions link collapse behavior. When active for an
-  // org, it owns the region selector, so the free tier experiment stays inactive for that org.
-  const specificRegionsLinkFlag = useFlag('projectCreationSpecificRegionsLink') === true
-  const isSpecificRegionsLinkEnabled = specificRegionsLinkFlag && isFreePlan
-  const specificRegionsLinkVariant = getSpecificRegionsLinkVariant({
-    isFreePlan,
-    smartRegionEnabled,
-    linkFlag: specificRegionsLinkFlag,
-  })
   const isResolvingFreeTierGeneralRegionExperiment =
-    !isSpecificRegionsLinkEnabled &&
     isFreePlan &&
     smartRegionEnabled &&
     (!flagsLoaded || isPendingOrganizationCreatedAt || isConfigCatStale === true)
@@ -229,7 +228,6 @@ export const ProjectCreationForm = ({
     smartRegionEnabled,
     enrollmentFlag: freeTierGeneralRegionEnrollment,
     selectionFlag: freeTierGeneralRegionSelection,
-    isOverridden: isSpecificRegionsLinkEnabled,
   })
 
   // Read dirty state during render rather than depending on form.formState in the
@@ -399,9 +397,6 @@ export const ProjectCreationForm = ({
           }),
           ...(freeTierGeneralRegionExperimentVariant !== undefined && {
             freeTierGeneralRegionExperiment: freeTierGeneralRegionExperimentVariant,
-          }),
-          ...(specificRegionsLinkVariant !== undefined && {
-            specificRegionsLinkExperiment: specificRegionsLinkVariant,
           }),
           ...(regionSelectionType !== undefined && { regionSelectionType }),
           regionCode: res.region,
@@ -653,9 +648,15 @@ export const ProjectCreationForm = ({
     if (freeTierGeneralRegionExperimentVariant === undefined) return
     if (!canCreateProject || projectCreationDisabled || isLoadingFreeProjectLimit) return
     freeTierGeneralRegionExposedSlug.current = slug
-    track('free_tier_general_region_experiment_exposed', {
-      variant: freeTierGeneralRegionExperimentVariant,
-    })
+    track(
+      'free_tier_general_region_experiment_exposed',
+      {
+        variant: freeTierGeneralRegionExperimentVariant,
+      },
+      {
+        organization: slug,
+      }
+    )
   }, [
     slug,
     isResolvingFreeTierGeneralRegionExperiment,

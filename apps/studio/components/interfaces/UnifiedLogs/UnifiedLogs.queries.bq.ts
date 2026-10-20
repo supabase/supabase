@@ -387,8 +387,12 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+export const getUnifiedLogsQuery = (
+  search: QuerySearchParamsType,
+  paginationFilter?: SafeLogSqlFragment
+): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
+  if (paginationFilter) conditions.push(paginationFilter)
   const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`

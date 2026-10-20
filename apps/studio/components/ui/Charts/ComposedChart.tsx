@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { useTheme } from 'next-themes'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -141,6 +142,8 @@ export function ComposedChart({
   showNewBadge,
   normalizeVisibleStackToPercent = false,
 }: ComposedChartProps) {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
+  const effectiveChartStyle = shouldDefaultToLineCharts ? 'line' : chartStyle
   const { resolvedTheme } = useTheme()
   const { hoveredIndex, syncTooltip, setHover, clearHover } = useChartHoverState(
     syncId || 'default'
@@ -190,14 +193,14 @@ export function ComposedChart({
     width: 0,
   }
   const yAxisPadding = useMemo(() => {
-    const needsTopPadding = normalizeVisibleStackToPercent && chartStyle !== 'bar'
+    const needsTopPadding = normalizeVisibleStackToPercent && effectiveChartStyle !== 'bar'
     if (!needsTopPadding) return _YAxisProps.padding
 
     return {
       ..._YAxisProps.padding,
       top: Math.max(8, _YAxisProps.padding?.top ?? 0),
     }
-  }, [_YAxisProps.padding, chartStyle, normalizeVisibleStackToPercent])
+  }, [_YAxisProps.padding, effectiveChartStyle, normalizeVisibleStackToPercent])
 
   function getHeaderLabel() {
     if (!xAxisIsDate) {
@@ -446,8 +449,8 @@ export function ComposedChart({
         highlightedValue={formatHighlightedValue(resolvedHighlightedValue)}
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
-        hideChartType={hideChartType}
-        chartStyle={chartStyle}
+        hideChartType={hideChartType || shouldDefaultToLineCharts}
+        chartStyle={effectiveChartStyle}
         onChartStyleChange={onChartStyleChange}
         showMaxValue={_showMaxValue}
         setShowMaxValue={maxAttribute ? setShowMaxValue : undefined}
@@ -557,7 +560,7 @@ export function ComposedChart({
             ))}
           </defs>
 
-          {chartStyle === 'bar'
+          {effectiveChartStyle === 'bar'
             ? visibleAttributes.map((attribute) => (
                 <Bar
                   key={attribute.name}

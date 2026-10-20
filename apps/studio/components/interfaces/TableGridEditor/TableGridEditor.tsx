@@ -158,7 +158,8 @@ export const TableGridEditor = ({
         </div>
       ) : (
         <TableEditorTableStateContextProvider
-          key={`table-editor-table-${selectedTable.id}`}
+          // Table ids are per-database OIDs, so the same id can exist in another project.
+          key={`table-editor-table-${projectRef}-${selectedTable.id}`}
           projectRef={projectRef}
           table={selectedTable}
           editable={editable}
