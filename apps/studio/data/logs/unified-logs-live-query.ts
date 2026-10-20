@@ -12,7 +12,14 @@ import { deduplicateUnifiedLogs } from './unified-logs.utils'
 
 type LogRow = UnifiedLogsData['data'][number]
 type LiveWindow = { start: number; end: number; row: NonNullable<UnifiedLogsData['nextRow']> }
-type LiveLogs = { rows: LogRow[]; completedUntil: number; window?: LiveWindow }
+type LiveStream = { completedUntil: number; window?: LiveWindow }
+type LiveLogs = {
+  rows: LogRow[]
+  forward: LiveStream
+  sweep: LiveStream
+}
+
+const isCatchingUp = (data?: LiveLogs) => !!(data?.forward.window || data?.sweep.window)
 
 const timestampNanos = (row: LogRow) => {
   const timestamp = String(row.timestamp)
@@ -39,6 +46,11 @@ export const useUnifiedLogsLiveQuery = ({
   seed,
 }: UnifiedLogsVariables & { isLive: boolean; seed?: number }) => {
   const queryClient = useQueryClient()
+  const turns = useRef(new Map<string, boolean>())
+  const getTurn = useCallback((scope: string) => turns.current.get(scope) ?? false, [])
+  const rotateTurn = useCallback((scope: string, isSweep: boolean) => {
+    turns.current.set(scope, !isSweep)
+  }, [])
   const seedRef = useRef(seed)
   useLayoutEffect(() => {
     seedRef.current = seed
@@ -53,27 +65,41 @@ export const useUnifiedLogsLiveQuery = ({
     retry: false,
     queryFn: async ({ signal, queryKey }): Promise<LiveLogs> => {
       const cached = queryClient.getQueryData<LiveLogs>(queryKey)
-      const completedUntil = cached?.completedUntil ?? getSeed()
-      if (completedUntil === undefined) throw new Error('Logs must load before live mode starts')
-      const start = cached?.window?.start ?? completedUntil - 2 * 60 * 1000
-      const end = cached?.window?.end ?? Date.now()
-      const row = cached?.window?.row
+      const seed = cached?.forward.completedUntil ?? getSeed()
+      if (seed === undefined) throw new Error('Logs must load before live mode starts')
+      const forward = cached?.forward ?? { completedUntil: seed }
+      const sweep = cached?.sweep ?? { completedUntil: seed }
+      const now = Date.now()
+      const hasForwardWork = !!forward.window || forward.completedUntil < now
+      const hasSweepWork = !!sweep.window || sweep.completedUntil + 30_000 <= now
+      const scope = hashKey(queryKey)
+      const isSweep = hasSweepWork && (getTurn(scope) || !hasForwardWork)
+      const stream = isSweep ? sweep : forward
+      const overlap = isSweep ? 2 * 60 * 1000 : 0
+      const start = stream.window?.start ?? stream.completedUntil - overlap
+      const end = stream.window?.end ?? now
+      const row = stream.window?.row
       const page = await getUnifiedLogs(
         {
           projectRef,
-          search: { ...search, date: [new Date(start), new Date(end)] },
+          search: { ...search, date: [new Date(start - 1), new Date(end)] },
           useOtel,
           pageParam: row ? { cursor: end, direction: 'next', row } : null,
         },
         signal
-      )
+      ).finally(() => rotateTurn(scope, isSweep))
       const rows = mergeUnifiedLogs([...page.data, ...(cached?.rows ?? [])]).filter(
         (entry) => entry.date.getTime() >= Date.now() - 60 * 60 * 1000
       )
       const window =
         page.data.length === 50 && page.nextRow ? { start, end, row: page.nextRow } : undefined
       signal.throwIfAborted()
-      return { rows, completedUntil: window ? completedUntil : end, window }
+      const updated = { completedUntil: window ? stream.completedUntil : end, window }
+      return {
+        rows,
+        forward: isSweep ? forward : updated,
+        sweep: isSweep ? updated : sweep,
+      }
     },
   })
   const canPoll =
@@ -93,13 +119,13 @@ export const useUnifiedLogsLiveQuery = ({
   const onPoll = useCallback(async () => {
     if (!canPoll) return { isCatchingUp: false }
     const result = await refetch({ cancelRefetch: false })
-    return { isCatchingUp: !result.error && result.data?.window !== undefined }
+    return { isCatchingUp: !result.error && isCatchingUp(result.data) }
   }, [canPoll, refetch])
   return {
     data: query.data,
     error: query.error,
     isError: query.isError,
     onPoll,
-    isCatchingUp: query.data?.window !== undefined,
+    isCatchingUp: isCatchingUp(query.data),
   }
 }
