@@ -37,10 +37,11 @@ from
       (
         select
           oid,
-          (string_to_array(unnest(rolconfig), '='))[1] as param,
-          (string_to_array(unnest(rolconfig), '='))[2] as value
+          split_part(config.entry, '=', 1) as param,
+          substr(config.entry, strpos(config.entry, '=') + 1) as value
         from
           pg_roles
+          cross join lateral unnest(rolconfig) as config(entry)
       ) as _
     group by
       oid
