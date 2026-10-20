@@ -2367,6 +2367,7 @@ Supabase Reports provide comprehensive insights into your project's performance,
 4. Trend analysis: Observe usage patterns over time to predict future needs and potential issues.
 5. Security overview: Monitor authentication attempts, failed queries, and other security-related metrics.
 6. Customizable dashboards: Create tailored views of the metrics most important to your team.
+7. Connection sessions: Database Connections, under Observability, shows which sessions hold your connections and what blocks them, so you can find the query holding up the rest. See [Database Connections](/features/database-connections).
 
 ## Reports are particularly valuable for:
 - Development teams needing to optimize application performance
@@ -2384,6 +2385,44 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Database Connections',
+    subtitle: 'See your running queries and stop the one blocking your app.',
+    description: `
+When your app slows down or hangs, Database Connections shows which queries are slow or stuck and which one holds up the most others. You can cancel a query or end a session without writing SQL.
+
+## Key benefits
+1. Start with the top blocker: Top blocker names the query that blocks the most others, so you know where to look first.
+2. Find the root blocker: The Root blockers filter lists sessions that block others but aren't blocked themselves, the ones to stop first.
+3. Slow and stuck sessions stand out: Run time turns amber at 30 seconds for an active query and red at 10 seconds for a transaction left open with nothing running.
+4. Read each session's details: Every row shows the query text, state, process ID (PID), and run time, so you can tell what each session is doing.
+5. Connections by service: Filter by application name to see which service holds the connections.
+6. Stop a session from the same page: Open the row's menu and choose Cancel query or Terminate session to clear the block.
+7. Get a summary: Click Summarize activity and the AI Assistant lists blocked, stuck, and slow sessions by PID.
+
+## When to use Database Connections
+- One query holds a lock and the rest of your app waits (Top blocker)
+- A migration hangs because an open transaction holds a lock (the Idle in transaction count and Terminate session)
+- Your app's connections keep climbing and you can't tell which service opened them (the application name filter)
+
+## How it works
+If a query waits on more than one session, the Blocked by column lists them all, but the chain shows only the first. Cancel query works only on active queries. Neither action works on a session owned by a superuser role.
+
+## Get started
+- In the dashboard, open Observability, then Database Connections. It's on by default for every project, including self-hosted.
+- Read [Diagnosing stuck and blocked queries](https://supabase.com/docs/guides/database/connection-management#diagnosing-stuck-and-blocked-queries).
+`,
+    icon: Activity,
+    products: [PRODUCT_SHORTNAMES.DATABASE],
+    heroImage: '',
+    docsUrl:
+      'https://supabase.com/docs/guides/database/connection-management#diagnosing-stuck-and-blocked-queries',
+    slug: 'database-connections',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
@@ -2482,6 +2521,7 @@ Trace propagation also works inbound. supabase-js, Swift, Flutter, and Python ca
 6. OpenTelemetry Support: Export telemetry data to vendor-agnostic monitoring platforms for unified observability.
 7. Metrics API: Stream Postgres performance metrics for CPU, IO, WAL, connections, and query statistics.
 8. Client-Side Trace Propagation: correlate a trace from your client app — web, mobile, or server-side — with the matching API Gateway and Edge Function log under one shared 'trace_id'.
+9. Agent Log Queries: The \`query_logs\` tool in the Supabase MCP Server lets your coding agent run read-only SQL on up to 24 hours of logs per request, so it can find the failing request for you. See [Query logs with SQL](https://supabase.com/docs/guides/observability/advanced-log-filtering#mcp).
 
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
@@ -2681,7 +2721,8 @@ The Security & Performance Advisor feature in Supabase offers users actionable i
 2. Performance optimization: Analyzes query performance to recommend optimizations that enhance efficiency.
 3. User-friendly dashboard: Presents findings in an easily digestible format within Supabase Studio.
 4. Actionable recommendations: Provides clear steps for addressing identified issues, empowering users to enhance their database environments.
-5. Ongoing monitoring: Continuously evaluates changes in database usage to adapt recommendations accordingly.
+5. Run on demand: Open the advisors in the dashboard, or run them with \`supabase db advisors\` or the Management API, after you change your schema, so you catch a missing index or an RLS problem early.
+6. Health checks: A Health tab beside Security and Performance flags error rates that stay high in the Data API, Auth, Storage, and Edge Functions, so you know which service to check first. See [Health Check Advisors](/features/health-check-advisors).
 
 This feature is essential for organizations aiming to maintain high security standards while ensuring optimal performance across their applications.
 `,
@@ -2694,6 +2735,44 @@ This feature is essential for organizations aiming to maintain high security sta
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Health Check Advisors',
+    subtitle: 'Find which Supabase service has a high server error rate.',
+    description: `
+With Health Check Advisors, you know which Supabase service to look at first. Run the checks for Auth, Storage, Edge Functions, and the Data API from the Health tab or the Management API. When you run them, each service whose error rate stays high returns a result.
+
+## Key benefits
+1. Know where to look: With one check per service, you see which one has a high error rate before you open a log.
+2. Sort by severity: Every result has a severity level, and you can start with the worst one.
+3. Go straight to the logs: In the dashboard, View logs on any result opens the API Gateway logs, so you can check the errors yourself.
+4. Trust an empty result: No result means every check ran and found no high error rate.
+5. Give your agent a starting point: Over the Management API, your agent gets the results you see in the dashboard.
+6. Read Health like the other advisors: Health results use the same fields as Security and Performance in the dashboard and the Management API, so all three read the same way.
+
+## When to use Health Check Advisors
+- Your app throws server errors and you don't know which service is behind them (one check per service, run on demand)
+- After a deploy, you want to see if any service's server errors stay high (run the checks from the Health tab)
+- Your agent needs to know which service to debug first (the same checks over the Management API)
+
+## How it works
+The checks measure the server error (5xx) rate in recent request logs for each service. The error rate has to stay high over a period, so a result can take a while to clear after a fix. Results are cached, and quick repeat calls return the same snapshot. Over the Management API, a check that could not run says so.
+
+## Get started
+- In the dashboard, open Advisors, then Health.
+- From the Management API, call \`POST /v2/projects/{ref}/advisors/run\` ([API reference](https://supabase.com/docs/reference/api/v2-run-project-advisors)).
+- Read the [Advisors docs](https://supabase.com/docs/guides/observability/advisors).
+`,
+    icon: Activity,
+    products: [ADDITIONAL_PRODUCTS.STUDIO],
+    heroImage: '',
+    hideHero: true,
+    docsUrl: 'https://supabase.com/docs/guides/observability/advisors',
+    slug: 'health-check-advisors',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
     },
   },
   {
@@ -2991,6 +3070,40 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
     },
   },
   {
+    title: 'Agent Skills',
+    subtitle: 'Teach your coding agent to build and debug on Supabase.',
+    description: `
+With Supabase Agent Skills, your coding agent checks the current Supabase docs and changelog before it writes code, so it knows what changed after its training data. The skills are open-source instructions your agent loads when a task involves Supabase. They work in Claude Code, Codex, Cursor, GitHub Copilot, and other agents that support Agent Skills.
+
+## Key benefits
+1. Avoid common security mistakes: The skill tells your agent that views skip RLS by default and how to make a view follow your policies.
+2. Debug quiet failures: When a query returns no rows or RLS blocks it, your agent reads the Observability docs before it suggests a fix.
+3. Search logs with SQL: The \`query_logs\` tool in the Supabase MCP server runs read-only SQL on up to 24 hours of logs per request, so your agent can find what failed.
+4. Check your project on a schedule: Agent prompts tell your agent to check Health, Security, Performance, or Resources and report what it finds.
+
+## When to use Agent Skills
+- Your agent writes Supabase code from old training data (the skill checks the changelog and current docs first)
+- Your agent hits a Supabase error and suggests a fix from memory (the skill sends your agent to the Observability docs)
+- You want your agent to report on your project regularly (Agent prompts, with the MCP server set to \`read_only=true\`)
+
+## Get started
+- Run \`npx skills add supabase/agent-skills --all\` to install the skills for every detected agent.
+- Install the skills and the MCP server together with the [Supabase plugin](https://supabase.com/docs/guides/ai-tools/plugins).
+- Read the [Agent Skills docs](https://supabase.com/docs/guides/ai-tools/ai-skills), the [Agent prompts guide](https://supabase.com/docs/guides/observability/automate-with-agents), and the [Agent Skills blog post](https://supabase.com/blog/supabase-agent-skills).
+`,
+    icon: Brain,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    hideHero: true,
+    docsUrl: 'https://supabase.com/docs/guides/ai-tools/ai-skills',
+    blogUrl: 'https://supabase.com/blog/supabase-agent-skills',
+    slug: 'agent-skills',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
     title: 'MCP Server',
     subtitle:
       'Connect your AI tools using the official Supabase Model Context Protocol (MCP) server.',
@@ -3003,7 +3116,7 @@ With the MCP Server, you can:
 - Design tables, generate migrations, and manage schema.
 - Query data and run reports using SQL.
 - Manage branches, configurations, and TypeScript types.
-- Retrieve logs for debugging and troubleshooting.
+- Query project logs with read-only SQL through \`query_logs\`, up to 24 hours per request, and pull Security and Performance Advisor findings with \`get_advisors\`, so you can debug without leaving your AI tool.
 - Automate repetitive tasks and streamline AI-assisted development workflows.
 
 The MCP Server simplifies the integration of AI tools with Supabase, enabling a seamless development experience without the need for custom APIs or wrappers.
@@ -3068,7 +3181,7 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     docsUrl: 'https://supabase.com/docs/guides/getting-started/mcp',
     slug: 'mcp-server',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
     },
   },
