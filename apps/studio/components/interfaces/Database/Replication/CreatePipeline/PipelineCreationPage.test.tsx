@@ -1,10 +1,11 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, expect, it, vi } from 'vitest'
 
 import PipelineCreationPage from '@/pages/project/[ref]/database/pipelines/new'
 import { customRender } from '@/tests/lib/custom-render'
 
 const state = vi.hoisted(() => ({
+  push: vi.fn(),
   enabled: false,
   loading: false,
   flagsLoaded: true,
@@ -12,8 +13,13 @@ const state = vi.hoisted(() => ({
   isHighAvailability: false,
   canUseReplication: true,
 }))
+vi.mock('next/router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/router')>()),
+  useRouter: () => ({ push: state.push, events: { on: vi.fn(), off: vi.fn() } }),
+}))
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default' }),
   useFeatureFlags: () => ({ hasLoaded: state.flagsLoaded }),
 }))
 vi.mock('@/hooks/misc/withAuth', () => ({ withAuth: (component: unknown) => component }))
@@ -35,7 +41,13 @@ vi.mock('@/components/interfaces/Database/Replication/useIsETLPrivateAlpha', () 
   useIsETLSnowflakePrivateAlpha: () => false,
   useIsETLClickHousePrivateAlpha: () => false,
 }))
-vi.mock('./PipelineCreationFlow', () => ({ PipelineCreationFlow: () => <div>Wizard form</div> }))
+vi.mock('./PipelineCreationFlow', () => ({
+  PipelineCreationFlow: ({ onClose }: { onClose: () => void }) => (
+    <button tabIndex={0} onClick={onClose}>
+      Wizard form
+    </button>
+  ),
+}))
 
 beforeEach(() => {
   Object.assign(state, {
@@ -81,4 +93,10 @@ it('falls back when the preview is off even if organisation and project queries 
   state.flagsLoaded = false
   customRender(<PipelineCreationPage />)
   expect(screen.getByRole('status')).toHaveTextContent('Returning to Pipelines')
+})
+
+it('returns through the shared router without reloading the toast host', () => {
+  customRender(<PipelineCreationPage />)
+  fireEvent.click(screen.getByRole('button', { name: 'Wizard form' }))
+  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
 })

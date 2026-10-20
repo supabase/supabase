@@ -5,8 +5,9 @@ import { delay, HttpResponse } from 'msw'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { PipelineCreationFlow } from './PipelineCreationFlow'
+import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -26,6 +27,12 @@ vi.mock('@/components/layouts/Navigation/NavigationBar/OrgSelector', () => ({
 vi.mock('@/components/layouts/AppLayout/ProjectDropdown', () => ({
   ProjectDropdown: () => <span>Project</span>,
 }))
+
+const PipelineCreationFlow = (props: Parameters<typeof CreationFlow>[0]) => (
+  <PipelineRequestStatusProvider>
+    <CreationFlow {...props} />
+  </PipelineRequestStatusProvider>
+)
 
 mockAnimationsApi()
 beforeEach(() => {
@@ -128,6 +135,250 @@ const selectPublication = async () => {
 const back = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
+  const reachReview = async (onClose = vi.fn()) => {
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fillConnection()
+    await continueToData()
+    await selectPublication()
+    next()
+    await screen.findByText(/Step 4 of 4/)
+  }
+
+  const mockCreation = ({ failCreate = false, failStart = false } = {}) => {
+    const requests: unknown[] = []
+    const starts = vi.fn()
+    const destinationRequests: unknown[] = []
+    const pipelineRequests: unknown[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations/validate',
+      response: async ({ request }) => {
+        destinationRequests.push(await request.json())
+        return HttpResponse.json<components['schemas']['ValidateDestinationResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/validate',
+      response: async ({ request }) => {
+        pipelineRequests.push(await request.json())
+        return HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+          validation_failures: [],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations-pipelines',
+      response: async ({ request }) => {
+        requests.push(await request.json())
+        return failCreate && requests.length === 1
+          ? HttpResponse.json<{ message: string }>(
+              { message: 'Create unavailable' },
+              { status: 503 }
+            )
+          : HttpResponse.json<components['schemas']['CreateDestinationPipelineResponse_Output']>({
+              destination_id: 7,
+              pipeline_id: 8,
+            })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/start',
+      response: () => {
+        starts()
+        return failStart
+          ? HttpResponse.json<{ message: string }>(
+              { message: 'Start unavailable' },
+              { status: 503 }
+            )
+          : HttpResponse.json<Record<string, never>>({})
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: () =>
+        HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
+          pipeline_id: 8,
+          status: { name: 'stopped' },
+        }),
+    })
+    return { requests, starts, destinationRequests, pipelineRequests }
+  }
+
+  it.each([false, true])(
+    'leaves after one committed creation, including start failure: %s',
+    async (failStart) => {
+      const { requests, starts, destinationRequests, pipelineRequests } = mockCreation({
+        failStart,
+      })
+      const onClose = vi.fn()
+      await reachReview(onClose)
+      fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+      expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled()
+      expect(screen.getByDisplayValue('Warehouse')).toBeDisabled()
+      fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+      await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+      // Stay locked until the document leaves, even when starting failed.
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+      fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+      expect(requests).toEqual([
+        expect.objectContaining({
+          source_id: 1,
+          destination_name: 'Warehouse',
+          destination_config: expect.objectContaining({
+            big_query: expect.objectContaining({ project_id: 'my-project', dataset_id: 'dataset' }),
+          }),
+          pipeline_config: expect.objectContaining({ publication_name: 'analytics' }),
+        }),
+      ])
+      expect(destinationRequests.at(-1)).toMatchObject({
+        source_id: 1,
+        pipeline_config: expect.objectContaining({ publication_name: 'analytics' }),
+      })
+      expect(pipelineRequests).toEqual([
+        { source_id: 1, config: expect.objectContaining({ publication_name: 'analytics' }) },
+      ])
+      expect(starts).toHaveBeenCalledOnce()
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument()
+      const unload = new Event('beforeunload', { cancelable: true })
+      window.dispatchEvent(unload)
+      expect(unload.defaultPrevented).toBe(false)
+    }
+  )
+
+  it('preserves reviewed values when creation fails and retries safely', async () => {
+    const { requests, starts } = mockCreation({ failCreate: true })
+    const onClose = vi.fn()
+    await reachReview(onClose)
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await waitFor(() => expect(requests).toHaveLength(1))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    )
+    expect(onClose).not.toHaveBeenCalled()
+    expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
+    expect(starts).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    expect(requests).toHaveLength(2)
+    expect(requests[1]).toEqual(requests[0])
+    expect(starts).toHaveBeenCalledOnce()
+  })
+
+  it('blocks critical final validation and requires confirmation for warnings', async () => {
+    const { requests, destinationRequests } = mockCreation()
+    const onClose = vi.fn()
+    await reachReview(onClose)
+    let validationRequests = 0
+    let failure_type: 'critical' | 'warning' = 'critical'
+    let reason = 'Check the publication.'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/validate',
+      response: () => {
+        validationRequests++
+        return HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+          validation_failures: [{ name: 'Publication issue', reason, failure_type }],
+        })
+      },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    expect(await screen.findByText('Check the publication.')).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
+    expect(onClose).not.toHaveBeenCalled()
+    failure_type = 'warning'
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await screen.findByRole('button', { name: 'Start pipeline anyway' })
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
+    )
+    expect(screen.getByText('Check the publication.')).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
+    back()
+    back()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Pipeline name' }), {
+      target: { value: 'Updated warehouse' },
+    })
+    next()
+    await screen.findByText(/Step 3 of 4/)
+    next()
+    await screen.findByText(/Step 4 of 4/)
+    expect(screen.queryByText('Check the publication.')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
+    )
+    const validatedDestinations = destinationRequests.length
+    const validatedPipelines = validationRequests
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline anyway' }))
+    expect(screen.getByText('Check the publication.')).toBeInTheDocument()
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    expect(requests).toHaveLength(1)
+    expect(destinationRequests).toHaveLength(validatedDestinations)
+    expect(validationRequests).toBe(validatedPipelines)
+  })
+
+  it('retains Review and retries after a final validation request fails', async () => {
+    const { requests } = mockCreation()
+    const onClose = vi.fn()
+    await reachReview(onClose)
+    let shouldFail = true
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/pipelines/validate',
+      response: () =>
+        shouldFail
+          ? HttpResponse.json<{ message: string }>(
+              { message: 'Validation unavailable' },
+              { status: 503 }
+            )
+          : HttpResponse.json<components['schemas']['ValidatePipelineResponse_Output']>({
+              validation_failures: [],
+            }),
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+    )
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    )
+    expect(screen.getByText(/Step 4 of 4/)).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
+    expect(requests).toHaveLength(0)
+    shouldFail = false
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
+    expect(requests).toHaveLength(1)
+  })
+
+  it('returns to Data when a publication is removed after review', async () => {
+    const { requests } = mockCreation()
+    await reachReview()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+          publications: [],
+        }),
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
+    await screen.findByText(/Step 3 of 4/)
+    expect(requests).toHaveLength(0)
+  })
+
   it('requires connection fields and reveals invalid advanced settings', async () => {
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
       nuqs: { hasMemory: true },
@@ -415,7 +666,7 @@ describe('PipelineCreationFlow', () => {
     await selectPublication()
     next()
     await waitForStep(4)
-    expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeDisabled()
+    expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 

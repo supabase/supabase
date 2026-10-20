@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -22,6 +22,7 @@ import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
 import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
+import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -52,24 +53,39 @@ export const PipelineCreationFlow = ({
 
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
-  const formId = useId()
   const form = useForm<DestinationPanelSchemaType>({
     defaultValues: generateDefaultValues({ catalogToken: '', editMode: false }),
     shouldUnregister: false,
   })
   const initialTypeRef = useRef(type)
   const { isDirty } = form.formState
-  const { requestNavigation, modalProps } = usePipelineNavigationGuard(
-    isDirty || type !== initialTypeRef.current
+  const { requestNavigation, completeNavigation, modalProps } = usePipelineNavigationGuard(
+    isDirty || type !== initialTypeRef.current,
+    () => isSubmitting
   )
-  const handleClose = () => requestNavigation(onClose)
+  const handleClose = () => {
+    if (!isSubmitting) requestNavigation(onClose)
+  }
   const { ref: projectRef } = useParams()
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
   const { validateData, isValidatingData, isDataVerified, dataError, publication } =
     usePipelineDataValidation({ projectRef, sourceId, type, form })
+  const {
+    handleSubmit,
+    isSubmitting,
+    failures: submissionFailures,
+    submitLabel,
+  } = usePipelineCreationSubmission({
+    type,
+    form,
+    validateData,
+    onCreated: () => completeNavigation(onClose),
+  })
+  const isBusy = isValidating || isValidatingData || isSubmitting
   const accessibleStep = (() => {
+    if (isSubmitting) return step
     if ((step === 'data' || step === 'review') && !isConnectionVerified) return 'connection'
     if (step === 'review' && !isDataVerified) return 'data'
     return step
@@ -98,23 +114,27 @@ export const PipelineCreationFlow = ({
       <PipelineCreationHeader
         onClose={handleClose}
         onNavigate={(href) => {
-          requestNavigation(() => window.location.assign(href))
+          if (!isSubmitting) requestNavigation(() => window.location.assign(href))
         }}
       />
       <main className="flex-1">
         <Form {...form}>
-          <form id={formId} onSubmit={(event) => event.preventDefault()}>
+          <fieldset disabled={isSubmitting} className="contents">
             <SteppedFlow
               steps={steps}
               currentStep={accessibleStep}
               onStepChange={setStep}
               onNext={handleNext}
-              nextLoading={isValidating || isValidatingData}
-              navigationDisabled={isValidating || isValidatingData}
+              nextLoading={isBusy}
+              navigationDisabled={isBusy}
               nextLabel="Continue"
               nextDisabled={accessibleStep === 'destination' && !canSelectDestination}
               onCancel={handleClose}
-              finalAction={{ label: 'Start pipeline', disabled: true }}
+              finalAction={{
+                label: submitLabel,
+                onClick: handleSubmit,
+                loading: isSubmitting,
+              }}
             >
               <SteppedFlowHeader title={currentStep.title} />
               {accessibleStep === 'destination' && (
@@ -172,14 +192,13 @@ export const PipelineCreationFlow = ({
                     control={form.control}
                     publication={publication}
                   />
+                  <Separator />
                   <PipelineReviewCosts control={form.control} publication={publication} />
-                  <p className="p-5 text-sm text-foreground-light">
-                    Pipeline creation is not available in this preview yet.
-                  </p>
+                  <PipelineValidationAdmonition failures={submissionFailures} />
                 </>
               )}
             </SteppedFlow>
-          </form>
+          </fieldset>
         </Form>
       </main>
       <NewPublicationPanel
