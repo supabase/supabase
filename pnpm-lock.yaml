@@ -145,7 +145,6 @@ overrides:
   '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
-  nuqs@2.7.1: a5d988f2a6e8c7731355e890bc7630f44973babbde04076a833dc5a539e88c7e
   react-data-grid: 803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488
 
 importers:
@@ -1284,7 +1283,7 @@ importers:
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       nuqs:
         specifier: 2.7.1
-        version: 2.7.1(patch_hash=a5d988f2a6e8c7731355e890bc7630f44973babbde04076a833dc5a539e88c7e)(@tanstack/react-router@1.170.44(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
+        version: 2.7.1(@tanstack/react-router@1.170.44(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6)
       openai:
         specifier: ^4.104.0
         version: 4.104.0(encoding@0.1.13)(ws@8.21.0)(zod@3.25.76)
@@ -34089,7 +34088,7 @@ snapshots:
       mitt: 3.0.1
       next: 15.5.25(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
 
-  nuqs@2.7.1(patch_hash=a5d988f2a6e8c7731355e890bc7630f44973babbde04076a833dc5a539e88c7e)(@tanstack/react-router@1.170.44(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6):
+  nuqs@2.7.1(@tanstack/react-router@1.170.44(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(next@16.3.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-router@7.18.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(react@19.2.6):
     dependencies:
       '@standard-schema/spec': 1.0.0
       react: 19.2.6

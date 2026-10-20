@@ -131,8 +131,4 @@ overrides:
   '@esbuild-plugins/node-resolve>esbuild': ^0.28.1
 
 patchedDependencies:
-  # Export nuqs' queue reset so Studio can drop a queued write on Back while
-  # that write's router update is still resolving. The pages adapter skips the
-  # reset in that window, and the queued value then wins over the URL.
-  nuqs@2.7.1: patches/nuqs@2.7.1.patch
   react-data-grid: patches/react-data-grid.patch
