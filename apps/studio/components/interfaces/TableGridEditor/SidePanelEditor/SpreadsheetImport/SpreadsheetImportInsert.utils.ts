@@ -112,7 +112,9 @@ function createImportSession(options: ImportOptions) {
   }
 
   const finish = async (): Promise<ImportResult> => {
-    if (counts.insertedCount > 0) {
+    // A batch with an unknown outcome may still have committed rows
+    const mayHaveInsertedRows = counts.insertedCount > 0 || failure?.outcome === 'unknown'
+    if (mayHaveInsertedRows) {
       const sequenceColumns = (table.columns ?? []).filter(
         (column) =>
           column.is_identity ||

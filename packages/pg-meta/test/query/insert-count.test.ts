@@ -224,4 +224,21 @@ describe('counted inserts', () => {
       await db.executeQuery('insert into default_imports default values returning id')
     ).toEqual([{ id: 101 }])
   })
+
+  test('does not lower the sequence below values already issued', async () => {
+    await db.executeQuery(
+      `select setval(pg_get_serial_sequence('public.default_imports', 'id'), 200)`
+    )
+    await db.executeQuery(
+      insertQuery({ name: 'default_imports', schema: 'public' }, [{ id: 100 }], {
+        returning: 'count',
+      })
+    )
+    await db.executeQuery(
+      getUpdateIdentitySequenceSQL({ schema: 'public', table: 'default_imports', column: 'id' })
+    )
+    expect(
+      await db.executeQuery('insert into default_imports default values returning id')
+    ).toEqual([{ id: 201 }])
+  })
 })

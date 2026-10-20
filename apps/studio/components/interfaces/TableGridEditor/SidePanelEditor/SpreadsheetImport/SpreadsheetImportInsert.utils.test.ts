@@ -193,6 +193,29 @@ describe('spreadsheet insert execution', () => {
     expect(requests).toBe(1)
   })
 
+  test('updates sequences after an unknown outcome, since the batch may have committed', async () => {
+    const queries: string[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = querySchema.parse(await request.json())
+        queries.push(query)
+        if (query.includes('setval(')) return HttpResponse.json([])
+        return HttpResponse.json({ message: 'Gateway timeout' }, { status: 504 })
+      },
+    })
+    const result = await insertTableRows({
+      ...options,
+      table: { ...importTable, columns: [identityColumn] },
+      rows: [{ id: 1 }],
+    })
+    expect(result).toMatchObject({ status: 'error', outcome: 'unknown', insertedCount: 0 })
+    expect(result).not.toHaveProperty('sequenceError')
+    expect(queries).toHaveLength(2)
+    expect(queries[1]).toContain('setval(')
+  })
+
   test('awaits sequence maintenance, including after partial insert failure', async () => {
     const queries: string[] = []
     addAPIMock({
