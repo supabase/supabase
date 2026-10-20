@@ -19,12 +19,22 @@ to use each green.
 
 Apps that import `config/inline-code.css` get shared styles for inline `<code>`, including
 a border, background, and default foreground color. Code inherits the surrounding font weight
-and line height, with text 1.5px smaller and a minimum of `0.75rem` (normally 12px). For example,
-16px prose gives you 14.5px code, while 13px prose gives you 12px code.
+and line height. Sizing keeps code readable beside small text, then stays 2px below the
+surrounding text from 16px upward, with a minimum of `0.75rem` (normally 12px).
+
+| Surrounding text | Inline code |
+| ---------------- | ----------- |
+| 13px             | 12px        |
+| 14px             | 12.5px      |
+| 15px             | 13.25px     |
+| 16px             | 14px        |
+| 20px             | 18px        |
+
+These sizes assume the standard 16px root font size.
 
 Long identifiers stay intact when they fit on the next line, but can break to avoid overflow.
 Tailwind utilities can override the defaults. A size class on `<code>` sets its size directly;
-put the class on a parent to keep the 1.5px reduction:
+put the class on a parent to keep the automatic sizing:
 
 ```tsx
 <span className="text-sm">
