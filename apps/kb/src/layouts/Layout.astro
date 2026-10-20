@@ -62,11 +62,11 @@ const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 		<title>{title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'}</title>
 		{jsonLd && <script type="application/ld+json" is:inline set:html={serializeJsonLd(jsonLd)} />}
 	</head>
-	<body>
+	<body class="flex min-h-dvh flex-col">
 		<div class="sticky top-0 z-40">
 			<Header client:load topics={navTopics} />
 		</div>
-		<main>
+		<main class="grow">
 			<slot />
 		</main>
 		<Footer />
