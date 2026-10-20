@@ -48,7 +48,7 @@ Update the values with your Supabase project URL and publishable key, which you 
 
 This app signs users in anonymously, so [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
-Anonymous sign-ins use the `authenticated` role, but the database setup in step 2 grants read access to the `anon` role only. Without the privilege and a matching policy for `authenticated`, the instruments query returns no rows. Run the following in the [SQL Editor](/dashboard/project/_/sql/new) to grant the privilege and add the policy:
+Anonymous sign-ins use the `authenticated` role, but the database setup in step 2 grants read access to the `anon` role only. Without the privilege and a matching policy for `authenticated`, the instruments query returns no rows. Grant the privilege and add the policy. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql SQL_EDITOR
 grant select on public.instruments to authenticated;
