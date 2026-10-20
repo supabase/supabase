@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useSonner } from 'sonner'
 
 import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
