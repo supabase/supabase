@@ -189,12 +189,6 @@ export function insertRowsViaSpreadsheet({
         quoteChar: file.type === 'text/tab-separated-values' ? '' : '"',
         chunk: async (results, parser) => {
           parser.pause()
-          const parseError = results.errors.find((error) => error.code !== 'UndetectableDelimiter')
-          if (parseError) {
-            session.fail(new Error(parseError.message), 'known')
-            parser.abort()
-            return
-          }
           if (!(await session.insert(results.data))) {
             parser.abort()
             return

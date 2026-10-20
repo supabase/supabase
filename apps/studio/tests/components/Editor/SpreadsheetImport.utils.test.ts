@@ -30,6 +30,20 @@ describe('SpreadsheetImport.utils: getImportResultMessage', () => {
       })
     ).toBe('1,000 rows imported, 4 skipped before the import stopped. foreign key violation')
   })
+  test('reports a sequence-only failure without saying the import stopped', () => {
+    expect(
+      getImportResultMessage({
+        status: 'error',
+        phase: 'sequence',
+        outcome: 'known',
+        insertedCount: 3,
+        skippedCount: 1,
+        error: new Error('permission denied for sequence'),
+      })
+    ).toBe(
+      '3 rows imported, 1 skipped. The identity sequence could not be updated: permission denied for sequence'
+    )
+  })
 })
 
 describe('SpreadsheetImport.utils: inferColumnType', () => {

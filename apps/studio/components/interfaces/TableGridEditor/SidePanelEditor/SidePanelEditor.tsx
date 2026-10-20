@@ -706,7 +706,7 @@ export const SidePanelEditor = ({
 
               if (importResult?.status === 'error') {
                 toast.error(
-                  `Table ${table.name} created, but its data import failed. ${getImportResultMessage(importResult)}`,
+                  `Table ${table.name} created. ${getImportResultMessage(importResult)}`,
                   { id: toastId }
                 )
               } else {
@@ -846,9 +846,11 @@ export const SidePanelEditor = ({
       })
       if (result.status === 'error') {
         toast.error(getImportResultMessage(result), { id: toastId })
-        return
+        // Keep the panel open unless every row was inserted, so a retry can't duplicate rows.
+        if (result.phase !== 'sequence') return
+      } else {
+        toast.success(getImportResultMessage(result), { id: toastId })
       }
-      toast.success(getImportResultMessage(result), { id: toastId })
       setIsEdited(false)
       snap.closeSidePanel()
     } catch (error) {

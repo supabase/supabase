@@ -276,12 +276,17 @@ describe('spreadsheet insert execution', () => {
     ).toEqual({ status: 'success', insertedCount: 0, skippedCount: 0 })
   })
 
-  test('a streamed parse error stops the import', async () => {
+  test('row-level parse issues do not stop an upload', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => HttpResponse.json([{ inserted_count: 1 }]),
+    })
     const result = await insertRowsViaSpreadsheet({
       ...options,
-      file: new File(['id,name\n1\n'], 'invalid.csv'),
+      file: new File(['id,name\n1\n'], 'ragged.csv'),
     })
-    expect(result).toMatchObject({ status: 'error', outcome: 'known', insertedCount: 0 })
+    expect(result).toEqual({ status: 'success', insertedCount: 1, skippedCount: 0 })
   })
 
   test('a failed later upload chunk preserves earlier counts and stops reading', async () => {
