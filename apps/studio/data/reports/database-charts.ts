@@ -68,7 +68,7 @@ export const getReportAttributesV2: (
       showLegend: true,
       hideChartType: false,
       defaultChartStyle: 'bar',
-      showMaxValue: false,
+      showMaxValue: true,
       showGrid: true,
       syncId: 'database-reports',
       valuePrecision: 2,
@@ -94,15 +94,6 @@ export const getReportAttributesV2: (
           fill: 'var(--chart-2-fill)',
           tooltip:
             'RAM used by the operating system page cache and PostgreSQL buffers to accelerate disk reads/writes',
-        },
-        {
-          attribute: 'ram_usage_free',
-          provider: 'infra-monitoring',
-          label: 'Free',
-          color: 'var(--chart-muted)',
-          fill: 'var(--chart-muted-fill)',
-          tooltip:
-            'Unallocated memory available for use. A small portion is always reserved by the operating system',
         },
         {
           attribute: 'ram_usage_total',

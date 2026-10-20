@@ -248,6 +248,7 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mikaël Francoeur
 Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
@@ -262,6 +263,7 @@ Nick Nowlan
 Nicola Ferraro
 Nicolas Nosenzo
 Nik Richers
+Nikita Sivukhin
 Noah Moss
 Nyannyacha
 Oli R

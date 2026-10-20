@@ -54,7 +54,7 @@ export const PipelineCostEstimate = ({
   const copyTableCount = copyTargets.length
 
   return (
-    <CardContent className="space-y-6">
+    <CardContent className="space-y-6 border-b-0">
       <header className="space-y-1">
         <h3 className="text-sm text-foreground">Estimated costs</h3>
         <p className="text-sm text-foreground-light">
