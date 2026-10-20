@@ -251,10 +251,8 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
+  applicationKey: 'supabase-www',
   webpack: {
-    unstable_sentryWebpackPluginOptions: {
-      applicationKey: 'supabase-www',
-    },
     treeshake: {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
       removeDebugLogging: true,
