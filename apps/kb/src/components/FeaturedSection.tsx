@@ -53,7 +53,7 @@ export const FeaturedSection = ({ title, items, className }: FeaturedSectionProp
       <ul
         ref={bindRevealOnce}
         className={cn(
-          'mx-auto grid w-full max-w-6xl list-none gap-6 px-6 sm:grid-cols-[repeat(auto-fit,minmax(18rem,1fr))]',
+          'mx-auto grid w-full max-w-6xl list-none gap-6 px-6 sm:grid-cols-[repeat(auto-fill,minmax(18rem,1fr))]',
           REVEAL_GROUP_CLASS
         )}
       >
