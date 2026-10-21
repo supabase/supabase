@@ -54,8 +54,7 @@ export const toSummary = (guide: CollectionEntry<'guides'>): GuideSummary => ({
   date: guide.data.date,
 })
 
-// FAQ entries have no description or topic list in frontmatter; every entry is
-// tagged with the FAQ topic by the collection schema (see content.config.ts).
+// FAQ entries have no description in frontmatter.
 export const toFaqSummary = (faq: CollectionEntry<'faqs'>): GuideSummary => ({
   id: faq.id,
   title: faq.data.title,
