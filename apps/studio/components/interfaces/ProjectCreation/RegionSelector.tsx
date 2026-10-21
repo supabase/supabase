@@ -5,7 +5,6 @@ import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
-  Button,
   cn,
   FormControl,
   FormField,
@@ -39,7 +38,6 @@ import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
-import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'

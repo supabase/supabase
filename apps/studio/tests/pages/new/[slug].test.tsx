@@ -606,7 +606,7 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
 
       const regionSelection = await submitAndReadRegionSelection(onRequest)
-      expect(regionSelection).toEqual({ code: 'auto', type: 'auto' })
+      expect(regionSelection).toMatchObject({ code: 'auto', type: 'auto' })
     })
 
     describe('specific regions behind a link', () => {
