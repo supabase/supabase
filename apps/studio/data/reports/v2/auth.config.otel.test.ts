@@ -14,23 +14,27 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     expect(out).not.toContain('cross join unnest')
   })
 
+  it.each(Object.entries(AUTH_REPORT_SQL_OTEL))('%s has a high fixed result limit', (_, query) => {
+    expect(sql(query('1h'))).toContain('limit 50000')
+  })
+
   it('emits 16-digit unix-microsecond timestamps bucketed by granularity', () => {
     expect(sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))).toContain(
-      'toUnixTimestamp(toStartOfHour(timestamp)) * 1000000 as timestamp'
+      'toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000 as timestamp'
     )
     expect(sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1d'))).toContain(
-      'toUnixTimestamp(toStartOfDay(timestamp)) * 1000000 as timestamp'
+      'toUnixTimestamp(toStartOfDay(logs.timestamp)) * 1000000 as timestamp'
     )
     expect(sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('5m'))).toContain(
-      'toUnixTimestamp(toStartOfMinute(timestamp)) * 1000000 as timestamp'
+      'toUnixTimestamp(toStartOfMinute(logs.timestamp)) * 1000000 as timestamp'
     )
   })
 
   it('groups and orders by the full bucket expression, not the timestamp alias', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))
 
-    expect(out).toContain('group by toUnixTimestamp(toStartOfHour(timestamp)) * 1000000')
-    expect(out).toContain('order by toUnixTimestamp(toStartOfHour(timestamp)) * 1000000 desc')
+    expect(out).toContain('group by toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000')
+    expect(out).toContain('order by toUnixTimestamp(toStartOfHour(logs.timestamp)) * 1000000 desc')
     expect(out).not.toContain('group by timestamp')
     expect(out).not.toContain('order by timestamp desc')
   })
@@ -40,38 +44,68 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
 
     expect(out).toContain("JSONExtractString(event_message, 'auth_event', 'action')")
     expect(out).toContain(
-      "count(distinct JSONExtractString(event_message, 'auth_event', 'actor_id')) as count"
+      "countDistinct(nullIf(JSONExtractString(event_message, 'auth_event', 'actor_id'), '')) as count"
     )
     expect(out).not.toContain('json_value')
     expect(out).not.toContain('timestamp_trunc')
     expect(out).not.toContain('count(*)')
   })
 
-  it('groups by provider only when a provider filter is set', () => {
-    const withProvider = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h', { provider: ['google'] }))
+  it.each([
+    ['active users', AUTH_REPORT_SQL_OTEL.ActiveUsers],
+    ['password reset requests', AUTH_REPORT_SQL_OTEL.PasswordResetRequests],
+    ['total sign-ups', AUTH_REPORT_SQL_OTEL.TotalSignUps],
+    ['sign-in processing time', AUTH_REPORT_SQL_OTEL.SignInProcessingTimeBasic],
+    ['sign-in processing percentiles', AUTH_REPORT_SQL_OTEL.SignInProcessingTimePercentiles],
+    ['sign-up processing time', AUTH_REPORT_SQL_OTEL.SignUpProcessingTimeBasic],
+    ['sign-up processing percentiles', AUTH_REPORT_SQL_OTEL.SignUpProcessingTimePercentiles],
+  ] as const)('uses the nested audit-event provider for %s', (_, query) => {
+    const withProvider = sql(query('1h', { provider: ['google'] }))
     expect(withProvider).toContain(
-      "coalesce(nullIf(JSONExtractString(event_message, 'provider'), ''), 'unknown') as provider"
+      "coalesce(nullIf(JSONExtractString(event_message, 'auth_event', 'traits', 'provider'), ''), 'unknown') as provider"
     )
-    expect(withProvider).toContain("JSONExtractString(event_message, 'provider') IN ('google')")
+    expect(withProvider).toContain(
+      "JSONExtractString(event_message, 'auth_event', 'traits', 'provider') IN ('google')"
+    )
+    expect(withProvider).not.toContain("JSONExtractString(event_message, 'provider') IN")
 
-    const withoutProvider = sql(AUTH_REPORT_SQL_OTEL.ActiveUsers('1h'))
+    const withoutProvider = sql(query('1h'))
     expect(withoutProvider).not.toContain('as provider')
   })
 
-  it('translates the sign-in metering predicate and login_type_provider concat', () => {
-    const out = sql(AUTH_REPORT_SQL_OTEL.SignInAttempts('1h'))
+  it('uses the top-level provider and boolean metering field for sign-in attempt queries', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.SignInAttempts('1h', { provider: ['google', 'github'] }))
 
     expect(out).toContain("JSONExtractString(event_message, 'action') = 'login'")
-    expect(out).toContain("JSONExtractString(event_message, 'metering') = 'true'")
+    expect(out).toContain("JSONExtractBool(event_message, 'metering') = 1")
+    expect(out).not.toContain("JSONExtractString(event_message, 'metering')")
+    expect(out).toContain(
+      "coalesce(nullIf(JSONExtractString(event_message, 'provider'), ''), 'unknown') as provider"
+    )
+    expect(out).toContain("JSONExtractString(event_message, 'provider') IN ('google', 'github')")
+    expect(out).not.toContain("'auth_event', 'traits', 'provider'")
     expect(out).toContain('as login_type_provider')
     expect(out).toContain('concat(')
   })
 
-  it('uses ClickHouse quantile() for percentiles over the duration field', () => {
+  it.each([
+    ['sign-in basic', AUTH_REPORT_SQL_OTEL.SignInProcessingTimeBasic],
+    ['sign-in percentiles', AUTH_REPORT_SQL_OTEL.SignInProcessingTimePercentiles],
+    ['sign-up basic', AUTH_REPORT_SQL_OTEL.SignUpProcessingTimeBasic],
+    ['sign-up percentiles', AUTH_REPORT_SQL_OTEL.SignUpProcessingTimePercentiles],
+  ] as const)('extracts numeric duration as nullable for %s', (_, query) => {
+    const out = sql(query('1h'))
+
+    expect(out).toContain("JSONExtract(event_message, 'duration', 'Nullable(Int64)')")
+    expect(out).not.toContain("JSONExtractString(event_message, 'duration')")
+    expect(out).not.toContain('toInt64OrZero')
+  })
+
+  it('uses ClickHouse quantile() for sign-in duration percentiles', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.SignInProcessingTimePercentiles('1h'))
 
     expect(out).toContain(
-      "round(quantile(0.5)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p50_processing_time_ms"
+      "round(quantile(0.5)(JSONExtract(event_message, 'duration', 'Nullable(Int64)')) / 1000000, 2) as p50_processing_time_ms"
     )
     expect(out).toContain('quantile(0.95)')
     expect(out).toContain('quantile(0.99)')
@@ -91,7 +125,7 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.SignUpProcessingTimePercentiles('1h'))
 
     expect(out).toContain(
-      "round(quantile(0.5)(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as p50_processing_time_ms"
+      "round(quantile(0.5)(JSONExtract(event_message, 'duration', 'Nullable(Int64)')) / 1000000, 2) as p50_processing_time_ms"
     )
     expect(out).toContain('quantile(0.95)')
     expect(out).toContain('quantile(0.99)')
@@ -103,7 +137,7 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
 
     expect(out).toContain("JSONExtractString(event_message, 'auth_event', 'action') = 'login'")
     expect(out).toContain(
-      "round(avg(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as avg_processing_time_ms"
+      "round(avg(JSONExtract(event_message, 'duration', 'Nullable(Int64)')) / 1000000, 2) as avg_processing_time_ms"
     )
     expect(out).not.toContain('quantile(')
   })
@@ -112,7 +146,7 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     const out = sql(AUTH_REPORT_SQL_OTEL.SignUpProcessingTimeBasic('1h'))
 
     expect(out).toContain(
-      "round(avg(toInt64OrZero(JSONExtractString(event_message, 'duration'))) / 1000000, 2) as avg_processing_time_ms"
+      "round(avg(JSONExtract(event_message, 'duration', 'Nullable(Int64)')) / 1000000, 2) as avg_processing_time_ms"
     )
     expect(out).not.toContain('quantile(')
   })
@@ -128,10 +162,13 @@ describe('AUTH_REPORT_SQL_OTEL', () => {
     expect(out).toContain("toInt32OrZero(log_attributes['response.status_code']) as status_code")
   })
 
-  it('selects the x_sb_error_code attribute for the by-code breakdown', () => {
-    expect(sql(AUTH_REPORT_SQL_OTEL.ErrorsByAuthCode('1h'))).toContain(
-      "log_attributes['response.headers.x_sb_error_code'] as error_code"
+  it('prefers the canonical error code and falls back to the legacy header', () => {
+    const out = sql(AUTH_REPORT_SQL_OTEL.ErrorsByAuthCode('1h'))
+
+    expect(out).toContain(
+      "coalesce(nullIf(log_attributes['response.headers.sb_error_code'], ''), nullIf(log_attributes['response.headers.x_sb_error_code'], '')) as error_code"
     )
+    expect(out).not.toContain("log_attributes['response.headers.x_sb_error_code'] as error_code")
   })
 
   it('applies the numeric status_code filter to edge_logs error queries', () => {

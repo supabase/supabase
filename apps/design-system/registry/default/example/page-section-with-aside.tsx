@@ -21,9 +21,7 @@ export default function PageSectionWithAside() {
             </PageSectionDescription>
           </PageSectionSummary>
           <PageSectionAside>
-            <Button variant="default" size="small">
-              Secondary
-            </Button>
+            <Button size="small">Secondary</Button>
             <Button variant="primary" size="small">
               Primary Action
             </Button>

@@ -57,12 +57,12 @@ const CommandInput = React.forwardRef<
     },
     ref
   ) => (
-    <div className={cn('flex items-center border-b px-4', wrapperClassName)} cmdk-input-wrapper="">
-      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" />}
+    <div className={cn('flex items-center border-b px-3', wrapperClassName)} cmdk-input-wrapper="">
+      {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" aria-hidden />}
       <CommandPrimitive.Input
         ref={ref}
         className={cn(
-          'flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
+          'flex h-9 w-full rounded-md bg-transparent py-3 pl-2 text-sm outline-hidden placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
           className
         )}
         {...props}
@@ -73,12 +73,13 @@ const CommandInput = React.forwardRef<
           tabIndex={props.disabled || !props.value?.length ? -1 : 0}
           disabled={props.disabled || !props.value?.length}
           onClick={handleReset}
+          aria-label="Clear search"
           className={cn(
             'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',
             !!props.value?.length && 'opacity-100'
           )}
         >
-          <RemoveIcon size={14} />
+          <RemoveIcon size={14} aria-hidden />
         </button>
       )}
     </div>
@@ -162,7 +163,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-xs outline-hidden data-[selected=true]:bg-overlay-hover data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-item px-2 py-1.5 text-xs outline-hidden data-[selected=true]:bg-overlay-hover data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
       className
     )}
     {...props}

@@ -210,6 +210,39 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  windsurf: {
+    primary: ({ url }) => (
+      <>
+        <paragraph>
+          These instructions use the Devin Local agent in Devin Desktop or Devin CLI. Add the
+          Supabase MCP server to your user configuration:
+        </paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['windsurf'].install!(url)} />
+      </>
+    ),
+    alternate: ({ isPlatform }) => (
+      <>
+        <paragraph>
+          On Windows, the configuration file is{' '}
+          <inlineCode value="%APPDATA%\devin\mcp_config.json" /> instead.
+        </paragraph>
+        {isPlatform && (
+          <>
+            <paragraph>
+              If you skipped the browser sign-in or need to re-authenticate, run:
+            </paragraph>
+            <code lang="bash" value={MCP_CLI_COMMANDS['windsurf'].authenticate!} />
+            <paragraph>Complete the authorization flow in your browser.</paragraph>
+          </>
+        )}
+        <paragraph>Check the server configuration:</paragraph>
+        <code lang="bash" value="devin mcp list" />
+        <paragraph>
+          Start a new Devin Local or Devin CLI session to load the server's tools.
+        </paragraph>
+      </>
+    ),
+  },
   goose: {
     primary: ({ url }) => (
       <>
@@ -272,6 +305,29 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
           For more details, see{' '}
           <link url="https://fx.sh/docs/capabilities/mcp">MCP configuration</link> in fx.
         </paragraph>
+      </>
+    ),
+  },
+  cursor: {
+    alternate: () => (
+      <>
+        <paragraph>
+          To make the server available across all projects, place the configuration in{' '}
+          <inlineCode value="~/.cursor/mcp.json" /> instead.
+        </paragraph>
+        <heading depth={5}>Using Cursor CLI</heading>
+        <paragraph>
+          Cursor IDE and the Cursor CLI (<inlineCode value="agent" />) use the same MCP
+          configuration. After you add the configuration above or install with the one-click button,
+          manage the server from your terminal using the{' '}
+          <link url="https://cursor.com/docs/cli/mcp">Cursor CLI</link>.
+        </paragraph>
+        <paragraph>Approve the server locally:</paragraph>
+        <code lang="bash" value="agent mcp enable supabase" />
+        <paragraph>Authenticate with Supabase:</paragraph>
+        <code lang="bash" value={MCP_CLI_COMMANDS['cursor'].authenticate!} />
+        <paragraph>Check the server connection status:</paragraph>
+        <code lang="bash" value="agent mcp list" />
       </>
     ),
   },

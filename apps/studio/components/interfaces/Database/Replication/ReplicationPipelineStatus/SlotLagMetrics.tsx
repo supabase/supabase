@@ -1,13 +1,10 @@
 import dayjs from 'dayjs'
-import { Info } from 'lucide-react'
 import { type ReactNode } from 'react'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { SlotLagMetricKey, SlotLagMetrics } from './ReplicationPipelineStatus.types'
+import { SlotLagMetricKey } from './ReplicationPipelineStatus.types'
 import { getFormattedLagValue } from './ReplicationPipelineStatus.utils'
-import { SlotConnectionIndicator, SlotStatusBadge } from './SlotStatus'
 
-interface SlotLagField {
+export interface SlotLagField {
   key: SlotLagMetricKey
   label: string
   type: 'bytes' | 'duration'
@@ -20,12 +17,15 @@ interface SlotLagField {
   getValueTooltip?: (value: number) => string
 }
 
-const SLOT_LAG_FIELDS: SlotLagField[] = [
+export const SLOT_LAG_FIELDS: SlotLagField[] = [
   {
     key: 'confirmed_flush_lsn_bytes',
-    label: 'Waiting to sync',
+    // Same label as the list column. Scoped to the main slot's ongoing change stream, so "Caught
+    // up" stays true while tables are still doing their initial copy.
+    label: 'Lag',
     type: 'bytes',
-    description: "Changes in your database the pipeline hasn't synced yet.",
+    description:
+      'Changes still on their way to the destination, measured on the pipeline’s main slot. Tables in their initial sync use their own slots and aren’t counted.',
     zeroLabel: 'Caught up',
   },
   {
@@ -44,7 +44,7 @@ const SLOT_LAG_FIELDS: SlotLagField[] = [
     key: 'reply_time_lag',
     label: 'Last check-in',
     type: 'duration',
-    description: 'Time since the pipeline last reported back to your database.',
+    description: 'Time since the pipeline last reported back to your database',
     zeroLabel: 'Just now',
     // reply_time_lag is "milliseconds ago", so the absolute time is now minus that, in local time.
     getValueTooltip: (ms) => dayjs().subtract(ms, 'millisecond').format('MMM D, YYYY, h:mm:ss A'),
@@ -53,118 +53,8 @@ const SLOT_LAG_FIELDS: SlotLagField[] = [
 
 // Resolves a field's value into a display string (+ optional precise detail), honoring the
 // friendly zero/null labels before falling back to the formatted byte/duration value.
-const getFieldDisplay = (field: SlotLagField, value: number | null | undefined) => {
+export const getFieldDisplay = (field: SlotLagField, value: number | null | undefined) => {
   if (value == null) return { display: field.nullLabel ?? 'n/a', detail: undefined }
   if (field.zeroLabel && value === 0) return { display: field.zeroLabel, detail: undefined }
   return getFormattedLagValue(field.type, value)
-}
-
-export const SlotLagMetricsInline = ({
-  tableName,
-  metrics,
-}: {
-  tableName: string
-  metrics: SlotLagMetrics
-}) => {
-  return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-foreground">
-      <span className="truncate font-medium" title={tableName}>
-        {tableName}
-      </span>
-      <SlotConnectionIndicator isActive={metrics.active} context="table" />
-      <span className="h-3.5 w-px bg-border" />
-      {metrics.wal_status && <SlotStatusBadge status={metrics.wal_status} context="table" />}
-      <span className="h-3.5 w-px bg-border" />
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-foreground-light">
-        {SLOT_LAG_FIELDS.map((field) => {
-          const { display } = getFieldDisplay(field, metrics[field.key])
-          return (
-            <span key={`${tableName}-${field.key}`} className="flex items-baseline gap-1">
-              <span className="uppercase tracking-wide text-[10px] text-foreground-lighter">
-                {field.label}
-              </span>
-              <span className="text-foreground">{display}</span>
-            </span>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-export const SlotLagMetricsList = ({
-  metrics,
-  size = 'default',
-  showMetricInfo = true,
-}: {
-  metrics: SlotLagMetrics
-  size?: 'default' | 'compact'
-  showMetricInfo?: boolean
-}) => {
-  const gridClasses =
-    size === 'default'
-      ? 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-4 gap-x-6'
-      : 'grid-cols-2 gap-y-2 gap-x-4'
-
-  const labelClasses =
-    size === 'default' ? 'text-xs text-foreground-light' : 'text-[11px] text-foreground-lighter'
-
-  const valueClasses =
-    size === 'default'
-      ? 'text-sm font-medium text-foreground'
-      : 'text-xs font-medium text-foreground'
-
-  return (
-    <dl className={`grid ${gridClasses}`}>
-      {SLOT_LAG_FIELDS.map((field) => {
-        const rawValue = metrics[field.key]
-        const { display, detail } = getFieldDisplay(field, rawValue)
-        const valueTooltip =
-          field.getValueTooltip && typeof rawValue === 'number'
-            ? field.getValueTooltip(rawValue)
-            : undefined
-        return (
-          <div key={field.key} className="flex flex-col gap-0.5">
-            <dt className={labelClasses}>
-              <span className="inline-flex items-center gap-1">
-                {field.label}
-                {showMetricInfo && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        tabIndex={0}
-                        aria-label={`What is ${field.label}`}
-                        className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-surface-200 text-foreground-lighter transition-colors hover:bg-surface-300 hover:text-foreground focus-ring"
-                      >
-                        <Info size={12} />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" align="start" className="max-w-xs text-xs">
-                      {field.description}
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </span>
-            </dt>
-            <dd className={`flex flex-col ${valueClasses}`}>
-              {valueTooltip ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <span className="w-fit cursor-default">{display}</span>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="text-xs">
-                    {valueTooltip}
-                  </TooltipContent>
-                </Tooltip>
-              ) : (
-                <span>{display}</span>
-              )}
-              {detail && <span className="text-[11px] text-foreground-lighter">{detail}</span>}
-            </dd>
-          </div>
-        )
-      })}
-    </dl>
-  )
 }

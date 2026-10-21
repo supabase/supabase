@@ -64,6 +64,43 @@ export type BigQueryDestinationConfig = {
   serviceAccountKey: string
   connectionPoolSize?: number
   maxStalenessMins?: number
+  tableOptions?: BigQueryTableOption[]
+}
+
+export const BIGQUERY_TIME_PARTITION_GRANULARITIES = ['hour', 'day', 'month', 'year'] as const
+export const BIGQUERY_MAX_CLUSTERING_COLUMNS = 4
+
+export type BigQueryTimePartitionGranularity =
+  (typeof BIGQUERY_TIME_PARTITION_GRANULARITIES)[number]
+
+export type BigQueryPartitionBy =
+  | { kind: 'time_column'; column: string; granularity?: BigQueryTimePartitionGranularity }
+  | {
+      kind: 'integer_range'
+      column: string
+      start: number | ''
+      end: number | ''
+      interval: number | ''
+    }
+  | { kind: 'ingestion_time'; granularity?: BigQueryTimePartitionGranularity }
+
+export type CompleteBigQueryPartitionBy =
+  | Exclude<BigQueryPartitionBy, { kind: 'integer_range' }>
+  | {
+      kind: 'integer_range'
+      column: string
+      start: number
+      end: number
+      interval: number
+    }
+
+// A single source table's BigQuery partitioning/clustering configuration. `tableId` is the
+// source Postgres table OID, stable across renames, matching the id used by the replication
+// tables/columns endpoints.
+export type BigQueryTableOption = {
+  tableId: number
+  partitionBy?: BigQueryPartitionBy
+  clusterBy?: string[]
 }
 
 export type IcebergDestinationConfig = {

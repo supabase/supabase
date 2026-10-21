@@ -34,7 +34,6 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    vi.clearAllMocks()
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     close = vi.fn().mockResolvedValue(undefined)
     tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })

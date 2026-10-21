@@ -82,7 +82,7 @@ export const NewScopedTokenSuccess = ({
         </div>
       </ScrollArea>
       <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
-        <Button className="ml-auto" disabled={!keyCopied} onClick={handleDone}>
+        <Button variant="primary" className="ml-auto" disabled={!keyCopied} onClick={handleDone}>
           Done
         </Button>
       </SheetFooter>

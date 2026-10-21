@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useReducedMotion } from 'common'
-import { ChevronRight, X } from 'lucide-react'
+import { ChevronRightIcon, XIcon } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -198,6 +198,7 @@ export const NewScopedTokenForm = forwardRef<
                   </div>
                   <Separator />
                   <PermissionsAccordion
+                    control={form.control}
                     selection={selection}
                     onChange={handlePermissionChange}
                     onApplyPreset={handleApplyPreset}
@@ -232,27 +233,31 @@ export const NewScopedTokenForm = forwardRef<
         )}
         <div className="flex items-center gap-2">
           {step === 'review' && (
-            <Button variant="default" disabled={isPending} onClick={() => setStep('form')}>
+            <Button disabled={isPending} onClick={() => setStep('form')}>
               Back
             </Button>
           )}
           <SheetClose asChild disabled={isPending}>
-            <Button variant="default">Cancel</Button>
+            <Button>Cancel</Button>
           </SheetClose>
           {step === 'form' && isClassicMode && (
-            <Button type="submit" form={FORM_ID} loading={isPending}>
+            <Button variant="primary" type="submit" form={FORM_ID} loading={isPending}>
               Generate token
             </Button>
           )}
           {step === 'form' && !isClassicMode && (
-            <Button type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
+            <Button variant="primary" type="submit" form={FORM_ID} iconRight={<ChevronRightIcon />}>
               Review access
             </Button>
           )}
           {step === 'review' && (
             <Popover open={!isCreateHintDismissed}>
               <PopoverAnchor asChild>
-                <Button loading={isPending} onClick={() => onCreateToken(formValues)}>
+                <Button
+                  variant="primary"
+                  loading={isPending}
+                  onClick={() => onCreateToken(formValues)}
+                >
                   Create token
                 </Button>
               </PopoverAnchor>
@@ -272,7 +277,7 @@ export const NewScopedTokenForm = forwardRef<
                 <Button
                   variant="text"
                   size="tiny"
-                  icon={<X />}
+                  icon={<XIcon />}
                   aria-label="Dismiss"
                   className="px-1 text-foreground-lighter"
                   onClick={() => setIsCreateHintDismissed(true)}

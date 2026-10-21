@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertCircle, Info, Search } from 'lucide-react'
+import { AlertCircleIcon, InfoIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -117,7 +117,7 @@ export const PublicationsList = () => {
           <Input
             ref={searchInputRef}
             size="tiny"
-            icon={<Search />}
+            icon={<SearchIcon />}
             className="w-48"
             placeholder="Search for a publication"
             value={filterString}
@@ -128,7 +128,7 @@ export const PublicationsList = () => {
         {isPermissionsLoaded && !canUpdatePublications && (
           <div className="w-[500px]">
             <InformationBox
-              icon={<AlertCircle className="text-foreground-light" strokeWidth={2} />}
+              icon={<AlertCircleIcon className="text-foreground-light" strokeWidth={2} />}
               title="You need additional permissions to update database publications"
             />
           </div>
@@ -185,7 +185,7 @@ export const PublicationsList = () => {
                         ) && (
                           <Tooltip>
                             <TooltipTrigger>
-                              <Info size={14} className="text-foreground-light" />
+                              <InfoIcon size={14} className="text-foreground-light" />
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
                               {x.name === 'supabase_realtime'
@@ -218,11 +218,7 @@ export const PublicationsList = () => {
                     ))}
                     <TableCell>
                       <div className="flex justify-end">
-                        <Button
-                          asChild
-                          variant="default"
-                          style={{ paddingTop: 3, paddingBottom: 3 }}
-                        >
+                        <Button asChild style={{ paddingTop: 3, paddingBottom: 3 }}>
                           <Link href={`/project/${ref}/database/publications/${x.id}`}>
                             {x.tables === null
                               ? 'All tables'

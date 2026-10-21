@@ -56,6 +56,18 @@ export function findConditionByPath(group: FilterGroup, path: number[]): FilterC
   return null
 }
 
+export function collectConditions(
+  group: FilterGroup,
+  path: number[] = []
+): { condition: FilterCondition; path: number[] }[] {
+  return group.conditions.flatMap((condition, index) => {
+    const currentPath = [...path, index]
+    return isGroup(condition)
+      ? collectConditions(condition, currentPath)
+      : [{ condition, path: currentPath }]
+  })
+}
+
 export function isCustomOptionObject(option: any): option is CustomOptionObject {
   return typeof option === 'object' && option !== null && 'component' in option
 }

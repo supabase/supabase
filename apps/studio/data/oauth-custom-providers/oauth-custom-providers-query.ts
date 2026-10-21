@@ -25,14 +25,14 @@ export async function getOAuthCustomProviders({
   const { data, error } = await supabaseClient.auth.admin.customProviders.listProviders()
 
   if (error) {
-    let newError = error
     // Non-JSON responses from the API indicate custom providers aren't enabled.
     // Different browsers/SDK versions produce different JSON parse error messages,
     // so we check broadly for JSON parse indicators.
-    if (/JSON\.parse|Unexpected token|unexpected.*character/i.test(newError.message)) {
-      newError = new AuthError('Custom providers are not enabled for this project')
+    if (/JSON\.parse|Unexpected token|unexpected.*character/i.test(error.message)) {
+      handleError(new AuthError('Custom providers are not enabled for this project'))
+    } else {
+      handleError(error)
     }
-    handleError(newError)
   }
   return data.providers as CustomOAuthProvider[]
 }

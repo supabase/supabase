@@ -7,7 +7,10 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf .turbo tsconfig.tsbuildinfo",
-    "codegen": "openapi-typescript --redocly ./redocly.yaml --alphabetize --default-non-nullable=false && prettier --cache --write types/*.d.ts"
+    "codegen": "openapi-typescript --redocly ./redocly.yaml --alphabetize --default-non-nullable=false && prettier --cache --write types/*.d.ts",
+    "codegen:prod": "node ./scripts/generate-production-types.mjs",
+    "verify-production-types": "node ./scripts/verify-production-types.mjs",
+    "test": "node --test ./scripts/*.test.mjs"
   },
   "author": "",
   "license": "MIT",

@@ -2,11 +2,17 @@
 import { createRequire } from 'node:module'
 import path from 'node:path'
 
+import { unified } from '@astrojs/markdown-remark'
+import mdx from '@astrojs/mdx'
 import react from '@astrojs/react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 
+import { BASE_PATH } from './src/lib/constants.ts'
+import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import supabaseTheme from '../learn/lib/themes/supabase-2.json' with { type: 'json' }
+
+import sitemap from '@astrojs/sitemap';
 
 // Absolute dir of lodash-es, for the SSR-only lodash alias below (same fix
 // apps/studio/vite.config.ts uses). `packages/ui`'s clipboard util does
@@ -38,14 +44,22 @@ const ssrLodashEs = {
 
 // https://astro.build/config
 export default defineConfig({
-  base: '/kb',
+  site: 'https://supabase.com',
+  base: BASE_PATH,
   trailingSlash: 'ignore',
-  integrations: [react()],
+  integrations: [react(), // rehype-admonitions is a custom rehype plugin and Astro's default pipeline is
+  // satteri, so .mdx gets its own unified processor. Plain .md stays on satteri.
+  mdx({
+    processor: unified({
+      rehypePlugins: [rehypeAdmonitions],
+    }),
+  }), sitemap()],
   vite: {
     ssr: {
       noExternal: ['lodash'],
     },
     plugins: [tailwindcss(), ssrLodashEs],
+    logLevel: 'error',
   },
   markdown: {
     shikiConfig: {

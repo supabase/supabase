@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -145,16 +145,22 @@ export const CreateFirebaseAuthIntegrationDialog = ({
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button variant="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<TrashIcon />}>
                 Remove connection
               </Button>
             </div>
           )}
 
-          <Button disabled={isPending} variant="default" onClick={() => onClose()}>
+          <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button form={FORM_ID} type="submit" disabled={isPending} loading={isPending}>
+          <Button
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={isPending}
+            loading={isPending}
+          >
             {isCreating ? 'Create connection' : 'Update connection'}
           </Button>
         </DialogFooter>

@@ -9,12 +9,30 @@ import {
   TOOL_CATEGORY_MAP,
   toolSetValidationSchema,
 } from './tool-filter'
+import { contract as updateNotebookContract } from './tools/update-notebook'
 
 describe('TOOL_CATEGORY_MAP', () => {
   it('should categorize tools correctly', () => {
     expect(TOOL_CATEGORY_MAP['execute_sql']).toBe(TOOL_CATEGORIES.UI)
     expect(TOOL_CATEGORY_MAP['list_tables']).toBe(TOOL_CATEGORIES.SCHEMA)
     expect(TOOL_CATEGORY_MAP['run_notebook']).toBe(TOOL_CATEGORIES.SCHEMA)
+  })
+})
+
+describe('tools with a contract', () => {
+  const tools = {
+    update_notebook: { description: 'Update a notebook', execute: vitest.fn() },
+  } as unknown as ToolSet
+
+  it('is gated by the contract minOptInLevel, not the category map', () => {
+    expect(updateNotebookContract.minOptInLevel).toBe('schema')
+    expect(Object.hasOwn(TOOL_CATEGORY_MAP, 'update_notebook')).toBe(false)
+
+    const blocked = filterToolsByOptInLevel(tools, 'disabled').update_notebook
+    const allowed = filterToolsByOptInLevel(tools, 'schema').update_notebook
+
+    expect(blocked.description).toContain('Requires opting in')
+    expect(allowed.description).toBe('Update a notebook')
   })
 })
 
@@ -147,7 +165,7 @@ describe('filterToolsByOptInLevel', () => {
 
     return (
       parsedResult.success &&
-      parsedResult.data.status.includes("You don't have permission to use this tool")
+      parsedResult.data.status.includes('This tool needs a higher opt-in level')
     )
   }
 
@@ -233,7 +251,8 @@ describe('createPrivacyMessageTool', () => {
     expect(privacyTool.toModelOutput).toBeUndefined()
 
     const result = await privacyTool.execute({}, {})
-    expect(result.status).toContain("You don't have permission to use this tool")
+    expect(result.status).toContain('This tool needs a higher opt-in level')
+    expect(result.status).toContain('third-party AI providers')
   })
 })
 

@@ -1,4 +1,4 @@
-import { Check, Copy, Github, MoreVertical, Settings } from 'lucide-react'
+import { CheckIcon, CopyIcon, GithubIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import InlineSVG from 'react-inlinesvg'
@@ -100,9 +100,9 @@ export const ProjectTableRow = ({
                   >
                     {projectRef}
                     {isCopied ? (
-                      <Check size={12} strokeWidth={1.25} className="text-brand" />
+                      <CheckIcon size={12} strokeWidth={1.25} className="text-primary" />
                     ) : (
-                      <Copy
+                      <CopyIcon
                         size={12}
                         strokeWidth={1.25}
                         className="opacity-0 group-hover:opacity-100 transition-opacity"
@@ -128,7 +128,7 @@ export const ProjectTableRow = ({
                 {isGithubIntegrated && (
                   <div className="bg-surface-100 flex items-center gap-x-0.5 h-5 pr-1 border border-strong rounded-md">
                     <div className="w-5 h-5 p-1 flex items-center">
-                      <Github size={12} strokeWidth={1.5} />
+                      <GithubIcon size={12} strokeWidth={1.5} />
                     </div>
                     {githubRepository && (
                       <p className="text-xs text-foreground-light truncate">{githubRepository}</p>
@@ -162,9 +162,7 @@ export const ProjectTableRow = ({
           </div>
         </TableCell>
         <TableCell>
-          <span className="lowercase text-sm text-foreground-light">
-            {project.cloud_provider} | {project.region || 'N/A'}
-          </span>
+          <span className="lowercase text-sm text-foreground-light">{project.region || 'N/A'}</span>
         </TableCell>
         <TableCell>
           {project.inserted_at ? (
@@ -181,8 +179,7 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="default"
-                  icon={<MoreVertical />}
+                  icon={<MoreVerticalIcon />}
                   aria-label={`Project ${name} actions`}
                   className="w-7"
                   onClick={(e) => e.stopPropagation()}
@@ -196,7 +193,7 @@ export const ProjectTableRow = ({
                     router.push(`/project/${projectRef}/settings/general`)
                   }}
                 >
-                  <Settings size={14} />
+                  <SettingsIcon size={14} />
                   <span>Settings</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

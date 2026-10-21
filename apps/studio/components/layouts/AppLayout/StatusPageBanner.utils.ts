@@ -1,4 +1,5 @@
 import type { IncidentCache } from '@/lib/api/incident-status'
+import { normalizeRegion } from '@/lib/status-page/status-page.utils'
 
 type BannerIncident = { id: string; cache?: IncidentCache | null }
 
@@ -10,9 +11,11 @@ type BannerIncident = { id: string; cache?: IncidentCache | null }
  *
  * @param incidents - Active incidents from the incident-status endpoint
  * @param hasProjects - Whether the user has any projects at all
- * @param userRegions - Deduplicated set of regions of all databases (primary and read replicas) owned by the user
- * @param hasUnknownRegions - True when region data is incomplete (org has >100 projects).
- *   When true, the region check is skipped and a match is assumed.
+ * @param userRegions - Deduplicated set of regions of all databases (primary and read replicas)
+ *   owned by the user, normalized via normalizeRegion
+ * @param hasUnknownRegions - True when region data is incomplete (an org has more than 100
+ *   projects, or an org's projects failed to load). When true, the region check is skipped and
+ *   a match is assumed.
  */
 export function shouldShowBanner({
   incidents,
@@ -22,7 +25,7 @@ export function shouldShowBanner({
 }: {
   incidents: Array<BannerIncident>
   hasProjects: boolean
-  userRegions: Set<string>
+  userRegions: ReadonlySet<string>
   hasUnknownRegions?: boolean
 }): boolean {
   return incidents.some((incident) => {
@@ -43,7 +46,7 @@ export function shouldShowBanner({
     if (hasUnknownRegions) return true
 
     // Region restriction: only show if the user has a database in an affected region
-    return affectedRegions.some((region) => userRegions.has(region.toLowerCase()))
+    return affectedRegions.some((region) => userRegions.has(normalizeRegion(region)))
   })
 }
 
@@ -61,7 +64,7 @@ export function getRelevantIncidentIds({
 }: {
   incidents: Array<BannerIncident>
   hasProjects: boolean
-  userRegions: Set<string>
+  userRegions: ReadonlySet<string>
   hasUnknownRegions?: boolean
 }): Array<string> {
   return incidents

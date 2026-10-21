@@ -1,4 +1,10 @@
-import { Clipboard, MessageSquare, MoreVertical, Settings, Trash } from 'lucide-react'
+import {
+  ClipboardIcon,
+  MessageSquareIcon,
+  MoreVerticalIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -9,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import {
   ExplorerToolbar,
@@ -18,6 +23,7 @@ import {
   ExplorerToolbarIcon,
   ExplorerToolbarTitle,
 } from './ExplorerToolbar'
+import { useExplorerDeleteItem } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
 import { AIAssistantMetadataWarning } from '@/components/ui/AIAssistantPanel/AIAssistantMetadataWarning'
 import type { AssistantChatHeaderProps } from '@/components/ui/AIAssistantPanel/AssistantChat'
 import { ShortcutPills } from '@/components/ui/ShortcutTooltip'
@@ -36,13 +42,12 @@ export const ExplorerChatToolbar = ({
   isChatLoading,
   showMetadataWarning,
   updatedOptInSinceMCP,
-  isHipaaProjectDisallowed,
   aiOptInLevel,
 }: ExplorerChatToolbarProps) => {
   const snap = useAiAssistantStateSnapshot()
   const chat = snap.chats[chatId]
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const { onSelectDelete } = useExplorerDeleteItem()
 
   const handleCopyChatId = () => {
     copyToClipboard(chatId, () => toast.success(`Copied chat ID for ${chat?.name}`))
@@ -50,12 +55,6 @@ export const ExplorerChatToolbar = ({
 
   const handleSaveName = (name: string) => {
     if (name.trim()) snap.renameChat(chatId, name.trim())
-  }
-
-  const handleDeleteChat = () => {
-    snap.deleteChat(chatId)
-    setIsDeleteModalOpen(false)
-    toast.success(`Deleted "${chat?.name}"`)
   }
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID, handleCopyChatId, {
@@ -69,7 +68,7 @@ export const ExplorerChatToolbar = ({
     <div className="z-30 sticky top-0">
       <ExplorerToolbar aria-label="Chat toolbar">
         <ExplorerToolbarIcon>
-          <MessageSquare size={16} strokeWidth={2} />
+          <MessageSquareIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveName}>{chat?.name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -77,14 +76,14 @@ export const ExplorerChatToolbar = ({
             <DropdownMenuTrigger asChild>
               <ExplorerToolbarAction
                 aria-label="More options"
-                icon={<MoreVertical size={16} strokeWidth={2} />}
+                icon={<MoreVerticalIcon size={16} strokeWidth={2} />}
                 disabled={isChatLoading}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-60">
               <DropdownMenuItem className="justify-between" onClick={handleCopyChatId}>
                 <div className="flex items-center gap-x-2">
-                  <Clipboard size={14} />
+                  <ClipboardIcon size={14} />
                   <span>Copy chat ID</span>
                 </div>
                 <ShortcutPills
@@ -96,7 +95,7 @@ export const ExplorerChatToolbar = ({
                 onClick={() => setIsOptInModalOpen(true)}
               >
                 <div className="flex items-center gap-x-2">
-                  <Settings size={14} />
+                  <SettingsIcon size={14} />
                   <span>Permission settings</span>
                 </div>
                 <ShortcutPills
@@ -106,8 +105,11 @@ export const ExplorerChatToolbar = ({
                 />
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="gap-x-2" onClick={() => setIsDeleteModalOpen(true)}>
-                <Trash size={14} />
+              <DropdownMenuItem
+                className="gap-x-2"
+                onClick={() => onSelectDelete({ id: chatId, type: 'chat', name: chat?.name ?? '' })}
+              >
+                <TrashIcon size={14} />
                 <span>Delete chat</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -120,23 +122,8 @@ export const ExplorerChatToolbar = ({
         onVisibleChange={setIsOptInModalOpen}
         showMetadataWarning={showMetadataWarning}
         updatedOptInSinceMCP={updatedOptInSinceMCP}
-        isHipaaProjectDisallowed={isHipaaProjectDisallowed}
         aiOptInLevel={aiOptInLevel}
       />
-
-      <ConfirmationModal
-        variant="destructive"
-        visible={isDeleteModalOpen}
-        title={`Delete "${chat?.name}"?`}
-        confirmLabel="Delete chat"
-        onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDeleteChat}
-      >
-        <p className="text-sm text-foreground-light">
-          This will permanently delete this chat and its message history. This action cannot be
-          undone.
-        </p>
-      </ConfirmationModal>
     </div>
   )
 }

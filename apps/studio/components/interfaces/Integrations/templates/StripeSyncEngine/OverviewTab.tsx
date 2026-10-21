@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -303,7 +303,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                   />
 
                   <div className="flex items-center gap-x-2">
-                    <Button asChild variant="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLinkIcon />}>
                       <Link
                         target="_blank"
                         rel="noopener noreferrer"
@@ -312,7 +312,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                         Get Stripe API key
                       </Link>
                     </Button>
-                    <Button asChild variant="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLinkIcon />}>
                       <Link
                         target="_blank"
                         rel="noopener noreferrer"
@@ -335,7 +335,6 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
 
               <SheetFooter>
                 <Button
-                  variant="default"
                   disabled={isInstallRequested}
                   onClick={() => handleCloseInstallSheet(false)}
                 >

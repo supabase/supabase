@@ -1,7 +1,7 @@
 [data-theme='dark'],
 .dark {
   --helpers-os-appearance: Dark;
-  --hue: 159;
+  --hue: 157.5;
   --chroma: 0.005;
   --surface: 0.19;
   --elevation-step: 0.025;
@@ -22,7 +22,6 @@
   --secondary-default: 247.8deg 100% 70%;
   --secondary-400: 248.3deg 54.5% 25.9%;
   --secondary-200: 248deg 53.6% 11%;
-  --brand-link: 155deg 100% 38.6%;
   --brand-default: 153.1deg 60.2% 52.7%;
   --brand-600: 154.9deg 59.5% 70%;
   --brand-500: 154.9deg 100% 19.2%;

@@ -24,7 +24,7 @@ export async function createScopedAccessToken({
   return data
 }
 
-export type NewScopedAccessToken = components['schemas']['CreateScopedAccessTokenResponse']
+export type NewScopedAccessToken = components['schemas']['CreateScopedAccessTokenResponse_Output']
 
 export const useScopedAccessTokenCreateMutation = ({
   onSuccess,

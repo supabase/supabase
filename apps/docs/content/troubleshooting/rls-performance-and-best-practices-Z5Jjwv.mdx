@@ -195,7 +195,6 @@ Execution Time: 0.046 ms
 
 [Stable functions do not seem to be honored in RLS in basic form](https://github.com/orgs/supabase/discussions/9311)
 [current_setting can lead to bad performance when used on RLS](https://github.com/PostgREST/postgrest-docs/issues/609#)
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 Thanks Steve Chavez and Wolfgang Walther in those threads.
 
 ### Added example of security definer function having select of a team table, comparing against a column in main table
@@ -225,8 +224,6 @@ $$ language plpgsql security definer;
 
 Some results:
 
-{/* supa-mdx-lint-disable Rule003Spelling */}
-
 | Policy                           | Index | Main Rs | Team Rs | on 10 teams | 100   | 500   | note               |
 | -------------------------------- | ----- | ------- | ------- | ----------- | ----- | ----- | ------------------ |
 | =ANY(user_teams())               | no    | 1M      | 1000    | >2Min       | >2Min | >2Min | TO or killed       |
@@ -235,5 +232,3 @@ Some results:
 | =ANY(ARRAY(select user_teams())) | yes   | 1M      | 1000    | 2ms         | 3     | 3     |                    |
 | in(1,2,3...100)                  | no    | 1M      | NA      | 130ms       | 142   | x     | baseline check     |
 | =ANY(ARRAY(select user_teams())) | yes   | 1M      | 10K     | x           | x     | x     | 24ms (on 1K teams) |
-
-{/* supa-mdx-lint-enable Rule003Spelling */}

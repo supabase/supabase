@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect } from 'react'
 import { Badge, Button } from 'ui'
 
@@ -78,7 +78,6 @@ export const BannerExplorer = () => {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="default"
             size="tiny"
             onClick={() => {
               selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER)

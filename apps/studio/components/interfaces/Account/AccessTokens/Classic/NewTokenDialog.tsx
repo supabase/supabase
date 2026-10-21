@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -154,7 +154,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild variant="default" icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLinkIcon />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>
@@ -235,7 +235,6 @@ export const NewTokenDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
-            variant="default"
             disabled={isPending}
             onClick={() => {
               form.reset()
@@ -246,7 +245,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} type="submit" loading={isPending}>
+          <Button variant="primary" form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

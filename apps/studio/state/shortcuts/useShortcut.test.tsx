@@ -53,7 +53,6 @@ const getLastRegisterCall = () => {
 
 describe('useShortcut', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseIsShortcutEnabled.mockReturnValue(true)
   })
 

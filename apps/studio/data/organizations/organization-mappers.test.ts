@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/data/fetchers', () => ({
   get: vi.fn(),
@@ -31,6 +31,7 @@ const baseOrganizationResponse = {
 }
 
 const baseOrganizationSlugResponse = {
+  created_at: '2023-01-01T00:00:00Z',
   billing_email: 'billing@example.com',
   billing_partner: null,
   has_oriole_project: false,
@@ -47,10 +48,6 @@ const baseOrganizationSlugResponse = {
 }
 
 describe('organization query mappers', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('keeps billing_partner unchanged while deriving Stripe display state from integration_source', () => {
     const organization = castOrganizationResponseToOrganization({
       ...baseOrganizationResponse,

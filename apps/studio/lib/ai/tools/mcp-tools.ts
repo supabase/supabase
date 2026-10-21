@@ -50,11 +50,9 @@ export const getMcpTools = async ({
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal
 }) => {
-  // Connect to the remote MCP server over HTTP and fetch its tools, which
-  // replace the old local tools. The legacy in-process server is no longer a
-  // production transport (eval-only now, see `createInProcessSupabaseMCPClient`),
-  // so this is unconditional. A remote failure (outage, timeout, auth) degrades
-  // to the remaining tools in `getTools` rather than breaking the assistant.
+  // Connect to the remote MCP server over HTTP and fetch its tools, replacing
+  // the local tools. A remote failure (outage, timeout, auth) degrades to the
+  // remaining tools in `getTools` rather than breaking the assistant.
   const mcpClient = await createSupabaseMCPClient({
     accessToken,
     projectRef,

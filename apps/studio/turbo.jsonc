@@ -33,6 +33,14 @@
         "SUPABASE_URL",
         "VERCEL",
         "VERCEL_ENV",
+        // Vite embeds this ID in server-function request pins.
+        // A different deployment ID requires fresh build output.
+        "VERCEL_DEPLOYMENT_ID",
+        // Project-level Vercel settings Nitro's vercel preset reads at build
+        // time; they change the emitted routes and asset paths.
+        "VERCEL_SKEW_PROTECTION_ENABLED",
+        "VERCEL_IMMUTABLE_STATIC_FILES_ENABLED",
+        "VERCEL_HASH_SALT",
         "MAINTENANCE_MODE",
         // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
@@ -100,18 +108,19 @@
         "STATUSPAGE_API_KEY",
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
+        "INCIDENT_IO_WIDGET_URL",
+        "INCIDENT_IO_STATUS_PAGE_ID",
         "LIVE_SUPABASE_SECRET_KEY",
         // Selects the build mode for the studio's `build`/`start` scripts
         // (e.g. e2e sets `MODE=test`). Listed so turbo invalidates the
         // cache when it changes — without this, switching between test and
         // production builds reuses a stale cached output.
         "MODE",
-        // Read by scripts/serve.js (the Node host for `pnpm start`).
-        // Declared here so the studio-package turbo env lint rule passes
-        // even though turbo doesn't directly drive `start`.
+        // Read by the Nitro server behind `pnpm start`. Declared so the turbo
+        // env lint rule passes even though turbo doesn't drive `start`.
         "PORT",
-        // Gates the TanStack vs Next path in api/server.js, vercel.ts,
-        // and scripts/dispatch.js (the dev/build/start dispatcher).
+        // Gates the TanStack vs Next path in vercel.ts and
+        // scripts/dispatch.js (the dev/build/start dispatcher).
         "STUDIO_FRAMEWORK",
         // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
         // to gate Vite-only `import.meta.glob`). Not a real process env var
@@ -131,7 +140,9 @@
         ".next/**",
         "!.next/cache/**",
         "!.next/dev/**/*",
-        "dist/**",
+        // TanStack Start via Nitro: node server and Vercel Build Output.
+        ".output/**",
+        ".vercel/output/**",
       ],
     },
   },

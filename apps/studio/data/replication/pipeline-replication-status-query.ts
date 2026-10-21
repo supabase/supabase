@@ -1,17 +1,23 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { replicationKeys } from './keys'
+import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelineReplicationStatusParams = { projectRef?: string; pipelineId?: number }
+export type ReplicationPipelineReplicationStatusVariables = {
+  projectRef?: string
+  pipelineId?: number
+}
+
+export type ReplicationPipelineReplicationStatusError = ResponseError
 
 export type ReplicationPipelineTableStatus =
   components['schemas']['PipelineReplicationStatusResponse_Output']['table_statuses'][number]
 
 async function fetchReplicationPipelineReplicationStatus(
-  { projectRef, pipelineId }: ReplicationPipelineReplicationStatusParams,
+  { projectRef, pipelineId }: ReplicationPipelineReplicationStatusVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -35,19 +41,43 @@ export type ReplicationPipelineReplicationStatusData = Awaited<
   ReturnType<typeof fetchReplicationPipelineReplicationStatus>
 >
 
-export const useReplicationPipelineReplicationStatusQuery = <
+export const replicationPipelineReplicationStatusQueryOptions = <
   TData = ReplicationPipelineReplicationStatusData,
->(
-  { projectRef, pipelineId }: ReplicationPipelineReplicationStatusParams,
-  {
-    enabled = true,
-    ...options
-  }: UseCustomQueryOptions<ReplicationPipelineReplicationStatusData, ResponseError, TData> = {}
-) =>
-  useQuery<ReplicationPipelineReplicationStatusData, ResponseError, TData>({
+>({
+  projectRef,
+  pipelineId,
+}: ReplicationPipelineReplicationStatusVariables) =>
+  queryOptions<
+    ReplicationPipelineReplicationStatusData,
+    ReplicationPipelineReplicationStatusError,
+    TData
+  >({
     queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
     queryFn: ({ signal }) =>
       fetchReplicationPipelineReplicationStatus({ projectRef, pipelineId }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+    ...replicationPollingOptions,
+    enabled: typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',
+  })
+
+export const useReplicationPipelineReplicationStatusQuery = <
+  TData = ReplicationPipelineReplicationStatusData,
+>(
+  variables: ReplicationPipelineReplicationStatusVariables,
+  options: UseCustomQueryOptions<
+    ReplicationPipelineReplicationStatusData,
+    ReplicationPipelineReplicationStatusError,
+    TData
+  > = {}
+) =>
+  useQuery<
+    ReplicationPipelineReplicationStatusData,
+    ReplicationPipelineReplicationStatusError,
+    TData
+  >({
+    ...replicationPipelineReplicationStatusQueryOptions<TData>(variables),
     ...options,
+    enabled:
+      options.enabled !== false &&
+      typeof variables.projectRef !== 'undefined' &&
+      typeof variables.pipelineId !== 'undefined',
   })

@@ -145,11 +145,7 @@ export const CustomDomainsConfigureHostname = () => {
 
           <CardFooter className="justify-end space-x-2">
             {form.formState.isDirty && (
-              <Button
-                variant="default"
-                disabled={isSubmitting}
-                onClick={() => form.reset({ domain: '' })}
-              >
+              <Button disabled={isSubmitting} onClick={() => form.reset({ domain: '' })}>
                 Cancel
               </Button>
             )}

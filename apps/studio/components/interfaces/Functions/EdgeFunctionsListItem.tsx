@@ -1,7 +1,7 @@
 import { IS_PLATFORM, useFlag } from 'common'
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
-import { Check, Copy } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useState, type MouseEvent } from 'react'
 import { cn, copyToClipboard, TableCell, TableRow } from 'ui'
@@ -87,13 +87,13 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
             }}
           >
             {isCopied ? (
-              <div className="text-brand">
-                <Check size={14} strokeWidth={3} />
+              <div className="text-primary">
+                <CheckIcon size={14} strokeWidth={3} />
               </div>
             ) : (
               <div className="relative">
                 <div className="block">
-                  <Copy size={14} strokeWidth={1.5} />
+                  <CopyIcon size={14} strokeWidth={1.5} />
                 </div>
               </div>
             )}

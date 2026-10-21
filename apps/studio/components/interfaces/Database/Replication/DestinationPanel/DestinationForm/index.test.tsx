@@ -14,10 +14,12 @@ type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type PipelineResponse = components['schemas']['PipelineResponse_Output']
 type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 type PublicationNamesResponse = components['schemas']['ReadPublicationsResponse_Output']
-type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse']
+type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Output']
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const mocks = vi.hoisted(() => ({
+  isSaving: false,
+  isPreviewEnabled: false,
   resetValidation: vi.fn(),
   submitPipeline: vi.fn(),
   validateConfiguration: vi.fn(),
@@ -137,7 +139,7 @@ vi.mock('common', async (importOriginal) => {
   return { ...actual, useParams: () => ({ ref: 'project-ref' }) }
 })
 
-vi.mock('framer-motion', () => ({
+vi.mock('motion/react', () => ({
   AnimatePresence: ({ children }: PropsWithChildren) => children,
   motion: { div: ({ children }: PropsWithChildren) => <div>{children}</div> },
 }))
@@ -187,11 +189,15 @@ vi.mock('../../useIsETLPrivateAlpha', () => ({
   useIsETLSnowflakePrivateAlpha: () => false,
 }))
 
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  usePipelineCreationPreview: () => ({ isEnabled: mocks.isPreviewEnabled }),
+}))
+
 vi.mock('./useDestinationForm', () => ({
   useDestinationForm: () => ({
     isValidating: false,
     validateConfiguration: mocks.validateConfiguration,
-    isSaving: false,
+    isSaving: mocks.isSaving,
     submitPipeline: mocks.submitPipeline,
     hasRunValidation: false,
     destinationValidationFailures: [],
@@ -251,8 +257,9 @@ vi.mock('@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketS
 
 describe('DestinationForm edit submission', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     pipelineTableIds = [101, 999]
+    mocks.isSaving = false
+    mocks.isPreviewEnabled = false
     mocks.submitPipeline.mockResolvedValue(undefined)
     mocks.validateConfiguration.mockResolvedValue({ canContinue: true, warnings: [] })
 
@@ -294,36 +301,103 @@ describe('DestinationForm edit submission', () => {
     })
   })
 
-  it('bypasses create validation and submits the pruned table policy with the existing batch', async () => {
-    const onClose = vi.fn()
+  it.each([
+    { isPreviewEnabled: false, isEditing: false, shouldShowSection: false },
+    { isPreviewEnabled: true, isEditing: false, shouldShowSection: true },
+    { isPreviewEnabled: true, isEditing: true, shouldShowSection: false },
+  ])(
+    'shows the connection section only for preview creation ($isPreviewEnabled, $isEditing)',
+    ({ isPreviewEnabled, isEditing, shouldShowSection }) => {
+      mocks.isPreviewEnabled = isPreviewEnabled
+      customRender(
+        <DestinationForm
+          selectedType="BigQuery"
+          visible
+          existingDestination={isEditing ? existingDestination : undefined}
+          onClose={vi.fn()}
+        />
+      )
+      expect(screen.queryByRole('region', { name: 'Data' }) !== null).toBe(shouldShowSection)
+      expect(screen.queryByRole('region', { name: 'Destination connection' }) !== null).toBe(
+        shouldShowSection
+      )
+      if (shouldShowSection) {
+        const section = screen.getByRole('region', { name: 'Destination connection' })
+        expect(
+          section.compareDocumentPosition(screen.getByText('Data')) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+        ).toBeTruthy()
+      }
+    }
+  )
 
-    customRender(
-      <DestinationForm
-        selectedType="BigQuery"
-        visible
-        existingDestination={existingDestination}
-        onClose={onClose}
-      />
-    )
+  it.each([true, false])(
+    'describes saving without claiming a stopped pipeline will start (enabled: %s)',
+    (enabled) => {
+      mocks.isSaving = true
+      customRender(
+        <DestinationForm
+          selectedType="BigQuery"
+          visible
+          existingDestination={{
+            ...existingDestination,
+            enabled,
+            statusName: enabled ? 'started' : 'stopped',
+          }}
+          onClose={vi.fn()}
+        />
+      )
+      expect(
+        screen.getByText(
+          enabled ? 'Updating destination and restarting pipeline...' : 'Updating destination...'
+        )
+      ).toBeInTheDocument()
+      expect(
+        screen.queryByText('Updating destination and starting pipeline...')
+      ).not.toBeInTheDocument()
+    }
+  )
 
-    const submitButton = screen.getByRole('button', { name: 'Apply and restart pipeline' })
-    await waitFor(() => expect(submitButton).toBeEnabled())
-    fireEvent.click(submitButton)
+  it.each([true, false])(
+    'submits the pruned table policy with the existing batch (enabled: %s)',
+    async (enabled) => {
+      const destination = {
+        ...existingDestination,
+        enabled,
+        statusName: enabled ? 'started' : 'stopped',
+      }
+      const onClose = vi.fn()
 
-    await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
+      customRender(
+        <DestinationForm
+          selectedType="BigQuery"
+          visible
+          existingDestination={destination}
+          onClose={onClose}
+        />
+      )
 
-    expect(mocks.validateConfiguration).not.toHaveBeenCalled()
-    expect(mocks.submitPipeline).toHaveBeenCalledWith({
-      data: expect.objectContaining({
-        tableSyncCopyMode: 'include_tables',
-        tableSyncCopyTableIds: ['101'],
-      }),
-      existingDestination,
-      existingBatch,
-      onSuccess: expect.any(Function),
-      onClose,
-    })
-  })
+      const submitButton = screen.getByRole('button', {
+        name: enabled ? 'Apply and restart pipeline' : 'Apply changes',
+      })
+      await waitFor(() => expect(submitButton).toBeEnabled())
+      fireEvent.click(submitButton)
+
+      await waitFor(() => expect(mocks.submitPipeline).toHaveBeenCalledOnce())
+
+      expect(mocks.validateConfiguration).not.toHaveBeenCalled()
+      expect(mocks.submitPipeline).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          tableSyncCopyMode: 'include_tables',
+          tableSyncCopyTableIds: ['101'],
+        }),
+        existingDestination: destination,
+        existingBatch,
+        onSuccess: expect.any(Function),
+        onClose,
+      })
+    }
+  )
 
   it('rejects an edit when every selected table has left the publication', async () => {
     pipelineTableIds = [999]

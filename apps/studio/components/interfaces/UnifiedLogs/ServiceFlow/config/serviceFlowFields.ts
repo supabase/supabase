@@ -30,25 +30,34 @@ export const networkPrimaryFields: BlockFieldConfig[] = [
     id: 'host', // Matches filterFields 'host' (input) - FILTERABLE
     label: 'Host',
     getValue: (data, enrichedData) =>
-      enrichedData?.request_host || enrichedData?.host || data?.host,
+      enrichedData?.request_host ||
+      enrichedData?.host ||
+      enrichedData?.['req.hostname'] ||
+      data?.host,
   },
   {
     id: 'method', // Matches filterFields 'method' (checkbox) - FILTERABLE
     label: 'Method',
     getValue: (data, enrichedData) =>
-      enrichedData?.request_method || enrichedData?.method || data?.method,
+      enrichedData?.request_method ||
+      enrichedData?.method ||
+      enrichedData?.['req.method'] ||
+      data?.method,
   },
   {
     id: 'pathname', // Matches filterFields 'pathname' (input) - FILTERABLE
     label: 'Path',
     getValue: (data, enrichedData) =>
-      enrichedData?.request_path || enrichedData?.pathname || data?.pathname,
+      enrichedData?.request_path ||
+      enrichedData?.pathname ||
+      enrichedData?.['req.url'] ||
+      data?.pathname,
   },
   {
     id: 'user_agent',
     label: 'Client',
     getValue: (_data, enrichedData) => {
-      const userAgent = enrichedData?.headers_user_agent
+      const userAgent = enrichedData?.headers_user_agent || enrichedData?.['req.headers.user_agent']
       if (!userAgent) return null
       // TODO: Parse user agent for nice display with icons
       return userAgent.length > 50 ? userAgent.substring(0, 50) + '...' : userAgent
@@ -180,7 +189,7 @@ export const locationAdditionalFields: BlockFieldConfig[] = [
   {
     id: 'client_region',
     label: 'Region',
-    getValue: (_data, enrichedData) => enrichedData?.client_region,
+    getValue: (_data, enrichedData) => enrichedData?.client_region || enrichedData?.region,
     requiresEnrichedData: true,
   },
   {
@@ -292,7 +301,8 @@ export const techDetailsFields: BlockFieldConfig[] = [
   {
     id: 'x_forwarded_proto',
     label: 'Forwarded Proto',
-    getValue: (_data, enrichedData) => enrichedData?.headers_x_forwarded_proto,
+    getValue: (_data, enrichedData) =>
+      enrichedData?.headers_x_forwarded_proto || enrichedData?.['req.headers.x_forwarded_proto'],
     requiresEnrichedData: true,
   },
 ]
@@ -480,7 +490,8 @@ export const storagePrimaryFields: BlockFieldConfig[] = [
   {
     id: 'status',
     label: 'Status',
-    getValue: (data, enrichedData) => enrichedData?.status || data?.status,
+    getValue: (data, enrichedData) =>
+      enrichedData?.status || enrichedData?.['res.statusCode'] || data?.status,
   },
   {
     id: 'filename',
@@ -537,8 +548,11 @@ export const storagePrimaryFields: BlockFieldConfig[] = [
     id: 'response_time',
     label: 'Response Time',
     getValue: (data, enrichedData) => {
-      const time = enrichedData?.response_origin_time || data?.response_time_ms
-      return time ? `${time}ms` : null
+      const time =
+        enrichedData?.response_origin_time ?? enrichedData?.responseTime ?? data?.response_time_ms
+      if (time === null || time === undefined || time === '') return null
+      const numericTime = Number(time)
+      return `${Number.isInteger(numericTime) ? numericTime : numericTime.toFixed(2)}ms`
     },
     requiresEnrichedData: true,
   },
@@ -607,7 +621,7 @@ export const storageDetailsFields: BlockFieldConfig[] = [
     id: 'content_disposition',
     label: 'Content Disposition',
     getValue: (data, enrichedData) => {
-      const status = enrichedData?.status || data?.status
+      const status = enrichedData?.status || enrichedData?.['res.statusCode'] || data?.status
       const isObjectDeleted = status === 404 || status === '404'
       const hasError = status && Number(status) >= 400
 
@@ -624,7 +638,8 @@ export const storageDetailsFields: BlockFieldConfig[] = [
   {
     id: 'method',
     label: 'Method',
-    getValue: (data, enrichedData) => enrichedData?.method || data?.method,
+    getValue: (data, enrichedData) =>
+      enrichedData?.method || enrichedData?.['req.method'] || data?.method,
     requiresEnrichedData: false,
   },
   {

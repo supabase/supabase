@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -123,9 +123,8 @@ export const ObservabilityMenu = () => {
                         <span className="uppercase font-mono">Custom Reports</span>
                         {customReportItems.length > 0 && (
                           <ButtonTooltip
-                            variant="default"
                             size="tiny"
-                            icon={<Plus />}
+                            icon={<PlusIcon />}
                             disabled={!canCreateCustomReport}
                             className="flex items-center justify-center h-6 w-6 absolute top-0 -right-1"
                             onClick={() => {
@@ -167,8 +166,7 @@ export const ObservabilityMenu = () => {
                       description="Create and save custom reports to track your project metrics"
                       actions={
                         <ButtonTooltip
-                          variant="default"
-                          icon={<Plus />}
+                          icon={<PlusIcon />}
                           disabled={!canCreateCustomReport}
                           onClick={() => {
                             setShowNewReportModal(true)

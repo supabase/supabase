@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlertCircle, XIcon } from 'lucide-react'
+import { AlertCircleIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -19,7 +19,7 @@ import {
 import PrivilegesHead from '@/components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
@@ -242,7 +242,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
             <>
               {!diffWarningDismissed && (
                 <Alert variant="warning">
-                  <AlertCircle strokeWidth={2} />
+                  <AlertCircleIcon strokeWidth={2} />
                   <AlertTitle>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-code-inline">supabase db diff</code>.
@@ -267,7 +267,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
               {!selectStarWarningDismissed && (
                 <Alert variant="warning">
-                  <AlertCircle strokeWidth={2} />
+                  <AlertCircleIcon strokeWidth={2} />
                   <AlertTitle>Changing column privileges can break existing queries.</AlertTitle>
                   <AlertDescription>
                     If you remove a column privilege for a role, that role will lose all access to
@@ -335,7 +335,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     privileges here
                   </p>
                   {selectedSchema === 'public' && (
-                    <Button asChild className="mt-4">
+                    <Button variant="primary" asChild className="mt-4">
                       <Link href={`/project/${ref}/editor`}>Create a new table</Link>
                     </Button>
                   )}
@@ -353,7 +353,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription>
               <div className="mt-4">
-                <Button variant="default" onClick={() => toggleFeaturePreviewModal(true)}>
+                <Button onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>

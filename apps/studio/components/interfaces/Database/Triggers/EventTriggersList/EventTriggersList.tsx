@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { DatabaseZap, Plus, Search } from 'lucide-react'
+import { DatabaseZapIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -202,7 +202,7 @@ export const EventTriggersList = () => {
               onKeyDown={onSearchInputEscape(filterString, setFilterString)}
             />
             <InputGroupAddon>
-              <Search />
+              <SearchIcon />
             </InputGroupAddon>
           </InputGroup>
           <ReportsSelectFilter
@@ -225,14 +225,14 @@ export const EventTriggersList = () => {
               onTrigger={createEventTrigger}
               side="bottom"
             >
-              <Button variant="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
+              <Button variant="primary" icon={<PlusIcon size={12} />} onClick={createEventTrigger}>
                 New trigger
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
               variant="primary"
-              icon={<Plus size={12} />}
+              icon={<PlusIcon size={12} />}
               disabled
               tooltip={{
                 content: {
@@ -249,12 +249,11 @@ export const EventTriggersList = () => {
 
       {showEmptyState ? (
         <EmptyStatePresentational
-          icon={DatabaseZap}
+          icon={DatabaseZapIcon}
           title="No event triggers yet"
           description="Event triggers run on database-level events like DDL commands."
         >
           <ButtonTooltip
-            variant="default"
             disabled={!canUpdateEventTriggers}
             onClick={createEventTrigger}
             tooltip={{

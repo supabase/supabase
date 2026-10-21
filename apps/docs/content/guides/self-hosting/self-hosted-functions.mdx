@@ -42,7 +42,7 @@ Add the following code to `index.ts`:
 import { withSupabase } from '@supabase/server'
 
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req) => {
+  fetch: withSupabase({ auth: ['publishable', 'secret'] }, async (req) => {
     const { name } = await req.json()
     const message = `Hello, ${name}!`
 
@@ -51,7 +51,7 @@ export default {
 }
 ```
 
-The `auth` option controls who can call the function: `'none'` accepts every request, `'user'` requires a valid user JWT, and `'publishable'` / `'secret'` require an API key. See the [Edge Functions auth guide](/docs/guides/functions/auth) for details.
+The `auth` option controls who can call the function. This example matches the default `hello` function and requires a publishable or secret API key in the `apikey` header. `'none'` accepts every request, and `'user'` requires a valid user JWT. See the [Edge Functions auth guide](/docs/guides/functions/auth) for details.
 
 ### Step 2: Restart the functions service to pick up the new function
 
@@ -63,6 +63,7 @@ sh run.sh restart functions
 
 ```sh
 curl -X POST http://<your-domain>/functions/v1/my-function \
+  -H 'apikey: <SUPABASE_PUBLISHABLE_KEY>' \
   -H 'Content-Type: application/json' \
   -d '{"name": "World"}'
 ```
@@ -209,11 +210,13 @@ For more details, see:
 
 ## Troubleshooting
 
-### 400 "missing function name in request"
+### 404 `NOT_FOUND`
 
-The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`.
+The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`. Check that the corresponding directory exists at `volumes/functions/hello/`.
 
-### 500 error on invocation
+### Function invocation errors
+
+Inspect the `sb-error-code` response header and see [Edge Functions error codes](/docs/guides/functions/error-codes) for details about the error.
 
 Check the functions service logs:
 
@@ -221,12 +224,13 @@ Check the functions service logs:
 docker compose logs functions
 ```
 
-Common causes: syntax errors in your function code, invalid imports, or missing dependencies.
+For 503 `BOOT_ERROR`, check for syntax errors, invalid imports, or missing dependencies that prevent the function from starting.
 
 ### 401 "invalid JWT"
 
 - Check that `FUNCTIONS_VERIFY_JWT` matches your intent (`true` or `false`) in `.env`
-- If verification is enabled, ensure you're passing a valid token: `Authorization: Bearer <anon_key or service_role_key>`
+- If verification is enabled, pass either a valid JWT in `Authorization: Bearer <token>` (a user session token or a legacy API key), or an `sb_publishable_*` or `sb_secret_*` key in the `apikey` header. The API gateway translates `sb_` keys to an internal JWT, which the functions service then verifies.
+- Verifying asymmetric JWTs, including translated `sb_` keys, requires `SUPABASE_JWKS` to be set for the `functions` service in `docker-compose.yml`. See [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
 
 ### Changes to function code not reflected after editing
 
@@ -250,4 +254,18 @@ sh run.sh recreate functions
 
 ### Memory or timeout errors
 
-The default limits are 150 MB memory and 60 seconds timeout per function invocation. These are set in `volumes/functions/main/index.ts`. To adjust them, edit the `memoryLimitMb` and `workerTimeoutMs` values and restart the functions service.
+The default limits in `volumes/functions/main/index.ts` apply to each worker:
+
+| Setting                  | Default    | Description                                                                                 |
+| ------------------------ | ---------- | ------------------------------------------------------------------------------------------- |
+| `memoryLimitMb`          | 150 MB     | Maximum memory usage.                                                                       |
+| `workerTimeoutMs`        | 400,000 ms | Maximum worker lifetime.                                                                    |
+| `requestAbsentTimeoutMs` | 60,000 ms  | Allows the worker to shut down after 60 seconds without requests when no tasks are pending. |
+
+To adjust these limits, edit the values in `volumes/functions/main/index.ts` and restart the functions service.
+
+Requests have a separate idle timeout of 150 seconds. This is set by `--user-worker-request-idle-timeout` in the functions service command in `docker-compose.yml`, with the value `150000` in milliseconds. Recreate the functions container after changing this value.
+
+The [Envoy gateway](/docs/guides/self-hosting/self-hosted-envoy#routes) has separate limits of 160 seconds of inactivity and a 410-second upstream response timeout.
+
+If you use the optional Kong gateway, `read_timeout` in `volumes/api/kong.yml` is set to `160000` milliseconds, allowing 160 seconds of inactivity between reads from the functions service.

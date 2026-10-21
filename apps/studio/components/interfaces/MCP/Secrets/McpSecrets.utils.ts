@@ -3,7 +3,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 
 import type { InterstitialTerminalCopy } from '../InterstitialTerminalScreen'
-import { UNKNOWN_CLIENT_LABEL } from './McpSecrets.constants'
 import type {
   SecretProviderHint,
   SecretRequest,
@@ -14,7 +13,7 @@ import type {
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
 
-const RETURN_TO_CLIENT_STEP = `Go back to ${UNKNOWN_CLIENT_LABEL} and choose "I've completed it" to finish the tool call.`
+const RETURN_TO_CLIENT_STEP = `Head back to your agent and let it know you're finished.`
 
 const CLOSE_TAB_FOOTER = 'You can close this tab.'
 
@@ -35,6 +34,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
           calloutBody:
             'Ask your agent to store the key again. It will find the saved key and finish without sending you back here.',
           footer: UNVERIFIED_KEY_FOOTER,
+          projectRef: state.request.ref,
         }
       }
 
@@ -44,6 +44,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         calloutTitle: 'Next step',
         calloutBody: RETURN_TO_CLIENT_STEP,
         footer: UNVERIFIED_KEY_FOOTER,
+        projectRef: state.request.ref,
       }
     }
 
@@ -54,6 +55,7 @@ export function getSecretsCopy(state: SecretsOutcomeState): InterstitialTerminal
         calloutTitle: 'Next step',
         calloutBody: RETURN_TO_CLIENT_STEP,
         footer: CLOSE_TAB_FOOTER,
+        projectRef: state.request.ref,
       }
 
     case 'expired':

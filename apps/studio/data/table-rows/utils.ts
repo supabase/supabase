@@ -1,3 +1,5 @@
+import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
+
 import type { Filter, ServiceError } from '@/components/grid/types'
 import { isNumericalColumn } from '@/components/grid/utils/types'
 import { Entity, isTableLike } from '@/data/table-editor/table-editor-types'
@@ -22,7 +24,7 @@ export function formatFilterValue(
       return filter.value
     else return numberValue
   }
-  return filter.value
+  return formatPatternMatchFilterValue(filter.value, filter.operator)
 }
 
 export function getPrimaryKeys({ table }: { table: Entity }): {

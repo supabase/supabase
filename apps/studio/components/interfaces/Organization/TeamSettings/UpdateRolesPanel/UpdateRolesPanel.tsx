@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { ChevronDown, X } from 'lucide-react'
+import { ChevronDownIcon, XIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import {
   Alert,
@@ -218,7 +218,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           ? `This member only has access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`
                           : `This member will only have access to ${numberOfProjectsWithAccess} project${numberOfProjectsWithAccess > 1 ? 's' : ''}`}
                       </span>
-                      <ChevronDown size={14} className="transition group-data-open:-rotate-180" />
+                      <ChevronDownIcon
+                        size={14}
+                        className="transition group-data-open:-rotate-180"
+                      />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="text-foreground-light text-sm px-4">
                       <p>
@@ -282,12 +285,19 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   const canAssignRole = rolesAddable.includes(role.id)
                                   const isOwnerRole = role.name === 'Owner'
                                   const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                                  const disabled = !canAssignRole || disabledForStripe
+
+                                  const isNoAccessRole = role.name === 'No-access'
+                                  const disabledForProjectRole =
+                                    !isApplyingRoleToAllProjects && isNoAccessRole
+                                  const disabled =
+                                    !canAssignRole || disabledForStripe || disabledForProjectRole
                                   const disabledReason = disabledForStripe
                                     ? 'Cannot be assigned in Stripe Projects organizations'
-                                    : !canAssignRole
-                                      ? 'Additional permissions required to assign role'
-                                      : undefined
+                                    : disabledForProjectRole
+                                      ? 'Cannot assign No-access role to project-scoped members'
+                                      : !canAssignRole
+                                        ? 'Additional permissions required to assign role'
+                                        : undefined
 
                                   return (
                                     <SelectItem
@@ -299,13 +309,9 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                       <div className="flex flex-col gap-0.5 max-w-xs">
                                         <span>{role.name}</span>
                                         <span className="text-xs text-foreground-lighter">
-                                          {[
-                                            ROLE_DESCRIPTIONS[role.name] ??
-                                              'Permissions are based on the configured organization role.',
-                                            disabledReason,
-                                          ]
-                                            .filter(Boolean)
-                                            .join(' ')}
+                                          {ROLE_DESCRIPTIONS[role.name] ??
+                                            'Permissions are based on the configured organization role.'}
+                                          {disabledReason && ` ${disabledReason}`}
                                         </span>
                                       </div>
                                     </SelectItem>
@@ -321,7 +327,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                             variant="text"
                             disabled={!canRemoveRole}
                             className="px-1"
-                            icon={<X />}
+                            icon={<XIcon />}
                             onClick={() => onRemoveProject(project?.ref)}
                             tooltip={{
                               content: {
@@ -345,11 +351,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   setOpen={setShowProjectDropdown}
                   modal={true}
                   onSelect={onSelectProject}
-                  renderTrigger={() => (
-                    <Button variant="default" className="w-min">
-                      Add project
-                    </Button>
-                  )}
+                  renderTrigger={() => <Button className="w-min">Add project</Button>}
                   renderRow={(project) => {
                     const hasRoleAssigned = projectsRoleConfiguration.some(
                       (p) => p.ref === project.ref
@@ -369,10 +371,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             </SheetSection>
 
             <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
-              <Button variant="default" disabled={false} onClick={() => onClose()}>
+              <Button disabled={false} onClick={() => onClose()}>
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 loading={false}
                 disabled={!canSaveRoles || hasNoChanges}
                 onClick={() => {

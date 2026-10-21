@@ -24,7 +24,9 @@ import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutatio
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
 import { TabsStateContext, type Tab } from '@/state/tabs'
 
-type SaveCoordinator = Pick<SaveScheduler, 'requestSave'>
+type SaveCoordinator = Pick<SaveScheduler, 'requestSave'> & {
+  saveFavorite: (id: string, favorite: boolean) => void
+}
 
 const SqlEditorSaveCoordinatorContext = createContext<SaveCoordinator | null>(null)
 
@@ -34,7 +36,8 @@ const SqlEditorSaveCoordinatorContext = createContext<SaveCoordinator | null>(nu
  * query invalidation uses the React Query client from context, and the
  * subscription is started/stopped deterministically — and is testable.
  *
- * Exposes `requestSave` (the explicit-save entry, e.g. Cmd+S) via context.
+ * Exposes `requestSave` (the explicit-save entry, e.g. Cmd+S) and `saveFavorite`
+ * via context.
  */
 export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient()
@@ -45,7 +48,7 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
     saveModeRef.current = isManualSaveEnabled ? 'manual' : 'auto'
   }, [isManualSaveEnabled])
 
-  const scheduler = useMemo(() => {
+  const coordinator = useMemo(() => {
     const mechanism = createSaveMechanism({
       state: sqlEditorState,
       upsertContent,
@@ -63,15 +66,29 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
     // getSaveMode is invoked synchronously from a Valtio `subscribe` callback,
     // outside React's render cycle, so it can't read reactive state directly.
     // Route it through a ref that's kept in sync via the effect above instead.
-    return createSaveScheduler({
+    const scheduler = createSaveScheduler({
       state: sqlEditorState,
       saveMechanism: mechanism,
       notify: toast,
       getSaveMode: () => saveModeRef.current,
     })
+
+    return {
+      ...scheduler,
+      saveFavorite: (id: string, favorite: boolean) => {
+        const storeSnippet = sqlEditorState.snippets[id]
+        if (!storeSnippet) return
+        const previousFavorite = storeSnippet.snippet.favorite
+
+        if (favorite) sqlEditorState.addFavorite(id)
+        else sqlEditorState.removeFavorite(id)
+
+        mechanism.saveFavorite({ id, projectRef: storeSnippet.projectRef, previousFavorite })
+      },
+    }
   }, [queryClient])
 
-  useEffect(() => scheduler.start(), [scheduler])
+  useEffect(() => coordinator.start(), [coordinator])
 
   // Own what a SQL tab means to the tabs layout — how it closes and the
   // unsaved-changes dot it shows — so the layout doesn't have to know about
@@ -133,7 +150,7 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
   }, [])
 
   return (
-    <SqlEditorSaveCoordinatorContext.Provider value={scheduler}>
+    <SqlEditorSaveCoordinatorContext.Provider value={coordinator}>
       {children}
     </SqlEditorSaveCoordinatorContext.Provider>
   )

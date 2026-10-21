@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -210,11 +210,10 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       <FormControl className="col-span-6">
                         <PopoverTrigger asChild>
                           <Button
-                            variant="default"
                             size={'medium'}
                             className={`w-full [&>span]:w-full text-left`}
                             iconRight={
-                              <ChevronsUpDown
+                              <ChevronsUpDownIcon
                                 className="text-foreground-muted"
                                 strokeWidth={2}
                                 size={14}
@@ -258,9 +257,9 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                     setSearchTerm('')
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
-                                      'text-brand',
+                                      'text-primary',
                                       schema.name === field.value ? 'opacity-100' : 'opacity-0'
                                     )}
                                     strokeWidth={2}
@@ -306,14 +305,13 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           disabled={isSelectEntityDisabled || isLoadingEntities}
                         >
                           <Button
-                            variant="default"
                             size="medium"
                             className={cn(
                               'w-full [&>span]:w-full text-left',
                               selectedEntity === '' && 'text-foreground-lighter'
                             )}
                             iconRight={
-                              <ChevronsUpDown
+                              <ChevronsUpDownIcon
                                 className="text-foreground-muted"
                                 strokeWidth={2}
                                 size={14}
@@ -351,7 +349,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                             <CommandEmpty>
                               {isLoadingEntities ? (
                                 <div className="flex items-center gap-2 text-center justify-center">
-                                  <Loader2 size={12} className="animate-spin" />
+                                  <Loader2Icon size={12} className="animate-spin" />
                                   Loading...
                                 </div>
                               ) : (
@@ -370,9 +368,9 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                                     form.setValue('type', INDEX_TYPES[0].value)
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
-                                      'text-brand',
+                                      'text-primary',
                                       entity.name === field.value ? 'opacity-100' : 'opacity-0'
                                     )}
                                     strokeWidth={2}
@@ -512,7 +510,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <SheetSection>
                   <div className="flex items-center justify-between">
                     <p className="text-sm">Preview of SQL statement</p>
-                    <Button asChild variant="default">
+                    <Button asChild>
                       <Link
                         href={
                           project !== undefined
@@ -544,7 +542,6 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
         </Form>
         <SheetFooter>
           <Button
-            variant="default"
             disabled={isExecuting}
             onClick={() => {
               form.reset()

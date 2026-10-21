@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag } from 'common'
-import { ChevronDown, RefreshCw } from 'lucide-react'
+import { ChevronDownIcon, RefreshCwIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -103,7 +103,6 @@ export const RestartServerButton = () => {
         <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
             type="button"
-            variant="default"
             className={cn(
               'flex-1 px-3 hover:z-10 focus-visible:z-10 @lg:flex-none',
               canRestartProject && canRestart ? 'rounded-r-none focus-visible:rounded-r-sm' : ''
@@ -132,10 +131,9 @@ export const RestartServerButton = () => {
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
-                  variant="default"
                   aria-label="Choose restart type"
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                  icon={<ChevronDown />}
+                  icon={<ChevronDownIcon />}
                   disabled={!canRestartProject}
                 />
               </DropdownMenuTrigger>
@@ -161,8 +159,7 @@ export const RestartServerButton = () => {
         </div>
       ) : (
         <Button
-          variant="default"
-          icon={<RefreshCw />}
+          icon={<RefreshCwIcon />}
           className="w-full @lg:w-auto"
           disabled={isLoading}
           onClick={() => {

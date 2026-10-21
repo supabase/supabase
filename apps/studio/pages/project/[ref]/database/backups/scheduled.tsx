@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { DatabaseBackup, Info } from 'lucide-react'
+import { DatabaseBackupIcon, InfoIcon } from 'lucide-react'
 import { Admonition } from 'ui-patterns/Admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -15,7 +15,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BackupsList } from '@/components/interfaces/Database/Backups/BackupsList'
 import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -24,7 +24,11 @@ import InformationBox from '@/components/ui/InformationBox'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useIsHighAvailability, useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsHighAvailability,
+  useIsOrioleDbInAws,
+  useOrioleDbReleaseStage,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -63,8 +67,9 @@ const ScheduledBackups = () => {
     isSuccess,
   } = useBackupsQuery({ projectRef })
 
-  const isOrioleDbInAws = useIsOrioleDbInAws()
   const isHighAvailability = useIsHighAvailability()
+  const isOrioleDbInAws = useIsOrioleDbInAws()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
   const isPitrEnabled = backups?.pitr_enabled
 
   const { can: canReadScheduledBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
@@ -72,14 +77,14 @@ const ScheduledBackups = () => {
     'back_ups'
   )
 
-  if (isOrioleDbInAws) {
+  if (isOrioleDbInAws && orioleDbReleaseStage === 'alpha') {
     return (
       <Admonition
         type="default"
         title="Database backups are not available for OrioleDB"
-        description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
+        description={`OrioleDB is currently in public ${orioleDbReleaseStage} and projects created are strictly ephemeral with no database backups`}
       >
-        <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
       </Admonition>
     )
   }
@@ -87,7 +92,7 @@ const ScheduledBackups = () => {
   if (isHighAvailability) {
     return (
       <HighAvailabilityDisabledEmptyState
-        icon={DatabaseBackup}
+        icon={DatabaseBackupIcon}
         title="Scheduled backups unavailable on High Availability projects"
         description="We're working to bring scheduled backups to High Availability projects. Contact support if this is blocking your work."
         className="max-w-none mx-0"
@@ -114,7 +119,7 @@ const ScheduledBackups = () => {
             <InformationBox
               hideCollapse
               defaultVisibility
-              icon={<Info strokeWidth={2} />}
+              icon={<InfoIcon strokeWidth={2} />}
               title="Point-In-Time-Recovery (PITR) enabled"
               description={
                 <div>
@@ -122,7 +127,7 @@ const ScheduledBackups = () => {
                   restore to a specific time (down to the second) within your selected PITR
                   retention period.{' '}
                   <a
-                    className="text-brand transition-colors hover:text-brand-600"
+                    className="text-primary transition-colors hover:text-primary-hover"
                     href={`${DOCS_URL}/guides/platform/backups`}
                   >
                     Learn more

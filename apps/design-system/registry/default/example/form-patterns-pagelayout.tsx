@@ -340,7 +340,6 @@ export default function FormPatternsPageLayout() {
                             </Button>
                             <div className="flex gap-2 items-center">
                               <Button
-                                variant="default"
                                 size="tiny"
                                 icon={<Upload size={14} />}
                                 onClick={() => uploadButtonRef.current?.click()}
@@ -349,7 +348,6 @@ export default function FormPatternsPageLayout() {
                               </Button>
                               {logoUrl && (
                                 <Button
-                                  variant="default"
                                   size="tiny"
                                   icon={<Trash size={12} />}
                                   onClick={() => {
@@ -454,7 +452,6 @@ export default function FormPatternsPageLayout() {
                                         {file.name}
                                       </span>
                                       <Button
-                                        variant="default"
                                         size="tiny"
                                         icon={<Trash size={12} />}
                                         onClick={() => {
@@ -760,24 +757,17 @@ export default function FormPatternsPageLayout() {
                   >
                     <div className="flex gap-2 items-center justify-end">
                       <Button
-                        variant="default"
                         icon={<ExternalLink size={14} />}
                         onClick={() => console.log('Action performed')}
                       >
                         View documentation
                       </Button>
-                      <Button variant="default" onClick={() => console.log('Reset action')}>
-                        Reset API key
-                      </Button>
+                      <Button onClick={() => console.log('Reset action')}>Reset API key</Button>
                     </div>
                   </FormItemLayout>
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
-                  {form.formState.isDirty && (
-                    <Button variant="default" onClick={() => form.reset()}>
-                      Cancel
-                    </Button>
-                  )}
+                  {form.formState.isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
                   <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>

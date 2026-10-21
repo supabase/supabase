@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useFlag, useParams } from 'common'
-import { Check, DatabaseZap, DollarSign, GitMerge, Loader2 } from 'lucide-react'
+import { CheckIcon, DatabaseZapIcon, DollarSignIcon, GitMergeIcon, Loader2Icon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -399,9 +399,9 @@ export const CreateBranchModal = () => {
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {field.value ? (
                               isCheckingGHBranchValidity ? (
-                                <Loader2 size={14} className="animate-spin" />
+                                <Loader2Icon size={14} className="animate-spin" />
                               ) : isGitBranchValid ? (
-                                <Check size={14} className="text-brand" strokeWidth={2} />
+                                <CheckIcon size={14} className="text-primary" strokeWidth={2} />
                               ) : null
                             ) : null}
                           </div>
@@ -454,7 +454,7 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-row gap-4">
                   <div>
                     <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                      <DatabaseZap className="text-info" size={20} strokeWidth={2} />
+                      <DatabaseZapIcon className="text-info" size={20} strokeWidth={2} />
                     </figure>
                   </div>
                   <div className="flex flex-col gap-y-1">
@@ -551,7 +551,7 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-row gap-4">
                   <div>
                     <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                      <GitMerge className="text-info" size={20} strokeWidth={2} />
+                      <GitMergeIcon className="text-info" size={20} strokeWidth={2} />
                     </figure>
                   </div>
                   <div className="flex flex-col gap-y-1">
@@ -583,7 +583,7 @@ export const CreateBranchModal = () => {
               <div className="flex flex-row gap-4">
                 <div>
                   <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
-                    <DollarSign className="text-info" size={20} strokeWidth={2} />
+                    <DollarSignIcon className="text-info" size={20} strokeWidth={2} />
                   </figure>
                 </div>
                 <div className="flex flex-col gap-y-1">
@@ -611,11 +611,7 @@ export const CreateBranchModal = () => {
             </DialogSection>
 
             <DialogFooter className="justify-end gap-2" padding="medium">
-              <Button
-                variant="default"
-                disabled={isCreatingBranch}
-                onClick={() => setShowCreateBranchModal(false)}
-              >
+              <Button disabled={isCreatingBranch} onClick={() => setShowCreateBranchModal(false)}>
                 Cancel
               </Button>
               <ButtonTooltip

@@ -79,14 +79,13 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
-                    <p className="text-2xl text-brand leading-none">
+                    <p className="text-2xl text-primary leading-none">
                       {currentPlan?.name ?? 'Unknown'} Plan
                     </p>
 
                     {canChangeTier && (
                       <div className="flex space-x-2">
                         <Button
-                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
@@ -118,7 +117,7 @@ const Subscription = () => {
                           title={`Unable to update plan from ${planName}`}
                           description="Please contact us if you'd like to change your plan."
                           actions={
-                            <Button asChild key="contact-support" variant="default">
+                            <Button asChild key="contact-support">
                               <SupportLink
                                 queryParams={{
                                   category: SupportCategories.SALES_ENQUIRY,

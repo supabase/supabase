@@ -7,7 +7,7 @@ import { get, handleError } from '@/data/fetchers'
 import { useProfile } from '@/lib/profile'
 import type { Organization, ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type OrganizationBase = components['schemas']['OrganizationResponse']
+export type OrganizationBase = components['schemas']['OrganizationResponse_Output']
 
 export function castOrganizationResponseToOrganization(org: OrganizationBase): Organization {
   return {

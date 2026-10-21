@@ -1,10 +1,10 @@
 import { useParams } from 'common'
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { ControllerRenderProps } from 'react-hook-form'
 import {
-  Button,
   cn,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -78,19 +78,16 @@ export const PublicationsComboBox = ({
       }}
     >
       <PopoverTrigger asChild>
-        <Button
-          variant="default"
+        <ComboboxTrigger
+          aria-expanded={isDropdownOpen}
+          data-state={isDropdownOpen ? 'open' : 'closed'}
           size="small"
-          className={cn(
-            'w-full [&>span]:w-full text-left',
-            !selectedPublication && 'text-foreground-muted'
-          )}
-          iconRight={<ChevronsUpDown />}
+          className={cn(!selectedPublication && 'text-foreground-muted')}
           name={field.name}
           onBlur={field.onBlur}
         >
           {selectedPublication || 'Select publication'}
-        </Button>
+        </ComboboxTrigger>
       </PopoverTrigger>
       <PopoverContent
         sameWidthAsTrigger
@@ -135,7 +132,7 @@ export const PublicationsComboBox = ({
                     >
                       <span>{pub.name}</span>
                       {selectedPublication === pub.name && (
-                        <Check className="text-brand" strokeWidth={2} size={13} />
+                        <CheckIcon className="text-primary" strokeWidth={2} size={13} />
                       )}
                     </CommandItem>
                   ))}
@@ -151,7 +148,7 @@ export const PublicationsComboBox = ({
                 onSelect={onNewPublicationClick}
                 onClick={onNewPublicationClick}
               >
-                <Plus size={14} strokeWidth={1.5} className="mr-2" />
+                <PlusIcon size={14} strokeWidth={1.5} className="mr-2" />
                 <p>New publication</p>
               </CommandItem>
             </CommandGroup>

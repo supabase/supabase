@@ -1,7 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Realtime } from 'icons'
-import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
+import {
+  BookOpenTextIcon,
+  LightbulbIcon,
+  LockIcon,
+  MoreVerticalIcon,
+  PlusCircleIcon,
+  UnlockIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -209,9 +216,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                 {policies.length < 1 && !isSchemaLocked ? (
                   <ButtonTooltip
                     asChild
-                    variant="default"
                     className="group"
-                    icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                    icon={<PlusCircleIcon strokeWidth={1.5} className="text-foreground-muted" />}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -243,7 +249,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                           </span>
                         </div>
                       ) : (
-                        <PlusCircle strokeWidth={1.5} />
+                        <PlusCircleIcon strokeWidth={1.5} />
                       )
                     }
                   >
@@ -256,13 +262,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             ) : tableHasLints ? (
               <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger asChild>
-                  <Button variant="danger" icon={<Lock strokeWidth={1.5} />}>
+                  <Button variant="danger" icon={<LockIcon strokeWidth={1.5} />}>
                     RLS disabled
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-80 text-sm" align="end">
                   <h4 className="flex items-center gap-2">
-                    <Lock size={16} /> Row Level Security (RLS)
+                    <LockIcon size={16} /> Row Level Security (RLS)
                   </h4>
                   <div className="grid gap-2 mt-4 text-foreground-light text-xs">
                     <p>
@@ -275,7 +281,6 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     </p>
                     {!isSchemaLocked && (
                       <Button
-                        variant="default"
                         className="mt-2 w-min"
                         onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
                       >
@@ -300,13 +305,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           {isMaterializedView && materializedViewHasLints && (
             <Popover modal={false}>
               <PopoverTrigger asChild>
-                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
+                <Button variant="warning" icon={<UnlockIcon strokeWidth={1.5} />}>
                   Materialized View in API
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
-                  <Unlock size={16} /> Secure your Materialized View
+                  <UnlockIcon size={16} /> Secure your Materialized View
                 </h3>
                 <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
@@ -329,7 +334,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       }
                     />
 
-                    <Button variant="default" asChild>
+                    <Button asChild>
                       <Link
                         target="_blank"
                         href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
@@ -346,13 +351,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
           {isForeignTable && table.schema === 'public' && (
             <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
               <PopoverTrigger asChild>
-                <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
+                <Button variant="warning" icon={<UnlockIcon strokeWidth={1.5} />}>
                   Unprotected Data API access
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
-                  <Unlock size={16} /> Secure Foreign table
+                  <UnlockIcon size={16} /> Secure Foreign table
                 </h3>
                 <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
@@ -362,7 +367,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   </p>
 
                   <div className="mt-2">
-                    <Button variant="default" asChild>
+                    <Button asChild>
                       <Link
                         target="_blank"
                         href={`${DOCS_URL}/guides/database/extensions/wrappers/overview#security`}
@@ -383,8 +388,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    variant="default"
-                    icon={<MoreVertical />}
+                    icon={<MoreVerticalIcon />}
                     className="h-7 w-7"
                     aria-label={`More options for ${table.name}`}
                   />
@@ -395,13 +399,13 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             <DropdownMenuContent className="w-48">
               {isTable && realtimeEnabled && (
                 <DropdownMenuItem className="gap-x-2" onClick={() => setRealtimeDialogOpen(true)}>
-                  <Realtime size={14} className={isRealtimeEnabled ? 'text-brand' : ''} />
+                  <Realtime size={14} className={isRealtimeEnabled ? 'text-primary' : ''} />
                   <span>{isRealtimeEnabled ? 'Disable' : 'Enable'} Realtime</span>
                 </DropdownMenuItem>
               )}
               {doesHaveAutoGeneratedAPIDocs && (
                 <DropdownMenuItem className="gap-x-2" onClick={() => onViewAPIDocs()}>
-                  <BookOpenText size={14} />
+                  <BookOpenTextIcon size={14} />
                   <span>View API docs</span>
                 </DropdownMenuItem>
               )}
@@ -412,7 +416,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     className="gap-x-2"
                     onClick={() => setIndexAdvisorDialogOpen(true)}
                   >
-                    <Lightbulb size={14} />
+                    <LightbulbIcon size={14} />
                     <span>Enable Index Advisor</span>
                   </DropdownMenuItem>
                 </>

@@ -244,6 +244,7 @@ const TalkToPartnershipTeamForm: FC<Props> = ({ className }) => {
 
             <Separator className="col-span-full" />
             <Button
+              variant="primary"
               block
               type="submit"
               size="small"

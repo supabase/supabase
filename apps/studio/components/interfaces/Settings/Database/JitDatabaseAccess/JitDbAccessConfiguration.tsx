@@ -1,6 +1,6 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -393,7 +393,7 @@ export const JitDbAccessConfiguration = () => {
               }
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
-                  <Button variant="default" asChild>
+                  <Button asChild>
                     <Link href={getServiceVersionsPath(ref)}>Upgrade Postgres</Link>
                   </Button>
                 ) : unavailableReason === 'ssl_enforcement_required' && ref ? (
@@ -402,12 +402,10 @@ export const JitDbAccessConfiguration = () => {
                     isSubmitting={isEnablingSSLEnforcement}
                     onConfirm={handleEnableSSLEnforcement}
                   >
-                    <Button variant="default" loading={isEnablingSSLEnforcement}>
-                      Enable SSL enforcement
-                    </Button>
+                    <Button loading={isEnablingSSLEnforcement}>Enable SSL enforcement</Button>
                   </SSLEnforcementConfirmDialog>
                 ) : (
-                  <Button variant="default" asChild>
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.PROBLEM,
@@ -433,7 +431,7 @@ export const JitDbAccessConfiguration = () => {
                 >
                   <div className="flex w-fit shrink-0 items-center justify-end gap-2">
                     {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
-                      <Loader2
+                      <Loader2Icon
                         className="animate-spin text-foreground-muted/50"
                         strokeWidth={2}
                         size={16}

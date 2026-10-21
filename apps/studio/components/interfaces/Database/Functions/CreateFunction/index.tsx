@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-format'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { Plus, Trash } from 'lucide-react'
+import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -451,10 +451,11 @@ export const CreateFunction = ({
             </form>
           </Form>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} variant="default" onClick={confirmOnClose}>
+            <Button disabled={isCreating || isUpdating} onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
+              variant="primary"
               form={FORM_ID}
               type="submit"
               disabled={isCreating || isUpdating}
@@ -542,12 +543,11 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="default"
-                      icon={<Trash size={12} />}
+                      icon={<TrashIcon size={12} />}
                       onClick={() => remove(index)}
                       className="h-[34px] w-[34px]"
                       aria-label="Remove argument"
-                      // Tooltip repeats the label; the description would read the name twice
+                      // Tooltip repeats the label; screen readers would read it twice
                       aria-describedby={undefined}
                     />
                   </TooltipTrigger>
@@ -560,8 +560,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
         {!readonly && (
           <Button
-            variant="default"
-            icon={<Plus size={12} />}
+            icon={<PlusIcon size={12} />}
             onClick={() => append({ name: '', type: 'integer' })}
             disabled={readonly}
           >

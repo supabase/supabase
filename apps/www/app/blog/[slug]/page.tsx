@@ -11,6 +11,7 @@ import {
 } from '@/lib/blog-images'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { SITE_ORIGIN } from '@/lib/constants'
+import { parseFrontmatter } from '@/lib/frontmatter.mjs'
 import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { mdAlternates } from '@/lib/md-alternates'
 import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
@@ -60,12 +61,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  const matter = (await import('gray-matter')).default
-
   // Try to get static markdown post first
   try {
     const postContent = await getPostdata(slug, '_blog')
-    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const parsedContent = parseFrontmatter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
     const metaImageUrl = getAbsoluteBlogSocialImage(blogPost, SITE_ORIGIN)
 
@@ -103,11 +102,9 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
 
   const { isEnabled: isDraft } = await draftMode()
 
-  const matter = (await import('gray-matter')).default
-
   try {
     const postContent = await getPostdata(slug, '_blog')
-    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const parsedContent = parseFrontmatter(postContent) as unknown as MatterReturn
     const content = parsedContent.content
     const tocDepth = (parsedContent.data as any)?.toc_depth ?? 3
     const { preprocessMdxWithCodeTabs } = await import('~/components/CodeTabs')
@@ -167,6 +164,7 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
       description: frontmatter.description,
       image: imageUrl,
       datePublished: frontmatter.date,
+      dateModified: frontmatter.updated ?? frontmatter.date,
       authors: blogAuthors.length > 0 ? blogAuthors : [{ name: 'Supabase' }],
     })
     const breadcrumbJsonLd = breadcrumbListSchema([

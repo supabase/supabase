@@ -1,4 +1,4 @@
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Checkbox } from 'ui'
@@ -46,7 +46,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
           <p className="text-xs text-foreground-light">Active custom domain:</p>
           <div className="flex items-center space-x-2">
             <code className="text-lg mx-0 flex items-center space-x-2">
-              <div className="h-2 w-2 rounded-full bg-brand" />
+              <div className="h-2 w-2 rounded-full bg-primary-bright" />
               <span>
                 <code className="text-code-inline">{customDomain.hostname}</code>
               </span>
@@ -65,7 +65,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <Button
             variant="danger"
-            icon={<Trash />}
+            icon={<TrashIcon />}
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >
             Delete custom domain

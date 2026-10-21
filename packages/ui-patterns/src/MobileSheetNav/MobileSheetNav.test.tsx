@@ -48,7 +48,6 @@ describe('MobileSheetNav', () => {
   }
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mockRouter.asPath = '/initial'
     mockWindowSize.width = 400
   })

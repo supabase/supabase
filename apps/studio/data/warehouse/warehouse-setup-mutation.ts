@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { warehouseKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import { replicationKeys } from '@/data/replication/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
@@ -42,9 +43,14 @@ export const useWarehouseSetupMutation = ({
   return useMutation<WarehouseSetupData, ResponseError, WarehouseSetupVariables>({
     mutationFn: (vars) => setupWarehouse(vars),
     async onSuccess(data, variables, context) {
-      await queryClient.invalidateQueries({
-        queryKey: warehouseKeys.setupStatus(variables.projectRef),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: warehouseKeys.setupStatus(variables.projectRef),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.sources(variables.projectRef),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {

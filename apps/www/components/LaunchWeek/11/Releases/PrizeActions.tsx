@@ -7,7 +7,7 @@ export default function PrizeActions() {
       <Button onClick={() => null} variant="secondary" size="tiny" asChild>
         <Link href="/ga-week#ticket">Claim your ticket</Link>
       </Button>
-      <Button onClick={() => null} variant="default" size="tiny">
+      <Button onClick={() => null} size="tiny">
         <Link href="/blog/supabase-oss-hackathon">Join Hackathon</Link>
       </Button>
     </div>

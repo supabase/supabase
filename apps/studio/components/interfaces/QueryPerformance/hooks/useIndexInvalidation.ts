@@ -30,7 +30,11 @@ export function useIndexInvalidation() {
 
   const { invalidate: invalidateTableIndexAdvisor } = useTableIndexAdvisor()
 
-  const preset = QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES]
+  // Falls back to UNIFIED so an unrecognized preset param doesn't resolve to
+  // undefined and crash generateQueryPerformanceSql.
+  const preset =
+    QUERY_PERFORMANCE_PRESET_MAP[urlPreset as QUERY_PERFORMANCE_REPORT_TYPES] ??
+    QUERY_PERFORMANCE_PRESET_MAP[QUERY_PERFORMANCE_REPORT_TYPES.UNIFIED]
   const orderBy = !!sort ? ({ column: sort, order } as QueryPerformanceSort) : undefined
   const roles = router?.query?.roles ?? []
 

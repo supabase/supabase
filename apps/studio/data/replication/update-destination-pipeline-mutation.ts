@@ -3,14 +3,21 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { optionalSecret } from './destination-secret-utils'
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
+  BigQueryTableOption,
   DestinationConfig,
   DucklakeDestinationConfig,
   PipelineConfig,
 } from './types'
-import { buildPipelineApiConfig, isDucklakeSupabaseConfig } from './utils'
+import {
+  buildBigQueryTableOptionApiConfig,
+  buildPipelineApiConfig,
+  getConfiguredBigQueryTableOptions,
+  isDucklakeSupabaseConfig,
+} from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -20,6 +27,15 @@ type UpdateDestinationApiConfig = UpdateDestinationPipelineBody['destination_con
 
 type UpdateBigQueryApiConfig = Extract<UpdateDestinationApiConfig, { big_query: unknown }>
 type UpdateDucklakeApiConfig = Extract<UpdateDestinationApiConfig, { ducklake: unknown }>
+
+const buildBigQueryTableOptionsUpdateApiConfig = (
+  tableOptions: BigQueryTableOption[] | undefined
+) => {
+  const configuredTableOptions = getConfiguredBigQueryTableOptions(tableOptions)
+  if (tableOptions === undefined) return undefined
+  if (configuredTableOptions.length === 0) return null
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
 
 export function buildBigQueryUpdateApiConfig(
   config: BigQueryDestinationConfig
@@ -31,6 +47,7 @@ export function buildBigQueryUpdateApiConfig(
       service_account_key: optionalSecret(config.serviceAccountKey),
       connection_pool_size: config.connectionPoolSize,
       max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsUpdateApiConfig(config.tableOptions),
     },
   }
 }
@@ -212,24 +229,23 @@ export const useUpdateDestinationPipelineMutation = ({
     {
       mutationFn: (vars) => updateDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
-        const { projectRef, destinationId, pipelineId } = variables
-
+        const { projectRef } = variables
+        // These prefixes include list, editor, pipeline status, and table metrics caches.
         await Promise.all([
-          // Invalidate lists
           queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
-          // Invalidate item-level caches used by the editor panel
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.destinationById(projectRef, destinationId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
-          }),
+          invalidateReplicationPipelineQueries(queryClient, projectRef),
         ])
 
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
+        // Settings may commit before runtime recreation fails.
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: replicationKeys.destinations(variables.projectRef),
+          }),
+          invalidateReplicationPipelineQueries(queryClient, variables.projectRef),
+        ])
         if (onError === undefined) {
           toast.error(`Failed to update destination or pipeline: ${data.message}`)
         } else {

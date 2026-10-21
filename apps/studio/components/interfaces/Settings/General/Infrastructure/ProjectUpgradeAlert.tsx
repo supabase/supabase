@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFlag, useParams } from 'common'
-import { AlertCircle, AlertTriangle } from 'lucide-react'
+import { AlertCircleIcon, AlertTriangleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -36,7 +36,7 @@ import { z } from 'zod'
 
 import { PLAN_DETAILS } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
-import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import {
@@ -173,7 +173,7 @@ export const ProjectUpgradeAlert = () => {
                     {/* @ts-ignore */}
                     {(data?.potential_breaking_changes ?? []).length > 0 && (
                       <Alert variant="destructive" title="Breaking changes">
-                        <AlertCircle className="h-4 w-4" strokeWidth={2} />
+                        <AlertCircleIcon className="h-4 w-4" strokeWidth={2} />
                         <AlertTitle>Breaking changes</AlertTitle>
                         <AlertDescription className="flex flex-col gap-3">
                           <p>
@@ -182,7 +182,7 @@ export const ProjectUpgradeAlert = () => {
                           </p>
 
                           <div>
-                            <Button size="tiny" variant="default" asChild>
+                            <Button size="tiny" asChild>
                               <Link
                                 href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                                 target="_blank"
@@ -200,7 +200,7 @@ export const ProjectUpgradeAlert = () => {
                         variant="warning"
                         title="Custom Postgres roles using md5 authentication have been detected"
                       >
-                        <AlertTriangle className="h-4 w-4" strokeWidth={2} />
+                        <AlertTriangleIcon className="h-4 w-4" strokeWidth={2} />
                         <AlertTitle>
                           Custom Postgres roles will not work automatically after upgrade
                         </AlertTitle>
@@ -216,15 +216,15 @@ export const ProjectUpgradeAlert = () => {
                               <code className="text-xs">
                                 {legacyAuthCustomRoles.map((role) => (
                                   <div key={role} className="pb-1">
-                                    ALTER ROLE <span className="text-brand">{role}</span> WITH
-                                    PASSWORD '<span className="text-brand">newpassword</span>';
+                                    ALTER ROLE <span className="text-primary">{role}</span> WITH
+                                    PASSWORD '<span className="text-primary">newpassword</span>';
                                   </div>
                                 ))}
                               </code>
                             </div>
                           </div>
                           <div>
-                            <Button size="tiny" variant="default" asChild>
+                            <Button size="tiny" asChild>
                               <Link
                                 href={`${DOCS_URL}/guides/platform/migrating-and-upgrading-projects#caveats`}
                                 target="_blank"
@@ -276,14 +276,15 @@ export const ProjectUpgradeAlert = () => {
                   </div>
                 </DialogSection>
                 <DialogFooter>
-                  <Button
-                    variant="default"
-                    onClick={() => setShowUpgradeModal(false)}
-                    disabled={isUpgrading}
-                  >
+                  <Button onClick={() => setShowUpgradeModal(false)} disabled={isUpgrading}>
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isUpgrading} loading={isUpgrading}>
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    disabled={isUpgrading}
+                    loading={isUpgrading}
+                  >
                     Confirm upgrade
                   </Button>
                 </DialogFooter>

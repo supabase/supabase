@@ -1,7 +1,6 @@
 'use client'
 
 import { ChevronDownIcon } from '@heroicons/react/outline'
-import Link from 'next/link'
 import React, { useEffect, useRef, useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { plans as allPlans } from 'shared-data/plans'
@@ -124,14 +123,14 @@ const PricingComputeSection = () => {
             </p>
             <h3 className="text-foreground text-2xl ml-0.5 md:ml-0 mb-2 md:mb-0">
               Scale compute up to
-              <br className="hidden sm:block" /> 64 cores and 256 GB RAM
+              <br className="hidden sm:block" /> 64 vCPUs and 256 GB RAM
             </h3>
           </div>
 
-          <Button asChild size="tiny" variant="default">
-            <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
+          <Button asChild size="tiny">
+            <a href="https://supabase.com/docs/guides/platform/compute-add-ons">
               Learn about Compute add-ons
-            </Link>
+            </a>
           </Button>
         </div>
         <div
@@ -161,21 +160,21 @@ const PricingComputeSection = () => {
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Read more on{' '}
-                  <Link
+                  <a
                     href="https://supabase.com/docs/guides/platform/manage-your-usage/compute"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     usage-based billing for compute
-                  </Link>{' '}
+                  </a>{' '}
                   or{' '}
-                  <Link
+                  <a
                     href="https://supabase.com/docs/guides/platform/compute-add-ons"
                     target="_blank"
-                    className="transition text-brand hover:text-brand-600"
+                    className="transition text-primary hover:text-brand-600"
                   >
                     Compute Add-ons
-                  </Link>
+                  </a>
                   .
                 </p>
               </div>

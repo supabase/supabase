@@ -1,6 +1,6 @@
 import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { Check, ChevronsUpDown, CircleAlert, Info } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, CircleAlertIcon, InfoIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -89,31 +89,46 @@ export const ExposedTableSelector = ({
     }
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
+  let tablesSummary: string
+
+  if (isCountsPending) {
+    tablesSummary = 'Loading tables...'
+  } else if (totalCount === 0) {
+    tablesSummary = 'No tables available'
+  } else {
+    tablesSummary = `${grantsCount} of ${totalCount} tables exposed${
+      pendingCount > 0 ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}` : ''
+    }`
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger asChild>
-        <Button
-          size="small"
-          disabled={disabled}
-          variant="default"
-          className="w-full [&>span]:w-full pr-1! space-x-1"
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
-        >
-          <div className="w-full flex gap-1">
-            <p className="text-foreground-lighter">
-              {isCountsPending
-                ? 'Loading tables...'
-                : totalCount === 0
-                  ? 'No tables available'
-                  : `${grantsCount} of ${totalCount} tables exposed${
-                      pendingCount > 0
-                        ? `, ${pendingCount} pending ${pluralize(pendingCount, 'change')}`
-                        : ''
-                    }`}
-            </p>
-          </div>
-        </Button>
-      </PopoverTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              size="small"
+              disabled={disabled}
+              className="w-full [&>span]:w-full pr-1! space-x-1"
+              iconRight={
+                <ChevronsUpDownIcon className="text-foreground-muted" strokeWidth={2} size={14} />
+              }
+              aria-label="Select tables"
+              // Tooltip repeats the label; the description would read the name twice
+              aria-describedby={undefined}
+            >
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter" aria-live="polite">
+                  {tablesSummary}
+                </p>
+              </div>
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="end">
+          Select tables
+        </TooltipContent>
+      </Tooltip>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
@@ -205,7 +220,9 @@ export const ExposedTableSelector = ({
                         >
                           <div className="w-full flex items-center gap-x-2">
                             <div className="w-4 shrink-0 flex items-center justify-center">
-                              {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                              {isExposed && (
+                                <CheckIcon size={16} className="text-primary shrink-0" />
+                              )}
                               {!isSchemaExposed && (
                                 <Tooltip>
                                   <TooltipTrigger asChild>
@@ -215,7 +232,7 @@ export const ExposedTableSelector = ({
                                       aria-label="Schema not exposed"
                                       className="inline-flex items-center text-foreground-muted hover:text-foreground-light"
                                     >
-                                      <Info size={14} />
+                                      <InfoIcon size={14} />
                                     </button>
                                   </TooltipTrigger>
                                   <TooltipContent side="left" className="max-w-[320px] text-xs">
@@ -247,7 +264,7 @@ export const ExposedTableSelector = ({
                                           : 'text-foreground-muted'
                                       )}
                                     >
-                                      <CircleAlert size={14} />
+                                      <CircleAlertIcon size={14} />
                                     </div>
                                   </TooltipTrigger>
                                   <TooltipContent

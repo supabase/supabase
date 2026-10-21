@@ -2,14 +2,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
+  BigQueryTableOption,
   DestinationConfig,
   DucklakeDestinationConfig,
   PipelineConfig,
 } from './types'
-import { buildPipelineApiConfig, isDucklakeSupabaseConfig } from './utils'
+import {
+  buildBigQueryTableOptionApiConfig,
+  buildPipelineApiConfig,
+  getConfiguredBigQueryTableOptions,
+  isDucklakeSupabaseConfig,
+} from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -19,6 +26,13 @@ type CreateDestinationApiConfig = CreateDestinationPipelineBody['destination_con
 
 type CreateBigQueryApiConfig = Extract<CreateDestinationApiConfig, { big_query: unknown }>
 type CreateDucklakeApiConfig = Extract<CreateDestinationApiConfig, { ducklake: unknown }>
+
+const buildBigQueryTableOptionsApiConfig = (tableOptions: BigQueryTableOption[] | undefined) => {
+  const configuredTableOptions = getConfiguredBigQueryTableOptions(tableOptions)
+
+  if (tableOptions === undefined || configuredTableOptions.length === 0) return undefined
+  return { tables: configuredTableOptions.map(buildBigQueryTableOptionApiConfig) }
+}
 
 // Maps the studio-side BigQuery config to the snake_case `{ big_query: ... }` payload accepted
 // by the platform API. Shared by the create and validate mutations.
@@ -30,6 +44,7 @@ export function buildBigQueryApiConfig(config: BigQueryDestinationConfig): Creat
       service_account_key: config.serviceAccountKey,
       connection_pool_size: config.connectionPoolSize,
       max_staleness_mins: config.maxStalenessMins,
+      table_options: buildBigQueryTableOptionsApiConfig(config.tableOptions),
     },
   }
 }
@@ -202,7 +217,7 @@ export const useCreateDestinationPipelineMutation = ({
 
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
+          invalidateReplicationPipelineQueries(queryClient, projectRef),
         ])
 
         await onSuccess?.(data, variables, context)

@@ -162,7 +162,7 @@ Supabase provides an open source toolkit for developing AI applications using Po
 `,
     icon: ChartScatter,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
+    heroImage: 'https://www.youtube-nocookie.com/embed/6xchFWcHkaI',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
     status: {
@@ -600,7 +600,8 @@ Dedicated Poolers provide an alternative to Supavisor for specific use cases, gi
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres#serverside-poolers',
+    docsUrl:
+      'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits#shared-pooler',
     slug: 'dedicated-poolers',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -653,10 +654,10 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
 4. Workload isolation: Keep analytical queries away from the primary database.
 
 ## Destinations
-BigQuery is currently available. ClickHouse, DuckLake, and Snowflake are in Early Access. [Request access](/go/supabase-pipelines-new-destinations) to these destinations.
+BigQuery, ClickHouse, DuckLake, and Snowflake are available in public alpha. See the [destination guides](/docs/guides/database/replication#supported-destinations) to get started.
 
 ## Setup
-Create a Postgres publication for the tables to replicate. In Database > Replication, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
+Create a Postgres publication for the tables to replicate. In Database > Pipelines, add a Pipelines destination, configure its settings, and monitor the pipeline from the Dashboard.
 
 ## Requirements
 Requirements depend on the destination. BigQuery and ClickHouse ReplacingMergeTree require source tables to have primary keys and require the publication to include those columns. ClickHouse updates require REPLICA IDENTITY FULL. ClickHouse deletes require primary-key or full identity. DuckLake updates and deletes require a primary-key identity, replica-identity index, or full identity. With a primary-key identity or replica-identity index, include every identity column in the publication. Snowflake updates require REPLICA IDENTITY FULL. Snowflake deletes require a published row identity.
@@ -786,7 +787,7 @@ Supabase's Realtime Postgres Changes feature allows you to listen to database ch
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
     status: {
@@ -827,7 +828,7 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
 `,
     icon: MessageCircle,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
     status: {
@@ -867,7 +868,7 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.REALTIME],
-    heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_-y_Lnujq64',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
     status: {
@@ -1955,7 +1956,7 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS],
-    heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
+    heroImage: 'https://www.youtube-nocookie.com/embed/EQ5h3NSWMbk',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
     status: {
@@ -2131,6 +2132,7 @@ Supabase's Command Line Interface (CLI) tool provides developers with a powerful
 5. Environment management: Handle multiple environments (development, staging, production) efficiently.
 6. Seed data management: Populate your database with test data for consistent development and testing.
 7. CI/CD integration: Incorporate Supabase operations into your continuous integration and deployment pipelines.
+8. Parallel local projects: Run a separate local project for each app, git worktree, or named environment with the experimental \`supabase stack\` commands.
 
 ## The CLI is particularly valuable for:
 - Development teams working on Supabase projects collaboratively
@@ -2144,12 +2146,74 @@ By leveraging the Supabase CLI, you can significantly improve your development w
 `,
     icon: Terminal,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
+    heroImage: 'https://www.youtube-nocookie.com/embed/_2N6ApZ0MmI',
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
     slug: 'cli',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Parallel local projects',
+    subtitle: 'Run a local Supabase project for every app or git worktree.',
+    description: `
+The Supabase CLI can run more than one local Supabase project on the same machine. Each local project belongs to its project directory and git branch. Every app or git worktree gets its own Postgres database, Auth, Storage, and other services, with separate ports and data.
+
+With the default ports, a second \`supabase start\` on the same machine fails with a port conflict. The experimental \`supabase stack\` commands assign ports automatically and keep them stable across restarts. One app can also run several named local projects, such as \`dev\` and \`test\`, so a destructive test run never touches your development data.
+
+## Key benefits
+1. One local project per worktree: Run coding agents in separate git worktrees, each against its own database.
+2. Automatic ports: The CLI assigns ports from a shared range and keeps them across restarts. Remove the fixed ports from \`config.toml\` once, or create the project with the stack commands turned on.
+3. Named environments: Start \`--stack dev\` and \`--stack test\` side by side in one app.
+4. Docker or native runtime: Run in containers, or as processes on your machine without Docker on Linux and on macOS on Apple silicon. Use Docker when you run several local projects on one machine.
+5. Services start on demand: Postgres starts right away. Other services start on their first request. Most of them stop when idle, which keeps idle local projects light.
+
+## Parallel local projects are valuable for:
+- Developers running coding agents in git worktrees
+- Teams that keep separate development and test databases on one machine
+- Freelancers and consultants switching between several client apps
+- CI jobs and agent sandboxes that run without a Docker daemon
+
+The \`supabase stack\` commands are experimental. Their interface can change between releases. See the documentation for the full workflow and limitations.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects',
+    slug: 'parallel-local-projects',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Native runtime for local development',
+    subtitle: 'Run a local Supabase project as processes on your machine, without Docker.',
+    description: `
+The Supabase CLI can run a local Supabase project as native processes instead of containers. Coding agent sandboxes and CI runners often have no Docker daemon. To run there, [turn on the \`[experimental] stack\` setting](https://supabase.com/docs/guides/local-development/running-multiple-local-projects#turn-on-the-stack-commands). Then \`supabase stack start\` downloads verified service binaries and runs Postgres, Auth, Storage, and the other services directly on the host.
+
+It is the same local project you get from \`supabase start\`, with the same services and most of the same \`config.toml\` settings. The CLI picks Docker when its daemon responds, then Podman, then native. To require one, pass \`--runtime docker\`, \`--runtime podman\`, or \`--runtime native\`.
+
+## Key benefits
+1. Works without Docker: Bring up a real local Supabase project in environments that can't run a container engine.
+2. Verified binaries: The CLI downloads service archives from Supabase's GitHub releases and checks them before extracting.
+3. Same project, same services: Postgres with the full extension set, Auth, PostgREST, Realtime, Storage, Edge Functions, Studio, and more.
+
+## The native runtime is valuable for:
+- Coding agents running in sandboxes with no container engine
+- CI jobs on runners without a Docker daemon
+
+The native runtime supports Linux on amd64 and arm64 and macOS on Apple silicon. Windows and Intel Macs use Docker. For several local projects on one machine, Docker remains the recommended runtime. The \`supabase stack\` commands are experimental.
+`,
+    icon: Terminal,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/local-development/docker-and-native-runtimes',
+    slug: 'native-local-runtime',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -2216,7 +2280,7 @@ Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flex
 By leveraging Role-Based Access Control, you can create a secure, scalable, and easily manageable access control system for your application. This feature allows you to implement complex permission structures with ease, ensuring that users only have access to the resources and functionalities appropriate for their role within the system.
 `,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/kwoKmi6inAw',
+    heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
@@ -2699,7 +2763,7 @@ This feature is particularly valuable for developers looking to build dynamic we
     icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/introduction',
     slug: 'client-library-javascript',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2724,7 +2788,7 @@ This feature is particularly useful for Flutter developers aiming to create resp
     icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    docsUrl: 'https://supabase.com/docs/reference/dart/introduction',
     slug: 'client-library-flutter',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2833,7 +2897,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
     slug: 'orioledb',
     status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -2946,66 +3010,68 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
   },
   {
     title: 'Declarative Schemas',
-    subtitle: 'Simplify database management with declarative schema files.',
+    subtitle: 'Keep your schema in SQL files and let the CLI write the migrations.',
     description: `
-Declarative schemas help you manage complex Postgres databases more easily by defining your database structure in SQL files that represent the final, desired state. These schema files can be stored and versioned alongside your codebase, enabling better collaboration and simplified reviews.
+Declarative schemas define your desired database structure in SQL files alongside your application code. Edit the files, generate a migration, review it, and apply it.
 
-With declarative schemas, you can:
+Declarative Schemas 2.0 runs on Supabase's open source diff engine, \`pg-delta\`. It covers gaps in the legacy \`migra\` engine, including column privileges, \`security_invoker\` on views, and publication membership.
 
-- Maintain a single source of truth for your database schema, reducing duplication and errors.
-- Generate migration files automatically by diffing your declarative schema against the current database state.
-- Review changes easily through concise, readable diffs instead of long, complex migration scripts.
+The CLI loads your schema files into one temporary Postgres database and replays your migration history into another. \`pg-delta\` compares their system catalogs to generate a migration. This comparison never reads your live database.
+
+\`pg-delta\` is still in alpha. New CLI projects get it from \`supabase init\`. Existing projects turn it on with \`[experimental.pgdelta]\` and \`enabled = true\` in \`config.toml\`.
 
 ## Key benefits
-1. Single source of truth: Define your entire database schema in a single, centralized location for better visibility and control.
-2. Version-controlled changes: Store your schema files alongside your application code, ensuring consistency across environments.
-3. Simplified code reviews: Schema changes become small, focused diffs that are easier to understand and validate.
-4. Reduce merge conflicts: Minimize the risk of conflicts when multiple developers work on the same schema.
-5. Support for advanced Postgres features: Manage tables, views, functions, triggers, policies, and more through declarative SQL files.
 
-Declarative schemas make it easier to manage growing database complexity, so your team can iterate faster without sacrificing stability or control.
+1. Version-controlled schema: Keep your schema in \`supabase/schemas/\` and review changes alongside your application code.
+2. Smaller schema diffs: A one-line change to a view appears as one changed line in the schema file. Review the generated migration too before applying it.
+3. Fewer merge conflicts: Separate files for tables, views, and functions help developers work on different objects independently.
+4. Broader coverage: Generate changes for RLS policies, grants, views, partitions, publications, domains, and comments. If your schema includes something the engine cannot track, such as a custom operator or text search configuration, it reports a warning.
+5. Automatic dependency ordering: The engine orders statements for you. You no longer hand-order files in \`schema_paths\`.
+6. Supabase-aware diffs: Supabase-managed objects stay out. Your customizations, including profile triggers on \`auth.users\`, stay in.
 
-## Use Cases for Declarative Schemas
+## Use cases
 
-Declarative schemas are valuable for a wide range of teams and scenarios:
+Declarative schemas help teams maintain databases with many views, functions, and policies. Developers can edit definitions in place and generate migrations in CI. Existing projects can export their database into schema files to adopt the same workflow.
 
-- Teams managing complex databases. Simplify schema management when working with multiple tables, views, policies, and functions.
-- Collaborative teams. Reduce merge conflicts and improve review processes when multiple developers are making schema changes.
-- CI/CD pipelines. Use declarative schemas to automate schema updates in your deployment workflows.
-- Teams adopting best practices. Adopt a more robust, maintainable approach to schema management with declarative patterns.
+## Supabase CLI workflow
 
-## Integration capabilities with Supabase
+Declarative schemas are part of the Supabase CLI:
 
-Declarative schemas integrate directly with the Supabase CLI, allowing you to:
+- Define your schema in SQL files under \`supabase/schemas/\`. One file per table works well but the layout is up to you.
+- Run \`supabase db schema declarative sync --no-apply\` to generate a migration for review.
+- Review the generated SQL, including any statements the CLI flags as destructive.
+- Apply the migration locally with \`supabase migration up\` and push it with \`supabase db push\`.
+- Schema files are plain SQL. Editor tooling such as the Postgres Language Server works on them.
 
-- Define your schema in SQL files within the \`supabase/schemas\` directory.
-- Use \`supabase db diff\` to generate migration files based on schema changes.
-- Apply and deploy migrations using the Supabase CLI, ensuring consistency across local and remote environments.
-- Combine with the Postgres Language Server for enhanced IDE support when working with declarative schemas.
-
-These tools help you maintain control over your database while moving faster and reducing the risk of errors.
-
-## FAQs about Declarative Schemas
-
-Below are answers to common questions about declarative schemas.
+## Frequently asked questions
 
 ### How do declarative schemas differ from migrations?
 
-Migrations are a record of incremental changes to your database schema. Declarative schemas define the final desired state of your schema, and the necessary migration files are generated by comparing the current database state with your schema files.
+Migrations record incremental changes. Declarative schemas describe the state you want. The CLI compares your schema files with your migration history and writes plain SQL migrations in \`supabase/migrations/\`. Hand-written migrations keep working alongside them.
 
 ### Do I need to write my own migration files?
 
-No. Supabase provides a schema diff tool (\`supabase db diff\`) that automatically generates migration files from your declarative schema files.
+The CLI generates schema migrations, but some changes need manual edits. A renamed column, for example, comes out as a drop followed by an add. Review and adjust the migration to preserve your data. Data changes still need seed files or hand-written migrations.
 
 ### Can I use declarative schemas with my existing projects?
 
-Yes. You can pull your production schema into declarative files by running \`supabase db dump > supabase/schemas/prod.sql\`. From there, you can split the schema into smaller files and adopt a declarative workflow.
+Yes. Turn on \`pg-delta\` first. If the project has no migration history, run \`supabase db pull\` to create a baseline. Run \`supabase db schema declarative generate --linked\` to export your database into SQL files under \`supabase/schemas/\`. Then edit, generate, review, and apply as usual. See the docs for [adopting declarative schemas on the legacy engine](https://supabase.com/docs/guides/local-development/declarative-database-schemas#starting-from-an-existing-database-on-the-legacy-engine).
+
+### What changes if I already use declarative schemas on migra?
+
+Turn on \`pg-delta\` in \`config.toml\` and remove \`schema_paths\`. Run \`supabase db pull\` to capture any objects missing from your migration history. Then switch your scripts from \`supabase db diff\` to \`supabase db schema declarative sync\`. Follow the [diff engines guide](https://supabase.com/docs/guides/local-development/diff-engines#switch-an-existing-project-to-pg-delta) for the full procedure. Projects that don't opt in keep using \`migra\`.
 
 ### Are there any limitations to declarative schemas?
 
-The schema diff tool handles most Postgres objects, but some entities (like DML statements) are not captured and may still require manual migrations.
+\`pg-delta\` does not diff application data or Storage buckets. Buckets are rows in \`storage.buckets\`. RLS policies on \`storage.objects\` are schema objects and are included in diffs.
 
-For detailed instructions and best practices, see the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
+The engine does not orchestrate zero-downtime rollouts. See [known caveats](https://supabase.com/docs/guides/local-development/declarative-database-schemas#known-caveats) for unsupported objects and extension-specific behavior.
+
+### Does pg-delta work outside Supabase?
+
+Yes. \`pg-delta\` is open source under the PostgreSQL License and ships on npm as \`@supabase/pg-delta\`. Point it at any two Postgres databases from version 14 through 18. It writes the migration between them. The engine is at [supabase/pg-delta](https://github.com/supabase/pg-toolbelt/tree/main/packages/pg-delta).
+
+Get started with the [Declarative Schemas documentation](https://supabase.com/docs/guides/local-development/declarative-database-schemas).
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],

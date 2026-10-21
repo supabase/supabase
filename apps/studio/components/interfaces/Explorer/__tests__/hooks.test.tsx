@@ -7,6 +7,7 @@ const {
   mockCreateChat,
   mockCreateDraft,
   mockPush,
+  mockReplace,
   mockSelectChat,
   mockSetContext,
   mockWhenInitialized,
@@ -14,12 +15,15 @@ const {
   mockCreateChat: vi.fn(() => 'chat-2'),
   mockCreateDraft: vi.fn(),
   mockPush: vi.fn(),
+  mockReplace: vi.fn(),
   mockSelectChat: vi.fn(),
   mockSetContext: vi.fn(),
   mockWhenInitialized: vi.fn(() => Promise.resolve()),
 }))
 
-vi.mock('next/router', () => ({ useRouter: () => ({ push: mockPush }) }))
+vi.mock('next/router', () => ({
+  useRouter: () => ({ push: mockPush, replace: mockReplace }),
+}))
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: () => ({
     data: { ref: 'default', connectionString: 'postgres://example' },
@@ -43,9 +47,10 @@ vi.mock('@/state/ai-assistant-state', () => ({
   whenAiAssistantInitialized: () => mockWhenInitialized(),
 }))
 
+beforeEach(() => vi.clearAllMocks())
+
 describe('useCreateChat', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockWhenInitialized.mockImplementation(() => Promise.resolve())
   })
 
@@ -112,8 +117,19 @@ describe('useCreateChat', () => {
 })
 
 describe('useCreateQuery', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
+  it('replaces the start route when opening the preferred query on startup', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    expect(result.current.createQuery({ replace: true })).toBe('query-new')
+    expect(mockCreateDraft).toHaveBeenCalledExactlyOnceWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: undefined,
+      name: undefined,
+      autoRun: undefined,
+    })
+    expect(mockReplace).toHaveBeenCalledWith('/project/default/explorer/query/query-new')
+    expect(mockPush).not.toHaveBeenCalled()
   })
 
   it('creates a draft and opens it as an Explorer query tab', () => {
@@ -140,6 +156,19 @@ describe('useCreateQuery', () => {
       projectRef: 'default',
       sql: undefined,
       name: undefined,
+    })
+  })
+
+  it('forwards autoRun to the draft so its query tab can run itself once mounted', () => {
+    const { result } = renderHook(() => useCreateQuery())
+
+    result.current.createQuery({ sql: 'select 1', autoRun: true })
+    expect(mockCreateDraft).toHaveBeenCalledWith({
+      id: 'query-new',
+      projectRef: 'default',
+      sql: 'select 1',
+      name: undefined,
+      autoRun: true,
     })
   })
 })

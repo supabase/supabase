@@ -1,4 +1,12 @@
-import { ChevronRight, Eye, MoreVertical, Plus, Search, Trash2, Webhook } from 'lucide-react'
+import {
+  ChevronRightIcon,
+  EyeIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  SearchIcon,
+  Trash2Icon,
+  WebhookIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo, useRef, useState } from 'react'
 import {
@@ -110,7 +118,7 @@ export const PlatformWebhooksEndpointList = ({
           ref={searchInputRef}
           placeholder="Search endpoints"
           size="tiny"
-          icon={<Search />}
+          icon={<SearchIcon />}
           value={search}
           className="w-full lg:w-52"
           onChange={(event) => onSearchChange(event.target.value)}
@@ -122,7 +130,7 @@ export const PlatformWebhooksEndpointList = ({
           label="New endpoint"
           onTrigger={onCreateEndpoint}
         >
-          <Button variant="primary" icon={<Plus />} onClick={onCreateEndpoint}>
+          <Button variant="primary" icon={<PlusIcon />} onClick={onCreateEndpoint}>
             New endpoint
           </Button>
         </Shortcut>
@@ -130,13 +138,11 @@ export const PlatformWebhooksEndpointList = ({
 
       {filteredEndpoints.length === 0 ? (
         <EmptyStatePresentational
-          icon={Webhook}
+          icon={WebhookIcon}
           title="No endpoints yet"
           description="Create an endpoint to start receiving webhook deliveries."
         >
-          <Button variant="default" onClick={onCreateEndpoint}>
-            Create endpoint
-          </Button>
+          <Button onClick={onCreateEndpoint}>Create endpoint</Button>
         </EmptyStatePresentational>
       ) : (
         <Card className="overflow-hidden">
@@ -215,11 +221,7 @@ export const PlatformWebhooksEndpointList = ({
                       >
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="default"
-                              icon={<MoreVertical />}
-                              className="w-7 hit-area-2"
-                            />
+                            <Button icon={<MoreVerticalIcon />} className="w-7 hit-area-2" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-40">
                             <DropdownMenuItem
@@ -228,7 +230,7 @@ export const PlatformWebhooksEndpointList = ({
                                 onViewEndpoint(endpoint.id)
                               }}
                             >
-                              <Eye size={14} />
+                              <EyeIcon size={14} />
                               <span>View details</span>
                             </DropdownMenuItem>
 
@@ -236,12 +238,12 @@ export const PlatformWebhooksEndpointList = ({
                               className="gap-x-2"
                               onClick={() => onDeleteEndpoint(endpoint.id)}
                             >
-                              <Trash2 size={14} />
+                              <Trash2Icon size={14} />
                               <span>Delete</span>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        <ChevronRight
+                        <ChevronRightIcon
                           aria-hidden={true}
                           size={14}
                           className="text-foreground-muted/60"

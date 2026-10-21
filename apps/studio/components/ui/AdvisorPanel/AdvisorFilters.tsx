@@ -1,4 +1,5 @@
-import { X } from 'lucide-react'
+import { useFlag } from 'common'
+import { XIcon } from 'lucide-react'
 import { z } from 'zod'
 
 import { advisorCategoryLabels } from './AdvisorPanel.utils'
@@ -58,9 +59,10 @@ export const AdvisorFilters = ({
   onClose,
   isPlatform = false,
 }: AdvisorFiltersProps) => {
-  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories).map(
-    (category) => ({ label: advisorCategoryLabels[category], value: category })
-  )
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
+  const categoryOptions = (isPlatform ? platformCategories : selfHostedCategories)
+    .filter((category) => category !== 'health' || isHealthAdvisorEnabled)
+    .map((category) => ({ label: advisorCategoryLabels[category], value: category }))
 
   return (
     <div className="border-b overflow-x-auto">
@@ -103,7 +105,7 @@ export const AdvisorFilters = ({
         <ButtonTooltip
           variant="text"
           className="w-7 h-7 p-0 mr-3"
-          icon={<X strokeWidth={1.5} />}
+          icon={<XIcon strokeWidth={1.5} />}
           onClick={onClose}
           tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
         />

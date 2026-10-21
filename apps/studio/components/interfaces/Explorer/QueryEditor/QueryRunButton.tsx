@@ -1,4 +1,4 @@
-import { ChevronDown, Play } from 'lucide-react'
+import { ChevronDownIcon, PlayIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -26,14 +26,13 @@ export const QueryRunButton = ({
   onRunSelected,
 }: QueryRunButtonProps) => {
   return (
-    <div className="flex w-fit">
+    <div className="ml-1 flex w-fit">
       <ButtonTooltip
         type="button"
-        variant="default"
         size="tiny"
         loading={isExecuting}
         disabled={disabled}
-        icon={<Play size={16} strokeWidth={2} />}
+        icon={<PlayIcon size={16} strokeWidth={2} />}
         className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
         onClick={onRun}
         tooltip={{
@@ -54,12 +53,11 @@ export const QueryRunButton = ({
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
-            variant="default"
             size="tiny"
             disabled={disabled}
             aria-label="More actions"
             className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-            icon={<ChevronDown />}
+            icon={<ChevronDownIcon />}
           />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">

@@ -31,7 +31,6 @@ vi.mock('@/components/ui/PartnerIcon', () => ({
 
 describe('OrganizationDropdown', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseIsFeatureEnabled.mockReturnValue(false)
     mockUseOrganizationsQuery.mockReturnValue({
       data: [

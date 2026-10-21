@@ -1,5 +1,6 @@
+/* eslint-disable turbo/no-undeclared-env-vars */
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'path'
-import { getHighlighter, loadTheme } from '@shikijs/compat'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
@@ -9,6 +10,17 @@ import { visit } from 'unist-util-visit'
 import { defineConfig, s } from 'velite'
 
 import { rehypeComponent } from './lib/rehype-component'
+
+const CODE_OUTPUT_DIR = '.velite/codes'
+
+const codeTheme = JSON.parse(
+  await readFile(path.join(process.cwd(), 'lib/themes/supabase-2.json'), 'utf8')
+)
+
+function toCodeId(slugAsParams) {
+  if (!slugAsParams) return 'index'
+  return Buffer.from(slugAsParams, 'utf8').toString('base64url')
+}
 
 const LinksProperties = s.object({
   doc: s.string().optional(),
@@ -46,16 +58,29 @@ const docs = s
     // real benefit for a dev-only content cache, and dominates build time.
     code: s.mdx({ copyLinkedFiles: false, minify: false }),
   })
-  .transform(({ path: flattenedPath, ...data }) => ({
-    ...data,
-    slug: `/${flattenedPath}`,
-    slugAsParams: flattenedPath.split('/').slice(1).join('/'),
-  }))
+  .transform(async ({ path: flattenedPath, code, ...data }) => {
+    const slugAsParams = flattenedPath.split('/').slice(1).join('/')
+    const codeId = toCodeId(slugAsParams)
+    const codesDir = path.join(process.cwd(), CODE_OUTPUT_DIR)
+
+    await mkdir(codesDir, { recursive: true })
+    const codePath = path.join(codesDir, `${codeId}.json`)
+    const tmpPath = `${codePath}.tmp`
+    await writeFile(tmpPath, JSON.stringify(code), 'utf8')
+    await rename(tmpPath, codePath)
+
+    return {
+      ...data,
+      slug: `/${flattenedPath}`,
+      slugAsParams,
+      codeId,
+    }
+  })
 
 export default defineConfig({
   root: './content',
   output: {
-    clean: true,
+    clean: process.env.NODE_ENV === 'production',
   },
   collections: {
     allDocs: {
@@ -96,18 +121,9 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          // Memoized so the (expensive) theme parse + oniguruma WASM init runs once
-          // for the whole build, instead of once per file — velite compiles every
-          // file concurrently, so without this every doc pays that cost redundantly.
-          getHighlighter: (() => {
-            let highlighterPromise
-            return () => {
-              highlighterPromise ??= loadTheme(
-                path.join(process.cwd(), '/lib/themes/supabase-2.json')
-              ).then((theme) => getHighlighter({ theme }))
-              return highlighterPromise
-            }
-          })(),
+          // plugin shares one cached highlighter per theme, lazy language loading needs shiki >= 4.5 (shikijs/shiki#1318)
+          theme: codeTheme,
+          keepBackground: false,
           onVisitLine(node) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted
@@ -116,17 +132,18 @@ export default defineConfig({
             }
           },
           onVisitHighlightedLine(node) {
-            node.properties.className.push('line--highlighted')
+            // the plugin strips the `line` class first, leaving className undefined
+            node.properties.className = [...(node.properties.className ?? []), 'line--highlighted']
           },
-          onVisitHighlightedWord(node) {
+          onVisitHighlightedChars(node) {
             node.properties.className = ['word--highlighted']
           },
         },
       ],
       () => (tree) => {
         visit(tree, (node) => {
-          if (node?.type === 'element' && node?.tagName === 'div') {
-            if (!('data-rehype-pretty-code-fragment' in node.properties)) {
+          if (node?.type === 'element' && node?.tagName === 'figure') {
+            if (!('data-rehype-pretty-code-figure' in node.properties)) {
               return
             }
 
@@ -135,7 +152,7 @@ export default defineConfig({
               return
             }
 
-            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'div'
+            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'figcaption'
             preElement.properties['__rawString__'] = node.__rawString__
 
             if (node.__src__) {

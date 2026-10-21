@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import {
@@ -107,11 +107,14 @@ export const Addons = () => {
     !projectUpdateDisabled &&
     (canUpdateIPv4 || ipv4Enabled) &&
     !isHighAvailability
+  // HIPAA projects must have 28-day PITR. Once enabled it is locked; until then it can be enabled.
+  const hasHipaaCompliantPitr = pitr?.variant.identifier === 'pitr_28'
+  const isPitrLockedByHipaa = hasHipaaAddon && hasHipaaCompliantPitr
   const canOpenPITR =
     isProjectActive &&
     !projectUpdateDisabled &&
     sufficientPgVersion &&
-    !hasHipaaAddon &&
+    !isPitrLockedByHipaa &&
     !isOrioleDbInAws &&
     !isHighAvailability
   const canOpenCustomDomain = isProjectActive && !projectUpdateDisabled && !isHighAvailability
@@ -128,7 +131,7 @@ export const Addons = () => {
   const pitrDisabledReason = getPitrDisabledReason({
     isProjectActive,
     projectUpdateDisabled,
-    hasHipaaAddon,
+    hasHipaaAddon: isPitrLockedByHipaa,
     sufficientPgVersion,
     isOrioleDbInAws,
     isHighAvailability,
@@ -141,6 +144,7 @@ export const Addons = () => {
   })
   const pitrAlertState = getPitrAlertState({
     hasHipaaAddon,
+    hasHipaaCompliantPitr,
     sufficientPgVersion,
     isOrioleDbInAws,
   })
@@ -157,11 +161,20 @@ export const Addons = () => {
         <AlertTitle>PITR cannot be changed with HIPAA</AlertTitle>
         <AlertDescription>
           All projects should have PITR enabled by default and cannot be changed with HIPAA enabled.
-          Contact support for further assistance.
+        </AlertDescription>
+      </Alert>
+    )
+  } else if (pitrAlertState === 'hipaa-non-compliant') {
+    pitrAlert = (
+      <Alert variant="warning" className="rounded-none border-0 border-b px-6">
+        <AlertTitle>Project is not HIPAA compliant</AlertTitle>
+        <AlertDescription>
+          Projects with HIPAA enabled must have 28 days of PITR. Enable the 28-day PITR add-on to
+          make this project compliant.
         </AlertDescription>
         <div className="mt-4">
-          <Button variant="default" asChild>
-            <SupportLink>Contact support</SupportLink>
+          <Button onClick={() => setPanel('pitr')} disabled={!canOpenPITR}>
+            Enable 28-day PITR
           </Button>
         </div>
       </Alert>
@@ -174,7 +187,7 @@ export const Addons = () => {
           <p className="text-sm leading-normal mb-2">
             Reach out to us via support if you're interested
           </p>
-          <Button asChild variant="default">
+          <Button asChild>
             <SupportLink
               queryParams={{
                 projectRef,
@@ -269,7 +282,7 @@ export const Addons = () => {
                     {!canOpenIPv4 && ipv4DisabledReason && (
                       <Tooltip>
                         <TooltipTrigger>
-                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
                         </TooltipTrigger>
                         <TooltipContent>{ipv4DisabledReason}</TooltipContent>
                       </Tooltip>
@@ -319,7 +332,7 @@ export const Addons = () => {
                   {!canOpenPITR && pitrDisabledReason && (
                     <Tooltip>
                       <TooltipTrigger>
-                        <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                        <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
                       </TooltipTrigger>
                       <TooltipContent>{pitrDisabledReason}</TooltipContent>
                     </Tooltip>
@@ -375,7 +388,7 @@ export const Addons = () => {
                     {!canOpenCustomDomain && customDomainDisabledReason && (
                       <Tooltip>
                         <TooltipTrigger>
-                          <Lock strokeWidth={1.5} className="text-foreground-light" size={16} />
+                          <LockIcon strokeWidth={1.5} className="text-foreground-light" size={16} />
                         </TooltipTrigger>
                         <TooltipContent>{customDomainDisabledReason}</TooltipContent>
                       </Tooltip>
