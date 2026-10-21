@@ -46,7 +46,7 @@ The Management API endpoints for creating invites and changing roles are availab
 
 </Admonition>
 
-The Management API examples in this section use the following variables:
+To use the Management API examples in this section, set the following variables:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
@@ -61,6 +61,17 @@ Each example names the permission a scoped access token needs. For more informat
 
 An invite is valid for 24 hours. The person gets access only after they accept it.
 
+<Admonition type="note">
+
+Only a SAML SSO account from the same identity provider can accept an invite sent from a SAML SSO account.
+
+This security measure prevents accidental invites to accounts that your enterprise's identity provider doesn't manage.
+
+</Admonition>
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
 To invite someone in the Supabase Dashboard:
 
 1. In your organization's [team settings](/dashboard/org/_/team), click **Invite members**.
@@ -73,13 +84,8 @@ After the person accepts, you can assign roles on more projects.
 
 If an invite expires before the person accepts it, send a new one. Next to the invite, click **More options**, then click **Resend invitation**.
 
-<Admonition type="note">
-
-Only a SAML SSO account from the same identity provider can accept an invite sent from a SAML SSO account.
-
-This security measure prevents accidental invites to accounts that your enterprise's identity provider doesn't manage.
-
-</Admonition>
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
 
 To invite someone with the Management API, call [Create organization invitations](/docs/reference/api/v2-create-organization-invitations). The token needs the **Organization Members** permission with **Read-write** access. Set `role` to `owner`, `administrator`, `developer`, `read-only`, or `no-access`.
 
@@ -119,9 +125,15 @@ curl -X POST "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/invita
   }'
 ```
 
+</TabPanel>
+</Tabs>
+
 ### Change a member's role
 
 You can change a member's role after they accept their invite.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
 
 To change a member's role in the Supabase Dashboard:
 
@@ -132,6 +144,9 @@ To change a member's role in the Supabase Dashboard:
 3. Click **Save roles**. In the confirmation dialog, click **Update roles**.
 
 The Supabase Dashboard replaces the member's previous roles with the roles you save.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
 
 To change a member's role with the Management API, call [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role) with the member's user ID. The token needs the **Organization Settings** permission with **Read-write** access. To find a member's user ID, list the organization's members.
 
@@ -169,6 +184,9 @@ curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$USER
 ```
 
 After a change, [list the member's roles](#list-organization-members-with-the-management-api) to check which roles and projects they have.
+
+</TabPanel>
+</Tabs>
 
 ### List organization members with the Management API
 
