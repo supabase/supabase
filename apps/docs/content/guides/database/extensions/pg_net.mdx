@@ -26,7 +26,7 @@ It eliminates the need for servers to continuously poll for database changes and
 <TabPanel id="dashboard" label="Dashboard">
 
 1. Go to the [Database](/dashboard/project/_/database/tables) page in the Dashboard.
-2. Click on **Extensions** in the sidebar.
+2. Click **Extensions** in the sidebar.
 3. Search for "pg_net" and enable the extension.
 
 </TabPanel>
@@ -56,9 +56,9 @@ Creates an HTTP GET request returning the request's ID. HTTP requests are not st
 
 ### Signature [#get-signature]
 
-<Admonition type="caution">
+<Admonition type="note">
 
-This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function.
+The privileges that this function runs with depend on your `pg_net` version and your project history. It can be `SECURITY INVOKER` or `SECURITY DEFINER`. See [Permissions](#permissions).
 
 </Admonition>
 
@@ -66,9 +66,9 @@ This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-s
 net.http_get(
     -- url for the request
     url text,
-    -- key/value pairs to be url encoded and appended to the `url`
+    -- key-value pairs to be url encoded and appended to the `url`
     params jsonb default '{}'::jsonb,
-    -- key/values to be included in request headers
+    -- key-value pairs to be included in request headers
     headers jsonb default '{}'::jsonb,
     -- the maximum number of milliseconds the request may take before being canceled
     timeout_milliseconds int default 2000
@@ -102,9 +102,9 @@ The body's character set encoding matches the database's `server_encoding` setti
 
 ### Signature [#post-signature]
 
-<Admonition type="caution">
+<Admonition type="note">
 
-This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
+The privileges that this function runs with depend on your `pg_net` version and your project history. It can be `SECURITY INVOKER` or `SECURITY DEFINER`. See [Permissions](#permissions).
 
 </Admonition>
 
@@ -114,9 +114,9 @@ net.http_post(
     url text,
     -- body of the POST request
     body jsonb default '{}'::jsonb,
-    -- key/value pairs to be url encoded and appended to the `url`
+    -- key-value pairs to be url encoded and appended to the `url`
     params jsonb default '{}'::jsonb,
-    -- key/values to be included in request headers
+    -- key-value pairs to be included in request headers
     headers jsonb default '{"Content-Type": "application/json"}'::jsonb,
     -- the maximum number of milliseconds the request may take before being canceled
     timeout_milliseconds int default 2000
@@ -149,9 +149,9 @@ Creates an HTTP DELETE request, returning the request's ID. HTTP requests are no
 
 ### Signature [#post-signature]
 
-<Admonition type="caution">
+<Admonition type="note">
 
-This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
+The privileges that this function runs with depend on your `pg_net` version and your project history. It can be `SECURITY INVOKER` or `SECURITY DEFINER`. See [Permissions](#permissions).
 
 </Admonition>
 
@@ -159,9 +159,9 @@ This is a Postgres [SECURITY DEFINER](/docs/guides/database/postgres/row-level-s
 net.http_delete(
     -- url for the request
     url text,
-    -- key/value pairs to be url encoded and appended to the `url`
+    -- key-value pairs to be url encoded and appended to the `url`
     params jsonb default '{}'::jsonb,
-    -- key/values to be included in request headers
+    -- key-value pairs to be included in request headers
     headers jsonb default '{}'::jsonb,
     -- the maximum number of milliseconds the request may take before being canceled
     timeout_milliseconds int default 2000
@@ -173,7 +173,6 @@ net.http_delete(
     volatile
     parallel safe
     language plpgsql
-    security definer
 ```
 
 ### Usage [#delete-usage]
@@ -193,30 +192,30 @@ select
 Waiting requests are stored in the `net.http_request_queue` table. Upon execution, they are deleted.
 
 ```sql
-CREATE UNLOGGED TABLE
+create unlogged table
     net.http_request_queue (
-        id bigint NOT NULL DEFAULT nextval('net.http_request_queue_id_seq'::regclass),
-        method text NOT NULL,
-        url text NOT NULL,
-        headers jsonb NOT NULL,
-        body bytea NULL,
-        timeout_milliseconds integer NOT NULL
+        id bigint not null default nextval('net.http_request_queue_id_seq'::regclass),
+        method text not null,
+        url text not null,
+        headers jsonb not null,
+        body bytea null,
+        timeout_milliseconds integer not null
     )
 ```
 
-Once a response is returned, by default, it is stored for 6 hours in the `net._http_response` table.
+After a response is returned, by default, it is stored for 6 hours in the `net._http_response` table.
 
 ```sql
-CREATE UNLOGGED TABLE
+create unlogged table
     net._http_response (
-        id bigint NULL,
-        status_code integer NULL,
-        content_type text NULL,
-        headers jsonb NULL,
-        content text NULL,
-        timed_out boolean NULL,
-        error_msg text NULL,
-        created timestamp with time zone NOT NULL DEFAULT now()
+        id bigint null,
+        status_code integer null,
+        content_type text null,
+        headers jsonb null,
+        content text null,
+        timed_out boolean null,
+        error_msg text null,
+        created timestamp with time zone not null default now()
     )
 ```
 
@@ -309,13 +308,13 @@ order by "created" desc;
 
 ## Configuration
 
-<Admonition type="note" title="Must be on pg_net v0.12.0 or above to reconfigure ">
+<Admonition type="note" title="Must be on pg_net v0.12.0 or later to reconfigure">
 
 Supabase supports reconfiguring `pg_net` starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [General Settings](/dashboard/project/_/settings/general).
 
 </Admonition>
 
-The extension is configured to reliably execute up to 200 requests per second. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting config variables.
+The extension is configured to reliably execute up to 200 requests per second. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting configuration variables.
 
 ### Get current settings
 
@@ -341,7 +340,7 @@ grant alter system on parameter pg_net.ttl to postgres;
 
 </Admonition>
 
-Once the privilege is assigned, apply the setting at the system level and restart the background worker:
+After the privilege is assigned, apply the setting at the system level and restart the background worker:
 
 ```sql
 alter system set pg_net.ttl to '24 hours';
@@ -391,7 +390,7 @@ Make a call to an external endpoint when a trigger event occurs.
 -- function called by trigger
 create or replace function <function_name>()
     returns trigger
-    language plpgSQL
+    language plpgsql
 as $$
 begin
     -- calls pg_net function net.http_post
@@ -405,7 +404,7 @@ begin
       headers:='{"Content-Type": "application/json"}'::jsonb
     ) as request_id;
     return new;
-END $$;
+end $$;
 
 -- trigger for table update
 create trigger <trigger_name>
@@ -428,27 +427,81 @@ select
     net.http_post(
         url := 'https://postman-echo.com/post'::text,
         body := JSON_payload
-    ) AS request_id
-FROM "selected_table_rows";
+    ) as request_id
+from "selected_table_rows";
 ```
 
 More examples can be seen on the [Extension's GitHub page](https://github.com/supabase/pg_net/)
 
 ## Permissions
 
-By default, the `net` schema grants `USAGE` to `PUBLIC`. As a result, `anon` and `authenticated`
-inherit direct object-level access (for example, `SELECT`) on `net.http_request_queue`,
-`net._http_response`, and their associated sequences.
+<Admonition type="note" title="The default privileges are secure">
 
-This doesn't expose request data to unauthenticated or client-side users, for two reasons:
+With the default privileges, clients can't send requests or read responses through `pg_net`. You don't need to change these privileges, and you don't need to contact Support.
 
-- `net` isn't exposed through the [Data API](/docs/guides/api), so anon/publishable keys can't
-  access or modify its objects through the API.
-- `anon` and `authenticated` are `NOLOGIN` roles, so they can't establish a direct database connection.
+Clients that use the `anon` or `authenticated` roles can't reach the `net` schema:
+
+- The Data API doesn't expose the `net` schema.
+- `anon` and `authenticated` are `NOLOGIN` roles, so they can't connect directly to the database.
+
+Clients can reach `pg_net` only through your own functions, views, and triggers. To control this access, see [Client access](#client-access).
+
+</Admonition>
+
+### Default privileges
+
+The `anon` and `authenticated` roles have privileges on `pg_net`, but clients can't use them directly. The privileges depend on your `pg_net` version:
+
+- In all versions, `anon` and `authenticated` have `EXECUTE` on `net.http_get` and `net.http_post`.
+- From `pg_net` 0.12.0, `anon` and `authenticated` also have all privileges on `net.http_request_queue` and `net._http_response`.
+
+From `pg_net` 0.12.0, `pg_net` grants these privileges to `PUBLIC`, which includes every role. If you create a role with the `LOGIN` attribute, that role can use these privileges directly. Give roles with `LOGIN` only to people and services that you trust.
+
+To see your `pg_net` version and the privileges on its functions, run:
+
+```sql
+select extversion from pg_extension where extname = 'pg_net';
+
+select
+  p.proname,
+  p.prosecdef as security_definer,
+  has_function_privilege('anon', p.oid, 'execute') as anon_can_execute,
+  has_function_privilege('authenticated', p.oid, 'execute') as authenticated_can_execute
+from
+  pg_proc as p
+  join pg_namespace as n on n.oid = p.pronamespace
+where n.nspname = 'net' and p.proname in ('http_get', 'http_post', 'http_delete');
+```
+
+### Client access
+
+Don't add the `net` schema to the exposed schemas of the Data API.
+
+If your own functions, views, or triggers use `pg_net`, you control who can reach them. You don't need Support for this:
+
+- **Functions:** If only `pg_cron` jobs or your backend call the function, revoke `EXECUTE` from the client roles. `pg_cron` jobs run as the job owner, so they don't need this grant.
+
+  ```sql
+  revoke execute on function public.my_http_function() from public, anon, authenticated;
+  ```
+
+- **Views:** Revoke `SELECT` from the client roles on views that read `net._http_response`.
+
+  ```sql
+  revoke select on public.my_responses_view from anon, authenticated;
+  ```
+
+- **Triggers:** A trigger that calls `pg_net` runs when a client writes to its table. Use [Row Level Security](/docs/guides/database/postgres/row-level-security) to control which clients can write to the table.
+
+You can't change the privileges on the `net` schema itself. `supabase_admin` owns it and granted them, so a `revoke` from `postgres` has no effect.
 
 ## Troubleshooting
 
-The Security Advisor might report that `pg_net` is installed in the `public` schema. Postgres defines the extension as non-relocatable, so `alter extension pg_net set schema extensions` can't move it. Instead, drop the extension and create it in the `extensions` schema:
+### Security Advisor reports `pg_net` in the `public` schema
+
+This warning is harmless for `pg_net`. You don't need to take action. `pg_net` creates all of its objects in the `net` schema, even when the extension is registered in `public`. Nothing is added to `public`, and the Data API doesn't expose the `net` schema.
+
+To clear the warning, you must drop the extension and create it again in the `extensions` schema. Postgres defines the extension as non-relocatable, so `alter extension pg_net set schema extensions` can't move it. Follow the steps below.
 
 <Admonition type="danger">
 
