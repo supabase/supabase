@@ -1,6 +1,5 @@
 import { getTableRowsCountSql } from '@supabase/pg-meta'
 import { formatPatternMatchFilterValue } from '@supabase/pg-meta/src/query/table-row-query'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
@@ -10,7 +9,7 @@ import type { Filter, SupaTable } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -108,9 +107,8 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
     identifier: readReplicaIdentifier,
     type,
   } = useConnectionStringForReadOps()
-  const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canSQLAdminWrite, isLoading: isPermissionsLoading } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -6,6 +5,7 @@ import { HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import type { ProfileContextType } from '@/lib/profile'
 import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -14,7 +14,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
-type PermissionResponse = components['schemas']['AccessControlPermission']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const PROJECT_REF = 'project-ref'
 const ORGANIZATION_SLUG = 'acme'
@@ -180,19 +180,28 @@ function mockInfrastructureEndpoints() {
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    response: [
-      {
-        actions: [PermissionAction.UPDATE],
-        condition: null,
-        organization_id: 1,
-        organization_slug: ORGANIZATION_SLUG,
-        project_ids: [PROJECT.id],
-        project_refs: [PROJECT_REF],
-        resources: ['projects'],
-        restrictive: false,
-      } satisfies PermissionResponse,
-    ],
+    path: '/platform/profile/permissions/v2',
+    response: {
+      organizations: [
+        {
+          slug: ORGANIZATION_SLUG,
+          role: 'administrator',
+          permissions: [],
+          projects: [
+            {
+              ref: PROJECT_REF,
+              role: 'administrator',
+              permissions: [
+                FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+                FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
+                FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
+                FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
+              ],
+            },
+          ],
+        },
+      ],
+    } satisfies PermissionsV2Response,
   })
   addAPIMock({
     method: 'get',

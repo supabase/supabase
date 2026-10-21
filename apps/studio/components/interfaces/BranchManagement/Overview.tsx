@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { partition } from 'lodash'
@@ -42,7 +41,7 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import type { Branch } from '@/data/branches/branches-query'
 import { branchKeys } from '@/data/branches/keys'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -252,13 +251,11 @@ const PreviewBranchActions = ({
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canDeleteBranches } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'preview_branches'
+  const { can: canDeleteBranches } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE
   )
-  const { can: canUpdateBranches } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'preview_branches'
+  const { can: canUpdateBranches } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_WRITE
   )
   // If user can update branches, they can restore branches
   const canRestoreBranches = canUpdateBranches
@@ -583,9 +580,8 @@ const PreviewBranchActions = ({
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canUpdateBranches } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'preview_branches'
+  const { can: canUpdateBranches } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_PRODUCTION_WRITE
   )
   const { mutate: branchPushMutate, isPending: isRetriggering } = useBranchPushMutation({
     onSuccess() {

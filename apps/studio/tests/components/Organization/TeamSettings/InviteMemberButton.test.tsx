@@ -25,10 +25,12 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useGetPermissions: () => ({ permissions: [], organizationSlug: 'test-org' }),
-  doPermissionsCheck: () => true,
-  useAsyncCheckPermissions: () => ({ can: true, isSuccess: true }),
+vi.mock('@/data/permissions/permissions-query-v2', () => ({
+  usePermissionsQueryV2: () => ({
+    data: {
+      organizations: [{ slug: 'test-org', role: 'owner', permissions: [], projects: [] }],
+    },
+  }),
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
@@ -76,13 +78,14 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: false }),
 }))
 
-const { mockRolesManagementPermissions, mockIsFeatureEnabled } = vi.hoisted(() => ({
-  mockRolesManagementPermissions: vi.fn(),
+const { mockGetAssignableRoleIds, mockIsFeatureEnabled } = vi.hoisted(() => ({
+  mockGetAssignableRoleIds: vi.fn(),
   mockIsFeatureEnabled: vi.fn(),
 }))
 
 vi.mock('@/components/interfaces/Organization/TeamSettings/TeamSettings.utils', () => ({
-  useGetRolesManagementPermissions: mockRolesManagementPermissions,
+  getOrgRole: () => 'owner',
+  getAssignableRoleIds: mockGetAssignableRoleIds,
 }))
 
 const mockInvite = vi.fn().mockResolvedValue({ succeeded: [], failed: [] })
@@ -124,10 +127,7 @@ async function submitForm(emailValue: string) {
 describe('InviteMemberButton', () => {
   beforeEach(() => {
     mockInvite.mockResolvedValue({ succeeded: [], failed: [] })
-    mockRolesManagementPermissions.mockReturnValue({
-      rolesAddable: [1, 2, 3, 4],
-      rolesRemovable: [1, 2, 3, 4],
-    })
+    mockGetAssignableRoleIds.mockReturnValue([1, 2, 3, 4])
     mockIsFeatureEnabled.mockReturnValue({ organizationMembersCreate: true })
   })
 
@@ -148,7 +148,7 @@ describe('InviteMemberButton', () => {
 
   describe('when the user cannot invite members', () => {
     beforeEach(() => {
-      mockRolesManagementPermissions.mockReturnValue({ rolesAddable: [], rolesRemovable: [] })
+      mockGetAssignableRoleIds.mockReturnValue([])
     })
 
     it('shows only the permission warning, not the shortcut tooltip', async () => {

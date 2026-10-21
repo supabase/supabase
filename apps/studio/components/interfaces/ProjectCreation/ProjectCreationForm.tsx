@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -69,7 +68,7 @@ import {
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import {
   isInDataApiRevokeTreatment,
   useDataApiRevokeOnCreateDefaultEnabled,
@@ -139,10 +138,9 @@ export const ProjectCreationForm = ({
   const canChooseInstanceSize = !isFreePlan
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
-  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.github_connections'
+  const { can: isAdmin } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE)
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
   const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
