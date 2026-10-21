@@ -1,4 +1,9 @@
-import { cube, type IsoBox, type IsoRing, type IsoView } from './iso-shapes'
+import {
+  cube,
+  type IsoBox,
+  type IsoRing,
+  type IsoView,
+} from 'ui-patterns/IsoShape/IsoShape.geometry'
 import type { Topic } from './topics'
 
 interface IsoComposition {
