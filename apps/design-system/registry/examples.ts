@@ -1554,6 +1554,16 @@ export const examples: Registry = [
     files: ['example/inner-side-menu-with-search.tsx'],
   },
   {
+    name: 'ai-tools-demo',
+    type: 'components:example',
+    files: ['example/ai-tools-demo.tsx'],
+  },
+  {
+    name: 'ai-tools-minimal',
+    type: 'components:example',
+    files: ['example/ai-tools-minimal.tsx'],
+  },
+  {
     name: 'toc-demo',
     type: 'components:example',
     files: ['example/toc-demo.tsx'],
