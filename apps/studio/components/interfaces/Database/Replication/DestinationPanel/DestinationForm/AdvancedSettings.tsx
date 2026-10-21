@@ -15,9 +15,11 @@ export const AdvancedSettings = ({
   form,
   group = 'all',
   revealInvalidSettings = false,
+  showPublicationLoadError = true,
 }: {
   group?: 'all' | 'connection' | 'data'
   revealInvalidSettings?: boolean
+  showPublicationLoadError?: boolean
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
@@ -81,7 +83,10 @@ export const AdvancedSettings = ({
                         destination table is first created or reset.
                       </p>
                     </div>
-                    <TableOptions control={form.control} />
+                    <TableOptions
+                      control={form.control}
+                      showPublicationLoadError={showPublicationLoadError}
+                    />
                   </div>
                 )}
               </>

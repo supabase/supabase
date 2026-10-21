@@ -11,18 +11,24 @@ export const PipelineDataSection = ({
   form,
   onSelectNewPublication,
   revealInvalidSettings = false,
+  showTableLoadError = true,
 }: {
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
   onSelectNewPublication: () => void
   revealInvalidSettings?: boolean
+  showTableLoadError?: boolean
 }) => (
   <section aria-label="Data">
     <div className="p-5 flex flex-col gap-y-6">
       <h3 className="text-sm font-medium text-foreground">Data</h3>
       <div className="flex flex-col gap-y-4">
-        <PublicationSelection form={form} onSelectNewPublication={onSelectNewPublication} />
-        <TableCopySelection form={form} editMode={false} />
+        <PublicationSelection
+          form={form}
+          onSelectNewPublication={onSelectNewPublication}
+          showPublicationLoadError={showTableLoadError}
+        />
+        <TableCopySelection form={form} editMode={false} showLoadError={showTableLoadError} />
       </div>
     </div>
     <AdvancedSettings
@@ -30,6 +36,7 @@ export const PipelineDataSection = ({
       form={form}
       group="data"
       revealInvalidSettings={revealInvalidSettings}
+      showPublicationLoadError={showTableLoadError}
     />
   </section>
 )

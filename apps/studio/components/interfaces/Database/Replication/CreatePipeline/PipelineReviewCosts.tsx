@@ -22,7 +22,6 @@ export const PipelineReviewCosts = ({
     <PipelineCostEstimate
       estimate={costs.estimate}
       isLoading={costs.isInitialCostEstimateLoading}
-      isError={costs.isError}
       publicationTables={costs.publicationTables}
       tableSyncCopy={costs.tableSyncCopy}
     />

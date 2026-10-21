@@ -31,6 +31,7 @@ export const usePipelineDataValidation = ({
   const dataError = dataErrorState?.snapshot === snapshot ? dataErrorState.message : undefined
   const names = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const publication = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
+  const hasPublicationLoadError = !!publicationName && (names.isError || publication.isError)
   const isDataVerified =
     verifiedSnapshot === JSON.stringify([snapshot, publication.data]) &&
     names.isSuccess &&
@@ -81,6 +82,7 @@ export const usePipelineDataValidation = ({
     isValidatingData,
     isDataVerified,
     dataError,
+    hasPublicationLoadError,
     publication: publication.data,
   }
 }

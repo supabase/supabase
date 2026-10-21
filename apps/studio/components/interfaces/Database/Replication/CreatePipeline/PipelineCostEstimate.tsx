@@ -29,13 +29,11 @@ const MAX_VISIBLE_TABLES = 10
 export const PipelineCostEstimate = ({
   estimate,
   isLoading,
-  isError,
   publicationTables,
   tableSyncCopy,
 }: {
   estimate?: ReplicationCostEstimateData
   isLoading: boolean
-  isError: boolean
   publicationTables: ReplicationTableIdentity[]
   tableSyncCopy?: TableSyncCopyConfig
 }) => {
@@ -65,9 +63,8 @@ export const PipelineCostEstimate = ({
           </p>
         </header>
 
-        {isLoading ? (
-          <GenericSkeletonLoader className="w-full" />
-        ) : isError || estimate === undefined ? null : (
+        {isLoading && <GenericSkeletonLoader className="w-full" />}
+        {!isLoading && estimate !== undefined && (
           <div className="space-y-6">
             <section className="space-y-2">
               <h4 className="text-sm font-medium text-foreground mb-3">Initial sync</h4>
@@ -182,14 +179,15 @@ export const PipelineCostEstimate = ({
           </div>
         )}
       </CardContent>
-      {!isLoading && (isError || estimate === undefined) && (
-        <Admonition
-          type="note"
-          role="status"
-          className={SANDWICHED_ADMONITION_CLASS}
-          description="A cost estimate is unavailable. You can still start the pipeline."
-        />
-      )}
+      <div role="status">
+        {!isLoading && estimate === undefined && (
+          <Admonition
+            type="note"
+            className={SANDWICHED_ADMONITION_CLASS}
+            description="A cost estimate is unavailable. You can still start the pipeline."
+          />
+        )}
+      </div>
     </>
   )
 }

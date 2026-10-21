@@ -74,8 +74,14 @@ export const PipelineCreationFlow = ({
   const { validateConnection, resetValidation, isValidating, isConnectionVerified, failures } =
     usePipelineConnectionValidation({ projectRef, type, form })
   const sourceId = useReplicationSourceId({ projectRef })
-  const { validateData, isValidatingData, isDataVerified, dataError, publication } =
-    usePipelineDataValidation({ projectRef, sourceId, type, form })
+  const {
+    validateData,
+    isValidatingData,
+    isDataVerified,
+    dataError,
+    hasPublicationLoadError,
+    publication,
+  } = usePipelineDataValidation({ projectRef, sourceId, type, form })
   const {
     handleSubmit,
     isSubmitting,
@@ -186,12 +192,19 @@ export const PipelineCreationFlow = ({
                     form={form}
                     onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
                     revealInvalidSettings
+                    showTableLoadError={false}
                   />
-                  {dataError && (
+                  {(hasPublicationLoadError || dataError) && (
                     <Admonition
                       type="danger"
-                      title="Check data settings"
-                      description={dataError}
+                      title={
+                        hasPublicationLoadError
+                          ? 'Publication tables could not be loaded'
+                          : 'Check data settings'
+                      }
+                      description={
+                        hasPublicationLoadError ? 'Click Continue to try again.' : dataError
+                      }
                       className={SANDWICHED_ADMONITION_CLASS}
                     />
                   )}
@@ -216,18 +229,19 @@ export const PipelineCreationFlow = ({
                   />
                   <Separator />
                   <PipelineReviewCosts costs={costs} />
-                  {submissionFailures.length > 0 && (
-                    <Admonition
-                      className={SANDWICHED_ADMONITION_CLASS}
-                      role="status"
-                      type={hasCriticalFailures ? 'danger' : 'warning'}
-                      description={
-                        hasCriticalFailures
-                          ? 'Fix the above issues before starting the pipeline.'
-                          : 'Review the warnings above before starting the pipeline.'
-                      }
-                    />
-                  )}
+                  <div role="status" aria-label="Pipeline validation status">
+                    {submissionFailures.length > 0 && (
+                      <Admonition
+                        className={SANDWICHED_ADMONITION_CLASS}
+                        type={hasCriticalFailures ? 'danger' : 'warning'}
+                        description={
+                          hasCriticalFailures
+                            ? 'Fix the above issues before starting the pipeline.'
+                            : 'Review the warnings above before starting the pipeline.'
+                        }
+                      />
+                    )}
+                  </div>
                 </>
               )}
             </SteppedFlow>

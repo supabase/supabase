@@ -230,6 +230,8 @@ describe('PipelineCreationFlow', () => {
     async (hasConnectionFailure) => {
       const { requests } = mockCreation()
       await reachReview()
+      const validationStatus = screen.getByRole('status', { name: 'Pipeline validation status' })
+      expect(validationStatus).toBeEmptyDOMElement()
       const scrollIntoView = vi.fn()
       vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(scrollIntoView)
       addAPIMock({
@@ -264,6 +266,9 @@ describe('PipelineCreationFlow', () => {
       })
       fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
       await screen.findByText('Check publication settings.')
+      expect(screen.getByRole('status', { name: 'Pipeline validation status' })).toBe(
+        validationStatus
+      )
       const connection = withinRegion('Connection review')
       const data = withinRegion('Data review')
       if (hasConnectionFailure)
@@ -839,6 +844,52 @@ describe('PipelineCreationFlow', () => {
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
+  it('shows one publication loading failure before Continue and clears it after a successful retry', async () => {
+    let shouldFail = true
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        shouldFail
+          ? HttpResponse.json<{ message: string }>({ message: 'Unavailable' }, { status: 503 })
+          : HttpResponse.json<components['schemas']['PublicationDetailsResponse_Output']>({
+              name: 'analytics',
+              config: {
+                type: 'tables',
+                tables: [],
+                operations: ['insert'],
+                publish_via_partition_root: false,
+              },
+              tables: [],
+            }),
+    })
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fillConnection()
+    await continueToData()
+    await selectPublication()
+    await screen.findByText('Publication tables could not be loaded')
+    fireEvent.click(withinRegion('Data').getByRole('button', { name: /Advanced settings/ }))
+    expect(screen.queryByText('Table settings could not be loaded')).not.toBeInTheDocument()
+    expect(screen.queryByText(/Partition handling could not be loaded/)).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.getAllByText('Publication tables could not be loaded')).toHaveLength(1)
+    )
+    expect(screen.getByText('Click Continue to try again.')).toBeInTheDocument()
+    expect(screen.queryByText(/Refresh the page before changing/)).not.toBeInTheDocument()
+    next()
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled())
+    await waitFor(() =>
+      expect(screen.getAllByText('Publication tables could not be loaded')).toHaveLength(1)
+    )
+    shouldFail = false
+    next()
+    await waitForStep(4)
+    expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
+  })
+
   it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
     const onUrlUpdate = vi.fn()
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
@@ -883,9 +934,7 @@ describe('PipelineCreationFlow', () => {
     })
     next()
     await waitFor(() =>
-      expect(
-        screen.queryByText('Publication tables could not be loaded. Click Continue to try again.')
-      ).toBeInTheDocument()
+      expect(screen.queryByText('Click Continue to try again.')).toBeInTheDocument()
     )
     shouldFail = false
     next()
