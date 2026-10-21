@@ -10,8 +10,9 @@ import {
   createAssistantMessageWithUpdateNotebookTool,
   createLongConversation,
 } from '../test-fixtures'
+import { NO_DATA_PERMISSIONS } from './execute-sql-output'
 import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE, type NotebookRunOutput } from './notebook-run-output'
-import { NO_DATA_PERMISSIONS, sanitizeMessagePart } from './tool-sanitizer'
+import { sanitizeMessagePart } from './tool-sanitizer'
 
 const notebookRunPart = {
   type: 'tool-run_notebook',

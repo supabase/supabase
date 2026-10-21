@@ -174,7 +174,8 @@ describe('ComputeAndDiskUsageCharts utils', () => {
             values: {
               max_cpu_usage: '120', // over 100 -> clamped
               ram_usage: '-5', // under 0 -> clamped
-              disk_io_consumption: '33',
+              disk_io_budget: '99',
+              disk_io_consumption: '1',
             },
           },
         ])
@@ -185,10 +186,31 @@ describe('ComputeAndDiskUsageCharts utils', () => {
           timestamp: '2024-01-01T00:00:00Z',
           maxCpuUsage: 100,
           ramUsage: 0,
-          diskIoConsumption: 33,
+          diskIoBalance: 99,
         },
       ])
     })
+
+    test.each([undefined, '', 'invalid'])(
+      'keeps unavailable balance %s out of the chart and score',
+      (balance) => {
+        const { computeChartData } = buildUsageChartData(
+          buildMultiResponse([
+            {
+              period_start: '2024-01-01T00:00:00Z',
+              values: {
+                max_cpu_usage: '20',
+                ram_usage: '30',
+                disk_io_budget: balance,
+              },
+            },
+          ])
+        )
+
+        expect(computeChartData[0].diskIoBalance).toBeUndefined()
+        expect(getComputeUsageSummary(computeChartData).peakComputeUsage).toBe(30)
+      }
+    )
 
     test('computes disk usage percentages relative to the disk size', () => {
       const result = buildUsageChartData(
@@ -239,7 +261,7 @@ describe('ComputeAndDiskUsageCharts utils', () => {
       expect(result.computeChartData).toHaveLength(2)
     })
 
-    test('treats missing compute values as 0', () => {
+    test('keeps missing disk IO balance unavailable', () => {
       const result = buildUsageChartData(
         buildMultiResponse([{ period_start: '2024-01-01T00:00:00Z', values: {} }])
       )
@@ -249,18 +271,48 @@ describe('ComputeAndDiskUsageCharts utils', () => {
           timestamp: '2024-01-01T00:00:00Z',
           maxCpuUsage: 0,
           ramUsage: 0,
-          diskIoConsumption: 0,
+          diskIoBalance: undefined,
         },
       ])
     })
   })
 
   describe('getComputeUsageSummary', () => {
+    test.each([
+      [99, 50, 'default'],
+      [25, 75, 'warning'],
+      [10, 90, 'negative'],
+      [0, 100, 'negative'],
+      [undefined, 50, 'default'],
+    ])('scores %s remaining balance as compute pressure %s', (balance, pressure, status) => {
+      const summary = getComputeUsageSummary([
+        { timestamp: 't1', maxCpuUsage: 40, ramUsage: 50, diskIoBalance: balance },
+      ])
+
+      expect(summary.minDiskIoBalance).toBe(balance)
+      expect(summary.peakComputeUsage).toBe(pressure)
+      expect(summary.status).toBe(status)
+      expect(summary.diskIoStatus).toBe(status)
+    })
+
+    test('uses the lowest sampled balance to capture burst exhaustion', () => {
+      const summary = getComputeUsageSummary([
+        { timestamp: 't1', maxCpuUsage: 20, ramUsage: 30, diskIoBalance: 99 },
+        { timestamp: 't2', maxCpuUsage: 25, ramUsage: 35, diskIoBalance: 5 },
+        { timestamp: 't3', maxCpuUsage: 10, ramUsage: 20, diskIoBalance: undefined },
+      ])
+
+      expect(summary.minDiskIoBalance).toBe(5)
+      expect(summary.peakComputeUsage).toBe(95)
+      expect(summary.status).toBe('negative')
+    })
+
     test('returns undefined peaks and default status for empty data', () => {
       expect(getComputeUsageSummary([])).toEqual({
         peakCpuUsage: undefined,
         peakMemoryUsage: undefined,
-        peakDiskIoUsage: undefined,
+        minDiskIoBalance: undefined,
+        diskIoStatus: 'default',
         peakComputeUsage: undefined,
         status: 'default',
       })
@@ -268,14 +320,15 @@ describe('ComputeAndDiskUsageCharts utils', () => {
 
     test('computes per-metric peaks, the overall peak, and the worst status', () => {
       const data: ComputeUsageChartDatum[] = [
-        { timestamp: 't1', maxCpuUsage: 40, ramUsage: 92, diskIoConsumption: 10 },
-        { timestamp: 't2', maxCpuUsage: 60, ramUsage: 80, diskIoConsumption: 20 },
+        { timestamp: 't1', maxCpuUsage: 40, ramUsage: 92, diskIoBalance: 90 },
+        { timestamp: 't2', maxCpuUsage: 60, ramUsage: 80, diskIoBalance: 80 },
       ]
 
       expect(getComputeUsageSummary(data)).toEqual({
         peakCpuUsage: 60,
         peakMemoryUsage: 92,
-        peakDiskIoUsage: 20,
+        minDiskIoBalance: 80,
+        diskIoStatus: 'default',
         peakComputeUsage: 92,
         status: 'negative', // memory peak of 92 is critical
       })
@@ -283,13 +336,14 @@ describe('ComputeAndDiskUsageCharts utils', () => {
 
     test('excludes disk IO from the overall peak and status for dedicated-I/O instances', () => {
       const data: ComputeUsageChartDatum[] = [
-        { timestamp: 't1', maxCpuUsage: 40, ramUsage: 50, diskIoConsumption: 95 },
+        { timestamp: 't1', maxCpuUsage: 40, ramUsage: 50, diskIoBalance: 5 },
       ]
 
       expect(getComputeUsageSummary(data, false)).toEqual({
         peakCpuUsage: 40,
         peakMemoryUsage: 50,
-        peakDiskIoUsage: 95,
+        minDiskIoBalance: 5,
+        diskIoStatus: 'negative',
         peakComputeUsage: 50,
         status: 'default',
       })

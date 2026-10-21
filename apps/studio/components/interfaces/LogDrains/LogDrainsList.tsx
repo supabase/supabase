@@ -1,13 +1,13 @@
 import { IS_PLATFORM } from 'common'
-import { MoreHorizontalIcon, PlugZapIcon, TrashIcon } from 'lucide-react'
+import { MoreVerticalIcon, PlugZapIcon, TrashIcon } from 'lucide-react'
 import { cloneElement, useEffect, useRef, useState } from 'react'
 import {
-  Button,
   Card,
   cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import { LogDrainsCard } from './LogDrainsCard'
 import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { VoteLink } from './VoteLink'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import type { ResponseError } from '@/types'
 
@@ -112,7 +113,7 @@ export function LogDrainsList({
           <TableBody>
             {logDrains
               ?.slice()
-              .sort((a, b) => b.id - a.id)
+              .sort((a, b) => a.name.localeCompare(b.name))
               .map((drain) => (
                 <TableRow key={drain.id}>
                   <TableCell className="font-medium truncate max-w-72" title={drain.name}>
@@ -145,27 +146,35 @@ export function LogDrainsList({
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="text"
+                        <ButtonTooltip
+                          variant="default"
                           className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
-                          icon={<MoreHorizontalIcon />}
+                          icon={<MoreVerticalIcon />}
+                          tooltip={{ content: { side: 'bottom', text: 'More options' } }}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[160px]" align="end">
                         {onTestDrain && (
-                          <DropdownMenuItem onClick={() => onTestDrain(drain)}>
-                            <PlugZapIcon className="h-4 w-4 mr-2" />
-                            Test connection
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem
+                              className="gap-x-2"
+                              onClick={() => onTestDrain(drain)}
+                            >
+                              <PlugZapIcon size={14} />
+                              Test connection
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                          </>
                         )}
                         <DropdownMenuItem
+                          className="gap-x-2"
                           onClick={() => {
                             setSelectedLogDrain(drain)
                             setIsDeleteModalOpen(true)
                           }}
                         >
-                          <TrashIcon className="h-4 w-4 mr-2" />
-                          Delete
+                          <TrashIcon size={14} />
+                          Delete log drain
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>

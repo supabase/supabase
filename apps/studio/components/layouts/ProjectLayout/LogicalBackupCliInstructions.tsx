@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
@@ -14,8 +13,7 @@ import {
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 export type LogicalBackupCliInstructionsProps = {
@@ -33,15 +31,8 @@ export const LogicalBackupCliInstructions = ({
 }: LogicalBackupCliInstructionsProps) => {
   const router = useRouter()
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { can: canResetDbPassword } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canResetDbPassword } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_CONFIG_WRITE
   )
 
   const {

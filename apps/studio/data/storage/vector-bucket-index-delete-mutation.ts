@@ -47,18 +47,18 @@ export const useVectorBucketIndexDeleteMutation = ({
 
   return useMutation<VectorBucketIndexDeleteData, ResponseError, VectorBucketIndexDeleteVariables>({
     mutationFn: (vars) => deleteVectorBucketIndex(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef, bucketName } = variables
       await queryClient.invalidateQueries({
         queryKey: storageKeys.vectorBucketsIndexes(projectRef, bucketName),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to delete vector bucket index: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

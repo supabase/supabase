@@ -434,7 +434,7 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/get-ip-address.ts` — canary port (validates the shim)
 - [x] `routes/api/**` — root-level simple endpoints (`check-cname`,
       `cli-release-version`, `enabled-features-overrides`, `generate-attachment-url`,
-      `get-deployment-commit`, `get-utc-time`, `status-override`)
+      `get-deployment-commit`, `get-utc-time`)
 - [x] `routes/api/ai/**` — AI endpoints (`docs.ts` direct-ported as Web-native)
 - [x] `routes/api/connect/**`
 - [x] `routes/api/content/**`
@@ -444,8 +444,7 @@ per-file items only when a subtree has special cases.
 - [x] `routes/api/v1/**` — except `body.ts` (streaming rewrite)
 - [x] `routes/api/v1/projects/$ref/functions/$slug/body.ts` — Web-streams rewrite. Returns a `Response` whose body is a `ReadableStream`; each artifact file is converted via `Readable.toWeb(createReadStream(...))` and pulled chunk-by-chunk into the multipart stream. Skips the `apiWrapper` since `getFunctionsArtifactStore` already asserts self-hosted mode (the pages-router `withAuth` was a no-op outside `IS_PLATFORM`).
 - [x] `routes/api/mcp/index.ts` — uses `WebStandardStreamableHTTPServerTransport` from `@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js`. Takes a Web `Request`, returns a `Response` directly — no shim needed. Query parsing pulled from `request.url`'s search params; headers passed through unchanged.
-- [x] `routes/api/incident-banner.ts`, `routes/api/incident-status.ts`,
-      `routes/api/status-page.ts` — App Router routes under `app/api/**`
+- [x] `routes/api/status-page.ts` — App Router route under `app/api/**`
       (already Web-native, direct re-export)
 
 ---
@@ -471,8 +470,9 @@ inline.
   `beforeHistoryChange` / `hashChangeStart` / `hashChangeComplete`.
   **Known gap:** Next's throw-from-`routeChangeStart`-to-cancel pattern
   isn't supportable — `subscribe` is fire-and-forget.
-  `usePreventNavigationOnUnsavedChanges` relies on it and needs
-  migrating to TanStack's `useBlocker` separately.
+  `usePreventNavigationOnUnsavedChanges` uses a Vite alias to
+  `compat/usePreventNavigationOnUnsavedChanges.ts`, which blocks through
+  TanStack's native `useBlocker`. Next keeps the original hook.
 - `api.ts` — `toWebHandler(nextHandler)`. See **API routes → Shim
   coverage** above.
 - `link.tsx`, `navigation.ts`, `dynamic.tsx`, `image.tsx`,
@@ -618,7 +618,7 @@ for the Vite pipeline:
 
 - Switch `routes/index.tsx` redirects from `href` to `to` — all targets
   now live in the TanStack tree.
-- Migrate `usePreventNavigationOnUnsavedChanges` from `router.events.on('routeChangeStart', …)` (throw-to-cancel pattern) to TanStack's `useBlocker`.
+- Remove the Vite alias for `usePreventNavigationOnUnsavedChanges` and replace the original Next hook with the native implementation in `compat/usePreventNavigationOnUnsavedChanges.ts`.
 - Drop the `_splat` / `routeSlug` normalisation block from
   `pages/org/_/[[...routeSlug]].tsx` + `pages/project/_/[[...routeSlug]].tsx` (only there to keep both runtimes mounting the same body).
 - Remove `RouteValidationWrapper` + `next/router` compat shim usage from `__root.tsx`.

@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { describe, expect, test, vi } from 'vitest'
 
 import { OAuthAppsAuthorizeScreen } from './OAuthAppsAuthorizeScreen'
@@ -32,6 +32,14 @@ function renderScreen({
       navigate={vi.fn()}
     />
   )
+}
+
+// The authorize button renders disabled while app details are still pending.
+// React Query 5.104 settles that query after the button is already in the document.
+async function enabledAuthorizeButton() {
+  const button = await screen.findByRole('button', { name: /Authorize Vercel/ })
+  await waitFor(() => expect(button).toBeEnabled())
+  return button
 }
 
 function selectProject(projectName: string) {
@@ -203,7 +211,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
   test('authorizes an app that hides the picker, with nothing selected', async () => {
     renderScreen({ authId: OAUTH_APPS_MOCK_SCENARIOS.vercelAllProjects })
 
-    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(await enabledAuthorizeButton()).toBeEnabled()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     expect(
       screen.queryByText('Must select at least one project to authorize.')
@@ -216,7 +224,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       organizationSlug: 'contoso-labs',
     })
 
-    expect(await screen.findByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
+    expect(await enabledAuthorizeButton()).toBeEnabled()
     expect(screen.queryByText(/No projects in/)).not.toBeInTheDocument()
   })
 
@@ -226,7 +234,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       organizationSlug: 'contoso-labs',
     })
 
-    fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
+    fireEvent.click(await enabledAuthorizeButton())
 
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
     expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()
@@ -331,7 +339,7 @@ describe('OAuthAppsAuthorizeScreen', () => {
       projectRef: 'northwindstorefront1',
     })
 
-    fireEvent.click(await screen.findByRole('button', { name: /Authorize Vercel/ }))
+    fireEvent.click(await enabledAuthorizeButton())
 
     expect(await screen.findByText('Vercel is connected')).toBeInTheDocument()
     expect(screen.getByText('All projects, including ones created later')).toBeInTheDocument()

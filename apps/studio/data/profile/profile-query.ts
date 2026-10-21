@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { profileKeys } from './keys'
-import type { Profile } from './types'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -18,9 +17,9 @@ export async function getProfile(signal?: AbortSignal) {
     return {
       ...data,
       disabled_features: process.env.NEXT_PUBLIC_DISABLED_FEATURES?.split(',') ?? [],
-    } as Profile
+    }
   } else {
-    return data as Profile
+    return data
   }
 }
 

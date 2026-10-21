@@ -34,6 +34,10 @@
       "import": "./src/Admonition/index.tsx",
       "types": "./src/Admonition/index.tsx"
     },
+    "./AiTools": {
+      "import": "./src/AiTools/index.tsx",
+      "types": "./src/AiTools/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -367,8 +371,8 @@
       "types": "./src/FilterBar/index.ts"
     },
     "./FilterBar/menuItems": {
-      "import": "./src/FilterBar/menuItems.ts",
-      "types": "./src/FilterBar/menuItems.ts"
+      "import": "./src/FilterBar/menuItems.tsx",
+      "types": "./src/FilterBar/menuItems.tsx"
     },
     "./FilterBar/types": {
       "import": "./src/FilterBar/types.ts",
@@ -381,10 +385,6 @@
     "./FilterBar/useCommandHandling": {
       "import": "./src/FilterBar/useCommandHandling.ts",
       "types": "./src/FilterBar/useCommandHandling.ts"
-    },
-    "./FilterBar/useCommandMenu": {
-      "import": "./src/FilterBar/useCommandMenu.ts",
-      "types": "./src/FilterBar/useCommandMenu.ts"
     },
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
@@ -521,6 +521,10 @@
     "./MultipleCodeBlock": {
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
+    },
+    "./Notch": {
+      "import": "./src/Notch/index.ts",
+      "types": "./src/Notch/index.ts"
     },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",

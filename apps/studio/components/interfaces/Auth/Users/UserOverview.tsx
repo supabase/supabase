@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
@@ -32,7 +31,7 @@ import { useUserSendMagicLinkMutation } from '@/data/auth/user-send-magic-link-m
 import { useUserSendOTPMutation } from '@/data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
 import { User } from '@/data/auth/users-infinite-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 import { timeout } from '@/lib/helpers'
@@ -73,23 +72,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   )
 
-  const { can: canUpdateUser } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const { can: canSendMagicLink } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'send_magic_link'
+  const { can: canUpdateUser } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canSendRecovery } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'send_recovery'
+  const { can: canSendMagicLink } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canSendOtp } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
-  const { can: canRemoveUser } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_DELETE,
-    'auth.users'
+  const { can: canSendRecovery } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canRemoveMFAFactors } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_DELETE,
-    'auth.mfa_factors'
+  const { can: canSendOtp } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE)
+  const { can: canRemoveUser } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
+  )
+  const { can: canRemoveMFAFactors } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const [successAction, setSuccessAction] = useState<

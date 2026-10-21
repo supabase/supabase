@@ -97,27 +97,14 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
  */
 export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, ToolCategory> = {
   // UI tools - always available
-  execute_sql: TOOL_CATEGORIES.UI,
-  deploy_edge_function: TOOL_CATEGORIES.UI,
-  rename_chat: TOOL_CATEGORIES.UI,
   update_opt_in_level: TOOL_CATEGORIES.UI,
-  escalate_to_human: TOOL_CATEGORIES.UI,
-  resolve_support_conversation: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
-  get_active_incidents: TOOL_CATEGORIES.UI,
-  load_knowledge: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
   list_tables: TOOL_CATEGORIES.SCHEMA,
   list_extensions: TOOL_CATEGORIES.SCHEMA,
   list_edge_functions: TOOL_CATEGORIES.SCHEMA,
   list_branches: TOOL_CATEGORIES.SCHEMA,
-  list_policies: TOOL_CATEGORIES.SCHEMA,
-  list_reports: TOOL_CATEGORIES.SCHEMA,
-  get_report: TOOL_CATEGORIES.SCHEMA,
-  list_databases: TOOL_CATEGORIES.SCHEMA,
-  list_notebooks: TOOL_CATEGORIES.SCHEMA,
-  get_notebook: TOOL_CATEGORIES.SCHEMA,
   getSchemaTables: TOOL_CATEGORIES.SCHEMA,
   getRlsKnowledge: TOOL_CATEGORIES.SCHEMA,
   getFunctions: TOOL_CATEGORIES.SCHEMA,

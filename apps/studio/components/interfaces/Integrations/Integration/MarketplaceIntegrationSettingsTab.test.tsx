@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
@@ -10,6 +9,7 @@ import { type components } from '@/data/api'
 import { type APIKey } from '@/data/api-keys/api-keys-query'
 import { type AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -17,9 +17,7 @@ import { addAPIMock } from '@/tests/lib/msw'
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
 type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
 type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse_Output']
-// Same story for permissions: the frontend `Permission` type narrows nullable wire fields, so build
-// the fixture against the raw `AccessControlPermission` shape the MSW resolver actually returns.
-type AccessControlPermission = components['schemas']['AccessControlPermission']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 // `useIntegrationDetail` resolves the integration definition from the route, the marketplace query
 // and feature flags — none of which is the subject of this test. Mock it so each test can drive a
@@ -84,15 +82,15 @@ const authorizedApp = (appId: string): OAuthAppResponse => ({
   registration_type: 'manual',
 })
 
-const CAN_READ_OAUTH_APPS_PERMISSION: AccessControlPermission = {
-  actions: [PermissionAction.READ],
-  condition: null,
-  organization_id: null,
-  organization_slug: 'acme',
-  project_ids: null,
-  project_refs: [],
-  resources: ['oauth_apps'],
-  restrictive: false,
+const CAN_READ_OAUTH_APPS_PERMISSIONS: PermissionsV2Response = {
+  organizations: [
+    {
+      slug: 'acme',
+      role: 'administrator',
+      permissions: [FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ],
+      projects: [],
+    },
+  ],
 }
 
 /**
@@ -107,8 +105,8 @@ const mockProjectResources = ({
 } = {}) => {
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    response: () => HttpResponse.json<AccessControlPermission[]>([CAN_READ_OAUTH_APPS_PERMISSION]),
+    path: '/platform/profile/permissions/v2',
+    response: () => HttpResponse.json<PermissionsV2Response>(CAN_READ_OAUTH_APPS_PERMISSIONS),
   })
   addAPIMock({
     method: 'get',

@@ -69,7 +69,7 @@ describe('parseInfrastructureMetrics', () => {
           totalAverage: 200,
           yAxisLimit: 100,
         },
-        disk_io_consumption: {
+        disk_io_budget: {
           format: 'percent',
           total: 210,
           totalAverage: 70,
@@ -118,7 +118,7 @@ describe('parseInfrastructureMetrics', () => {
           totalAverage: '200.0',
           yAxisLimit: 100,
         },
-        disk_io_consumption: {
+        disk_io_budget: {
           format: 'percent',
           total: 210,
           totalAverage: '70.2',
@@ -137,7 +137,22 @@ describe('parseInfrastructureMetrics', () => {
     })
   })
 
-  it('returns 0 for missing metrics', () => {
+  it('uses average remaining balance in the selected window rather than consumed IO or its lowest sample', () => {
+    const response: InfraMonitoringMultiResponse = {
+      data: [
+        { period_start: 't1', values: { disk_io_budget: '98', disk_io_consumption: '2' } },
+        { period_start: 't2', values: { disk_io_budget: '100', disk_io_consumption: '0' } },
+      ],
+      series: {
+        disk_io_budget: { format: '%', total: 198, totalAverage: 99, yAxisLimit: 100 },
+        disk_io_consumption: { format: '%', total: 2, totalAverage: 1, yAxisLimit: 100 },
+      },
+    }
+
+    expect(parseInfrastructureMetrics(response)?.diskIo.current).toBe(99)
+  })
+
+  it('keeps missing disk IO balance unavailable', () => {
     const mockResponse: InfraMonitoringMultiResponse = {
       data: [],
       series: {},
@@ -149,7 +164,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 0, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
-      diskIo: { current: 0, max: 100 },
+      diskIo: { current: undefined, max: 100 },
     })
   })
 
@@ -167,7 +182,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 50, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
-      diskIo: { current: 0, max: 100 },
+      diskIo: { current: undefined, max: 100 },
     })
   })
 
@@ -186,7 +201,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 0, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
-      diskIo: { current: 0, max: 100 },
+      diskIo: { current: undefined, max: 100 },
     })
   })
 })

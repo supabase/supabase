@@ -242,6 +242,7 @@ const getPostgresLogsQuery = (): SafeLogSqlFragment => safeSql`
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
           WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+          WHEN pgl_parsed.error_severity = 'PANIC' THEN 'error'
           ELSE null
       END as level,
       null as pathname,
