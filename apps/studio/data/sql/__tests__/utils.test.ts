@@ -158,6 +158,18 @@ describe('applyAutoLimit', () => {
   ])('Should return false for a CTE query that writes: %s', (query) => {
     expect(applyAutoLimit(query as SafeSqlFragment, 100).appendAutoLimit).toBe(false)
   })
+  test.each([
+    "with a as (select $t1$'$t1$ as s) select s into t from a where s = $t1$'$t1$",
+    "with a as (select $é$'$é$ as s) select s into t from a where s = $é$'$é$",
+  ])('Should return false when a dollar-quoted tag hides a write keyword: %s', (query) => {
+    expect(applyAutoLimit(query as SafeSqlFragment, 100).appendAutoLimit).toBe(false)
+  })
+  test.each([
+    "with t as (select $t1$update$t1$ as k) select * from t",
+    "with t as (select $é$delete$é$ as k) select * from t",
+  ])('Should append the limit when a write keyword is inside a dollar-quoted literal: %s', (query) => {
+    expect(applyAutoLimit(query as SafeSqlFragment, 100).appendAutoLimit).toBe(true)
+  })
   test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
     const sql = safeSql`SELECT * FROM countries LIMIT 10;`
     const limit = 100
