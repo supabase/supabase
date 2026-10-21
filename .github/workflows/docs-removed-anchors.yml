@@ -1,0 +1,68 @@
+name: Docs removed anchors
+
+# Fails a PR that removes a guide heading other docs pages link to. See
+# apps/docs/scripts/check-removed-anchors.ts. The `skip-anchor-check` label
+# turns the failure into a warning.
+#
+# No `paths` filter: a required check that never starts blocks the PR. The job
+# exits early instead when no docs content changed.
+on:
+  pull_request:
+    branches: ['master']
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks out the merge commit. Its first parent is the base branch, so
+      # diffing against HEAD^1 shows exactly what the PR changes.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+          sparse-checkout: |
+            apps/docs
+            packages
+            patches
+
+      - name: Check for docs content changes
+        id: changes
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- apps/docs/content; then
+            echo "No docs content changed."
+            echo "content=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "content=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        if: steps.changes.outputs.content == 'true'
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        if: steps.changes.outputs.content == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install deps
+        if: steps.changes.outputs.content == 'true'
+        run: pnpm install --frozen-lockfile --filter docs...
+
+      - name: Check removed anchors
+        if: steps.changes.outputs.content == 'true'
+        working-directory: apps/docs
+        env:
+          PR_LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+        run: pnpm check:removed-anchors --base HEAD^1
