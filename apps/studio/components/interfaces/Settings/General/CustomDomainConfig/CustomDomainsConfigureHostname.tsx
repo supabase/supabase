@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -22,8 +21,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from '@/data/custom-domains/check-cname-mutation'
 import { useCustomDomainCreateMutation } from '@/data/custom-domains/custom-domains-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 const schema = z.object({
@@ -32,21 +30,14 @@ const schema = z.object({
 
 export const CustomDomainsConfigureHostname = () => {
   const { ref } = useParams()
-  const { data: project } = useSelectedProjectQuery()
 
   const { mutate: checkCNAMERecord, isPending: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: createCustomDomain, isPending: isCreating } = useCustomDomainCreateMutation()
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
   const endpoint = settings?.app_config?.endpoint
-  const { can: canConfigureCustomDomain } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canConfigureCustomDomain } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.CUSTOM_DOMAIN_WRITE
   )
 
   const form = useForm<z.infer<typeof schema>>({

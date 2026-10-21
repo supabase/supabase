@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Usage } from './Usage'
 import type { Branch } from '@/data/branches/branches-query'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse, createMockProject } from '@/tests/helpers'
 import { createTestBranch } from '@/tests/lib/branch-test-utils'
 import { customRender } from '@/tests/lib/custom-render'
@@ -142,20 +143,18 @@ describe('Usage branch URLs', () => {
     })
     addAPIMock({
       method: 'get',
-      path: '/platform/profile/permissions',
+      path: '/platform/profile/permissions/v2',
       response: () =>
-        HttpResponse.json<components['schemas']['AccessControlPermission'][]>([
-          {
-            actions: ['%'],
-            resources: ['%'],
-            organization_id: 1,
-            organization_slug: 'test-org',
-            project_ids: [],
-            project_refs: [],
-            condition: null,
-            restrictive: false,
-          },
-        ]),
+        HttpResponse.json<components['schemas']['UserPermissionsResponse_Output']>({
+          organizations: [
+            {
+              slug: 'test-org',
+              role: 'owner',
+              permissions: [FGA_PERMISSIONS.ORGANIZATION.BILLING_READ],
+              projects: [],
+            },
+          ],
+        }),
     })
     addAPIMock({
       method: 'get',
@@ -193,8 +192,11 @@ describe('Usage branch URLs', () => {
     })
     addAPIMock({
       method: 'get',
-      path: '/platform/profile/permissions',
-      response: () => HttpResponse.json<components['schemas']['AccessControlPermission'][]>([]),
+      path: '/platform/profile/permissions/v2',
+      response: () =>
+        HttpResponse.json<components['schemas']['UserPermissionsResponse_Output']>({
+          organizations: [{ slug: 'test-org', role: 'readonly', permissions: [], projects: [] }],
+        }),
     })
     const subscriptionRequested = vi.fn()
     addAPIMock({

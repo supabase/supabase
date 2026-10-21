@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { act, configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -9,14 +8,15 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
-import type { Permission } from '@/types'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
 type RegionsInfo = components['schemas']['RegionsInfo_Output']
@@ -76,16 +76,19 @@ vi.mock(import('@/lib/constants'), async (importOriginal) => {
 
 const ORG_SLUG = 'default-org'
 
-const ADMIN_PERMISSIONS = [
-  {
-    actions: [PermissionAction.CREATE],
-    resources: ['projects', 'integrations.github_connections'],
-    condition: null,
-    organization_slug: ORG_SLUG,
-    project_refs: [],
-    restrictive: false,
-  },
-] as unknown as Permission[]
+const ADMIN_PERMISSIONS: PermissionsV2Response = {
+  organizations: [
+    {
+      slug: ORG_SLUG,
+      role: 'administrator',
+      permissions: [
+        FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE,
+        FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE,
+      ],
+      projects: [],
+    },
+  ],
+}
 
 const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
   all: {
@@ -171,7 +174,7 @@ const mockOrg = (overrides: Partial<OrganizationResponse> = {}) =>
 function mockWizardEndpoints(
   overrides: {
     organizations?: OrganizationResponse[]
-    permissions?: Permission[]
+    permissions?: PermissionsV2Response
     freeProjectLimitMembers?: MemberWithFreeProjectLimit[]
     overdueInvoices?: OverdueInvoiceCount[]
     orgProjects?: OrganizationProjectsResponse
@@ -199,9 +202,9 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    // @ts-expect-error - Permission is bridged from the raw API shape, not the generated type
-    response: () => HttpResponse.json<Permission[]>(overrides.permissions ?? ADMIN_PERMISSIONS),
+    path: '/platform/profile/permissions/v2',
+    response: () =>
+      HttpResponse.json<PermissionsV2Response>(overrides.permissions ?? ADMIN_PERMISSIONS),
   })
   addAPIMock({
     method: 'get',

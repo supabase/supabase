@@ -5,10 +5,13 @@ import { useConnectServerEnv } from '../useConnectServerEnv'
 import { useRevealedSecret } from '@/components/interfaces/APIKeys/useRevealedSecret'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: vi.fn(),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: vi.fn(),
+  FGA_PERMISSIONS: {
+    PROJECT: {},
+  },
 }))
 vi.mock('@/data/config/project-endpoint-query', () => ({
   useProjectApiUrl: vi.fn(),
@@ -38,7 +41,7 @@ describe('useConnectServerEnv secret reveal', () => {
   let revealMock: ReturnType<typeof vi.fn>
 
   beforeEach(() => {
-    vi.mocked(useAsyncCheckPermissions).mockReturnValue({
+    vi.mocked(useAsyncCheckPermissionsV2).mockReturnValue({
       can: true,
       isLoading: false,
     } as any)
