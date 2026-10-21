@@ -102,4 +102,32 @@ describe(`EditSecretModal`, () => {
       expect(screen.queryByRole(`dialog`)).not.toBeInTheDocument()
     })
   })
+
+  it(`enables Update secret for a long multi-line value`, async () => {
+    customRender(
+      <ProjectContextProvider projectRef="default">
+        <EditSecretModal />
+      </ProjectContextProvider>,
+      {
+        nuqs: {
+          searchParams: {
+            edit: secret.id,
+          },
+        },
+      }
+    )
+
+    await screen.findByRole(`dialog`)
+    const valueInput = await screen.findByLabelText(`Secret value`)
+    const submitButton = screen.getByRole(`button`, { name: `Update secret` })
+    const longValue = Array.from({ length: 200 }, (_, i) => `line-${i}-${'x'.repeat(60)}`).join(
+      '\n'
+    )
+
+    await userEvent.clear(valueInput)
+    await userEvent.paste(longValue)
+
+    expect(valueInput).toHaveValue(longValue)
+    await waitFor(() => expect(submitButton).toBeEnabled())
+  })
 })
