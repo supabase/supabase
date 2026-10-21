@@ -1039,10 +1039,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     },
   },
   {
-    title: 'Social login',
-    subtitle: 'Provide social logins from platforms like Apple, GitHub, and Slack.',
+    title: 'Social sign-in',
+    subtitle: 'Provide social sign-in from platforms like Apple, GitHub, and Slack.',
     description: `
-Supabase's Social Login feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
+Supabase's Social Sign-in feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
 
 ## Key features
 1. Multiple provider support: Integrate with various platforms like Google, Facebook, Twitter, and more.
@@ -1057,14 +1057,14 @@ Supabase's Social Login feature enables users to authenticate using their existi
 - Enhanced security: Leverage the robust security measures of established platforms.
 - Rich user profiles: Access additional user data to personalize experiences.
 
-## Social login is valuable for:
+## Social sign-in is valuable for:
 - Mobile apps seeking to minimize user input
 - E-commerce platforms aiming to reduce cart abandonment
 - Content platforms looking to personalize user experiences
 - Community-driven websites fostering user engagement
 - B2B applications integrating with professional networks
 
-Supabase's Social Login feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
+Supabase's Social Sign-in feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
