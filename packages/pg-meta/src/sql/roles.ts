@@ -37,10 +37,12 @@ from
       (
         select
           oid,
-          (string_to_array(unnest(rolconfig), '='))[1] as param,
-          (string_to_array(unnest(rolconfig), '='))[2] as value
+          split_part(config, '=', 1) as param,
+          -- Values may themselves contain '=', so keep everything after the first one
+          substr(config, strpos(config, '=') + 1) as value
         from
-          pg_roles
+          pg_roles,
+          unnest(rolconfig) as config
       ) as _
     group by
       oid

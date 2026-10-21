@@ -412,3 +412,32 @@ withTestDatabase(
     await executeQuery(removeSql)
   }
 )
+
+withTestDatabase(
+  'retrieve function config_params whose values contain equals signs',
+  async ({ executeQuery }) => {
+    await executeQuery(safeSql`
+      create function public.test_func_config_equals()
+      returns integer
+      language sql
+      set application_name to 'tenant=blue=west'
+      set search_path to "tenant=blue", public
+      as 'select 1';
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_func_config_equals',
+      schema: 'public',
+      args: [],
+    })
+    const result = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    expect(result!.config_params).toEqual({
+      application_name: 'tenant=blue=west',
+      search_path: '"tenant=blue", public',
+    })
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(result!))
+    await executeQuery(removeSql)
+  }
+)

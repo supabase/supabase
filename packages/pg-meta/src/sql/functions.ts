@@ -74,10 +74,12 @@ from
       (
         select
           oid,
-          (string_to_array(unnest(proconfig), '='))[1] as param,
-          (string_to_array(unnest(proconfig), '='))[2] as value
+          split_part(config, '=', 1) as param,
+          -- Values may themselves contain '=', so keep everything after the first one
+          substr(config, strpos(config, '=') + 1) as value
         from
-          functions
+          functions,
+          unnest(proconfig) as config
       ) as t
     group by
       oid
