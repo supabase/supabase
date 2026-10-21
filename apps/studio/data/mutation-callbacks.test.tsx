@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { act } from '@testing-library/react'
+import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -69,11 +70,24 @@ describe('mutation callback contracts', () => {
     queryClient.setQueryData(key, [])
     addAPIMock({
       method: 'post',
-      path: '/platform/projects/:ref/privatelink/associations/aws-account',
+      path: '/v2/projects/:ref/private-link/associations',
       response: () =>
         failure
           ? HttpResponse.json<APIErrorBody>({ message: 'Mutation failed' }, { status: 500 })
-          : HttpResponse.json<null>(null),
+          : HttpResponse.json<components['schemas']['V2PrivateLinkAssociationResponse_Output']>({
+              data: {
+                type: 'private_link_association',
+                id: '1',
+                attributes: {
+                  aws_account_id: 'test-account',
+                  custom_dns_name: 'db.example.com',
+                  database_identifier: 'default',
+                  database_type: 'PRIMARY',
+                  shared_at: null,
+                  status: 'CREATING',
+                },
+              },
+            }),
     })
     const onSuccess = vi.fn()
     const onError = vi.fn()
