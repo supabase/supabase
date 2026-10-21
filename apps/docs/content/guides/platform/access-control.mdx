@@ -40,12 +40,6 @@ To give a member no project access by default and grant access project by projec
 
 You can invite members, change their roles, and list them in your organization's [team settings](/dashboard/org/_/team) or with the [Management API](/docs/reference/api/introduction).
 
-<Admonition type="note">
-
-The Management API endpoints for creating invites and changing roles are available only on the [Team and Enterprise plans](/pricing). Listing members works on every plan.
-
-</Admonition>
-
 To use the Management API examples in this section, set the following variables:
 
 ```bash
@@ -147,6 +141,12 @@ The Supabase Dashboard replaces the member's previous roles with the roles you s
 
 </TabPanel>
 <TabPanel id="management-api" label="Management API">
+
+<Admonition type="note">
+
+The Management API endpoint for changing roles is available only on the [Team and Enterprise plans](/pricing).
+
+</Admonition>
 
 To change a member's role with the Management API, call [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role) with the member's user ID. The token needs the **Organization Settings** permission with **Read-write** access. To find a member's user ID, list the organization's members.
 
