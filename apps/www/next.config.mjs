@@ -173,7 +173,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(docs|blog)/:path*',
+        source: '/(docs|blog|kb)/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
