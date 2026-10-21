@@ -42,7 +42,7 @@ import {
 import { ProjectCreationFooter } from './ProjectCreationFooter'
 import { ProjectNameInput } from './ProjectNameInput'
 import { RegionSelector } from './RegionSelector'
-import { getRegionRestrictionMessage } from './RegionSelector.utils'
+import { getRegionRestrictionMessage, getShowLockedSpecificRegions } from './RegionSelector.utils'
 import { SecurityOptions } from './SecurityOptions'
 import { useRegionRestriction } from './useRegionRestriction'
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
@@ -341,10 +341,19 @@ export const ProjectCreationForm = ({
     fixedDefaultRegion,
   })
 
+  const regionLockedOverlayVariant = usePHFlag<boolean>('regionLockedOverlay')
+  const isSelectedRegionLocked =
+    getShowLockedSpecificRegions({
+      isFreePlan,
+      regionLockedOverlayVariant,
+      hasGeneralRegions: smartRegionEnabled && !highAvailability,
+    }) &&
+    (availableRegionsData?.all.specific.some((region) => region.name === dbRegion) ?? false)
+
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const hasAvailableRegions =
     !smartRegionEnabled || (availableRegionsData !== undefined && !availableRegionsError)
-  const canSubmitProject = canCreateProject && hasAvailableRegions
+  const canSubmitProject = canCreateProject && hasAvailableRegions && !isSelectedRegionLocked
   const canConfigureGitHubOnCreate =
     canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
@@ -793,6 +802,7 @@ export const ProjectCreationForm = ({
             <ProjectCreationFooter
               form={form}
               canCreateProject={canSubmitProject}
+              isSelectedRegionLocked={isSelectedRegionLocked}
               instanceSize={instanceSize}
               highAvailability={highAvailability}
               organizationProjects={organizationProjects}

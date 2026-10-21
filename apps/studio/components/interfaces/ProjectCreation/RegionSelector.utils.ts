@@ -126,3 +126,26 @@ export function getItemsAffectingProjectCreation(
     )
   })
 }
+
+type GetShowLockedSpecificRegionsArgs = {
+  isFreePlan: boolean
+  regionLockedOverlayVariant: boolean | undefined
+  hasGeneralRegions: boolean
+}
+
+/**
+ * Whether the project creation region selector should show the full, greyed-out
+ * "Specific regions" list with the blurred upgrade overlay on top. Gated behind the
+ * regionLockedOverlay PostHog flag, defaulting to off so it doesn't affect the
+ * concurrent freeTierGeneralRegionExperiment (ConfigCat) while that experiment runs.
+ * When on, it supersedes both of that baseline's free-plan treatments: the
+ * "Need a specific region?" collapsed-behind-link state and the hideSpecificRegions
+ * footer upgrade link.
+ */
+export function getShowLockedSpecificRegions({
+  isFreePlan,
+  regionLockedOverlayVariant,
+  hasGeneralRegions,
+}: GetShowLockedSpecificRegionsArgs): boolean {
+  return isFreePlan && regionLockedOverlayVariant === true && hasGeneralRegions
+}
