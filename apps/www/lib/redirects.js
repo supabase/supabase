@@ -1513,7 +1513,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/migrating-between-projects',
-    destination: '/docs/guides/platform/upgrading',
+    destination: '/docs/guides/platform/migrating-within-supabase',
   },
 
   // supabase-js v1 to v2 redirects
