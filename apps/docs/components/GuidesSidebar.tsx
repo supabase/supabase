@@ -93,5 +93,5 @@ const GuidesSidebar = ({
 }
 
 export default GuidesSidebar
-export { AdditionalLinks, GuidesSidebar }
+export { GuidesSidebar }
 export type { TOCHeader }

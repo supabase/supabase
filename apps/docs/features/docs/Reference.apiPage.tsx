@@ -1,8 +1,9 @@
-import { AdditionalLinks, GuidesSidebar } from '~/components/GuidesSidebar'
+import { GuidesSidebar } from '~/components/GuidesSidebar'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { reference_api } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { getSectionsBySlug } from '~/features/docs/Reference.generated.singleton'
+import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
 import { SectionSwitch } from '~/features/docs/Reference.sections'
@@ -11,11 +12,18 @@ import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { notFound, redirect } from 'next/navigation'
 import { cn } from 'ui'
 
-const INTRODUCTION_LINKS = [
-  { title: 'OpenAPI Docs', href: 'https://api.supabase.com/api/v1' },
-  { title: 'OpenAPI Spec', href: 'https://api.supabase.com/api/v1-json' },
-  { title: 'Report bugs and issues', href: 'https://github.com/supabase/supabase' },
-]
+/**
+ * The links live in the MDX source so they also reach the generated reference
+ * markdown. The web page lifts them into the sidebar (the copy in the article
+ * is hidden from `md` up).
+ */
+function getAdditionalLinks(mdx: string) {
+  const [, list = ''] = mdx.split(/^Additional links\s*$/m)
+  return Array.from(list.matchAll(/^\s*-\s+\[([^\]]+)\]\(([^)]+)\)/gm), ([, title, href]) => ({
+    title,
+    href,
+  }))
+}
 
 export async function ApiReferencePage({ path }: { path: Array<string> }) {
   const operationSlug = path[0]
@@ -36,6 +44,9 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
   if (!section) notFound()
 
   const isIntroduction = section.type === 'markdown'
+  const additionalLinks = isIntroduction
+    ? getAdditionalLinks(await getRefMarkdown(`api/${section.id}`))
+    : []
 
   return (
     <ReferenceContentScrollHandler libPath="api" version="latest" isLatestVersion={true}>
@@ -63,11 +74,9 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
                   className="@container/article col-span-12 md:col-span-8 min-w-0"
                 >
                   <SectionSwitch libraryId="api" version="latest" section={section} />
-                  {/* The sidebar is hidden below `md`, so keep the links reachable */}
-                  <AdditionalLinks links={INTRODUCTION_LINKS} className="mt-8 md:hidden" />
                 </article>
                 <GuidesSidebar
-                  links={INTRODUCTION_LINKS}
+                  links={additionalLinks}
                   className={cn(
                     'hidden md:flex md:col-span-3 md:col-start-10',
                     'self-start sticky',
