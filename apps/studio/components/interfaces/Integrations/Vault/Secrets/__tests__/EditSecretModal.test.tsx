@@ -128,6 +128,7 @@ describe(`EditSecretModal`, () => {
     await userEvent.paste(longValue)
 
     expect(valueInput).toHaveValue(longValue)
+    expect(valueInput).toHaveClass('max-h-[320px]', 'overflow-y-auto')
     await waitFor(() => expect(submitButton).toBeEnabled())
   })
 })
