@@ -85,12 +85,16 @@ type AggregatedBucket = {
   period_start: string
   periodStartFormatted: string
   _counts: Record<string, number>
-  _hasMissingPreservedAttribute: boolean
-  [key: string]: string | number | boolean | Record<string, number>
+  _missingAttributes: Set<string>
+  [key: string]: string | number | Set<string> | Record<string, number>
 }
 
 type DataPointWithFormatted = DataPoint & {
   periodStartFormatted: string
+}
+
+function shouldPreserveMissingAttribute(attribute: string, preserveMissingAttribute?: string) {
+  return attribute === 'ram_commit_limit' || attribute === preserveMissingAttribute
 }
 
 export const aggregate1MinTo2Min = (
@@ -124,7 +128,7 @@ export const aggregate1MinTo2Min = (
         period_start: bucketKey,
         periodStartFormatted: twoMinBucket.format('HH:mm DD MMM'),
         _counts: Object.fromEntries(Array.from(valueKeys).map((key) => [key, 0])),
-        _hasMissingPreservedAttribute: false,
+        _missingAttributes: new Set(),
       }
       // Initialize all value keys to 0
       valueKeys.forEach((key) => {
@@ -136,8 +140,11 @@ export const aggregate1MinTo2Min = (
     const bucket = aggregated.get(bucketKey)!
     valueKeys.forEach((key) => {
       const value = point[key]
-      if (key === preserveMissingAttribute && typeof value !== 'number') {
-        bucket._hasMissingPreservedAttribute = true
+      if (
+        shouldPreserveMissingAttribute(key, preserveMissingAttribute) &&
+        typeof value !== 'number'
+      ) {
+        bucket._missingAttributes.add(key)
       }
       if (typeof value === 'number') {
         const currentValue = typeof bucket[key] === 'number' ? bucket[key] : 0
@@ -149,14 +156,16 @@ export const aggregate1MinTo2Min = (
 
   // Calculate averages
   const result: DataPointWithFormatted[] = Array.from(aggregated.values()).map((bucket) => {
-    const { _counts, _hasMissingPreservedAttribute, period_start, periodStartFormatted, ...rest } =
-      bucket
+    const { _counts, _missingAttributes, period_start, periodStartFormatted, ...rest } = bucket
     const averaged: DataPointWithFormatted = {
       period_start,
       periodStartFormatted,
     }
     valueKeys.forEach((key) => {
-      if (key === preserveMissingAttribute && (_hasMissingPreservedAttribute || _counts[key] === 0))
+      if (
+        shouldPreserveMissingAttribute(key, preserveMissingAttribute) &&
+        (_missingAttributes.has(key) || _counts[key] === 0)
+      )
         return
       if (_counts[key] > 0) {
         const restValue = rest[key]
@@ -193,7 +202,7 @@ export function mapResponseToAnalyticsData(
         }
         const numericValue = Number(value ?? 0)
         const isMissingPreservedValue =
-          attribute === preserveMissingAttribute &&
+          shouldPreserveMissingAttribute(attribute, preserveMissingAttribute) &&
           (value == null || !Number.isFinite(numericValue))
         if (!isMissingPreservedValue) dataPoint[attribute] = numericValue
         return dataPoint
@@ -229,7 +238,8 @@ export function mapResponseToAnalyticsData(
     }
     const numericValue = Number(value ?? 0)
     const isMissingPreservedValue =
-      attribute === preserveMissingAttribute && (value == null || !Number.isFinite(numericValue))
+      shouldPreserveMissingAttribute(attribute, preserveMissingAttribute) &&
+      (value == null || !Number.isFinite(numericValue))
     if (!isMissingPreservedValue) dataPoint[attribute] = numericValue
     return dataPoint
   })
