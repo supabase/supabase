@@ -70,6 +70,7 @@ import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { mergeUnifiedLogs, useUnifiedLogsLiveQuery } from '@/data/logs/unified-logs-live-query'
+import { filterUnifiedLogsWindow } from '@/data/logs/unified-logs-time-range'
 import { deduplicateUnifiedLogs } from '@/data/logs/unified-logs.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -172,7 +173,11 @@ export const UnifiedLogs = () => {
     }
     return parameters
   }, [search, showMultigresLogs, computeAvailability.canQueryCompute])
-  const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
+  const urlFilterScope = JSON.stringify([
+    searchParameters.filter,
+    searchParameters.date,
+    searchParameters.durationSeconds,
+  ])
 
   useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
 
@@ -239,8 +244,23 @@ export const UnifiedLogs = () => {
   }, [unifiedLogsData?.pages])
   const flatData = useMemo(() => {
     const rows = [...rawFlatData, ...(liveQuery.data?.rows ?? [])]
-    return search.sort ? deduplicateUnifiedLogs(rows) : mergeUnifiedLogs(rows)
-  }, [liveQuery.data?.rows, rawFlatData, search.sort])
+    const anchor = Math.max(
+      unifiedLogsData?.pages[0]?.prevCursor ?? 0,
+      liveQuery.data?.latestSuccessfulEnd ?? 0
+    )
+    let effectiveDurationSeconds = search.durationSeconds
+    if (search.date) effectiveDurationSeconds = null
+    else if (liveQuery.data) effectiveDurationSeconds ??= 3600
+    const visible = filterUnifiedLogsWindow(rows, effectiveDurationSeconds, anchor || undefined)
+    return search.sort ? deduplicateUnifiedLogs(visible) : mergeUnifiedLogs(visible)
+  }, [
+    liveQuery.data,
+    rawFlatData,
+    search.sort,
+    search.date,
+    search.durationSeconds,
+    unifiedLogsData?.pages,
+  ])
   const liveMode = useLiveMode(flatData)
 
   const totalDBRowCount = counts?.totalRowCount
@@ -332,6 +352,7 @@ export const UnifiedLogs = () => {
     })
 
     return gatedFields.map((field) => {
+      if (field.type === 'timerange') return { ...field, durationSeconds: search.durationSeconds }
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -357,7 +378,7 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute])
+  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute, search.durationSeconds])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)

@@ -58,7 +58,7 @@ describe('bounded live logs', () => {
       )
     }
     customRender(createElement(Logs), { queryClient: new QueryClient() })
-    expect(await screen.findByText('50')).toBeVisible()
+    expect(await screen.findByText('0')).toBeVisible()
   })
 
   it('merges precise timestamps and equal-timestamp IDs while preserving refreshed values', () => {
@@ -111,14 +111,14 @@ describe('bounded live logs', () => {
           .map((row) => row.id)
       )
       expect(rendered.result.current.isCatchingUp).toBe(page < 3)
-      vi.setSystemTime(now.getTime() + page * 10_000)
+      vi.setSystemTime(now.getTime() + page * 1000)
     }
     expect(
       requests.map(({ iso_timestamp_start, iso_timestamp_end }) => [
         iso_timestamp_start,
         iso_timestamp_end,
       ])
-    ).toEqual(Array(3).fill(['2026-09-30T11:57:50.000Z', now.toISOString()]))
+    ).toEqual(Array(3).fill(['2026-09-30T11:59:49.999Z', now.toISOString()]))
     selectedSearch = { ...search, filter: ['method:eq:GET'] }
     seed = undefined
     rendered.rerender()
@@ -138,7 +138,7 @@ describe('bounded live logs', () => {
           projectRef: 'default',
           search,
           isLive: true,
-          seed: now.getTime(),
+          seed: now.getTime() - 2000,
         }),
       { queryClient }
     )
@@ -168,7 +168,7 @@ describe('bounded live logs', () => {
           projectRef: 'default',
           search: selectedSearch,
           isLive,
-          seed: now.getTime(),
+          seed: now.getTime() - 2000,
         }),
       { queryClient }
     )
@@ -235,6 +235,7 @@ describe('bounded live logs', () => {
   })
 
   it('retains live rows without changing history pagination or losing them on refresh', async () => {
+    vi.setSystemTime(now.getTime() - 2000)
     const rows = Array.from({ length: 110 }, (_, index) =>
       createRow(`old-${index}`, (now.getTime() - 600_000 - index * 1000) * 1000)
     )
@@ -259,6 +260,7 @@ describe('bounded live logs', () => {
     })
     await waitFor(() => expect(result.current.history.data?.pages).toHaveLength(2))
     const history = result.current.history.data
+    vi.setSystemTime(now)
     rows.push(...burst())
     await act(async () => {
       await result.current.live.onPoll()

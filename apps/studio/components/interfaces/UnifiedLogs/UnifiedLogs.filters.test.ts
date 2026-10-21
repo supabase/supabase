@@ -118,6 +118,8 @@ describe('buildFilterSearchUpdate', () => {
     )
     expect(update.filter).toEqual(['method:eq:GET'])
     expect(update.date).toBe(range)
+    expect(update.live).toBeNull()
+    expect(update.durationSeconds).toBeNull()
   })
 
   it('nulls an absent timerange key so a cleared brush is removed from the URL', () => {

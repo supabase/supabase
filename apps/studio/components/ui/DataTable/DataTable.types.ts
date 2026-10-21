@@ -37,6 +37,7 @@ export type DateRangeDisabled = { before?: Date; after?: Date }
 
 export type Timerange = {
   type: 'timerange'
+  durationSeconds?: number | null
   options?: Option[] // required for TS
   presets?: DatePreset[]
   dateRangeDisabled?: DateRangeDisabled
