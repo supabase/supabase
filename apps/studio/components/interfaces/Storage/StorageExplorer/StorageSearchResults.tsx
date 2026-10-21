@@ -16,14 +16,13 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 const ROW_HEIGHT = 37
 
 interface StorageSearchResultsProps {
-  /** Debounced search term. Empty while typing is still settling, which reads as pending. */
   searchString: string
   onClearSearch: () => void
 }
 
 /**
  * Matches for a search across the whole bucket, shown in place of the folder columns.
- * Selecting a result navigates to it, which is also what clears the search.
+ * Selecting a result navigates to it and clears the search.
  */
 export const StorageSearchResults = ({
   searchString,

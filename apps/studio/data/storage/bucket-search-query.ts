@@ -13,7 +13,6 @@ export type StorageSearchResult = {
   /** Set for files; folders are prefixes and have no row of their own */
   id: string | null
   name: string
-  /** Full path of the item within the bucket, e.g. `images/2024/cat.png` */
   path: string
   isFolder: boolean
   mimetype?: string
@@ -49,7 +48,6 @@ export function collectSearchMatches(
   searchString: string
 ): ScoredMatch[] {
   return objects.flatMap((object) => {
-    // Placeholders are how an empty folder is stored, not a file anyone can act on
     if (object.name === EMPTY_FOLDER_PLACEHOLDER_FILE_NAME) return []
 
     const path = parentPath.length > 0 ? `${parentPath}/${object.name}` : object.name
@@ -89,7 +87,6 @@ export type BucketSearchVariables = {
 
 export type BucketSearchData = {
   results: StorageSearchResult[]
-  /** True when the search covered only part of the bucket, or matched more than it kept */
   isTruncated: boolean
 }
 

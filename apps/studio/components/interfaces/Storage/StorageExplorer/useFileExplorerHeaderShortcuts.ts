@@ -27,8 +27,6 @@ export function useFileExplorerHeaderShortcuts({
   }
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, focusSearch, { label: 'Search files' })
-  // The standard find combo lands here too, since searching the bucket is what people
-  // reach for it to do. `Mod+F` fires inside inputs, so it also reselects the term.
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_FOCUS_SEARCH, focusSearch)
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_UPLOAD, () => uploadButtonRef.current?.click(), {

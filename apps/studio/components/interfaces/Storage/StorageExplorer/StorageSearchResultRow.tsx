@@ -10,16 +10,11 @@ import { formatBytes } from '@/lib/helpers'
 
 interface StorageSearchResultRowProps {
   item: StorageSearchResult
-  /** Stands in for an item's location when it sits at the root of the bucket */
   bucketName: string
   onSelectResult: (item: StorageSearchResult) => void
   style?: CSSProperties
 }
 
-/**
- * One match in a bucket-wide search. Results span folders, so each row carries the folder
- * it lives in, and selecting it navigates there rather than acting on it in place.
- */
 export const StorageSearchResultRow = ({
   item,
   bucketName,

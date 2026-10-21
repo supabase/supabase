@@ -438,7 +438,6 @@ export function createStorageExplorerState({
       await getQueryClient().invalidateQueries({
         queryKey: storageKeys.archivedObjects(state.projectRef, state.selectedBucket?.id),
       })
-      // A cached bucket search would otherwise keep listing what was just removed or moved.
       await getQueryClient().invalidateQueries({
         queryKey: storageKeys.searchAll(state.projectRef, state.selectedBucket?.id),
       })

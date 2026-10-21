@@ -28,9 +28,6 @@ export const storageExplorerRegistry: RegistryDefinations<StorageExplorerShortcu
   [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_FOCUS_SEARCH]: {
     id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_FOCUS_SEARCH,
     label: 'Search bucket',
-    // Search in the explorer is a search of the bucket, so it takes the combo people
-    // already reach for. Unlike the other explorer shortcuts this one shadows a browser
-    // default, so it stays switchable in Account -> Preferences.
     sequence: ['Mod+F'],
     options: { registerInCommandMenu: true },
   },

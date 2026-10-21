@@ -306,8 +306,7 @@ test.describe('Storage', () => {
     const filePath = path.join(import.meta.dirname, 'files', fileName)
     await uploadFile(page, filePath, fileName)
 
-    // Back at the bucket root the file is a level down, so a folder-scoped search
-    // would not find it
+    // Always start the search from the bucket root
     await navigateToStorageFiles(page, ref)
     await navigateToBucket(page, ref, bucketName)
 

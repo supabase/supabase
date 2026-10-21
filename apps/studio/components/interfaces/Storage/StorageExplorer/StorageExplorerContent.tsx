@@ -23,7 +23,6 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 interface StorageExplorerContentProps {
   itemSearchString: string
-  /** `itemSearchString` once the typing settles — what the bucket-wide search runs on */
   debouncedSearchString: string
   setItemSearchString: (value: string) => void
   isLoading: boolean
@@ -62,9 +61,6 @@ export const StorageExplorerContent = ({
     onClearSearch: handleClearSearch,
   })
 
-  // A bucket-wide search spans folders, so its matches replace the folder columns rather
-  // than filtering them. Keyed off the raw term, not the debounced one, so typing and
-  // clearing both land right away — the debounce only paces the search itself.
   const isShowingSearchResults = itemSearchString.trim().length > 0
 
   /** Checkbox selection methods */

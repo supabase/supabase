@@ -38,10 +38,6 @@ export function getPathAlongOpenedFolders(
   return state.openedFolders.map((folder) => folder.name).join('/')
 }
 
-/**
- * Returns where an item lives, for a list that spans folders: the path to its parent
- * folder, or the bucket name when it sits at the root of the bucket.
- */
 export function getParentPathLabel(itemPath: string, bucketName: string): string {
   const parentSegments = itemPath.split('/').slice(0, -1)
   return parentSegments.length > 0 ? parentSegments.join('/') : bucketName

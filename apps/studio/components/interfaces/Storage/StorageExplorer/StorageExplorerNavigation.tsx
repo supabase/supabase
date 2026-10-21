@@ -137,10 +137,7 @@ export const StorageExplorerNavigationProvider = ({
   // Restoring `?preview` needs the full item, which only exists once its column has loaded.
   useEffect(() => {
     if (!isBucketReady || !isLastColumnReady) return
-    // `?preview` names a file in `?path`'s folder, so it can only be judged against columns
-    // that have caught up to `?path`. Landing on a folder and a file at once — a search
-    // result, or Back onto an earlier deep link — briefly leaves the previous folder's
-    // columns in place, and they would read as "that file is gone" and drop the param.
+    // Wait for columns to catch up to `?path`
     if (storePath !== urlPath) return
 
     const hasPreviewChangedInStore = previewedFileName !== previousPreviewRef.current

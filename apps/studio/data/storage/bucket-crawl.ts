@@ -1,34 +1,33 @@
 import { listBucketObjects, type StorageObject } from './bucket-objects-list-mutation'
 
-/** Number of objects requested per folder listing */
+/** Max objects fetched per list request */
 export const CRAWL_PAGE_LIMIT = 1000
-/** Cap on how many listings a single crawl issues */
+/** Max list requests made in a single crawl */
 export const CRAWL_MAX_LISTINGS = 200
-/** How many listings are issued at a time while crawling */
+/** How many list requests run in parallel while crawling */
 const CRAWL_CONCURRENCY = 5
 
 type CrawlBucketVariables = {
   projectRef: string
   bucketId: string
   /**
-   * Called once per listing page, with the objects in it and the folder they came from.
+   * Called once per list request, with the objects in it and the folder they came from.
    * Return `false` to stop the crawl — callers use this to cap what they collect.
    */
   onPage: (objects: StorageObject[], parentPath: string) => boolean | void
 }
 
 type FolderCrawlResult = {
-  /** Names of the subfolders found under the folder, to be crawled next */
   folderNames: string[]
-  /** True when the folder's own listings ran into `CRAWL_MAX_LISTINGS` */
+  /** True when the folder's list requests hit `CRAWL_MAX_LISTINGS` */
   isTruncated: boolean
   /** True when `onPage` asked for the crawl to stop */
   isStopped: boolean
 }
 
 /**
- * Pages through a single folder, counting each page against the crawl-wide `listingsState`
- * so concurrent folders share one budget.
+ * Pages through a single folder, counting each list request against the crawl-wide
+ * `listingsState` so concurrent folders share one budget.
  */
 const crawlFolder = async (
   {
@@ -81,12 +80,11 @@ const crawlFolder = async (
 }
 
 /**
- * Walks every folder in a bucket breadth first, handing each listing page to `onPage`.
- * The Storage list endpoint only ever returns one level at a time, so anything that spans
- * a whole bucket — searching it, collecting its folders — has to be assembled client side.
+ * Lists every folder in a bucket, level by level, and calls `onPage` with each page of objects
+ * found. The list endpoint returns one level at a time, so bucket-wide results must be built
+ * client side.
  *
- * Stops early once `CRAWL_MAX_LISTINGS` is reached or `onPage` returns `false`, which is
- * reported back as `isTruncated` so callers can tell the user their view is partial.
+ * Stops at `CRAWL_MAX_LISTINGS` or when `onPage` returns `false`, reporting `isTruncated`.
  */
 export async function crawlBucket(
   { projectRef, bucketId, onPage }: CrawlBucketVariables,

@@ -189,8 +189,6 @@ describe('StorageExplorerNavigation', () => {
   })
 
   it('jumps to a folder and opens a file in it in a single URL write', async () => {
-    // How a bucket-wide search result for a file is opened: its folder and its name have
-    // to land together, or history keeps the file paired with the folder we came from.
     const snapshot = createSnapshot({
       columns: [makeColumn('my-bucket')],
     })
