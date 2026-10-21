@@ -6,7 +6,7 @@ import { cn } from '../../../lib/utils'
 import { buttonVariants } from '../../Button'
 import { StatusIcon } from './../../StatusIcon'
 
-export const SONNER_DEFAULT_DURATION = Infinity
+export const SONNER_DEFAULT_DURATION = 4000
 
 type ToasterProps = React.ComponentProps<typeof Sonner> & { theme: 'light' | 'dark' | 'system' }
 
@@ -32,7 +32,7 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'w-full',
             'rounded-md',
             'py-3!',
-            'px-3!',
+            'px-5!',
             'flex',
             'gap-2',
             'items-center',
@@ -42,6 +42,7 @@ const SonnerToaster = ({ toastOptions, ...props }: ToasterProps) => {
             'group-[.toaster]:bg-overlay group-[.toaster]:text-foreground group-[.toaster]:border group-[.toaster]:border-overlay group-[.toaster]:shadow-lg'
           ),
           icon: 'self-start',
+          loader: 'relative! data-[visible="false"]:hidden!',
           title: 'font-normal!',
           description:
             'text-xs! group-[.toast]:!text-foreground-lighter transition-opacity group-data-[expanded=false]:opacity-0 group-data-[front=true]:opacity-100!',
