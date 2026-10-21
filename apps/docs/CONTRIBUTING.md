@@ -97,20 +97,6 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and optional `icon` for your page.
 
-### Remove or rename a section
-
-Other pages link to guide sections by their anchor, like `/docs/guides/getting-started/api-keys#leaked-key`. A CI check fails your PR if it removes an H2 or H3 heading that another docs page links to. The failure names the heading and every page that links to it.
-
-Fix it in one of these ways:
-
-- **Keep the heading.** Replace its body with a short summary and a link to where the content went.
-- **Keep the old anchor when you rename a heading.** Add it as a custom id: `## New title [#old-anchor]`.
-- **Update the links** so they point somewhere else.
-
-If the removal is deliberate and you've accepted the broken links, add the `skip-anchor-check` label to the PR. The check then passes and lists the links as warnings. Use the label sparingly, for example when a whole topic is retired and has no new home.
-
-To run the check locally against `origin/master`, run `pnpm check:removed-anchors` from `apps/docs`.
-
 ## Reference structure
 
 Reference docs are produced from the reference specs and library source code. A common spec file contains shared function and endpoint definitions, and library-specific spec files contain further details.
