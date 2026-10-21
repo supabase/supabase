@@ -1,16 +1,10 @@
-import { cube, type IsoBox, type IsoRing } from './iso-shapes'
-import type { Topic } from './topics'
+import { cube, type IsoBox, type IsoRing } from './IsoShape.geometry'
+
+type IsoPose = (activation: number) => IsoBox[]
 
 const SHACKLE_LIFT = 2
 
-const FAQ_BLOCKS: IsoBox[] = [
-  cube(0, 0, 0, 1),
-  cube(1.4, 0, 0, 1),
-  cube(0, 1.4, 0, 1),
-  cube(1.4, 1.4, 0, 1),
-]
-
-export const HERO_SHAPES: Record<Topic, IsoBox[]> = {
+export const ISO_SHAPES = {
   Auth: [
     { x: 0, y: 0, z: 0, w: 0.8, d: 1.8, h: 1.3, inset: 'front' },
     { x: 0.3, y: 0.3, z: SHACKLE_LIFT, w: 0.2, d: 0.2, h: 0.8 },
@@ -40,18 +34,28 @@ export const HERO_SHAPES: Record<Topic, IsoBox[]> = {
     { ...cube(-0.1, 0.1, 1.88, 1), h: 0.7 },
   ],
   Tutorials: [0, 1, 2].map((i) => ({ ...cube(0, -i * 1.4, i * 0.85, 1.1), h: 0.6 })),
-  Platform: [0, 1, 2].map((i) => ({ x: 0, y: 0, z: i * 0.9, w: 2.2, d: 2.2, h: 0.18 })),
-  FAQs: FAQ_BLOCKS,
+  Platform: [0, 1, 2].map((i) => ({
+    x: 0,
+    y: 0,
+    z: i * 0.9,
+    w: 2.2,
+    d: 2.2,
+    h: 0.18,
+    fillFace: 'top',
+  })),
+  FAQs: [cube(0, 0, 0, 1), cube(1.4, 0, 0, 1), cube(0, 1.4, 0, 1), cube(1.4, 1.4, 0, 1)],
   Community: [],
-}
+} satisfies Record<string, IsoBox[]>
+
+export type IsoShapeName = keyof typeof ISO_SHAPES
 
 // a share of the shape's long side added on each edge, so a lone shape does not fill the flank.
 // storage's sides then sit on the grid columns
-export const HERO_PADDING: Partial<Record<Topic, number>> = {
+export const ISO_SHAPE_PADDING: Partial<Record<IsoShapeName, number>> = {
   Storage: 1 / 6,
 }
 
-export const HERO_RINGS: Partial<Record<Topic, IsoRing[]>> = {
+export const ISO_SHAPE_RINGS: Partial<Record<IsoShapeName, IsoRing[]>> = {
   Migration: [
     { x: 0.5, y: 0.5, z: 0.5, radius: 1.5 },
     { x: 1.65, y: -0.65, z: 1.1, radius: 1.85, isDashed: true },
@@ -65,4 +69,31 @@ export const HERO_RINGS: Partial<Record<Topic, IsoRing[]>> = {
     { x: 0, y: 0, z: 1, radius: Math.sqrt(3), scale: [1, 0.25], arc: [0, Math.PI] },
     { x: 0, y: 0, z: -1, radius: Math.sqrt(3), scale: [1, 0.25], arc: [0, Math.PI] },
   ],
+}
+
+// how a shape moves while active. each pose returns the resting shape at 0
+export const ISO_SHAPE_POSES: Partial<Record<IsoShapeName, IsoPose>> = {
+  Auth: (t) =>
+    ISO_SHAPES.Auth.map((box, i) =>
+      i === 0 ? box : { ...box, z: box.z - (SHACKLE_LIFT - 1.3) * t }
+    ),
+  Database: (t) => ISO_SHAPES.Database.map((box, i) => ({ ...box, z: box.z + i * 0.35 * t })),
+}
+
+// boxes that hold still while the rest of the shape orbits around them
+export const ISO_SHAPE_STILL_BOXES: Partial<Record<IsoShapeName, number[]>> = {
+  'Edge Functions': [0],
+  Realtime: [0],
+}
+
+// boxes that fill with glyphs when active, as on kb covers. other shapes fill their recesses
+export const ISO_SHAPE_FILL_BOXES: Partial<Record<IsoShapeName, number[]>> = {
+  Database: [0, 1],
+  Platform: [0, 1],
+}
+
+// shapes that swing back and forth by this many radians, not a full turn
+export const ISO_SHAPE_SWINGS: Partial<Record<IsoShapeName, number>> = {
+  // a full turn moves the small cube too far out, so the shape swings
+  Realtime: Math.PI / 4,
 }
