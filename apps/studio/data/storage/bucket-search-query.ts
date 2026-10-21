@@ -97,7 +97,6 @@ export type BucketSearchData = {
    */
   truncation: 'match-limit' | 'request-limit' | null
   progress: CrawlProgress
-  /** False while the crawl is still running and `results` is not filled in yet */
   isComplete: boolean
 }
 
