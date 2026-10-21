@@ -62,6 +62,20 @@ describe('Table Row Query', () => {
       const result = getDefaultOrderByColumns(table, { excludedColumns: ['id'] })
       expect(result).toEqual(['name'])
     })
+
+    test('should exclude only the specified columns of a composite primary key', () => {
+      const table = {
+        primary_keys: [{ name: 'tenant_id' }, { name: 'id' }],
+        columns: [
+          { name: 'tenant_id', data_type: 'integer' },
+          { name: 'id', data_type: 'integer' },
+          { name: 'name', data_type: 'text' },
+        ],
+      } as any
+
+      const result = getDefaultOrderByColumns(table, { excludedColumns: ['tenant_id'] })
+      expect(result).toEqual(['id'])
+    })
   })
 
   describe('getTableRowsSql', () => {
