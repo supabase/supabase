@@ -396,6 +396,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to send webhook test event', error)
       return
     }
+    // A new delivery always lands on the first page — jump there so it's visible.
+    setDeliveryCursor({})
+    setDeliveryPage(1)
     toast.success('Test event sent — check deliveries shortly')
   }
 
@@ -431,6 +434,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       console.error('Failed to retry webhook delivery', error)
       return
     }
+    // A retried delivery is a new delivery — it lands on the first page too.
+    setDeliveryCursor({})
+    setDeliveryPage(1)
     toast.success('Delivery queued for retry')
   }
 
@@ -569,7 +575,9 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                   setDeliveryId(id)
                 }}
                 onPreviousDeliveriesPage={() => {
-                  setDeliveryCursor({ before: previousCursor ?? undefined })
+                  setDeliveryCursor(
+                    deliveryPage <= 2 ? {} : { before: previousCursor ?? undefined }
+                  )
                   setDeliveryPage((page) => Math.max(1, page - 1))
                 }}
                 onRetryDelivery={handleRetryDelivery}
