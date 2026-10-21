@@ -1799,8 +1799,8 @@ functions:
 
         ```js
         .or('id.in.(6,7), arraycol.cs.{"a","b"}')  // Use Postgres list () for in filter. Array {} for array column and 'cs' for contains.
-        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a javascipt array for list or array on array column.
-        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a javascipt array for list or range on a range column.
+        .or(`id.in.(${arrList}),arraycol.cs.{${arr}}`)	// You can insert a JavaScript array for list or array on array column.
+        .or(`id.in.(${arrList}),rangecol.cs.[${arrRange})`)	// You can insert a JavaScript array for list or range on a range column.
         ```
     examples:
       - id: with-select
