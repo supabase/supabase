@@ -125,10 +125,7 @@ export const AddRestrictionModal = ({
 
   const { mutate: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
-      onSuccess: () => {
-        toast.success(stagedAddresses.length === 1 ? 'Restriction added' : 'Restrictions added')
-        handleClose()
-      },
+      onSuccess: () => handleClose(),
     })
 
   // Validates the draft fields and moves a valid entry to the list. Returns the
@@ -163,17 +160,23 @@ export const AddRestrictionModal = ({
     const addresses = hasDraft ? await addDraftToList() : stagedAddresses
     if (addresses === undefined || addresses.length === 0) return
 
+    // Based on the submitted addresses, as the staged list may not have updated yet
+    const applyOptions = {
+      onSuccess: () =>
+        toast.success(addresses.length === 1 ? 'Restriction added' : 'Restrictions added'),
+    }
+
     // Need to replace over arching restriction (allow all / disallow all)
     if (hasOverachingRestriction) {
       const dbAllowedCidrs = type === 'IPv4' ? addresses : []
       const dbAllowedCidrsV6 = type === 'IPv6' ? addresses : []
-      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 }, applyOptions)
     } else {
       const dbAllowedCidrs =
         type === 'IPv4' ? [...ipv4Restrictions, ...addresses] : ipv4Restrictions
       const dbAllowedCidrsV6 =
         type === 'IPv6' ? [...ipv6Restrictions, ...addresses] : ipv6Restrictions
-      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 }, applyOptions)
     }
   }
 

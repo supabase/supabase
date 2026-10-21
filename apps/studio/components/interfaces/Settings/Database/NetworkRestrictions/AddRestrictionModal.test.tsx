@@ -4,12 +4,17 @@ import userEvent from '@testing-library/user-event'
 import { apiV1Components as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test, vi } from 'vitest'
+import { toast } from 'sonner'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AddRestrictionModal } from './AddRestrictionModal'
 import { networkRestrictionKeys } from '@/data/network-restrictions/keys'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+
+vi.mock('sonner', () => ({
+  toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }),
+}))
 
 mockAnimationsApi()
 
@@ -91,6 +96,10 @@ const addEntry = async (address: string, cidrBlockSize?: string) => {
 }
 
 describe('AddRestrictionModal', () => {
+  beforeEach(() => {
+    vi.mocked(toast.success).mockClear()
+  })
+
   test('disables Save until an address is entered', async () => {
     mockExistingRestrictions([])
     renderModal()
@@ -149,6 +158,20 @@ describe('AddRestrictionModal', () => {
       dbAllowedCidrs: ['203.0.113.7/32', '192.0.2.1/32'],
       dbAllowedCidrsV6: [],
     })
+    expect(toast.success).toHaveBeenCalledWith('Restrictions added')
+  })
+
+  test('confirms a single restriction when only a typed address is saved', async () => {
+    mockExistingRestrictions([])
+    const requests = mockApply()
+    const { onClose } = renderModal()
+
+    await userEvent.type(await screen.findByPlaceholderText('0.0.0.0'), '192.0.2.1')
+    fireEvent.click(await screen.findByRole('button', { name: 'Save restriction' }))
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+    expect(requests).toHaveLength(1)
+    expect(toast.success).toHaveBeenCalledWith('Restriction added')
   })
 
   test('replaces an allow-all restriction instead of appending to it', async () => {
