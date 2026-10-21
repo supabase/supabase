@@ -4158,8 +4158,7 @@ module.exports = [
       '/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting',
   },
   // Remaining troubleshooting guides whose docs slug matches the KB slug exactly.
-  // Hash-suffixed slugs are handled above (KB drops the suffix). The tls-handshake
-  // guide has no KB counterpart, and _template is not a page, so both stay on docs.
+  // Hash-suffixed slugs are handled above (KB drops the suffix).
   {
     permanent: true,
     source:
