@@ -13,6 +13,7 @@ import {
   SLIDER_DELIMITER,
   SORT_DELIMITER,
 } from '@/components/ui/DataTable/DataTable.constants'
+import { parseUnifiedLogsDuration } from '@/data/logs/unified-logs-time-range'
 
 export const REGIONS = ['ams', 'fra', 'gru', 'hkg', 'iad', 'syd'] as const
 export const METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'] as const
@@ -72,6 +73,7 @@ export const SEARCH_PARAMS_PARSER = {
   'timing.ttfb': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   'timing.transfer': parseAsArrayOf(parseAsInteger, SLIDER_DELIMITER),
   date: parseAsArrayOf(parseAsTimestamp, RANGE_DELIMITER),
+  durationSeconds: createParser({ parse: parseUnifiedLogsDuration, serialize: String }),
 
   // REQUIRED FOR SORTING & PAGINATION
   sort: parseAsSort,

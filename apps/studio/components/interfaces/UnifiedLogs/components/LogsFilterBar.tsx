@@ -30,15 +30,20 @@ import { UUID_REGEX } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
-  <DataTableFilterTimerange
-    label="Time range"
-    value={TIME_RANGE_PROPERTY}
-    type="timerange"
-    variant="inline"
-    onChange={(range) => onChange(serializeTimeRange(range))}
-  />
-)
+const TimeRangeOption = ({ onChange }: CustomOptionProps) => {
+  const { filterFields } = useDataTable()
+  const field = filterFields.find(({ value }) => value === TIME_RANGE_PROPERTY)
+  return (
+    <DataTableFilterTimerange
+      label="Time range"
+      value={TIME_RANGE_PROPERTY}
+      type="timerange"
+      variant="inline"
+      durationSeconds={field?.type === 'timerange' ? field.durationSeconds : undefined}
+      onChange={(range) => onChange(serializeTimeRange(range))}
+    />
+  )
+}
 
 export const LogsFilterBar = () => {
   const { ref: projectRef } = useParams()

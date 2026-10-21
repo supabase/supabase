@@ -4,6 +4,7 @@ import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
+  getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
   UnifiedLogsVariables,
   useUnifiedLogsBackend,
@@ -22,28 +23,17 @@ export async function getUnifiedLogsChart(
     throw new Error('projectRef is required for getUnifiedLogsChart')
   }
 
-  // Use a default date range (last hour) if no date range is selected
-  let dateStart: string
-  let dateEnd: string
-  let startTime: Date
-  let endTime: Date
-
-  if (search.date && search.date.length === 2) {
-    const parseDate = (d: string | Date) => (d instanceof Date ? d : new Date(d))
-    startTime = parseDate(search.date[0])
-    endTime = parseDate(search.date[1])
-    dateStart = startTime.toISOString()
-    dateEnd = endTime.toISOString()
-  } else {
-    // Default to last hour
-    endTime = new Date()
-    startTime = new Date(endTime.getTime() - 60 * 60 * 1000)
-    dateStart = startTime.toISOString()
-    dateEnd = endTime.toISOString()
-  }
+  const { isoTimestampStart: dateStart, isoTimestampEnd: dateEnd } =
+    getUnifiedLogsISOStartEnd(search)
+  const startTime = new Date(dateStart)
+  const endTime = new Date(dateEnd)
 
   // Get SQL query from utility function (with dynamic bucketing)
-  const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
+  const sql = pickLogsQueryBuilder(
+    useOtel,
+    getLogsChartQuery,
+    getLogsChartQueryBq
+  )({ ...search, date: [startTime, endTime] })
 
   const endpoint = logsAllEndpointUrl(useOtel)
   const data = await executeAnalyticsSql({

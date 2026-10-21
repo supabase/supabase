@@ -133,6 +133,10 @@ export const buildFilterSearchUpdate = (
     if (field.type !== 'timerange') continue
     const current = columnFilters.find((c) => c.id === field.value)?.value
     update[field.value] = current ?? null
+    if (field.value === 'date' && Array.isArray(current)) {
+      update.live = null
+      update.durationSeconds = null
+    }
   }
   return update
 }

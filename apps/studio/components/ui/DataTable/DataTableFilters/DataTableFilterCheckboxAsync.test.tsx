@@ -41,6 +41,7 @@ const columns = [
 ]
 const initialDate = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
 const defaultPathnameSearch: QuerySearchParamsType = {
+  durationSeconds: null,
   filter: null,
   latency: null,
   'timing.dns': null,

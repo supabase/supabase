@@ -9,7 +9,9 @@ import { useFeatureFlags } from 'common'
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import { parseOtelTimestamp } from './otel-inspection.utils'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
+import { getUnifiedLogsDurationMs } from './unified-logs-time-range'
 import {
   mapUnifiedLogRow,
   parseUnifiedLogsQueryRows,
@@ -36,7 +38,11 @@ const refreshBudgets = new WeakMap<AbortSignal, { remaining: number }>()
 type RowCursor = Pick<UnifiedLogsQueryRow, 'id' | 'timestamp'>
 type RefreshBoundary = { row: RowCursor; hasMore: true } | { hasMore: false }
 type UnifiedLogsPageParam =
-  | (NonNullable<PageParam> & { row?: RowCursor; refreshThrough?: RefreshBoundary })
+  | (NonNullable<PageParam> & {
+      row?: RowCursor
+      refreshThrough?: RefreshBoundary
+      range?: { isoTimestampStart: string; isoTimestampEnd: string }
+    })
   | null
   | undefined
 
@@ -59,7 +65,7 @@ export const useUnifiedLogsBackend = () => {
 
 export const getUnifiedLogsISOStartEnd = (
   search: QuerySearchParamsType,
-  endHoursFromNow: number = 1
+  endHoursFromNow?: number
 ) => {
   // Extract date range from search or use default (last hour)
   let isoTimestampStart: string
@@ -72,7 +78,12 @@ export const getUnifiedLogsISOStartEnd = (
   } else {
     const now = new Date()
     isoTimestampEnd = now.toISOString()
-    const nHoursAgo = new Date(now.getTime() - 60 * 60 * (endHoursFromNow * 1000))
+    const nHoursAgo = new Date(
+      now.getTime() -
+        getUnifiedLogsDurationMs(
+          endHoursFromNow === undefined ? search.durationSeconds : endHoursFromNow * 3600
+        )
+    )
     isoTimestampStart = nHoursAgo.toISOString()
   }
 
@@ -99,7 +110,8 @@ export async function getUnifiedLogs(
   if (typeof projectRef === 'undefined')
     throw new Error('projectRef is required for getUnifiedLogs')
 
-  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const { isoTimestampStart, isoTimestampEnd } =
+    pageParam?.range ?? getUnifiedLogsISOStartEnd(search)
   const buildQuery = pickLogsQueryBuilder(useOtel, getUnifiedLogsQuery, getUnifiedLogsQueryBq)
 
   const cursorValue = pageParam?.cursor
@@ -119,6 +131,11 @@ export async function getUnifiedLogs(
   }
 
   const endpoint = logsAllEndpointUrl(useOtel)
+  const hasExpiredRefreshBoundary =
+    search.durationSeconds &&
+    refreshThrough?.hasMore &&
+    parseOtelTimestamp(refreshThrough.row.timestamp).getTime() < Date.parse(timestampStart)
+  if (hasExpiredRefreshBoundary) refreshThrough = { hasMore: false }
   const idColumn = useOtel ? safeSql`toString(id)` : safeSql`id`
   const cursorTimestamp = (cursor: RowCursor) => {
     const rawTimestamp = String(cursor.timestamp)
@@ -187,6 +204,7 @@ export async function getUnifiedLogs(
 
   return {
     data: result,
+    range: { isoTimestampStart: timestampStart, isoTimestampEnd: timestampEnd },
     nextCursor: hasMore ? nextCursor : null,
     prevCursor,
     nextRow: lastQueryRow ? { id: lastQueryRow.id, timestamp: lastQueryRow.timestamp } : null,
@@ -268,6 +286,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
         cursor: lastPage.nextCursor,
         direction: 'next',
         row: lastPage.nextRow ?? undefined,
+        range: search.durationSeconds ? lastPage.range : undefined,
         refreshThrough: isRefreshing ? getRefreshBoundary(loadedPages, pages.length) : undefined,
       } as const
     },

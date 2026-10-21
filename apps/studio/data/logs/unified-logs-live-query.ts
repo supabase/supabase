@@ -8,6 +8,7 @@ import {
   type UnifiedLogsData,
   type UnifiedLogsVariables,
 } from './unified-logs-infinite-query'
+import { getUnifiedLogsDurationMs } from './unified-logs-time-range'
 import { deduplicateUnifiedLogs } from './unified-logs.utils'
 
 type LogRow = UnifiedLogsData['data'][number]
@@ -17,6 +18,7 @@ type LiveLogs = {
   rows: LogRow[]
   forward: LiveStream
   sweep: LiveStream
+  latestSuccessfulEnd: number
 }
 
 const isCatchingUp = (data?: LiveLogs) => !!(data?.forward.window || data?.sweep.window)
@@ -76,8 +78,10 @@ export const useUnifiedLogsLiveQuery = ({
       const isSweep = hasSweepWork && (getTurn(scope) || !hasForwardWork)
       const stream = isSweep ? sweep : forward
       const overlap = isSweep ? 2 * 60 * 1000 : 0
-      const start = stream.window?.start ?? stream.completedUntil - overlap
       const end = stream.window?.end ?? now
+      const durationMs = getUnifiedLogsDurationMs(search.durationSeconds)
+      const start =
+        stream.window?.start ?? Math.max(stream.completedUntil - overlap, end - durationMs)
       const row = stream.window?.row
       const page = await getUnifiedLogs(
         {
@@ -88,8 +92,13 @@ export const useUnifiedLogsLiveQuery = ({
         },
         signal
       ).finally(() => rotateTurn(scope, isSweep))
+      const latestSuccessfulEnd = Math.max(
+        cached?.latestSuccessfulEnd ?? seed,
+        end,
+        getSeed() ?? seed
+      )
       const rows = mergeUnifiedLogs([...page.data, ...(cached?.rows ?? [])]).filter(
-        (entry) => entry.date.getTime() >= Date.now() - 60 * 60 * 1000
+        (entry) => entry.date.getTime() >= latestSuccessfulEnd - durationMs
       )
       const window =
         page.data.length === 50 && page.nextRow ? { start, end, row: page.nextRow } : undefined
@@ -97,6 +106,7 @@ export const useUnifiedLogsLiveQuery = ({
       const updated = { completedUntil: window ? stream.completedUntil : end, window }
       return {
         rows,
+        latestSuccessfulEnd,
         forward: isSweep ? forward : updated,
         sweep: isSweep ? updated : sweep,
       }
