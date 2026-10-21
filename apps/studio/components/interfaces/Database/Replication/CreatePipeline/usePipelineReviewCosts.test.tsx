@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
@@ -118,4 +118,52 @@ test('keeps cached costs visible after a background refresh fails', async () => 
   expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
   unmount()
   queryClient.clear()
+})
+
+test('keeps starting available while refetching an estimate that previously failed', async () => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  queryClient.setQueryData(replicationKeys.sources('default'), sources)
+  const { unmount } = customRender(<ReviewCosts />, { queryClient })
+
+  await waitFor(() => expect(queryClient.getQueryState(key)?.status).toBe('error'))
+  expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+
+  let finishRefetch = () => {}
+  const refetchResponse = new Promise<void>((resolve) => {
+    finishRefetch = resolve
+  })
+  let markRefetchStarted = () => {}
+  const refetchStarted = new Promise<void>((resolve) => {
+    markRefetchStarted = resolve
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
+    response: async () => {
+      markRefetchStarted()
+      await refetchResponse
+      return HttpResponse.json<APIErrorBody>({ message: 'Estimate unavailable' }, { status: 503 })
+    },
+  })
+
+  try {
+    await act(async () => {
+      void queryClient.refetchQueries({ queryKey: key })
+      await refetchStarted
+      await new Promise((resolve) => setTimeout(resolve, 0))
+    })
+
+    expect(queryClient.getQueryState(key)).toMatchObject({
+      status: 'pending',
+      fetchStatus: 'fetching',
+      fetchFailureCount: 0,
+      errorUpdateCount: 1,
+    })
+    expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
+    expect(screen.getByRole('status')).toHaveTextContent('A cost estimate is unavailable.')
+  } finally {
+    finishRefetch()
+    unmount()
+    queryClient.clear()
+  }
 })

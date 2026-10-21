@@ -182,6 +182,7 @@ export const PipelineCostEstimate = ({
       <div role="status">
         {!isLoading && estimate === undefined && (
           <Admonition
+            role={undefined}
             type="note"
             className={SANDWICHED_ADMONITION_CLASS}
             description="A cost estimate is unavailable. You can still start the pipeline."

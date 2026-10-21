@@ -94,6 +94,7 @@ test('keeps the status region mounted when loading finishes without an estimate'
   rerender(<PipelineCostEstimate isLoading={false} publicationTables={publicationTables} />)
 
   expect(screen.getByRole('status')).toBe(status)
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   expect(status).toHaveTextContent(
     'A cost estimate is unavailable. You can still start the pipeline.'
   )

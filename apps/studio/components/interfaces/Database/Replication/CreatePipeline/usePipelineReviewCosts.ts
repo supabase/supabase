@@ -47,11 +47,12 @@ export const usePipelineReviewCosts = ({
   }
 
   const isEstimateEnabled = enabled && hasPublication && tableSyncCopy !== undefined
-  const { data, isLoading, failureCount } = useReplicationCostEstimateQuery(
+  const { data, isLoading, failureCount, errorUpdateCount } = useReplicationCostEstimateQuery(
     { projectRef, sourceId, publicationName },
     { enabled: isEstimateEnabled }
   )
-  const isInitialCostEstimateLoading = isEstimateEnabled && isLoading && failureCount === 0
+  const isInitialCostEstimateLoading =
+    isEstimateEnabled && isLoading && failureCount === 0 && errorUpdateCount === 0
 
   if (!hasPublication) return { status: 'missing-publication', isInitialCostEstimateLoading: false }
   if (tableSyncCopy === undefined)
