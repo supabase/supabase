@@ -1,9 +1,37 @@
 import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { SkipToContent } from './SkipToContent'
 
 describe('SkipToContent', () => {
+  afterEach(() => {
+    window.history.replaceState(null, '', '/')
+    vi.restoreAllMocks()
+  })
+
+  it('preserves the current fragment and moves keyboard focus to the landmark', async () => {
+    window.history.replaceState(null, '', '/#v1=dashboard-definition')
+    const scrollIntoView = vi.fn()
+    render(
+      <>
+        <SkipToContent href="#main" />
+        <main id="main" tabIndex={-1}>
+          Dashboard content
+        </main>
+      </>
+    )
+    const main = screen.getByRole('main')
+    main.scrollIntoView = scrollIntoView
+    const user = userEvent.setup()
+    await user.tab()
+    expect(screen.getByRole('link', { name: 'Skip to content' })).toHaveFocus()
+    await user.keyboard('{Enter}')
+    expect(main).toHaveFocus()
+    expect(window.location.hash).toBe('#v1=dashboard-definition')
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: 'start' })
+  })
+
   it('renders a link with the provided href and default label', () => {
     render(<SkipToContent href="#main" />)
 

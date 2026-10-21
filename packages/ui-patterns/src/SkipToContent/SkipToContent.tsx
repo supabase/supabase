@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { type MouseEvent, type ReactNode } from 'react'
 import { Button, cn, FloatingPlate } from 'ui'
 
 export interface SkipToContentProps {
@@ -16,6 +16,15 @@ export interface SkipToContentProps {
  * landmark itself should not show a visible focus ring.
  */
 function SkipToContent({ href, children = 'Skip to content', className }: SkipToContentProps) {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!href.startsWith('#')) return
+    const target = document.getElementById(href.slice(1))
+    if (!target) return
+    event.preventDefault()
+    target.focus({ preventScroll: true })
+    target.scrollIntoView({ block: 'start' })
+  }
+
   return (
     <FloatingPlate
       className={cn(
@@ -28,7 +37,9 @@ function SkipToContent({ href, children = 'Skip to content', className }: SkipTo
       )}
     >
       <Button size="tiny" asChild>
-        <a href={href}>{children}</a>
+        <a href={href} onClick={handleClick}>
+          {children}
+        </a>
       </Button>
     </FloatingPlate>
   )
