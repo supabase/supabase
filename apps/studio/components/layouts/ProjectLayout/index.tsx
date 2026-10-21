@@ -87,6 +87,7 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/addons',
   '/project/[ref]/database/settings',
   '/project/[ref]/reports',
+  '/project/[ref]/model',
 ]
 
 const DEFAULT_PROJECT_INTEGRATION_BANNER_DISMISS_KEY =
