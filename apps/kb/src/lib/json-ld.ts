@@ -2,6 +2,12 @@
 const KB_ORIGIN = 'https://supabase.com'
 export const KB_BASE_URL = `${KB_ORIGIN}/kb`
 
+// Canonical URL for a rendered page, from `Astro.url.pathname`. Always on the production origin, even on preview
+// deployments, and trailing slashes are dropped so the index and every other route share one form.
+export function canonicalUrl(pathname: string): string {
+  return new URL(pathname.replace(/\/+$/, '') || '/', KB_ORIGIN).href
+}
+
 type JsonLdSchema = Record<string, unknown> | Record<string, unknown>[]
 
 export function serializeJsonLd(schema: JsonLdSchema): string {

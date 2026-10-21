@@ -8,6 +8,8 @@ export type ToolContext = {
   connectionString?: string
   authorization?: string
   aiOptInLevel?: AiOptInLevel
+  /** Public dashboard URL, used by tools that call Studio's own API routes. */
+  baseUrl?: string
 }
 
 /**

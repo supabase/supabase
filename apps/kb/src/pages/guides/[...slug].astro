@@ -3,24 +3,29 @@ import { getCollection, render } from 'astro:content'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
-import { breadcrumbListSchema, KB_BASE_URL, techArticleSchema } from '../../lib/json-ld'
+import { relatedGuides, toSummary } from '../../lib/guides'
+import { breadcrumbListSchema, canonicalUrl, KB_BASE_URL, techArticleSchema } from '../../lib/json-ld'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
+	const summaries = guides.map(toSummary)
 	return guides.map((guide) => ({
 		params: { slug: guide.id },
-		props: { guide },
+		props: { guide, related: relatedGuides({ guide: toSummary(guide), guides: summaries }) },
 	}))
 }
 
-const { guide } = Astro.props
+const { guide, related } = Astro.props
 const { title, description, topics, github_url, date } = guide.data
-const { Content } = await render(guide)
+const { Content, headings } = await render(guide)
+const toc = headings
+	.filter((heading) => heading.depth === 2 || heading.depth === 3)
+	.map((heading) => ({ title: heading.text, url: `#${heading.slug}`, depth: heading.depth }))
 
 // guide.filePath is relative to the kb app root, e.g. "src/content/guides/foo.mdx"
 const viewGitHubLink = `https://github.com/supabase/supabase/blob/master/apps/kb/${guide.filePath}`
 
-const url = `${KB_BASE_URL}/guides/${guide.id}`
+const url = canonicalUrl(Astro.url.pathname)
 const jsonLd = [
 	techArticleSchema({ url, headline: title, description }),
 	breadcrumbListSchema([
@@ -38,6 +43,8 @@ const jsonLd = [
 	viewGitHubLink={viewGitHubLink}
 	date={date}
 	jsonLd={jsonLd}
+	toc={toc}
+	related={related}
 >
 	<Content components={{ Admonition }} />
 </ArticleLayout>
