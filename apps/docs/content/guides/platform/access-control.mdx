@@ -181,12 +181,22 @@ curl -X PATCH "https://api.supabase.com/v2/organizations/$ORG_SLUG/members/$USER
   }'
 ```
 
-After a change, [list the member's roles](#list-organization-members-with-the-management-api) to check which roles and projects they have.
+After a change, [list the member's roles](#list-organization-members) to check which roles and projects they have.
 
 </TabPanel>
 </Tabs>
 
-### List organization members with the Management API
+### List organization members
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="method">
+<TabPanel id="dashboard" label="Dashboard">
+
+To see your organization's members in the Supabase Dashboard, go to your organization's [team settings](/dashboard/org/_/team). The **Role** column shows where each role applies: **Organization** for an organization-wide role, or the projects for a project-scoped role. Pending invites are marked **Invited**, or **Expired** after 24 hours.
+
+To narrow the list, search with **Filter members**, or filter by **MFA status** or **Roles**.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
 
 To list members and their roles, call [List organization members](/docs/reference/api/v2-list-organization-members). The token needs the **Organization Members** permission with **Read** access.
 
@@ -210,6 +220,9 @@ Each member's `roles` array shows every role they have. A role's `scope` is `org
 ```
 
 The results are paginated. The endpoint's reference page lists the pagination parameters.
+
+</TabPanel>
+</Tabs>
 
 ### Transfer ownership of an organization
 
