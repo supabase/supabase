@@ -380,7 +380,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/library/getting-started',
-    destination: '/docs#reference-documentation',
+    destination: '/docs/guides/getting-started',
   },
   {
     permanent: false,
@@ -436,7 +436,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/supabase-client',
-    destination: '/docs#reference-documentation',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: false,
@@ -823,7 +823,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/supabase-client',
-    destination: '/docs#reference-documentation',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: true,
@@ -1493,7 +1493,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/client-libraries',
-    destination: '/docs#reference-documentation',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: true,
@@ -2067,7 +2067,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/local-development',
-    destination: '/docs/guides/local-development/database-migrations',
+    destination: '/docs/guides/local-development',
   },
   {
     permanent: true,
@@ -2412,7 +2412,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/local-development',
-    destination: '/docs/guides/local-development/database-migrations',
+    destination: '/docs/guides/local-development',
   },
   {
     permanent: true,
@@ -2667,8 +2667,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
-    destination:
-      '/docs/guides/integrations/build-a-supabase-oauth-integration#create-an-oauth-app',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration#create-an-oauth-app',
   },
   {
     permanent: true,
@@ -2680,16 +2679,20 @@ module.exports = [
     source: '/docs/guides/integrations/build-a-supabase-integration',
     destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
-  { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/local-development/cli/config' },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/config',
+    destination: '/docs/guides/local-development/cli/config',
+  },
   {
     permanent: true,
     source: '/docs/guides/database/timeouts',
-    destination: '/docs/guides/database/postgres/configuration',
+    destination: '/docs/guides/database/postgres/timeouts',
   },
   {
     permanent: true,
     source: '/docs/guides/database/managing-timezones',
-    destination: '/docs/guides/database/postgres/configuration',
+    destination: '/docs/guides/database/postgres/configuration#managing-timezones',
   },
   {
     permanent: true,
