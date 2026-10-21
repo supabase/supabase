@@ -71,12 +71,16 @@ export function collectSearchMatches(
   })
 }
 
-/** Orders matches by how closely they match, then by path, and caps the list */
-export function rankSearchMatches(matches: ScoredMatch[]): StorageSearchResult[] {
+/** Keeps the `MAX_SEARCH_RESULTS` closest matches, ordered by score and then by path */
+function keepBestMatches(matches: ScoredMatch[]): ScoredMatch[] {
   return [...matches]
     .sort((a, b) => a.score - b.score || a.result.path.localeCompare(b.result.path))
     .slice(0, MAX_SEARCH_RESULTS)
-    .map((match) => match.result)
+}
+
+/** Orders matches by how closely they match, then by path, and caps the list */
+export function rankSearchMatches(matches: ScoredMatch[]): StorageSearchResult[] {
+  return keepBestMatches(matches).map((match) => match.result)
 }
 
 export type BucketSearchVariables = {
@@ -110,8 +114,7 @@ function getSearchTruncation(
   matchCount: number,
   isCrawlTruncated: boolean
 ): BucketSearchData['truncation'] {
-  // Checked first: stopping at the match cap leaves folders unvisited, so the crawl
-  // reports itself truncated too
+  // Checked first: with more matches than fit, refining the search helps more than browsing
   if (matchCount > MAX_SEARCH_RESULTS) return 'match-limit'
   if (isCrawlTruncated) return 'request-limit'
   return null
@@ -135,7 +138,10 @@ async function* streamBucketSearchResults(
     return
   }
 
-  const matches: ScoredMatch[] = []
+  // Ranked as the crawl goes so a broad search doesn't hold every match in memory. The
+  // crawl keeps going past the cap, so closer matches in later folders still make the cut.
+  let matches: ScoredMatch[] = []
+  let matchCount = 0
   let progress = EMPTY_PROGRESS
   let hasNewProgress = false
   let isCrawlDone = false
@@ -146,8 +152,10 @@ async function* streamBucketSearchResults(
       projectRef,
       bucketId,
       onPage: (objects, parentPath) => {
-        matches.push(...collectSearchMatches(objects, parentPath, searchString))
-        return matches.length <= MAX_SEARCH_RESULTS
+        const pageMatches = collectSearchMatches(objects, parentPath, searchString)
+        matchCount += pageMatches.length
+        matches.push(...pageMatches)
+        if (matches.length > MAX_SEARCH_RESULTS * 2) matches = keepBestMatches(matches)
       },
       onProgress: (nextProgress) => {
         progress = nextProgress
@@ -176,7 +184,7 @@ async function* streamBucketSearchResults(
   const { isTruncated } = await crawl
   yield {
     results: rankSearchMatches(matches),
-    truncation: getSearchTruncation(matches.length, isTruncated),
+    truncation: getSearchTruncation(matchCount, isTruncated),
     progress,
     isComplete: true,
   }

@@ -9,6 +9,7 @@ import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/Inf
 import {
   bucketSearchQueryOptions,
   MAX_SEARCH_RESULTS,
+  type BucketSearchData,
   type StorageSearchResult,
 } from '@/data/storage/bucket-search-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -18,6 +19,16 @@ const ROW_HEIGHT = 37
 
 const pluralize = (count: number, singular: string, plural: string) =>
   `${count.toLocaleString()} ${count === 1 ? singular : plural}`
+
+const getTruncationNotice = (truncation: BucketSearchData['truncation'], bucketName: string) => {
+  if (truncation === 'match-limit') {
+    return `Showing the ${MAX_SEARCH_RESULTS} closest matches. Refine your search to narrow them down.`
+  }
+  if (truncation === 'request-limit') {
+    return `${bucketName} has too many items to search through all of them. Browse to an item if it isn't listed.`
+  }
+  return null
+}
 
 interface StorageSearchResultsProps {
   searchString: string
@@ -50,6 +61,10 @@ export const StorageSearchResults = ({
     progress && progress.folderCount > 0
       ? ` ${pluralize(progress.itemCount, 'item', 'items')} in ${pluralize(progress.folderCount, 'folder', 'folders')}`
       : ''
+  const truncation = data?.truncation ?? null
+  const truncationNotice = getTruncationNotice(truncation, bucketName)
+  const hasResults = !isSearching && !isError && results.length > 0
+  const hasNoResults = !isSearching && !isError && results.length === 0
 
   const handleSelectResult = (item: StorageSearchResult) => {
     track('storage_explorer_search_result_clicked', {
@@ -74,6 +89,8 @@ export const StorageSearchResults = ({
         >
           {isSearching && `Searching ${bucketName}...${progressText}`}
           {!isSearching && !isError && `${matchCount} in ${bucketName}`}
+          {/* The footer shows the same notice; announcing it here tells screen readers why */}
+          {!isSearching && truncationNotice && <span className="sr-only"> {truncationNotice}</span>}
         </p>
         <Button size="tiny" variant="outline" onClick={onClearSearch}>
           Clear search
@@ -103,7 +120,7 @@ export const StorageSearchResults = ({
           </div>
         )}
 
-        {!isSearching && !isError && results.length === 0 && (
+        {hasNoResults && truncation !== 'request-limit' && (
           <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
             <p className="text-sm text-foreground">No items match "{searchString}"</p>
             <p className="text-center text-sm text-foreground-light">
@@ -112,7 +129,20 @@ export const StorageSearchResults = ({
           </div>
         )}
 
-        {!isSearching && !isError && results.length > 0 && (
+        {/* Part of the bucket went unsearched, so no matches doesn't mean none exist */}
+        {hasNoResults && truncation === 'request-limit' && (
+          <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
+            <p className="text-sm text-foreground">
+              No matches for "{searchString}" in the items searched
+            </p>
+            <p className="text-center text-sm text-foreground-light">
+              {bucketName} has too many items to search through all of them. Clear the search to
+              browse to the item instead.
+            </p>
+          </div>
+        )}
+
+        {hasResults && (
           <InfiniteListDefault
             className="h-full"
             items={results}
@@ -125,15 +155,13 @@ export const StorageSearchResults = ({
         )}
       </div>
 
-      {data?.truncation === 'match-limit' && (
-        <p className="shrink-0 border-t border-overlay bg-surface-100 px-2.5 py-2 text-xs text-foreground-lighter">
-          Showing the first {MAX_SEARCH_RESULTS} matches. Refine your search to narrow them down.
-        </p>
-      )}
-      {data?.truncation === 'request-limit' && (
-        <p className="shrink-0 border-t border-overlay bg-surface-100 px-2.5 py-2 text-xs text-foreground-lighter">
-          {bucketName} has too many items to search through all of them. Browse to an item if it
-          isn't listed.
+      {/* Already announced through the status region above */}
+      {hasResults && truncationNotice && (
+        <p
+          aria-hidden
+          className="shrink-0 border-t border-overlay bg-surface-100 px-2.5 py-2 text-xs text-foreground-lighter"
+        >
+          {truncationNotice}
         </p>
       )}
     </div>

@@ -4,6 +4,7 @@ import { HttpResponse } from 'msw'
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { StorageSearchResults } from './StorageSearchResults'
+import { CRAWL_MAX_LISTINGS } from '@/data/storage/bucket-crawl'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
@@ -165,6 +166,23 @@ describe('StorageSearchResults', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Clear search' }))
     expect(onClearSearch).toHaveBeenCalled()
+  })
+
+  it("doesn't claim nothing matches when part of the bucket went unsearched", async () => {
+    // More folders than the crawl has list requests for
+    mockBucket({
+      '': Array.from({ length: CRAWL_MAX_LISTINGS + 1 }, (_, index) => makeFolder(`f-${index}`)),
+    })
+
+    render(<StorageSearchResults searchString="cat" onClearSearch={vi.fn()} />)
+
+    expect(
+      await screen.findByText('No matches for "cat" in the items searched')
+    ).toBeInTheDocument()
+    expect(screen.queryByText('No items match "cat"')).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'my-bucket has too many items to search through all of them'
+    )
   })
 
   it('surfaces a failed search with a way to retry', async () => {

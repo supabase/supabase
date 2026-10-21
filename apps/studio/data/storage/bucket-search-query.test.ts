@@ -178,6 +178,22 @@ describe('bucketSearchQueryOptions', () => {
     expect(truncation).toBe('match-limit')
   })
 
+  it('keeps searching past the cap so closer matches in later folders make the cut', async () => {
+    mockBucket({
+      '': [makeFolder('a'), makeFolder('z')],
+      a: Array.from({ length: MAX_SEARCH_RESULTS + 10 }, (_, index) =>
+        makeFile(`icon-${index}.png`)
+      ),
+      z: [makeFile('icon')],
+    })
+
+    const { results, truncation } = await search('icon')
+
+    expect(results).toHaveLength(MAX_SEARCH_RESULTS)
+    expect(results[0]).toEqual(expect.objectContaining({ path: 'z/icon' }))
+    expect(truncation).toBe('match-limit')
+  })
+
   it('matches folders by name and carries their path', async () => {
     mockBucket({
       '': [makeFolder('archive')],
