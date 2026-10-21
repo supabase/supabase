@@ -1,11 +1,18 @@
+import type { Control } from 'react-hook-form'
+
+import type { DestinationPanelSchemaType } from '../DestinationPanel/DestinationForm/DestinationForm.schema'
 import { PipelineCostEstimate } from './PipelineCostEstimate'
-import type { usePipelineReviewCosts } from './usePipelineReviewCosts'
+import { usePipelineReviewCosts } from './usePipelineReviewCosts'
+import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 
 export const PipelineReviewCosts = ({
-  costs,
+  control,
+  publication,
 }: {
-  costs: ReturnType<typeof usePipelineReviewCosts>
+  control: Control<DestinationPanelSchemaType>
+  publication?: ReplicationPublicationData
 }) => {
+  const costs = usePipelineReviewCosts({ control, publication })
   if (costs.status === 'missing-publication')
     return (
       <div className="p-5 text-sm text-foreground-light">

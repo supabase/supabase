@@ -55,7 +55,7 @@ const ReviewCosts = () => {
   const costs = usePipelineReviewCosts({ control, publication })
   return (
     <>
-      <PipelineReviewCosts costs={costs} />
+      <PipelineReviewCosts control={control} publication={publication} />
       <button tabIndex={0} disabled={costs.isInitialCostEstimateLoading}>
         Start pipeline
       </button>

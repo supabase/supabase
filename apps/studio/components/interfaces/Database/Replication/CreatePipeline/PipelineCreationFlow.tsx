@@ -206,7 +206,7 @@ export const PipelineCreationFlow = ({
                     onEdit={() => void setStep('data')}
                   />
                   <Separator />
-                  <PipelineReviewCosts costs={costs} />
+                  <PipelineReviewCosts control={form.control} publication={publication} />
                   <PipelineValidationAdmonition failures={submissionFailures} />
                 </>
               )}
