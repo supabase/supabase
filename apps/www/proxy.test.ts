@@ -60,6 +60,15 @@ describe('www proxy', () => {
       expect(res.headers.get('Cache-Control')).toBe('no-store')
     })
 
+    it.each(['/docs/guides/auth', '/docs', '/dashboard/project/x', '/kb/guides/x'])(
+      'does not touch v15-shaped state on other zones (%s)',
+      (path) => {
+        const res = proxy(makeRequest(`${path}?_rsc=abc`, { routerStateTree: v15Tree }))
+
+        expect(res.status).toBe(200)
+      }
+    )
+
     it('passes v16-shaped state through', () => {
       const res = proxy(makeRequest('/blog?_rsc=abc', { routerStateTree: v16Tree }))
 

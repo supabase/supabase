@@ -4,6 +4,17 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 import { CHANGELOG_PAGES, MD_PAGES } from './app/api-v2/md/content.generated'
 
+const OTHER_ZONE_PREFIXES = [
+  '/docs',
+  '/dashboard',
+  '/library',
+  '/design-system',
+  '/kb',
+  '/evals',
+  '/migrate/instantdb',
+  '/new-docs',
+]
+
 /**
  * www is a Next.js 16 zone, but the docs zone (served under /docs through a rewrite) and clients
  * holding a pre-upgrade bundle still run Next.js 15. Their client-side navigations into www pages
@@ -11,7 +22,15 @@ import { CHANGELOG_PAGES, MD_PAGES } from './app/api-v2/md/content.generated'
  * (`isRootLayout`) is a boolean. v16 expects a number there, so it throws "The router state header
  * was sent but could not be parsed" and returns a 500.
  */
-function hasLegacyRouterStateTree(request: NextRequest) {
+function hasLegacyRouterStateTree(request: NextRequest, pathname: string) {
+  // Paths that lib/rewrites.js forwards to other zones. Those zones may legitimately run Next.js 15
+  // (docs), so their own client navigations must reach them untouched.
+  if (
+    OTHER_ZONE_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
+  ) {
+    return false
+  }
+
   const header = request.headers.get('next-router-state-tree')
   if (!header) return false
 
@@ -28,7 +47,7 @@ export function proxy(request: NextRequest) {
 
   // The Next.js 15 router treats any non-RSC response as a cue to fall back to a full page load,
   // which is what happens today after the 500. Answer with a cheap 400 so it doesn't hit the renderer.
-  if (hasLegacyRouterStateTree(request)) {
+  if (hasLegacyRouterStateTree(request, pathname)) {
     return new NextResponse(null, {
       status: 400,
       headers: { 'Cache-Control': 'no-store' },
