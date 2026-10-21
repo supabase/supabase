@@ -4162,7 +4162,7 @@ module.exports = [
   {
     permanent: true,
     source:
-      '/docs/guides/troubleshooting/:slug((?!(?:tls-handshake-failures-after-cbc-cipher-removal|_template)(?:\\.md)?$)(?![^/]*-[0-9a-f]{6}(?:\\.md)?$)[^/]+)',
+      '/docs/guides/troubleshooting/:slug((?!_template(?:\\.md)?$)(?![^/]*-[0-9a-f]{6}(?:\\.md)?$)[^/]+)',
     destination: '/kb/troubleshooting/:slug',
   },
   {
