@@ -57,7 +57,9 @@ async function getWebhookDeliveries(
   // would skip that record on the way forward again).
   const nextCursor = hasExtraRecord
     ? (resources[pageSize - 1]?.id ?? null)
-    : (resources[resources.length - 1]?.id ?? before ?? null)
+    : before
+      ? (resources[resources.length - 1]?.id ?? before)
+      : null
 
   return {
     deliveries,

@@ -1,4 +1,3 @@
-import { keepPreviousData } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVerticalIcon, PencilIcon, RotateCwIcon, SendIcon, Trash2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -183,7 +182,15 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       after: deliveryCursor.after,
       before: deliveryCursor.before,
     },
-    { enabled: queryEnabled && !!selectedEndpoint, placeholderData: keepPreviousData }
+    {
+      enabled: queryEnabled && !!selectedEndpoint,
+      // Only keep showing the previous page's rows while loading if it belonged to this
+      // same endpoint — otherwise a newly selected endpoint would briefly show whichever
+      // endpoint's deliveries happened to be cached last (queryKey[4] is the endpointId,
+      // see platformWebhooksKeys.deliveries).
+      placeholderData: (previousData, previousQuery) =>
+        previousQuery?.queryKey[4] === selectedEndpoint?.id ? previousData : undefined,
+    }
   )
   const {
     data: selectedDelivery = null,
