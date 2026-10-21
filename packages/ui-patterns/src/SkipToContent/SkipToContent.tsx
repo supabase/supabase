@@ -1,3 +1,5 @@
+'use client'
+
 import { type MouseEvent, type ReactNode } from 'react'
 import { Button, cn, FloatingPlate } from 'ui'
 
