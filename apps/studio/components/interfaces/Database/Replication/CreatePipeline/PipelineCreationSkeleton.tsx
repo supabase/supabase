@@ -27,9 +27,9 @@ export const PipelineCreationSkeleton = () => {
               <Skeleton className="h-4 w-4 rounded-full" />
               <div className="flex flex-1 items-center gap-3.5">
                 <Skeleton className="h-8 w-8 rounded-md" />
-                <div className="flex-1">
-                  <Skeleton className="h-5 w-24" />
-                  <Skeleton className="h-5 w-3/4" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-4 w-3/4" />
                 </div>
               </div>
             </div>
