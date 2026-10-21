@@ -15,6 +15,12 @@ const formatDate = (date: Date): string => {
   }).format(adjusted)
 }
 
+// Astro's default id is a lowercased slug of the file path, but the markdown
+// export (scripts/generate-markdown.ts) keeps the filename's case and Vercel
+// serves static files case-sensitively. Keeping the case here makes the page
+// URL and the `.md` export path line up.
+const generateId = ({ entry }: { entry: string }) => entry.replace(/\.mdx?$/, '')
+
 // Every entry here is rendered through GuideLayout by
 // Shared by every article-like collection (guides, troubleshooting) so their
 // schemas can't drift on these fields — both render through ArticleLayout via
@@ -31,7 +37,7 @@ const articleFields = {
 // src/pages/guides/[...slug].astro — dropping a new file in
 // src/content/guides doesn't need any per-file layout wiring.
 const guides = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/guides', generateId }),
   schema: z.object({
     ...articleFields,
     description: z.string(),
@@ -53,7 +59,7 @@ const guides = defineCollection({
 // entirely generated, never hand-authored, see .gitignore. Rendered through
 // ArticleLayout by src/pages/troubleshooting/[...slug].astro.
 const troubleshooting = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/troubleshooting', generateId }),
   schema: z.object({
     ...articleFields,
     // The source has no description field, and ArticleLayout already

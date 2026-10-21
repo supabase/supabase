@@ -2,6 +2,7 @@
   "buildCommand": "pnpm build",
   "redirects": [
     { "source": "/", "destination": "/kb", "permanent": false },
+    { "source": "/kb/sitemap.md", "destination": "/kb/markdown/sitemap.md", "permanent": true },
     {
       "source": "/kb/guides/:path+.md",
       "destination": "/kb/markdown/guides/:path+.md",
