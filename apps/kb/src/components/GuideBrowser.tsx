@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react'
-import { Fragment, useId, useState, useSyncExternalStore } from 'react'
+import { Fragment, useId, useSyncExternalStore } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -84,11 +84,8 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
     parseTopicParam(new URLSearchParams(window.location.search).get(param))
   const activeTopic = useSyncExternalStore(subscribeToTopic, getTopicFromUrl, getTopicOnServer)
   const visibleGuides = filterGuides({ guides, topic: activeTopic })
-  const filterKey = activeTopic ?? ''
-  const [paging, setPaging] = useState({ filterKey, count: PAGE_SIZE })
-  const shownCount = paging.filterKey === filterKey ? paging.count : PAGE_SIZE
-  const shownGuides = visibleGuides.slice(0, shownCount)
-  const hasMore = visibleGuides.length > shownCount
+  const leadingGuides = visibleGuides.slice(0, PAGE_SIZE)
+  const overflowGuides = visibleGuides.slice(PAGE_SIZE)
 
   const setTopicInUrl = (topic: Topic | null) => {
     const { pathname, search, hash } = window.location
@@ -97,7 +94,6 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
     window.dispatchEvent(new Event(TOPIC_CHANGE_EVENT))
   }
   const handleTabChange = (value: string) => setTopicInUrl(isKnownTopic(value) ? value : null)
-  const handleLoadMore = () => setPaging({ filterKey, count: shownCount + PAGE_SIZE })
   const handleTopicClear = () => setTopicInUrl(null)
   const filterTopics = TOPICS.filter(
     (topic) =>
@@ -149,30 +145,30 @@ export const GuideBrowser = ({ title, guides, param = 'topic', className }: Guid
           )}
         >
           <div ref={bindPanelHeight}>
-            <p aria-live="polite" className="sr-only">
-              {`${shownGuides.length} of ${visibleGuides.length} ${visibleGuides.length === 1 ? 'guide' : 'guides'} shown`}
-            </p>
             <GuideList
-              guides={shownGuides}
+              guides={leadingGuides}
               activeTopic={activeTopic}
               onTopicClear={handleTopicClear}
             />
-            {hasMore ? (
-              <div className="flex justify-center py-6">
-                <button
-                  type="button"
-                  onClick={handleLoadMore}
+            {overflowGuides.length > 0 ? (
+              <details className="group">
+                <summary
                   className={cn(
-                    'inline-flex cursor-pointer items-center gap-1.5 rounded-full py-1 pl-2.5 pr-3 text-xs text-foreground',
+                    'mx-auto my-6 flex w-fit cursor-pointer list-none items-center gap-1.5 rounded-full py-1 pl-2.5 pr-3 text-xs text-foreground',
                     'bg-surface-200/90 shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm',
-                    'transition duration-200 ease-out',
-                    'hover:bg-surface-300 active:scale-[0.96] focus-ring'
+                    'transition duration-200 ease-out [&::-webkit-details-marker]:hidden',
+                    'hover:bg-surface-300 active:scale-[0.96] focus-ring group-open:hidden'
                   )}
                 >
                   <ChevronDown aria-hidden className="size-3.5" />
                   Load more
-                </button>
-              </div>
+                </summary>
+                <GuideList
+                  guides={overflowGuides}
+                  activeTopic={activeTopic}
+                  onTopicClear={handleTopicClear}
+                />
+              </details>
             ) : null}
           </div>
         </TabsContent>
