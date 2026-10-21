@@ -15,7 +15,7 @@ import {
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -345,6 +345,13 @@ export const UnifiedLogs = () => {
 
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
+  const clearRollingDuration = useCallback(() => {
+    if (search.durationSeconds != null) setSearch({ durationSeconds: null, live: null })
+  }, [search.durationSeconds, setSearch])
+  const resetFilters = () => {
+    table.resetColumnFilters()
+    clearRollingDuration()
+  }
   const filterFields = useMemo(() => {
     const gatedFields = gateLogTypeOptions(defaultFilterFields, {
       multigres: showMultigresLogs,
@@ -352,7 +359,8 @@ export const UnifiedLogs = () => {
     })
 
     return gatedFields.map((field) => {
-      if (field.type === 'timerange') return { ...field, durationSeconds: search.durationSeconds }
+      if (field.type === 'timerange')
+        return { ...field, durationSeconds: search.durationSeconds, onClear: clearRollingDuration }
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -378,7 +386,13 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets, showMultigresLogs, computeAvailability.canQueryCompute, search.durationSeconds])
+  }, [
+    facets,
+    showMultigresLogs,
+    computeAvailability.canQueryCompute,
+    search.durationSeconds,
+    clearRollingDuration,
+  ])
 
   const applyFilterSearch = () => {
     const update = buildFilterSearchUpdate(columnFilters, filterFields)
@@ -426,8 +440,8 @@ export const UnifiedLogs = () => {
   useShortcut(SHORTCUT_IDS.DATA_TABLE_TOGGLE_FILTERS, () => setIsFilterBarOpen((prev) => !prev), {
     registerInCommandMenu: true,
   })
-  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
-    enabled: columnFilters.length > 0,
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, resetFilters, {
+    enabled: columnFilters.length > 0 || search.durationSeconds != null,
     registerInCommandMenu: true,
   })
 
@@ -468,6 +482,8 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
+            hasAdditionalFilters={search.durationSeconds != null}
+            onReset={clearRollingDuration}
           />
           <ResizableHandle withHandle />
           <ResizablePanel

@@ -24,6 +24,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TimeSplitInput } from '@/components/ui/DatePicker/TimeSplitInput'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { onSearchInputEscape } from '@/lib/keyboard'
 import type { ShortcutId } from '@/state/shortcuts/registry'
 
 export type DatePickerValue = {
@@ -120,9 +121,10 @@ export const LogsDatePicker = ({
   const handleHelperChange = (newValue: string) => {
     const selectedHelper = displayedHelpers.find((h) => h.text === newValue)
     if (onSubmit && selectedHelper) {
+      const to = selectedHelper.calcTo()
       onSubmit({
-        to: selectedHelper.calcTo(),
-        from: selectedHelper.calcFrom(),
+        to,
+        from: selectedHelper.calcFrom(to),
         isHelper: true,
         text: selectedHelper.text,
       })
@@ -297,9 +299,10 @@ export const LogsDatePicker = ({
       <div className="border-r p-2 flex flex-col gap-px">
         <Input
           type="text"
-          placeholder="e.g. 2h, 30m, 7d"
+          placeholder="e.g. 10s, 30m, 2h"
           value={customValue}
           onChange={(e) => setCustomValue(e.target.value)}
+          onKeyDown={onSearchInputEscape(customValue, setCustomValue)}
           className="mb-2 text-xs h-7 rounded-xs"
         />
         <RadioGroup
@@ -444,6 +447,12 @@ export const LogsDatePicker = ({
         side="bottom"
         align={align}
         {...popoverContentProps}
+        onEscapeKeyDown={(event) => {
+          if (!customValue) return
+          event.preventDefault()
+          event.stopPropagation()
+          setCustomValue('')
+        }}
       >
         {content}
       </PopoverContent>

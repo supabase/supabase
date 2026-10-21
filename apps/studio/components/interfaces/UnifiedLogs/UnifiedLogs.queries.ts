@@ -1,12 +1,10 @@
-import dayjs from 'dayjs'
-
 import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
 } from './UnifiedLogs.filters'
-import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
@@ -14,6 +12,10 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import {
+  getUnifiedLogsChartBucket,
+  type UnifiedLogsChartBucket,
+} from '@/data/logs/unified-logs-chart.utils'
 import { WORKER_LOG_SOURCES } from '@/lib/constants/compute'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
@@ -243,45 +245,10 @@ const translateFilter = (
 const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
-/**
- * Calculates the chart bucketing level (minute/hour/day) given the date range.
- */
-const calculateChartBucketing = (
-  search: SearchParamsType | Record<string, unknown>
-): 'MINUTE' | 'HOUR' | 'DAY' => {
-  const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
-
-  const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
-    if (!timestamp) return null
-    if (timestamp instanceof Date) return timestamp.getTime()
-    if (typeof timestamp === 'string') return dayjs(timestamp).valueOf()
-    if (typeof timestamp === 'number') {
-      const str = timestamp.toString()
-      if (str.length >= 16) return Math.floor(timestamp / 1000)
-      return timestamp
-    }
-    return null
-  }
-
-  let startMillis = convertToMillis(dateRange[0])
-  let endMillis = convertToMillis(dateRange[1])
-
-  if (!startMillis) startMillis = dayjs().subtract(1, 'hour').valueOf()
-  if (!endMillis) endMillis = dayjs().valueOf()
-
-  const startTime = dayjs(startMillis)
-  const endTime = dayjs(endMillis)
-
-  const hourDiff = endTime.diff(startTime, 'hour')
-  const dayDiff = endTime.diff(startTime, 'day')
-
-  if (dayDiff >= 2) return 'DAY'
-  if (hourDiff >= 12) return 'HOUR'
-  return 'MINUTE'
-}
-
-const truncationFunction = (level: 'MINUTE' | 'HOUR' | 'DAY'): SafeLogSqlFragment => {
+const truncationFunction = (level: UnifiedLogsChartBucket['level']): SafeLogSqlFragment => {
   switch (level) {
+    case 'SECOND':
+      return safeSql`toStartOfSecond`
     case 'DAY':
       return safeSql`toStartOfDay`
     case 'HOUR':
@@ -574,7 +541,7 @@ ${joinSqlFragments(blocks, ' UNION ALL ')}`
  * Logs chart query with dynamic bucketing based on time range.
  */
 export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
-  const truncationLevel = calculateChartBucketing(search)
+  const { level: truncationLevel } = getUnifiedLogsChartBucket(search)
   const truncFn = truncationFunction(truncationLevel)
   const conditions = buildBaseWhere(search)
 

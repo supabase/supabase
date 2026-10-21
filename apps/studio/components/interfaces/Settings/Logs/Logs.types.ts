@@ -143,7 +143,7 @@ export type Override = {
 export interface DatetimeHelper {
   text: string
   calcTo: () => string
-  calcFrom: () => string
+  calcFrom: (to?: string) => string
   default?: boolean
   disabled?: boolean
 }

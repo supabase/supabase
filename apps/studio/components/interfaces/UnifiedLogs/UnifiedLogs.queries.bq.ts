@@ -4,11 +4,9 @@
 // during the migration. This file should be deleted once the flag is
 // removed.
 
-import dayjs from 'dayjs'
-
 import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
 import { groupLogsFiltersByColumn, parseLogsFilterUrlParams } from './UnifiedLogs.filters'
-import { QuerySearchParamsType, SearchParamsType } from './UnifiedLogs.types'
+import { QuerySearchParamsType } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
 import {
   joinSqlFragments,
@@ -17,6 +15,10 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
+import {
+  getUnifiedLogsChartBucket,
+  type UnifiedLogsChartBucket,
+} from '@/data/logs/unified-logs-chart.utils'
 
 // Operator fragments for SQL emission. `safeSql` rejects plain strings, so we
 // pre-brand the keywords we want to switch between.
@@ -109,61 +111,11 @@ const buildConditions = (
 const whereClause = (conditions: SafeLogSqlFragment[]): SafeLogSqlFragment =>
   conditions.length > 0 ? safeSql`WHERE ${joinSqlFragments(conditions, ' AND ')}` : safeSql``
 
-/**
- * Calculates how much the chart start datetime should be offset given the current datetime filter params
- * and determines the appropriate bucketing level (minute, hour, day)
- * Ported from the older implementation (apps/studio/components/interfaces/Settings/Logs/Logs.utils.ts)
- */
-type TruncationLevel = 'MINUTE' | 'HOUR' | 'DAY'
-
-const TRUNCATION_LEVEL_SQL: Record<TruncationLevel, SafeLogSqlFragment> = {
+const TRUNCATION_LEVEL_SQL: Record<UnifiedLogsChartBucket['level'], SafeLogSqlFragment> = {
+  SECOND: safeSql`SECOND`,
   MINUTE: safeSql`MINUTE`,
   HOUR: safeSql`HOUR`,
   DAY: safeSql`DAY`,
-}
-
-const calculateChartBucketing = (
-  search: SearchParamsType | Record<string, unknown>
-): TruncationLevel => {
-  // Extract start and end times from the date array if available
-  const dateRange = (search.date as Array<Date | string | number | null | undefined>) || []
-
-  // Handle timestamps that could be in various formats
-  const convertToMillis = (timestamp: Date | string | number | null | undefined) => {
-    if (!timestamp) return null
-    // If timestamp is a Date object
-    if (timestamp instanceof Date) return timestamp.getTime()
-
-    // If timestamp is a string that needs parsing
-    if (typeof timestamp === 'string') return dayjs(timestamp).valueOf()
-
-    // If timestamp is already a number (unix timestamp)
-    // Check if microseconds (16 digits) and convert to milliseconds
-    if (typeof timestamp === 'number') {
-      const str = timestamp.toString()
-      if (str.length >= 16) return Math.floor(timestamp / 1000)
-      return timestamp
-    }
-
-    return null
-  }
-
-  let startMillis = convertToMillis(dateRange[0])
-  let endMillis = convertToMillis(dateRange[1])
-
-  // Default values if not set
-  if (!startMillis) startMillis = dayjs().subtract(1, 'hour').valueOf()
-  if (!endMillis) endMillis = dayjs().valueOf()
-
-  const startTime = dayjs(startMillis)
-  const endTime = dayjs(endMillis)
-
-  const hourDiff = endTime.diff(startTime, 'hour')
-  const dayDiff = endTime.diff(startTime, 'day')
-
-  if (dayDiff >= 2) return 'DAY'
-  if (hourDiff >= 12) return 'HOUR'
-  return 'MINUTE'
 }
 
 /**
@@ -519,7 +471,7 @@ UNION ALL SELECT dimension, value, count FROM status_count
  */
 export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
-  const truncationLevel = calculateChartBucketing(search)
+  const { level: truncationLevel } = getUnifiedLogsChartBucket(search)
   const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`
