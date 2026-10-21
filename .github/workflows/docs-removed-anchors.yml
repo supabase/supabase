@@ -1,11 +1,9 @@
 name: Docs removed anchors
 
-# Fails a PR that removes a guide heading other docs pages link to. See
-# apps/docs/scripts/check-removed-anchors.ts. The `skip-anchor-check` label
-# turns the failure into a warning.
-#
-# No `paths` filter: a required check that never starts blocks the PR. The job
-# exits early instead when no docs content changed.
+# Stops a PR from removing a guide section that other docs pages link to, so
+# readers who follow those links land on the answer instead of the top of the
+# page. Deliberate removals can pass with the `skip-anchor-check` label. See
+# apps/docs/scripts/check-removed-anchors.ts.
 on:
   pull_request:
     branches: ['master']
@@ -22,8 +20,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      # Checks out the merge commit. Its first parent is the base branch, so
-      # diffing against HEAD^1 shows exactly what the PR changes.
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false

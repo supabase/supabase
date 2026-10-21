@@ -1,13 +1,19 @@
 /**
- * Fails when a change removes an H2 or H3 anchor from a guide page while other
- * docs content still links to it. Compares the base revision against the
- * working tree, and only parses guide pages the change touches, directly or
- * through a changed partial.
+ * Keeps links between docs pages pointing at the right section.
  *
- * Usage: pnpm check:removed-anchors [--base <rev>]
+ * Docs pages often link straight to a section of a guide, like the "Rotate a
+ * leaked key" section of the API keys guide. If a PR removes or renames that
+ * section, the link still loads the page but drops readers at the top, far
+ * from the answer they clicked for. Nothing warns the author, and nobody
+ * notices until a reader does.
  *
- * `--base` defaults to the merge base with origin/master. CI passes the base
- * branch commit.
+ * This check fails the PR instead and lists every page that links to the
+ * section. The author can keep the heading with a pointer to where the
+ * content went, keep the old anchor on a renamed heading, or update the
+ * links. For deliberate removals, the `skip-anchor-check` label lets the PR
+ * through.
+ *
+ * Run it locally with `pnpm check:removed-anchors`.
  */
 
 import { execFile } from 'node:child_process'
@@ -27,10 +33,8 @@ import { toString } from 'mdast-util-to-string'
 import { getAnchor } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { visit } from 'unist-util-visit'
 
-/** Reads a file by its path relative to `apps/docs/content`. Returns undefined if it doesn't exist. */
 export type ReadContent = (contentPath: string) => Promise<string | undefined>
 
-/** Lists content paths, in the working tree, whose text contains `needle`. */
 export type FindFiles = (needle: string) => Promise<string[]>
 
 export interface LinkLocation {
@@ -39,9 +43,7 @@ export interface LinkLocation {
 }
 
 export interface BrokenAnchor {
-  /** Content path of the guide page, e.g. `guides/getting-started/api-keys.mdx` */
   page: string
-  /** Route of the guide page, e.g. `/guides/getting-started/api-keys` */
   route: string
   anchor: string
   linkedFrom: LinkLocation[]
@@ -81,7 +83,6 @@ export async function findBrokenAnchors({
       collectAnchors(page, readBase),
       collectAnchors(page, readHead),
     ])
-    // Deleted and moved pages are out of scope: redirects cover them.
     if (!baseAnchors || !headAnchors) continue
 
     const removed = [...baseAnchors].filter((anchor) => !headAnchors.has(anchor))
@@ -109,10 +110,6 @@ export async function findBrokenAnchors({
   return broken
 }
 
-/**
- * Changed guide pages, plus every guide page that includes a changed partial,
- * directly or through another partial.
- */
 async function findAffectedPages(changedFiles: string[], findFiles: FindFiles) {
   const pages = new Set(changedFiles.filter((file) => isGuidePage(file)))
   const queue = changedFiles.filter((file) => isPartial(file))
@@ -120,7 +117,6 @@ async function findAffectedPages(changedFiles: string[], findFiles: FindFiles) {
 
   while (queue.length > 0) {
     const partial = queue.pop()!
-    // A loose match costs at most an extra parse, so no need to parse the include here.
     for (const file of await findFiles(partial.slice(PARTIALS_PREFIX.length))) {
       if (isGuidePage(file)) {
         pages.add(file)
@@ -135,7 +131,6 @@ async function findAffectedPages(changedFiles: string[], findFiles: FindFiles) {
 }
 
 function parseMdx(source: string): Root {
-  // Blank out frontmatter rather than strip it, so line numbers still match the file.
   const withoutFrontmatter = source.replace(/^---\r?\n[\s\S]*?\r?\n---(?=\r?\n|$)/, (match) =>
     match.replace(/[^\n]/g, '')
   )
@@ -158,12 +153,6 @@ async function collectAnchors(page: string, read: ReadContent) {
   return anchors
 }
 
-/**
- * Computes the anchor the same way the rendered `Heading` component does, by
- * passing `getAnchor` the shape React gives it as children: a string for a
- * plain-text heading, an element for a single inline node, and an array
- * otherwise.
- */
 function headingAnchor(node: Heading) {
   const children = node.children.map((child) =>
     child.type === 'text' ? child.value : { props: { children: toString(child) } }
@@ -171,7 +160,6 @@ function headingAnchor(node: Heading) {
   return getAnchor(children.length === 1 ? children[0] : children)
 }
 
-/** Inlines `<$Partial>` includes, mirroring `features/directives/Partial.ts`. */
 async function expandPartials(tree: Root, read: ReadContent) {
   for (let depth = 0; depth < MAX_PARTIAL_DEPTH; depth++) {
     const includes: [Parent, MdxJsxFlowElement][] = []
@@ -215,7 +203,6 @@ async function collectLinks(file: string, read: ReadContent): Promise<Link[]> {
     if (target) links.push({ ...target, file, line: line ?? 0 })
   }
 
-  // Partials hold `{{ .var }}` placeholders that only parse once substituted.
   const tree = parseMdx(isPartial(file) ? substitutePartialVars(source, undefined) : source)
   visit(tree, (node) => {
     const line = node.position?.start.line
@@ -229,10 +216,6 @@ async function collectLinks(file: string, read: ReadContent): Promise<Link[]> {
   return links
 }
 
-/**
- * Resolves a link to the guide route and anchor it points at, or undefined if
- * it isn't a guide anchor link. A bare `#anchor` resolves to `ownRoute`.
- */
 function parseLinkTarget(url: string, ownRoute?: string) {
   const hashIndex = url.indexOf('#')
   if (hashIndex === -1) return undefined
@@ -270,7 +253,6 @@ function formatReport(broken: BrokenAnchor[]) {
   return lines.join('\n')
 }
 
-/** Whether the PR's labels include the bypass label. `labelsJson` is a JSON array of names. */
 export function hasBypassLabel(labelsJson: string | undefined) {
   if (!labelsJson) return false
   try {
@@ -307,7 +289,6 @@ export function findInWorkingTree(contentDir: string): FindFiles {
       )
       return stdout.split('\n').filter(Boolean)
     } catch {
-      // git grep exits 1 when nothing matches.
       return []
     }
   }
@@ -353,7 +334,6 @@ async function main() {
     return
   }
 
-  // Set only by the docs-removed-anchors workflow, not a turbo task.
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   const bypassed = hasBypassLabel(process.env.PR_LABELS)
   if (process.env.GITHUB_ACTIONS) {

@@ -16,7 +16,6 @@ const LEAKED_KEY_HEADING = '### Rotate a leaked or compromised key [#leaked-key]
 
 const readBase = readFromWorkingTree(CONTENT_DIR)
 
-/** Runs the check against real content, with `edits` applied to the head revision. */
 function checkRealContent(edits: Record<string, (source: string) => string>) {
   const readHead: ReadContent = async (contentPath) => {
     const source = await readBase(contentPath)
@@ -37,7 +36,6 @@ const replaceOrThrow = (search: string | RegExp, replacement: string) => (source
   return result
 }
 
-/** Matches a section from its heading up to the next H2 or H3, or the end of the file. */
 const section = (heading: string) =>
   new RegExp(
     `^${heading.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\n[\\s\\S]*?(?=^#{2,3} |(?![\\s\\S]))`,
