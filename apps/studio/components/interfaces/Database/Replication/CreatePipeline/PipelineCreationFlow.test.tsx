@@ -213,9 +213,14 @@ describe('PipelineCreationFlow', () => {
     return { requests, starts, destinationRequests, pipelineRequests }
   }
 
-  it.each([false, true])(
-    'places review failures and keeps the current position (connection: %s)',
-    async (hasConnectionFailure) => {
+  it.each([
+    [false, false],
+    [true, false],
+    [false, true],
+    [true, true],
+  ])(
+    'places review failures and keeps the current position (connection: %s, warnings: %s)',
+    async (hasConnectionFailure, hasWarnings) => {
       const { requests } = mockCreation()
       await reachReview()
       const validationStatus = screen.getByRole('status', { name: 'Pipeline validation status' })
@@ -249,6 +254,15 @@ describe('PipelineCreationFlow', () => {
                 reason: 'Check publication settings.',
                 failure_type: 'critical',
               },
+              ...(hasWarnings
+                ? [
+                    {
+                      name: 'Retention',
+                      reason: 'Review retention settings.',
+                      failure_type: 'warning' as const,
+                    },
+                  ]
+                : []),
             ],
           }),
       })
@@ -266,7 +280,11 @@ describe('PipelineCreationFlow', () => {
       expect(data.getByText('Check publication settings.')).toBeInTheDocument()
       expect(data.getByRole('button', { name: 'Edit data' })).toBeInTheDocument()
       expect(
-        screen.getByText('Fix the above issues before starting the pipeline.')
+        screen.getByText(
+          hasWarnings
+            ? 'Fix the above issues and review warnings before starting the pipeline.'
+            : 'Fix the above issues before starting the pipeline.'
+        )
       ).toBeInTheDocument()
       expect(scrollIntoView).not.toHaveBeenCalled()
       expect(requests).toHaveLength(0)

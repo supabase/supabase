@@ -97,6 +97,13 @@ export const PipelineCreationFlow = ({
   const hasCriticalFailures = submissionFailures.some(
     ({ failure_type }) => failure_type === 'critical'
   )
+  const hasWarnings = submissionFailures.some(({ failure_type }) => failure_type === 'warning')
+  let validationMessage = 'Review the warnings above before starting the pipeline.'
+  if (hasCriticalFailures) {
+    validationMessage = hasWarnings
+      ? 'Fix the above issues and review warnings before starting the pipeline.'
+      : 'Fix the above issues before starting the pipeline.'
+  }
   const isBusy = isValidating || isValidatingData || isSubmitting
   const accessibleStep = (() => {
     if (isSubmitting) return step
@@ -185,7 +192,7 @@ export const PipelineCreationFlow = ({
                     form={form}
                     onSelectNewPublication={() => setIsPublicationPanelVisible(true)}
                     revealInvalidSettings
-                    showTableLoadError={false}
+                    showLoadError={false}
                   />
                   {(hasPublicationLoadError || dataError) && (
                     <Admonition
@@ -227,11 +234,7 @@ export const PipelineCreationFlow = ({
                       <Admonition
                         className={SANDWICHED_ADMONITION_CLASS}
                         type={hasCriticalFailures ? 'danger' : 'warning'}
-                        description={
-                          hasCriticalFailures
-                            ? 'Fix the above issues before starting the pipeline.'
-                            : 'Review the warnings above before starting the pipeline.'
-                        }
+                        description={validationMessage}
                       />
                     )}
                   </div>

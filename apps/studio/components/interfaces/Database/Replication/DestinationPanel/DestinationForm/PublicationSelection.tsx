@@ -14,13 +14,13 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
   onSelectNewPublication: () => void
-  showPublicationLoadError?: boolean
+  showLoadError?: boolean
 }
 
 export const PublicationSelection = ({
   form,
   onSelectNewPublication,
-  showPublicationLoadError = true,
+  showLoadError = true,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
@@ -52,7 +52,7 @@ export const PublicationSelection = ({
         ? 'Partitioned tables use the parent table identity.'
         : 'Each partition is replicated separately.'
     } else if (isPublicationError || isSourceUnavailable) {
-      if (showPublicationLoadError || isSourceUnavailable) {
+      if (showLoadError || isSourceUnavailable) {
         partitionHandlingMessage = 'Partition handling could not be loaded.'
       }
     } else {

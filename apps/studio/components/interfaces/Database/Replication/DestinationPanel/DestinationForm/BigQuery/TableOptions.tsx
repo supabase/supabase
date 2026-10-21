@@ -73,10 +73,10 @@ const TableOptionsSkeleton = () => (
 
 interface TableOptionsProps {
   control: Control<DestinationPanelSchemaType>
-  showPublicationLoadError?: boolean
+  showLoadError?: boolean
 }
 
-export const TableOptions = ({ control, showPublicationLoadError = true }: TableOptionsProps) => {
+export const TableOptions = ({ control, showLoadError = true }: TableOptionsProps) => {
   const { ref: projectRef } = useParams()
   const sourceId = useReplicationSourceId({ projectRef })
   const publicationName = useWatch({ control, name: 'publicationName' })
@@ -159,7 +159,7 @@ export const TableOptions = ({ control, showPublicationLoadError = true }: Table
   }
 
   if (isPublicationError) {
-    if (!showPublicationLoadError) return null
+    if (!showLoadError) return null
 
     return (
       <Admonition
