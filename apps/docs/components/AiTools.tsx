@@ -1,13 +1,9 @@
 'use client'
 
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { askAiUrls, useCopyMarkdownFromUrl } from 'common'
 import { type MarkdownAffordancePageType } from 'common/telemetry-constants'
-import { Chatgpt, Claude, Google } from 'icons'
-import { Check, Copy, Sparkles } from 'lucide-react'
-import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { cn } from 'ui'
+import { AiTools as SharedAiTools, type AiAgent } from 'ui-patterns/AiTools'
 
 function AiTools({
   pageType,
@@ -24,108 +20,47 @@ function AiTools({
 }) {
   const path = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-  const urls = askAiUrls(`https://supabase.com/docs${path}`)
 
   function handleAgentSetupClick() {
     sendTelemetryEvent({ action: 'agent_setup_clicked' })
   }
 
-  async function handleCopy() {
-    const ok = await copyMarkdown(`/docs${path}.md`, {
-      fallback: () => document.getElementById(articleId)?.innerHTML ?? '',
-    })
-    if (ok) {
-      sendTelemetryEvent({ action: 'copy_as_markdown_clicked', properties: { pageType } })
-    }
+  function handleMarkdownCopy() {
+    sendTelemetryEvent({ action: 'copy_as_markdown_clicked', properties: { pageType } })
+  }
+
+  function handlePreferredSourceClick() {
+    sendTelemetryEvent({ action: 'preferred_source_clicked', properties: { pageType } })
+  }
+
+  function handleAskAiClick(agent: AiAgent) {
+    sendTelemetryEvent({ action: 'ask_ai_clicked', properties: { agent, pageType } })
+  }
+
+  function getArticleHtml() {
+    return document.getElementById(articleId)?.innerHTML ?? ''
   }
 
   return (
-    <section className={className} aria-labelledby="ai-tools-title">
-      <h2
-        id="ai-tools-title"
-        className={cn(
-          'mb-3',
-          pageType === 'troubleshooting'
-            ? 'text-sm text-foreground-lighter'
-            : 'block font-mono uppercase text-xs text-foreground-light'
-        )}
-      >
-        AI tools
-      </h2>
-      <div className="flex flex-col gap-2">
-        {showAgentSetup && (
-          <Link
-            href="/guides/ai-tools"
-            onClick={handleAgentSetupClick}
-            className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-          >
-            <Sparkles size={14} strokeWidth={1.5} />
-            Connect your AI agent
-          </Link>
-        )}
-        <button
-          tabIndex={0}
-          onClick={handleCopy}
-          className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
-        >
-          {copied ? (
-            <Check size={14} strokeWidth={1.5} className="text-primary" aria-hidden />
-          ) : (
-            <Copy size={14} strokeWidth={1.5} aria-hidden />
-          )}
-          {copied ? 'Copied!' : 'Copy as Markdown'}
-        </button>
-        <span className="sr-only" role="status">
-          {copied ? 'Copied to clipboard' : ''}
-        </span>
-        <a
-          href={urls.chatgpt}
-          target="_blank"
-          onClick={() =>
-            sendTelemetryEvent({
-              action: 'ask_ai_clicked',
-              properties: { agent: 'chatgpt', pageType },
-            })
-          }
-          rel="noreferrer noopener"
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-        >
-          <Chatgpt size={14} aria-hidden />
-          Ask ChatGPT
-        </a>
-        <a
-          href={urls.claude}
-          target="_blank"
-          onClick={() =>
-            sendTelemetryEvent({
-              action: 'ask_ai_clicked',
-              properties: { agent: 'claude', pageType },
-            })
-          }
-          rel="noreferrer noopener"
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-        >
-          <Claude size={14} aria-hidden />
-          Ask Claude
-        </a>
-        {showPreferredSource && (
-          <a
-            href="https://www.google.com/preferences/source?q=supabase.com"
-            target="_blank"
-            title="Add Supabase as a preferred source on Google"
-            rel="noreferrer noopener"
-            onClick={() =>
-              sendTelemetryEvent({ action: 'preferred_source_clicked', properties: { pageType } })
-            }
-            className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-          >
-            <Google size={14} aria-hidden />
-            Prefer on Google
-          </a>
-        )}
-      </div>
-    </section>
+    <SharedAiTools
+      pageUrl={`https://supabase.com/docs${path}`}
+      markdownUrl={`/docs${path}.md`}
+      markdownFallback={getArticleHtml}
+      agentSetupHref={showAgentSetup ? '/docs/guides/ai-tools' : undefined}
+      preferredSourceHref={
+        showPreferredSource ? 'https://www.google.com/preferences/source?q=supabase.com' : undefined
+      }
+      onAgentSetupClick={handleAgentSetupClick}
+      onPreferredSourceClick={handlePreferredSourceClick}
+      onMarkdownCopy={handleMarkdownCopy}
+      onAskAiClick={handleAskAiClick}
+      titleClassName={
+        pageType === 'troubleshooting'
+          ? 'font-sans text-sm normal-case text-foreground-lighter'
+          : undefined
+      }
+      className={className}
+    />
   )
 }
 

@@ -51,13 +51,13 @@ You write RLS rules in SQL, so a rule can express whatever access logic your app
 
 Postgres runs two checks before a client touches a table. Grants decide whether a role can run an operation on the table at all. Policies decide which rows that operation applies to. Set both for every table you expose.
 
-On existing projects, a new table in `public` starts with every privilege already granted to all three roles:
+On existing projects, a new table in `public` starts with every privilege already granted to all three roles. The default grants include `select`, `insert`, `update`, `delete`, `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`:
 
-| Role            | Granted automatically                  | What it should keep                                     |
-| --------------- | -------------------------------------- | ------------------------------------------------------- |
-| `anon`          | `select`, `insert`, `update`, `delete` | Only what signed-out visitors are meant to read         |
-| `authenticated` | `select`, `insert`, `update`, `delete` | Only the operations your app exposes to signed-in users |
-| `service_role`  | `select`, `insert`, `update`, `delete` | Full access. It bypasses RLS, so keep it server-side    |
+| Role            | Granted automatically | What it should keep                                     |
+| --------------- | --------------------- | ------------------------------------------------------- |
+| `anon`          | Every privilege       | Only what signed-out visitors are meant to read         |
+| `authenticated` | Every privilege       | Only the operations your app exposes to signed-in users |
+| `service_role`  | Every privilege       | Full access. It bypasses RLS, so keep it server-side    |
 
 Adding policies doesn't take those grants back. A table protected only by policies still hands `anon` an insert path if you never revoke the grant.
 

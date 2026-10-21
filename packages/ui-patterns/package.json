@@ -34,6 +34,10 @@
       "import": "./src/Admonition/index.tsx",
       "types": "./src/Admonition/index.tsx"
     },
+    "./AiTools": {
+      "import": "./src/AiTools/index.tsx",
+      "types": "./src/AiTools/index.tsx"
+    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -517,6 +521,10 @@
     "./MultipleCodeBlock": {
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
+    },
+    "./Notch": {
+      "import": "./src/Notch/index.ts",
+      "types": "./src/Notch/index.ts"
     },
     "./PageBreadcrumbs": {
       "import": "./src/PageBreadcrumbs/index.tsx",

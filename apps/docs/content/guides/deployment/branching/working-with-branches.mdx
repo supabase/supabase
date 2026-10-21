@@ -185,7 +185,7 @@ The preview branch inherits the migration history of your base project, so it on
 
 ### Default privileges on branches
 
-New branches are secure by default. They are created without [default privileges](/docs/guides/api/securing-your-api#default-privileges) on the `public` schema, regardless of the setting on your base project. New tables, functions, and sequences on a branch require explicit grants before `anon`, `authenticated`, or `service_role` can reach them through the Data API.
+New branches are secure by default. They are created without [default privileges](/docs/guides/api/securing-your-api#default-privileges) on the `public` schema, regardless of the setting on your base project. New tables and sequences on a branch require explicit grants before `anon`, `authenticated`, or `service_role` can reach them through the Data API. New functions stay callable, because Postgres grants `execute` on every new function to `PUBLIC`. For how to restrict them, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
 
 Your migrations control whether a branch re-enables these privileges. If your base project has default privileges enabled and your migration history was initialized by Supabase Branching or the Supabase CLI, the initial migration already contains the `alter default privileges` statements that grant access on `public`. Running it on a new branch restores the same access your base project has, so no changes are needed.
 
@@ -202,7 +202,7 @@ If your migration history was not initialized by Supabase Branching or the Supab
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Turn on default privileges on your base project" fullWidth>
 
-      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn on **Default privileges for new entities**.
+      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn on **Automatically expose new tables**.
 
     </StepHikeCompact.Details>
 
@@ -245,7 +245,7 @@ For improved security, we recommend not exposing the `public` schema automatical
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Turn off default privileges on your base project" fullWidth>
 
-      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn off **Default privileges for new entities**.
+      Open the [Data API settings](/dashboard/project/_/integrations/data_api/settings) in the Supabase Dashboard and turn off **Automatically expose new tables**.
 
     </StepHikeCompact.Details>
 
@@ -267,6 +267,8 @@ For improved security, we recommend not exposing the `public` schema automatical
       alter default privileges for role postgres in schema public revoke execute on functions from anon, authenticated, service_role, public;
       alter default privileges for role postgres in schema public revoke usage, select, update on sequences from anon, authenticated, service_role;
       ```
+
+      These statements leave new tables with `truncate`, `references`, `trigger`, and, on Postgres 17, `maintain`, and leave new functions callable through `PUBLIC`. To also remove those privileges, see [Revoke default privileges](/docs/guides/api/securing-your-api#revoke-default-privileges).
 
     </StepHikeCompact.Details>
 
