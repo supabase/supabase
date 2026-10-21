@@ -16,27 +16,6 @@ export function useHighAvailability() {
   }
 }
 
-/**
- * Realtime (and the publications it relies on) is available on High
- * Availability projects in every environment. Whether a project is actually
- * registered as a Realtime tenant is decided by the platform.
- */
-export function resolveRealtimeUnavailable(
-  isHighAvailability: boolean,
-  isHighAvailabilityRealtimeAvailable = true
-) {
-  return isHighAvailability && !isHighAvailabilityRealtimeAvailable
-}
-
-export function useIsRealtimeUnavailable() {
-  const { isHighAvailability, isPending } = useHighAvailability()
-
-  return {
-    isRealtimeUnavailable: resolveRealtimeUnavailable(isHighAvailability),
-    isPending,
-  }
-}
-
 export function filterSchemasForHighAvailability<T extends { name: string }>(
   schemas: T[],
   isHighAvailability: boolean
