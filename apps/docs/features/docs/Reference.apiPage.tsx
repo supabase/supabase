@@ -1,4 +1,3 @@
-import { GuidesSidebar } from '~/components/GuidesSidebar'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { reference_api } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
@@ -7,6 +6,7 @@ import { getRefMarkdown } from '~/features/docs/Reference.mdx'
 import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
 import { ReferenceContentScrollHandler } from '~/features/docs/Reference.navigation.client'
 import { SectionSwitch } from '~/features/docs/Reference.sections'
+import { ReferenceSidebar } from '~/features/docs/Reference.sidebar'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { notFound, redirect } from 'next/navigation'
@@ -75,7 +75,7 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
                 >
                   <SectionSwitch libraryId="api" version="latest" section={section} />
                 </article>
-                <GuidesSidebar
+                <ReferenceSidebar
                   links={additionalLinks}
                   className={cn(
                     'hidden md:flex md:col-span-3 md:col-start-10',
