@@ -57,7 +57,7 @@ export const StorageSearchResults = ({
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center justify-between gap-x-2 border-b border-default bg-surface-75 px-2.5 py-2">
-        <p className="min-w-0 truncate text-xs text-foreground-light">
+        <p role="status" className="min-w-0 truncate text-xs text-foreground-light">
           {isPending && `Searching ${bucketName}...`}
           {!isPending && !isError && `${matchCount} in ${bucketName}`}
         </p>
