@@ -116,30 +116,33 @@ export function sanitizeNameForDuplicateInColumn(
 ): string | null {
   const columnIndex_ = columnIndex !== undefined ? columnIndex : state.columns.length - 1
   const currentColumn = state.columns[columnIndex_]
-  const currentColumnItems = currentColumn.items.filter(
-    (item) => item.status !== STORAGE_ROW_STATUS.EDITING
+  const existingNames = new Set(
+    currentColumn.items
+      .filter((item) => item.status !== STORAGE_ROW_STATUS.EDITING)
+      .map((item) => item.name)
+      .concat(reservedNames)
+      .map((name) => name.toLowerCase())
   )
-  // One list, so the suffix counter sees everything the clash check does. Counting only
-  // column items would hand back a ` (1)` that an archived object already holds.
-  const takenNames = currentColumnItems.map((item) => item.name).concat(reservedNames)
   // [Joshen] JFYI storage does support folders of the same name with different casing
   // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
   // for folders of the same name with different casing
   // We should remove this check once all projects are on the List V2 endpoint
-  const hasSameNameInColumn =
-    takenNames.filter((takenName) => takenName.toLowerCase() === name.toLowerCase()).length > 0
+  const hasSameNameInColumn = existingNames.has(name.toLowerCase())
 
   if (hasSameNameInColumn) {
     if (autofix) {
-      const fileNameSegments = name.split('.')
-      const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
-      const fileExt = fileNameSegments[fileNameSegments.length - 1]
+      const extensionIndex = name.lastIndexOf('.')
+      const fileName = extensionIndex > 0 ? name.slice(0, extensionIndex) : name
+      const fileExt = extensionIndex > 0 ? name.slice(extensionIndex) : ''
+      let suffix = 1
+      let updatedFileName = `${fileName} (${suffix})${fileExt}`
 
-      const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
-      const namesWithSuffix = takenNames.filter((takenName) => takenName.match(dupeNameRegex))
+      while (existingNames.has(updatedFileName.toLowerCase())) {
+        suffix++
+        updatedFileName = `${fileName} (${suffix})${fileExt}`
+      }
 
-      const updatedFileName = fileName + ` (${namesWithSuffix.length + 1})`
-      return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
+      return updatedFileName
     } else {
       toast.error(
         `The name ${name} already exists in the current directory. Please use a different name.`
