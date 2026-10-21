@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getOptInTools, getStudioTools } from './studio-tools'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
+import { NO_DATA_ERROR, NO_DATA_PERMISSIONS } from '@/lib/ai/tools/execute-sql-output'
 
 vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
@@ -200,6 +200,37 @@ describe('ai/tools/studio-tools', () => {
         value: NO_DATA_PERMISSIONS,
       })
     })
+
+    it.each([
+      ['schema', NO_DATA_ERROR],
+      ['schema_and_log_and_data', 'duplicate key (email)=(test@example.com)'],
+    ] as const)(
+      'should surface execute_sql errors per opt-in level (%s)',
+      async (aiOptInLevel, message) => {
+        vi.mocked(executeSql).mockRejectedValue(
+          new Error('duplicate key (email)=(test@example.com)')
+        )
+
+        const tools = getStudioTools({
+          projectRef: 'test-project',
+          connectionString: 'encrypted-connection-string',
+          aiOptInLevel,
+        })
+
+        if (!tools.execute_sql.execute) throw new Error('execute is undefined')
+        await expect(
+          tools.execute_sql.execute(
+            {
+              sql: 'INSERT INTO users (email) VALUES (1)',
+              label: 'Insert',
+              chartConfig: { view: 'table' },
+              isWriteQuery: true,
+            },
+            { toolCallId: 'test', messages: [], context: {} }
+          )
+        ).rejects.toThrow(message)
+      }
+    )
 
     it('should return execute_sql rows with data opt-in', async () => {
       const rows = [{ email: 'test@example.com' }]
