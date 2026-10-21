@@ -1,19 +1,8 @@
 /**
- * Keeps links between docs pages pointing at the right section.
- *
- * Docs pages often link straight to a section of a guide, like the "Rotate a
- * leaked key" section of the API keys guide. If a PR removes or renames that
- * section, the link still loads the page but drops readers at the top, far
- * from the answer they clicked for. Nothing warns the author, and nobody
- * notices until a reader does.
- *
- * This check fails the PR instead and lists every page that links to the
- * section. The author can keep the heading with a pointer to where the
- * content went, keep the old anchor on a renamed heading, or update the
- * links. For deliberate removals, the `skip-anchor-check` label lets the PR
- * through.
- *
- * Run it locally with `pnpm check:removed-anchors`.
+ * Leaves a trail when sections move. Agents are slow to update what they
+ * remember about the docs, so this fails a PR that removes a section another
+ * page links to, unless the heading stays with a summary and a link to where
+ * the content went. The `skip-anchor-check` label allows a deliberate removal.
  */
 
 import { execFile } from 'node:child_process'

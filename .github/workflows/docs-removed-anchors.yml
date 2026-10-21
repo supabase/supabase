@@ -1,9 +1,6 @@
 name: Docs removed anchors
 
-# Stops a PR from removing a guide section that other docs pages link to, so
-# readers who follow those links land on the answer instead of the top of the
-# page. Deliberate removals can pass with the `skip-anchor-check` label. See
-# apps/docs/scripts/check-removed-anchors.ts.
+# Leaves a trail when sections move. See apps/docs/scripts/check-removed-anchors.ts.
 on:
   pull_request:
     branches: ['master']
