@@ -177,6 +177,42 @@ describe('fillTimeseries', () => {
     expect(result.map((point) => point.value)).toEqual([1, 2])
   })
 
+  test.each([undefined, '1s'])(
+    'should bound generated points across a long range with interval %s',
+    (interval) => {
+      const start = dayjs.utc('2026-09-17T06:01:02.000Z')
+      const end = start.add(7, 'days')
+      const data = [
+        { timestamp: start.valueOf() * 1000, value: 1 },
+        { timestamp: end.valueOf() * 1000, value: 2 },
+      ]
+
+      const result = fillTimeseries(
+        data,
+        'timestamp',
+        'value',
+        0,
+        start.toISOString(),
+        end.toISOString(),
+        20,
+        interval
+      )
+
+      expect(result.length).toBeLessThanOrEqual(1002)
+      expect(result).toContainEqual({ timestamp: start.toISOString(), value: 1 })
+      expect(result).toContainEqual({ timestamp: end.toISOString(), value: 2 })
+    }
+  )
+
+  test('should advance when the requested interval is zero', () => {
+    const timestamp = '2026-09-24T06:01:02.000Z'
+    const data = [{ timestamp, value: 1 }]
+
+    expect(fillTimeseries(data, 'timestamp', 'value', 0, timestamp, timestamp, 20, '0s')).toEqual(
+      data
+    )
+  })
+
   test('should normalize a single microsecond point without an end date', () => {
     const timestamp = dayjs.utc('2026-09-24T06:00:00.000Z')
     const data = [{ timestamp: timestamp.valueOf() * 1000, value: 1 }]
