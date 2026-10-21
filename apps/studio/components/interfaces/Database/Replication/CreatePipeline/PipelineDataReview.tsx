@@ -1,4 +1,5 @@
 import { EditIcon } from 'lucide-react'
+import type { Ref } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -12,18 +13,24 @@ import {
 } from '../DestinationPanel/DestinationForm/DestinationFormFieldCopy'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { describeBigQueryTableLayout } from './PipelineReviewSummary.utils'
+import { DATA_VALIDATION_HINT, PipelineValidationAdmonition } from './PipelineValidationAdmonition'
 import type { ReplicationPublicationData } from '@/data/replication/publication-query'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 export const PipelineDataReview = ({
   type,
   control,
   publication,
   onEdit,
+  validationFailures = [],
+  validationRef,
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
   publication?: ReplicationPublicationData
   onEdit?: () => void
+  validationFailures?: ValidationFailure[]
+  validationRef?: Ref<HTMLDivElement>
 }) => {
   const [publicationName, mode, ids, workers, copies, slot, batch, options] = useWatch({
     control,
@@ -128,6 +135,11 @@ export const PipelineDataReview = ({
           </Button>
         )}
       </div>
+      <PipelineValidationAdmonition
+        ref={validationRef}
+        failures={validationFailures}
+        hint={DATA_VALIDATION_HINT}
+      />
       {rows.map((row) => (
         <ReviewField key={row.label} {...row} />
       ))}

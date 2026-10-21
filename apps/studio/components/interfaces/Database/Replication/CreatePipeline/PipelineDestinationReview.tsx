@@ -1,5 +1,5 @@
 import { EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useState, type Ref } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -26,6 +26,8 @@ import {
 import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/PipelineRegionField'
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionReview } from './PipelineConnectionReview'
+import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
   const [isVisible, setIsVisible] = useState(false)
@@ -51,11 +53,15 @@ export const PipelineDestinationReview = ({
   control,
   onEditDestination,
   onEditConnection,
+  validationFailures = [],
+  validationRef,
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
   onEditDestination?: () => void
   onEditConnection?: () => void
+  validationFailures?: ValidationFailure[]
+  validationRef?: Ref<HTMLDivElement>
 }) => {
   const [
     name,
@@ -175,7 +181,7 @@ export const PipelineDestinationReview = ({
         </FormItemLayout>
       </div>
       <Separator />
-      <div className="space-y-6 p-5">
+      <section aria-label="Connection review" className="space-y-6 p-5">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm font-medium text-foreground">Connection</h3>
           {onEditConnection && (
@@ -190,6 +196,7 @@ export const PipelineDestinationReview = ({
             </Button>
           )}
         </div>
+        <PipelineValidationAdmonition ref={validationRef} failures={validationFailures} />
         {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
           <FormItemLayout
             key={row.label}
@@ -214,7 +221,7 @@ export const PipelineDestinationReview = ({
         >
           <PipelineRegionReadonly />
         </FormItemLayout>
-      </div>
+      </section>
     </section>
   )
 }

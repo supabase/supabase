@@ -25,6 +25,7 @@ import { usePipelineConnectionValidation } from './usePipelineConnectionValidati
 import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
+import { usePipelineReviewCosts } from './usePipelineReviewCosts'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -50,6 +51,8 @@ export const PipelineCreationFlow = ({
 }) => {
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
+  const connectionValidationRef = useRef<HTMLDivElement>(null)
+  const dataValidationRef = useRef<HTMLDivElement>(null)
 
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
@@ -75,7 +78,8 @@ export const PipelineCreationFlow = ({
   const {
     handleSubmit,
     isSubmitting,
-    failures: submissionFailures,
+    destinationValidationFailures,
+    pipelineValidationFailures,
     submitLabel,
   } = usePipelineCreationSubmission({
     type,
@@ -90,6 +94,11 @@ export const PipelineCreationFlow = ({
     if (step === 'review' && !isDataVerified) return 'data'
     return step
   })()
+  const costs = usePipelineReviewCosts({
+    control: form.control,
+    publication,
+    enabled: accessibleStep === 'review',
+  })
   const handleNext = async () => {
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
@@ -108,6 +117,15 @@ export const PipelineCreationFlow = ({
     }
     if (step !== accessibleStep) void setStep(accessibleStep, { history: 'replace' })
   }, [step, accessibleStep, setStep])
+
+  useEffect(() => {
+    if (accessibleStep !== 'review' || isSubmitting) return
+    const firstIssue =
+      destinationValidationFailures.length > 0
+        ? connectionValidationRef.current
+        : dataValidationRef.current
+    firstIssue?.scrollIntoView({ behavior: 'auto', block: 'center' })
+  }, [accessibleStep, isSubmitting, destinationValidationFailures, pipelineValidationFailures])
 
   return (
     <div className="flex min-h-screen flex-col bg-dash-sidebar">
@@ -134,6 +152,7 @@ export const PipelineCreationFlow = ({
                 label: submitLabel,
                 onClick: handleSubmit,
                 loading: isSubmitting,
+                disabled: costs.isInitialCostEstimateLoading,
               }}
             >
               <SteppedFlowHeader title={currentStep.title} />
@@ -190,6 +209,8 @@ export const PipelineCreationFlow = ({
                     control={form.control}
                     onEditDestination={() => void setStep('destination')}
                     onEditConnection={() => void setStep('connection')}
+                    validationFailures={destinationValidationFailures}
+                    validationRef={connectionValidationRef}
                   />
                   <Separator />
                   <PipelineDataReview
@@ -197,10 +218,11 @@ export const PipelineCreationFlow = ({
                     control={form.control}
                     publication={publication}
                     onEdit={() => void setStep('data')}
+                    validationFailures={pipelineValidationFailures}
+                    validationRef={dataValidationRef}
                   />
                   <Separator />
-                  <PipelineReviewCosts control={form.control} publication={publication} />
-                  <PipelineValidationAdmonition failures={submissionFailures} />
+                  <PipelineReviewCosts costs={costs} />
                 </>
               )}
             </SteppedFlow>
