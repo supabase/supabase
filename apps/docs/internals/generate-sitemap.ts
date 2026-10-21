@@ -45,6 +45,8 @@ async function generate() {
     referencePages,
     cliPages
   )
+  // Keep the output order stable across builds
+  allPages.sort((a, b) => (a.link < b.link ? -1 : a.link > b.link ? 1 : 0))
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -75,7 +77,6 @@ async function generate() {
     `Total of ${allPages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
   )
 
-  // eslint-disable-next-line no-sync
   fs.writeFileSync(sitemapFilePath, formatted)
 }
 
