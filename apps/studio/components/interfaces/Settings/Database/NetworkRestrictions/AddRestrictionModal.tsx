@@ -291,16 +291,19 @@ export const AddRestrictionModal = ({
                   </p>
                   <ul className="space-y-2">
                     {stagedAddresses.map((address) => (
-                      <li
-                        key={address}
-                        className="flex items-center justify-between rounded border border-default bg-surface-100 py-1 pl-3 pr-1"
-                      >
-                        <code className="text-code-inline">{address}</code>
+                      <li key={address} className="flex items-center space-x-2">
+                        <Input
+                          readOnly
+                          size="small"
+                          value={address}
+                          aria-label={`Restriction ${address}`}
+                          className="flex-1"
+                        />
                         <Button
-                          variant="text"
                           size="tiny"
                           icon={<TrashIcon size={12} />}
                           aria-label={`Remove ${address}`}
+                          className="h-[34px] w-[34px] shrink-0"
                           disabled={isApplying}
                           onClick={() =>
                             setStagedAddresses((addresses) =>

@@ -106,7 +106,7 @@ describe('AddRestrictionModal', () => {
     await addEntry('203.0.113.7')
 
     expect(await screen.findByText('1 range to add')).toBeInTheDocument()
-    expect(screen.getByText('203.0.113.7/32')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('203.0.113.7/32')).toBeInTheDocument()
     expect(screen.getByPlaceholderText('0.0.0.0')).toHaveValue('')
   })
 
@@ -205,7 +205,7 @@ describe('AddRestrictionModal', () => {
     await addEntry('203.0.113.7')
     await userEvent.click(await screen.findByRole('button', { name: 'Remove 203.0.113.7/32' }))
 
-    expect(screen.queryByText('203.0.113.7/32')).not.toBeInTheDocument()
+    expect(screen.queryByDisplayValue('203.0.113.7/32')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Save restrictions' })).toBeDisabled()
   })
 
