@@ -8,11 +8,9 @@ import { globby } from 'globby'
 import matter from 'gray-matter'
 import prettier from 'prettier'
 
-import { generateCLIPages } from './files/cli'
 import { generateReferencePages } from './files/reference-lib'
 
 async function generate() {
-  const cliPages = generateCLIPages()
   const referencePages = await generateReferencePages()
 
   const contentFiles = await globby(['content/guides/**/!(_)*.mdx'])
@@ -42,18 +40,13 @@ async function generate() {
 
   const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
     troubleshootingPages,
-    referencePages,
-    cliPages
+    referencePages
   )
-
-  // Several generators emit the same link (CLI pages come from both cliPages and referencePages),
-  // so keep one entry per link
-  const uniquePages = [...new Map(allPages.map((page) => [page.link, page])).values()]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${uniquePages
+        ${allPages
           .map(({ link, priority }) => {
             const finalPriority = priority ?? 0.8
             return `
@@ -76,7 +69,7 @@ async function generate() {
 
   const sitemapFilePath = `public/sitemap.xml`
   console.log(
-    `Total of ${uniquePages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
+    `Total of ${allPages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
   )
 
    
