@@ -296,6 +296,14 @@ const renderLayout = () =>
     </MobileSheetProvider>
   )
 
+beforeEach(() => {
+  mockUseLocalStorageQuery.mockImplementation(() => [
+    mockBannerDismissedState.current,
+    vi.fn(),
+    { isSuccess: true },
+  ])
+})
+
 describe('ProjectLayout title', () => {
   beforeEach(() => {
     mockViewport.isMobile = false
@@ -311,11 +319,6 @@ describe('ProjectLayout title', () => {
       integration_source: null,
     }
     mockBannerDismissedState.current = false
-    mockUseLocalStorageQuery.mockImplementation(() => [
-      mockBannerDismissedState.current,
-      vi.fn(),
-      { isSuccess: true },
-    ])
   })
 
   afterEach(() => {
