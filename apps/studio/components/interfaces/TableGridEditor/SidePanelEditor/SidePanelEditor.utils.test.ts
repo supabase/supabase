@@ -1,6 +1,10 @@
 import { describe, expect, test } from 'vitest'
 
-import { formatRowsForInsert, getRowFromSidePanel } from './SidePanelEditor.utils'
+import {
+  formatRowsForInsert,
+  getForeignKeyUpdatePayload,
+  getRowFromSidePanel,
+} from './SidePanelEditor.utils'
 import type { SupaRow } from '@/components/grid/types'
 import type { SidePanel } from '@/state/table-editor'
 
@@ -213,5 +217,31 @@ describe('getRowFromSidePanel', () => {
       type: 'operation-queue',
     }
     expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
+  })
+
+  test('getForeignKeyUpdatePayload only keeps the edited column for a composite foreign key', () => {
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+    expect(getForeignKeyUpdatePayload({ value, columnName: 'role_id' })).toEqual({
+      role_id: 'role-2',
+    })
+  })
+
+  test('getForeignKeyUpdatePayload preserves a null value for the edited column', () => {
+    const value = { role_id: null }
+    expect(getForeignKeyUpdatePayload({ value, columnName: 'role_id' })).toEqual({ role_id: null })
+  })
+
+  test('getForeignKeyUpdatePayload fails closed when the column is unknown', () => {
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+    expect(getForeignKeyUpdatePayload({ value, columnName: undefined })).toBeUndefined()
+  })
+
+  test('getForeignKeyUpdatePayload fails closed when the column is not in the value', () => {
+    const value = { role_id: 'role-2', tenant_id: 'tenant-B' }
+    expect(getForeignKeyUpdatePayload({ value, columnName: 'missing_id' })).toBeUndefined()
+  })
+
+  test('getForeignKeyUpdatePayload returns undefined when there is no value', () => {
+    expect(getForeignKeyUpdatePayload({ value: undefined, columnName: 'role_id' })).toBeUndefined()
   })
 })
