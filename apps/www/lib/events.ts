@@ -125,9 +125,9 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
   const apiKey = process.env.NOTION_EVENTS_API_KEY ?? ''
   const dbId = process.env.NOTION_EVENTS_DB_ID_ACTUAL ?? NOTION_EVENTS_DB_ID_FALLBACK
 
-  requireEnvironmentVariables({ NOTION_EVENTS_API_KEY: apiKey })
-
   try {
+    requireEnvironmentVariables({ NOTION_EVENTS_API_KEY: apiKey })
+
     const pages = await queryDatabase(
       dbId,
       apiKey,
@@ -181,7 +181,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
       .filter((e): e is SupabaseEvent => e !== null)
   } catch (error) {
     console.error('Error fetching Notion events:', error)
-    throw error
+    return []
   }
 }
 

@@ -16,11 +16,12 @@ a maintainer if their contribution needs access to one of those services.
 
 Check required configuration when a feature runs, rather than at server startup.
 Use `requireEnvironmentVariables` from `lib/required-env.ts` to report missing
-variable names and link here. Do not log credential values, show sample content,
-or turn unavailable content into an empty result. Let page errors reach Next.js;
-API handlers should return a failure response when the requested action fails.
-Optional integrations can be skipped, but must not be required for the action's
-success. Check required credentials before making changes to external services.
+variable names and link here. Never log credential values. Required content
+failures should reach Next.js; API handlers should return a failure response when
+the requested action fails. Optional sources, such as Notion events alongside
+committed event content, can be omitted with a logged error. Optional integrations
+must not be required for the action's success. Check required credentials before
+making changes to external services.
 
 ## Production builds
 

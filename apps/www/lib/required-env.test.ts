@@ -42,16 +42,25 @@ describe('required environment variables', () => {
     expect(fetchChangelogEntryFilesFromTarball).not.toHaveBeenCalled()
   })
 
-  it('reports missing Events credentials and propagates Notion failures', async () => {
+  it('logs optional Events failures without blocking committed event content', async () => {
     const { getNotionEvents } = await import('./events')
     const { queryDatabase } = await import('lib/notion')
+    const logError = vi.spyOn(console, 'error').mockImplementation(() => {})
     vi.stubEnv('NOTION_EVENTS_API_KEY', '')
-    await expect(getNotionEvents()).rejects.toThrow('NOTION_EVENTS_API_KEY')
+    await expect(getNotionEvents()).resolves.toEqual([])
+    expect(logError).toHaveBeenCalledWith(
+      'Error fetching Notion events:',
+      expect.objectContaining({ message: expect.stringContaining('NOTION_EVENTS_API_KEY') })
+    )
     expect(queryDatabase).not.toHaveBeenCalled()
 
     vi.stubEnv('NOTION_EVENTS_API_KEY', 'configured')
     vi.mocked(queryDatabase).mockRejectedValueOnce(new Error('Notion unavailable'))
-    await expect(getNotionEvents()).rejects.toThrow('Notion unavailable')
+    await expect(getNotionEvents()).resolves.toEqual([])
+    expect(logError).toHaveBeenLastCalledWith(
+      'Error fetching Notion events:',
+      expect.objectContaining({ message: 'Notion unavailable' })
+    )
   })
 
   it.each([
