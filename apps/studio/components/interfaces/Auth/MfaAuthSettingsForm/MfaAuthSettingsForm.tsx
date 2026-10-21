@@ -14,7 +14,6 @@ import {
   FormControl,
   FormField,
   FormInputGroupInput,
-  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
@@ -24,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -544,12 +544,14 @@ export const MfaAuthSettingsForm = () => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Phone verification message"
-                        description="To format the OTP code use `{{ .Code }}`"
+                        description="To format the OTP code use `{{ .Code }}`. Newlines are supported for WebOTP API compatibility."
                       >
                         <FormControl>
-                          <Input
-                            type="text"
+                          <Textarea
                             {...field}
+                            rows={4}
+                            placeholder="Your code is {{ .Code }}"
+                            className="resize-none"
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                             data-1p-ignore // 1Password
                             data-lpignore="true" // LastPass
