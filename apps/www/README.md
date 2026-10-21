@@ -4,7 +4,23 @@
 
 Refer to the [Development Guide](../../DEVELOPERS.md) to learn how to run this site locally.
 
-To get started copy the example env file using `cp .env.local.example .env.local`.
+## Environment variables
+
+Run `cp .env.local.example .env.local` in this directory, then restart www after
+changing values. The example contains public defaults and placeholders for private
+credentials. Never commit credentials or prefix secrets with `NEXT_PUBLIC_`.
+
+Features backed by private services need additional credentials. Employees should
+use the internal environment setup instructions. External contributors should ask
+a maintainer if their contribution needs access to one of those services.
+
+Check required configuration when a feature runs, rather than at server startup.
+Use `requireEnvironmentVariables` from `lib/required-env.ts` to report missing
+variable names and link here. Do not log credential values, show sample content,
+or turn unavailable content into an empty result. Let page errors reach Next.js;
+API handlers should return a failure response when the requested action fails.
+Optional integrations can be skipped, but must not be required for the action's
+success. Check required credentials before making changes to external services.
 
 ## Production builds
 

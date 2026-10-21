@@ -23,6 +23,7 @@ import matter from 'gray-matter'
 import { queryDatabase } from 'lib/notion'
 
 import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
+import { requireEnvironmentVariables } from './required-env'
 
 // The actual DB ID (child database inside the page)
 const NOTION_EVENTS_DB_ID_FALLBACK = '21b5004b775f8058872fe8fa81e2c7ac'
@@ -121,13 +122,10 @@ function getFormulaString(page: any, name: string): string {
  * Returns SupabaseEvent objects sorted by start date ascending.
  */
 export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
-  const apiKey = process.env.NOTION_EVENTS_API_KEY
+  const apiKey = process.env.NOTION_EVENTS_API_KEY ?? ''
   const dbId = process.env.NOTION_EVENTS_DB_ID_ACTUAL ?? NOTION_EVENTS_DB_ID_FALLBACK
 
-  if (!apiKey) {
-    console.error('NOTION_EVENTS_API_KEY is not set')
-    return []
-  }
+  requireEnvironmentVariables({ NOTION_EVENTS_API_KEY: apiKey })
 
   try {
     const pages = await queryDatabase(
@@ -183,7 +181,7 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
       .filter((e): e is SupabaseEvent => e !== null)
   } catch (error) {
     console.error('Error fetching Notion events:', error)
-    return []
+    throw error
   }
 }
 
