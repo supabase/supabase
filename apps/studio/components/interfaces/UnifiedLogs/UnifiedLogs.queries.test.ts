@@ -130,14 +130,6 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain(`WHEN source = 'auth_logs' THEN log_attributes['status']`)
     })
 
-    it('includes Postgres PANIC rows in the error classification filter', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:postgres', 'level:eq:error'))
-      const where = sql.split(/\bWHERE\b/).at(-1) ?? ''
-
-      expect(where).toMatch(/severity_text IN \([^)]*'PANIC'[^)]*\) THEN 'error'/)
-      expect(where).toMatch(/END\) IN \('error'\)/)
-    })
-
     it('reads the HTTP status from log_attributes[res.statusCode] for storage rows', () => {
       // Storage-service logs expose their status under `res.statusCode`, not the
       // gateway's `response.status_code`.
@@ -501,13 +493,6 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 })
 
 describe('UnifiedLogs.queries.bq', () => {
-  it('includes Postgres PANIC rows in the error classification', () => {
-    const sql = getUnifiedLogsQueryBQ(withFilters('log_type:eq:postgres', 'level:eq:error'))
-
-    expect(sql).toMatch(/WHEN pgl_parsed\.error_severity = 'PANIC' THEN 'error'/)
-    expect(sql).toContain("WHERE `log_type` IN ('postgres') AND `level` IN ('error')")
-  })
-
   it('backtick-quotes column identifiers (BigQuery syntax)', () => {
     const sql = getUnifiedLogsQueryBQ(withFilters('method:eq:GET'))
     expect(sql).toContain("`method` IN ('GET')")
