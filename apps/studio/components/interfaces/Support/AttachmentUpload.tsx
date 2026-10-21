@@ -21,6 +21,10 @@ import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
+const ALLOWED_FILE_EXTENSIONS = ['.txt', '.log', '.png', '.jpg', '.jpeg', '.pdf', '.json', '.har']
+
+const isAllowedFile = (file: File) =>
+  ALLOWED_FILE_EXTENSIONS.some((extension) => file.name.toLowerCase().endsWith(extension))
 
 const removeAttachmentButtonClassName = cn(
   'absolute -top-1 -right-1 size-4 shrink-0 rounded-full bg-red-900 p-0 cursor-pointer',
@@ -41,7 +45,7 @@ const uploadAttachments = async ({ userId, files }: { userId: string; files: Fil
   const filesToUpload = Array.from(files)
   const uploadedFiles = await Promise.all(
     filesToUpload.map(async (file) => {
-      const suffix = file.name.endsWith('.har') ? 'har' : file.type.split('/')[1]
+      const suffix = file.name.split('.').pop()
       const prefix = `${userId}/${uuidv4()}.${suffix}`
       const options = { cacheControl: '3600' }
 
@@ -76,10 +80,18 @@ export function useAttachmentUpload() {
       event.persist()
       const items = event.target.files || (event as any).dataTransfer.items
       const itemsCopied = Array.prototype.map.call(items, (item: any) => item) as File[]
-      const itemsToBeUploaded = itemsCopied.slice(0, MAX_ATTACHMENTS - uploadedFiles.length)
+
+      const allowedItems = itemsCopied.filter(isAllowedFile)
+      const rejectedItems = itemsCopied.filter((item) => !isAllowedFile(item))
+      const itemsToBeUploaded = allowedItems.slice(0, MAX_ATTACHMENTS - uploadedFiles.length)
 
       setUploadedFiles(uploadedFiles.concat(itemsToBeUploaded))
-      if (items.length + uploadedFiles.length > MAX_ATTACHMENTS) {
+      if (rejectedItems.length > 0) {
+        toast.error(
+          `Unsupported file type: ${rejectedItems.map((item) => item.name).join(', ')}. Supported formats: ${ALLOWED_FILE_EXTENSIONS.join(', ')}`
+        )
+      }
+      if (allowedItems.length + uploadedFiles.length > MAX_ATTACHMENTS) {
         toast(`Only up to ${MAX_ATTACHMENTS} attachments are allowed`)
       }
       event.target.value = ''
@@ -191,13 +203,16 @@ export function AttachmentUploadDisplay({
             HAR files
           </InlineLink>
         </p>
+        <p className="text-sm text-foreground-lighter">
+          Supported formats: {ALLOWED_FILE_EXTENSIONS.join(', ')}
+        </p>
       </div>
       <input
         multiple
         type="file"
         ref={uploadButtonRef}
         className="hidden"
-        accept="image/png, image/jpeg, .har"
+        accept={ALLOWED_FILE_EXTENSIONS.join(',')}
         onChange={handleFileUpload}
       />
       <div className="flex items-center gap-x-2">
