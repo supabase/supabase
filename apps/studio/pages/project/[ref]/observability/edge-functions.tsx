@@ -172,7 +172,6 @@ const EdgeFunctionsUsage = () => {
               <ReportSettings chartId="edge-functions-charts" />
 
               <LogsDatePicker
-                align="start"
                 value={datePickerValue}
                 helpers={datePickerHelpers}
                 onSubmit={handleDatePickerChange}

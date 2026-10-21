@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { act, configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
@@ -9,17 +8,18 @@ import { toast } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
+import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
-import type { Permission } from '@/types'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
-type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type RegionsInfo = components['schemas']['RegionsInfoPlatform_Output']
 type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
@@ -76,16 +76,19 @@ vi.mock(import('@/lib/constants'), async (importOriginal) => {
 
 const ORG_SLUG = 'default-org'
 
-const ADMIN_PERMISSIONS = [
-  {
-    actions: [PermissionAction.CREATE],
-    resources: ['projects', 'integrations.github_connections'],
-    condition: null,
-    organization_slug: ORG_SLUG,
-    project_refs: [],
-    restrictive: false,
-  },
-] as unknown as Permission[]
+const ADMIN_PERMISSIONS: PermissionsV2Response = {
+  organizations: [
+    {
+      slug: ORG_SLUG,
+      role: 'administrator',
+      permissions: [
+        FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE,
+        FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE,
+      ],
+      projects: [],
+    },
+  ],
+}
 
 const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
   all: {
@@ -104,6 +107,18 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 
 const FRANKFURT = 'Central EU (Frankfurt)'
 const SAO_PAULO = 'South America (São Paulo)'
+
+const AVAILABLE_REGIONS_WITH_AUTO: RegionsInfo = {
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    auto: { code: 'auto', name: 'Auto', type: 'auto' },
+  },
+  recommendations: {
+    ...DEFAULT_AVAILABLE_REGIONS.recommendations,
+    auto: { code: 'auto', name: 'Auto', type: 'auto' },
+  },
+}
 
 const availableRegionsWithSaoPaulo = (status?: 'capacity' | 'other'): RegionsInfo => ({
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -171,7 +186,7 @@ const mockOrg = (overrides: Partial<OrganizationResponse> = {}) =>
 function mockWizardEndpoints(
   overrides: {
     organizations?: OrganizationResponse[]
-    permissions?: Permission[]
+    permissions?: PermissionsV2Response
     freeProjectLimitMembers?: MemberWithFreeProjectLimit[]
     overdueInvoices?: OverdueInvoiceCount[]
     orgProjects?: OrganizationProjectsResponse
@@ -199,9 +214,9 @@ function mockWizardEndpoints(
   })
   addAPIMock({
     method: 'get',
-    path: '/platform/profile/permissions',
-    // @ts-expect-error - Permission is bridged from the raw API shape, not the generated type
-    response: () => HttpResponse.json<Permission[]>(overrides.permissions ?? ADMIN_PERMISSIONS),
+    path: '/platform/profile/permissions/v2',
+    response: () =>
+      HttpResponse.json<PermissionsV2Response>(overrides.permissions ?? ADMIN_PERMISSIONS),
   })
   addAPIMock({
     method: 'get',
@@ -546,6 +561,55 @@ describe('project creation wizard', () => {
 
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ name: 'Americas' })
+    })
+
+    test('defaults to the Auto option when it is available', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+
+      await renderWizard()
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
+    })
+
+    test('hides the smart and specific region badges while Auto is recommended', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      await user.click(getSelectTriggerByLabel('Region'))
+
+      const autoOption = await screen.findByRole('option', { name: /Auto/ })
+      expect(within(autoOption).getByText('Recommended')).toBeInTheDocument()
+      const americasOption = screen.getByRole('option', { name: /Americas/ })
+      expect(within(americasOption).queryByText('Recommended')).not.toBeInTheDocument()
+    })
+
+    test('defaults to the first general region when there is no recommendation', async () => {
+      mockWizardEndpoints({
+        availableRegions: { ...DEFAULT_AVAILABLE_REGIONS, recommendations: {} },
+      })
+
+      await renderWizard()
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas'))
+    })
+
+    test('keeps the Auto option selected and submits it as an auto region selection', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Auto Region Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Auto/)
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ code: 'auto', type: 'auto' })
     })
 
     describe('specific regions behind a link', () => {

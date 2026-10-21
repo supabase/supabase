@@ -30,6 +30,15 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
   return sql.replace(/;+\s*$/, '') as SafeSqlFragment
 }
 
+// Quoted text and comments, matched left to right so a quote inside a comment (or the reverse)
+// can't desync the scan: E'..' strings, '..' strings, "..." identifiers, $tag$..$tag$ bodies,
+// -- line comments and /* */ block comments
+const LITERALS_AND_COMMENTS =
+  /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$[a-z_]*\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//gi
+
+/** Keeps only the SQL tokens, so keywords inside literals and comments aren't mistaken for syntax. */
+export const stripLiteralsAndComments = (sql: string) => sql.replace(LITERALS_AND_COMMENTS, ' ')
+
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
 // This is to prevent dashboard from accidentally appending limit to the end of a query
 // thats not supposed to have any, since there's too many cases to cover.

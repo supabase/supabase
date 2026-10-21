@@ -8,6 +8,7 @@ import {
 } from './ProjectCreation.constants'
 import type { AvailableRegions } from './ProjectCreation.utils'
 import {
+  AUTO_REGION_VALUE,
   extractPostgresVersionDetails,
   filterHighAvailabilityRegions,
   getAvailableRegions,
@@ -16,8 +17,20 @@ import {
   getRegionSelectionType,
   resolveDefaultDbRegion,
   resolvePostgresVersion,
+  smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+
+describe('smartRegionToExactRegion', () => {
+  it('maps the Auto option to the exact region of Americas', () => {
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe(smartRegionToExactRegion('Americas'))
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('East US (North Virginia)')
+  })
+
+  it('passes through values that are not smart regions', () => {
+    expect(smartRegionToExactRegion('us-east-1')).toBe('us-east-1')
+  })
+})
 
 describe('resolveDefaultDbRegion', () => {
   const base = {
@@ -52,6 +65,42 @@ describe('resolveDefaultDbRegion', () => {
         autoDefaultRegion: AWS_REGIONS.SOUTHEAST_ASIA.displayName,
       })
     ).toBe('Americas')
+  })
+
+  it('falls back to the first available smart region when there is no recommendation', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        recommendedSmartRegion: undefined,
+        firstAvailableSmartRegion: 'Americas',
+      })
+    ).toBe('Americas')
+  })
+
+  it('prefers the Auto option over the recommended smart region when it is available', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        cloudProvider: 'AWS',
+        isSmartRegionEnabled: true,
+        isAutoRegionAvailable: true,
+        recommendedSmartRegion: 'Americas',
+      })
+    ).toBe(AUTO_REGION_VALUE)
+  })
+
+  it('still prefers the high availability region over Auto when restricted', () => {
+    expect(
+      resolveDefaultDbRegion({
+        ...base,
+        isHighAvailabilityRestricted: true,
+        highAvailabilityRegionName: AWS_REGIONS.EAST_US.displayName,
+        isSmartRegionEnabled: true,
+        isAutoRegionAvailable: true,
+      })
+    ).toBe(AWS_REGIONS.EAST_US.displayName)
   })
 
   it('uses the geolocated region when the provider offers it', () => {
@@ -189,6 +238,24 @@ describe('getRegionSelectionType', () => {
 
   it('returns undefined when the region matches neither list', () => {
     expect(getRegionSelectionType({ dbRegion: 'Nonexistent', availableRegions })).toBeUndefined()
+  })
+
+  it('classifies the Auto option as auto when it is available', () => {
+    expect(
+      getRegionSelectionType({
+        dbRegion: AUTO_REGION_VALUE,
+        availableRegions: {
+          ...availableRegions,
+          auto: { code: 'auto', name: 'Auto', type: 'auto' },
+        },
+      })
+    ).toBe('auto')
+  })
+
+  it('returns undefined for the Auto option when it is not available', () => {
+    expect(
+      getRegionSelectionType({ dbRegion: AUTO_REGION_VALUE, availableRegions })
+    ).toBeUndefined()
   })
 
   it('returns undefined when dbRegion is undefined', () => {

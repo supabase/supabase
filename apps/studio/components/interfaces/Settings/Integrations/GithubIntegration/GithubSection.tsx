@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -30,7 +29,7 @@ import {
   type GitHubConnection,
 } from '@/data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   GITHUB_INTEGRATION_INSTALLATION_URL,
@@ -64,14 +63,12 @@ export const GitHubSection = ({ isProjectScoped = false }: { isProjectScoped?: b
   const { data: org } = useSelectedOrganizationQuery()
 
   const { can: canReadGitHubConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.github_connections')
-  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.github_connections'
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
-  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'integrations.github_connections'
+  const { can: canUpdateGitHubConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const { data: gitHubAuthorization } = useGitHubAuthorizationQuery({

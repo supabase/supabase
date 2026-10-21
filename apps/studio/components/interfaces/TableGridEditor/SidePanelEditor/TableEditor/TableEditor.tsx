@@ -32,7 +32,6 @@ import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-const
 import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useChanged } from '@/hooks/misc/useChanged'
-import { useIsRealtimeUnavailable } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -66,25 +65,13 @@ export interface TableEditorProps {
 
 interface TableRealtimeToggleProps {
   checked: boolean
-  isRealtimeUnavailable: boolean
-  isPending: boolean
   onCheckedChange: () => void
 }
 
-export const TableRealtimeToggle = ({
-  checked,
-  isRealtimeUnavailable,
-  isPending,
-  onCheckedChange,
-}: TableRealtimeToggleProps) => {
+export const TableRealtimeToggle = ({ checked, onCheckedChange }: TableRealtimeToggleProps) => {
   return (
     <div className="items-start flex space-x-2">
-      <Checkbox
-        id="enable-realtime"
-        checked={checked}
-        disabled={isRealtimeUnavailable || isPending}
-        onCheckedChange={onCheckedChange}
-      />
+      <Checkbox id="enable-realtime" checked={checked} onCheckedChange={onCheckedChange} />
       <div className="grid gap-1.5 leading-none">
         <label
           htmlFor="enable-realtime"
@@ -93,9 +80,7 @@ export const TableRealtimeToggle = ({
           Enable Realtime
         </label>
         <p className="text-sm text-foreground-muted">
-          {isRealtimeUnavailable
-            ? 'Realtime is unavailable on High Availability projects.'
-            : 'Broadcast changes on this table to authorized subscribers.'}
+          Broadcast changes on this table to authorized subscribers.
         </p>
       </div>
     </div>
@@ -116,8 +101,6 @@ export const TableEditor = ({
   const snap = useTableEditorStateSnapshot()
   const tableEditorApi = useContext(TableEditorStateContext)
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
-  const { isRealtimeUnavailable, isPending: isRealtimeUnavailablePending } =
-    useIsRealtimeUnavailable()
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
   const [params, setParams] = useUrlState()
@@ -261,7 +244,7 @@ export const TableEditor = ({
           tableId: table?.id,
           importContent,
           isRLSEnabled: tableFields.isRLSEnabled,
-          isRealtimeEnabled: !isRealtimeUnavailable && tableFields.isRealtimeEnabled,
+          isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
@@ -543,8 +526,6 @@ export const TableEditor = ({
         {realtimeEnabled && (
           <TableRealtimeToggle
             checked={tableFields.isRealtimeEnabled}
-            isRealtimeUnavailable={isRealtimeUnavailable}
-            isPending={isRealtimeUnavailablePending}
             onCheckedChange={() => {
               track('realtime_toggle_table_clicked', {
                 newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',

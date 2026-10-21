@@ -1,4 +1,4 @@
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
@@ -49,9 +49,13 @@ const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
 export const PipelineDestinationReview = ({
   type,
   control,
+  onEditDestination,
+  onEditConnection,
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
+  onEditDestination?: () => void
+  onEditConnection?: () => void
 }) => {
   const [
     name,
@@ -144,14 +148,27 @@ export const PipelineDestinationReview = ({
   return (
     <section aria-label="Destination review">
       <div className="space-y-6 p-5">
-        <h3 className="text-sm font-medium text-foreground">Destination</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-foreground">Destination</h3>
+          {onEditDestination && (
+            <Button
+              type="button"
+              icon={<EditIcon />}
+              size="tiny"
+              aria-label="Edit destination"
+              onClick={onEditDestination}
+            >
+              Edit
+            </Button>
+          )}
+        </div>
         <FormItemLayout
           isReactForm={false}
           layout="horizontal"
           label="Type"
           description={`Destination type cannot be changed after creation. ${type === 'Analytics Bucket' ? 'Analytics Bucket is deprecated.' : `${type} support is in public alpha.`}`}
         >
-          <div className="flex items-center gap-3 rounded-md border bg-surface-200 p-3">
+          <div className="flex h-11 min-w-0 items-center gap-2 rounded-md border bg-surface-200 px-3">
             <DestinationLogo type={type} />
             <span className="text-sm text-foreground">{type}</span>
           </div>
@@ -159,7 +176,20 @@ export const PipelineDestinationReview = ({
       </div>
       <Separator />
       <div className="space-y-6 p-5">
-        <h3 className="text-sm font-medium text-foreground">Connection</h3>
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-sm font-medium text-foreground">Connection</h3>
+          {onEditConnection && (
+            <Button
+              type="button"
+              icon={<EditIcon />}
+              size="tiny"
+              aria-label="Edit connection"
+              onClick={onEditConnection}
+            >
+              Edit
+            </Button>
+          )}
+        </div>
         {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
           <FormItemLayout
             key={row.label}

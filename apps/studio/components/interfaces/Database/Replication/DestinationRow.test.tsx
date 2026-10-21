@@ -3,14 +3,16 @@ import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { Table, TableBody } from 'ui'
 import { describe, expect, test, vi } from 'vitest'
 
 import { DestinationRow as DestinationRowComponent } from './DestinationRow'
+import type { SlotLagMetrics } from './ReplicationPipelineStatus/ReplicationPipelineStatus.types'
+import { API_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
 type ReplicationPipelinesResponse = components['schemas']['PipelinesResponse_Output']
@@ -359,6 +361,43 @@ describe('DestinationRow', () => {
     customRender(<DestinationRow destinationId={DESTINATION_ID} />)
 
     expect(await screen.findByText('2 KB')).toHaveClass('text-foreground-light')
+  })
+
+  test('shows unavailable lag instead of caught up when the distance is null', async () => {
+    addSourcesMock()
+    addDestinationMock()
+    addPipelinesMock()
+    addPipelineStatusMock('started')
+    // Exercise an unavailable measurement outside the current production OpenAPI contract.
+    type UnavailableLagResponse = Omit<
+      ReplicationPipelineReplicationStatusResponse,
+      'apply_lag'
+    > & {
+      apply_lag: SlotLagMetrics
+    }
+    mswServer.use(
+      http.get(
+        `${API_URL}/platform/replication/:ref/pipelines/:pipeline_id/replication-status`,
+        () =>
+          HttpResponse.json<UnavailableLagResponse>({
+            pipeline_id: PIPELINE_ID,
+            apply_lag: {
+              active: true,
+              wal_status: 'reserved',
+              restart_lsn_bytes: 0,
+              confirmed_flush_lsn_bytes: null,
+              safe_wal_size_bytes: null,
+            },
+            table_statuses: [],
+          })
+      )
+    )
+    addVersionMock()
+
+    customRender(<DestinationRow destinationId={DESTINATION_ID} />)
+
+    expect(await screen.findByText('Unavailable')).toBeInTheDocument()
+    expect(screen.queryByText('Caught up')).not.toBeInTheDocument()
   })
 
   test('shows initial sync with the same lag text treatment', async () => {

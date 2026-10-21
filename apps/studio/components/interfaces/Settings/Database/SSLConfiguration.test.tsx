@@ -20,8 +20,9 @@ const { mockUseAsyncCheckPermissions, mockUseHighAvailability, mockUseSelectedPr
     mockUseSelectedProjectQuery: vi.fn(),
   }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { DATABASE_SSL_CONFIG_WRITE: 'database_ssl_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useHighAvailability', () => ({
