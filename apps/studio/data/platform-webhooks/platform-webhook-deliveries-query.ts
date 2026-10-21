@@ -49,7 +49,11 @@ async function getWebhookDeliveries(
 
   return {
     deliveries,
-    nextCursor: hasExtraRecord ? extractCursor(result?.links.next, 'page[after]') : null,
+    // The server's `links.next` points after the lookahead record itself (the one we
+    // fetched but didn't display), which would skip it entirely on the next page. Use
+    // the last *displayed* record's id instead, so the lookahead record becomes page 2's
+    // first row rather than disappearing.
+    nextCursor: hasExtraRecord ? (resources[pageSize - 1]?.id ?? null) : null,
     previousCursor: extractCursor(result?.links.prev, 'page[before]'),
   }
 }
