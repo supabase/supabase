@@ -22,6 +22,17 @@ type PipelineReviewCostsState = { isInitialCostEstimateLoading: boolean } & (
     }
 )
 
+const getTableSyncCopy = (
+  params: Parameters<typeof buildTableSyncCopyConfig>[0]
+): TableSyncCopyConfig | undefined => {
+  try {
+    return buildTableSyncCopyConfig(params)
+  } catch {
+    // An incomplete initial sync selection has no estimate to request.
+    return undefined
+  }
+}
+
 export const usePipelineReviewCosts = ({
   control,
   publication,
@@ -39,12 +50,7 @@ export const usePipelineReviewCosts = ({
   })
   const hasPublication = !!publicationName && publication?.name === publicationName
 
-  let tableSyncCopy: TableSyncCopyConfig | undefined
-  try {
-    tableSyncCopy = buildTableSyncCopyConfig({ mode, selectedTableIds: ids })
-  } catch {
-    // An incomplete initial sync selection has no estimate to request.
-  }
+  const tableSyncCopy = getTableSyncCopy({ mode, selectedTableIds: ids })
 
   const isEstimateEnabled = enabled && hasPublication && tableSyncCopy !== undefined
   const { data, isLoading, failureCount, errorUpdateCount } = useReplicationCostEstimateQuery(

@@ -28,12 +28,12 @@ const MAX_VISIBLE_TABLES = 10
 
 export const PipelineCostEstimate = ({
   estimate,
-  isLoading,
+  isLoading = false,
   publicationTables,
   tableSyncCopy,
 }: {
   estimate?: ReplicationCostEstimateData
-  isLoading: boolean
+  isLoading?: boolean
   publicationTables: ReplicationTableIdentity[]
   tableSyncCopy?: TableSyncCopyConfig
 }) => {
