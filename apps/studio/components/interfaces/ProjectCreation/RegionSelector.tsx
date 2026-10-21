@@ -126,14 +126,20 @@ export const RegionSelector = ({
   const smartRegions = highAvailability ? [] : allSmartRegions
 
   const hasAutoOption = !highAvailability && availableRegionsData?.all.auto !== undefined
-  const isAutoRecommended = availableRegionsData?.recommendations.auto !== undefined
+  const isAutoRecommended =
+    hasAutoOption && availableRegionsData?.recommendations.auto !== undefined
 
+  // Auto takes precedence, so the other recommendations are ignored while it's recommended
   const recommendedSmartRegions = new Set(
-    [availableRegionsData?.recommendations.smartGroup?.code].filter(Boolean)
+    isAutoRecommended
+      ? []
+      : [availableRegionsData?.recommendations.smartGroup?.code].filter(Boolean)
   )
 
   const recommendedSpecificRegions = new Set(
-    availableRegionsData?.recommendations.specific?.map((region) => region.code)
+    isAutoRecommended
+      ? []
+      : availableRegionsData?.recommendations.specific?.map((region) => region.code)
   )
 
   const availableRegions = getAvailableRegions(cloudProvider)

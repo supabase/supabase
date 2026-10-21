@@ -350,10 +350,7 @@ export const ProjectCreationForm = ({
   const canConfigureGitHubOnCreate =
     canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
-  // The Auto option isn't a real region, so look up versions against the recommended region instead
-  const dbRegionExact = smartRegionToExactRegion(
-    dbRegion === AUTO_REGION_VALUE ? (recommendedSmartRegion ?? '') : (dbRegion ?? '')
-  )
+  const dbRegionExact = smartRegionToExactRegion(dbRegion ?? '')
 
   const availableOrioleVersion = useAvailableOrioleImageVersion(
     {

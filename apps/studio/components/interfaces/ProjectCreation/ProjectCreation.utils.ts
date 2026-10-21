@@ -14,6 +14,7 @@ import {
 export const AUTO_REGION_VALUE = 'best_available'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
+  if (smartOrExactRegion === AUTO_REGION_VALUE) return 'auto'
   return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
 }
 

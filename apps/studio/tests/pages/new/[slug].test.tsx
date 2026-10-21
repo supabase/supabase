@@ -568,6 +568,20 @@ describe('project creation wizard', () => {
       await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
     })
 
+    test('hides the smart and specific region badges while Auto is recommended', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      await user.click(getSelectTriggerByLabel('Region'))
+
+      const autoOption = await screen.findByRole('option', { name: /Auto/ })
+      expect(within(autoOption).getByText('Recommended')).toBeInTheDocument()
+      const americasOption = screen.getByRole('option', { name: /Americas/ })
+      expect(within(americasOption).queryByText('Recommended')).not.toBeInTheDocument()
+    })
+
     test('defaults to the first general region when there is no recommendation', async () => {
       mockWizardEndpoints({
         availableRegions: { ...DEFAULT_AVAILABLE_REGIONS, recommendations: {} },

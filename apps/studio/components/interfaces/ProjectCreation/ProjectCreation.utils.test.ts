@@ -17,8 +17,19 @@ import {
   getRegionSelectionType,
   resolveDefaultDbRegion,
   resolvePostgresVersion,
+  smartRegionToExactRegion,
 } from './ProjectCreation.utils'
 import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
+
+describe('smartRegionToExactRegion', () => {
+  it('maps the Auto option to the auto region code', () => {
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('auto')
+  })
+
+  it('passes through values that are not smart regions', () => {
+    expect(smartRegionToExactRegion('us-east-1')).toBe('us-east-1')
+  })
+})
 
 describe('resolveDefaultDbRegion', () => {
   const base = {
