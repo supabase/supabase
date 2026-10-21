@@ -3198,32 +3198,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-disk-io',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+    destination: '/kb/troubleshooting/exhaust-disk-io',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-cpu',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+    destination: '/kb/troubleshooting/high-cpu-usage',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-ram',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+    destination: '/kb/troubleshooting/exhaust-ram',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-swap',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+    destination: '/kb/troubleshooting/exhaust-swap',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/http-status-codes',
-    destination: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+    destination: '/kb/troubleshooting/http-status-codes',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/troubleshooting',
-    destination: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+    destination: '/kb/troubleshooting/http-api-issues',
   },
   {
     permanent: true,
@@ -3241,32 +3241,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
-    destination: '/docs/guides/troubleshooting/http-api-issues',
+    destination: '/kb/troubleshooting/http-api-issues',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
-    destination: '/docs/guides/troubleshooting/exhaust-disk-io',
+    destination: '/kb/troubleshooting/exhaust-disk-io',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
-    destination: '/docs/guides/troubleshooting/exhaust-ram',
+    destination: '/kb/troubleshooting/exhaust-ram',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
-    destination: '/docs/guides/troubleshooting/exhaust-swap',
+    destination: '/kb/troubleshooting/exhaust-swap',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
-    destination: '/docs/guides/troubleshooting/high-cpu-usage',
+    destination: '/kb/troubleshooting/high-cpu-usage',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
-    destination: '/docs/guides/troubleshooting/http-status-codes',
+    destination: '/kb/troubleshooting/http-status-codes',
   },
   {
     permanent: true,
@@ -3828,8 +3828,13 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/troubleshooting',
+    destination: '/kb/topics/troubleshooting',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password',
-    destination: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
+    destination: '/kb/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
   },
   {
     permanent: true,
