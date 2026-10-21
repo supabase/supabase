@@ -158,6 +158,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — home
 
+- [x] `routes/project/$ref/model.tsx` ← `pages/project/[ref]/model.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent shell provides `DefaultLayout`)
 - [x] A `routes/project/$ref/index.tsx` ← `pages/project/[ref]/index.tsx` (route wraps in `ProjectLayoutWithAuth` itself — see shell delta above)
 - [x] `routes/project/$ref/merge.tsx` ← `pages/project/[ref]/merge.tsx` (leaf wraps body in `ProjectLayoutWithAuth`; parent `project/$ref.tsx` shell provides DefaultLayout)
 - [x] `routes/project/$ref/explorer.tsx` — converted from a leaf into a shell (`ExplorerLayout` + `Outlet`) to host the new `/explorer/notebook/$id` leaf; parent `project/$ref.tsx` shell still provides DefaultLayout.

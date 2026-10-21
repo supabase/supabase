@@ -82,6 +82,7 @@ import { Route as ProjectRefFunctionsRouteImport } from './routes/project/$ref/f
 import { Route as ProjectRefIntegrationsRouteImport } from './routes/project/$ref/integrations'
 import { Route as ProjectRefLogsRouteImport } from './routes/project/$ref/logs'
 import { Route as ProjectRefMergeRouteImport } from './routes/project/$ref/merge'
+import { Route as ProjectRefModelRouteImport } from './routes/project/$ref/model'
 import { Route as ProjectRefObservabilityRouteImport } from './routes/project/$ref/observability'
 import { Route as ProjectRefRealtimeRouteImport } from './routes/project/$ref/realtime'
 import { Route as ProjectRefSettingsRouteImport } from './routes/project/$ref/settings'
@@ -703,6 +704,11 @@ const ProjectRefLogsRoute = ProjectRefLogsRouteImport.update({
 const ProjectRefMergeRoute = ProjectRefMergeRouteImport.update({
   id: '/merge',
   path: '/merge',
+  getParentRoute: () => ProjectRefRoute,
+} as any)
+const ProjectRefModelRoute = ProjectRefModelRouteImport.update({
+  id: '/model',
+  path: '/model',
   getParentRoute: () => ProjectRefRoute,
 } as any)
 const ProjectRefObservabilityRoute = ProjectRefObservabilityRouteImport.update({
@@ -2213,6 +2219,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/merge': typeof ProjectRefMergeRoute
+  '/project/$ref/model': typeof ProjectRefModelRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
@@ -2528,6 +2535,7 @@ export interface FileRoutesByTo {
   '/project/$ref/auth': typeof ProjectRefAuthRouteWithChildren
   '/project/$ref/database': typeof ProjectRefDatabaseRouteWithChildren
   '/project/$ref/merge': typeof ProjectRefMergeRoute
+  '/project/$ref/model': typeof ProjectRefModelRoute
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
   '/project/$ref/storage': typeof ProjectRefStorageRouteWithChildren
@@ -2849,6 +2857,7 @@ export interface FileRoutesById {
   '/project/$ref/integrations': typeof ProjectRefIntegrationsRouteWithChildren
   '/project/$ref/logs': typeof ProjectRefLogsRouteWithChildren
   '/project/$ref/merge': typeof ProjectRefMergeRoute
+  '/project/$ref/model': typeof ProjectRefModelRoute
   '/project/$ref/observability': typeof ProjectRefObservabilityRouteWithChildren
   '/project/$ref/realtime': typeof ProjectRefRealtimeRouteWithChildren
   '/project/$ref/settings': typeof ProjectRefSettingsRouteWithChildren
@@ -3175,6 +3184,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
     | '/project/$ref/merge'
+    | '/project/$ref/model'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
@@ -3490,6 +3500,7 @@ export interface FileRouteTypes {
     | '/project/$ref/auth'
     | '/project/$ref/database'
     | '/project/$ref/merge'
+    | '/project/$ref/model'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
     | '/project/$ref/storage'
@@ -3810,6 +3821,7 @@ export interface FileRouteTypes {
     | '/project/$ref/integrations'
     | '/project/$ref/logs'
     | '/project/$ref/merge'
+    | '/project/$ref/model'
     | '/project/$ref/observability'
     | '/project/$ref/realtime'
     | '/project/$ref/settings'
@@ -4704,6 +4716,13 @@ declare module '@tanstack/react-router' {
       path: '/merge'
       fullPath: '/project/$ref/merge'
       preLoaderRoute: typeof ProjectRefMergeRouteImport
+      parentRoute: typeof ProjectRefRoute
+    }
+    '/project/$ref/model': {
+      id: '/project/$ref/model'
+      path: '/model'
+      fullPath: '/project/$ref/model'
+      preLoaderRoute: typeof ProjectRefModelRouteImport
       parentRoute: typeof ProjectRefRoute
     }
     '/project/$ref/observability': {
@@ -7130,6 +7149,7 @@ interface ProjectRefRouteChildren {
   ProjectRefIntegrationsRoute: typeof ProjectRefIntegrationsRouteWithChildren
   ProjectRefLogsRoute: typeof ProjectRefLogsRouteWithChildren
   ProjectRefMergeRoute: typeof ProjectRefMergeRoute
+  ProjectRefModelRoute: typeof ProjectRefModelRoute
   ProjectRefObservabilityRoute: typeof ProjectRefObservabilityRouteWithChildren
   ProjectRefRealtimeRoute: typeof ProjectRefRealtimeRouteWithChildren
   ProjectRefSettingsRoute: typeof ProjectRefSettingsRouteWithChildren
@@ -7151,6 +7171,7 @@ const ProjectRefRouteChildren: ProjectRefRouteChildren = {
   ProjectRefIntegrationsRoute: ProjectRefIntegrationsRouteWithChildren,
   ProjectRefLogsRoute: ProjectRefLogsRouteWithChildren,
   ProjectRefMergeRoute: ProjectRefMergeRoute,
+  ProjectRefModelRoute: ProjectRefModelRoute,
   ProjectRefObservabilityRoute: ProjectRefObservabilityRouteWithChildren,
   ProjectRefRealtimeRoute: ProjectRefRealtimeRouteWithChildren,
   ProjectRefSettingsRoute: ProjectRefSettingsRouteWithChildren,

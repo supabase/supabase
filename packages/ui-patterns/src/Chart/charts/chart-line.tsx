@@ -47,8 +47,7 @@ export type ChartHighlightAction = {
   onSelect: (ctx: { start: string; end: string; clear: () => void }) => void
 }
 
-export type ChartReferenceLine = {
-  y: number
+export type ChartReferenceLine = ({ x: number | string; y?: never } | { y: number; x?: never }) & {
   label?: string
   stroke?: string
   strokeWidth?: number
@@ -318,7 +317,8 @@ export const ChartLine = ({
           )}
           {referenceLines?.map((line, index) => (
             <ReferenceLine
-              key={`${line.y}-${index}`}
+              key={`${line.x ?? line.y}-${index}`}
+              x={line.x}
               y={line.y}
               stroke={line.stroke ?? CHART_COLORS.TICK}
               strokeWidth={line.strokeWidth ?? 1.5}
