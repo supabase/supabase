@@ -2,7 +2,7 @@ import { createTool as createEscalateToHumanTool } from './escalate-to-human.ser
 import { createTool as createResolveSupportConversationTool } from './resolve-support-conversation.server'
 import type { ToolContext } from './types'
 
-export const getSupportLifecycleTools = (ctx: ToolContext = {}) => ({
+export const getSupportLifecycleTools = (ctx: ToolContext) => ({
   escalate_to_human: createEscalateToHumanTool(ctx),
   resolve_support_conversation: createResolveSupportConversationTool(ctx),
 })

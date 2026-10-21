@@ -37,21 +37,30 @@ describe('ai/tools/incident-tools', () => {
 
   describe('getIncidentTools', () => {
     it('should return an object with get_active_incidents tool', () => {
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
 
       expect(tools).toBeDefined()
       expect(tools.get_active_incidents).toBeDefined()
     })
 
     it('should have correct description for get_active_incidents', () => {
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
 
       expect(tools.get_active_incidents.description).toContain('Check for active incidents')
       expect(tools.get_active_incidents.description).toContain('Supabase service')
     })
 
     it('should have empty input schema', () => {
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       const schema = tools.get_active_incidents.inputSchema
 
       // The schema is a Zod object that accepts empty object
@@ -64,7 +73,10 @@ describe('ai/tools/incident-tools', () => {
         const common = await import('common')
         vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(false)
 
-        const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+        const tools = getIncidentTools({
+          baseUrl: 'https://supabase.com/dashboard',
+          aiOptInLevel: 'schema',
+        })
         const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
         expect(result).toEqual({
@@ -80,7 +92,10 @@ describe('ai/tools/incident-tools', () => {
 
         mockFetch.mockRejectedValue(new Error('Network error'))
 
-        const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+        const tools = getIncidentTools({
+          baseUrl: 'https://supabase.com/dashboard',
+          aiOptInLevel: 'schema',
+        })
         await expect(
           (tools.get_active_incidents.execute as any)({}, executeOptions)
         ).rejects.toThrow('Network error')
@@ -95,7 +110,10 @@ describe('ai/tools/incident-tools', () => {
           json: async () => statusPagePayload(),
         })
 
-        const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+        const tools = getIncidentTools({
+          baseUrl: 'https://supabase.com/dashboard',
+          aiOptInLevel: 'schema',
+        })
         if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
         await tools.get_active_incidents.execute(
           {},
@@ -113,7 +131,10 @@ describe('ai/tools/incident-tools', () => {
         })
         const abortController = new AbortController()
 
-        const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+        const tools = getIncidentTools({
+          baseUrl: 'https://supabase.com/dashboard',
+          aiOptInLevel: 'schema',
+        })
         if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
         await tools.get_active_incidents.execute(
           {},
@@ -162,7 +183,10 @@ describe('ai/tools/incident-tools', () => {
         json: async () => statusPagePayload(),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://example.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://example.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       if (!tools.get_active_incidents.execute) throw new Error('execute is undefined')
       await tools.get_active_incidents.execute({}, executeOptions)
 
@@ -184,7 +208,10 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
       expect((result as any).incidents).toHaveLength(1)
@@ -203,7 +230,10 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
       expect((result as any).incidents).toHaveLength(1)
@@ -235,7 +265,10 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
       expect((result as any).incidents).toHaveLength(2)
@@ -255,7 +288,10 @@ describe('ai/tools/incident-tools', () => {
           }),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
       expect((result as any).incidents).toHaveLength(1)
@@ -269,7 +305,10 @@ describe('ai/tools/incident-tools', () => {
         json: async () => statusPagePayload(),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       const result = await (tools.get_active_incidents.execute as any)({}, executeOptions)
 
       expect(result).toEqual({
@@ -284,7 +323,10 @@ describe('ai/tools/incident-tools', () => {
         json: async () => ({ this_is: 'not a valid status page response' }),
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       await expect((tools.get_active_incidents.execute as any)({}, executeOptions)).rejects.toThrow(
         'Failed to parse status page response'
       )
@@ -296,7 +338,10 @@ describe('ai/tools/incident-tools', () => {
         status: 500,
       })
 
-      const tools = getIncidentTools({ baseUrl: 'https://supabase.com/dashboard' })
+      const tools = getIncidentTools({
+        baseUrl: 'https://supabase.com/dashboard',
+        aiOptInLevel: 'schema',
+      })
       await expect((tools.get_active_incidents.execute as any)({}, executeOptions)).rejects.toThrow(
         'Failed to fetch status page: 500'
       )

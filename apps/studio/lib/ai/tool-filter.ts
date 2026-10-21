@@ -1,7 +1,7 @@
 import type { Tool, ToolSet } from 'ai'
 import { z } from 'zod'
 
-import { isOptInLevelAtLeast, optInLevelSchema } from './opt-in-level'
+import { isOptInLevelAtLeast } from './opt-in-level'
 import { getToolContract, type ContractToolName } from './tools/registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -61,20 +61,6 @@ export const toolSetValidationSchema = z.record(
 )
 export type ToolName = keyof z.infer<typeof toolSetValidationSchema>
 
-export const updateOptInLevelInputSchema = z.object({
-  requiredLevel: z
-    .enum(['schema', 'schema_and_log', 'schema_and_log_and_data'])
-    .optional()
-    .describe(
-      'The lowest opt-in level that unlocks what you need: `schema` for table and column metadata, `schema_and_log` for logs, `schema_and_log_and_data` for query results. Omit it when the user just wants to review or change the setting, for example to lower it.'
-    ),
-})
-
-/** Input as stored on the message. `levelWhenAsked` is the org's level when the call was made. */
-export const storedUpdateOptInLevelInputSchema = updateOptInLevelInputSchema.extend({
-  levelWhenAsked: optInLevelSchema.optional(),
-})
-
 /**
  * Tool categories based on the data they access
  */
@@ -97,7 +83,6 @@ type ToolCategory = (typeof TOOL_CATEGORIES)[keyof typeof TOOL_CATEGORIES]
  */
 export const TOOL_CATEGORY_MAP: Record<Exclude<ToolName, ContractToolName>, ToolCategory> = {
   // UI tools - always available
-  update_opt_in_level: TOOL_CATEGORIES.UI,
   search_docs: TOOL_CATEGORIES.UI,
 
   // Schema tools - MCP
@@ -209,5 +194,15 @@ export function filterToolsByOptInLevel(tools: ToolSet, aiOptInLevel: AiOptInLev
         // If the tool is not allowed, provide a stub that returns a privacy message
         return [toolName, createPrivacyMessageTool(toolInstance)]
       })
+  )
+}
+
+/**
+ * Drops tools that need approval. A one-shot request can't answer an approval request, so a
+ * call to one ends generation without output.
+ */
+export function withoutApprovalTools(tools: ToolSet): ToolSet {
+  return Object.fromEntries(
+    Object.entries(tools).filter(([, toolInstance]) => !toolInstance.needsApproval)
   )
 }

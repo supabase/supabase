@@ -7,7 +7,7 @@ export type ToolContext = {
   projectRef?: string
   connectionString?: string
   authorization?: string
-  aiOptInLevel?: AiOptInLevel
+  aiOptInLevel: AiOptInLevel
   /** Public dashboard URL, used by tools that call Studio's own API routes. */
   baseUrl?: string
 }
@@ -19,6 +19,12 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
   name: string
   description: string
   inputSchema: z.ZodType<TInput, z.ZodTypeDef, unknown>
+  /**
+   * For tools whose stored input depends on the request, since the SDK stores the parsed value.
+   * It must produce the same type `inputSchema` describes. `inputSchema` stays the shape stored
+   * on the message, which is what history and the client parse. Omit it to parse with `inputSchema`.
+   */
+  createInputSchema?(ctx: ToolContext): z.ZodType<TInput, z.ZodTypeDef, unknown>
   outputSchema: z.ZodType<TOutput, z.ZodTypeDef, unknown>
   /** Lowest opt-in level at which the tool runs. `null` means always available. */
   minOptInLevel: AiOptInLevel | null
