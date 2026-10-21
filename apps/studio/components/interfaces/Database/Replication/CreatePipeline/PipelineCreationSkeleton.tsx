@@ -1,4 +1,4 @@
-import { Skeleton } from 'ui'
+import { RadioGroupStacked, RadioGroupStackedItem, Skeleton } from 'ui'
 
 import { PIPELINE_CREATION_STEPS } from './PipelineCreationFlow.constants'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
@@ -18,23 +18,24 @@ export const PipelineCreationSkeleton = () => {
       <SteppedFlowHeader title={initialStep.title} description={initialStep.description()} />
       <div className="space-y-3 p-5" aria-busy="true" aria-label="Loading destinations">
         <p className="text-sm font-medium text-foreground">Destination type</p>
-        <div className="overflow-hidden rounded-md border" aria-hidden="true">
+        <RadioGroupStacked disabled aria-hidden="true" className="pointer-events-none">
           {[0, 1, 2, 3].map((index) => (
-            <div
+            <RadioGroupStackedItem
               key={index}
-              className="flex items-center gap-3 border-b px-5.25 py-3.5 last:border-b-0"
-            >
-              <Skeleton className="h-4 w-4 rounded-full" />
-              <div className="flex flex-1 items-center gap-3.5">
-                <Skeleton className="h-8 w-8 rounded-md" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-3/4" />
-                </div>
-              </div>
-            </div>
+              value={String(index)}
+              className="opacity-100! [&>div]:items-center [&>div]:py-3.5"
+              label={
+                <span className="flex items-center gap-x-3.5">
+                  <Skeleton className="h-8 w-8 rounded-md" />
+                  <span className="flex flex-col gap-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-40 sm:w-72" />
+                  </span>
+                </span>
+              }
+            />
           ))}
-        </div>
+        </RadioGroupStacked>
       </div>
     </SteppedFlow>
   )
