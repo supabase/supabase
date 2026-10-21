@@ -51,9 +51,13 @@ async function getWebhookDeliveries(
   // fetched but didn't display), which would skip it entirely on the next page. Use the
   // last *displayed* record's id instead, so the lookahead record becomes page 2's first
   // row rather than disappearing. When paging backward (`before` set) and this page
-  // doesn't overflow past `pageSize`, there's no extra record to anchor to — but a next
-  // page still exists: it's exactly the page we navigated back from, starting at `before`.
-  const nextCursor = hasExtraRecord ? (resources[pageSize - 1]?.id ?? null) : (before ?? null)
+  // doesn't overflow past `pageSize`, there's no extra record to anchor to, but the page
+  // we navigated back from still exists — resume from the last record actually shown
+  // here, not from `before` itself (cursors are exclusive, so reusing `before` as `after`
+  // would skip that record on the way forward again).
+  const nextCursor = hasExtraRecord
+    ? (resources[pageSize - 1]?.id ?? null)
+    : (resources[resources.length - 1]?.id ?? before ?? null)
 
   return {
     deliveries,
