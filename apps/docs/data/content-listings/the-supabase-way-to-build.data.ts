@@ -8,14 +8,14 @@ export const supabaseWayDatabaseBuild: ContentListingGroup = {
   columns: 3,
   items: [
     {
-      title: 'Database overview',
-      href: '/guides/database/overview',
-      description: 'Tables, relationships, and the Postgres features Supabase gives you.',
+      title: 'Tables and data',
+      href: '/guides/database/tables',
+      description: 'Create tables and relationships, and edit rows from the Dashboard.',
     },
     {
-      title: 'REST API',
-      href: '/guides/api',
-      description: 'The REST API auto-generated from your schema.',
+      title: 'API keys',
+      href: '/guides/getting-started/api-keys',
+      description: 'Use a publishable key in the browser and a secret key only on the server.',
     },
     {
       title: 'Connect a framework',
@@ -33,9 +33,9 @@ export const supabaseWayAuthBuild: ContentListingGroup = {
   columns: 3,
   items: [
     {
-      title: 'Auth overview',
-      href: '/guides/auth',
-      description: 'Users, sessions, and the providers Supabase Auth supports.',
+      title: 'Password-based auth',
+      href: '/guides/auth/passwords',
+      description: 'Sign up and sign in users with email and password.',
     },
     {
       title: 'Server-side auth',
@@ -43,9 +43,9 @@ export const supabaseWayAuthBuild: ContentListingGroup = {
       description: 'Handle sessions and cookies in server-rendered apps.',
     },
     {
-      title: 'Social login',
-      href: '/guides/auth/social-login',
-      description: 'Add sign-in with Google, GitHub, and other providers.',
+      title: 'Which package to use',
+      href: '/guides/auth/choosing-a-server-package',
+      description: 'Choose supabase-js, @supabase/ssr, or @supabase/server for server code.',
     },
   ],
 }
@@ -78,14 +78,14 @@ export const supabaseWayRealtimeBuild: ContentListingGroup = {
   columns: 3,
   items: [
     {
-      title: 'Realtime overview',
-      href: '/guides/realtime',
-      description: 'Stream changes, broadcast messages, and track presence.',
-    },
-    {
       title: 'Postgres Changes',
       href: '/guides/realtime/postgres-changes',
       description: 'Subscribe to inserts, updates, and deletes on your tables.',
+    },
+    {
+      title: 'Broadcast',
+      href: '/guides/realtime/broadcast',
+      description: 'Send low-latency messages between clients.',
     },
     {
       title: 'Presence',
@@ -100,22 +100,17 @@ export const supabaseWayStorageBuild: ContentListingGroup = {
   heading: 'Build it',
   headingLevel: 'h3',
   type: 'grid',
-  columns: 3,
+  columns: 2,
   items: [
     {
-      title: 'Storage overview',
-      href: '/guides/storage',
-      description: 'S3-compatible object storage with metadata in Postgres.',
+      title: 'Storage quickstart',
+      href: '/guides/storage/quickstart',
+      description: 'Upload files to a bucket and serve them.',
     },
     {
       title: 'Access control',
       href: '/guides/storage/security/access-control',
       description: 'Secure buckets and objects with RLS policies.',
-    },
-    {
-      title: 'Image transformations',
-      href: '/guides/storage/serving/image-transformations',
-      description: 'Resize and optimize images as you serve them.',
     },
   ],
 }
@@ -158,14 +153,14 @@ export const supabaseWayProductionBuild: ContentListingGroup = {
       description: 'What to review before you launch.',
     },
     {
-      title: 'Security',
-      href: '/guides/security/product-security',
-      description: 'Harden your project against common risks.',
+      title: 'Connection pooling',
+      href: '/guides/database/connecting-to-postgres',
+      description: 'Choose a direct connection or a Supavisor pooler for your clients.',
     },
     {
-      title: 'Performance and advisors',
-      href: '/guides/observability/advisors',
-      description: 'Deterministic checks for security and performance issues.',
+      title: 'Backups',
+      href: '/guides/platform/backups',
+      description: 'Scheduled backups on paid plans, and how to restore them.',
     },
   ],
 }
