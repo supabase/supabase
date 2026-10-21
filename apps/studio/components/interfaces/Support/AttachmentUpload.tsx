@@ -22,9 +22,16 @@ import { useProfile } from '@/lib/profile'
 
 const MAX_ATTACHMENTS = 5
 const ALLOWED_FILE_EXTENSIONS = ['.txt', '.log', '.png', '.jpg', '.jpeg', '.pdf', '.json', '.har']
+const IMAGE_FILE_EXTENSIONS = ['.png', '.jpg', '.jpeg']
 
-const isAllowedFile = (file: File) =>
-  ALLOWED_FILE_EXTENSIONS.some((extension) => file.name.toLowerCase().endsWith(extension))
+const getFileExtension = (filename: string) => {
+  const extension = filename.split('.').pop()
+  return extension ? `.${extension.toLowerCase()}` : ''
+}
+
+const isAllowedFile = (file: File) => ALLOWED_FILE_EXTENSIONS.includes(getFileExtension(file.name))
+
+const isImageFile = (file: File) => IMAGE_FILE_EXTENSIONS.includes(getFileExtension(file.name))
 
 const removeAttachmentButtonClassName = cn(
   'absolute -top-1 -right-1 size-4 shrink-0 rounded-full bg-red-900 p-0 cursor-pointer',
@@ -115,10 +122,10 @@ export function useAttachmentUpload() {
   useEffect(() => {
     if (!uploadedFiles) return
     const objectUrls = uploadedFiles.map((file) => {
-      if (file.name.endsWith('.har')) {
-        return file.name
-      } else {
+      if (isImageFile(file)) {
         return URL.createObjectURL(file)
+      } else {
+        return file.name
       }
     })
     setUploadedDataUrls(objectUrls)
@@ -217,10 +224,13 @@ export function AttachmentUploadDisplay({
       />
       <div className="flex items-center gap-x-2">
         {uploadedDataUrls.map((url, idx) => {
-          if (url.endsWith('.har')) {
+          const isImage = url.startsWith('blob:')
+          if (!isImage) {
+            const filename = url
+            const label = getFileExtension(filename).slice(1).toUpperCase()
             return (
               <div
-                key={url}
+                key={filename}
                 className="border relative h-14 w-14 rounded-sm flex items-center justify-center"
               >
                 <Tooltip>
@@ -228,11 +238,11 @@ export function AttachmentUploadDisplay({
                     <div className="flex flex-col items-center justify-center gap-y-1">
                       <FileCodeIcon className="text-foreground-light" size={16} />
                       <p className="text-[10px] font-mono text-foreground-light tracking-wide leading-none">
-                        HAR
+                        {label}
                       </p>
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom">{url}</TooltipContent>
+                  <TooltipContent side="bottom">{filename}</TooltipContent>
                 </Tooltip>
 
                 <button
