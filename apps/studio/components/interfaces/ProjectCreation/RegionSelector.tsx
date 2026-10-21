@@ -1,5 +1,5 @@
 import { useFeatureFlags, useParams } from 'common'
-import { Loader2Icon, ThumbsUpIcon } from 'lucide-react'
+import { EarthIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
@@ -72,7 +72,7 @@ const isLocal = process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
 const BestAvailableRegionIcon = () => (
   <div className="w-5 h-4 border border-brand-500 rounded-xs bg-brand-300 flex items-center justify-center">
-    <ThumbsUpIcon size={10} className="text-brand" />
+    <EarthIcon size={10} className="text-brand" />
   </div>
 )
 
