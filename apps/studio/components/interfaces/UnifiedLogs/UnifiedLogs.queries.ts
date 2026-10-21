@@ -130,7 +130,7 @@ const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 400 AND 499 THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) BETWEEN 200 AND 299 THEN 'success'
-      WHEN severity_text IN ('ERROR','FATAL','CRITICAL','ALERT','EMERGENCY') THEN 'error'
+      WHEN severity_text IN ('ERROR','FATAL','PANIC','CRITICAL','ALERT','EMERGENCY') THEN 'error'
       WHEN severity_text IN ('WARN','WARNING') THEN 'warning'
       WHEN severity_text IN ('TRACE','DEBUG','INFO','LOG','NOTICE') THEN 'success'
       ELSE 'success'
