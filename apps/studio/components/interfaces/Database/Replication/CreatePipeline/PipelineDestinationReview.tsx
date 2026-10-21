@@ -1,5 +1,5 @@
 import { EditIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
-import { useState, type Ref } from 'react'
+import { useState } from 'react'
 import { useWatch, type Control } from 'react-hook-form'
 import { Button, Input, Separator } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -54,14 +54,12 @@ export const PipelineDestinationReview = ({
   onEditDestination,
   onEditConnection,
   validationFailures = [],
-  validationRef,
 }: {
   type: DestinationType
   control: Control<DestinationPanelSchemaType>
   onEditDestination?: () => void
   onEditConnection?: () => void
   validationFailures?: ValidationFailure[]
-  validationRef?: Ref<HTMLDivElement>
 }) => {
   const [
     name,
@@ -181,46 +179,48 @@ export const PipelineDestinationReview = ({
         </FormItemLayout>
       </div>
       <Separator />
-      <section aria-label="Connection review" className="space-y-6 p-5">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-medium text-foreground">Connection</h3>
-          {onEditConnection && (
-            <Button
-              type="button"
-              icon={<EditIcon />}
-              size="tiny"
-              aria-label="Edit connection"
-              onClick={onEditConnection}
+      <section aria-label="Connection review">
+        <div className="space-y-6 p-5">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-medium text-foreground">Connection</h3>
+            {onEditConnection && (
+              <Button
+                type="button"
+                icon={<EditIcon />}
+                size="tiny"
+                aria-label="Edit connection"
+                onClick={onEditConnection}
+              >
+                Edit
+              </Button>
+            )}
+          </div>
+          {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
+            <FormItemLayout
+              key={row.label}
+              isReactForm={false}
+              layout="horizontal"
+              label={row.label}
+              description={row.description}
             >
-              Edit
-            </Button>
-          )}
-        </div>
-        <PipelineValidationAdmonition ref={validationRef} failures={validationFailures} />
-        {[{ ...PIPELINE_NAME_FIELD_COPY, value: name }, ...rows].map((row) => (
+              {row.isMasked ? (
+                <MaskedUrl key={`${type}-${row.value}`} value={row.value ?? ''} label={row.label} />
+              ) : (
+                <Input readOnly aria-label={row.label} value={row.value || 'Not set'} />
+              )}
+            </FormItemLayout>
+          ))}
+          <PipelineConnectionReview type={type} control={control} />
           <FormItemLayout
-            key={row.label}
             isReactForm={false}
             layout="horizontal"
-            label={row.label}
-            description={row.description}
+            label="Pipeline region"
+            description={`All pipelines run from this region. ${type} connections originate here.`}
           >
-            {row.isMasked ? (
-              <MaskedUrl key={`${type}-${row.value}`} value={row.value ?? ''} label={row.label} />
-            ) : (
-              <Input readOnly aria-label={row.label} value={row.value || 'Not set'} />
-            )}
+            <PipelineRegionReadonly />
           </FormItemLayout>
-        ))}
-        <PipelineConnectionReview type={type} control={control} />
-        <FormItemLayout
-          isReactForm={false}
-          layout="horizontal"
-          label="Pipeline region"
-          description={`All pipelines run from this region. ${type} connections originate here.`}
-        >
-          <PipelineRegionReadonly />
-        </FormItemLayout>
+        </div>
+        <PipelineValidationAdmonition failures={validationFailures} />
       </section>
     </section>
   )

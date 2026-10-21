@@ -226,7 +226,7 @@ describe('PipelineCreationFlow', () => {
   }
 
   it.each([false, true])(
-    'places review failures and scrolls to the first issue (connection: %s)',
+    'places review failures and keeps the current position (connection: %s)',
     async (hasConnectionFailure) => {
       const { requests } = mockCreation()
       await reachReview()
@@ -272,12 +272,10 @@ describe('PipelineCreationFlow', () => {
       expect(connection.queryByText('Check publication settings.')).not.toBeInTheDocument()
       expect(data.getByText('Check publication settings.')).toBeInTheDocument()
       expect(data.getByRole('button', { name: 'Edit data' })).toBeInTheDocument()
-      await waitFor(() => expect(scrollIntoView).toHaveBeenCalled())
-      expect(scrollIntoView.mock.instances[0]).toContainElement(
-        screen.getByText(
-          hasConnectionFailure ? 'Check destination credentials.' : 'Check publication settings.'
-        )
-      )
+      expect(
+        screen.getByText('Fix the above issues before starting the pipeline.')
+      ).toBeInTheDocument()
+      expect(scrollIntoView).not.toHaveBeenCalled()
       expect(requests).toHaveLength(0)
     }
   )
@@ -466,6 +464,9 @@ describe('PipelineCreationFlow', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Start pipeline' }))
     await screen.findByRole('button', { name: 'Start pipeline anyway' })
+    expect(
+      screen.getByText('Review the warnings above before starting the pipeline.')
+    ).toBeInTheDocument()
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Start pipeline anyway' })).toBeEnabled()
     )

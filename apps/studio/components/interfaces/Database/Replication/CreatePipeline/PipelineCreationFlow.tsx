@@ -20,7 +20,10 @@ import { PipelineDataSection } from './PipelineDataSection'
 import { PipelineDestinationReview } from './PipelineDestinationReview'
 import { PipelineDestinationSelection } from './PipelineDestinationSelection'
 import { PipelineReviewCosts } from './PipelineReviewCosts'
-import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import {
+  PipelineValidationAdmonition,
+  SANDWICHED_ADMONITION_CLASS,
+} from './PipelineValidationAdmonition'
 import { usePipelineConnectionValidation } from './usePipelineConnectionValidation'
 import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
@@ -51,8 +54,6 @@ export const PipelineCreationFlow = ({
 }) => {
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
-  const connectionValidationRef = useRef<HTMLDivElement>(null)
-  const dataValidationRef = useRef<HTMLDivElement>(null)
 
   const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
@@ -87,6 +88,10 @@ export const PipelineCreationFlow = ({
     validateData,
     onCreated: () => completeNavigation(onClose),
   })
+  const submissionFailures = [...destinationValidationFailures, ...pipelineValidationFailures]
+  const hasCriticalFailures = submissionFailures.some(
+    ({ failure_type }) => failure_type === 'critical'
+  )
   const isBusy = isValidating || isValidatingData || isSubmitting
   const accessibleStep = (() => {
     if (isSubmitting) return step
@@ -117,15 +122,6 @@ export const PipelineCreationFlow = ({
     }
     if (step !== accessibleStep) void setStep(accessibleStep, { history: 'replace' })
   }, [step, accessibleStep, setStep])
-
-  useEffect(() => {
-    if (accessibleStep !== 'review' || isSubmitting) return
-    const firstIssue =
-      destinationValidationFailures.length > 0
-        ? connectionValidationRef.current
-        : dataValidationRef.current
-    firstIssue?.scrollIntoView({ behavior: 'auto', block: 'center' })
-  }, [accessibleStep, isSubmitting, destinationValidationFailures, pipelineValidationFailures])
 
   return (
     <div className="flex min-h-screen flex-col bg-dash-sidebar">
@@ -193,12 +189,11 @@ export const PipelineCreationFlow = ({
                   />
                   {dataError && (
                     <Admonition
-                      type="destructive"
+                      type="danger"
                       title="Check data settings"
-                      className="mb-0 rounded-none border-x-0 border-t border-b-0 border-default"
-                    >
-                      {dataError}
-                    </Admonition>
+                      description={dataError}
+                      className={SANDWICHED_ADMONITION_CLASS}
+                    />
                   )}
                 </>
               )}
@@ -210,7 +205,6 @@ export const PipelineCreationFlow = ({
                     onEditDestination={() => void setStep('destination')}
                     onEditConnection={() => void setStep('connection')}
                     validationFailures={destinationValidationFailures}
-                    validationRef={connectionValidationRef}
                   />
                   <Separator />
                   <PipelineDataReview
@@ -219,10 +213,21 @@ export const PipelineCreationFlow = ({
                     publication={publication}
                     onEdit={() => void setStep('data')}
                     validationFailures={pipelineValidationFailures}
-                    validationRef={dataValidationRef}
                   />
                   <Separator />
                   <PipelineReviewCosts costs={costs} />
+                  {submissionFailures.length > 0 && (
+                    <Admonition
+                      className={SANDWICHED_ADMONITION_CLASS}
+                      role="status"
+                      type={hasCriticalFailures ? 'danger' : 'warning'}
+                      description={
+                        hasCriticalFailures
+                          ? 'Fix the above issues before starting the pipeline.'
+                          : 'Review the warnings above before starting the pipeline.'
+                      }
+                    />
+                  )}
                 </>
               )}
             </SteppedFlow>
