@@ -384,6 +384,15 @@ th code {
   @apply break-all;
 }
 
+/*
+ * break-all squeezes WebKit columns to one character, splitting short
+ * tokens like "Read" and "Write". A minimum width on cells that contain only
+ * a code token prevents that while long values still wrap.
+ */
+.prose table td:not(:first-child):has(> code:only-child) {
+  min-width: 5rem;
+}
+
 .prose table td:first-child,
 .prose table th:first-child {
   min-width: 12rem;
