@@ -46,10 +46,14 @@ async function generate() {
     cliPages
   )
 
+  // Several generators emit the same link (CLI pages come from both cliPages and referencePages),
+  // so keep one entry per link
+  const uniquePages = [...new Map(allPages.map((page) => [page.link, page])).values()]
+
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${allPages
+        ${uniquePages
           .map(({ link, priority }) => {
             const finalPriority = priority ?? 0.8
             return `
@@ -72,10 +76,10 @@ async function generate() {
 
   const sitemapFilePath = `public/sitemap.xml`
   console.log(
-    `Total of ${allPages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
+    `Total of ${uniquePages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
   )
 
-  // eslint-disable-next-line no-sync
+   
   fs.writeFileSync(sitemapFilePath, formatted)
 }
 
