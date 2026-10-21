@@ -33,6 +33,8 @@ You also need to set up an SMS provider. Each provider has its own configuration
 
 By default, a user can only request an OTP once every <SharedData data="config">auth.rate_limits.otp.period</SharedData> and they expire after <SharedData data="config">auth.rate_limits.otp.validity</SharedData>.
 
+To test phone sign-in without sending SMS, add test phone numbers with fixed codes. For more information, see [Test phone sign-in with test numbers](/docs/guides/auth/testing-auth-flows#test-phone-sign-in-with-test-numbers).
+
 ## Signing in with phone OTP
 
 With OTP, a user can sign in without setting a password on their account. They need to verify their phone number each time they sign in.
