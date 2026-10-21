@@ -33,7 +33,7 @@ const AdditionalLinks = ({ links, className }: { links: SidebarLink[]; className
             className="inline-flex items-center gap-1 text-foreground-lighter hover:text-foreground transition-colors"
           >
             {link.title}
-            <ExternalLink size={12} strokeWidth={1.5} />
+            <ExternalLink size={12} strokeWidth={1.5} aria-hidden="true" />
           </a>
         </li>
       ))}
