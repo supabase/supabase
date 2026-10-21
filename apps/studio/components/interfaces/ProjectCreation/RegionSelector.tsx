@@ -5,6 +5,7 @@ import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
+  Button,
   cn,
   FormControl,
   FormField,
@@ -38,6 +39,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { RegionFlag } from '@/components/ui/RegionFlag'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
@@ -405,25 +407,31 @@ export const RegionSelector = ({
                         )}
 
                         {hideSpecificRegions && (
-                          <div
-                            className="border-t px-3 py-2.5 text-xs text-foreground-light"
-                            onPointerDown={(e) => e.stopPropagation()}
-                          >
-                            <InlineLink
-                              href={`/org/${slug ?? '_'}/billing?panel=subscriptionPlan&source=freeTierGeneralRegionSelector`}
-                              onClick={() => track('free_tier_general_region_upgrade_clicked')}
-                            >
-                              Upgrade to Pro
-                            </InlineLink>{' '}
-                            to choose a{' '}
-                            <InlineLink
-                              href={`${DOCS_URL}/guides/platform/regions`}
-                              onClick={() => track('free_tier_general_region_docs_link_clicked')}
-                            >
-                              specific region
-                            </InlineLink>
-                            .
-                          </div>
+                          <>
+                            <SelectSeparator />
+                            <div className="px-3 py-2 flex items-center justify-between">
+                              <div className="flex flex-col gap-y-0.5 text-xs">
+                                <p>Want a specific region?</p>
+                                <p className="text-foreground-light">
+                                  Choose{' '}
+                                  <InlineLink
+                                    href={`${DOCS_URL}/guides/platform/regions`}
+                                    onClick={() =>
+                                      track('free_tier_general_region_docs_link_clicked')
+                                    }
+                                  >
+                                    individual regions
+                                  </InlineLink>{' '}
+                                  on the Pro plan
+                                </p>
+                              </div>
+                              <UpgradePlanButton
+                                plan="Pro"
+                                source="project-creation-region-selection"
+                                onClick={() => track('free_tier_general_region_upgrade_clicked')}
+                              />
+                            </div>
+                          </>
                         )}
                       </SelectContent>
                     </Select>
