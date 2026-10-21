@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 import { constructHeaders } from '../apiHelpers'
-import { databaseErrorSchema, PgMetaDatabaseError, WrappedResult } from './types'
+import { createPgMetaDatabaseError, WrappedResult } from './types'
 import { assertSelfHosted, encryptString, getConnectionString } from './util'
 import { PG_META_URL } from '@/lib/constants/index'
 
@@ -48,10 +48,9 @@ export async function executeQuery<T = unknown>({
       const result = await response.json()
 
       if (!response.ok) {
-        const { message, code, formattedError } = databaseErrorSchema.parse(result)
         span.setAttribute('db.error', 1)
         span.setAttribute('db.status_code', response.status)
-        const error = new PgMetaDatabaseError(message, code, response.status, formattedError)
+        const error = createPgMetaDatabaseError(result, response.status)
         return { data: undefined, error }
       }
 
