@@ -9,6 +9,7 @@ import {
   MAX_SEARCH_RESULTS,
   rankSearchMatches,
   scoreStorageMatch,
+  type BucketSearchData,
 } from './bucket-search-query'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -129,12 +130,36 @@ describe('bucketSearchQueryOptions', () => {
       'images/2024': [makeFile('cat.png'), makeFile('dog.png')],
     })
 
-    const { results, truncation } = await search('cat')
+    const { results, truncation, isComplete } = await search('cat')
 
     expect(results).toEqual([
       expect.objectContaining({ name: 'cat.png', path: 'images/2024/cat.png', isFolder: false }),
     ])
     expect(truncation).toBeNull()
+    expect(isComplete).toBe(true)
+  })
+
+  it('streams crawl progress before the results', async () => {
+    mockBucket({
+      '': [makeFolder('images'), makeFile('readme.md')],
+      images: [makeFolder('2024')],
+      'images/2024': [makeFile('cat.png'), makeFile('dog.png')],
+    })
+    const snapshots: BucketSearchData[] = []
+    const unsubscribe = queryClient.getQueryCache().subscribe(({ query }) => {
+      const data = query.state.data as BucketSearchData | undefined
+      if (data && snapshots.at(-1) !== data) snapshots.push(data)
+    })
+
+    const { progress } = await search('cat')
+    unsubscribe()
+
+    const inProgress = snapshots.filter((snapshot) => !snapshot.isComplete)
+    expect(inProgress.length).toBeGreaterThan(0)
+    expect(inProgress.every((snapshot) => snapshot.results.length === 0)).toBe(true)
+    const folderCounts = inProgress.map((snapshot) => snapshot.progress.folderCount)
+    expect(folderCounts).toEqual([...folderCounts].sort((a, b) => a - b))
+    expect(progress).toEqual({ folderCount: 3, itemCount: 5 })
   })
 
   it('reports the match limit, not the request limit, when it stops at the match cap', async () => {

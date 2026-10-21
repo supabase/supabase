@@ -93,6 +93,34 @@ describe('StorageSearchResults', () => {
     expect(screen.getByText('1 match in my-bucket')).toBeInTheDocument()
   })
 
+  it('counts up the items searched while the crawl runs', async () => {
+    let releaseImages: () => void = () => {}
+    const imagesGate = new Promise<void>((resolve) => (releaseImages = resolve))
+    const bucket: Record<string, StorageObject[]> = {
+      '': [makeFolder('images'), makeFile('readme.md')],
+      images: [makeFile('cat.png')],
+    }
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: async ({ request }) => {
+        const { path } = (await request.json()) as { path: string }
+        if (path === 'images') await imagesGate
+        return HttpResponse.json(bucket[path] ?? [])
+      },
+    })
+
+    render(<StorageSearchResults searchString="cat" onClearSearch={vi.fn()} />)
+
+    expect(
+      await screen.findByText('Searching my-bucket... 2 items in 1 folder')
+    ).toBeInTheDocument()
+
+    releaseImages()
+
+    expect(await screen.findByText('1 match in my-bucket')).toBeInTheDocument()
+  })
+
   it('opens a matching file in its own folder', async () => {
     mockBucket({
       '': [makeFolder('images')],

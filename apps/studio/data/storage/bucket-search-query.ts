@@ -1,6 +1,6 @@
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, experimental_streamedQuery as streamedQuery } from '@tanstack/react-query'
 
-import { crawlBucket } from './bucket-crawl'
+import { crawlBucket, type CrawlProgress } from './bucket-crawl'
 import type { StorageObject } from './bucket-objects-list-mutation'
 import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from './bucket-util'
 import { storageKeys } from './keys'
@@ -92,21 +92,56 @@ export type BucketSearchData = {
    * ran out of list requests before covering the bucket. `null` when the search is complete.
    */
   truncation: 'match-limit' | 'request-limit' | null
+  progress: CrawlProgress
+  /** False while the crawl is still running and `results` is not filled in yet */
+  isComplete: boolean
+}
+
+const EMPTY_PROGRESS: CrawlProgress = { folderCount: 0, itemCount: 0 }
+
+const PENDING_SEARCH: BucketSearchData = {
+  results: [],
+  truncation: null,
+  progress: EMPTY_PROGRESS,
+  isComplete: false,
+}
+
+function getSearchTruncation(
+  matchCount: number,
+  isCrawlTruncated: boolean
+): BucketSearchData['truncation'] {
+  // Checked first: stopping at the match cap leaves folders unvisited, so the crawl
+  // reports itself truncated too
+  if (matchCount > MAX_SEARCH_RESULTS) return 'match-limit'
+  if (isCrawlTruncated) return 'request-limit'
+  return null
 }
 
 export type BucketSearchError = ResponseError
 
-async function getBucketSearchResults(
+/**
+ * Searches the bucket, yielding a progress snapshot after each list request and the ranked
+ * results once the crawl ends. Snapshots arriving faster than they're consumed collapse into
+ * the latest one.
+ */
+async function* streamBucketSearchResults(
   { projectRef, bucketId, searchString }: BucketSearchVariables,
   signal?: AbortSignal
-): Promise<BucketSearchData> {
+): AsyncGenerator<BucketSearchData> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!bucketId) throw new Error('bucketId is required')
-  if (searchString.trim().length === 0) return { results: [], truncation: null }
+  if (searchString.trim().length === 0) {
+    yield { ...PENDING_SEARCH, isComplete: true }
+    return
+  }
 
   const matches: ScoredMatch[] = []
+  let progress = EMPTY_PROGRESS
+  let hasNewProgress = false
+  let isCrawlDone = false
+  let wake: (() => void) | undefined
 
-  const { isTruncated } = await crawlBucket(
+  const crawl = crawlBucket(
     {
       projectRef,
       bucketId,
@@ -114,16 +149,37 @@ async function getBucketSearchResults(
         matches.push(...collectSearchMatches(objects, parentPath, searchString))
         return matches.length <= MAX_SEARCH_RESULTS
       },
+      onProgress: (nextProgress) => {
+        progress = nextProgress
+        hasNewProgress = true
+        wake?.()
+      },
     },
     signal
-  )
+  ).finally(() => {
+    isCrawlDone = true
+    wake?.()
+  })
+  // Rejections surface through the `await crawl` below; this only keeps them from being
+  // reported as unhandled while the loop is still waiting
+  crawl.catch(() => {})
 
-  const results = rankSearchMatches(matches)
-  // Checked first: stopping at the match cap leaves folders unvisited, so the crawl
-  // reports itself truncated too
-  if (matches.length > MAX_SEARCH_RESULTS) return { results, truncation: 'match-limit' }
-  if (isTruncated) return { results, truncation: 'request-limit' }
-  return { results, truncation: null }
+  while (true) {
+    if (!hasNewProgress && !isCrawlDone) {
+      await new Promise<void>((resolve) => (wake = resolve))
+    }
+    if (isCrawlDone) break
+    hasNewProgress = false
+    yield { ...PENDING_SEARCH, progress }
+  }
+
+  const { isTruncated } = await crawl
+  yield {
+    results: rankSearchMatches(matches),
+    truncation: getSearchTruncation(matches.length, isTruncated),
+    progress,
+    isComplete: true,
+  }
 }
 
 export const bucketSearchQueryOptions = ({
@@ -135,8 +191,13 @@ export const bucketSearchQueryOptions = ({
 
   return queryOptions({
     queryKey: storageKeys.search(projectRef, bucketId, term),
-    queryFn: ({ signal }) =>
-      getBucketSearchResults({ projectRef, bucketId, searchString: term }, signal),
+    queryFn: streamedQuery<BucketSearchData, BucketSearchData>({
+      streamFn: ({ signal }) =>
+        streamBucketSearchResults({ projectRef, bucketId, searchString: term }, signal),
+      // Every chunk is a full snapshot, so the latest one replaces what came before
+      reducer: (_, chunk) => chunk,
+      initialValue: PENDING_SEARCH,
+    }),
     enabled:
       typeof projectRef !== 'undefined' && typeof bucketId !== 'undefined' && term.length > 0,
     // Crawling the bucket is expensive, so hold onto a term's results while the user

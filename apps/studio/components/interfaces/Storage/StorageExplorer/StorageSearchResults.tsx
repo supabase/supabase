@@ -16,6 +16,9 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 const ROW_HEIGHT = 37
 
+const pluralize = (count: number, singular: string, plural: string) =>
+  `${count.toLocaleString()} ${count === 1 ? singular : plural}`
+
 interface StorageSearchResultsProps {
   searchString: string
   onClearSearch: () => void
@@ -38,8 +41,15 @@ export const StorageSearchResults = ({
     bucketSearchQueryOptions({ projectRef, bucketId: selectedBucket.id, searchString })
   )
 
+  // Progress snapshots stream in before the results do, so the query leaves `pending` early
+  const isSearching = isPending || (!isError && !data.isComplete)
   const results = data?.results ?? []
-  const matchCount = `${results.length} ${results.length === 1 ? 'match' : 'matches'}`
+  const matchCount = pluralize(results.length, 'match', 'matches')
+  const progress = data?.progress
+  const progressText =
+    progress && progress.folderCount > 0
+      ? ` ${pluralize(progress.itemCount, 'item', 'items')} in ${pluralize(progress.folderCount, 'folder', 'folders')}`
+      : ''
 
   const handleSelectResult = (item: StorageSearchResult) => {
     track('storage_explorer_search_result_clicked', {
@@ -57,9 +67,13 @@ export const StorageSearchResults = ({
   return (
     <div className="flex h-full min-w-0 flex-1 flex-col">
       <div className="flex shrink-0 items-center justify-between gap-x-2 border-b border-default bg-surface-75 px-2.5 py-2">
-        <p role="status" className="min-w-0 truncate text-xs text-foreground-light">
-          {isPending && `Searching ${bucketName}...`}
-          {!isPending && !isError && `${matchCount} in ${bucketName}`}
+        <p
+          role="status"
+          aria-busy={isSearching}
+          className="min-w-0 truncate text-xs text-foreground-light"
+        >
+          {isSearching && `Searching ${bucketName}...${progressText}`}
+          {!isSearching && !isError && `${matchCount} in ${bucketName}`}
         </p>
         <Button size="tiny" variant="outline" onClick={onClearSearch}>
           Clear search
@@ -67,7 +81,7 @@ export const StorageSearchResults = ({
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        {isPending && (
+        {isSearching && (
           <div className="flex flex-col gap-y-2 p-2.5">
             <ShimmeringLoader />
             <ShimmeringLoader />
@@ -89,7 +103,7 @@ export const StorageSearchResults = ({
           </div>
         )}
 
-        {!isPending && !isError && results.length === 0 && (
+        {!isSearching && !isError && results.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-y-1 px-6">
             <p className="text-sm text-foreground">No items match "{searchString}"</p>
             <p className="text-center text-sm text-foreground-light">
@@ -98,7 +112,7 @@ export const StorageSearchResults = ({
           </div>
         )}
 
-        {!isError && results.length > 0 && (
+        {!isSearching && !isError && results.length > 0 && (
           <InfiniteListDefault
             className="h-full"
             items={results}

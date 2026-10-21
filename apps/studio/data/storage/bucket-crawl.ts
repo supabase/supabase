@@ -15,7 +15,19 @@ type CrawlBucketVariables = {
    * Return `false` to stop the crawl — callers use this to cap what they collect.
    */
   onPage: (objects: StorageObject[], parentPath: string) => boolean | void
+  /** Called after every list request with the running totals for the crawl */
+  onProgress?: (progress: CrawlProgress) => void
 }
+
+export type CrawlProgress = {
+  /** Folders whose contents have been fully listed */
+  folderCount: number
+  /** Objects returned so far, files or folders */
+  itemCount: number
+}
+
+/** Shared by every folder in a crawl, so concurrent folders share one request */
+type CrawlState = CrawlProgress & { requestCount: number }
 
 type FolderCrawlResult = {
   folderNames: string[]
@@ -25,32 +37,21 @@ type FolderCrawlResult = {
   isStopped: boolean
 }
 
-/**
- * Pages through a single folder, counting each list request against the crawl-wide
- * `listingsState` so concurrent folders share one budget.
- */
+/** Pages through a single folder, recording each list request on the crawl-wide `crawlState` */
 const crawlFolder = async (
-  {
-    projectRef,
-    bucketId,
-    path,
-    onPage,
-  }: Omit<CrawlBucketVariables, 'onPage'> & {
-    path: string
-    onPage: CrawlBucketVariables['onPage']
-  },
-  listingsState: { count: number },
+  { projectRef, bucketId, path, onPage, onProgress }: CrawlBucketVariables & { path: string },
+  crawlState: CrawlState,
   signal?: AbortSignal
 ): Promise<FolderCrawlResult> => {
   const folderNames: string[] = []
   let offset = 0
 
   while (true) {
-    if (listingsState.count >= CRAWL_MAX_LISTINGS) {
+    if (crawlState.requestCount >= CRAWL_MAX_LISTINGS) {
       return { folderNames, isTruncated: true, isStopped: false }
     }
 
-    listingsState.count++
+    crawlState.requestCount++
     const objects =
       (await listBucketObjects(
         {
@@ -69,10 +70,15 @@ const crawlFolder = async (
     // Objects without an id are prefixes (folders) rather than files
     folderNames.push(...objects.filter((object) => !object.id).map((object) => object.name))
 
+    const isLastPage = objects.length < CRAWL_PAGE_LIMIT
+    crawlState.itemCount += objects.length
+    if (isLastPage) crawlState.folderCount++
+    onProgress?.({ folderCount: crawlState.folderCount, itemCount: crawlState.itemCount })
+
     if (onPage(objects, path) === false) {
       return { folderNames, isTruncated: false, isStopped: true }
     }
-    if (objects.length < CRAWL_PAGE_LIMIT) {
+    if (isLastPage) {
       return { folderNames, isTruncated: false, isStopped: false }
     }
     offset += CRAWL_PAGE_LIMIT
@@ -87,15 +93,15 @@ const crawlFolder = async (
  * Stops at `CRAWL_MAX_LISTINGS` or when `onPage` returns `false`, reporting `isTruncated`.
  */
 export async function crawlBucket(
-  { projectRef, bucketId, onPage }: CrawlBucketVariables,
+  variables: CrawlBucketVariables,
   signal?: AbortSignal
 ): Promise<{ isTruncated: boolean }> {
   let queue = ['']
-  const listingsState = { count: 0 }
+  const crawlState: CrawlState = { requestCount: 0, folderCount: 0, itemCount: 0 }
   let isTruncated = false
 
   while (queue.length > 0) {
-    if (listingsState.count >= CRAWL_MAX_LISTINGS) {
+    if (crawlState.requestCount >= CRAWL_MAX_LISTINGS) {
       isTruncated = true
       break
     }
@@ -106,7 +112,7 @@ export async function crawlBucket(
     const results = await Promise.all(
       batch.map(async (path) => ({
         path,
-        ...(await crawlFolder({ projectRef, bucketId, path, onPage }, listingsState, signal)),
+        ...(await crawlFolder({ ...variables, path }, crawlState, signal)),
       }))
     )
 
