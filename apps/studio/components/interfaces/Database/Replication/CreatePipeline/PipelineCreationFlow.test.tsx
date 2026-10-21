@@ -2,6 +2,7 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { delay, HttpResponse } from 'msw'
+import router from 'next-router-mock'
 import { NuqsAdapter } from 'nuqs/adapters/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -136,6 +137,28 @@ const selectPublication = async () => {
 const back = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
+  it('keeps header navigation pending until dirty changes are discarded', async () => {
+    const push = vi.spyOn(router, 'push')
+    customRender(
+      <PipelineCreationFlow availableDestinations={['BigQuery', 'Snowflake']} onClose={vi.fn()} />
+    )
+    fireEvent.click(destinationType().getByRole('radio', { name: /Snowflake/ }))
+    fireEvent.click(screen.getByRole('link', { name: 'Supabase home' }))
+    expect(await screen.findByRole('alertdialog')).toBeInTheDocument()
+    expect(push).not.toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Keep editing' }))
+    expect(push).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('link', { name: 'Supabase home' }))
+    const discard = await screen.findByRole('button', { name: 'Discard changes' })
+    fireEvent.click(discard)
+
+    await waitFor(() =>
+      expect(push).toHaveBeenCalledWith(`${window.location.origin}/organizations`)
+    )
+    push.mockRestore()
+  })
+
   it.each([
     ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
     ['DuckLake', 'ducklake#choose-a-configuration-mode'],

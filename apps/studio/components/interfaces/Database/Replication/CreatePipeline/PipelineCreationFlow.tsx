@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -14,6 +15,7 @@ import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fie
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { DESTINATION_DOCS_PATHS } from '../DestinationPanel/DestinationPanel.constants'
+import type { FlowDestination } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
 import { PIPELINE_CREATION_STEPS as steps } from './PipelineCreationFlow.constants'
 import { PipelineCreationHeader } from './PipelineCreationHeader'
@@ -33,7 +35,12 @@ import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/Step
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
 
-type FlowDestination = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
+const getDocsUrl = (step: string, destination: FlowDestination) => {
+  if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
+  if (step === 'data')
+    return `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
+  return undefined
+}
 
 const stepParser = parseAsStringEnum(steps.map(({ id }) => id))
   .withDefault('destination')
@@ -46,6 +53,7 @@ export const PipelineCreationFlow = ({
   availableDestinations: FlowDestination[]
   onClose: () => void
 }) => {
+  const router = useRouter()
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
 
@@ -96,13 +104,7 @@ export const PipelineCreationFlow = ({
     if (next) void setStep(next.id)
   }
   const currentStep = steps.find((item) => item.id === accessibleStep) ?? steps[0]
-  let docsUrl: string | undefined
-  if (accessibleStep === 'connection') {
-    docsUrl = `${DOCS_URL}${DESTINATION_DOCS_PATHS[type]}`
-  }
-  if (accessibleStep === 'data') {
-    docsUrl = `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
-  }
+  const docsUrl = getDocsUrl(accessibleStep, type)
   const canSelectDestination = availableDestinations.includes(type)
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export const PipelineCreationFlow = ({
       <PipelineCreationHeader
         onClose={handleClose}
         onNavigate={(href) => {
-          if (!isSubmitting) requestNavigation(() => window.location.assign(href))
+          if (!isSubmitting) requestNavigation(() => void router.push(href))
         }}
       />
       <main className="flex-1">
@@ -143,7 +145,7 @@ export const PipelineCreationFlow = ({
             >
               <SteppedFlowHeader
                 title={currentStep.title}
-                description={currentStep.description.replace('{destination}', type)}
+                description={currentStep.description(type)}
                 actions={docsUrl && <DocsButton href={docsUrl} />}
               />
               {accessibleStep === 'destination' && (

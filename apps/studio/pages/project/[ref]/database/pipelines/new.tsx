@@ -18,7 +18,6 @@ import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { BASE_PATH } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import type { NextPageWithLayout } from '@/types'
 
@@ -42,16 +41,16 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
     { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
   )
   const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
-  const listHref = `${BASE_PATH}/project/${ref}/database/pipelines`
+  const listHref = `/project/${ref}/database/pipelines`
   const isAccessLoading =
     !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)
   const canOpenFlow = canAccessFlow && sources.isSuccess && hasSource
   useEffect(() => {
     if (!isAccessLoading && !canOpenFlow) {
       const fallback = isEnabled ? listHref : `${listHref}?destinationType=BigQuery`
-      window.location.replace(fallback)
+      void router.replace(fallback)
     }
-  }, [isAccessLoading, canOpenFlow, isEnabled, listHref])
+  }, [isAccessLoading, canOpenFlow, isEnabled, listHref, router])
   const handleClose = () => {
     if (!ref) return
     void router.push(`/project/${ref}/database/pipelines`)
@@ -77,7 +76,7 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
           <PipelineCreationHeader
             onClose={handleClose}
             isCloseDisabled={!ref}
-            onNavigate={(href) => window.location.assign(href)}
+            onNavigate={(href) => void router.push(href)}
           />
           <main className="flex-1">
             {isAccessLoading && <PipelineCreationSkeleton />}

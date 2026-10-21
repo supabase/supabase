@@ -105,9 +105,12 @@ export const DestinationPanel = () => {
     onClose,
   })
 
+  const destinationDocsPath =
+    destinationType && destinationType !== 'Analytics Bucket'
+      ? DESTINATION_DOCS_PATHS[destinationType]
+      : undefined
   const docsUrl = `${DOCS_URL}${
-    (destinationType && DESTINATION_DOCS_PATHS[destinationType]) ??
-    '/guides/database/replication/pipelines#step-3-configure-a-destination'
+    destinationDocsPath ?? '/guides/database/replication/pipelines#step-3-configure-a-destination'
   }`
 
   useEffect(() => {

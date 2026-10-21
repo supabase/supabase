@@ -12,6 +12,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 const state = vi.hoisted(() => ({
   hasProjectRef: true,
   push: vi.fn(),
+  replace: vi.fn(),
   enabled: false,
   loading: false,
   flagsLoaded: true,
@@ -21,7 +22,11 @@ const state = vi.hoisted(() => ({
 }))
 vi.mock('next/router', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/router')>()),
-  useRouter: () => ({ push: state.push, events: { on: vi.fn(), off: vi.fn() } }),
+  useRouter: () => ({
+    push: state.push,
+    replace: state.replace,
+    events: { on: vi.fn(), off: vi.fn() },
+  }),
 }))
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
@@ -48,7 +53,7 @@ vi.mock('@/components/interfaces/Database/Replication/useIsETLPrivateAlpha', () 
   useIsETLClickHousePrivateAlpha: () => false,
 }))
 vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
-  HomeIcon: () => <span>Supabase home</span>,
+  HomeIcon: () => <a href="/dashboard/projects">Supabase home</a>,
 }))
 vi.mock('@/components/layouts/AppLayout/OrganizationDropdown', () => ({
   OrganizationDropdown: () => <span>Organization</span>,
@@ -75,6 +80,7 @@ const mockSources = (sources: components['schemas']['SourcesResponse_Output']['s
   })
 beforeEach(() => {
   state.push.mockClear()
+  state.replace.mockClear()
   mockSources([
     {
       id: 42,
@@ -134,6 +140,9 @@ it('falls back when the preview is off even if organisation and project queries 
   expect(screen.getByRole('status', { name: 'Pipeline creation status' })).toHaveTextContent(
     'Opening Pipelines…'
   )
+  expect(state.replace).toHaveBeenCalledWith(
+    '/project/default/database/pipelines?destinationType=BigQuery'
+  )
 })
 
 it('returns through the shared router without reloading the toast host', async () => {
@@ -159,6 +168,7 @@ it.each(['disabled', 'error'])(
     customRender(<PipelineCreationPage />)
     expect(await screen.findByText('Returning to Pipelines…')).toBeInTheDocument()
     expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+    expect(state.replace).toHaveBeenCalledWith('/project/default/database/pipelines')
   }
 )
 
@@ -168,6 +178,7 @@ it.each([false, true])('waits for the project reference (preview: %s)', (enabled
   customRender(<PipelineCreationPage />)
   expect(screen.queryByText('Returning to Pipelines…')).not.toBeInTheDocument()
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+  expect(state.replace).not.toHaveBeenCalled()
 })
 it('rechecks cached enablement before allowing direct entry', async () => {
   const queryClient = new QueryClient()
@@ -204,6 +215,17 @@ it('keeps the header and disabled destination step visible while preview access 
   expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
   fireEvent.click(screen.getByRole('button', { name: 'Close' }))
   expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+})
+
+it('uses the shared router for loading header links with their existing base path', () => {
+  state.loading = true
+  customRender(<PipelineCreationPage />)
+  const home = screen.getByRole('link', { name: 'Supabase home' })
+
+  fireEvent.click(home)
+
+  expect(state.push).toHaveBeenCalledWith(`${window.location.origin}/dashboard/projects`)
+  expect(state.replace).not.toHaveBeenCalled()
 })
 
 it('keeps the header visible while source enablement loads', async () => {
