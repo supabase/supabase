@@ -721,7 +721,7 @@ export const auth: NavMenuConstant = {
           url: '/guides/auth/quickstarts/react-native' as `/${string}`,
         },
         {
-          name: 'React Native with Expo & Social Login',
+          name: 'React Native with Expo & Social Sign-in',
           url: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
         },
       ],
@@ -790,7 +790,7 @@ export const auth: NavMenuConstant = {
         },
 
         {
-          name: 'Social Login (OAuth)',
+          name: 'Social Sign-in (OAuth)',
           url: '/guides/auth/social-login',
           items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
           enabled: allAuthProvidersEnabled,
@@ -3176,7 +3176,7 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
-        { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
+        { name: 'Configure Social Sign-in (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         {
           name: 'Configure Custom OAuth/OIDC',
           url: '/guides/self-hosting/self-hosted-custom-oauth-providers',
