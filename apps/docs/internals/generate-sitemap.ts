@@ -72,7 +72,6 @@ async function generate() {
     `Total of ${allPages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
   )
 
-   
   fs.writeFileSync(sitemapFilePath, formatted)
 }
 
