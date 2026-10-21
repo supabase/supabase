@@ -2645,6 +2645,14 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc
+      >https://supabase.com/blog/operate-with-confidence-check-production-with-your-coding-agent</loc
+    >
+    <lastmod>2026-10-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://supabase.com/customers/asap-work</loc>
     <lastmod>2025-02-28</lastmod>
     <changefreq>weekly</changefreq>
@@ -2999,6 +3007,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://supabase.com/features/agent-skills</loc>
+
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://supabase.com/features/ai-assistant</loc>
 
     <changefreq>weekly</changefreq>
@@ -3107,6 +3121,12 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://supabase.com/features/database-connections</loc>
+
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://supabase.com/features/database-webhooks</loc>
 
     <changefreq>weekly</changefreq>
@@ -3156,6 +3176,12 @@
   </url>
   <url>
     <loc>https://supabase.com/features/foreign-key-selector</loc>
+
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://supabase.com/features/health-check-advisors</loc>
 
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
