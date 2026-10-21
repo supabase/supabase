@@ -8,6 +8,7 @@ import {
   TOOL_CATEGORIES,
   TOOL_CATEGORY_MAP,
   toolSetValidationSchema,
+  withoutApprovalTools,
 } from './tool-filter'
 import { contract as createNotebookContract } from './tools/create-notebook'
 import { contract as deleteNotebookContract } from './tools/delete-notebook'
@@ -352,5 +353,22 @@ describe('toolSetValidationSchema', () => {
 
     const incompleteValidationResult = toolSetValidationSchema.safeParse(incompleteTools)
     expect(incompleteValidationResult.success).toBe(true) // Should still pass as we allow subsets
+  })
+})
+
+describe('withoutApprovalTools', () => {
+  const makeTool = (needsApproval?: Tool['needsApproval']) =>
+    ({ description: 'A tool', execute: vitest.fn(), needsApproval }) as unknown as Tool
+
+  it('keeps tools without approval and drops gated ones', () => {
+    const tools: ToolSet = {
+      unset: makeTool(undefined),
+      off: makeTool(false),
+      on: makeTool(true),
+      conditional: makeTool(() => false),
+      stub: createPrivacyMessageTool(makeTool(true)) as Tool,
+    }
+
+    expect(Object.keys(withoutApprovalTools(tools))).toEqual(['unset', 'off'])
   })
 })

@@ -53,6 +53,7 @@ export const getTools = async ({
         projectRef,
         connectionString,
         authorization,
+        aiOptInLevel,
         includeSchemaMetadata: aiOptInLevel !== 'disabled',
       }),
     }
@@ -80,8 +81,9 @@ export const getTools = async ({
         projectRef,
         connectionString,
         authorization,
+        aiOptInLevel,
       }),
-      ...getReportTools({ projectRef, authorization }),
+      ...getReportTools({ projectRef, authorization, aiOptInLevel }),
       ...(isExplorerEnabled
         ? getNotebookTools({
             projectRef,
@@ -90,12 +92,14 @@ export const getTools = async ({
             aiOptInLevel,
           })
         : {}),
-      ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
+      ...(baseUrl ? getIncidentTools({ baseUrl, aiOptInLevel }) : {}),
     }
   }
 
   // Filter all tools based on the (potentially modified) AI opt-in level
-  const toolsWithSupport = supportMode ? { ...tools, ...getSupportLifecycleTools() } : tools
+  const toolsWithSupport = supportMode
+    ? { ...tools, ...getSupportLifecycleTools({ aiOptInLevel }) }
+    : tools
   const filteredTools: ToolSet = filterToolsByOptInLevel(toolsWithSupport, aiOptInLevel)
 
   return filteredTools

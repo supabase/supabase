@@ -93,7 +93,7 @@ Each contract tool is a pair of files named after the tool, plus an optional out
 - `<tool-name>.server.ts` exports `createTool`, which builds the executable tool from the contract with `toolFromContract`, or `approvalGatedToolFromContract` when `needsApproval` is true.
 - `<tool-name>-output.ts` holds output schemas and transformations that outgrow the contract file.
 
-[update-notebook.ts](./tools/update-notebook.ts) and [update-notebook.server.ts](./tools/update-notebook.server.ts) show the split with approval. [execute-sql.ts](./tools/execute-sql.ts) shows an output schema that also accepts an older persisted shape.
+[update-notebook.ts](./tools/update-notebook.ts) and [update-notebook.server.ts](./tools/update-notebook.server.ts) show the split with approval. [update-opt-in-level.ts](./tools/update-opt-in-level.ts) shows `createInputSchema`, for a tool whose stored input depends on the request: the SDK stores the parsed input, so the contract's `inputSchema` describes the stored shape and the per-request schema is built from the context. [execute-sql.ts](./tools/execute-sql.ts) shows an output schema that also accepts an older persisted shape.
 
 To migrate a tool to a contract:
 
@@ -122,7 +122,7 @@ These checks have different responsibilities:
 
 The opt-in levels are `disabled`, `schema`, `schema_and_log`, and `schema_and_log_and_data`. `execute_sql` is available at every level and requires user approval; sharing its result rows with the model requires `schema_and_log_and_data`. History sanitization also considers the level stamped on the original SQL output. Permission to change opt-in settings, user approval to run SQL, and the database's authorization checks are separate from result sharing.
 
-The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Every call requires approval through the opt-in request card, even when the organization already has the requested level. If the requested level is already satisfied, the input transform removes `requiredLevel` and treats the call as a review request; `levelWhenAsked` records the organization's level when the call was made.
+The model can call `update_opt_in_level` with `requiredLevel` to request higher access, or without `requiredLevel` when the user asks to review or change the setting. Every call requires approval through the opt-in request card, even when the organization already has the requested level. If the requested level is already satisfied, the contract's `createInputSchema` transform removes `requiredLevel` and treats the call as a review request; `levelWhenAsked` records the organization's level when the call was made.
 
 On platform, the endpoint resolves organization access and `getTools` includes platform tools when an access token is available. It also registers the opt-in request tool. Self-hosted requests use the `schema` level and fallback tools instead of the platform tool set. Check [getTools](./tools/index.ts) and [generate-v4](../../pages/api/ai/sql/generate-v4.ts) when changing either environment.
 
