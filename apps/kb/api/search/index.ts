@@ -1,10 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-import { corsHeaders } from '../src/lib/search/cors'
-import type { Database, KbSearchResult } from '../src/lib/search/types'
+import { corsHeaders } from './_cors.js'
+import type { Database, KbSearchResult } from './_types.js'
 
 let client: SupabaseClient<Database> | undefined
-function searchClient() {
+function supabase() {
   client ??= createClient<Database>(
     process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
   if (!query)
     return Response.json({ error: 'Missing q parameter' }, { status: 400, headers: corsHeaders })
 
-  const { data, error } = await searchClient().rpc('search_kb', {
+  const { data, error } = await supabase().rpc('search_kb', {
     query_text: query,
     match_limit: limit,
   })
