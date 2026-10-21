@@ -1,8 +1,7 @@
 import 'server-only'
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-
-import { type Database } from '~/lib/supabase'
+import { type Database } from 'common'
 
 let supabaseAdminClient: SupabaseClient<Database> | null = null
 
@@ -15,7 +14,7 @@ export function supabaseAdmin() {
       throw new Error('Missing required environment variables for Supabase admin client')
     }
 
-    supabaseAdminClient = createClient(url, key)
+    supabaseAdminClient = createClient<Database>(url, key)
   }
 
   return supabaseAdminClient

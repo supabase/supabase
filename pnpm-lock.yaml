@@ -2285,6 +2285,9 @@ importers:
       ai:
         specifier: 5.0.52
         version: 5.0.52(zod@3.25.76)
+      common:
+        specifier: workspace:*
+        version: link:../common
       common-tags:
         specifier: ^1.8.2
         version: 1.8.2
