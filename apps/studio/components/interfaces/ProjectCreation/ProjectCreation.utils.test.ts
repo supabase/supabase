@@ -22,8 +22,9 @@ import {
 import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 
 describe('smartRegionToExactRegion', () => {
-  it('maps the Auto option to the auto region code', () => {
-    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('auto')
+  it('maps the Auto option to the exact region of Americas', () => {
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe(smartRegionToExactRegion('Americas'))
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('East US (North Virginia)')
   })
 
   it('passes through values that are not smart regions', () => {
