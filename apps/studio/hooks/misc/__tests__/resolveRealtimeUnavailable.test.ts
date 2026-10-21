@@ -3,11 +3,15 @@ import { describe, expect, it } from 'vitest'
 import { resolveRealtimeUnavailable } from '../useHighAvailability'
 
 describe('resolveRealtimeUnavailable', () => {
-  it('is unavailable on High Availability projects outside staging and local', () => {
+  it('is available on High Availability projects by default', () => {
+    expect(resolveRealtimeUnavailable(true)).toBe(false)
+  })
+
+  it('is unavailable on High Availability projects when switched off', () => {
     expect(resolveRealtimeUnavailable(true, false)).toBe(true)
   })
 
-  it('is available on High Availability projects in staging and local', () => {
+  it('is available on High Availability projects when switched on', () => {
     expect(resolveRealtimeUnavailable(true, true)).toBe(false)
   })
 

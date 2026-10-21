@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 
 import { MULTIGRES_SCHEMA_NAME, resolveHighAvailability } from './useHighAvailability.constants'
 import { useIsHighAvailability, useSelectedProjectQuery } from './useSelectedProject'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 export { MULTIGRES_SCHEMA_NAME, resolveHighAvailability }
 
@@ -18,14 +17,13 @@ export function useHighAvailability() {
 }
 
 /**
- * Realtime (and the publications it relies on) is only available on High
- * Availability projects in staging and local environments while it is being
- * validated there. Whether a project is actually registered as a Realtime
- * tenant is decided by the platform.
+ * Realtime (and the publications it relies on) is available on High
+ * Availability projects in every environment. Whether a project is actually
+ * registered as a Realtime tenant is decided by the platform.
  */
 export function resolveRealtimeUnavailable(
   isHighAvailability: boolean,
-  isHighAvailabilityRealtimeAvailable = IS_STAGING_OR_LOCAL
+  isHighAvailabilityRealtimeAvailable = true
 ) {
   return isHighAvailability && !isHighAvailabilityRealtimeAvailable
 }
