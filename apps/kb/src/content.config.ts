@@ -80,11 +80,10 @@ const faqs = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs' }),
   // `topics` is not part of the schema, so frontmatter can't set it (zod strips
   // unknown keys). Every entry is tagged with the FAQ topic in the background.
-  schema: z
-    .object({
-      title: z.string(),
-    })
-    .transform((data) => ({ ...data, topics: ['FAQs'] })),
+  schema: z.object({
+    title: z.string(),
+    topics: z.array(z.string()).default([]),
+  }),
 })
 
 export const collections = { guides, troubleshooting, faqs }

@@ -83,17 +83,11 @@ export const TOPICS = [
     pinned: false,
     visible: true,
   },
-  {
-    name: 'FAQs',
-    description: 'Frequently asked questions and their answers.',
-    pinned: false,
-    visible: true,
-  },
 ] as const
 
 export type Topic = (typeof TOPICS)[number]['name']
 
-type ContentCollection = 'guides' | 'troubleshooting'
+type ContentCollection = 'guides' | 'troubleshooting' | 'faqs'
 
 interface ListedTopicsParams {
   guides: { topics: readonly string[] }[]
