@@ -3857,11 +3857,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/database/schemas',
-    destination: '/docs/guides/api/using-custom-schemas',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/getting-started/intro',
     destination: '/docs/guides/getting-started/architecture',
   },
@@ -3901,16 +3896,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/platform/manage-your-usage/log-ingestion',
     destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/terraform',
-    destination: '/docs/guides/deployment/terraform',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/local-development/seeding',
-    destination: '/docs/guides/local-development/seeding-your-database',
   },
   {
     permanent: true,
