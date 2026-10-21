@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
-import { HttpResponse } from 'msw'
+import { delay, HttpResponse } from 'msw'
 import { beforeEach, expect, it, vi } from 'vitest'
 
 import { replicationKeys } from '@/data/replication/keys'
@@ -46,6 +46,16 @@ vi.mock('@/components/interfaces/Database/Replication/useIsETLPrivateAlpha', () 
   useIsETLDucklakePrivateAlpha: () => false,
   useIsETLSnowflakePrivateAlpha: () => false,
   useIsETLClickHousePrivateAlpha: () => false,
+}))
+vi.mock('./PipelineCreationHeader', () => ({
+  PipelineCreationHeader: ({ onClose }: { onClose: () => void }) => (
+    <header>
+      <nav aria-label="Pipeline creation">New pipeline</nav>
+      <button tabIndex={0} onClick={onClose}>
+        Close
+      </button>
+    </header>
+  ),
 }))
 vi.mock('./PipelineCreationFlow', () => ({
   PipelineCreationFlow: ({ onClose }: { onClose: () => void }) => (
@@ -142,7 +152,7 @@ it.each(['disabled', 'error'])(
           ),
       })
     customRender(<PipelineCreationPage />)
-    expect(await screen.findByRole('status')).toHaveTextContent('Returning to Pipelines')
+    expect(await screen.findByText('Returning to Pipelines…')).toBeInTheDocument()
     expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
   }
 )
@@ -151,7 +161,7 @@ it.each([false, true])('waits for the project reference (preview: %s)', (enabled
   state.enabled = enabled
   state.hasProjectRef = false
   customRender(<PipelineCreationPage />)
-  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  expect(screen.queryByText('Returning to Pipelines…')).not.toBeInTheDocument()
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
 })
 it('rechecks cached enablement before allowing direct entry', async () => {
@@ -173,8 +183,35 @@ it('rechecks cached enablement before allowing direct entry', async () => {
   })
   customRender(<PipelineCreationPage />, { queryClient })
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
-  expect(screen.queryByRole('status')).not.toBeInTheDocument()
+  expect(screen.queryByText('Returning to Pipelines…')).not.toBeInTheDocument()
   finish?.()
-  expect(await screen.findByRole('status')).toHaveTextContent('Returning to Pipelines')
+  expect(await screen.findByText('Returning to Pipelines…')).toBeInTheDocument()
+  expect(screen.getByRole('navigation', { name: 'Pipeline creation' })).toBeInTheDocument()
+  expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
+})
+
+it('keeps the header and disabled destination step visible while preview access loads', () => {
+  state.loading = true
+  customRender(<PipelineCreationPage />)
+  expect(screen.getByRole('navigation', { name: 'Pipeline creation' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Choose a destination' })).toBeInTheDocument()
+  expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
+  expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }))
+  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+})
+
+it('keeps the header visible while source enablement loads', async () => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: async () => {
+      await delay('infinite')
+      return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources: [] })
+    },
+  })
+  customRender(<PipelineCreationPage />)
+  expect(await screen.findByRole('navigation', { name: 'Pipeline creation' })).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Choose a destination' })).toBeInTheDocument()
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
 })

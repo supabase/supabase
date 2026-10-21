@@ -13,7 +13,9 @@ import { generateDefaultValues } from '../DestinationPanel/DestinationForm/Desti
 import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fields'
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
+import { DESTINATION_DOCS_PATHS } from '../DestinationPanel/DestinationPanel.constants'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
+import { PIPELINE_CREATION_STEPS as steps } from './PipelineCreationFlow.constants'
 import { PipelineCreationHeader } from './PipelineCreationHeader'
 import { PipelineDataReview } from './PipelineDataReview'
 import { PipelineDataSection } from './PipelineDataSection'
@@ -26,16 +28,12 @@ import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
+import { DOCS_URL } from '@/lib/constants'
 
 type FlowDestination = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
-const steps = [
-  { id: 'destination', label: 'Destination', title: 'Choose a destination' },
-  { id: 'connection', label: 'Connection', title: 'Authorize the destination' },
-  { id: 'data', label: 'Data', title: 'Choose what to replicate' },
-  { id: 'review', label: 'Review', title: 'Review and create' },
-]
 
 const stepParser = parseAsStringEnum(steps.map(({ id }) => id))
   .withDefault('destination')
@@ -98,6 +96,13 @@ export const PipelineCreationFlow = ({
     if (next) void setStep(next.id)
   }
   const currentStep = steps.find((item) => item.id === accessibleStep) ?? steps[0]
+  let docsUrl: string | undefined
+  if (accessibleStep === 'connection') {
+    docsUrl = `${DOCS_URL}${DESTINATION_DOCS_PATHS[type]}`
+  }
+  if (accessibleStep === 'data') {
+    docsUrl = `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
+  }
   const canSelectDestination = availableDestinations.includes(type)
 
   useEffect(() => {
@@ -136,7 +141,11 @@ export const PipelineCreationFlow = ({
                 loading: isSubmitting,
               }}
             >
-              <SteppedFlowHeader title={currentStep.title} />
+              <SteppedFlowHeader
+                title={currentStep.title}
+                description={currentStep.description.replace('{destination}', type)}
+                actions={docsUrl && <DocsButton href={docsUrl} />}
+              />
               {accessibleStep === 'destination' && (
                 <div className="p-5">
                   <PipelineDestinationSelection

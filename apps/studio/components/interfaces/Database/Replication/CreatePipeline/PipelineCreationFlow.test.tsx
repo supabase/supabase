@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
+import { DOCS_URL } from '@/lib/constants'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -135,6 +136,58 @@ const selectPublication = async () => {
 const back = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
+  it.each([
+    ['BigQuery', 'bigquery#configure-bigquery-as-a-destination'],
+    ['DuckLake', 'ducklake#choose-a-configuration-mode'],
+    ['Snowflake', 'snowflake#prepare-snowflake-resources'],
+    ['ClickHouse', 'clickhouse#configure-clickhouse-as-a-destination'],
+  ] as const)('matches the connection subtitle and Docs to %s', (type, path) => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+          id: 1,
+          ref: 'default',
+          name: 'Test project',
+          organization_id: 1,
+          status: 'ACTIVE_HEALTHY',
+          cloud_provider: 'AWS',
+          region: 'us-east-1',
+          db_host: 'db.default.supabase.co',
+          restUrl: 'https://default.supabase.co/rest/v1/',
+          connectionString: null,
+          inserted_at: '2026-01-01T00:00:00Z',
+          updated_at: '2026-01-01T00:00:00Z',
+          subscription_id: 'subscription',
+          is_branch_enabled: false,
+          is_physical_backups_enabled: false,
+          high_availability: false,
+          integration_source: null,
+        }),
+    })
+    customRender(
+      <PipelineCreationFlow
+        availableDestinations={['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse']}
+        onClose={vi.fn()}
+      />,
+      { nuqs: { hasMemory: true } }
+    )
+    expect(screen.getByText('Where should this database be replicated?')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
+    fireEvent.click(destinationType().getByRole('radio', { name: new RegExp(type) }))
+    next()
+    expect(
+      screen.getByText(`Name this pipeline and enter credentials for ${type}.`)
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      `${DOCS_URL}/guides/database/replication/pipelines/${path}`
+    )
+    back()
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
+  })
+
   const reachReview = async (onClose = vi.fn(), onUrlUpdate = vi.fn()) => {
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
       nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
@@ -263,12 +316,21 @@ describe('PipelineCreationFlow', () => {
         )
       )
     await reachReview(vi.fn(), onUrlUpdate)
+    expect(screen.getByText('Check these details, then start the pipeline.')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Docs' })).not.toBeInTheDocument()
     await waitForReview()
     fireEvent.click(screen.getByRole('button', { name: 'Edit connection' }))
     await screen.findByText(/Step 2 of 4/)
     expect(screen.getByRole('textbox', { name: 'Pipeline name' })).toHaveValue('Warehouse')
     next()
     await screen.findByText(/Step 3 of 4/)
+    expect(
+      screen.getByText('Select a publication and which existing rows to copy during initial sync.')
+    ).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute(
+      'href',
+      `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
+    )
     next()
     await waitForReview()
     fireEvent.click(screen.getByRole('button', { name: 'Edit data' }))

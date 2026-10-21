@@ -2,10 +2,11 @@ import { useFeatureFlags, useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { PipelineCreationFlow } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationFlow'
+import { PipelineCreationHeader } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationHeader'
+import { PipelineCreationSkeleton } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationSkeleton'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -51,9 +52,32 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
       window.location.replace(fallback)
     }
   }, [isAccessLoading, canOpenFlow, isEnabled, listHref])
-  if (isAccessLoading)
-    return <GenericSkeletonLoader className="mx-auto w-full max-w-[760px] px-6 py-8" />
-  if (!canOpenFlow) return <p role="status">Returning to Pipelines…</p>
+  const handleClose = () => {
+    if (!ref) return
+    void router.push(`/project/${ref}/database/pipelines`)
+  }
+
+  if (isAccessLoading || !canOpenFlow) {
+    return (
+      <div className="flex min-h-screen flex-col bg-dash-sidebar">
+        <Head>
+          <title>New Pipeline | Supabase</title>
+        </Head>
+        <PipelineCreationHeader
+          onClose={handleClose}
+          onNavigate={(href) => window.location.assign(href)}
+        />
+        <main className="flex-1">
+          {isAccessLoading && <PipelineCreationSkeleton />}
+          {!isAccessLoading && (
+            <p className="mx-auto w-full max-w-[760px] px-6 py-8" role="status">
+              Returning to Pipelines…
+            </p>
+          )}
+        </main>
+      </div>
+    )
+  }
   return (
     <>
       <Head>
@@ -66,10 +90,7 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
           ...(snowflake ? ['Snowflake' as const] : []),
           ...(clickHouse ? ['ClickHouse' as const] : []),
         ]}
-        onClose={() => {
-          if (!ref) return
-          void router.push(`/project/${ref}/database/pipelines`)
-        }}
+        onClose={handleClose}
       />
     </>
   )
