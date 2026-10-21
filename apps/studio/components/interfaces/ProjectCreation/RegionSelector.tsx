@@ -427,7 +427,7 @@ export const RegionSelector = ({
                               </div>
                               <UpgradePlanButton
                                 plan="Pro"
-                                source="project-creation-region-selection"
+                                source="freeTierGeneralRegionSelector"
                                 onClick={() => track('free_tier_general_region_upgrade_clicked')}
                               />
                             </div>
