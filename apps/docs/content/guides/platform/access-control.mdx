@@ -21,12 +21,6 @@ The **Read-only** and **No-access** roles are available only on the [Team and En
 
 When you create an account, Supabase creates a default organization and makes you its **Owner**. You're also the **Owner** of any organization you create.
 
-The rest of this guide has three parts:
-
-- [Organization scoped roles vs project scoped roles](#organization-scoped-roles-vs-project-scoped-roles) explains how a role's scope decides which projects a member can access. Read it before you invite someone.
-- [Manage organization members](#manage-organization-members) covers inviting members, listing them with the Management API, and transferring ownership. Use it when someone joins your organization or an owner leaves.
-- [Permissions across roles](#permissions-across-roles) lists the actions each role can take. Use it to pick the right role.
-
 ## Organization scoped roles vs project scoped roles
 
 <Admonition type="note">
@@ -58,7 +52,7 @@ This security measure prevents accidental invites to accounts that your enterpri
 
 ### List organization members with the Management API
 
-You can also list organization members with the Management API:
+You can list organization members with the Management API:
 
 ```bash
 # Get your access token from https://supabase.com/dashboard/account/tokens
