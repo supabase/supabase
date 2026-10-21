@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "title": "Database health around a deployment",
+  "start": "2026-10-21T08:00:00Z",
+  "end": "2026-10-21T09:00:00Z",
+  "interval": "1m",
+  "panels": [
+    { "metric": "connections", "description": "Check whether concurrent connections changed." },
+    { "metric": "cpu" },
+    { "metric": "memory" }
+  ],
+  "annotations": [
+    {
+      "at": "2026-10-21T08:30:00Z",
+      "label": "Illustrative deployment marker; replace with your event"
+    }
+  ]
+}
