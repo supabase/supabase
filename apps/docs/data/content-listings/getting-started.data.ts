@@ -326,7 +326,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
     },
     {
       title: 'Expo React Native Social Auth',
-      href: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
+      href: '/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
       icon: '/docs/img/icons/expo-icon',
       hasLightIcon: true,
       description:

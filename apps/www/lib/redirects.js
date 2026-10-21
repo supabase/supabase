@@ -1851,88 +1851,103 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/social-login',
+    destination: '/docs/guides/auth/social-sign-in',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/social-login/:path*',
+    destination: '/docs/guides/auth/social-sign-in/:path*',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/auth/auth-google',
-    destination: '/docs/guides/auth/social-login/auth-google',
+    destination: '/docs/guides/auth/social-sign-in/auth-google',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-facebook',
-    destination: '/docs/guides/auth/social-login/auth-facebook',
+    destination: '/docs/guides/auth/social-sign-in/auth-facebook',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-apple',
-    destination: '/docs/guides/auth/social-login/auth-apple',
+    destination: '/docs/guides/auth/social-sign-in/auth-apple',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-azure',
-    destination: '/docs/guides/auth/social-login/auth-azure',
+    destination: '/docs/guides/auth/social-sign-in/auth-azure',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-twitter',
-    destination: '/docs/guides/auth/social-login/auth-twitter',
+    destination: '/docs/guides/auth/social-sign-in/auth-twitter',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-github',
-    destination: '/docs/guides/auth/social-login/auth-github',
+    destination: '/docs/guides/auth/social-sign-in/auth-github',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-gitlab',
-    destination: '/docs/guides/auth/social-login/auth-gitlab',
+    destination: '/docs/guides/auth/social-sign-in/auth-gitlab',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-bitbucket',
-    destination: '/docs/guides/auth/social-login/auth-bitbucket',
+    destination: '/docs/guides/auth/social-sign-in/auth-bitbucket',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-discord',
-    destination: '/docs/guides/auth/social-login/auth-discord',
+    destination: '/docs/guides/auth/social-sign-in/auth-discord',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-keycloak',
-    destination: '/docs/guides/auth/social-login/auth-keycloak',
+    destination: '/docs/guides/auth/social-sign-in/auth-keycloak',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-linkedin',
-    destination: '/docs/guides/auth/social-login/auth-linkedin',
+    destination: '/docs/guides/auth/social-sign-in/auth-linkedin',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-notion',
-    destination: '/docs/guides/auth/social-login/auth-notion',
+    destination: '/docs/guides/auth/social-sign-in/auth-notion',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-slack',
-    destination: '/docs/guides/auth/social-login/auth-slack',
+    destination: '/docs/guides/auth/social-sign-in/auth-slack',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-spotify',
-    destination: '/docs/guides/auth/social-login/auth-spotify',
+    destination: '/docs/guides/auth/social-sign-in/auth-spotify',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-twitch',
-    destination: '/docs/guides/auth/social-login/auth-twitch',
+    destination: '/docs/guides/auth/social-sign-in/auth-twitch',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-workos',
-    destination: '/docs/guides/auth/social-login/auth-workos',
+    destination: '/docs/guides/auth/social-sign-in/auth-workos',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-zoom',
-    destination: '/docs/guides/auth/social-login/auth-zoom',
+    destination: '/docs/guides/auth/social-sign-in/auth-zoom',
   },
   {
     permanent: true,
@@ -2012,7 +2027,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/with-expo-social-auth',
-    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
   },
   {
     permanent: true,
@@ -2022,7 +2037,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/getting-started/tutorials/with-expo-social-auth',
-    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-auth',
+    destination: '/docs/guides/auth/quickstarts/with-expo-react-native-social-sign-in',
   },
   {
     permanent: true,
@@ -2849,7 +2864,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/native-mobile-login',
-    destination: '/docs/guides/auth/social-login',
+    destination: '/docs/guides/auth/social-sign-in',
   },
   {
     permanent: true,
@@ -2884,7 +2899,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
-    destination: '/docs/guides/auth/social-login/auth-google',
+    destination: '/docs/guides/auth/social-sign-in/auth-google',
   },
   {
     permanent: true,
@@ -2979,7 +2994,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-    destination: '/docs/guides/auth/social-login',
+    destination: '/docs/guides/auth/social-sign-in',
   },
   {
     permanent: true,
@@ -3323,6 +3338,11 @@ module.exports = [
   },
 
   // features
+  {
+    permanent: true,
+    source: '/features/social-login',
+    destination: '/features/social-sign-in',
+  },
   {
     permanent: true,
     source: '/features/ai-query-assistance',

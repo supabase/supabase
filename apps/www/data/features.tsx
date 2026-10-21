@@ -1070,8 +1070,8 @@ Supabase's Social Login feature allows you to improve user experience and potent
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
     heroImage: '/images/features/social-login.png',
     heroImageLight: '/images/features/social-login-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
-    slug: 'social-login',
+    docsUrl: 'https://supabase.com/docs/guides/auth/social-sign-in',
+    slug: 'social-sign-in',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
