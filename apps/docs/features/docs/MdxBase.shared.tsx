@@ -38,6 +38,7 @@ import { Admonition, type AdmonitionProps } from 'ui-patterns/Admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import SqlToRest from 'ui-patterns/SqlToRest'
 
+import { GettingStartedStepper } from '../getting-started/GettingStartedStepper'
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { AgentSetup } from '../ui/AgentSetup'
 import { AgentWatchSchedule } from '../ui/AgentWatchSchedule'
@@ -93,6 +94,7 @@ const components = {
   DatabaseAdvisorsIndex,
   ErrorCodes,
   Extensions,
+  GettingStartedStepper,
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
