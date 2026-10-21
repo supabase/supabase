@@ -157,12 +157,24 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointId) ?? null,
     [endpoints, endpointId]
   )
+
+  // Reset synchronously during render, not in a useEffect — an effect runs after this
+  // render has already queried deliveries using the previous endpoint's leftover cursor,
+  // which can briefly leak that endpoint's deliveries onto the newly selected one.
+  const [cursorResetForEndpointId, setCursorResetForEndpointId] = useState(selectedEndpoint?.id)
+  if (selectedEndpoint?.id !== cursorResetForEndpointId) {
+    setCursorResetForEndpointId(selectedEndpoint?.id)
+    setDeliveryCursor({})
+    setDeliveryPage(1)
+  }
+
   const {
     data: { deliveries, nextCursor, previousCursor } = {
       deliveries: [],
       nextCursor: null,
       previousCursor: null,
     },
+    isPlaceholderData: isDeliveriesPagePending,
   } = useWebhookDeliveriesQuery(
     {
       scope: apiScope,
@@ -243,11 +255,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       setPendingCreatedEndpointId(null)
     }
   }, [endpointId, pendingCreatedEndpointId, selectedEndpoint])
-
-  useEffect(() => {
-    setDeliveryCursor({})
-    setDeliveryPage(1)
-  }, [selectedEndpoint?.id])
 
   const handleDeliverySearchChange = (value: string) => {
     setDeliveryCursor({})
@@ -561,8 +568,8 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 deliveryPage={deliveryPage}
                 deliverySearch={deliverySearch}
                 filteredDeliveries={filteredDeliveries}
-                hasNextDeliveriesPage={!!nextCursor}
-                hasPreviousDeliveriesPage={deliveryPage > 1}
+                hasNextDeliveriesPage={!isDeliveriesPagePending && !!nextCursor}
+                hasPreviousDeliveriesPage={!isDeliveriesPagePending && deliveryPage > 1}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={handleDeliverySearchChange}
