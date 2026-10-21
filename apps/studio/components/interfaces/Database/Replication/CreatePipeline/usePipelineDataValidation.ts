@@ -31,7 +31,10 @@ export const usePipelineDataValidation = ({
   const dataError = dataErrorState?.snapshot === snapshot ? dataErrorState.message : undefined
   const names = useReplicationPublicationNamesQuery({ projectRef, sourceId })
   const publication = useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
-  const hasPublicationLoadError = !!publicationName && (names.isError || publication.isError)
+  const isSelectedPublicationMissing =
+    names.isSuccess && !names.data.some(({ name }) => name === publicationName)
+  const hasPublicationLoadError =
+    !!publicationName && (names.isError || (publication.isError && !isSelectedPublicationMissing))
   const isDataVerified =
     verifiedSnapshot === JSON.stringify([snapshot, publication.data]) &&
     names.isSuccess &&
@@ -56,6 +59,11 @@ export const usePipelineDataValidation = ({
         publication.refetch(),
       ])
       if (currentSnapshot.current !== snapshot) return false
+      if (freshNames.isSuccess && !freshNames.data.some(({ name }) => name === publicationName)) {
+        form.setError('publicationName', { message: 'Select an available publication.' })
+        form.setFocus('publicationName')
+        return false
+      }
       if (freshNames.isError || freshPublication.isError) {
         setDataError('Publication tables could not be loaded. Click Continue to try again.')
         return false

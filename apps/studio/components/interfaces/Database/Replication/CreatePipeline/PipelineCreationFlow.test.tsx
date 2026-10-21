@@ -807,6 +807,36 @@ describe('PipelineCreationFlow', () => {
     expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
   })
 
+  it('asks for another publication when the selected publication was deleted', async () => {
+    customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
+      nuqs: { hasMemory: true },
+    })
+    next()
+    fillConnection()
+    await continueToData()
+    await selectPublication()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications',
+      response: () =>
+        HttpResponse.json<components['schemas']['ReadPublicationsResponse_Output']>({
+          publications: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        HttpResponse.json<{ message: string }>({ message: 'Not found' }, { status: 404 }),
+    })
+    next()
+    await screen.findByText('The publication analytics was not found.')
+    await screen.findByText('Select an available publication.')
+    expect(screen.queryByText('Publication tables could not be loaded')).not.toBeInTheDocument()
+    expect(screen.queryByText('Click Continue to try again.')).not.toBeInTheDocument()
+    expect(stepStatus()).toHaveTextContent('Step 3 of 4')
+  })
+
   it('blocks incomplete data, retries metadata failures, and reveals invalid advanced settings', async () => {
     const onUrlUpdate = vi.fn()
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={vi.fn()} />, {
