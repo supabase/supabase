@@ -11,9 +11,11 @@ import { OrgSelector } from '@/components/layouts/Navigation/NavigationBar/OrgSe
 export const PipelineCreationHeader = ({
   onClose,
   onNavigate,
+  isCloseDisabled = false,
 }: {
   onClose: () => void
   onNavigate: (href: string) => void
+  isCloseDisabled?: boolean
 }) => {
   const handleLinkClick = (event: MouseEvent<HTMLElement>) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
@@ -56,6 +58,7 @@ export const PipelineCreationHeader = ({
         className="shrink-0 px-1"
         aria-label="Close"
         onClick={onClose}
+        disabled={isCloseDisabled}
       />
     </header>
   )

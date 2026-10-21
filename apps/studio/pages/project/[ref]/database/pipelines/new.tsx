@@ -57,29 +57,41 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
     void router.push(`/project/${ref}/database/pipelines`)
   }
 
+  let statusMessage = 'Pipeline creation ready'
+  if (isAccessLoading) statusMessage = 'Loading pipeline creation…'
+  else if (!canOpenFlow) statusMessage = 'Opening Pipelines…'
+  const status = (
+    <p role="status" aria-label="Pipeline creation status" className="sr-only">
+      {statusMessage}
+    </p>
+  )
+
   if (isAccessLoading || !canOpenFlow) {
     return (
-      <div className="flex min-h-screen flex-col bg-dash-sidebar">
-        <Head>
-          <title>New Pipeline | Supabase</title>
-        </Head>
-        <PipelineCreationHeader
-          onClose={handleClose}
-          onNavigate={(href) => window.location.assign(href)}
-        />
-        <main className="flex-1">
-          {isAccessLoading && <PipelineCreationSkeleton />}
-          {!isAccessLoading && (
-            <p className="mx-auto w-full max-w-[760px] px-6 py-8" role="status">
-              Returning to Pipelines…
-            </p>
-          )}
-        </main>
-      </div>
+      <>
+        {status}
+        <div className="flex min-h-screen flex-col bg-dash-sidebar">
+          <Head>
+            <title>New Pipeline | Supabase</title>
+          </Head>
+          <PipelineCreationHeader
+            onClose={handleClose}
+            isCloseDisabled={!ref}
+            onNavigate={(href) => window.location.assign(href)}
+          />
+          <main className="flex-1">
+            {isAccessLoading && <PipelineCreationSkeleton />}
+            {!isAccessLoading && (
+              <p className="mx-auto w-full max-w-[760px] px-6 py-8">Returning to Pipelines…</p>
+            )}
+          </main>
+        </div>
+      </>
     )
   }
   return (
     <>
+      {status}
       <Head>
         <title>New Pipeline | Supabase</title>
       </Head>
