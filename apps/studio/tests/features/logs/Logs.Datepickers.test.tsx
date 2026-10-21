@@ -5,6 +5,7 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { HttpResponse } from 'msw'
 import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { render } from '../../helpers'
@@ -52,7 +53,13 @@ describe('inline and popover date-picker state', () => {
       if (variant === 'popover') await user.click(screen.getByRole('button'))
       const input = screen.getByPlaceholderText('e.g. 10s, 30m, 2h')
       await user.type(input, '10s')
-      await user.keyboard('{Escape}')
+      const flushCapture = () => flushSync(() => {})
+      document.addEventListener('keydown', flushCapture, true)
+      try {
+        await user.keyboard('{Escape}')
+      } finally {
+        document.removeEventListener('keydown', flushCapture, true)
+      }
       expect(input).toHaveValue('')
       expect(input).toHaveFocus()
       await user.type(input, '10s')

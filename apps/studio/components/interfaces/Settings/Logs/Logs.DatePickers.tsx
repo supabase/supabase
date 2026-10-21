@@ -450,6 +450,7 @@ export const LogsDatePicker = ({
         onEscapeKeyDown={(event) => {
           if (!customValue) return
           event.preventDefault()
+          event.stopPropagation()
           setCustomValue('')
         }}
       >

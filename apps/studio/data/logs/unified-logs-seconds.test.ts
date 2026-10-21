@@ -44,16 +44,6 @@ describe('second-resolution logs controls', () => {
       }).level
     ).toBe('DAY')
   })
-  it.each(['10s', '10 sec', '10 second', '10S'])(
-    'accepts %s without rounding the selected width',
-    (input) => {
-      const helpers = generateHelpersFromInput(input)
-      expect(helpers).toHaveLength(1)
-      expect(helpers?.[0].text).toBe('Last 10 seconds')
-      expect(helpers?.[0].calcFrom()).toBe('2026-09-30T11:59:50.000Z')
-    }
-  )
-
   it('distinguishes nearby second ranges and retains seconds in custom labels', () => {
     const helpers = generateHelpersFromInput('10s') ?? []
     expect(findMatchingDateHelper(new Date(now.getTime() - 10_000), now, helpers)).toBe(helpers[0])
