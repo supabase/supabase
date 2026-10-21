@@ -31,10 +31,14 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
 }
 
 // Quoted text and comments, matched left to right so a quote inside a comment (or the reverse)
-// can't desync the scan: E'..' strings, '..' strings, "..." identifiers, $tag$..$tag$ bodies,
-// -- line comments and /* */ block comments
+// can't desync the scan: E'..' strings, '..' strings, ".." identifiers, $tag$..$tag$ bodies,
+// -- line comments and /* */ block comments.
+//
+// A dollar-quote tag follows Postgres' unquoted-identifier rules, so after the first character
+// it may contain digits, and letters are not limited to ASCII ($t1$, $é$ are both valid tags).
+// Matching the tag with \p{L}/\p{N} keeps those from slipping past the stripper.
 const LITERALS_AND_COMMENTS =
-  /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$[a-z_]*\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//gi
+  /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$(?:[\p{L}_][\p{L}\p{N}_]*)?\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//giu
 
 /** Keeps only the SQL tokens, so keywords inside literals and comments aren't mistaken for syntax. */
 export const stripLiteralsAndComments = (sql: string) => sql.replace(LITERALS_AND_COMMENTS, ' ')
