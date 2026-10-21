@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 import { CHANGELOG_PAGES, MD_PAGES } from './app/api-v2/md/content.generated'
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   const isMarkdownSuffix = pathname.endsWith('.md')
