@@ -40,21 +40,6 @@ describe('PipelineCreationHeader', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(onClose).toHaveBeenCalledOnce()
   })
-  it('disables Close while the project context is unavailable', () => {
-    const onClose = vi.fn()
-    const { rerender } = customRender(
-      <PipelineCreationHeader onClose={onClose} onNavigate={vi.fn()} isCloseDisabled />
-    )
-    const close = screen.getByRole('button', { name: 'Close' })
-    expect(close).toBeDisabled()
-    fireEvent.click(close)
-    expect(onClose).not.toHaveBeenCalled()
-
-    rerender(<PipelineCreationHeader onClose={onClose} onNavigate={vi.fn()} />)
-    expect(close).toBeEnabled()
-    fireEvent.click(close)
-    expect(onClose).toHaveBeenCalledOnce()
-  })
   it.each(['Supabase home', 'Project'])('guards navigation from %s', (name) => {
     const onNavigate = vi.fn()
     customRender(<PipelineCreationHeader onClose={vi.fn()} onNavigate={onNavigate} />)

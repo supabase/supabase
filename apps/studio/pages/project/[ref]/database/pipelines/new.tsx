@@ -75,7 +75,6 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
           </Head>
           <PipelineCreationHeader
             onClose={handleClose}
-            isCloseDisabled={!ref}
             onNavigate={(href) => void router.push(href)}
           />
           <main className="flex-1">

@@ -271,12 +271,12 @@ it('keeps the same live status when loading finishes with a redirect', () => {
   expect(status).toHaveTextContent('Opening Pipelines…')
 })
 
-it('disables Close until the project reference is available', () => {
+it('only navigates on Close once the project reference is available', () => {
   state.hasProjectRef = false
   state.loading = true
   const { rerender } = customRender(<PipelineCreationPage />)
   const close = screen.getByRole('button', { name: 'Close' })
-  expect(close).toBeDisabled()
+  expect(close).toBeEnabled()
   fireEvent.click(close)
   expect(state.push).not.toHaveBeenCalled()
 
