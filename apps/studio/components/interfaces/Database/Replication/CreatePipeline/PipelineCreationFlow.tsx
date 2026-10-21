@@ -28,7 +28,6 @@ import { usePipelineConnectionValidation } from './usePipelineConnectionValidati
 import { usePipelineCreationSubmission } from './usePipelineCreationSubmission'
 import { usePipelineDataValidation } from './usePipelineDataValidation'
 import { usePipelineNavigationGuard } from './usePipelineNavigationGuard'
-import { usePipelineReviewCosts } from './usePipelineReviewCosts'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/SteppedFlow'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
@@ -105,11 +104,6 @@ export const PipelineCreationFlow = ({
     if (step === 'review' && !isDataVerified) return 'data'
     return step
   })()
-  const costs = usePipelineReviewCosts({
-    control: form.control,
-    publication,
-    enabled: accessibleStep === 'review',
-  })
   const handleNext = async () => {
     if (accessibleStep === 'connection' && !isConnectionVerified && !(await validateConnection()))
       return
@@ -154,7 +148,6 @@ export const PipelineCreationFlow = ({
                 label: submitLabel,
                 onClick: handleSubmit,
                 loading: isSubmitting,
-                disabled: costs.isInitialCostEstimateLoading,
               }}
             >
               <SteppedFlowHeader title={currentStep.title} />
@@ -228,7 +221,7 @@ export const PipelineCreationFlow = ({
                     validationFailures={pipelineValidationFailures}
                   />
                   <Separator />
-                  <PipelineReviewCosts costs={costs} />
+                  <PipelineReviewCosts control={form.control} publication={publication} />
                   <div role="status" aria-label="Pipeline validation status">
                     {submissionFailures.length > 0 && (
                       <Admonition

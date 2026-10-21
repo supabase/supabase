@@ -43,6 +43,7 @@ describe('PipelineCostEstimate', () => {
       <PipelineCostEstimate
         estimate={estimate}
         isLoading={false}
+        isError={false}
         publicationTables={publicationTables}
         tableSyncCopy={{ type: 'include_tables', table_ids: [101] }}
       />
@@ -56,7 +57,9 @@ describe('PipelineCostEstimate', () => {
   })
 
   test('keeps pipeline creation available when the estimate is unavailable', () => {
-    customRender(<PipelineCostEstimate isLoading={false} publicationTables={publicationTables} />)
+    customRender(
+      <PipelineCostEstimate isLoading={false} isError publicationTables={publicationTables} />
+    )
 
     expect(
       screen.getByText('A cost estimate is unavailable. You can still start the pipeline.')
@@ -69,6 +72,7 @@ test('shows zero initial-sync cost when all existing rows are skipped', () => {
     <PipelineCostEstimate
       estimate={estimate}
       isLoading={false}
+      isError={false}
       publicationTables={publicationTables}
       tableSyncCopy={{ type: 'skip_all_tables' }}
     />
@@ -79,22 +83,12 @@ test('shows zero initial-sync cost when all existing rows are skipped', () => {
 
 test('does not show stale rates while an estimate is loading', () => {
   customRender(
-    <PipelineCostEstimate estimate={estimate} isLoading publicationTables={publicationTables} />
+    <PipelineCostEstimate
+      estimate={estimate}
+      isLoading
+      isError={false}
+      publicationTables={publicationTables}
+    />
   )
   expect(screen.queryByText('$0.05/hour')).not.toBeInTheDocument()
-})
-
-test('keeps the status region mounted when loading finishes without an estimate', () => {
-  const { rerender } = customRender(
-    <PipelineCostEstimate isLoading publicationTables={publicationTables} />
-  )
-  const status = screen.getByRole('status')
-  expect(status).toBeEmptyDOMElement()
-
-  rerender(<PipelineCostEstimate isLoading={false} publicationTables={publicationTables} />)
-
-  expect(screen.getByRole('status')).toBe(status)
-  expect(status).toHaveTextContent(
-    'A cost estimate is unavailable. You can still start the pipeline.'
-  )
 })

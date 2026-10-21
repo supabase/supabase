@@ -16,7 +16,6 @@ import { PipelineDataSection } from '../../CreatePipeline/PipelineDataSection'
 import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinationReview'
 import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
 import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
-import { usePipelineReviewCosts } from '../../CreatePipeline/usePipelineReviewCosts'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLClickHousePrivateAlpha,
@@ -258,11 +257,6 @@ export const DestinationForm = ({
   const publicationName = useWatch({ control: form.control, name: 'publicationName' })
   const { data: selectedPublication, isSuccess: isSuccessPublication } =
     useReplicationPublicationQuery({ projectRef, sourceId, publicationName })
-  const costs = usePipelineReviewCosts({
-    control: form.control,
-    publication: selectedPublication,
-    enabled: visible && shouldShowConnectionSection,
-  })
 
   const isSelectedPublicationMissing =
     isSuccessPublicationNames &&
@@ -558,7 +552,7 @@ export const DestinationForm = ({
                       publication={selectedPublication}
                     />
                     <DialogSectionSeparator />
-                    <PipelineReviewCosts costs={costs} />
+                    <PipelineReviewCosts control={form.control} publication={selectedPublication} />
                   </>
                 )}
 

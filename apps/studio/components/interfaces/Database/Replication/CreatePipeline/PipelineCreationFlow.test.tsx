@@ -1,4 +1,3 @@
-import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -8,7 +7,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineCreationFlow as CreationFlow } from './PipelineCreationFlow'
 import type { ReplicationCostEstimateData } from '@/data/replication/cost-estimate-query'
-import { replicationKeys } from '@/data/replication/keys'
 import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -137,15 +135,9 @@ const selectPublication = async () => {
 const back = () => fireEvent.click(within(stepCard()).getByRole('button', { name: 'Back' }))
 
 describe('PipelineCreationFlow', () => {
-  const reachReview = async (
-    onClose = vi.fn(),
-    onUrlUpdate = vi.fn(),
-    queryClient?: QueryClient,
-    shouldWaitForEstimate = true
-  ) => {
+  const reachReview = async (onClose = vi.fn(), onUrlUpdate = vi.fn()) => {
     customRender(<PipelineCreationFlow availableDestinations={['BigQuery']} onClose={onClose} />, {
       nuqs: { hasMemory: true, rateLimitFactor: 1, onUrlUpdate },
-      queryClient,
     })
     next()
     fillConnection()
@@ -153,10 +145,6 @@ describe('PipelineCreationFlow', () => {
     await selectPublication()
     next()
     await screen.findByText(/Step 4 of 4/)
-    if (shouldWaitForEstimate)
-      await waitFor(() =>
-        expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
-      )
   }
 
   const mockCreation = ({ failCreate = false, failStart = false } = {}) => {
@@ -284,75 +272,6 @@ describe('PipelineCreationFlow', () => {
       expect(requests).toHaveLength(0)
     }
   )
-
-  it.each(['success', 'error'] as const)(
-    'waits for the initial cost estimate and permits starting after %s',
-    async (result) => {
-      const { requests } = mockCreation()
-      let finishEstimate = () => {}
-      const gate = new Promise<void>((resolve) => {
-        finishEstimate = resolve
-      })
-      addAPIMock({
-        method: 'get',
-        path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
-        response: async () => {
-          await gate
-          if (result === 'error')
-            return HttpResponse.json<{ message: string }>(
-              { message: 'Estimate unavailable' },
-              { status: 503 }
-            )
-          return HttpResponse.json<ReplicationCostEstimateData>({
-            currency: 'usd',
-            pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
-            streaming: { rate_per_gb: 3 },
-            table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
-          })
-        },
-      })
-      await reachReview(vi.fn(), vi.fn(), undefined, false)
-      const start = screen.getByRole('button', { name: 'Start pipeline' })
-      expect(start).toBeDisabled()
-      fireEvent.click(start)
-      expect(requests).toHaveLength(0)
-      expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled()
-      finishEstimate()
-      await waitFor(() => expect(start).toBeEnabled())
-      if (result === 'error')
-        expect(screen.getByText(/A cost estimate is unavailable/)).toBeInTheDocument()
-      fireEvent.click(start)
-      await waitFor(() => expect(requests).toHaveLength(1))
-    }
-  )
-
-  it('keeps starting available during a background cost refresh with a cached estimate', async () => {
-    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    const key = replicationKeys.costEstimate('default', 1, 'analytics')
-    queryClient.setQueryData<ReplicationCostEstimateData>(key, {
-      currency: 'usd',
-      pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
-      streaming: { rate_per_gb: 3 },
-      table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
-    })
-    addAPIMock({
-      method: 'get',
-      path: '/platform/replication/:ref/sources/:source_id/publications/:publication_name/cost-estimate',
-      response: async () => {
-        await delay('infinite')
-        return HttpResponse.json<ReplicationCostEstimateData>({
-          currency: 'usd',
-          pipeline: { hourly_cost: 0.05, monthly_cost: 36.5 },
-          streaming: { rate_per_gb: 3 },
-          table_copy: { rate_per_gb: 0.6, total_bytes: 0, total_cost: 0, tables: [] },
-        })
-      },
-    })
-    await reachReview(vi.fn(), vi.fn(), queryClient)
-    await waitFor(() => expect(queryClient.getQueryState(key)?.fetchStatus).toBe('fetching'))
-    expect(screen.getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
-    expect(screen.getByRole('heading', { name: 'Initial sync' })).toBeInTheDocument()
-  })
 
   it.each([false, true])(
     'leaves after one committed creation, including start failure: %s',
@@ -838,9 +757,7 @@ describe('PipelineCreationFlow', () => {
     await selectPublication()
     next()
     await waitForStep(4)
-    await waitFor(() =>
-      expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
-    )
+    expect(within(stepCard()).getByRole('button', { name: 'Start pipeline' })).toBeEnabled()
     expect(screen.getByDisplayValue('Warehouse')).toBeInTheDocument()
   })
 
