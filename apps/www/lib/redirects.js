@@ -3428,6 +3428,7 @@ module.exports = [
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
   { permanent: true, source: '/homepage.md', destination: '/index.md' },
   { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/kb.md', destination: '/kb/sitemap.md' },
   { permanent: true, source: '/index', destination: '/' },
   // High-traffic 404s
   { permanent: true, source: '/docs/graphql', destination: '/docs/guides/graphql' },
