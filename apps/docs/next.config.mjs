@@ -124,27 +124,6 @@ const nextConfig = {
     ]
   },
 
-  async rewrites() {
-    return {
-      beforeFiles: [
-        // Tabs still running a Next.js 15 bundle send a router state header that Next.js 16 can't
-        // parse, which returns a 500. A 400 makes the old router fall back to a full page load. This
-        // can't live in the proxy, because Next.js strips the header before the proxy runs.
-        {
-          source: '/:path*',
-          has: [
-            {
-              type: 'header',
-              key: 'next-router-state-tree',
-              value: '.*%2Ctrue(%2C\\d)?%5D',
-            },
-          ],
-          destination: '/api/legacy-router-state',
-        },
-      ],
-    }
-  },
-
   /**
    * Doc rewrites and redirects are
    * handled by the `www` nextjs config:
