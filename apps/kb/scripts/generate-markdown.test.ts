@@ -5,8 +5,9 @@ import {
   getInternalLinkBaseUrl,
   parseFrontmatter,
   renderMarkdown,
+  renderSitemapMarkdown,
   renderTopicMarkdown,
-} from './generate-markdown.mjs'
+} from './generate-markdown.ts'
 
 describe('parseFrontmatter', () => {
   it('parses title/description out of the YAML frontmatter and returns the rest as body', () => {
@@ -172,6 +173,31 @@ describe('renderTopicMarkdown', () => {
   it('falls back to "No guides for this topic" when the list is empty', () => {
     expect(renderTopicMarkdown(topic, [])).toBe(
       '# Tutorial\n\nStep-by-step walkthroughs.\n\nNo guides for this topic\n'
+    )
+  })
+})
+
+describe('renderSitemapMarkdown', () => {
+  it('renders the site title and description, then a linked list for topics, troubleshooting and guides', () => {
+    const markdown = renderSitemapMarkdown({
+      topics: [{ title: 'Auth', url: 'https://supabase.com/kb/topics/auth.md' }],
+      troubleshooting: [
+        { title: 'Permission denied', url: 'https://supabase.com/kb/troubleshooting/denied.md' },
+      ],
+      guides: [{ title: 'Sample guide', url: 'https://supabase.com/kb/guides/sample-guide.md' }],
+    })
+
+    expect(markdown).toBe(
+      [
+        '# Supabase Knowledge Base',
+        'In-depth guides, tutorials, troubleshooting, and explainers for best practices for Supabase',
+        '## Topics',
+        '- [Auth](https://supabase.com/kb/topics/auth.md)',
+        '## Troubleshooting',
+        '- [Permission denied](https://supabase.com/kb/troubleshooting/denied.md)',
+        '## Guides',
+        '- [Sample guide](https://supabase.com/kb/guides/sample-guide.md)',
+      ].join('\n\n') + '\n'
     )
   })
 })

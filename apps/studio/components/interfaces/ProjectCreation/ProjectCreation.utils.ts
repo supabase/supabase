@@ -14,8 +14,9 @@ import {
 export const AUTO_REGION_VALUE = 'best_available'
 
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
-  if (smartOrExactRegion === AUTO_REGION_VALUE) return 'auto'
-  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
+  // available-versions doesn't accept 'auto', so look versions up against the Americas region for Auto
+  const smartRegion = smartOrExactRegion === AUTO_REGION_VALUE ? 'Americas' : smartOrExactRegion
+  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartRegion) ?? smartRegion
 }
 
 export function getAvailableRegions(
