@@ -15,9 +15,9 @@ import type { Topic } from '../lib/topics'
 import { useQueryVariant } from '../lib/use-query-variant'
 import { AsciiCanvas, type CanvasSize } from './AsciiCanvas'
 import { AsciiHoverText } from './AsciiHoverText'
-import { GuideSearchDialog } from './GuideSearchDialog'
 import { HeroGrid } from './HeroGrid'
 import { InfallText } from './InfallText'
+import { KbSearchDialog } from './KbSearchDialog'
 import { TopicShape } from './TopicShape'
 import { WarpCanvas } from './WarpCanvas'
 
@@ -52,13 +52,6 @@ export interface HomeHeroProps {
   guides: GuideSummary[]
   className?: string
 }
-
-interface HeroSearchProps {
-  guides: GuideSummary[]
-}
-
-// hidden for launch. preview with ?search=on, flip the fallback to ship it
-const SEARCH_FLAG = ['off', 'on'] as const
 
 const DRAW_OUT = 'motion-safe:animate-draw-out'
 
@@ -186,9 +179,6 @@ export const Hero = ({
 }
 
 export const HomeHero = ({ guides, className }: HomeHeroProps) => {
-  const isSearchEnabled =
-    useQueryVariant({ key: 'search', options: SEARCH_FLAG, fallback: 'off' }) === 'on'
-
   return (
     <Hero
       title="Knowledge base"
@@ -196,7 +186,7 @@ export const HomeHero = ({ guides, className }: HomeHeroProps) => {
       guides={guides}
       className={className}
     >
-      {isSearchEnabled ? <HeroSearch guides={guides} /> : null}
+      <HeroSearch />
     </Hero>
   )
 }
@@ -272,7 +262,7 @@ const CopyFrame = ({ lines }: CopyFrameProps) =>
     />
   ))
 
-const HeroSearch = ({ guides }: HeroSearchProps) => {
+const HeroSearch = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const isMac = useSyncExternalStore(subscribeToNothing, getIsMac, getIsMacOnServer)
 
@@ -308,7 +298,7 @@ const HeroSearch = ({ guides }: HeroSearchProps) => {
         <span className="flex-1 truncate">Search guides</span>
         <KeyboardShortcut keys={[isMac ? '⌘' : 'Ctrl', 'K']} />
       </button>
-      <GuideSearchDialog guides={guides} isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
+      <KbSearchDialog isOpen={isSearchOpen} onOpenChange={setIsSearchOpen} />
     </>
   )
 }

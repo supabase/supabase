@@ -11,6 +11,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
+import { SEARCH_V2_ENDPOINT } from './constants'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 type SearchV2DialogProps = Pick<SearchDialogProps, 'open' | 'onOpenChange'>
@@ -35,7 +36,9 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
 
 function SearchV2Panel({ onResultNavigate, onResultLinkNavigate }: SearchV2PanelProps) {
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2()
+  const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2({
+    endpoint: SEARCH_V2_ENDPOINT,
+  })
 
   useEffect(() => {
     if (searchState.status === 'results' || searchState.status === 'noResults') {

@@ -19,8 +19,13 @@ vi.mock('next/link', () => ({
     ...props
   }: React.ComponentProps<'a'> & { prefetch?: boolean }) => <a {...props} />,
 }))
+const useDocsSearchV2 = vi.fn((_options: { endpoint: string }) => ({
+  searchState,
+  handleDocsSearchDebounced,
+  resetSearch,
+}))
 vi.mock('common', () => ({
-  useDocsSearchV2: () => ({ searchState, handleDocsSearchDebounced, resetSearch }),
+  useDocsSearchV2: (options: { endpoint: string }) => useDocsSearchV2(options),
 }))
 
 const result = {
@@ -68,6 +73,12 @@ function setSearchState(view: ReturnType<typeof render>, next: DocsSearchV2State
 }
 
 describe('SearchV2 telemetry', () => {
+  it("searches through the docs app's own route, under its base path", () => {
+    openDialog()
+
+    expect(useDocsSearchV2).toHaveBeenCalledWith({ endpoint: '/docs/api/search_v2' })
+  })
+
   it('sends docs_search_v2_opened with search_input when the trigger is clicked', () => {
     openDialog()
 
