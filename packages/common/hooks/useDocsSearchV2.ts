@@ -144,4 +144,4 @@ const useDocsSearchV2 = () => {
 }
 
 export { useDocsSearchV2 }
-export type { DocsSearchV2Result }
+export type { DocsSearchV2Result, SearchState as DocsSearchV2State }

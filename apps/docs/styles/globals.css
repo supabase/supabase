@@ -1,8 +1,7 @@
 @import 'config/tailwind.config.css';
 @import './code-block.css';
 @import './reference.css';
-@import './loading-beam.css';
-@import './scroll-fade.css';
+@import 'docs-search/styles.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
@@ -13,6 +12,7 @@
 @source '../pages/**/*.{tsx,mdx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/docs-search/src/**/*.{tsx,ts}';
 
 @theme inline {
   --font-sans:
