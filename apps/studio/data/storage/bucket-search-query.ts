@@ -7,7 +7,7 @@ import { storageKeys } from './keys'
 import type { ResponseError } from '@/types'
 
 /** Maximum number of matches kept for a single search */
-export const MAX_SEARCH_RESULTS = 100
+export const MAX_SEARCH_RESULTS = 250
 
 export type StorageSearchResult = {
   /** Set for files; folders are prefixes and have no row of their own */
@@ -87,7 +87,11 @@ export type BucketSearchVariables = {
 
 export type BucketSearchData = {
   results: StorageSearchResult[]
-  isTruncated: boolean
+  /**
+   * Why `results` may be incomplete: more matches than `MAX_SEARCH_RESULTS`, or the crawl
+   * ran out of list requests before covering the bucket. `null` when the search is complete.
+   */
+  truncation: 'match-limit' | 'request-limit' | null
 }
 
 export type BucketSearchError = ResponseError
@@ -98,7 +102,7 @@ async function getBucketSearchResults(
 ): Promise<BucketSearchData> {
   if (!projectRef) throw new Error('projectRef is required')
   if (!bucketId) throw new Error('bucketId is required')
-  if (searchString.trim().length === 0) return { results: [], isTruncated: false }
+  if (searchString.trim().length === 0) return { results: [], truncation: null }
 
   const matches: ScoredMatch[] = []
 
@@ -114,10 +118,12 @@ async function getBucketSearchResults(
     signal
   )
 
-  return {
-    results: rankSearchMatches(matches),
-    isTruncated: isTruncated || matches.length > MAX_SEARCH_RESULTS,
-  }
+  const results = rankSearchMatches(matches)
+  // Checked first: stopping at the match cap leaves folders unvisited, so the crawl
+  // reports itself truncated too
+  if (matches.length > MAX_SEARCH_RESULTS) return { results, truncation: 'match-limit' }
+  if (isTruncated) return { results, truncation: 'request-limit' }
+  return { results, truncation: null }
 }
 
 export const bucketSearchQueryOptions = ({

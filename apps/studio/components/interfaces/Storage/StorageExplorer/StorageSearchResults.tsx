@@ -8,6 +8,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
 import {
   bucketSearchQueryOptions,
+  MAX_SEARCH_RESULTS,
   type StorageSearchResult,
 } from '@/data/storage/bucket-search-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -110,7 +111,12 @@ export const StorageSearchResults = ({
         )}
       </div>
 
-      {!!data?.isTruncated && (
+      {data?.truncation === 'match-limit' && (
+        <p className="shrink-0 border-t border-overlay bg-surface-100 px-2.5 py-2 text-xs text-foreground-lighter">
+          Showing the first {MAX_SEARCH_RESULTS} matches. Refine your search to narrow them down.
+        </p>
+      )}
+      {data?.truncation === 'request-limit' && (
         <p className="shrink-0 border-t border-overlay bg-surface-100 px-2.5 py-2 text-xs text-foreground-lighter">
           {bucketName} has too many items to search through all of them. Browse to an item if it
           isn't listed.

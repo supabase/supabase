@@ -129,12 +129,28 @@ describe('bucketSearchQueryOptions', () => {
       'images/2024': [makeFile('cat.png'), makeFile('dog.png')],
     })
 
-    const { results, isTruncated } = await search('cat')
+    const { results, truncation } = await search('cat')
 
     expect(results).toEqual([
       expect.objectContaining({ name: 'cat.png', path: 'images/2024/cat.png', isFolder: false }),
     ])
-    expect(isTruncated).toBe(false)
+    expect(truncation).toBeNull()
+  })
+
+  it('reports the match limit, not the request limit, when it stops at the match cap', async () => {
+    mockBucket({
+      '': [
+        makeFolder('more-icons'),
+        ...Array.from({ length: MAX_SEARCH_RESULTS + 1 }, (_, index) =>
+          makeFile(`icon-${index}.png`)
+        ),
+      ],
+    })
+
+    const { results, truncation } = await search('icon')
+
+    expect(results).toHaveLength(MAX_SEARCH_RESULTS)
+    expect(truncation).toBe('match-limit')
   })
 
   it('matches folders by name and carries their path', async () => {
@@ -152,9 +168,9 @@ describe('bucketSearchQueryOptions', () => {
   })
 
   it('returns nothing without hitting the API for a blank search', async () => {
-    const { results, isTruncated } = await search('   ')
+    const { results, truncation } = await search('   ')
 
     expect(results).toEqual([])
-    expect(isTruncated).toBe(false)
+    expect(truncation).toBeNull()
   })
 })
