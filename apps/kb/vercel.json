@@ -1,5 +1,6 @@
 {
   "buildCommand": "pnpm build",
+  "trailingSlash": false,
   "redirects": [
     { "source": "/", "destination": "/kb", "permanent": false },
     {
