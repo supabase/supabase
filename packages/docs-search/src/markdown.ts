@@ -4,39 +4,20 @@ import remarkGfm from 'remark-gfm'
 import remarkParse from 'remark-parse'
 import { unified } from 'unified'
 
+import type { ParsedPage, Section } from './types.js'
+
 const processor = unified().use(remarkParse).use(remarkFrontmatter, ['yaml']).use(remarkGfm)
 
 /**
- * Types are derived from the processor's own output rather than imported from
- * `mdast` directly: this app pins `@types/mdast` v3 for its wider MDX pipeline,
- * while `remark-parse` v11 resolves its own (structurally incompatible) v4
- * types for its nested `@types/mdast` dependency.
+ * Types are derived from the processor's output rather than imported from `mdast`:
+ * the docs app pins `@types/mdast` v3, while `remark-parse` v11 resolves its own
+ * (structurally incompatible) v4 types.
  */
 export type Root = ReturnType<typeof processor.parse>
-/** Any child of the root node (paragraph, heading, list, table, ...). */
 type Content = Root['children'][number]
 type Heading = Extract<Content, { type: 'heading' }>
-/** Union of every node type that can appear in the tree (root or content). */
 type Nodes = Root | Content
 
-export interface Section {
-  /** Text of this section's heading ('' for text that appears before any heading). */
-  heading: string
-  /** 1..6, or 0 for text before any heading. */
-  level: number
-  /** Headings from the H1 down to this section, e.g. ['Users', 'Permanent and anonymous users']. */
-  headingPath: string[]
-  /** Plain text of everything under the heading until the next heading. */
-  content: string
-}
-
-export interface ParsedPage {
-  title: string
-  excerpt: string
-  sections: Section[]
-}
-
-/** Parse markdown into an mdast tree (GFM tables/lists + YAML frontmatter supported). */
 export function parseMarkdownAst(markdown: string): Root {
   return processor.parse(markdown)
 }
@@ -59,7 +40,6 @@ export function nodeToText(node: Nodes): string {
   }
 }
 
-/** The first H1 of the document, or '' if there is none. */
 export function extractTitle(tree: Root): string {
   const h1 = tree.children.find(
     (node): node is Heading => node.type === 'heading' && node.depth === 1
@@ -73,7 +53,6 @@ export function extractExcerpt(tree: Root): string {
   return paragraph ? nodeToText(paragraph) : ''
 }
 
-/** Nodes that carry no searchable text. */
 function isIgnored(node: Content): boolean {
   return (
     node.type === 'yaml' ||
@@ -118,7 +97,6 @@ export function extractSections(tree: Root): Section[] {
       continue
     }
 
-    // Body text before the first heading gets a headless section.
     if (!current) current = { heading: '', level: 0, headingPath: [], content: '' }
     const text = nodeToText(node)
     if (text) body.push(text)
@@ -128,7 +106,6 @@ export function extractSections(tree: Root): Section[] {
   return sections
 }
 
-/** Everything the ingester needs from one markdown file. */
 export function parsePage(markdown: string): ParsedPage {
   const tree = parseMarkdownAst(markdown)
   return {
