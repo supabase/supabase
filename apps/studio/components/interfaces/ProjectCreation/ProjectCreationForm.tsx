@@ -28,6 +28,7 @@ import {
 } from './ProjectCreation.constants'
 import { FormSchema } from './ProjectCreation.schema'
 import {
+  AUTO_REGION_VALUE,
   getAvailableRegions,
   getFreeTierGeneralRegionExperimentVariant,
   getHighAvailabilityRegionCode,
@@ -316,8 +317,14 @@ export const ProjectCreationForm = ({
         )
       : undefined
   const recommendedSmartRegion = smartRegionEnabled
-    ? availableRegionsData?.recommendations.smartGroup.name
+    ? availableRegionsData?.recommendations.smartGroup?.name
     : ''
+
+  const firstAvailableSmartRegion = highAvailability
+    ? undefined
+    : availableRegionsData?.all.smartGroup[0]?.name
+  const isAutoRegionAvailable =
+    smartRegionEnabled && !highAvailability && availableRegionsData?.all.auto !== undefined
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
@@ -327,7 +334,9 @@ export const ProjectCreationForm = ({
       highAvailability === true && highAvailabilityRegionCode !== undefined,
     highAvailabilityRegionName: highAvailabilityRegion?.name,
     isSmartRegionEnabled: smartRegionEnabled,
+    isAutoRegionAvailable,
     recommendedSmartRegion,
+    firstAvailableSmartRegion,
     autoDefaultRegion,
     fixedDefaultRegion,
   })
@@ -511,10 +520,11 @@ export const ProjectCreationForm = ({
       availableOrioleVersion,
     })
 
-    const { smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
-    const selectedRegion = smartRegionEnabled
-      ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
-      : undefined
+    const { auto, smartGroup = [], specific = [] } = availableRegionsData?.all ?? {}
+    const selectedExplicitRegion =
+      smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion)
+    const selectedSmartRegion = dbRegion === AUTO_REGION_VALUE ? auto : selectedExplicitRegion
+    const selectedRegion = smartRegionEnabled ? selectedSmartRegion : undefined
 
     if (highAvailability && highAvailabilityRegionCode !== undefined && !selectedRegion) {
       return toast.error(

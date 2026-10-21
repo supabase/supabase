@@ -19,7 +19,7 @@ type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
-type RegionsInfo = components['schemas']['RegionsInfo_Output']
+type RegionsInfo = components['schemas']['RegionsInfoPlatform_Output']
 type MemberWithFreeProjectLimit = components['schemas']['MemberWithFreeProjectLimit_Output']
 type OverdueInvoiceCount = components['schemas']['OverdueInvoiceCount_Output']
 type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
@@ -107,6 +107,18 @@ const DEFAULT_AVAILABLE_REGIONS: RegionsInfo = {
 
 const FRANKFURT = 'Central EU (Frankfurt)'
 const SAO_PAULO = 'South America (São Paulo)'
+
+const AVAILABLE_REGIONS_WITH_AUTO: RegionsInfo = {
+  ...DEFAULT_AVAILABLE_REGIONS,
+  all: {
+    ...DEFAULT_AVAILABLE_REGIONS.all,
+    auto: { code: 'auto', name: 'Auto', type: 'auto' },
+  },
+  recommendations: {
+    ...DEFAULT_AVAILABLE_REGIONS.recommendations,
+    auto: { code: 'auto', name: 'Auto', type: 'auto' },
+  },
+}
 
 const availableRegionsWithSaoPaulo = (status?: 'capacity' | 'other'): RegionsInfo => ({
   ...DEFAULT_AVAILABLE_REGIONS,
@@ -549,6 +561,55 @@ describe('project creation wizard', () => {
 
       await waitFor(() => expect(onRequest).toHaveBeenCalled())
       expect(onRequest.mock.calls[0][0].region_selection).toMatchObject({ name: 'Americas' })
+    })
+
+    test('defaults to the Auto option when it is available', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+
+      await renderWizard()
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
+    })
+
+    test('hides the smart and specific region badges while Auto is recommended', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+
+      await renderWizard()
+
+      await screen.findByPlaceholderText('Project name')
+      await user.click(getSelectTriggerByLabel('Region'))
+
+      const autoOption = await screen.findByRole('option', { name: /Auto/ })
+      expect(within(autoOption).getByText('Recommended')).toBeInTheDocument()
+      const americasOption = screen.getByRole('option', { name: /Americas/ })
+      expect(within(americasOption).queryByText('Recommended')).not.toBeInTheDocument()
+    })
+
+    test('defaults to the first general region when there is no recommendation', async () => {
+      mockWizardEndpoints({
+        availableRegions: { ...DEFAULT_AVAILABLE_REGIONS, recommendations: {} },
+      })
+
+      await renderWizard()
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas'))
+    })
+
+    test('keeps the Auto option selected and submits it as an auto region selection', async () => {
+      mockWizardEndpoints({ availableRegions: AVAILABLE_REGIONS_WITH_AUTO })
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Auto Region Project')
+      await generateAndWaitForStrongPassword()
+      await selectRegion(/Auto/)
+
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Auto'))
+
+      const regionSelection = await submitAndReadRegionSelection(onRequest)
+      expect(regionSelection).toMatchObject({ code: 'auto', type: 'auto' })
     })
 
     describe('specific regions behind a link', () => {
