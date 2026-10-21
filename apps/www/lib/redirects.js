@@ -808,7 +808,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides',
-    destination: '/docs/',
+    destination: '/docs',
   },
   {
     permanent: true,
@@ -1498,17 +1498,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/auth-helpers',
-    destination: '/docs/guides/auth/auth-helpers/',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: true,
     source: '/docs/reference/auth-helpers/next-js',
-    destination: '/docs/guides/auth/auth-helpers/nextjs',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: true,
     source: '/docs/reference/auth-helpers/sveltekit',
-    destination: '/docs/guides/auth/auth-helpers/sveltekit',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: true,
@@ -2077,27 +2077,27 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/migrations/auth0',
-    destination: '/docs/guides/resources/migrating-to-supabase/auth0',
+    destination: '/docs/guides/platform/migrating-to-supabase/auth0',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/firestore-data',
-    destination: '/docs/guides/resources/migrating-to-supabase/firestore-data',
+    destination: '/docs/guides/platform/migrating-to-supabase/firestore-data',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/firebase-auth',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-auth',
+    destination: '/docs/guides/platform/migrating-to-supabase/firebase-auth',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/firebase-storage',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-storage',
+    destination: '/docs/guides/platform/migrating-to-supabase/firebase-storage',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/heroku',
-    destination: '/docs/guides/resources/migrating-to-supabase/heroku',
+    destination: '/docs/guides/platform/migrating-to-supabase/heroku',
   },
   {
     permanent: true,
@@ -2407,7 +2407,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/using-environment-variables-in-config',
-    destination: '/docs/guides/cli/managing-config',
+    destination: '/docs/guides/local-development/managing-config',
   },
   {
     permanent: true,
@@ -3166,22 +3166,22 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/logs',
-    destination: '/docs/guides/monitoring-troubleshooting/logs',
+    destination: '/docs/guides/observability/logs',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/metrics',
-    destination: '/docs/guides/monitoring-troubleshooting/metrics',
+    destination: '/docs/guides/observability/metrics',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/sentry-monitoring',
-    destination: '/docs/guides/monitoring-troubleshooting/sentry-monitoring',
+    destination: '/docs/guides/observability/sentry-monitoring',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/advanced-log-filtering',
-    destination: '/docs/guides/monitoring-troubleshooting/advanced-log-filtering',
+    destination: '/docs/guides/observability/advanced-log-filtering',
   },
   {
     permanent: true,
@@ -3216,7 +3216,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/log-drains',
-    destination: '/docs/guides/monitoring-troubleshooting/log-drains',
+    destination: '/docs/guides/observability/log-drains',
   },
   {
     // [Charis] This is a nice URL and I'm not 100% on permanently
