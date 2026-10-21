@@ -2,7 +2,6 @@ import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   AlignLeftIcon,
-  CheckIcon,
   ChevronDownIcon,
   HeartIcon,
   KeyboardIcon,
@@ -14,6 +13,7 @@ import {
   Button,
   cn,
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuRadioGroup,
@@ -45,6 +45,11 @@ import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
+
+// DropdownMenuCheckboxItem puts its check indicator on the left. These menus show
+// it on the right, matching the other toggle items, so move the indicator over.
+const CHECKBOX_ITEM_CHECK_ON_RIGHT =
+  'gap-x-2 pl-2 pr-8 [&>span:first-child]:left-auto [&>span:first-child]:right-2 [&>span:first-child_svg]:text-primary'
 
 export type UtilityActionsProps = {
   id: string
@@ -136,24 +141,23 @@ export const UtilityActions = ({
           <TooltipContent side="bottom">More actions</TooltipContent>
         </Tooltip>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
-            <span className="flex items-center gap-x-2">
-              <KeyboardIcon size={14} className="text-foreground-light" />
-              Intellisense enabled
-            </span>
-            {intellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
-          </DropdownMenuItem>
+          <DropdownMenuCheckboxItem
+            className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+            checked={intellisenseEnabled}
+            onCheckedChange={toggleIntellisense}
+          >
+            <KeyboardIcon size={14} className="text-foreground-light" />
+            Intellisense enabled
+          </DropdownMenuCheckboxItem>
           {isManualSaveEnabled && (
-            <DropdownMenuItem
-              className="justify-between"
-              onClick={() => setConfirmUnsavedChanges(!confirmUnsavedChanges)}
+            <DropdownMenuCheckboxItem
+              className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+              checked={confirmUnsavedChanges}
+              onCheckedChange={setConfirmUnsavedChanges}
             >
-              <span className="flex items-center gap-x-2">
-                <TriangleAlertIcon size={14} className="text-foreground-light" />
-                Confirm on discard
-              </span>
-              {confirmUnsavedChanges && <CheckIcon className="text-primary" size={16} />}
-            </DropdownMenuItem>
+              <TriangleAlertIcon size={14} className="text-foreground-light" />
+              Confirm on discard
+            </DropdownMenuCheckboxItem>
           )}
           {IS_PLATFORM && (
             <>
@@ -208,24 +212,23 @@ export const UtilityActions = ({
             <TooltipContent side="bottom">More actions</TooltipContent>
           </Tooltip>
           <DropdownMenuContent className="w-56">
-            <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
-              <span className="flex items-center gap-x-2">
-                <KeyboardIcon size={14} className="text-foreground-light" />
-                Intellisense enabled
-              </span>
-              {intellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
-            </DropdownMenuItem>
+            <DropdownMenuCheckboxItem
+              className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+              checked={intellisenseEnabled}
+              onCheckedChange={toggleIntellisense}
+            >
+              <KeyboardIcon size={14} className="text-foreground-light" />
+              Intellisense enabled
+            </DropdownMenuCheckboxItem>
             {isManualSaveEnabled && (
-              <DropdownMenuItem
-                className="justify-between"
-                onClick={() => setConfirmUnsavedChanges(!confirmUnsavedChanges)}
+              <DropdownMenuCheckboxItem
+                className={CHECKBOX_ITEM_CHECK_ON_RIGHT}
+                checked={confirmUnsavedChanges}
+                onCheckedChange={setConfirmUnsavedChanges}
               >
-                <span className="flex items-center gap-x-2">
-                  <TriangleAlertIcon size={14} className="text-foreground-light" />
-                  Confirm on discard
-                </span>
-                {confirmUnsavedChanges && <CheckIcon className="text-primary" size={16} />}
-              </DropdownMenuItem>
+                <TriangleAlertIcon size={14} className="text-foreground-light" />
+                Confirm on discard
+              </DropdownMenuCheckboxItem>
             )}
           </DropdownMenuContent>
         </DropdownMenu>
