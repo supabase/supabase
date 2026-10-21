@@ -1,5 +1,8 @@
 import { initLogger, setMaskingFunction } from 'braintrust'
 
+import { contract as executeSqlContract } from './tools/execute-sql'
+import { contract as runNotebookContract } from './tools/run-notebook'
+
 const DATA_LEVEL = 'schema_and_log_and_data'
 const BRAINTRUST_API_KEY = process.env.BRAINTRUST_API_KEY
 const BRAINTRUST_PROJECT_ID = process.env.BRAINTRUST_PROJECT_ID
@@ -14,36 +17,43 @@ if (IS_TRACING_ENABLED) {
   })
   // TODO: Remove this mask (and `maskTraceValue`) once tool spans log `toModelOutput` instead of
   // the raw `execute` result: https://github.com/braintrustdata/braintrust-sdk-javascript/issues/2651
-  setMaskingFunction((value) => maskTraceValue(value))
+  setMaskingFunction(maskTraceValue)
 }
 
-const REDACTED = '[redacted]'
-const MAX_MASK_DEPTH = 50
-
 /**
- * Redacts query rows and cell errors from tool output stamped below the data opt-in level.
- * The nearest enclosing `optInLevel` decides, so a notebook's stamp covers its cells.
- * Unstamped values, like what the model saw, are left alone.
- *
- * `{ optInLevel: 'schema', rows: [...] }` → `{ optInLevel: 'schema', rows: '[redacted]' }`
+ * Replaces stamped `execute_sql` and `run_notebook` output below the data opt-in level with what
+ * `toModelOutput` sent the model. The mask only receives a bare value, so the tool is recognized
+ * by its output schema. A stamped value that neither schema accepts keeps only its stamp.
  */
-export function maskTraceValue(value: unknown, isBelowData = false, depth = 0): unknown {
-  if (depth > MAX_MASK_DEPTH) return REDACTED
-  if (Array.isArray(value)) return value.map((item) => maskTraceValue(item, isBelowData, depth + 1))
+export function maskTraceValue(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(maskTraceValue)
   if (typeof value !== 'object' || value === null) return value
 
-  const entries = Object.entries(value)
-  const stamp = entries.find(([key]) => key === 'optInLevel')?.[1]
-  const isBelowDataHere = typeof stamp === 'string' ? stamp !== DATA_LEVEL : isBelowData
+  if (
+    'optInLevel' in value &&
+    typeof value.optInLevel === 'string' &&
+    value.optInLevel !== DATA_LEVEL
+  ) {
+    return toModelView(value) ?? { optInLevel: value.optInLevel }
+  }
 
   return Object.fromEntries(
-    entries.map(([key, child]) => [
-      key,
-      isBelowDataHere && (key === 'rows' || key === 'error')
-        ? REDACTED
-        : maskTraceValue(child, isBelowDataHere, depth + 1),
-    ])
+    Object.entries(value).map(([key, child]) => [key, maskTraceValue(child)])
   )
+}
+
+function toModelView(value: object) {
+  const sqlOutput = executeSqlContract.outputSchema.safeParse(value)
+  if (sqlOutput.success) {
+    return executeSqlContract.toModelOutput(sqlOutput.data, sqlOutput.data.optInLevel)
+  }
+
+  const notebookOutput = runNotebookContract.outputSchema.safeParse(value)
+  if (notebookOutput.success && notebookOutput.data.optInLevel) {
+    return runNotebookContract.toModelOutput(notebookOutput.data, notebookOutput.data.optInLevel)
+  }
+
+  return undefined
 }
 
 // Checks that the project is outside the EU. An unknown region fails closed.
