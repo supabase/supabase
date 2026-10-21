@@ -1,15 +1,38 @@
 import { screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { AddNewSecretModal } from '../AddNewSecretModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import type { ProjectDetail } from '@/data/projects/project-detail-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
 mockAnimationsApi()
+
+const PROJECT: ProjectDetail = {
+  cloud_provider: 'localhost',
+  connectionString: 'postgresql://postgres@localhost:5432/postgres',
+  db_host: 'localhost',
+  high_availability: false,
+  id: 1,
+  inserted_at: '2021-08-02T06:40:40.646Z',
+  integration_source: null,
+  is_branch_enabled: false,
+  is_hibernating: false,
+  is_physical_backups_enabled: false,
+  name: 'Default Project',
+  organization_id: 1,
+  ref: 'default',
+  region: 'local',
+  restUrl: 'http://localhost:54321/rest/v1',
+  status: 'ACTIVE_HEALTHY',
+  subscription_id: 'subscription-1',
+  updated_at: '2021-08-02T06:40:40.646Z',
+}
 
 describe('AddNewSecretModal', () => {
   beforeEach(() => {
@@ -17,17 +40,7 @@ describe('AddNewSecretModal', () => {
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
-      // @ts-expect-error
-      response: {
-        cloud_provider: 'localhost',
-        id: 1,
-        inserted_at: '2021-08-02T06:40:40.646Z',
-        name: 'Default Project',
-        organization_id: 1,
-        ref: 'default',
-        region: 'local',
-        status: 'ACTIVE_HEALTHY',
-      },
+      response: () => HttpResponse.json<ProjectDetail>(PROJECT),
     })
   })
 
