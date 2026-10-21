@@ -54,7 +54,7 @@ export interface CheckOptions {
   findFiles: FindFiles
 }
 
-export const BYPASS_LABEL = 'skip-anchor-check'
+const BYPASS_LABEL = 'skip-anchor-check'
 
 const PARTIALS_PREFIX = '_partials/'
 const MAX_PARTIAL_DEPTH = 10
@@ -65,7 +65,7 @@ const isGuidePage = (contentPath: string) =>
 const isPartial = (contentPath: string) =>
   contentPath.startsWith(PARTIALS_PREFIX) && isMarkdown(contentPath)
 
-export const toRoute = (guidePath: string) => `/${guidePath.replace(/\.mdx?$/, '')}`
+const toRoute = (guidePath: string) => `/${guidePath.replace(/\.mdx?$/, '')}`
 
 export async function findBrokenAnchors({
   changedFiles,
@@ -164,7 +164,7 @@ async function collectAnchors(page: string, read: ReadContent) {
  * plain-text heading, an element for a single inline node, and an array
  * otherwise.
  */
-export function headingAnchor(node: Heading) {
+function headingAnchor(node: Heading) {
   const children = node.children.map((child) =>
     child.type === 'text' ? child.value : { props: { children: toString(child) } }
   )
@@ -233,7 +233,7 @@ async function collectLinks(file: string, read: ReadContent): Promise<Link[]> {
  * Resolves a link to the guide route and anchor it points at, or undefined if
  * it isn't a guide anchor link. A bare `#anchor` resolves to `ownRoute`.
  */
-export function parseLinkTarget(url: string, ownRoute?: string) {
+function parseLinkTarget(url: string, ownRoute?: string) {
   const hashIndex = url.indexOf('#')
   if (hashIndex === -1) return undefined
 
@@ -250,7 +250,7 @@ export function parseLinkTarget(url: string, ownRoute?: string) {
   return { route: path, anchor }
 }
 
-export function formatReport(broken: BrokenAnchor[]) {
+function formatReport(broken: BrokenAnchor[]) {
   const lines = [
     `This change removes ${broken.length} linked section anchor${broken.length === 1 ? '' : 's'}:`,
     '',
