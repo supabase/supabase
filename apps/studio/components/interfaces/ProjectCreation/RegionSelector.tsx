@@ -419,7 +419,7 @@ export const RegionSelector = ({
 
                                       {hoveredLockedRegionCode === value.code && (
                                         <Badge variant="success" className="mr-1">
-                                          Upgrade
+                                          Pro
                                         </Badge>
                                       )}
                                     </div>
