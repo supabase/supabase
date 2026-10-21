@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { organizationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
+import { invalidatePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OrganizationMemberUnassignRoleVariables = {
@@ -64,6 +65,7 @@ export const useOrganizationMemberUnassignRoleMutation = ({
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
           queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
+          invalidatePermissionsQueryV2(queryClient),
         ])
       }
 

@@ -20,6 +20,7 @@ import {
 } from '@/data/organization-members/organization-roles-query'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
+import { invalidatePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface UpdateRolesConfirmationModal {
@@ -120,6 +121,7 @@ export const UpdateRolesConfirmationModal = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
         queryClient.invalidateQueries({ queryKey: organizationKeysV1.members(slug) }),
+        invalidatePermissionsQueryV2(queryClient),
       ])
       toast.success(`Successfully updated role for ${member.username}`)
       onClose(true)
