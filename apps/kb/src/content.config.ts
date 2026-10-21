@@ -77,7 +77,7 @@ const troubleshooting = defineCollection({
 // and the body holds the answer. Entries are not rendered by a page yet — this
 // collection only defines the schema so content can be authored against it.
 const faqs = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs' }),
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/faqs', generateId }),
   // `topics` is not part of the schema, so frontmatter can't set it (zod strips
   // unknown keys). Every entry is tagged with the FAQ topic in the background.
   schema: z.object({
