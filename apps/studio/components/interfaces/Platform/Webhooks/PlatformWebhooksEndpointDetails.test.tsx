@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ComponentProps } from 'react'
 import { describe, expect, it, vi } from 'vitest'
@@ -162,61 +162,53 @@ describe('PlatformWebhooksEndpointDetails', () => {
   ) =>
     render(
       <PlatformWebhooksEndpointDetails
+        deliveryPage={1}
         deliverySearch=""
         filteredDeliveries={allDeliveries}
+        hasNextDeliveriesPage={false}
+        hasPreviousDeliveriesPage={false}
         selectedEndpoint={selectedEndpoint}
         onCopyUrl={vi.fn()}
         onDeliverySearchChange={vi.fn()}
+        onNextDeliveriesPage={vi.fn()}
         onOpenDelivery={vi.fn()}
+        onPreviousDeliveriesPage={vi.fn()}
         onRetryDelivery={vi.fn()}
         {...props}
       />
     )
 
-  it('renders paginated deliveries with previous and next controls', async () => {
-    const user = userEvent.setup()
+  it('renders every delivery it is given, with the current page in the footer', () => {
+    renderComponent({ deliveryPage: 2 })
 
-    renderComponent()
-
-    expect(screen.getByText('Showing 1 to 5 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.queryByText('2026-02-27T06:59:00.000Z')).not.toBeInTheDocument()
-
-    await user.click(screen.getByLabelText('Next page'))
-
-    expect(screen.getByText('Showing 6 to 10 of 12 deliveries')).toBeInTheDocument()
+    expect(screen.getByText('Page 2')).toBeInTheDocument()
     expect(screen.getByText('2026-02-27T06:59:00.000Z')).toBeInTheDocument()
-
-    await user.click(screen.getByLabelText('Previous page'))
-
-    expect(screen.getByText('Showing 1 to 5 of 12 deliveries')).toBeInTheDocument()
-    expect(screen.queryByText('2026-02-27T06:59:00.000Z')).not.toBeInTheDocument()
   })
 
-  it('resets to the first page when the delivery search changes', async () => {
+  it('disables pagination controls when there is no next or previous page', () => {
+    renderComponent({ hasNextDeliveriesPage: false, hasPreviousDeliveriesPage: false })
+
+    expect(screen.getByLabelText('Next page')).toBeDisabled()
+    expect(screen.getByLabelText('Previous page')).toBeDisabled()
+  })
+
+  it('calls the page callbacks when pagination controls are enabled and clicked', async () => {
     const user = userEvent.setup()
-    const projectDeliveries = allDeliveries.filter((delivery) =>
-      delivery.eventType?.includes('project')
-    )
-    const { rerender } = renderComponent()
+    const onNextDeliveriesPage = vi.fn()
+    const onPreviousDeliveriesPage = vi.fn()
+
+    renderComponent({
+      hasNextDeliveriesPage: true,
+      hasPreviousDeliveriesPage: true,
+      onNextDeliveriesPage,
+      onPreviousDeliveriesPage,
+    })
 
     await user.click(screen.getByLabelText('Next page'))
-    expect(screen.getByText('Showing 6 to 10 of 12 deliveries')).toBeInTheDocument()
+    expect(onNextDeliveriesPage).toHaveBeenCalledTimes(1)
 
-    rerender(
-      <PlatformWebhooksEndpointDetails
-        deliverySearch="project"
-        filteredDeliveries={projectDeliveries}
-        selectedEndpoint={selectedEndpoint}
-        onCopyUrl={vi.fn()}
-        onDeliverySearchChange={vi.fn()}
-        onOpenDelivery={vi.fn()}
-        onRetryDelivery={vi.fn()}
-      />
-    )
-
-    await waitFor(() => {
-      expect(screen.getByText('Showing 1 to 5 of 8 deliveries')).toBeInTheDocument()
-    })
+    await user.click(screen.getByLabelText('Previous page'))
+    expect(onPreviousDeliveriesPage).toHaveBeenCalledTimes(1)
   })
 
   it('retries a failed delivery without opening the delivery row', async () => {
@@ -230,6 +222,28 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
     expect(onRetryDelivery).toHaveBeenCalledWith('org-delivery-2')
     expect(onOpenDelivery).not.toHaveBeenCalled()
+  })
+
+  it('does not open or allow retrying a pending delivery', async () => {
+    const user = userEvent.setup()
+    const onOpenDelivery = vi.fn()
+    const onRetryDelivery = vi.fn()
+    const pendingDelivery = createDelivery({
+      id: 'pending-delivery',
+      status: 'pending',
+      responseCode: 0,
+    })
+
+    renderComponent({
+      filteredDeliveries: [pendingDelivery],
+      onOpenDelivery,
+      onRetryDelivery,
+    })
+
+    await user.click(screen.getByText('pending'))
+
+    expect(onOpenDelivery).not.toHaveBeenCalled()
+    expect(screen.queryByLabelText('Retry pending-delivery')).not.toBeInTheDocument()
   })
 
   it('renders a zero response code instead of the placeholder', () => {

@@ -1,11 +1,9 @@
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
-  type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
 import {
@@ -15,7 +13,7 @@ import {
   RotateCcwIcon,
   SearchIcon,
 } from 'lucide-react'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
@@ -57,16 +55,20 @@ const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProp
 )
 
 interface PlatformWebhooksEndpointDetailsProps {
+  deliveryPage: number
   deliverySearch: string
   filteredDeliveries: WebhookDelivery[]
+  hasNextDeliveriesPage: boolean
+  hasPreviousDeliveriesPage: boolean
   selectedEndpoint: WebhookEndpoint
   onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
+  onNextDeliveriesPage: () => void
   onOpenDelivery: (deliveryId: string) => void
+  onPreviousDeliveriesPage: () => void
   onRetryDelivery: (deliveryId: string) => void
 }
 
-const DELIVERIES_PAGE_SIZE = 5
 const DELIVERY_ACTIONS_COLUMN_ID = 'actions'
 const DEFAULT_DELIVERY_SORTING: SortingState = [{ id: 'attemptAt', desc: true }]
 
@@ -125,7 +127,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
 
       return (
         <div className="flex h-full items-center justify-end">
-          {row.original.status !== 'success' ? (
+          {row.original.status !== 'success' && row.original.status !== 'pending' ? (
             <ButtonTooltip
               size="tiny"
               className="w-7 shrink-0 hit-area-2"
@@ -154,12 +156,17 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
 ]
 
 export const PlatformWebhooksEndpointDetails = ({
+  deliveryPage,
   deliverySearch,
   filteredDeliveries,
+  hasNextDeliveriesPage,
+  hasPreviousDeliveriesPage,
   selectedEndpoint,
   onCopyUrl,
   onDeliverySearchChange,
+  onNextDeliveriesPage,
   onOpenDelivery,
+  onPreviousDeliveriesPage,
   onRetryDelivery,
 }: PlatformWebhooksEndpointDetailsProps) => {
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
@@ -170,36 +177,19 @@ export const PlatformWebhooksEndpointDetails = ({
   useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
     label: 'Search deliveries',
   })
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: DELIVERIES_PAGE_SIZE,
-  })
 
   const table = useReactTable({
     data: filteredDeliveries,
     columns: DELIVERY_COLUMNS,
-    state: { pagination, sorting },
+    state: { sorting },
     meta: { onRetryDelivery },
     getRowId: (row) => row.id,
-    onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
   })
 
-  const paginatedDeliveries = table.getRowModel().rows
-  const deliveryStartIndex =
-    table.getState().pagination.pageIndex * table.getState().pagination.pageSize
-  const deliveryRangeStart = filteredDeliveries.length === 0 ? 0 : deliveryStartIndex + 1
-  const deliveryRangeEnd = Math.min(
-    deliveryStartIndex + table.getState().pagination.pageSize,
-    filteredDeliveries.length
-  )
-
-  useEffect(() => {
-    setPagination((currentPagination) => ({ ...currentPagination, pageIndex: 0 }))
-  }, [deliverySearch, selectedEndpoint.id])
+  const sortedDeliveries = table.getRowModel().rows
 
   return (
     <div className="space-y-16">
@@ -316,32 +306,40 @@ export const PlatformWebhooksEndpointDetails = ({
               ))}
             </TableHeader>
             <TableBody>
-              {paginatedDeliveries.length > 0 ? (
-                paginatedDeliveries.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    className="cursor-pointer focus-inset"
-                    onClick={() => onOpenDelivery(row.original.id)}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        onOpenDelivery(row.original.id)
+              {sortedDeliveries.length > 0 ? (
+                sortedDeliveries.map((row) => {
+                  const isPending = row.original.status === 'pending'
+
+                  return (
+                    <TableRow
+                      key={row.id}
+                      className={isPending ? 'focus-inset' : 'cursor-pointer focus-inset'}
+                      onClick={isPending ? undefined : () => onOpenDelivery(row.original.id)}
+                      onKeyDown={
+                        isPending
+                          ? undefined
+                          : (event) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                onOpenDelivery(row.original.id)
+                              }
+                            }
                       }
-                    }}
-                    tabIndex={0}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell
-                        key={cell.id}
-                        className={
-                          cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
-                        }
-                      >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                      tabIndex={isPending ? -1 : 0}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell
+                          key={cell.id}
+                          className={
+                            cell.column.id === DELIVERY_ACTIONS_COLUMN_ID ? 'w-1 text-right' : ''
+                          }
+                        >
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )
+                })
               ) : (
                 <TableRow className="[&>td]:hover:bg-inherit">
                   <TableCell colSpan={DELIVERY_COLUMNS.length}>
@@ -356,26 +354,23 @@ export const PlatformWebhooksEndpointDetails = ({
           </Table>
           {filteredDeliveries.length > 0 && (
             <CardFooter className="border-t p-4 flex items-center justify-between">
-              <p className="text-foreground-muted text-sm">
-                Showing {deliveryRangeStart} to {deliveryRangeEnd} of {filteredDeliveries.length}{' '}
-                deliveries
-              </p>
+              <p className="text-foreground-muted text-sm">Page {deliveryPage}</p>
               <div className="flex items-center gap-x-2" aria-label="Pagination">
                 <Button
                   icon={<ChevronLeftIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
                   size="tiny"
-                  disabled={!table.getCanPreviousPage()}
-                  onClick={() => table.previousPage()}
+                  disabled={!hasPreviousDeliveriesPage}
+                  onClick={onPreviousDeliveriesPage}
                 />
                 <Button
                   icon={<ChevronRightIcon />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
                   size="tiny"
-                  disabled={!table.getCanNextPage()}
-                  onClick={() => table.nextPage()}
+                  disabled={!hasNextDeliveriesPage}
+                  onClick={onNextDeliveriesPage}
                 />
               </div>
             </CardFooter>
