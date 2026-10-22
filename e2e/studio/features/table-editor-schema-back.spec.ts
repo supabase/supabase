@@ -72,14 +72,26 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await expect(page.getByRole('tab', { name: new RegExp(tableName) })).toBeVisible()
   await expect(page.getByRole('combobox', { name: 'Schema public' })).toBeVisible()
 
-  await page.evaluate((projectRef) => {
-    localStorage.removeItem(`dashboard-history-${projectRef}`)
-    localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
-  }, ref)
-  // Reloading here would reload the open table, and that page records the table
-  // id again. Load the list as its own document, then reload that document.
+  // Clear and leave in one turn. A later reload of the open table records that
+  // table id again before the list document can read empty storage.
   const listLoad = waitForTableToLoad(page, ref, 'public')
-  await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+  const listUrl = page.waitForURL(/\/editor\?schema=public/)
+  const leftTable = page
+    .evaluate((projectRef) => {
+      localStorage.removeItem(`dashboard-history-${projectRef}`)
+      localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
+      const url = new URL(window.location.href)
+      url.pathname = `/project/${projectRef}/editor`
+      url.search = '?schema=public'
+      window.location.replace(url.toString())
+    }, ref)
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error)
+      if (!message.includes('context was destroyed') && !message.includes('navigation')) {
+        throw error
+      }
+    })
+  await Promise.all([listUrl, leftTable])
   await listLoad
   await expect(page).toHaveURL(/\/editor\?schema=public/)
   await page.reload()
