@@ -29,6 +29,7 @@ import {
   writeRecoveryReminderSnooze,
 } from '@/lib/account-recovery/recovery-reminder'
 import { useTrack } from '@/lib/telemetry/track'
+import { BASE_PATH } from '@/lib/constants'
 
 export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
@@ -39,7 +40,7 @@ export const RecoveryInterstitial = () => {
     process.env.NODE_ENV === 'development',
     process.env.NEXT_PUBLIC_VERCEL_ENV
   )
-  const destination = getRecoveryReturnTo(returnTo)
+  const destination = getRecoveryReturnTo(returnTo, BASE_PATH)
 
   if (mockGap)
     return (
