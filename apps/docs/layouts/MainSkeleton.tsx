@@ -4,7 +4,10 @@ import type { NavMenuSection } from '~/components/Navigation/Navigation.types'
 import DefaultNavigationMenu, {
   type MenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import { getMenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
+import {
+  getMenuGroupLabel,
+  getMenuId,
+} from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -18,246 +21,18 @@ import { memo, useEffect, useState, type PropsWithChildren, type ReactNode } fro
 import { cn } from 'ui'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+const GlobalMenuDrawerSection = dynamic(() =>
+  import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
+    (mod) => mod.GlobalMenuDrawerSection
+  )
+)
+const GlobalMenuDrawerFooter = dynamic(() =>
+  import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
+    (mod) => mod.GlobalMenuDrawerFooter
+  )
+)
 
 const footerEnabled = isFeatureEnabled('docs:footer')
-
-const levelsData = {
-  home: {
-    icon: 'home',
-    name: 'Home',
-  },
-  gettingstarted: {
-    icon: 'getting-started',
-    name: 'Getting Started',
-  },
-  database: {
-    icon: 'database',
-    name: 'Database',
-  },
-  cron: {
-    icon: 'cron',
-    name: 'Cron',
-  },
-  queues: {
-    icon: 'queues',
-    name: 'Queues',
-  },
-  api: {
-    icon: 'rest',
-    name: 'REST API',
-  },
-  graphql: {
-    icon: 'graphql',
-    name: 'GraphQL',
-  },
-  auth: {
-    icon: 'auth',
-    name: 'Auth',
-  },
-  functions: {
-    icon: 'edge-functions',
-    name: 'Edge Functions',
-  },
-  telemetry: {
-    icon: 'telemetry',
-    name: 'Observability',
-  },
-  realtime: {
-    icon: 'realtime',
-    name: 'Realtime',
-  },
-  analytics: {
-    icon: 'analytics',
-    name: 'Analytics',
-  },
-  storage: {
-    icon: 'storage',
-    name: 'Storage',
-  },
-  ai: {
-    icon: 'ai',
-    name: 'AI & Vectors',
-  },
-  local_development: {
-    icon: 'reference-cli',
-    name: 'Local Development',
-  },
-  security: {
-    icon: 'platform',
-    name: 'Security',
-  },
-  platform: {
-    icon: 'platform',
-    name: 'Platform',
-  },
-  contributing: {
-    icon: 'contributing',
-    name: 'Contributing',
-  },
-  resources: {
-    icon: 'resources',
-    name: 'Resources',
-  },
-  self_hosting: {
-    icon: 'self-hosting',
-    name: 'Self-Hosting',
-  },
-  integrations: {
-    icon: 'integrations',
-    name: 'Integrations',
-  },
-  reference_server_v1: {
-    icon: 'reference-javascript',
-    name: 'Server Reference v1.0',
-  },
-  reference_middleware_v1: {
-    icon: 'reference-javascript',
-    name: 'Middleware Reference v1.0',
-  },
-  reference_javascript_v1: {
-    icon: 'reference-javascript',
-    name: 'JavaScript Reference v1.0',
-  },
-  reference_javascript_v2: {
-    icon: 'reference-javascript',
-    name: 'JavaScript Reference v2.0',
-  },
-  reference_dart_v1: {
-    icon: 'reference-dart',
-    name: 'Dart Reference v1.0',
-  },
-  reference_dart_v2: {
-    icon: 'reference-dart',
-    name: 'Dart Reference v2.0',
-  },
-  reference_csharp_v0: {
-    icon: 'reference-csharp',
-    name: 'C# Reference v0.0',
-  },
-  reference_csharp_v1: {
-    icon: 'reference-csharp',
-    name: 'C# Reference v1.0',
-  },
-  reference_csharp_v8: {
-    icon: 'reference-csharp',
-    name: 'C# Reference v8.0',
-  },
-  reference_python_v2: {
-    icon: 'reference-python',
-    name: 'Python Reference v2.0',
-  },
-  reference_swift_v1: {
-    icon: 'reference-swift',
-    name: 'Swift Reference v1.0',
-  },
-  reference_swift_v2: {
-    icon: 'reference-swift',
-    name: 'Swift Reference v2.0',
-  },
-  reference_kotlin_v1: {
-    icon: 'reference-kotlin',
-    name: 'Kotlin Reference v1.0',
-  },
-  reference_kotlin_v2: {
-    icon: 'reference-kotlin',
-    name: 'Kotlin Reference v2.0',
-  },
-  reference_kotlin_v3: {
-    icon: 'reference-kotlin',
-    name: 'Kotlin Reference v3.0',
-  },
-  reference_cli: {
-    icon: 'reference-cli',
-    name: 'CLI Reference',
-  },
-  reference_api: {
-    icon: 'reference-api',
-    name: 'Management API Reference',
-  },
-  reference_self_hosting_auth: {
-    icon: 'reference-auth',
-    name: 'Auth Server Reference',
-  },
-  reference_self_hosting_storage: {
-    icon: 'reference-storage',
-    name: 'Storage Server Reference',
-  },
-  reference_self_hosting_realtime: {
-    icon: 'reference-realtime',
-    name: 'Realtime Server Reference',
-  },
-  reference_self_hosting_analytics: {
-    icon: 'reference-analytics',
-    name: 'Analytics Server Reference',
-  },
-  reference_self_hosting_functions: {
-    icon: 'reference-functions',
-    name: 'Functions Server Reference',
-  },
-}
-
-type MobileHeaderProps = { menuId: MenuId } | { menuName: string }
-
-const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
-  const mobileMenuOpen = useMenuMobileOpen()
-
-  return (
-    <div
-      className={cn(
-        'lg:hidden px-3.5 border-b z-10',
-        'transition-all ease-out',
-        'top-0',
-        mobileMenuOpen && 'absolute',
-        'flex items-center',
-        mobileMenuOpen ? 'gap-0' : 'gap-1'
-      )}
-    >
-      <button
-        tabIndex={0}
-        className={cn(
-          'h-8 w-8 flex group items-center justify-center mr-1',
-          mobileMenuOpen && 'mt-0.5'
-        )}
-        onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
-        aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-        aria-expanded={mobileMenuOpen}
-      >
-        <div
-          className={cn(
-            'space-y-1  cursor-pointer relative',
-            mobileMenuOpen ? 'w-4 h-4' : 'w-4 h-[8px]'
-          )}
-        >
-          <span
-            className={cn(
-              'transition-all ease-out block w-4 h-px bg-foreground-muted group-hover:bg-foreground',
-              !mobileMenuOpen ? 'w-4' : 'absolute rotate-45 top-[6px]'
-            )}
-          />
-          <span
-            className={cn(
-              'transition-all ease-out block h-px bg-foreground-muted group-hover:bg-foreground',
-              !mobileMenuOpen ? 'w-3 group-hover:w-4' : 'absolute w-4 -rotate-45 top-[2px]'
-            )}
-          />
-        </div>
-      </button>
-      <span
-        className={cn(
-          'transition-all duration-200',
-          'text-foreground',
-          mobileMenuOpen ? 'text-xs' : 'text-sm'
-        )}
-      >
-        {mobileMenuOpen
-          ? 'Close'
-          : 'menuId' in props
-            ? (levelsData[props.menuId]?.name ?? levelsData['home'].name)
-            : props.menuName}
-      </span>
-    </div>
-  )
-})
 
 const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
   const mobileMenuOpen = useMenuMobileOpen()
@@ -281,7 +56,7 @@ const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
         'left-0',
         'right-0',
         'z-10',
-        'backdrop-blur-xs backdrop-filter bg-alternative/90',
+        'bg-alternative/90',
         mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
         // always hide on desktop
         'lg:hidden'
@@ -320,16 +95,14 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
       aria-labelledby="main-nav-title"
       className={cn(
         'fixed lg:relative z-40 lg:z-auto',
-        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-full',
-        'lg:w-[420px] !lg:left-0',
+        'inset-x-0 top-(--header-height) overflow-hidden',
+        'h-[calc(100dvh-var(--header-height))]',
+        !mobileMenuOpen && 'max-lg:hidden',
+        'lg:w-[420px] lg:left-0',
         'lg:top-(--header-height) lg:sticky',
-        'h-screen lg:h-[calc(100vh-var(--header-height))]',
-        // desktop override any left styles
-        'lg:left-0',
-        'transition-all',
-        'top-0 bottom-0',
+        'lg:h-[calc(100vh-var(--header-height))]',
         'flex flex-col ml-0',
-        'border-r',
+        'lg:border-r',
         'lg:overflow-y-auto'
       )}
     >
@@ -341,8 +114,8 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           'w-full lg:w-auto',
           'h-fit lg:h-full overflow-y-scroll lg:overflow-auto',
           'overscroll-contain',
-          'backdrop-blur-sm backdrop-filter bg-background',
-          'flex flex-col grow'
+          'lg:backdrop-blur-sm lg:backdrop-filter bg-background',
+          'flex flex-col flex-1 min-h-0'
         )}
       >
         <span id="main-nav-title" className="sr-only">
@@ -355,7 +128,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           className={cn(
             'transition-all ease-out duration-200',
             'absolute left-0 right-0',
-            'px-5 pl-5 pt-6 pb-16 lg:pb-32',
+            'px-6 pt-6 pb-16 lg:pb-32',
             'bg-background',
             // desktop styles
             'lg:relative lg:left-0 lg:pb-10 lg:px-10 lg:flex',
@@ -365,13 +138,13 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           {children}
         </div>
       </div>
+      <GlobalMenuDrawerFooter className="shrink-0 border-t bg-background px-6 py-4 lg:hidden" />
     </nav>
   )
 })
 
 interface SkeletonProps extends PropsWithChildren {
   menuId?: MenuId
-  menuName?: string
   hideSideNav?: boolean
   NavigationMenu?: ReactNode
   hideFooter?: boolean
@@ -393,7 +166,6 @@ function TopNavSkeleton({ children }) {
 function SidebarSkeleton({
   children,
   menuId: _menuId,
-  menuName,
   NavigationMenu,
   hideFooter = !footerEnabled,
   className,
@@ -405,35 +177,45 @@ function SidebarSkeleton({
 
   const mobileMenuOpen = useMenuMobileOpen()
   const [tocSlot, setTocSlot] = useState<HTMLDivElement | null>(null)
+  const [pickedGroupLabel, setPickedGroupLabel] = useState<string>()
+  const currentGroupLabel = getMenuGroupLabel(menuId)
+  const selectedGroupLabel = pickedGroupLabel ?? currentGroupLabel
+  const isSideNavShown = selectedGroupLabel === currentGroupLabel
+
+  const handleMenuToggle = () => {
+    // the menu opens on the current group again
+    if (!mobileMenuOpen) setPickedGroupLabel(undefined)
+    menuState.setMenuMobileOpen(!mobileMenuOpen)
+  }
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
       {!hideSideNav && (
         <NavContainer>
-          {NavigationMenu ?? (
-            <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
-          )}
+          <GlobalMenuDrawerSection
+            selectedLabel={selectedGroupLabel}
+            currentLabel={currentGroupLabel}
+            currentLevel={menuId}
+            onGroupPick={setPickedGroupLabel}
+            className={cn('lg:hidden', isSideNavShown && 'mb-6 border-b pb-6')}
+          />
+          <div className={cn('lg:contents', !isSideNavShown && 'max-lg:hidden')}>
+            {NavigationMenu ?? (
+              <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
+            )}
+          </div>
         </NavContainer>
       )}
       <Container>
-        <div
-          className={cn(
-            'flex lg:hidden w-full top-0 left-0 right-0 z-50',
-            hideSideNav && 'sticky',
-            mobileMenuOpen && 'z-10'
-          )}
-        >
-          <TopNavBar />
+        <div className="sticky top-0 z-20 lg:hidden">
+          <TopNavBar
+            isMenuOpen={mobileMenuOpen}
+            onMenuToggle={hideSideNav ? undefined : handleMenuToggle}
+          />
+          <div ref={setTocSlot} inert={mobileMenuOpen} className="md:hidden" />
         </div>
-        <div className={cn('sticky', 'transition-all top-0 z-10', 'bg-background')}>
-          {hideSideNav ? null : menuName ? (
-            <MobileHeader menuName={menuName} />
-          ) : (
-            <MobileHeader menuId={menuId} />
-          )}
-          <div ref={setTocSlot} className="md:hidden" />
-        </div>
-        <div className="grow">
+        {/* the drawer covers the page, so tab stays in the header and the drawer */}
+        <div inert={mobileMenuOpen} className="grow">
           <MobileHeaderSlotsContext value={{ tocSlot }}>{children}</MobileHeaderSlotsContext>
           {!hideFooter && <Footer />}
         </div>

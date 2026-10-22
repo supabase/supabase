@@ -3,15 +3,17 @@
 import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
 import { isFeatureEnabled } from 'common/enabled-features'
 import { DevToolbarTrigger } from 'dev-tools'
-import { Command, Menu, Search } from 'lucide-react'
+import { Command, Menu, Search, X } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
+import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
@@ -23,21 +25,31 @@ const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const largeLogo = isFeatureEnabled('branding:large_logo')
 
-const TopNavBar: FC = () => {
+interface TopNavBarProps {
+  // on pages with a sidebar the burger opens the sidebar drawer, not the global menu
+  isMenuOpen?: boolean
+  onMenuToggle?: () => void
+}
+
+const TopNavBar: FC<TopNavBarProps> = ({ isMenuOpen = false, onMenuToggle }) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const user = useUser()
   const menu = useDropdownMenu(user)
   const searchVariant = useSearchV2Variant()
+  const { theme, setTheme } = useTheme()
+
+  const isOpen = onMenuToggle ? isMenuOpen : mobileMenuOpen
+  const handleMenuToggle = onMenuToggle ?? (() => setMobileMenuOpen(!mobileMenuOpen))
 
   return (
     <>
       <nav
         aria-label="top bar"
-        className="w-full z-40 flex flex-col subhighlight-border backdrop-blur-sm backdrop-filter bg-default/75"
+        className="w-full z-40 flex flex-col subhighlight-border bg-default lg:bg-default/75 lg:backdrop-blur-sm lg:backdrop-filter"
       >
-        <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
+        <div className="w-full px-6 lg:pl-10 lg:pr-5 flex justify-between h-(--header-height) gap-3">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">
             <HeaderLogo />
             <GlobalNavigationMenu />
@@ -49,7 +61,9 @@ const TopNavBar: FC = () => {
 
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
-              {searchVariant === 'search-v2-active' ? (
+              {onMenuToggle && isOpen ? (
+                <MobileNavThemeButton value={theme} onValueChange={setTheme} />
+              ) : searchVariant === 'search-v2-active' ? (
                 <SearchV2Trigger
                   placeholder={
                     <>
@@ -72,13 +86,31 @@ const TopNavBar: FC = () => {
               <button
                 tabIndex={0}
                 title="Menu dropdown button"
+                aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isOpen}
                 className={cn(
                   buttonVariants({ variant: 'default' }),
-                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] px-0 data-open:bg-overlay-hover/30'
+                  'relative flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] px-0 data-open:bg-overlay-hover/30',
+                  "before:absolute before:-inset-y-2 before:left-0 before:-right-3 before:content-['']"
                 )}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                onClick={handleMenuToggle}
               >
-                <Menu size={18} strokeWidth={1} />
+                <Menu
+                  size={18}
+                  strokeWidth={1}
+                  className={cn(
+                    'absolute inset-0 m-auto transition duration-150 ease-out',
+                    isOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
+                  )}
+                />
+                <X
+                  size={18}
+                  strokeWidth={1}
+                  className={cn(
+                    'absolute inset-0 m-auto transition duration-150 ease-out',
+                    !isOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
+                  )}
+                />
               </button>
             </div>
           </div>

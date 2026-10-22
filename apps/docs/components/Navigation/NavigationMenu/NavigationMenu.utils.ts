@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { menuState } from '../../../hooks/useMenuState'
+import { GLOBAL_MENU_ITEMS } from './NavigationMenu.constants'
 
 export function getPathWithoutHash(relativePath: string) {
   return new URL(relativePath, 'http://placeholder').pathname
@@ -167,3 +168,12 @@ export const useCloseMenuOnRouteChange = () => {
     menuState.setMenuMobileOpen(false)
   }, [pathname])
 }
+
+// the top-level group that holds a section: start itself, or the group that links to it
+export const getMenuGroupLabel = (menuId: string): string | undefined =>
+  GLOBAL_MENU_ITEMS.find(
+    ([section]) =>
+      section.enabled !== false &&
+      (section.level === menuId ||
+        section.menuItems?.some((group) => group.some((item) => item.level === menuId)))
+  )?.[0].label
