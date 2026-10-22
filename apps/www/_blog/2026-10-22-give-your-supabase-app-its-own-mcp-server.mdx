@@ -23,6 +23,16 @@ The [MCP Server block](https://supabase.com/library/docs/headless/mcp) adds the 
 
 See it in action in [Greg Richardson’s Select talk](https://www.youtube.com/watch?v=H6R8JT5U5rU). For the broader announcements, read [Build anything: Supabase from code, and an MCP server for your app](https://supabase.com/blog/select-2026-build-anything) and our [Supabase Select 2026 recap](https://supabase.com/blog/supabase-select-2026-recap).
 
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/vEv87D-eJK4"
+    title="Add MCP Server to Your Supabase App"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
+
 ## Your app, in your customer’s workflow
 
 Say your app turns product photos into video ads. A customer is planning a campaign in Claude. They need their products and the ad tools in your app. Through MCP, their agent can find a product, request an ad, and use the result in the same conversation, alongside their other tools.
@@ -36,16 +46,6 @@ Install the MCP Server block from the Supabase Library:
 ```bash
 npx shadcn@latest add https://supabase.com/library/r/mcp.json
 ```
-
-<div className="video-container">
-  <iframe
-    className="w-full"
-    src="https://www.youtube-nocookie.com/embed/vEv87D-eJK4"
-    title="Add MCP Server to Your Supabase App"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
-    allowFullScreen
-  />
-</div>
 
 The command copies an Edge Function into `supabase/functions/mcp`. It includes the MCP handler, authentication middleware, and a `whoami` tool for checking the caller’s identity. Each tool has its own file, and `tools/index.ts` registers them.
 
