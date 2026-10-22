@@ -1,5 +1,5 @@
 import { useFlag, useUser } from 'common'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, CardFooter } from 'ui'
@@ -7,30 +7,18 @@ import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryCodesModal'
-import { PreviewRecoveryCodesFlow } from './PreviewRecoveryCodesFlow'
-import {
-  getMockRecoveryGap,
-  getRecoveryGap,
-  getRecoveryReturnTo,
-  type RecoveryGap,
-} from './RecoveryInterstitial.utils'
+import { getRecoveryGap, getRecoveryReturnTo, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 
 export const RecoveryInterstitial = () => {
-  const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
   const [returnTo] = useQueryState('returnTo', parseAsString)
-  const mockGap = getMockRecoveryGap(
-    mock,
-    process.env.NODE_ENV === 'development',
-    process.env.NEXT_PUBLIC_VERCEL_ENV
-  )
   const destination = getRecoveryReturnTo(returnTo, BASE_PATH)
 
-  if (mockGap) return <RecoveryReminder gap={mockGap} destination={destination} isPreview />
   return <LiveRecoveryReminder destination={destination} />
 }
 
@@ -43,15 +31,21 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   })
   const gap = isError || isPending ? null : getRecoveryGap(findings)
   return (
-    <RecoveryReminder key={user?.id} gap={gap} destination={destination} isLoading={isPending} />
+    <RecoveryReminder
+      key={user?.id}
+      gap={gap}
+      destination={destination}
+      isLoading={isPending}
+      isError={isError}
+    />
   )
 }
 
 export const RecoveryReminder = ({
   gap,
   destination,
-  isPreview = false,
   isLoading = false,
+  isError = false,
   onCodesComplete,
   onAction,
   onTaskComplete,
@@ -59,8 +53,8 @@ export const RecoveryReminder = ({
 }: {
   gap: RecoveryGap | null
   destination: string
-  isPreview?: boolean
   isLoading?: boolean
+  isError?: boolean
   onCodesComplete?: () => void
   onAction?: (action: 'generate_codes' | 'regenerate_codes' | 'add_factor') => void
   onTaskComplete?: (task: 'recovery_codes' | 'authenticator') => void
@@ -71,6 +65,24 @@ export const RecoveryReminder = ({
   const isFactorComplete = false
   // Preserve all task dialogs and completed rows during background status updates.
   const activeGap = startedGap ?? gap
+  if (!activeGap && isError) {
+    return (
+      <InterstitialLayout
+        logo={<SupabaseLogo />}
+        title="Account recovery check unavailable"
+        widthClassName="max-w-md"
+      >
+        <div className="px-6">
+          <AlertError subject="Failed to check account recovery" />
+        </div>
+        <CardFooter className="justify-center">
+          <Button asChild size="tiny">
+            <a href={destination}>Continue</a>
+          </Button>
+        </CardFooter>
+      </InterstitialLayout>
+    )
+  }
   if (!activeGap) {
     return (
       <InterstitialLayout
@@ -132,14 +144,8 @@ export const RecoveryReminder = ({
           description={getCodesDescription(isExhausted, areCodesSaved)}
           isComplete={areCodesSaved}
         >
-          {isPreview && (
-            <PreviewRecoveryCodesFlow
-              action={isExhausted ? 'regenerate' : 'generate'}
-              {...flowProps}
-            />
-          )}
-          {!isPreview && isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
-          {!isPreview && !isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
+          {isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
+          {!isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
         </RecoveryTaskRow>
       </div>
       <CardFooter className="justify-center px-6 py-5 border-t">
@@ -150,7 +156,7 @@ export const RecoveryReminder = ({
           className={areCodesSaved || isFactorComplete ? '' : 'text-foreground-lighter'}
           iconRight={
             areCodesSaved || isFactorComplete ? (
-              <ArrowRight size={14} aria-hidden="true" />
+              <ArrowRightIcon size={14} aria-hidden="true" />
             ) : undefined
           }
         >
