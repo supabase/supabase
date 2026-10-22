@@ -3,6 +3,9 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useAccountRecovery } from './useAccountRecovery'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 
 const mock = vi.hoisted(() => ({
   userId: 'user-a',
@@ -91,6 +94,33 @@ describe('useAccountRecovery', () => {
     const { result } = renderRecovery()
     await waitFor(() => expect(result.current.isError).toBe(true))
     expect(result.current.findings).toEqual([])
+  })
+
+  it('isolates existing callers that omit a user ID', async () => {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    const { result, rerender } = renderHook(
+      () => ({
+        factors: useMfaListFactorsQuery(),
+        identities: useProfileIdentitiesQuery(),
+        codes: useRecoveryCodesStatusQuery(),
+      }),
+      {
+        wrapper: ({ children }) => (
+          <QueryClientProvider client={client}>{children}</QueryClientProvider>
+        ),
+      }
+    )
+    await waitFor(() => expect(result.current.codes.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.factors.isSuccess).toBe(true))
+    await waitFor(() => expect(result.current.identities.isSuccess).toBe(true))
+    mock.userId = 'user-b'
+    rerender()
+    expect(result.current.factors.data).toBeUndefined()
+    expect(result.current.identities.data).toBeUndefined()
+    expect(result.current.codes.data).toBeUndefined()
+    await waitFor(() => expect(mock.getStatus).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(mock.listFactors).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(mock.getUser).toHaveBeenCalledTimes(2))
   })
 
   it('does not reuse findings after the signed-in user changes', async () => {
