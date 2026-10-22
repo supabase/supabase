@@ -14,18 +14,16 @@ export async function getLogDrains({ ref }: LogDrainsVariables, signal?: AbortSi
     throw new Error('ref is required')
   }
 
-  const { data, error } = await get(`/v2/projects/{ref}/analytics/log-drains`, {
+  const { data, error } = await get(`/platform/projects/{ref}/analytics/log-drains`, {
     params: { path: { ref: ref } },
     signal,
   })
 
-  if (error) handleError(error)
+  if (error) {
+    handleError(error)
+  }
 
-  // [Joshen] Format V2 API response to suit the shape which Studio consumes
-  return (data?.data ?? []).map(({ id, attributes }) => {
-    const { name, description, config, backend_type } = attributes
-    return { id, token: id, name, description, config, type: backend_type }
-  })
+  return data
 }
 
 export type LogDrainsData = Awaited<ReturnType<typeof getLogDrains>>

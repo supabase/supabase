@@ -1,21 +1,18 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
+import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
-
-type LogDrainAttributes =
-  components['schemas']['UpdateLogDrainRequestOpenApi']['data']['attributes']
 
 export type LogDrainUpdateVariables = {
   projectRef: string
   token?: string
   name: string
   description?: string
-  type: LogDrainAttributes['backend_type']
-  config: LogDrainAttributes['config']
+  type: LogDrainType
+  config: Record<string, never>
 }
 
 export async function updateLogDrain(payload: LogDrainUpdateVariables) {
@@ -23,18 +20,13 @@ export async function updateLogDrain(payload: LogDrainUpdateVariables) {
     throw new Error('Token is required')
   }
 
-  const { data, error } = await put('/v2/projects/{ref}/analytics/log-drains/{id}', {
-    params: { path: { ref: payload.projectRef, id: payload.token } },
+  const { data, error } = await put('/platform/projects/{ref}/analytics/log-drains/{token}', {
+    params: { path: { ref: payload.projectRef, token: payload.token } },
     body: {
-      data: {
-        type: 'log_drain',
-        attributes: {
-          name: payload.name,
-          description: payload.description,
-          backend_type: payload.type,
-          config: payload.config,
-        },
-      },
+      name: payload.name,
+      description: payload.description,
+      type: payload.type,
+      config: payload.config as any,
     },
   })
 
