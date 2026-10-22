@@ -97,11 +97,14 @@ The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/
 
 Add an entry with the `name`, `url`, and optional `icon` for your page.
 
-### Remove a linked section
+### Skip anchor link CI check
 
-CI fails a PR that removes a heading other docs pages link to. To remove it anyway:
+When you remove a header that is linked to elsewhere, CI fails.
+You may want to merge your change anyway. For example, you may want to correct the links in a separate PR to avoid PR bloat.
 
-1. Confirm the removal is deliberate and the content has no new home.
+To merge anyway:
+
+1. Confirm the removal is deliberate.
 2. Add the `skip-anchor-check` label to the PR.
 3. Wait for the check to rerun. It passes and lists the broken links as warnings.
 
