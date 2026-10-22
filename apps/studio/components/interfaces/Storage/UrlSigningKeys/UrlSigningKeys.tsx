@@ -68,7 +68,6 @@ export const UrlSigningKeys = () => {
   })
 
   const { activeKey, standbyKeys, revokedKeys } = groupUrlSigningKeys(data ?? [])
-  // The API allows several standby keys, but we keep rotation simple with one
   const hasStandbyKey = standbyKeys.length > 0
   const canCreateStandbyKey = canUpdateKeys && !hasStandbyKey
 
