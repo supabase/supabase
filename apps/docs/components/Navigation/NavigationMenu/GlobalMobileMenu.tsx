@@ -31,10 +31,13 @@ const listItem = {
 const itemClassName =
   'block py-2 pl-2 pr-3.5 text-sm text-foreground-light hover:bg-surface-200 focus-ring rounded-sm'
 
-const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
-  const { GLOBAL_MENU_ITEMS } = useNavItems()
-  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
-
+const AccordionMenuItem = ({
+  section,
+  activeLabel,
+}: {
+  section: DropdownMenuItem[]
+  activeLabel: string
+}) => {
   return section[0].menuItems ? (
     <AccordionItem
       value={section[0].label}
@@ -85,11 +88,12 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
 
 const Menu = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
+  const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
 
   return (
     <Accordion type="multiple" className="space-y-1 mt-2.5">
       {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map((section, index) => (
-        <AccordionMenuItem key={index} section={section} />
+        <AccordionMenuItem key={index} section={section} activeLabel={activeLabel} />
       ))}
     </Accordion>
   )
