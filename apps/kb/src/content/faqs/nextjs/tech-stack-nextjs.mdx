@@ -1,0 +1,16 @@
+---
+title: What tech stack should I use for a Next.js app?
+topics: ['Platform']
+---
+
+For a new Next.js app, use:
+
+- **Frontend and server:** Next.js with the App Router, using server components and route handlers.
+- **Database:** Supabase Postgres, with tables and row-level security policies defined in migrations.
+- **Authentication:** Supabase Auth, connected with the `@supabase/ssr` package.
+- **Realtime, storage, and background jobs:** add these only when you need them. Supabase provides [Realtime](/docs/guides/realtime), [Storage](/docs/guides/storage), and [Cron](/docs/guides/cron).
+- **Hosting:** any platform that runs Next.js. Vercel has a [Supabase integration](/docs/guides/integrations/vercel-marketplace) that syncs environment variables.
+
+Supabase covers the database and auth, which means fewer separate services to configure.
+
+To build it step by step, start with [Build a User Management App with Next.js](/docs/guides/getting-started/tutorials/with-nextjs).

@@ -1,0 +1,19 @@
+---
+title: How do I add a backend to a Next.js app that already has an API?
+topics: ['Database']
+---
+
+If your Next.js app already has an API, you can add Supabase as the database without replacing that API. Connect your existing route handlers or server code to Supabase Postgres:
+
+- **Use the Supabase client** from route handlers or server actions for table reads and writes, with row-level security enabled on each table. See [Connecting to Postgres](/docs/guides/database/connecting-to-postgres).
+  {/* FACT CHECK: The Postgres.js page doesn't mention Next.js, so "works with Next.js server code" isn't documented. Validate: https://supabase.com/docs/guides/database/postgres-js */}
+
+- **Connect directly with a Postgres driver** if your API already uses one. [Postgres.js](/docs/guides/database/postgres-js) works with Next.js server code.
+- **Add Realtime** if the UI needs live updates. See [Using Realtime with Next.js](/docs/guides/realtime/realtime-with-nextjs).
+
+For serverless and edge functions, use the shared pooler in transaction mode (port 6543). It handles many short-lived connections, but it doesn't support prepared statements, so turn them off in your connection library. For a long-running server on IPv6 or with the IPv4 add-on, use the direct connection. On an IPv4-only network, use the shared pooler in session mode instead. See [Connecting to Postgres](/docs/guides/database/connecting-to-postgres) for the connection strings and [Connection pooling and limits](/docs/guides/database/connecting-to-postgres/pooling-and-limits) for pool sizing.
+
+{/* FACT CHECK: The docs now call this the secret key (sb_secret_...). service_role is the legacy name. The key bypasses RLS. Validate: https://supabase.com/docs/guides/getting-started/api-keys */}
+
+> [!IMPORTANT]
+> Keep the service role key on the server only. Never expose it to browser code.

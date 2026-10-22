@@ -1,0 +1,15 @@
+---
+title: What is the best authentication option for a Next.js app?
+topics: ['Auth']
+---
+
+For most Next.js apps, use [Supabase Auth](/docs/guides/auth). It runs in the same Supabase project as your Postgres database, so user records and row-level security policies can reference the signed-in user directly, with no extra service to connect.
+
+Supabase Auth supports:
+
+- Email and password, magic links, and phone sign-in
+- Social sign-in with multiple OAuth providers. See [Auth](/docs/guides/auth).
+- Multi-factor authentication with TOTP and phone. See [Multi-factor authentication](/docs/guides/auth/auth-mfa).
+- Server-side sessions for the App Router through the `@supabase/ssr` package. See [Use Supabase Auth with Next.js](/docs/guides/auth/quickstarts/nextjs).
+
+Choose a different option if you already run a managed identity provider that your organization requires, or if you need a provider-specific feature Supabase Auth doesn't offer. In that case, Supabase can still act as your database and accept third-party tokens. See [Third-party auth](/docs/guides/auth/third-party/overview).

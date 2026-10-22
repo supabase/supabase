@@ -1,0 +1,14 @@
+---
+title: How do I add authentication to a Next.js app?
+topics: ['Auth']
+---
+
+Use [Supabase Auth](/docs/guides/auth) with the `@supabase/ssr` package to add authentication to a Next.js app. It handles sign-up, sign-in, sessions, and social login, and it works with the App Router's server components and route handlers.
+
+The basic setup has three parts:
+
+1. **Create a browser client and a server client.** The server client reads and writes the session cookie, so server components and route handlers can see who is signed in. See [Creating a Supabase client for SSR](/docs/guides/auth/server-side/creating-a-client).
+2. **Refresh the session in a proxy.** Server components can't write cookies, so Next.js needs a proxy to refresh expired tokens and store them. On Next.js 16 and later, the file is `proxy.ts`. On Next.js 15 and earlier, it's `middleware.ts`. The Supabase code inside is the same either way. See [Creating a Supabase client for SSR](/docs/guides/auth/server-side/creating-a-client).
+3. **Protect routes on the server.** Check the user in server components and route handlers, not only in client-side code.
+
+To see the full flow end to end, follow [Build a User Management App with Next.js](/docs/guides/getting-started/tutorials/with-nextjs).
