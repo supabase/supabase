@@ -10,13 +10,13 @@ type GetUserContentByIdResponse = components['schemas']['GetUserContentByIdRespo
 describe('ai/tools/report-tools', () => {
   describe('getReportTools', () => {
     it('should return list_reports and get_report tools', () => {
-      const tools = getReportTools()
+      const tools = getReportTools({ aiOptInLevel: 'schema' })
 
       expect(Object.keys(tools)).toEqual(['list_reports', 'get_report'])
     })
 
     it('should not require approval to read reports', () => {
-      const tools = getReportTools()
+      const tools = getReportTools({ aiOptInLevel: 'schema' })
 
       expect(tools.list_reports.needsApproval).toBe(false)
       expect(tools.get_report.needsApproval).toBe(false)
@@ -61,7 +61,11 @@ describe('ai/tools/report-tools', () => {
         },
       })
 
-      const tools = getReportTools({ projectRef: 'test-project', authorization: 'Bearer token' })
+      const tools = getReportTools({
+        projectRef: 'test-project',
+        authorization: 'Bearer token',
+        aiOptInLevel: 'schema',
+      })
       if (!tools.list_reports.execute) throw new Error('execute is undefined')
 
       const result = await tools.list_reports.execute(
@@ -164,7 +168,7 @@ describe('ai/tools/report-tools', () => {
         },
       })
 
-      const tools = getReportTools({ projectRef: 'test-project' })
+      const tools = getReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       const result = (await tools.get_report.execute(
@@ -204,7 +208,7 @@ describe('ai/tools/report-tools', () => {
           }),
       })
 
-      const tools = getReportTools({ projectRef: 'test-project' })
+      const tools = getReportTools({ projectRef: 'test-project', aiOptInLevel: 'schema' })
       if (!tools.get_report.execute) throw new Error('execute is undefined')
 
       await expect(

@@ -5,12 +5,15 @@ import { useConnectServerEnv } from '../useConnectServerEnv'
 import { getAPIKeysById } from '@/data/api-keys/api-key-id-query'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 // Uses the real useRevealedSecret (not mocked) so the requestId invalidation
 // in clear() actually interacts with revealPromiseRef in useConnectServerEnv.
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: vi.fn(),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: vi.fn(),
+  FGA_PERMISSIONS: {
+    PROJECT: {},
+  },
 }))
 vi.mock('@/data/config/project-endpoint-query', () => ({
   useProjectApiUrl: vi.fn(),
@@ -35,7 +38,7 @@ function deferred<T>() {
 
 describe('useConnectServerEnv secret reveal (real useRevealedSecret)', () => {
   beforeEach(() => {
-    vi.mocked(useAsyncCheckPermissions).mockReturnValue({
+    vi.mocked(useAsyncCheckPermissionsV2).mockReturnValue({
       can: true,
       isLoading: false,
     } as any)

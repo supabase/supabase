@@ -3428,6 +3428,7 @@ module.exports = [
   { permanent: true, source: '/vector.md', destination: '/modules/vector.md' },
   { permanent: true, source: '/homepage.md', destination: '/index.md' },
   { permanent: true, source: '/.md', destination: '/index.md' },
+  { permanent: true, source: '/kb.md', destination: '/kb/sitemap.md' },
   { permanent: true, source: '/index', destination: '/' },
   // High-traffic 404s
   { permanent: true, source: '/docs/graphql', destination: '/docs/guides/graphql' },
@@ -3829,5 +3830,416 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password',
     destination: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/FWD-wrappers-error-component-verification-failed-94a76b',
+    destination: '/kb/troubleshooting/FWD-wrappers-error-component-verification-failed',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/app-store-rejection-tls-error-in-ipv6-only-environments-4e9c62',
+    destination: '/kb/troubleshooting/app-store-rejection-tls-error-in-ipv6-only-environments',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/auth-error-500-database-error-querying-schema-eb6b44',
+    destination: '/kb/troubleshooting/auth-error-500-database-error-querying-schema',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/auth-error-503-authretryablefetcherror-51b88c',
+    destination: '/kb/troubleshooting/auth-error-503-authretryablefetcherror',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/auth-hooks-invalid-payload-when-anonymous-users-attempt-phone-changes-022c47',
+    destination:
+      '/kb/troubleshooting/auth-hooks-invalid-payload-when-anonymous-users-attempt-phone-changes',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot-d55aa2',
+    destination: '/kb/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/cloudflare-origin-error-1016-on-custom-domain-a57af4',
+    destination: '/kb/troubleshooting/cloudflare-origin-error-1016-on-custom-domain',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted-ddaa1c',
+    destination:
+      '/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net-ad6357',
+    destination: '/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/disk-size-not-shrinking-after-deleting-data-135390',
+    destination: '/kb/troubleshooting/disk-size-not-shrinking-after-deleting-data',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace-1094d3',
+    destination: '/kb/troubleshooting/edge-function-error-rate-limit-exceeded-for-trace',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/email-password-login-disabled-supabase-vercel-marketplace-a7dd36',
+    destination: '/kb/troubleshooting/email-password-login-disabled-supabase-vercel-marketplace',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks-e78cf8',
+    destination:
+      '/kb/troubleshooting/error-invalid-byte-sequence-for-encoding-utf8-0x00-when-accessing-triggers-or-webhooks',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/error-relation-supabase_migrationsschema_migrations-does-not-exist-a787d6',
+    destination:
+      '/kb/troubleshooting/error-relation-supabase_migrationsschema_migrations-does-not-exist',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/error-target-organization-is-not-managed-by-vercel-marketplace-during-project-transfer-5262c3',
+    destination:
+      '/kb/troubleshooting/error-target-organization-is-not-managed-by-vercel-marketplace-during-project-transfer',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/formatting-support-requests-for-faster-resolution-616717',
+    destination: '/kb/troubleshooting/formatting-support-requests-for-faster-resolution',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/get-detailed-storage-metrics-with-the-aws-cli-587a7d',
+    destination: '/kb/troubleshooting/get-detailed-storage-metrics-with-the-aws-cli',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions-77326b',
+    destination:
+      '/kb/troubleshooting/high-cpu-and-infinite-transaction-retries-when-using-custom-error-codes-in-rpc-functions',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/how-to-delete-vercel-linked-projects-9d08aa',
+    destination: '/kb/troubleshooting/how-to-delete-vercel-linked-projects',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/issues-with-rotating-pgsodium-and-vault-root-encryption-keys-efeb47',
+    destination: '/kb/troubleshooting/issues-with-rotating-pgsodium-and-vault-root-encryption-keys',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/managing-or-disconnecting-github-oauth-connections-e3dc3b',
+    destination: '/kb/troubleshooting/managing-or-disconnecting-github-oauth-connections',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/manually-created-databases-are-not-visible-in-the-supabase-dashboard-4415aa',
+    destination:
+      '/kb/troubleshooting/manually-created-databases-are-not-visible-in-the-supabase-dashboard',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors-5ee4d0',
+    destination:
+      '/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/permission-denied-when-deleting-the-cli_login_postgres-role-808bae',
+    destination: '/kb/troubleshooting/permission-denied-when-deleting-the-cli_login_postgres-role',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/pg_cron-launcher-crashes-with-duplicate-key-value-violates-unique-constraint-cc6472',
+    destination:
+      '/kb/troubleshooting/pg_cron-launcher-crashes-with-duplicate-key-value-violates-unique-constraint',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/pg_dump-fails-with-query-would-be-affected-by-row-level-security-policy-1d5783',
+    destination:
+      '/kb/troubleshooting/pg_dump-fails-with-query-would-be-affected-by-row-level-security-policy',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/pkce-flow-errors-cannot-parse-response-or-zgotmplz-in-magic-link-emails-433665',
+    destination:
+      '/kb/troubleshooting/pkce-flow-errors-cannot-parse-response-or-zgotmplz-in-magic-link-emails',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/postgres-error-could-not-access-status-of-transaction-or-could-not-open-file-pg_xact-f88389',
+    destination:
+      '/kb/troubleshooting/postgres-error-could-not-access-status-of-transaction-or-could-not-open-file-pg_xact',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators-46ff23',
+    destination:
+      '/kb/troubleshooting/postgrest-error-400-column-example_tableexample_column-does-not-exist-when-using-or-operators',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache-c396e9',
+    destination:
+      '/kb/troubleshooting/postgrest-error-pgrst002-could-not-query-the-database-for-the-schema-cache',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/postgrest-not-recognizing-new-columns-or-functions-bd75f5',
+    destination: '/kb/troubleshooting/postgrest-not-recognizing-new-columns-or-functions',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/powerbi-service-error-the-remote-certificate-is-invalid-according-to-the-validation-procedure-640a98',
+    destination:
+      '/kb/troubleshooting/powerbi-service-error-the-remote-certificate-is-invalid-according-to-the-validation-procedure',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/rclone-error-s3-protocol-error-received-listing-v1-with-istruncated-set-no-nextmarker-and-no-contents-e64d34',
+    destination:
+      '/kb/troubleshooting/rclone-error-s3-protocol-error-received-listing-v1-with-istruncated-set-no-nextmarker-and-no-contents',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794',
+    destination:
+      '/kb/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads-8f21f0',
+    destination: '/kb/troubleshooting/relation-objects-does-not-exist-error-during-storage-uploads',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections-ef582c',
+    destination:
+      '/kb/troubleshooting/resolving-cannot-execute-update-in-a-read-only-transaction-on-transaction-pooler-connections',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/resolving-permission-denied-for-database-postgres-during-migrations-78f33a',
+    destination:
+      '/kb/troubleshooting/resolving-permission-denied-for-database-postgres-during-migrations',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16',
+    destination: '/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login-a0c686',
+    destination:
+      '/kb/troubleshooting/scan-error-on-column-confirmation_token-converting-null-to-string-is-unsupported-during-auth-login',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload-a94384',
+    destination:
+      '/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files-988baa',
+    destination:
+      '/kb/troubleshooting/storage-error-database-schema-is-incompatible-when-uploading-files',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/storage-unexpectedly-high-usage-or-exceed_storage_size_quota-errors-ae21a5',
+    destination:
+      '/kb/troubleshooting/storage-unexpectedly-high-usage-or-exceed_storage_size_quota-errors',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/supabase-project-provisioned-via-bolt-not-visible-in-dashboard-7188fc',
+    destination:
+      '/kb/troubleshooting/supabase-project-provisioned-via-bolt-not-visible-in-dashboard',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges-b05a4d',
+    destination:
+      '/kb/troubleshooting/supabase-storage-inefficient-folder-operations-and-hierarchical-rls-challenges',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/supavisor-connection-error-fatal-eauthquery-unsupported-or-invalid-secret-format-d23dd4',
+    destination:
+      '/kb/troubleshooting/supavisor-connection-error-fatal-eauthquery-unsupported-or-invalid-secret-format',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/supavisor-error-circuit-breaker-open-after-password-rotation-0fdb72',
+    destination: '/kb/troubleshooting/supavisor-error-circuit-breaker-open-after-password-rotation',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/tracking-postgres-role-activity-to-specific-dashboard-users-8d3715',
+    destination: '/kb/troubleshooting/tracking-postgres-role-activity-to-specific-dashboard-users',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions-775f92',
+    destination:
+      '/kb/troubleshooting/troubleshooting-connect_timeout-or-hanging-queries-in-vercel-serverless-functions',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/unexpected-behavior-with-authupdateuser-phone-phone-linked-to-incorrect-user-id-45368f',
+    destination:
+      '/kb/troubleshooting/unexpected-behavior-with-authupdateuser-phone-phone-linked-to-incorrect-user-id',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/vercel-integration-environment-variables-not-syncing-for-persistent-git-branches-b9191e',
+    destination:
+      '/kb/troubleshooting/vercel-integration-environment-variables-not-syncing-for-persistent-git-branches',
+  },
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting-3d78b0',
+    destination:
+      '/kb/troubleshooting/why-supabase-edge-functions-cannot-provide-static-egress-ips-for-whitelisting',
+  },
+  // Remaining troubleshooting guides whose docs slug matches the KB slug exactly.
+  // Hash-suffixed slugs are handled above (KB drops the suffix).
+  {
+    permanent: true,
+    source:
+      '/docs/guides/troubleshooting/:slug((?!_template(?:\\.md)?$)(?![^/]*-[0-9a-f]{6}(?:\\.md)?$)[^/]+)',
+    destination: '/kb/troubleshooting/:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-admin-mfa-deletefactor',
+    destination: '/docs/reference/javascript/auth-admin-deletefactor',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-reauthentication',
+    destination: '/docs/reference/javascript/auth-reauthenticate',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-api',
+    destination: '/docs/reference/javascript/auth',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/auth-mfa-api',
+    destination: '/docs/reference/javascript/auth-mfa',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/javascript/db-abortsignal',
+    destination: '/docs/reference/javascript/using-modifiers-abortsignal',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/intro',
+    destination: '/docs/guides/getting-started/architecture',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/local-development',
+    destination: '/docs/guides/functions/development-environment',
+  },
+  {
+    permanent: true,
+    source: '/changelog/45329',
+    destination:
+      '/changelog/45329-breaking-change-tables-not-exposed-to-data-and-graphql-api-automatically',
+  },
+  {
+    permanent: true,
+    source: '/changelog/48235-migration-of-supabase-management-api-logs-all-endpoint',
+    destination:
+      '/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-mfa/webauthn',
+    destination: '/docs/guides/auth/passkeys',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/free-plan',
+    destination: '/docs/guides/platform/billing-on-supabase',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/storage/cdn/basic-cdn',
+    destination: '/docs/guides/storage/cdn/fundamentals',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/platform/manage-your-usage/log-ingestion',
+    destination: '/docs/guides/platform/manage-your-usage/logs-ingest',
+  },
+  {
+    permanent: true,
+    source: '/docs/api',
+    destination: '/docs/guides/api',
+  },
+  {
+    permanent: true,
+    source: '/docs/deployment/branching/dashboard',
+    destination: '/docs/guides/deployment/branching/dashboard',
   },
 ]
