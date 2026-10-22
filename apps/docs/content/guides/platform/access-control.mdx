@@ -79,6 +79,12 @@ If an invite expires before the person accepts it, send a new one. Next to the i
 </TabPanel>
 <TabPanel id="management-api" label="Management API">
 
+<Admonition type="note">
+
+The Management API endpoint for creating invites is available only on the [Team and Enterprise plans](/pricing).
+
+</Admonition>
+
 To invite someone with the Management API, call [Create organization invitations](/docs/reference/api/v2-create-organization-invitations). The token needs the **Organization Members** permission with **Read-write** access. Set `role` to `owner`, `administrator`, `developer`, `read-only`, or `no-access`.
 
 Without `projects`, the role applies to the whole organization:
@@ -146,7 +152,7 @@ The Management API endpoint for changing roles is available only on the [Team an
 
 </Admonition>
 
-To change a member's role with the Management API, call [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role) with the member's user ID. The token needs the **Organization Settings** permission with **Read-write** access. To find a member's user ID, list the organization's members.
+To change a member's role with the Management API, call [Assign organization member role](/docs/reference/api/v2-assign-organization-member-role) with the member's user ID. Only an organization **Owner** can call this endpoint. The token needs the **Organization Settings** permission with **Read-write** access. To find a member's user ID, list the organization's members.
 
 Without `projects`, the call assigns an organization-wide role:
 
