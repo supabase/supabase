@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { apiWrapper } from '@/lib/api/apiWrapper'
-import { asLogDrainResource, parseLogDrainRequest } from '@/lib/api/self-hosted/log-drains'
 import { PROJECT_ANALYTICS_URL } from '@/lib/constants/api'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
@@ -53,19 +52,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           .json({ error: { message: 'Unexpected response format from upstream' } })
       }
 
-      return res.status(200).json({ data: resp.map(asLogDrainResource) })
+      return res.status(200).json(resp)
     case 'POST':
       // create the log drain
-      const parsedBody = parseLogDrainRequest(req.body)
-      if (!parsedBody.success) {
-        return res.status(400).json({ error: { message: 'Invalid log drain request body' } })
-      }
-
       const postUrl = new URL(baseUrl)
       postUrl.pathname = '/api/backends'
-      const postUpstream = await fetch(postUrl, {
+      const postResult = await fetch(postUrl, {
         body: JSON.stringify({
-          ...parsedBody.data,
+          ...req.body,
+          config: req.body.config,
           metadata: {
             type: 'log-drain',
           },
@@ -76,15 +71,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           'Content-Type': 'application/json',
           Accept: 'application/json',
         },
-      })
-
-      if (!postUpstream.ok) {
-        return res
-          .status(500)
-          .json({ error: { message: 'Failed to create log drain in upstream' } })
-      }
-
-      const postResult = await postUpstream.json()
+      }).then(async (r) => await r.json())
 
       const sourcesGetUrl = new URL(baseUrl)
       sourcesGetUrl.pathname = '/api/sources'
@@ -129,7 +116,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           })
         )
       )
-      return res.status(201).json({ data: asLogDrainResource(postResult) })
+      return res.status(201).json(postResult)
 
     default:
       res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])

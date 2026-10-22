@@ -22,10 +22,7 @@ export async function getAuditLogDrains({ slug }: AuditLogDrainsVariables, signa
 
   if (error) handleError(error)
 
-  // Match the flattened shape of project log drains, where `id` is the token
-  return (data ?? []).map(({ token, name, description, config, type }): LogDrainData => {
-    return { id: token, token, name, description, config, type }
-  })
+  return (data ?? []) as LogDrainData[]
 }
 
 export type AuditLogDrainsData = LogDrainData[]
