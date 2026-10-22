@@ -259,7 +259,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'reference-csharp',
             href: '/reference/csharp' as `/${string}`,
             level: 'reference_csharp',
-            community: true,
             enabled: sdkCsharpEnabled,
           },
           {
@@ -342,6 +341,11 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             icon: 'troubleshooting',
             href: '/guides/troubleshooting' as `/${string}`,
             level: 'troubleshooting',
+          },
+          {
+            label: 'Knowledge base',
+            icon: 'resources',
+            href: 'https://supabase.com/kb',
           },
         ],
       ],
@@ -541,18 +545,6 @@ export const gettingstarted: NavMenuConstant = {
   ],
 }
 
-export const cli = {
-  title: 'CLI',
-  items: [
-    { name: 'Overview', url: '/guides/cli' },
-    { name: 'Managing Environments', url: '/guides/cli/managing-environments' },
-    {
-      name: 'Using environment variables in config.toml',
-      url: '/guides/cli/using-environment-variables-in-config',
-    },
-  ],
-}
-
 export const NativeMobileLoginItems = [
   {
     name: 'Apple',
@@ -729,7 +721,7 @@ export const auth: NavMenuConstant = {
           url: '/guides/auth/quickstarts/react-native' as `/${string}`,
         },
         {
-          name: 'React Native with Expo & Social Auth',
+          name: 'React Native with Expo & Social Sign-in',
           url: '/guides/auth/quickstarts/with-expo-react-native-social-auth',
         },
       ],
@@ -786,7 +778,7 @@ export const auth: NavMenuConstant = {
           enabled: allAuthProvidersEnabled,
         },
         {
-          name: 'Phone Login',
+          name: 'Phone sign-in',
           url: '/guides/auth/phone-login' as `/${string}`,
           enabled: allAuthProvidersEnabled,
         },
@@ -798,7 +790,7 @@ export const auth: NavMenuConstant = {
         },
 
         {
-          name: 'Social Login (OAuth)',
+          name: 'Social Sign-in (OAuth)',
           url: '/guides/auth/social-login',
           items: [{ name: 'Overview', url: '/guides/auth/social-login' }, ...SocialLoginItems],
           enabled: allAuthProvidersEnabled,
@@ -884,6 +876,7 @@ export const auth: NavMenuConstant = {
         { name: 'Auth0', url: '/guides/auth/third-party/auth0' },
         { name: 'AWS Cognito (Amplify)', url: '/guides/auth/third-party/aws-cognito' },
         { name: 'WorkOS', url: '/guides/auth/third-party/workos' },
+        { name: 'Custom OIDC', url: '/guides/auth/third-party/custom-oidc' },
       ],
     },
     {
@@ -2693,6 +2686,7 @@ export const security: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Platform configuration', url: '/guides/security/platform-security' },
+        { name: 'TLS for project APIs', url: '/guides/security/tls' },
         { name: 'Product configuration', url: '/guides/security/product-security' },
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Platform Audit Logs', url: '/guides/security/platform-audit-logs' },
@@ -3182,12 +3176,15 @@ export const self_hosting: NavMenuConstant = {
         { name: 'Run Self-Hosted Functions', url: '/guides/self-hosting/self-hosted-functions' },
         { name: 'Configure S3 Storage', url: '/guides/self-hosting/self-hosted-s3' },
         { name: 'Enable MCP server', url: '/guides/self-hosting/enable-mcp' },
-        { name: 'Configure Social Login (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
+        { name: 'Configure Social Sign-in (OAuth)', url: '/guides/self-hosting/self-hosted-oauth' },
         {
           name: 'Configure Custom OAuth/OIDC',
           url: '/guides/self-hosting/self-hosted-custom-oauth-providers',
         },
-        { name: 'Configure Phone Login & MFA', url: '/guides/self-hosting/self-hosted-phone-mfa' },
+        {
+          name: 'Configure Phone Sign-in & MFA',
+          url: '/guides/self-hosting/self-hosted-phone-mfa',
+        },
         { name: 'Add Custom Email Templates', url: '/guides/self-hosting/custom-email-templates' },
         { name: 'Configure Auth Hooks', url: '/guides/self-hosting/self-hosted-auth-hooks' },
         { name: 'Configure Passkeys', url: '/guides/self-hosting/self-hosted-passkeys' },
@@ -3536,7 +3533,7 @@ export const reference_csharp_v0 = {
   parent: '/reference',
   pkg: {
     name: 'supabase',
-    repo: 'https://github.com/supabase-community/supabase-csharp',
+    repo: 'https://github.com/supabase/supabase-csharp',
   },
 }
 
@@ -3547,7 +3544,7 @@ export const reference_csharp_v1 = {
   parent: '/reference',
   pkg: {
     name: 'supabase',
-    repo: 'https://github.com/supabase-community/supabase-csharp',
+    repo: 'https://github.com/supabase/supabase-csharp',
   },
 }
 
@@ -3558,7 +3555,7 @@ export const reference_csharp_v8 = {
   parent: '/reference',
   pkg: {
     name: 'supabase',
-    repo: 'https://github.com/supabase-community/supabase-csharp',
+    repo: 'https://github.com/supabase/supabase-csharp',
   },
 }
 

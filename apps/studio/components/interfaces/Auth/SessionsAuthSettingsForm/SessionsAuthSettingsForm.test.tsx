@@ -13,7 +13,7 @@ import {
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-// FormMessage animates via framer-motion, which relies on the Web Animations API.
+// FormMessage animates via Motion, which relies on the Web Animations API.
 mockAnimationsApi()
 
 vi.mock('@/lib/constants', async (importOriginal) => {
@@ -25,8 +25,14 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: true, isLoading: false }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isLoading: false, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      AUTH_CONFIG_READ: 'auth_config_read',
+      AUTH_CONFIG_WRITE: 'auth_config_write',
+    },
+  },
 }))
 
 function mockAuthConfig(overrides: Record<string, unknown> = {}) {

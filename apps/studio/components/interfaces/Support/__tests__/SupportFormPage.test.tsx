@@ -143,10 +143,6 @@ const { mockCommitSha, mockCommitTime, mockUseDeploymentCommitQuery } = vi.hoist
 
 const mockStudioVersion = `SHA ${mockCommitSha} deployed at ${dayjs(mockCommitTime).format('YYYY-MM-DD HH:mm:ss Z')}`
 
-const { mockUseFlag } = vi.hoisted(() => ({
-  mockUseFlag: vi.fn().mockReturnValue(false),
-}))
-
 vi.mock('react-inlinesvg', () => ({
   __esModule: true,
   default: () => null,
@@ -195,7 +191,7 @@ vi.mock(import('common'), async (importOriginal) => {
     ...actual,
     useParams: vi.fn().mockReturnValue({ ref: 'default' }),
     useIsLoggedIn: vi.fn().mockReturnValue(true),
-    useFlag: mockUseFlag,
+    useFlag: vi.fn().mockReturnValue(false),
     isFeatureEnabled: vi.fn((feature: any, disabledFeatures: any) => {
       if (typeof feature === 'string') {
         if (feature === 'support:show_client_libraries') {
@@ -347,9 +343,7 @@ const getSupportForm = () => {
 }
 
 const getAttachmentFileInput = () => {
-  const input = getSupportForm().querySelector<HTMLInputElement>(
-    'input[type="file"][accept*="image"]'
-  )
+  const input = getSupportForm().querySelector<HTMLInputElement>('input[type="file"]')
   expect(input).not.toBeNull()
   return input!
 }
@@ -398,7 +392,6 @@ describe('SupportFormPage', () => {
   })
 
   beforeEach(async () => {
-    mockUseFlag.mockReset().mockReturnValue(false)
     mockUseDeploymentCommitQuery.mockReturnValue({
       data: { commitSha: mockCommitSha, commitTime: mockCommitTime },
     })
@@ -500,7 +493,15 @@ describe('SupportFormPage', () => {
     })
 
     mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () => HttpResponse.json([], { status: 200 }))
+      http.get(`${BASE_PATH}/api/status-page`, () =>
+        HttpResponse.json<StatusPageResponse>({
+          page_title: 'Supabase status',
+          page_url: 'https://status.supabase.com/',
+          ongoing_incidents: [],
+          in_progress_maintenances: [],
+          scheduled_maintenances: [],
+        })
+      )
     )
 
     addAPIMock({
@@ -558,34 +559,9 @@ describe('SupportFormPage', () => {
     })
   })
 
-  test('shows system status: not healthy', async () => {
-    mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () =>
-        HttpResponse.json(
-          [
-            {
-              id: 'z3qp8rln72pl',
-              active_since: '2026-01-26T10:30:00Z',
-              impact: 'critical',
-              status: 'in_progress',
-              name: 'Test incident',
-            },
-          ],
-          { status: 200 }
-        )
-      )
-    )
-
-    renderSupportFormStatusButton()
-
-    await waitFor(() => {
-      expect(getStatusLink(screen)).toHaveTextContent('Active incident ongoing')
-    })
-  })
-
   test('shows system status: check failed', async () => {
     mswServer.use(
-      http.get(`${BASE_PATH}/api/incident-status`, () =>
+      http.get(`${BASE_PATH}/api/status-page`, () =>
         HttpResponse.json({ msg: 'Status service unavailable' }, { status: 500 })
       )
     )
@@ -597,9 +573,7 @@ describe('SupportFormPage', () => {
     })
   })
 
-  test('flag on: shows an active incident from the new status page endpoint', async () => {
-    mockUseFlag.mockImplementation((name: string) => name === 'incidentIoStatusPage')
-
+  test('shows system status: not healthy', async () => {
     mswServer.use(
       http.get(`${BASE_PATH}/api/status-page`, () =>
         HttpResponse.json<StatusPageResponse>({

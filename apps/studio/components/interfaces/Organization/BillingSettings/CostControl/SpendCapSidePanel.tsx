@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ChevronRight, ExternalLink } from 'lucide-react'
+import { ChevronRightIcon, ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -34,7 +33,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from '@/data/subscriptions/org-subscription-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { BASE_PATH, DOCS_URL, PRICING_TIER_PRODUCT_IDS } from '@/lib/constants'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
@@ -74,9 +73,8 @@ export const SpendCapSidePanel = () => {
   const [showUsageCosts, setShowUsageCosts] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'on' | 'off'>()
 
-  const { can: canUpdateSpendCap } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSpendCap } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
@@ -150,7 +148,7 @@ export const SpendCapSidePanel = () => {
       <SheetContent showClose={false} size="lg" className="flex flex-col gap-0">
         <SheetHeader className="flex items-center justify-between w-full">
           <SheetTitle>Spend cap</SheetTitle>
-          <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
+          <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
             <Link
               href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}
               target="_blank"
@@ -171,7 +169,7 @@ export const SpendCapSidePanel = () => {
             <Collapsible open={showUsageCosts} onOpenChange={setShowUsageCosts}>
               <CollapsibleTrigger asChild>
                 <div className="flex items-center space-x-2 cursor-pointer">
-                  <ChevronRight
+                  <ChevronRightIcon
                     strokeWidth={1.5}
                     size={16}
                     className={showUsageCosts ? 'rotate-90' : ''}

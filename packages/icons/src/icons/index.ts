@@ -16,6 +16,7 @@ export { default as Datadog } from './datadog';
 export { default as EdgeFunctions } from './edge-functions';
 export { default as Elastic } from './elastic';
 export { default as FilesBucket } from './files-bucket';
+export { default as Google } from './google';
 export { default as Grafana } from './grafana';
 export { default as Graphql } from './graphql';
 export { default as Home } from './home';

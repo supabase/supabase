@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
@@ -8,7 +7,7 @@ import { ButtonTooltip } from './ButtonTooltip'
 import { RequestUpgradeToBillingOwners } from './RequestUpgradeToBillingOwners'
 import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -54,11 +53,11 @@ export const UpgradePlanButton = ({
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { billingAll } = useIsFeatureEnabled(['billing:all'])
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions',
-    undefined,
-    { organizationSlug: slug }
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
+    {
+      organizationSlug: slug,
+    }
   )
 
   const subject = `Enquiry to upgrade ${!!plan ? `to ${plan} ` : ''}plan for organization`

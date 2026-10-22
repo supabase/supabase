@@ -61,6 +61,6 @@ const OVERRIDE_ROLE_NAMES: Record<string, string> = {
   None: 'No-access',
 }
 
-export function getOverrideRoleName(rolename: string) {
+function getOverrideRoleName(rolename: string) {
   return OVERRIDE_ROLE_NAMES[rolename] ?? rolename
 }

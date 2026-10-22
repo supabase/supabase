@@ -1,5 +1,18 @@
 # Docker image version updates in docker-compose.yml
 
+## 2026-10-16
+- supabase/studio:2026.10.12-sha-3699278 (prev supabase/studio:2026.09.07-sha-7996410)
+- supabase/gotrue:v2.197.0 (prev supabase/gotrue:v2.196.0)
+- postgrest/postgrest:v14.18 (prev postgrest/postgrest:v14.17)
+- supabase/realtime:v2.143.3 (prev supabase/realtime:v2.134.10)
+- supabase/storage-api:v1.81.0 (prev supabase/storage-api:v1.74.0)
+- supabase/postgres-meta:v0.100.0 (prev supabase/postgres-meta:v0.99.0)
+- supabase/edge-runtime:v1.77.4 (prev supabase/edge-runtime:v1.76.2)
+- supabase/supavisor:2.9.13 (prev supabase/supavisor:2.9.12)
+- jonasal/nginx-certbot:6.2.0-nginx1.31.6 (prev jonasal/nginx-certbot:6.2.0-nginx1.31.5)
+- rustfs/rustfs:1.0.1 (prev rustfs/rustfs:v1.0.0-rc.5)
+- supabase/logflare:1.50.15 (prev supabase/logflare:1.50.10)
+
 ## 2026-09-09
 - supabase/studio:2026.09.07-sha-7996410 (prev supabase/studio:2026.08.03-sha-022b374)
 - envoyproxy/envoy:v1.39.1 (prev envoyproxy/envoy:v1.39.0)

@@ -1,8 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
+import { ChevronDownIcon, ExternalLinkIcon } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { cn } from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -31,14 +30,14 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from '@/data/integrations/integrations.types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { pluralize } from '@/lib/helpers'
 import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 import { useSidePanelsStateSnapshot } from '@/state/side-panels'
 
-export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
+export const VercelSection = ({ isProjectScoped = false }: { isProjectScoped?: boolean }) => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
@@ -46,14 +45,12 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   const isBranch = project?.parent_project_ref !== undefined
 
   const { can: canReadVercelConnection, isLoading: isLoadingPermissions } =
-    useAsyncCheckPermissions(PermissionAction.READ, 'integrations.vercel_connections')
-  const { can: canCreateVercelConnection } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'integrations.vercel_connections'
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ)
+  const { can: canCreateVercelConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
-  const { can: canUpdateVercelConnection } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'integrations.vercel_connections'
+  const { can: canUpdateVercelConnection } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
@@ -143,7 +140,7 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
     : 'Connect your Vercel teams to this Supabase organization. Supabase keeps environment variables up to date in each connected project. You can also link multiple Vercel projects to the same Supabase project.'
 
   return (
-    <PageSection>
+    <PageSection id="vercel">
       <PageSectionMeta>
         <div className="flex flex-1 items-start gap-6">
           <IntegrationSectionIcon title="vercel" />
@@ -160,32 +157,52 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
           <NoPermission resourceText="view this organization's Vercel connections" />
         ) : (
           <div className="space-y-6">
-            <div>
-              {vercelIntegration ? (
-                <div key={vercelIntegration.id}>
-                  <IntegrationInstallation title="Vercel" integration={vercelIntegration} />
-                  <IntegrationConnectionHeader
-                    title={ConnectionHeaderTitle}
-                    className={connections.length === 0 ? 'pb-0' : undefined}
-                    markdown="Project connections for Vercel"
-                  />
-                  {connections.length > 0 && (
-                    <ul className="flex flex-col gap-y-2">
-                      {connections.map((connection) => (
-                        <div
-                          key={connection.id}
-                          className={cn(
-                            isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
-                          )}
-                        >
-                          <IntegrationConnectionItem
-                            connection={connection}
-                            disabled={isBranch || !canUpdateVercelConnection}
-                            type={'Vercel' as IntegrationName}
-                            onDeleteConnection={onDeleteVercelConnection}
-                            className={cn(isProjectScoped && 'rounded-b-none! mb-0!')}
-                          />
-                          {isProjectScoped ? (
+            {vercelIntegration ? (
+              <div key={vercelIntegration.id}>
+                <IntegrationInstallation title="Vercel" integration={vercelIntegration} />
+                <IntegrationConnectionHeader
+                  title={ConnectionHeaderTitle}
+                  className={connections.length === 0 ? 'pb-0' : undefined}
+                  markdown="Project connections for Vercel"
+                />
+                {connections.length > 0 && (
+                  <ul>
+                    {connections.map((connection) => (
+                      <Collapsible
+                        key={connection.id}
+                        className={cn(
+                          'group/collapsible',
+                          'relative flex flex-col',
+                          '[&>li>div]:rounded-none [&>li>div]:border-b-0',
+                          '[&:first-child>li>div]:rounded-t-lg',
+                          '[&[data-state=open]>li>div]:border-b',
+                          '[&:last-child>li>div]:border-b',
+                          '[&:last-child[data-state=closed]>li>div]:rounded-b-lg'
+                        )}
+                      >
+                        <IntegrationConnectionItem
+                          connection={connection}
+                          disabled={isBranch || !canUpdateVercelConnection}
+                          isProjectScoped={isProjectScoped}
+                          type={'Vercel' as IntegrationName}
+                          onDeleteConnection={onDeleteVercelConnection}
+                          leadingAction={
+                            isProjectScoped ? (
+                              <CollapsibleTrigger asChild>
+                                <Button
+                                  className="group"
+                                  iconRight={
+                                    <ChevronDownIcon className="transition-transform group-data-[state=open]:rotate-180" />
+                                  }
+                                >
+                                  Edit
+                                </Button>
+                              </CollapsibleTrigger>
+                            ) : undefined
+                          }
+                        />
+                        {isProjectScoped && (
+                          <CollapsibleContent className="overflow-hidden data-closed:animate-collapsible-up data-open:animate-collapsible-down">
                             <div className="relative pl-8 ml-6 border-l border-muted pb-6">
                               <div className="border-b border-l border-r rounded-b-lg">
                                 <VercelIntegrationConnectionForm
@@ -195,30 +212,30 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                                 />
                               </div>
                             </div>
-                          ) : null}
-                        </div>
-                      ))}
-                    </ul>
-                  )}
-                  <EmptyIntegrationConnection
-                    disabled={isBranch || !canCreateVercelConnection}
-                    onClick={() => onAddVercelConnection(vercelIntegration.id)}
-                  >
-                    Add new project connection
-                  </EmptyIntegrationConnection>
-                </div>
-              ) : (
+                          </CollapsibleContent>
+                        )}
+                      </Collapsible>
+                    ))}
+                  </ul>
+                )}
                 <EmptyIntegrationConnection
-                  showNode={false}
-                  disabled={isBranch}
-                  href={integrationUrl}
-                  icon={<ExternalLink />}
-                  disabledTooltip="Install the Vercel integration on your project's main branch"
+                  disabled={isBranch || !canCreateVercelConnection}
+                  onClick={() => onAddVercelConnection(vercelIntegration.id)}
                 >
-                  Install Vercel integration
+                  Add new project connection
                 </EmptyIntegrationConnection>
-              )}
-            </div>
+              </div>
+            ) : (
+              <EmptyIntegrationConnection
+                showNode={false}
+                disabled={isBranch}
+                href={integrationUrl}
+                icon={<ExternalLinkIcon />}
+                disabledTooltip="Install the Vercel integration on your project's main branch"
+              >
+                Install Vercel integration
+              </EmptyIntegrationConnection>
+            )}
             {vercelProjectCount > 0 && vercelIntegration !== undefined && (
               <p className="text-sm text-foreground-light">
                 Your Vercel connection can access {vercelProjectCount} Vercel projects. To change

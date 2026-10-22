@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { BookOpen, Loader2, Send } from 'lucide-react'
+import { BookOpenIcon, Loader2Icon, SendIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -44,7 +43,7 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { prettifyJSON } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -84,7 +83,10 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const [error, setError] = useState<string | null>(null)
   const errorDocs = response ? getEdgeFunctionErrorDocs(response.headers) : undefined
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
   const { data: apiKeysData } = useAPIKeys(
     { projectRef, reveal: true },
     { enabled: canReadAPIKeys }
@@ -324,7 +326,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                                   asChild
                                   variant="text"
                                   size="tiny"
-                                  icon={<BookOpen size={14} />}
+                                  icon={<BookOpenIcon size={14} />}
                                 >
                                   <a
                                     href={errorDocs.href}
@@ -362,12 +364,12 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     </div>
                   ) : isPending ? (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
-                      <Loader2 size={24} className="text-foreground-muted animate-spin" />
+                      <Loader2Icon size={24} className="text-foreground-muted animate-spin" />
                       <p className="text-sm text-foreground-light">Sending request...</p>
                     </div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
-                      <Send size={24} className="text-foreground-muted" />
+                      <SendIcon size={24} className="text-foreground-muted" />
                       <p className="text-sm text-foreground-light">Send your first test request</p>
                     </div>
                   )}

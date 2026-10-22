@@ -14,9 +14,9 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
-  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   STATUS_BANNER_DISMISSED_KEYS: 'status-banner-dismissed-keys',
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
+  HOME_CHART_INTERVAL: (ref: string) => `home-chart-interval-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
   UI_TIMEZONE: 'supabase-ui-timezone',
@@ -32,6 +32,7 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
   UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
   UI_PREVIEW_EXPLORER: 'preview-explorer',
+  UI_PREVIEW_PIPELINE_CREATION: 'supabase-ui-pipeline-creation',
   UI_PREVIEW_STORAGE_VERSIONING: 'supabase-ui-storage-versioning',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
@@ -55,6 +56,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
+  SQL_EDITOR_CONFIRM_UNSAVED_CHANGES: 'sql-editor-confirm-unsaved-changes',
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
   NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
@@ -168,6 +170,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
   LOCAL_STORAGE_KEYS.SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,

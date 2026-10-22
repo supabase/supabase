@@ -144,7 +144,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <Tabs type="underlined" size="small">
                 <TabPanel id="serverful" label="server-based deployments">
                   In your .env file, set the DATABASE_URL variable to your connection string
-                    ```text .env
+                    ```dotenv .env
                     # Used for Prisma Migrations and within your application
                     DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@[DB-REGION].pooler.supabase.com:5432/postgres"
                     ```
@@ -160,7 +160,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
                     Next, create a DIRECT_URL variable in your .env file and assign the connection string that ends with port 5432 to it.
 
-                    ```text .env # Used in your application (use transaction mode)
+                    ```dotenv .env # Used in your application (use transaction mode)
                     DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 
                     # Used for Prisma Migrations (use session mode or direct connection)

@@ -193,7 +193,7 @@ Follow the same configuration guide as if your app was a Web application when bu
 To use the Google provider in local development:
 
 1. Add a new environment variable:
-   ```env
+   ```dotenv
    SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<client-secret>"
    ```
 2. Configure the provider in `supabase/config.toml`:
@@ -247,7 +247,7 @@ supabase.auth.signInWithOAuth({
 })
 ```
 
-For an implicit flow, that's all you need to do. The user will be taken to Google's consent screen, and finally redirected to your app with an access and refresh token pair representing their session.
+For an [implicit flow](/docs/guides/auth/sessions/implicit-flow), that's all you need to do. The user will be taken to Google's consent screen, and finally redirected to your app with an access and refresh token pair representing their session.
 
 <$Partial path="oauth_pkce_flow.mdx" />
 

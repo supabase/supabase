@@ -25,9 +25,11 @@ Amir Issaei
 Amogh Rao
 Amy Q
 Ana Mogul
+Andrew Jackson
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
+Anil Maharjan
 Anna Baker
 Ant Evans
 Ant Wilson
@@ -53,7 +55,9 @@ Brian Cullen
 Brent Schroeter
 Bruno Kilian
 Burhan A
+Caleb Boylan
 Carel de Waal
+Carlos Robles
 Carson Adam
 Cameron Blackwood
 Cameron Michie
@@ -71,6 +75,7 @@ Chris Martin
 Chris Opland
 Chris Stockton
 Christian Funkhouser
+Christian Melchior
 Claudiu Dragalina-Paraipan
 Clayton Kast
 Colin Goodheart-Smithe
@@ -78,8 +83,9 @@ Colin Murray
 Colum Ferry
 Connor Davis
 Craig Cannon
-Cuong Do
 Dane Harrigan
+Daniel Bergqvist
+Daniel Chapman
 Daniel Guerra
 Daniel Mitterdorfer
 Daniel Velázquez Lara
@@ -96,6 +102,7 @@ Davide Pellegatta
 Deepthi Sigireddi
 Deji I
 Dennis Senn
+Dhruv Sehgal
 Dimitrios Liappis
 Div Arora
 Dion Zeneli
@@ -103,8 +110,10 @@ Divit D
 Divya Sharma
 Donna Alexandra
 Douglas Hunley
+Drew McLellan
 Eduardo Gurgel
 Eleftheria Trivyzaki
+Eliot Daigneault-Mestre
 Eliot Whalan
 Emmett Folger
 Erfi Anugrah
@@ -113,20 +122,23 @@ Etienne Stalmans
 Evan Cummack
 Fabrizio Fenoglio
 Fady A
+Farley Thomas
 Fatuma Abdullahi
 Felipe Stival
 Ferhat Elmas
 Filipe Cabaco
 Firas El Rachidi
 Francesco Sansalvadore
+Francisco Ulate
 Franek Richardson
 Gabriel Claudino
 Garrett Crowell
 Gerardo Estaba
 Gildas Garcia
 Giuseppe Mandato
+Gonzalo Servat
+Graeme Gillies
 Greg Kress
-Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
@@ -150,6 +162,7 @@ Jamie Boyd
 Jake Ng
 Jared Patterson
 Jason Farber
+Jason Harley
 Jason Voegele
 Jean-Paul Argudo
 Jeff Smick
@@ -172,7 +185,6 @@ John Jarvis
 Joel Martin
 Johan Bergström
 John Pena
-John Schaeffer
 Jon M
 Jonathan Smock
 Jonny Summers-Muir
@@ -226,9 +238,11 @@ Marija Milicevic
 Mario Karuza
 Mark Burggraf
 Márton Boros
+Masha Koltsova
 Matthew Hambright
 Matt Hudson
 Matt Johnston
+Matt McGill
 Matt Robinson
 Matt Rossman
 Matt Smiley
@@ -238,12 +252,14 @@ Mert Yerekapan
 Michal Kleczek
 Michal Olszewski
 Michelle Jubrey
+Mikaël Francoeur
+Mike Donnalley
 Mike Podobnik
 Miranda Limonczenko
-Mo Khan
 Monica Khoury
 Mrinal Paliwal
 Mykhailo Mischa Lieibenson
+Nara Kasbergen Kwon
 Natalie Roberge
 Nick B
 Nick Littman
@@ -251,6 +267,7 @@ Nick Nowlan
 Nicola Ferraro
 Nicolas Nosenzo
 Nik Richers
+Nikita Sivukhin
 Noah Moss
 Nyannyacha
 Oli R
@@ -258,8 +275,6 @@ Pamela Chia
 Patricia Szasz
 Patrick Crane
 Paul Bauer
-Paul Caselton
-Paul Cioanca
 Paul Copplestone
 Paul Ibeabuchi
 Pavel Borisov
@@ -274,9 +289,11 @@ Prashansa Kulshrestha
 Qiao Han
 Quintin Willison
 Rafael Chacón
+Rakesh Patel
 Raminder Singh
 Rand Arete
 Raúl Barroso
+Ricardo Tavares
 Riccardo Busetti
 Richard Kasprzak
 Rob Shields
@@ -285,6 +302,7 @@ Rodrigo Mansueli
 Román Cuellar
 Roman Hernandez
 Ronan Lehane
+Rory Hunter
 Rory Wilding
 Ryan Goulet
 Ryan Senior

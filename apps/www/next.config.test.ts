@@ -14,7 +14,7 @@ describe('next.config.mjs', () => {
     expect(headers).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          source: '/(docs|blog)/:path*',
+          source: '/(docs|blog|kb)/:path*',
           headers: [{ key: 'X-Robots-Tag', value: 'all' }],
         }),
         expect.objectContaining({
@@ -60,6 +60,25 @@ describe('next.config.mjs', () => {
     expect(
       redirects.findIndex((redirect) => redirect.source === '/ui/docs/ai-editors-rules/prompts')
     ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
+  })
+
+  it('proxies the InstantDB migration app with its basePath prefix intact', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
+
+    expect(afterFiles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/migrate/instantdb',
+          destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb',
+        }),
+        expect.objectContaining({
+          source: '/migrate/instantdb/:path*',
+          destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
+        }),
+      ])
+    )
   })
 
   it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {

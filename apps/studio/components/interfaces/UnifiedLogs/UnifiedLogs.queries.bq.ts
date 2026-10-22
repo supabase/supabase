@@ -242,6 +242,7 @@ const getPostgresLogsQuery = (): SafeLogSqlFragment => safeSql`
           WHEN pgl_parsed.error_severity = 'WARNING' THEN 'warning'
           WHEN pgl_parsed.error_severity = 'FATAL' THEN 'error'
           WHEN pgl_parsed.error_severity = 'ERROR' THEN 'error'
+          WHEN pgl_parsed.error_severity = 'PANIC' THEN 'error'
           ELSE null
       END as level,
       null as pathname,
@@ -387,8 +388,12 @@ WITH unified_logs AS (
 /**
  * Unified logs SQL query
  */
-export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
+export const getUnifiedLogsQuery = (
+  search: QuerySearchParamsType,
+  paginationFilter?: SafeLogSqlFragment
+): SafeLogSqlFragment => {
   const conditions = buildConditions(search)
+  if (paginationFilter) conditions.push(paginationFilter)
   const effectiveLogTypes = getEffectiveLogTypes(search)
 
   return safeSql`

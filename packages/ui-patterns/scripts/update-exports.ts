@@ -6,6 +6,7 @@ const SRC_DIR = path.resolve(__dirname, '..', 'src')
 
 interface ExportMap {
   [key: string]: {
+    style?: string
     import: string
     types: string
   }
@@ -33,6 +34,8 @@ function getAllSourceFiles(dir: string): ExportMap {
       const filePath = `./src/${relativePath.replace(/\\/g, '/')}`
 
       exportsMap[subpath] = {
+        // tailwind resolves css @import with the "style" condition only
+        ...(relativePath.endsWith('.css') && { style: filePath }),
         import: filePath,
         types: filePath,
       }

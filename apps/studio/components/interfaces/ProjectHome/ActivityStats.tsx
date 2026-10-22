@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Archive, Cpu, Database, GitBranch, Github } from 'lucide-react'
+import { ArchiveIcon, CpuIcon, DatabaseIcon, GitBranchIcon } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, Skeleton } from 'ui'
+import { cn, GithubIcon, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
@@ -159,7 +159,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={getInfrastructurePath(ref)}
-          icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<CpuIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Compute size</span>}
           value={
             <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
@@ -181,7 +181,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={integrationsPath}
-          icon={<Github size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<GithubIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>GitHub</span>}
           value={
             isLoadingGithubConnections ? (
@@ -200,7 +200,7 @@ export const ActivityStats = () => {
         <DisableInteraction disabled={isHighAvailability} aria-disabled={isHighAvailability}>
           <SingleStat
             href={isHighAvailability ? undefined : `/project/${ref}/branches`}
-            icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
+            icon={<GitBranchIcon size={18} strokeWidth={1.5} className="text-foreground" />}
             label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
             trackingProperties={{
               stat_type: 'branches',
@@ -221,7 +221,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}
-          icon={<Database size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<DatabaseIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last migration</span>}
           trackingProperties={{
             stat_type: 'migrations',
@@ -246,7 +246,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={`/project/${ref}/database/backups/scheduled`}
-          icon={<Archive size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<ArchiveIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last backup</span>}
           trackingProperties={{
             stat_type: 'backups',

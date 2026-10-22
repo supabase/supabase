@@ -435,6 +435,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/database/{ref}/db-integrity/operations/{op}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Reads the current db-integrity task for an operation on the project primary. */
+    get: operations['DatabaseDbIntegrityController_status']
+    put?: never
+    /** Submits a db-integrity operation on the project primary. */
+    post: operations['DatabaseDbIntegrityController_submit']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/hook-enable': {
     parameters: {
       query?: never
@@ -5037,6 +5055,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/support/csat': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Submit a support CSAT survey response
+     * @description Called by the Supabase dashboard when a customer answers the satisfaction survey linked from a resolved support ticket. Records the answer on the Front conversation as custom fields and a tag. One answer per conversation.
+     */
+    post: operations['CsatController_submit']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/support/verify-email': {
     parameters: {
       query?: never
@@ -5866,19 +5904,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
-        | 'webhook'
-        | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
-        | 'last9'
-        | 'otlp'
-        | 'syslog'
+      type: 'webhook' | 'datadog' | 'loki' | 'sentry' | 's3' | 'axiom' | 'last9' | 'otlp' | 'syslog'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
@@ -6741,6 +6767,8 @@ export interface components {
         | 'audit_logs_read'
         | 'billing_read'
         | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -6761,8 +6789,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -6864,6 +6896,7 @@ export interface components {
             | 't4g.nano'
             | 't3a.nano'
             | 't3.nano'
+            | 't8i.nano'
             | 't4g.micro'
             | 't3a.micro'
             | 't3.micro'
@@ -7054,6 +7087,12 @@ export interface components {
             code: 'americas' | 'emea' | 'apac'
             /** @enum {string} */
             type: 'smartGroup'
+          }
+        | {
+            /** @enum {string} */
+            code: 'auto'
+            /** @enum {string} */
+            type: 'auto'
           }
       /**
        * @description Release channel. If not provided, GA will be used.
@@ -7705,6 +7744,8 @@ export interface components {
         | 'audit_logs_read'
         | 'billing_read'
         | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -7725,8 +7766,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -7985,6 +8030,15 @@ export interface components {
         | 'requires_payment_method'
         | 'succeeded'
     }
+    CsatBody: {
+      comment?: string
+      conversation_id: string
+      satisfied: boolean
+    }
+    CsatResponse_Output: {
+      /** @enum {string} */
+      result: 'success'
+    }
     CustomerResponse_Output: {
       additional_emails: string[] | null
       address?: {
@@ -8086,6 +8140,22 @@ export interface components {
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
         | 'RESIZING'
+    }
+    DbIntegritySubmitBody: {
+      idempotency_key?: string
+      metadata?: {
+        [key: string]: string
+      }
+      parameters?: {
+        [key: string]: unknown
+      }
+      rerun?: boolean
+    }
+    DbIntegrityTaskResponse_Output: {
+      error?: string
+      host_lock_yield?: unknown
+      result?: unknown
+      status: string
     }
     DeclineAuthorizationResponse_Output: {
       id: string
@@ -10859,10 +10929,10 @@ export interface components {
          */
         active: boolean
         /**
-         * @description Bytes between the current WAL location and the confirmed flush LSN.
+         * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
          * @example 2048
          */
-        confirmed_flush_lsn_bytes: number
+        confirmed_flush_lsn_bytes?: number | null
         /**
          * @description Flush lag expressed in milliseconds.
          * @example 1200
@@ -10874,10 +10944,10 @@ export interface components {
          */
         reply_time_lag?: number | null
         /**
-         * @description Bytes between the current WAL location and the slot restart LSN.
+         * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
          * @example 1024
          */
-        restart_lsn_bytes: number
+        restart_lsn_bytes?: number | null
         /**
          * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
@@ -10979,10 +11049,10 @@ export interface components {
            */
           active: boolean
           /**
-           * @description Bytes between the current WAL location and the confirmed flush LSN.
+           * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
            * @example 2048
            */
-          confirmed_flush_lsn_bytes: number
+          confirmed_flush_lsn_bytes?: number | null
           /**
            * @description Flush lag expressed in milliseconds.
            * @example 1200
@@ -10994,10 +11064,10 @@ export interface components {
            */
           reply_time_lag?: number | null
           /**
-           * @description Bytes between the current WAL location and the slot restart LSN.
+           * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
            * @example 1024
            */
-          restart_lsn_bytes: number
+          restart_lsn_bytes?: number | null
           /**
            * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
@@ -12403,8 +12473,15 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean | null
     }
-    RegionsInfo_Output: {
+    RegionsInfoPlatform_Output: {
       all: {
+        auto?: {
+          /** @enum {string} */
+          code: 'auto'
+          name: string
+          /** @enum {string} */
+          type: 'auto'
+        }
         smartGroup: {
           /** @enum {string} */
           code: 'americas' | 'emea' | 'apac'
@@ -12443,14 +12520,21 @@ export interface components {
         }[]
       }
       recommendations: {
-        smartGroup: {
+        auto?: {
+          /** @enum {string} */
+          code: 'auto'
+          name: string
+          /** @enum {string} */
+          type: 'auto'
+        }
+        smartGroup?: {
           /** @enum {string} */
           code: 'americas' | 'emea' | 'apac'
           name: string
           /** @enum {string} */
           type: 'smartGroup'
         }
-        specific: {
+        specific?: {
           /** @enum {string} */
           code:
             | 'us-east-1'
@@ -13309,9 +13393,6 @@ export interface components {
       name?: string
       /** @enum {string} */
       type?:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
         | 'webhook'
         | 'datadog'
         | 'loki'
@@ -14326,6 +14407,8 @@ export interface components {
         | 'audit_logs_read'
         | 'billing_read'
         | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -14346,8 +14429,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -16224,6 +16311,11 @@ export interface components {
             type: 'table'
           }
       )[]
+      /**
+       * @description Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.
+       * @example ap-southeast-1
+       */
+      warehouse_region?: string
     }
     WarehouseSetupResponse_Output: {
       /**
@@ -16275,6 +16367,13 @@ export interface components {
     WarehouseSetupStatusResponse_Output: {
       /** @description Whether the current disable request deletes DuckLake data. */
       delete_data?: boolean
+      /** @description Warehouse DNS delivery status. Ready means the DNS API accepted the route; client DNS caches may still be updating. */
+      dns?: {
+        hostname: string
+        region: string
+        /** @enum {string} */
+        status: 'pending' | 'ready' | 'error' | 'removed'
+      }
       /** @description Warehouse cleanup failure, when present. */
       error?: string
       /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
@@ -17849,6 +17948,96 @@ export interface operations {
       }
       /** @description Failed to retrieve clone project status */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  DatabaseDbIntegrityController_status: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        op: 'collation' | 'collation_check'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DbIntegrityTaskResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  DatabaseDbIntegrityController_submit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        op: 'collation' | 'collation_check'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DbIntegritySubmitBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DbIntegrityTaskResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -23154,7 +23343,7 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
-        /** @description Search projects by name */
+        /** @description Search projects by name, or by exact project ref */
         search?: string
         /** @description Sort order for projects */
         sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
@@ -30017,7 +30206,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo_Output']
+          'application/json': components['schemas']['RegionsInfoPlatform_Output']
         }
       }
     }
@@ -35010,6 +35199,30 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  CsatController_submit: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CsatBody']
+      }
+    }
+    responses: {
+      /** @description Survey response recorded */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CsatResponse_Output']
+        }
       }
     }
   }

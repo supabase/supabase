@@ -31,6 +31,7 @@ describe('ai/tools/schema-tools list_policies', () => {
       projectRef: 'abcdefghijklmnopqrst',
       connectionString: 'encrypted',
       authorization: 'Bearer token',
+      aiOptInLevel: 'schema',
     })
     if (!tools.list_policies.execute) throw new Error('execute is undefined')
 
@@ -51,6 +52,7 @@ describe('ai/tools/schema-tools list_policies', () => {
     const tools = getSchemaTools({
       projectRef: 'abcdefghijklmnopqrst',
       connectionString: 'encrypted',
+      aiOptInLevel: 'schema',
     })
     if (!tools.list_policies.execute) throw new Error('execute is undefined')
 
