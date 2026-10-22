@@ -2465,6 +2465,10 @@ export const ai: NavMenuConstant = {
           url: '/guides/ai/integrations/amazon-bedrock' as `/${string}`,
         },
         {
+          name: 'Fireworks AI',
+          url: '/guides/ai/integrations/fireworks-ai' as `/${string}`,
+        },
+        {
           name: 'Mixpeek',
           url: '/guides/ai/examples/mixpeek-video-search' as `/${string}`,
         },
