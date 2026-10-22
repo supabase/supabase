@@ -258,20 +258,23 @@ export function useQueryTableCommands(options?: CommandOptions) {
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
-  // starts false so mounting while open still counts as just opened.
-  // updated in the effect so an extra render cannot consume the edge first.
-  const commandMenuPreviouslyOpen = useRef(false)
+  // false until this open prefetches, so a menu that mounts already open
+  // still prefetches once the project exists. reset when it closes.
+  const hasPrefetchedThisOpen = useRef(false)
 
   const prefetchTables = usePrefetchTables({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   useEffect(() => {
-    const justOpened = commandMenuOpen && !commandMenuPreviouslyOpen.current
-    commandMenuPreviouslyOpen.current = commandMenuOpen
+    if (!commandMenuOpen) {
+      hasPrefetchedThisOpen.current = false
+      return
+    }
 
-    if (!project || !justOpened) return
+    if (hasPrefetchedThisOpen.current || !project) return
 
+    hasPrefetchedThisOpen.current = true
     prefetchTables(undefined, true)
   }, [commandMenuOpen, project, prefetchTables])
 
