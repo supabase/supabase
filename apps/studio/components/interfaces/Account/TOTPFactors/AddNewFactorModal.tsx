@@ -207,13 +207,16 @@ const SecondStep = ({
   })
 
   const [factor, setFactor] = useState<{ id: string; type: 'totp'; totp: TOTP } | null>(null)
+  const [verifiedFactorId, setVerifiedFactorId] = useState<string | null>(null)
+  const hasCompletedChallenge = !!factor && verifiedFactorId === factor.id
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
   const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      setVerifiedFactorId(variables.factorId)
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
           queryKey: organizationKeys.members(lastVisitedOrganization),
@@ -247,12 +250,12 @@ const SecondStep = ({
       title={`Verify new factor ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
-      loading={isVerifying || isLoading}
+      loading={isVerifying || isLoading || hasCompletedChallenge}
       onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
         // side effect so that it's not confusing to the user why the modal stays open while
         // unenrolling.
-        if (factor) unenroll({ factorId: factor.id })
+        if (factor && !hasCompletedChallenge) unenroll({ factorId: factor.id })
       }}
       onConfirm={form.handleSubmit(onSubmit)}
     >

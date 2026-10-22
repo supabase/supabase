@@ -21,6 +21,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
+import { BASE_PATH } from '@/lib/constants'
 
 interface RecoveryCodesModalProps<T>
   extends
@@ -185,7 +186,7 @@ export const RecoveryCodesModal = <T = unknown,>({
                 <p className="text-xs text-foreground-lighter">
                   Manage recovery codes in{' '}
                   <a
-                    href="/account/security"
+                    href={`${BASE_PATH}/account/security`}
                     target="_blank"
                     rel="noreferrer"
                     className="underline underline-offset-2 hover:text-foreground"
