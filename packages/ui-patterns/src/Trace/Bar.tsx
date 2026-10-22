@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react'
 import { cn } from 'ui'
 
 import { Duration, useSpan } from './Rows'
-import { useTrace } from './Trace'
+import { useTrace, useView } from './Trace'
 import type { SpanStatus } from './types'
 import {
   collapsedChildMidpoints,
@@ -28,6 +28,7 @@ const STATUS_CLASS: Record<SpanStatus, string> = {
 export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
   const { row, isSelected } = useSpan()
   const { nowMs } = useTrace()
+  const { isZoomed } = useView()
   const scale = useWaterfallScale()
   const { span } = row
   const { visibleStart, visibleEnd, isVisible } = getSpanBounds(span, nowMs, scale)
@@ -42,7 +43,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
         'absolute top-1/2 h-[50%] min-w-0.5 -translate-y-1/2 rounded-sm',
         STATUS_CLASS[span.status],
         'data-[state=selected]:ring-1 data-[state=selected]:ring-inset data-[state=selected]:ring-foreground',
-        LIVE_GROWTH_TRANSITION,
+        !isZoomed && LIVE_GROWTH_TRANSITION,
         className
       )}
       style={{
@@ -58,6 +59,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
 export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const { row } = useSpan()
   const { nowMs } = useTrace()
+  const { isZoomed } = useView()
   const scale = useWaterfallScale()
   const { span } = row
   const { visibleStart, visibleEnd, isVisible } = getSpanBounds(span, nowMs, scale)
@@ -92,7 +94,7 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
         'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm px-1',
         placement === 'inside' && fitsInBar && '[&>span]:text-background',
         placement === 'inside' && !fitsInBar && 'bg-background/90',
-        LIVE_GROWTH_TRANSITION,
+        !isZoomed && LIVE_GROWTH_TRANSITION,
         className
       )}
       style={{ ...position, ...style }}
@@ -135,15 +137,18 @@ export function CollapsedChildren() {
 
   return (
     <>
-      {collapsedChildMidpoints(index, row.span.id).map((ms, i) => (
-        <div
-          key={i}
-          aria-hidden
-          data-trace-collapsed-mark
-          className="pointer-events-none absolute top-1/2 h-[25%] w-px -translate-y-1/2 bg-background/70"
-          style={{ left: `${scale.toFraction(ms) * 100}%` }}
-        />
-      ))}
+      {collapsedChildMidpoints(index, row.span.id)
+        .map((ms) => scale.toFraction(ms))
+        .filter((fraction) => fraction >= 0 && fraction <= 1)
+        .map((fraction, i) => (
+          <div
+            key={i}
+            aria-hidden
+            data-trace-collapsed-mark
+            className="pointer-events-none absolute top-1/2 h-[25%] w-px -translate-y-1/2 bg-background/70"
+            style={{ left: `${fraction * 100}%` }}
+          />
+        ))}
     </>
   )
 }

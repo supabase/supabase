@@ -52,7 +52,8 @@ export default function TraceWaterfallDemo() {
   return (
     <div className="flex w-full flex-col gap-8">
       <Trace.Root trace={finished} defaultCollapsed={new Set(['db'])}>
-        <Trace.Waterfall treeWidth={220} className="h-56">
+        <Trace.Waterfall treeWidth={220} className="h-64">
+          <Trace.Minimap />
           <Trace.Ruler />
           <Trace.Grid />
           <Trace.Cursor />
@@ -69,7 +70,8 @@ export default function TraceWaterfallDemo() {
       </Trace.Root>
 
       <Trace.Root trace={live} minRangeMs={3000}>
-        <Trace.Waterfall treeWidth={220} className="h-40">
+        <Trace.Waterfall treeWidth={220} className="h-52">
+          <Trace.Minimap />
           <Trace.Ruler />
           <Trace.Grid />
           <Trace.Cursor />
