@@ -10,21 +10,21 @@ describe('viewState', () => {
     viewState = initViewState()
   })
 
-  it('Does not initiate when closing a menu that was never opened', () => {
+  it('does not initiate when closing a menu that was never opened', () => {
     viewState.setOpen(false)
 
     expect(viewState.initiated).toBe(false)
     expect(viewState.open).toBe(false)
   })
 
-  it('Initiates and opens when set open', () => {
+  it('initiates and opens when set open', () => {
     viewState.setOpen(true)
 
     expect(viewState.initiated).toBe(true)
     expect(viewState.open).toBe(true)
   })
 
-  it('Stays initiated after closing an opened menu', () => {
+  it('stays initiated after closing an opened menu', () => {
     viewState.setOpen(true)
     viewState.setOpen(false)
 
@@ -32,7 +32,7 @@ describe('viewState', () => {
     expect(viewState.open).toBe(false)
   })
 
-  it('Initiates when toggled open from closed', () => {
+  it('initiates when toggled open from closed', () => {
     viewState.toggleOpen()
 
     expect(viewState.initiated).toBe(true)
