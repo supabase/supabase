@@ -20,6 +20,7 @@ import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
 
 export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
@@ -30,7 +31,7 @@ export const RecoveryInterstitial = () => {
     process.env.NODE_ENV === 'development',
     process.env.NEXT_PUBLIC_VERCEL_ENV
   )
-  const destination = getRecoveryReturnTo(returnTo)
+  const destination = getRecoveryReturnTo(returnTo, BASE_PATH)
 
   if (mockGap)
     return (

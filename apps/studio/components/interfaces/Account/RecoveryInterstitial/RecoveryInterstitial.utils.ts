@@ -8,18 +8,23 @@ export function getRecoveryGap(findings: AccountRecoveryFinding[]): RecoveryGap 
   return null
 }
 
-export function getRecoveryReturnTo(value: string | null): string {
+export function getRecoveryReturnTo(value: string | null, basePath = ''): string {
+  const fallback = `${basePath}/organizations`
   if (!value || !value.startsWith('/') || value.startsWith('//') || /[\\\s]/.test(value)) {
-    return '/organizations'
+    return fallback
   }
   try {
     const url = new URL(value, 'https://studio.local')
-    if (url.origin !== 'https://studio.local' || url.pathname === '/account-recovery') {
-      return '/organizations'
+    const pathname =
+      basePath && (url.pathname === basePath || url.pathname.startsWith(`${basePath}/`))
+        ? url.pathname.slice(basePath.length) || '/'
+        : url.pathname
+    if (url.origin !== 'https://studio.local' || pathname === '/account-recovery') {
+      return fallback
     }
-    return `${url.pathname}${url.search}${url.hash}`
+    return `${basePath}${pathname}${url.search}${url.hash}`
   } catch {
-    return '/organizations'
+    return fallback
   }
 }
 
