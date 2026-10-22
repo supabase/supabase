@@ -31,6 +31,7 @@ export const SERVICE_FLOW_TYPES = [
   'edge-function',
   'storage',
   'postgres',
+  'supavisor',
 ] as const
 
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
@@ -47,6 +48,7 @@ const SERVICE_FLOW_TYPE_SOURCE: Record<ServiceFlowType, SafeLogSqlFragment> = {
   'edge-function': lit(LOG_TYPE_TO_SOURCE['edge function']),
   storage: lit(LOG_TYPE_TO_SOURCE.storage),
   postgres: lit(LOG_TYPE_TO_SOURCE.postgres),
+  supavisor: lit(LOG_TYPE_TO_SOURCE.supavisor),
 }
 
 export type UnifiedLogInspectionVariables = {
@@ -185,6 +187,12 @@ export async function getUnifiedLogInspection(
 
   const { isoTimestampStart, isoTimestampEnd } = getInspectionISOStartEnd(search, logTimestampMs)
 
+  // Supavisor is OTEL-only: there's no BigQuery service-flow query for it, so the
+  // detail panel falls back to the list row.
+  if (!useOtel && type === 'supavisor') {
+    return { result: [] }
+  }
+
   if (!useOtel) {
     let sql: SafeLogSqlFragment
     switch (type) {
@@ -252,6 +260,21 @@ LIMIT 1
   const row = otelData?.result?.[0]
   if (!row) {
     return { result: [] }
+  }
+
+  // Supavisor has no service-flow panel. Mirror the old logs UI, which showed the
+  // row with its full metadata, instead of the flattened HTTP-shaped entry.
+  if (type === 'supavisor') {
+    return {
+      result: [
+        {
+          id: row.id,
+          timestamp: row.timestamp,
+          event_message: row.event_message,
+          metadata: row.log_attributes ?? {},
+        } as unknown as UnifiedLogInspectionEntry,
+      ],
+    }
   }
 
   const entry = flattenOtelInspectionRow(row) as UnifiedLogInspectionEntry & Record<string, unknown>
