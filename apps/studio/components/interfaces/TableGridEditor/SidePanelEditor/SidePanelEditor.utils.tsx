@@ -27,7 +27,6 @@ import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/Fore
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
 import { SparkBar } from '@/components/ui/SparkBar'
-import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
@@ -182,7 +181,7 @@ const updateForeignKey = async ({
  * dashboard and hence do not sit within their own stores
  */
 
-/** TODO: Refactor to do in a single transaction */
+/** Creates a column and its related constraints atomically. */
 export const createColumn = async ({
   projectRef,
   connectionString,
@@ -206,11 +205,25 @@ export const createColumn = async ({
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    await createDatabaseColumn({
-      projectRef: projectRef,
-      connectionString: connectionString,
-      payload: formattedPayload,
+    const sqlStatements: Array<SafeSqlFragment> = []
+
+    const { sql: createColumnSQL } = pgMeta.columns.create({
+      schema: formattedPayload.schema,
+      table: formattedPayload.table,
+      name: formattedPayload.name,
+      type: formattedPayload.type,
+      default_value: formattedPayload.defaultValue,
+      default_value_format: formattedPayload.defaultValueFormat,
+      is_identity: formattedPayload.isIdentity,
+      identity_generation: formattedPayload.identityGeneration,
+      is_nullable: formattedPayload.isNullable,
+      is_primary_key: formattedPayload.isPrimaryKey,
+      is_unique: formattedPayload.isUnique,
+      comment: formattedPayload.comment,
+      check: formattedPayload.check,
+      no_transaction: true,
     })
+    sqlStatements.push(createColumnSQL)
 
     // Firing createColumn in createTable will bypass this block
     if (isPrimaryKey) {
@@ -219,34 +232,41 @@ export const createColumn = async ({
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
       if (existingPrimaryKeys.length > 0 && primaryKey !== undefined) {
-        await dropConstraint(
-          projectRef,
-          connectionString,
-          payload.schema,
-          payload.table,
-          primaryKey.name
+        sqlStatements.push(
+          getDropConstraintSQL({
+            schema: payload.schema,
+            table: payload.table,
+            name: primaryKey.name,
+          })
         )
       }
 
       const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
-      await addPrimaryKey(
-        projectRef,
-        connectionString,
-        payload.schema,
-        payload.table,
-        primaryKeyColumns
+      sqlStatements.push(
+        getAddPrimaryKeySQL({
+          schema: payload.schema,
+          table: payload.table,
+          columns: primaryKeyColumns,
+        })
       )
     }
 
     // Then add the foreign key constraints here
     if (foreignKeyRelations.length > 0) {
-      await addForeignKey({
-        projectRef,
-        connectionString,
+      const fkSql = getAddForeignKeySQL({
         table: { schema: payload.schema, name: payload.table },
         foreignKeys: foreignKeyRelations,
       })
+      sqlStatements.push(fkSql.replace(/;+$/, '') as SafeSqlFragment)
     }
+
+    await executeSql({
+      projectRef,
+      connectionString,
+      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';
+')}; COMMIT;`,
+      queryKey: ['column', 'create-with-constraints'],
+    })
 
     if (!skipSuccessMessage) {
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
@@ -257,7 +277,6 @@ export const createColumn = async ({
     return { error }
   }
 }
-
 /** TODO: Refactor to do in a single transaction */
 export const updateColumn = async ({
   projectRef,
