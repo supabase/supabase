@@ -4,11 +4,11 @@ import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '
 
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const AddUserDropdown = () => {

@@ -1,12 +1,18 @@
-import { parseAsArrayOf, parseAsBoolean, parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
+import {
+  parseAsArrayOf,
+  parseAsBoolean,
+  parseAsString,
+  parseAsStringEnum,
+  useQueryState,
+} from 'nuqs'
 import { Dispatch, RefObject, SetStateAction, useEffect, useState } from 'react'
 import type { CellKeyboardEvent, DataGridHandle } from 'react-data-grid'
 
 import { MAX_BULK_DELETE } from './Users.constants'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { User } from '@/data/auth/users-infinite-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 

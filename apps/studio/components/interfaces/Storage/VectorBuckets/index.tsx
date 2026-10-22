@@ -15,10 +15,10 @@ import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
 import { VectorBucketsErrorState } from './VectorBucketsErrorState'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { createNavigationHandler } from '@/lib/navigation'
 
 /**

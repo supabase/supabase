@@ -25,12 +25,12 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { AlertError } from '@/components/ui/AlertError'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {

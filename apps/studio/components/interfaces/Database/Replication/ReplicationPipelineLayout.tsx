@@ -47,11 +47,6 @@ import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from '@/state/replication-pipeline-request-status'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -61,7 +56,12 @@ import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { DOCS_URL } from '@/lib/constants'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 import { type ResponseError } from '@/types'
 
 type LifecycleAction = 'start' | 'stop' | 'restart'

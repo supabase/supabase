@@ -4,17 +4,17 @@ import { parseAsBoolean } from 'nuqs'
 import { useEffect } from 'react'
 import { LogoLoader } from 'ui'
 
-import {
-  FGA_PERMISSIONS,
-  useAsyncCheckUserContentPermissions,
-} from '@/hooks/misc/useCheckPermissionsV2'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { ObservabilityOverview } from '@/components/interfaces/Observability/ObservabilityOverview'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
 import { useContentQuery } from '@/data/content/content-query'
+import {
+  FGA_PERMISSIONS,
+  useAsyncCheckUserContentPermissions,
+} from '@/hooks/misc/useCheckPermissionsV2'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import type { NextPageWithLayout } from '@/types'
 
 export const UserReportPage: NextPageWithLayout = () => {

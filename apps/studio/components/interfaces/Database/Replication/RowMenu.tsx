@@ -28,16 +28,16 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from '@/state/replication-pipeline-request-status'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
 import type { ResponseError } from '@/types'
 
 interface RowMenuProps {

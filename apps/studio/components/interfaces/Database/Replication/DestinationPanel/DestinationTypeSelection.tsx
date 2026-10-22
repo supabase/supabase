@@ -21,8 +21,8 @@ import {
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 interface DestinationTypeOption {
   value: DestinationType

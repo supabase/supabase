@@ -24,7 +24,6 @@ import {
 } from 'ui'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
-import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 
 import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
 import { DeleteBucketModal } from '@/components/interfaces/Storage/FilesBuckets/DeleteBucketModal'
@@ -38,6 +37,7 @@ import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
+import { usePanelQueryState } from '@/hooks/ui/usePanelQueryState'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
 

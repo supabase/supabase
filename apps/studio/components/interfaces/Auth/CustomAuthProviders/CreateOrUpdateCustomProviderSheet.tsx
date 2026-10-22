@@ -33,14 +33,14 @@ import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import {
-  useOAuthCustomProviderUpdateMutation,
-  type OAuthCustomProviderUpdateVariables,
-} from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FormSectionLabel } from '@/components/ui/Forms/FormSection'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useOAuthCustomProviderCreateMutation } from '@/data/oauth-custom-providers/oauth-custom-provider-create-mutation'
+import {
+  useOAuthCustomProviderUpdateMutation,
+  type OAuthCustomProviderUpdateVariables,
+} from '@/data/oauth-custom-providers/oauth-custom-provider-update-mutation'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 interface CreateOrUpdateCustomProviderSheetProps {
