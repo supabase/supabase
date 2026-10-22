@@ -9,12 +9,13 @@ import { ForeignRowSelector } from './ForeignRowSelector/ForeignRowSelector'
 import { HeaderTitle } from './HeaderTitle'
 import { InputField } from './InputField'
 import { JsonEditor } from './JsonEditor'
-import type { EditValue, RowField } from './RowEditor.types'
+import type { EditValue, RowEditorMode, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  prepareRowForDuplication,
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
@@ -26,6 +27,7 @@ import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
+  mode?: RowEditorMode
   selectedTable: PGTable
   visible: boolean
   editable?: boolean
@@ -38,6 +40,7 @@ const formId = 'row-editor-panel'
 
 export const RowEditor = ({
   row,
+  mode,
   selectedTable,
   visible = false,
   editable = true,
@@ -58,7 +61,8 @@ export const RowEditor = ({
   const [isSelectingForeignKey, setIsSelectingForeignKey] = useState<boolean>(false)
   const [referenceRow, setReferenceRow] = useState<RowField>()
 
-  const isNewRecord = row === undefined
+  const resolvedMode: RowEditorMode = mode ?? (row === undefined ? 'new' : 'edit')
+  const isNewRecord = resolvedMode !== 'edit'
   const isEditingText = selectedValueForTextEdit !== undefined
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
@@ -93,8 +97,10 @@ export const RowEditor = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable, foreignKeys)
-      setRowFields(rowFields)
+      const sourceRow =
+        resolvedMode === 'duplicate' && row ? prepareRowForDuplication(row, selectedTable) : row
+      const nextRowFields = generateRowFields(sourceRow, selectedTable, foreignKeys)
+      setRowFields(nextRowFields)
     }
   }, [visible])
 
@@ -179,7 +185,7 @@ export const RowEditor = ({
       size="large"
       key="RowEditor"
       visible={visible}
-      header={<HeaderTitle isNewRecord={isNewRecord} tableName={selectedTable.name} />}
+      header={<HeaderTitle mode={resolvedMode} tableName={selectedTable.name} />}
       className={`transition-all duration-100 ease-in ${
         isEditingText || isEditingJson || isSelectingForeignKey ? ' mr-32' : ''
       }`}

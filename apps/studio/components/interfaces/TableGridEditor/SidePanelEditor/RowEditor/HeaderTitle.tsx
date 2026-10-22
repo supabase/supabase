@@ -1,13 +1,15 @@
+import { getRowEditorHeader } from './HeaderTitle.utils'
+import type { RowEditorMode } from './RowEditor.types'
+
 interface HeaderTitleProps {
-  isNewRecord: boolean
+  mode: RowEditorMode
   tableName?: string
 }
 
-export const HeaderTitle = ({ isNewRecord, tableName }: HeaderTitleProps) => {
-  let header = `${isNewRecord ? 'Add new' : 'Update'} row ${isNewRecord ? 'to' : 'from'} `
+export const HeaderTitle = ({ mode, tableName }: HeaderTitleProps) => {
   return (
     <span>
-      {header}
+      {getRowEditorHeader(mode)}
       {tableName && <code className="text-sm!">{tableName}</code>}
     </span>
   )

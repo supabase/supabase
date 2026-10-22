@@ -887,6 +887,7 @@ export const SidePanelEditor = ({
       {!isUndefined(selectedTable) && (
         <RowEditor
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
+          mode={snap.sidePanel?.type === 'row' ? snap.sidePanel.mode : undefined}
           selectedTable={selectedTable}
           visible={snap.sidePanel?.type === 'row'}
           editable={editable}
