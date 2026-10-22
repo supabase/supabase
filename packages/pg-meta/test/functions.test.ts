@@ -412,3 +412,37 @@ withTestDatabase(
     await executeQuery(removeSql)
   }
 )
+
+withTestDatabase(
+  'retrieve function with config_params values containing =',
+  async ({ executeQuery }) => {
+    const { sql: createSql } = pgMeta.functions.create({
+      name: 'test_func_config_equals',
+      schema: 'public',
+      definition: 'select 1',
+      return_type: safeSql`integer`,
+      language: 'sql',
+      config_params: {
+        application_name: safeSql`'tenant=blue=west'`,
+        search_path: safeSql`"tenant=blue", public`,
+      },
+    })
+    await executeQuery(createSql)
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_func_config_equals',
+      schema: 'public',
+      args: [],
+    })
+    const result = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    expect(result).toBeDefined()
+    expect(result!.config_params).toEqual({
+      application_name: 'tenant=blue=west',
+      search_path: '"tenant=blue", public',
+    })
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(result!))
+    await executeQuery(removeSql)
+  }
+)
