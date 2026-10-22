@@ -187,12 +187,6 @@ export async function getUnifiedLogInspection(
 
   const { isoTimestampStart, isoTimestampEnd } = getInspectionISOStartEnd(search, logTimestampMs)
 
-  // Supavisor is OTEL-only: there's no BigQuery service-flow query for it, so the
-  // detail panel falls back to the list row.
-  if (!useOtel && type === 'supavisor') {
-    return { result: [] }
-  }
-
   if (!useOtel) {
     let sql: SafeLogSqlFragment
     switch (type) {
@@ -262,8 +256,8 @@ LIMIT 1
     return { result: [] }
   }
 
-  // Supavisor has no service-flow panel. Mirror the old logs UI, which showed the
-  // row with its full metadata, instead of the flattened HTTP-shaped entry.
+  // Supavisor rows aren't HTTP requests, so skip the flattened HTTP-shaped entry and
+  // return the raw attributes as `metadata` for the supavisor block and Raw JSON tab.
   if (type === 'supavisor') {
     return {
       result: [
