@@ -212,9 +212,12 @@ describe('useQueryTableCommands', () => {
   })
 
   it('prefetches tables when the project changes while the menu is open', async () => {
-    mockProjectDetail(({ params }) =>
-      HttpResponse.json<ProjectDetailResponse>(projectWithRef(String(params.ref)))
-    )
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: ({ params }) =>
+        HttpResponse.json<ProjectDetailResponse>(projectWithRef(String(params.ref))),
+    })
     const { prefetchQuery, rerender } = renderMountedMenu()
 
     rerender(<MenuToggle open />)
