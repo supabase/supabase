@@ -258,19 +258,22 @@ export function useQueryTableCommands(options?: CommandOptions) {
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
-  const commandMenuPreviouslyOpen = useRef(commandMenuOpen)
-  const commandMenuJustOpened = commandMenuOpen && !commandMenuPreviouslyOpen.current
-  commandMenuPreviouslyOpen.current = commandMenuOpen
+  // starts false so mounting while open still counts as just opened.
+  // updated in the effect so an extra render cannot consume the edge first.
+  const commandMenuPreviouslyOpen = useRef(false)
 
   const prefetchTables = usePrefetchTables({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   useEffect(() => {
-    if (project && commandMenuJustOpened) {
-      prefetchTables(undefined, true)
-    }
-  }, [project, prefetchTables, commandMenuJustOpened])
+    const justOpened = commandMenuOpen && !commandMenuPreviouslyOpen.current
+    commandMenuPreviouslyOpen.current = commandMenuOpen
+
+    if (!project || !justOpened) return
+
+    prefetchTables(undefined, true)
+  }, [commandMenuOpen, project, prefetchTables])
 
   useRegisterPage(
     QUERY_TABLE_PAGE_NAME,
