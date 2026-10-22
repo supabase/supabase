@@ -237,13 +237,8 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/blog/2021/03/08/toad-a-link-shorterner-with-simple-apis-for-low-coders',
-    destination: '/blog/2021/03/08/toad-a-link-shortener-with-simple-apis-for-low-coders',
-  },
-  {
-    permanent: false,
     source: '/blog/2020/07/10/surviving-hacker-news',
-    destination: '/blog/2020/07/10/alpha-launch-postmortem',
+    destination: '/blog/alpha-launch-postmortem',
   },
   {
     permanent: false,
@@ -385,7 +380,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/library/getting-started',
-    destination: '/docs/reference/javascript/supabase-client',
+    destination: '/docs/guides/getting-started',
   },
   {
     permanent: false,
@@ -441,7 +436,7 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/client/supabase-client',
-    destination: '/docs/reference/javascript/supabase-client',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: false,
@@ -645,11 +640,6 @@ module.exports = [
   },
   {
     permanent: false,
-    source: '/docs/client/gte',
-    destination: '/docs/reference/javascript/using-filters-gte',
-  },
-  {
-    permanent: false,
     source: '/docs/client/cs',
     destination: '/docs/reference/javascript/using-filters-contains',
   },
@@ -728,17 +718,17 @@ module.exports = [
     destination: 'https://about.supabase.com/careers//:match*',
   },
 
-  { permanent: false, source: '/docs/resources', destination: '/docs/guides' },
+  { permanent: false, source: '/docs/resources', destination: '/docs' },
 
   {
     permanent: false,
     source: '/docs/reference/postgres/getting-started',
-    destination: '/docs/guides/database/introduction',
+    destination: '/docs/guides/database/overview',
   },
   {
     permanent: false,
     source: '/reference/postgres/connection-strings',
-    destination: '/docs/guides/database/connecting/connecting-to-postgres',
+    destination: '/docs/guides/database/connecting-to-postgres',
   },
   {
     permanent: false,
@@ -753,17 +743,17 @@ module.exports = [
   {
     permanent: false,
     source: '/docs/guides/database/resource-management',
-    destination: '/docs/guides/database/timeouts',
+    destination: '/docs/guides/database/postgres/configuration',
   },
   {
     permanent: false,
     source: '/docs/reference/postgres/database-passwords',
-    destination: '/docs/guides/database/managing-passwords',
+    destination: '/docs/guides/database/postgres/roles#passwords',
   },
   {
     permanent: false,
     source: '/docs/reference/postgres/changing-timezones',
-    destination: '/docs/guides/database/managing-timezones',
+    destination: '/docs/guides/database/postgres/configuration',
   },
   {
     permanent: false,
@@ -793,12 +783,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/delete-user',
-    destination: '/docs/reference/javascript/auth-api-deleteuser',
+    destination: '/docs/reference/javascript/auth-admin-deleteuser',
   },
   {
     permanent: true,
     source: '/docs/reference/javascript/reset-password-email',
-    destination: '/docs/reference/javascript/auth-api-resetpasswordforemail',
+    destination: '/docs/reference/javascript/auth-resetpasswordforemail',
   },
   {
     permanent: true,
@@ -818,12 +808,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides',
-    destination: '/docs/',
+    destination: '/docs',
   },
   {
     permanent: true,
     source: '/docs/guides/database/introduction',
-    destination: '/docs/guides/database',
+    destination: '/docs/guides/database/overview',
   },
   {
     permanent: false,
@@ -833,7 +823,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/javascript/supabase-client',
-    destination: '/docs#reference-documentation',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: true,
@@ -858,7 +848,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2020/05/01/supabase-alpha-april-2020',
-    destination: 'blog/supabase-alpha-april-2020',
+    destination: '/blog/supabase-alpha-april-2020',
   },
   {
     permanent: true,
@@ -1018,7 +1008,7 @@ module.exports = [
   {
     permanent: true,
     source: '/blog/2021/03/29/pricing',
-    destination: '/blog/pricing',
+    destination: '/pricing',
   },
   {
     permanent: true,
@@ -1405,7 +1395,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/cli/config-reference',
-    destination: '/docs/reference/cli/config',
+    destination: '/docs/guides/local-development/cli/config',
   },
   {
     permanent: true,
@@ -1466,7 +1456,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/reference/tools/reference-auth',
-    destination: '/docs/reference/auth',
+    destination: '/docs/guides/auth',
   },
   {
     permanent: true,
@@ -1503,27 +1493,27 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/client-libraries',
-    destination: '/docs#reference-documentation',
+    destination: '/docs/reference/javascript/introduction',
   },
   {
     permanent: true,
     source: '/docs/reference/auth-helpers',
-    destination: '/docs/guides/auth/auth-helpers/',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: true,
     source: '/docs/reference/auth-helpers/next-js',
-    destination: '/docs/guides/auth/auth-helpers/nextjs',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: true,
     source: '/docs/reference/auth-helpers/sveltekit',
-    destination: '/docs/guides/auth/auth-helpers/sveltekit',
+    destination: '/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
   },
   {
     permanent: true,
     source: '/docs/guides/database/migrating-between-projects',
-    destination: '/docs/guides/platform/migrating-and-upgrading-projects',
+    destination: '/docs/guides/platform/migrating-within-supabase',
   },
 
   // supabase-js v1 to v2 redirects
@@ -1645,7 +1635,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/cicd-workflows',
-    destination: '/docs/guides/cli/managing-environments',
+    destination: '/docs/guides/deployment/managing-environments',
   },
 
   // supabase-flutter v0 to v1 redirects
@@ -1705,12 +1695,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/going-into-prod',
-    destination: '/docs/guides/platform/going-into-prod',
+    destination: '/docs/guides/deployment/going-into-prod',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/disk-usage',
-    destination: '/docs/guides/platform/database-usage',
+    destination: '/docs/guides/platform/database-size',
   },
   {
     permanent: true,
@@ -1735,7 +1725,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/storage-cdn',
-    destination: '/docs/guides/storage/cdn',
+    destination: '/docs/guides/storage/cdn/fundamentals',
   },
   {
     permanent: true,
@@ -1781,7 +1771,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/oss',
-    destination: '/oss',
+    destination: '/open-source',
   },
   {
     permanent: true,
@@ -1831,23 +1821,23 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/passwordless-login/phone-sms-otp-messagebird',
-    destination: '/docs/guides/auth/phone-login/messagebird',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
   },
   { permanent: true, source: '/docs/guides/auth/overview', destination: '/docs/guides/auth' },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-messagebird',
-    destination: '/docs/guides/auth/phone-login/messagebird',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=MessageBird',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-twilio',
-    destination: '/docs/guides/auth/phone-login/twilio',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=Twilio',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/auth-vonage',
-    destination: '/docs/guides/auth/phone-login/vonage',
+    destination: '/docs/guides/auth/phone-login?showSmsProvider=Vonage',
   },
   {
     permanent: true,
@@ -2072,42 +2062,42 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/resources/supabase-cli',
-    destination: '/docs/guides/cli',
+    destination: '/docs/guides/local-development',
   },
   {
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/local-development',
-    destination: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/local-development',
   },
   {
     permanent: true,
     source: '/docs/guides/resources/supabase-cli/managing-environments',
-    destination: '/docs/guides/cli/managing-environments',
+    destination: '/docs/guides/deployment/managing-environments',
   },
   {
     permanent: true,
     source: '/docs/guides/auth/migrations/auth0',
-    destination: '/docs/guides/resources/migrating-to-supabase/auth0',
+    destination: '/docs/guides/platform/migrating-to-supabase/auth0',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/firestore-data',
-    destination: '/docs/guides/resources/migrating-to-supabase/firestore-data',
+    destination: '/docs/guides/platform/migrating-to-supabase/firestore-data',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/firebase-auth',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-auth',
+    destination: '/docs/guides/platform/migrating-to-supabase/firebase-auth',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/firebase-storage',
-    destination: '/docs/guides/resources/migrating-to-supabase/firebase-storage',
+    destination: '/docs/guides/platform/migrating-to-supabase/firebase-storage',
   },
   {
     permanent: true,
     source: '/docs/guides/migrations/heroku',
-    destination: '/docs/guides/resources/migrating-to-supabase/heroku',
+    destination: '/docs/guides/platform/migrating-to-supabase/heroku',
   },
   {
     permanent: true,
@@ -2177,7 +2167,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/handbook/supasquad',
-    destination: '/supasquad',
+    destination: '/open-source/contributing/supasquad',
   },
   {
     permanent: true,
@@ -2207,7 +2197,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/examples',
-    destination: '/docs/guides/resources/examples',
+    destination: '/docs/guides/getting-started',
   },
   {
     permanent: true,
@@ -2417,12 +2407,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/using-environment-variables-in-config',
-    destination: '/docs/guides/cli/managing-config',
+    destination: '/docs/guides/local-development/managing-config',
   },
   {
     permanent: true,
     source: '/docs/guides/getting-started/local-development',
-    destination: '/docs/guides/cli/local-development',
+    destination: '/docs/guides/local-development',
   },
   {
     permanent: true,
@@ -2549,12 +2539,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/oauth-apps/authorize-an-oauth-app',
-    destination: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/oauth-apps/publish-an-oauth-app',
-    destination: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration#create-an-oauth-app',
   },
   {
     permanent: true,
@@ -2677,29 +2667,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/publish-an-oauth-app',
-    destination:
-      '/docs/guides/platform/oauth-apps/build-a-supabase-integration#create-an-oauth-app',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration#create-an-oauth-app',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/authorize-an-oauth-app',
-    destination: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/build-a-supabase-integration',
     destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
-  { permanent: true, source: '/docs/reference/cli/config', destination: '/docs/guides/cli/config' },
+  {
+    permanent: true,
+    source: '/docs/reference/cli/config',
+    destination: '/docs/guides/local-development/cli/config',
+  },
   {
     permanent: true,
     source: '/docs/guides/database/timeouts',
-    destination: '/docs/guides/database/postgres/configuration',
+    destination: '/docs/guides/database/postgres/timeouts',
   },
   {
     permanent: true,
     source: '/docs/guides/database/managing-timezones',
-    destination: '/docs/guides/database/postgres/configuration',
+    destination: '/docs/guides/database/postgres/configuration#managing-timezones',
   },
   {
     permanent: true,
@@ -2734,7 +2727,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/auth-magic-link',
-    destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
+    destination: '/docs/guides/auth/auth-email-passwordless',
   },
   {
     permanent: true,
@@ -2764,12 +2757,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-deep-dive-jwts',
-    destination: '/docs/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
+    destination: '/docs/guides/auth/jwts',
   },
   {
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-row-level-security',
-    destination: '/docs/guides/auth/auth-deep-dive/auth-row-level-security',
+    destination: '/docs/guides/database/postgres/row-level-security',
   },
   {
     permanent: true,
@@ -2779,17 +2772,17 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-policies',
-    destination: '/docs/guides/auth/auth-deep-dive/auth-policies',
+    destination: '/docs/guides/database/postgres/row-level-security',
   },
   {
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-gotrue',
-    destination: '/docs/guides/auth/auth-deep-dive/auth-gotrue',
+    destination: '/docs/guides/auth/architecture',
   },
   {
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-google-oauth',
-    destination: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
+    destination: '/docs/guides/auth/social-login/auth-google',
   },
   {
     permanent: true,
@@ -2873,13 +2866,8 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/column-level-security',
-    destination: '/docs/guides/database/postgres/column-level-security',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/auth/custom-claims-and-role-based-access-control-rbac',
-    destination: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/api/custom-claims-and-role-based-access-control-rbac',
   },
   {
     permanent: true,
@@ -3060,7 +3048,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/enterprise-billing',
-    destination: '/docs/guides/platform/org-based-billing',
+    destination: '/docs/guides/platform/billing-on-supabase',
   },
   {
     permanent: true,
@@ -3168,7 +3156,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/oauth-apps/build-a-supabase-integration',
-    destination: '/docs/guides/integrations/build-a-supabase-integration',
+    destination: '/docs/guides/integrations/build-a-supabase-oauth-integration',
   },
   {
     permanent: true,
@@ -3178,57 +3166,57 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/logs',
-    destination: '/docs/guides/monitoring-troubleshooting/logs',
+    destination: '/docs/guides/observability/logs',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/metrics',
-    destination: '/docs/guides/monitoring-troubleshooting/metrics',
+    destination: '/docs/guides/observability/metrics',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/sentry-monitoring',
-    destination: '/docs/guides/monitoring-troubleshooting/sentry-monitoring',
+    destination: '/docs/guides/observability/sentry-monitoring',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/advanced-log-filtering',
-    destination: '/docs/guides/monitoring-troubleshooting/advanced-log-filtering',
+    destination: '/docs/guides/observability/advanced-log-filtering',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-disk-io',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
+    destination: '/kb/troubleshooting/exhaust-disk-io',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-cpu',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
+    destination: '/kb/troubleshooting/high-cpu-usage',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-ram',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
+    destination: '/kb/troubleshooting/exhaust-ram',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/exhaust-swap',
-    destination: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
+    destination: '/kb/troubleshooting/exhaust-swap',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/http-status-codes',
-    destination: '/docs/guides/monitoring-troubleshooting/http-status-codes',
+    destination: '/kb/troubleshooting/http-status-codes',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/troubleshooting',
-    destination: '/docs/guides/monitoring-troubleshooting/troubleshooting',
+    destination: '/kb/troubleshooting/http-api-issues',
   },
   {
     permanent: true,
     source: '/docs/guides/platform/log-drains',
-    destination: '/docs/guides/monitoring-troubleshooting/log-drains',
+    destination: '/docs/guides/observability/log-drains',
   },
   {
     // [Charis] This is a nice URL and I'm not 100% on permanently
@@ -3241,32 +3229,32 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/troubleshooting',
-    destination: '/docs/guides/troubleshooting/http-api-issues',
+    destination: '/kb/troubleshooting/http-api-issues',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-disk-io',
-    destination: '/docs/guides/troubleshooting/exhaust-disk-io',
+    destination: '/kb/troubleshooting/exhaust-disk-io',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-ram',
-    destination: '/docs/guides/troubleshooting/exhaust-ram',
+    destination: '/kb/troubleshooting/exhaust-ram',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-swap',
-    destination: '/docs/guides/troubleshooting/exhaust-swap',
+    destination: '/kb/troubleshooting/exhaust-swap',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/exhaust-cpu',
-    destination: '/docs/guides/troubleshooting/high-cpu-usage',
+    destination: '/kb/troubleshooting/high-cpu-usage',
   },
   {
     permanent: true,
     source: '/docs/guides/monitoring-troubleshooting/http-status-codes',
-    destination: '/docs/guides/troubleshooting/http-status-codes',
+    destination: '/kb/troubleshooting/http-status-codes',
   },
   {
     permanent: true,
@@ -3311,7 +3299,7 @@ module.exports = [
   {
     permanent: false,
     source: '/mcp',
-    destination: '/docs/guides/getting-started/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
   },
 
   // marketing
@@ -3344,11 +3332,6 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/getting-started/plugins',
     destination: '/docs/guides/ai-tools/plugins',
-  },
-  {
-    permanent: true,
-    source: '/docs/guides/getting-started/ai-prompts',
-    destination: '/docs/guides/ai-tools/ai-prompts',
   },
   {
     permanent: true,
@@ -3828,8 +3811,13 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/troubleshooting',
+    destination: '/kb/topics/troubleshooting',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password',
-    destination: '/docs/guides/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
+    destination: '/kb/troubleshooting/how-do-i-reset-my-supabase-database-password-oTs5sB',
   },
   {
     permanent: true,
