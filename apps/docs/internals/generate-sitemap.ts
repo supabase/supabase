@@ -8,11 +8,9 @@ import { globby } from 'globby'
 import matter from 'gray-matter'
 import prettier from 'prettier'
 
-import { generateCLIPages } from './files/cli'
 import { generateReferencePages } from './files/reference-lib'
 
 async function generate() {
-  const cliPages = generateCLIPages()
   const referencePages = await generateReferencePages()
 
   const contentFiles = await globby(['content/guides/**/!(_)*.mdx'])
@@ -42,8 +40,7 @@ async function generate() {
 
   const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
     troubleshootingPages,
-    referencePages,
-    cliPages
+    referencePages
   )
   // Keep the output order stable across builds
   allPages.sort((a, b) => (a.link < b.link ? -1 : a.link > b.link ? 1 : 0))
