@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getComputeCpuLabel, isSharedComputeSize } from './compute-labels'
+import { getComputeCpuLabel, getComputeSizeLabel, isSharedComputeSize } from './compute-labels'
 
 describe('isSharedComputeSize', () => {
   it('treats sizes below Large as shared', () => {
@@ -38,5 +38,26 @@ describe('getComputeCpuLabel', () => {
 
   it('falls back to a generic dedicated label without a count', () => {
     expect(getComputeCpuLabel('large')).toBe('Dedicated compute')
+  })
+})
+
+describe('getComputeSizeLabel', () => {
+  it('maps infra compute sizes to display labels', () => {
+    expect(getComputeSizeLabel('nano')).toBe('Nano')
+    expect(getComputeSizeLabel('medium')).toBe('Medium')
+    expect(getComputeSizeLabel('xlarge')).toBe('XL')
+    expect(getComputeSizeLabel('2xlarge')).toBe('2XL')
+    expect(getComputeSizeLabel('48xlarge_high_memory')).toBe('48XL - High Memory')
+  })
+
+  it('accepts addon variant identifiers and mixed case', () => {
+    expect(getComputeSizeLabel('ci_micro')).toBe('Micro')
+    expect(getComputeSizeLabel('Medium')).toBe('Medium')
+  })
+
+  it('returns undefined for unknown or missing values instead of leaking them', () => {
+    expect(getComputeSizeLabel('t4g.small')).toBeUndefined()
+    expect(getComputeSizeLabel(undefined)).toBeUndefined()
+    expect(getComputeSizeLabel(null)).toBeUndefined()
   })
 })
