@@ -1039,10 +1039,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     },
   },
   {
-    title: 'Social login',
-    subtitle: 'Provide social logins from platforms like Apple, GitHub, and Slack.',
+    title: 'Social sign-in',
+    subtitle: 'Provide social sign-in from platforms like Apple, GitHub, and Slack.',
     description: `
-Supabase's Social Login feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
+Supabase's Social Sign-in feature enables users to authenticate using their existing accounts from popular social platforms and services, providing a streamlined, password-free access to your application.
 
 ## Key features
 1. Multiple provider support: Integrate with various platforms like Google, Facebook, Twitter, and more.
@@ -1057,14 +1057,14 @@ Supabase's Social Login feature enables users to authenticate using their existi
 - Enhanced security: Leverage the robust security measures of established platforms.
 - Rich user profiles: Access additional user data to personalize experiences.
 
-## Social login is valuable for:
+## Social sign-in is valuable for:
 - Mobile apps seeking to minimize user input
 - E-commerce platforms aiming to reduce cart abandonment
 - Content platforms looking to personalize user experiences
 - Community-driven websites fostering user engagement
 - B2B applications integrating with professional networks
 
-Supabase's Social Login feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
+Supabase's Social Sign-in feature allows you to improve user experience and potentially increase signup rates while maintaining security and control over user authentication.
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.AUTHENTICATION],
@@ -1998,6 +1998,47 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     slug: 'supabase-middleware',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Server SDK',
+    subtitle: "Extend your app to users' agents with your Auth and RLS.",
+    description: `
+Use the Server SDK to give your Supabase app its own MCP server, so your users connect from Claude, Cursor, or ChatGPT (in developer mode) and work with their own records. They sign in with the account they already have, and every tool call runs as that user, so the RLS policies already in your database decide what the agent can read. If your app runs on Supabase Postgres and Supabase Auth, the access rules are already written.
+
+The same SDK, \`@supabase/server\`, checks who's calling your Edge Functions and other server code. The Supabase MCP server is separate: it connects your coding agent to your project so you can build the app.
+
+## Key benefits
+1. Give each agent the user's own view: Every tool call runs as the signed-in user, so a user's agent sees what that user can see in your app.
+2. Reuse the RLS you already wrote: The RLS policies that scope your web app decide what each MCP client can read, with no per-tool authorization code.
+3. Let users sign in with the account they have: Supabase Auth runs the OAuth 2.1 flow, dynamic client registration included, so users approve the MCP client once and never make a new account.
+4. Let users manage their own agents: The OAuth grant management endpoints list connected clients, and the Headless App block ships an \`/agents\` page for it. A user removes an agent's access from inside your app.
+5. Start from two blocks: The MCP Server block installs the Edge Function with a \`whoami\` tool. The OAuth Consent block adds the \`/oauth/consent\` route for Next.js, React, React Router, or TanStack Start.
+6. Keep your runtime: The same code also runs off Edge Functions, in a Next.js route handler, a SvelteKit endpoint, Cloudflare Workers, or a Node, Bun, or Deno server. There, you set the server URLs yourself.
+
+## When to use the Server SDK
+- Users of your CRM, ops, or analytics tool want to work on their own records from Claude, ChatGPT, Cursor, or VS Code (tool calls scoped by the RLS policies on those tables)
+- Staff need agent access to company data as themselves, with the row filters the web app already applies (a user session for every tool call, through your existing login)
+- You run a separate Express server beside your project to own one \`.well-known\` route (one Edge Function replaces it, with OAuth discovery served by the middleware)
+
+## How it works
+Turn on the OAuth 2.1 server and dynamic client registration under Authentication > OAuth Server. Host a consent screen in your frontend at the Auth Site URL. The project must sign JWTs with an asymmetric key (ES256 or RS256). Your function composes \`withOAuthProtectedResource()\` and \`withSupabase({ auth: 'user' })\` in a \`pipeline\` ahead of your MCP handler and sets \`verify_jwt = false\`. The first serves the protected resource metadata and the \`WWW-Authenticate\` challenge, so an MCP client needs the server URL and nothing else. The second rejects requests without a valid user token and hands your handler a client for that user, so anything a tool reads or writes goes through RLS. Test your RLS policies before you connect agents.
+
+## Get started
+- Start from the [Server SDK reference](https://supabase.com/docs/reference/server/introduction).
+- Run \`npx shadcn@latest add https://supabase.com/library/r/mcp.json\` to install the [MCP Server block](https://supabase.com/library/docs/headless/mcp).
+- Follow [Add authentication](https://supabase.com/docs/guides/ai-tools/byo-mcp#add-authentication) in the Deploy MCP servers guide.
+- Read the [authenticated example](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/mcp/authenticated-mcp-server) with the \`todos\` tools, migration, and RLS policy.
+`,
+    icon: Server,
+    products: [PRODUCT_SHORTNAMES.AUTHENTICATION, PRODUCT_SHORTNAMES.FUNCTIONS],
+    heroImage: '',
+    hideHero: true,
+    docsUrl: 'https://supabase.com/docs/reference/server/introduction',
+    slug: 'server-sdk',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
