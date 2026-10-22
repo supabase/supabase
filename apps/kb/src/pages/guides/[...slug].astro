@@ -7,17 +7,26 @@ import { Admonition } from 'ui-patterns/Admonition'
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
 import { relatedGuides, toSummary } from '../../lib/guides'
 import { breadcrumbListSchema, canonicalUrl, KB_BASE_URL, techArticleSchema } from '../../lib/json-ld'
+import { getLastEdited } from '../../lib/git-last-edited'
 
 export async function getStaticPaths() {
 	const guides = await getCollection('guides')
 	const summaries = guides.map(toSummary)
-	return guides.map((guide) => ({
-		params: { slug: guide.id },
-		props: { guide, related: relatedGuides({ guide: toSummary(guide), guides: summaries }) },
-	}))
+	const lastEditedByPath = await getLastEdited(['src/content/guides'])
+	return guides.map((guide) => {
+		const iso = lastEditedByPath.get(guide.filePath ?? '')
+		return {
+			params: { slug: guide.id },
+			props: {
+				guide,
+				related: relatedGuides({ guide: toSummary(guide), guides: summaries }),
+				lastEdited: iso ? new Date(iso) : undefined,
+			},
+		}
+	})
 }
 
-const { guide, related } = Astro.props
+const { guide, related, lastEdited } = Astro.props
 const { title, description, topics, github_url, date } = guide.data
 const { Content, headings } = await render(guide)
 const toc = headings
@@ -46,6 +55,7 @@ const jsonLd = [
 	github_url={github_url}
 	viewGitHubLink={viewGitHubLink}
 	date={date}
+	lastEdited={lastEdited}
 	jsonLd={jsonLd}
 	toc={toc}
 	related={related}

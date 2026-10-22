@@ -20,6 +20,7 @@ interface Props {
 	github_url?: string
 	viewGitHubLink?: string
 	date?: string
+	lastEdited?: Date
 	toc?: TOCItemType[]
 	jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 	related?: RelatedGuides | null
@@ -32,10 +33,18 @@ const {
 	github_url,
 	viewGitHubLink,
 	date,
+	lastEdited,
 	toc = [],
 	jsonLd,
 	related,
 } = Astro.props
+// Formatted in UTC so the label doesn't shift with the build machine's timezone.
+const lastEditedLabel = lastEdited?.toLocaleDateString('en-US', {
+	year: 'numeric',
+	month: 'long',
+	day: 'numeric',
+	timeZone: 'UTC',
+})
 const pagePath = Astro.url.pathname.replace(/\/$/, '')
 // the `<page>.md` redirect only exists on vercel (vercel.json), so fetch the generated file directly
 const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta.env.BASE_URL}/markdown`)}.md`
@@ -78,6 +87,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 			</Breadcrumb>
 			<header class="mb-8">
 				<h1 class="mt-0 mb-0 text-balance">{title}</h1>
+				{lastEditedLabel && <p class="not-prose mt-3 text-sm text-foreground-lighter">Last edited: {lastEditedLabel}</p>}
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
 			<slot />
