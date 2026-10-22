@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useUser } from 'common'
 import { ArrowRight } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -18,8 +19,15 @@ import {
 } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { profileKeys } from '@/data/profile/keys'
+import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  clearRecoveryReminderSnooze,
+  getRemainingRecoveryGap,
+  writeRecoveryReminderSnooze,
+} from '@/lib/account-recovery/recovery-reminder'
 
 export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
@@ -46,6 +54,7 @@ export const RecoveryInterstitial = () => {
 
 const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const user = useUser()
+  const queryClient = useQueryClient()
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const { findings, isPending, isError, verifiedFactorCount } = useAccountRecovery({
@@ -59,6 +68,26 @@ const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
       destination={destination}
       isLoading={isPending}
       hasAuthenticatorTask={verifiedFactorCount === 1}
+      onExit={({ gap: activeGap, areCodesSaved, isFactorComplete }) => {
+        if (user?.id) {
+          // Completed mutations can precede the refreshed status response.
+          const remainingGap = getRemainingRecoveryGap({
+            currentGap: getRecoveryGap(findings),
+            activeGap,
+            isReadUnavailable: isPending || isError,
+            areCodesSaved,
+            isFactorComplete,
+          })
+          if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
+          else clearRecoveryReminderSnooze(user.id)
+        }
+      }}
+      onCodesComplete={() => {
+        queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
+      }}
+      onFactorComplete={() => {
+        queryClient.invalidateQueries({ queryKey: profileKeys.mfaFactors(user?.id) })
+      }}
     />
   )
 }
