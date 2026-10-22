@@ -89,11 +89,14 @@ describe('isHistoryTraverseNavigation', () => {
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
-  test('reads a document back-forward once, and settle does not clear it first', () => {
+  test('keeps a document back-forward across reads until a push', () => {
     mockNavigationType('back_forward')
 
     settleHistoryTraverseNavigation()
     expect(isHistoryTraverseNavigation()).toBe(true)
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    history.pushState(null, '', '/project/default/sql')
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 

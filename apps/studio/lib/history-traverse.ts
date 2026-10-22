@@ -6,8 +6,8 @@ interface HistoryTraverseState {
   isInstalled: boolean
   isTraverseNavigation: boolean
   isShellReady: boolean
-  // a document back-forward is only a traverse on its own url, and only for
-  // the first read. the editor copies that read into its decision.
+  // set once a push or a url change leaves the document back-forward.
+  // repeated reads on that same url stay true, because the editor can remount.
   documentConsumed: boolean
 }
 
@@ -124,9 +124,11 @@ function readDocumentBackForward(state: HistoryTraverseState): boolean {
   const entry = getNavigationTiming()
   if (!entry || entry.type !== 'back_forward') return false
 
-  state.documentConsumed = true
-
-  if (entry.name !== window.location.href) return false
+  // don't consume a match. a remount on this url has to see the same traverse.
+  if (entry.name !== window.location.href) {
+    state.documentConsumed = true
+    return false
+  }
 
   return true
 }
