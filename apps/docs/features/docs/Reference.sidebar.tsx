@@ -1,6 +1,5 @@
 'use client'
 
-import { AiTools } from '~/components/AiTools'
 import { Feedback } from '~/components/Feedback'
 import { useTocAnchors } from '~/features/docs/GuidesMdx.state'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
@@ -16,8 +15,9 @@ interface ReferenceSidebarProps {
 
 /**
  * Right-hand sidebar for reference pages that render prose (e.g. the
- * Management API introduction). Mirrors `GuidesSidebar`, plus a list of
- * additional links.
+ * Management API introduction). Mirrors `GuidesSidebar` minus the AI tools,
+ * which need a per-page markdown file that reference pages don't have yet,
+ * plus a list of additional links.
  */
 export function ReferenceSidebar({ className, links = [] }: ReferenceSidebarProps) {
   const pathname = usePathname()
@@ -32,15 +32,6 @@ export function ReferenceSidebar({ className, links = [] }: ReferenceSidebarProp
             <Feedback key={pathname} />
           </div>
         )}
-        <div className="pl-5">
-          <AiTools
-            key={pathname}
-            pageType="guide"
-            articleId="sb-docs-guide-main-article"
-            showAgentSetup
-            showPreferredSource
-          />
-        </div>
         {toc.length !== 0 && <TocSection items={toc} />}
         {links.length !== 0 && (
           <div className="pl-5">
