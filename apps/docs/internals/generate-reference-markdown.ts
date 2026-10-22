@@ -251,7 +251,7 @@ async function renderMarkdownSection(mdxDir: string, section: Section): Promise<
   const body = [
     stripMdxJsx(content),
     links.length
-      ? `Additional links\n\n${links.map((l) => `- [${l.title}](${l.href})`).join('\n')}`
+      ? `## Additional links\n\n${links.map((l) => `- [${l.title}](${l.href})`).join('\n')}`
       : '',
   ]
     .filter(Boolean)
