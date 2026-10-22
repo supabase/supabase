@@ -12,6 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Table,
 } from 'ui'
 
 import {
@@ -113,7 +114,7 @@ export default function RealtimeLimitsEstimater({}) {
             Current maximum possible throughput
           </span>
 
-          <table className="table-auto">
+          <Table prose className="table-auto">
             <thead>
               <tr>
                 {THROUGHPUT_METRIC_HEADINGS.map((heading) => (
@@ -133,7 +134,7 @@ export default function RealtimeLimitsEstimater({}) {
                 <td className="border px-4 py-2">{limits.p95Latency}ms</td>
               </tr>
             </tbody>
-          </table>
+          </Table>
         </div>
       )}
 
@@ -160,7 +161,7 @@ export default function RealtimeLimitsEstimater({}) {
                   <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
                     {COMPUTE_LABELS[computeAddOn]}
                   </span>
-                  <table className="table-auto">
+                  <Table prose className="table-auto">
                     <thead>
                       <tr>
                         {THROUGHPUT_TABLE_HEADINGS.map((heading) => (
@@ -188,7 +189,7 @@ export default function RealtimeLimitsEstimater({}) {
                           </tr>
                         ))}
                     </tbody>
-                  </table>
+                  </Table>
                 </div>
               ))}
           </div>

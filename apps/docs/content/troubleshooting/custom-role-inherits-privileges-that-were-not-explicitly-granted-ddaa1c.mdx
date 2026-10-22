@@ -90,7 +90,7 @@ The following table lists what `PUBLIC` holds and whether the `postgres` role ca
 | Large-object functions such as `lo_create`       | `execute`. A role can create large objects in the database.                                                                                | No                       |
 | System catalogs such as `pg_class` and `pg_proc` | Read access to the names and definitions of database objects                                                                               | No                       |
 
-The `postgres` role owns the `postgres` database, and through it the `public` schema, so it can revoke the `PUBLIC` grants on those. Supabase roles own the other objects, so a revoke on them prints the `no privileges could be revoked` warning. For the pg_net grants, see [Revoking access to pg_net objects has no effect](/docs/guides/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect-0bbc16).
+The `postgres` role owns the `postgres` database, and through it the `public` schema, so it can revoke the `PUBLIC` grants on those. Supabase roles own the other objects, so a revoke on them prints the `no privileges could be revoked` warning. For the pg_net grants, see [Revoking access to pg_net objects has no effect](/kb/troubleshooting/revoking-access-to-pg_net-objects-has-no-effect).
 
 Extensions you enable can grant more privileges to `PUBLIC`. After you enable an extension, check the role again.
 

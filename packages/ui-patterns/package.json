@@ -86,6 +86,18 @@
       "import": "./src/Chart/index.tsx",
       "types": "./src/Chart/index.tsx"
     },
+    "./CodeBlock/CodeBlock.highlight": {
+      "import": "./src/CodeBlock/CodeBlock.highlight.ts",
+      "types": "./src/CodeBlock/CodeBlock.highlight.ts"
+    },
+    "./CodeBlock/CodeBlock.theme": {
+      "import": "./src/CodeBlock/CodeBlock.theme.ts",
+      "types": "./src/CodeBlock/CodeBlock.theme.ts"
+    },
+    "./CodeBlock/CodeBlock.tokens": {
+      "import": "./src/CodeBlock/CodeBlock.tokens.ts",
+      "types": "./src/CodeBlock/CodeBlock.tokens.ts"
+    },
     "./CodeBlock/CodeBlock": {
       "import": "./src/CodeBlock/CodeBlock.tsx",
       "types": "./src/CodeBlock/CodeBlock.tsx"
@@ -93,6 +105,23 @@
     "./CodeBlock/CodeBlock.utils": {
       "import": "./src/CodeBlock/CodeBlock.utils.ts",
       "types": "./src/CodeBlock/CodeBlock.utils.ts"
+    },
+    "./CodeBlock/CodeBlockAnnotation": {
+      "import": "./src/CodeBlock/CodeBlockAnnotation.tsx",
+      "types": "./src/CodeBlock/CodeBlockAnnotation.tsx"
+    },
+    "./CodeBlock/CodeBlockControls": {
+      "import": "./src/CodeBlock/CodeBlockControls.tsx",
+      "types": "./src/CodeBlock/CodeBlockControls.tsx"
+    },
+    "./CodeBlock/CodeBlockFrame": {
+      "import": "./src/CodeBlock/CodeBlockFrame.tsx",
+      "types": "./src/CodeBlock/CodeBlockFrame.tsx"
+    },
+    "./CodeBlock/code-block.css": {
+      "style": "./src/CodeBlock/code-block.css",
+      "import": "./src/CodeBlock/code-block.css",
+      "types": "./src/CodeBlock/code-block.css"
     },
     "./CodeBlock": {
       "import": "./src/CodeBlock/index.tsx",
@@ -567,6 +596,7 @@
       "types": "./src/PromoToast/index.ts"
     },
     "./PromoToast/styles.css": {
+      "style": "./src/PromoToast/styles.css",
       "import": "./src/PromoToast/styles.css",
       "types": "./src/PromoToast/styles.css"
     },
@@ -587,6 +617,7 @@
       "types": "./src/SelectionListState/index.ts"
     },
     "./ShimmeringLoader/index.css": {
+      "style": "./src/ShimmeringLoader/index.css",
       "import": "./src/ShimmeringLoader/index.css",
       "types": "./src/ShimmeringLoader/index.css"
     },
@@ -799,6 +830,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",
+    "shiki": "catalog:",
     "smol-toml": "^1.6.1",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",

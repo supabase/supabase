@@ -3,6 +3,7 @@ import { ExternalLink } from 'lucide-react'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, GithubIcon } from 'ui'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
+import { CodeBlockControlsIsland } from '../components/CodeBlockControlsIsland'
 import { FeaturedSection } from '../components/FeaturedSection'
 import { GuideSidebar } from '../components/GuideSidebar'
 import type { RelatedGuides } from '../lib/guides'
@@ -80,6 +81,7 @@ const markdownUrl = `${pagePath.replace(import.meta.env.BASE_URL, `${import.meta
 				{description && <p class="not-prose mt-3 text-xl leading-7 text-foreground-light">{description}</p>}
 			</header>
 			<slot />
+			<CodeBlockControlsIsland client:only="react" />
 			<div class="not-prose mt-12 -ml-5 lg:hidden">
 				<GuideSidebar
 					client:visible

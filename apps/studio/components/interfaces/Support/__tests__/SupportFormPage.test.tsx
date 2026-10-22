@@ -343,9 +343,7 @@ const getSupportForm = () => {
 }
 
 const getAttachmentFileInput = () => {
-  const input = getSupportForm().querySelector<HTMLInputElement>(
-    'input[type="file"][accept*="image"]'
-  )
+  const input = getSupportForm().querySelector<HTMLInputElement>('input[type="file"]')
   expect(input).not.toBeNull()
   return input!
 }
