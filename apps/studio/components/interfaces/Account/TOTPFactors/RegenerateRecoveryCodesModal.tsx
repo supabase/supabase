@@ -6,7 +6,10 @@ import { RecoveryCodesFlow } from './RecoveryCodesFlow'
 import { useRecoveryCodesRegenerateMutation } from '@/data/recovery-codes/recovery-codes-regenerate-mutation'
 
 type RegenerateRecoveryCodesModalProps = Partial<
-  Pick<ComponentProps<typeof RecoveryCodesFlow>, 'children' | 'onComplete' | 'onStart'>
+  Pick<
+    ComponentProps<typeof RecoveryCodesFlow>,
+    'children' | 'onComplete' | 'onStart' | 'showSecurityLink'
+  >
 >
 
 export const RegenerateRecoveryCodesModal = ({

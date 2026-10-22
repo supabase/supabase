@@ -32,12 +32,14 @@ import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
 import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
+import { RecoveryReminderController } from '@/components/interfaces/Account/RecoveryReminderController'
 import { AppearanceSettingsProvider } from '@/components/interfaces/App/AppearanceSettingsProvider'
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'
@@ -148,6 +150,7 @@ configureMonacoLoader()
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
+  const recoveryRouter = useRouter()
   const queryClient = useRootQueryClient()
   const { appTitle } = useCustomContent(['app:title'])
   const [isCLI, setIsCLI] = useState(false)
@@ -202,6 +205,12 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
             <AuthProvider>
               <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
                 <ProfileProvider>
+                  <RecoveryReminderController
+                    href={recoveryRouter.asPath}
+                    onNavigate={(href) => {
+                      void recoveryRouter.replace(href)
+                    }}
+                  />
                   <TimezoneProvider>
                     <TimestampInfoTimezoneBridge>
                       <Head>

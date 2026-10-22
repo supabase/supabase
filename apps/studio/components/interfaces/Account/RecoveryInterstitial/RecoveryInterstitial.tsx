@@ -22,6 +22,12 @@ import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import {
+  clearRecoveryReminderSnooze,
+  getRemainingRecoveryGap,
+  writeRecoveryReminderSnooze,
+} from '@/lib/account-recovery/recovery-reminder'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const RecoveryInterstitial = () => {
   const [mock] = useQueryState('mockRecoveryInterstitial', parseAsString)
@@ -49,18 +55,39 @@ export const RecoveryInterstitial = () => {
 const LiveRecoveryReminder = ({ destination }: { destination: string }) => {
   const user = useUser()
   const queryClient = useQueryClient()
+  const track = useTrack()
   const isEnabled = useFlag('enableAuthRecoveryCodes')
   const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const { findings, isPending, isError } = useAccountRecovery({
+  const { findings, isPending, isError, verifiedFactorCount } = useAccountRecovery({
     enabled: isEnabled && hasSecuritySettings,
   })
-  const gap = isError ? null : getRecoveryGap(findings)
+  const gap = isError || isPending ? null : getRecoveryGap(findings)
   return (
     <RecoveryReminder
       key={user?.id}
       gap={gap}
       destination={destination}
       isLoading={isPending}
+      hasAuthenticatorTask={verifiedFactorCount === 1}
+      onAction={(actionType) => track('account_recovery_action_clicked', { actionType })}
+      onTaskComplete={(taskType) => track('account_recovery_task_completed', { taskType })}
+      onExit={({ gap: activeGap, areCodesSaved, isFactorComplete }) => {
+        if (user?.id) {
+          // Completed mutations can precede the refreshed status response.
+          const remainingGap = getRemainingRecoveryGap({
+            currentGap: getRecoveryGap(findings),
+            activeGap,
+            isReadUnavailable: isPending || isError,
+            areCodesSaved,
+            isFactorComplete,
+          })
+          if (remainingGap) writeRecoveryReminderSnooze(user.id, remainingGap)
+          else clearRecoveryReminderSnooze(user.id)
+        }
+        track('account_recovery_reminder_closed', {
+          hasCompletedTask: areCodesSaved || isFactorComplete,
+        })
+      }}
       onCodesComplete={() => {
         queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status(user?.id) })
       }}
@@ -79,6 +106,9 @@ export const RecoveryReminder = ({
   hasAuthenticatorTask = true,
   onCodesComplete,
   onFactorComplete,
+  onAction,
+  onTaskComplete,
+  onExit,
 }: {
   gap: RecoveryGap | null
   destination: string
@@ -87,8 +117,14 @@ export const RecoveryReminder = ({
   hasAuthenticatorTask?: boolean
   onCodesComplete?: () => void
   onFactorComplete?: () => void
+  onAction?: (action: 'generate_codes' | 'regenerate_codes' | 'add_factor') => void
+  onTaskComplete?: (task: 'recovery_codes' | 'authenticator') => void
+  onExit?: (state: { gap: RecoveryGap; areCodesSaved: boolean; isFactorComplete: boolean }) => void
 }) => {
   const [startedGap, setStartedGap] = useState<RecoveryGap | null>(null)
+  const [startedHasAuthenticatorTask, setStartedHasAuthenticatorTask] = useState<boolean | null>(
+    null
+  )
   const [areCodesSaved, setAreCodesSaved] = useState(false)
   const [isFactorComplete, setIsFactorComplete] = useState(false)
   // Preserve all task dialogs and completed rows during background status updates.
@@ -112,13 +148,21 @@ export const RecoveryReminder = ({
     )
   }
   const isExhausted = activeGap === 'exhausted'
-  const handleStart = () => setStartedGap(activeGap)
+  const handleStart = () => {
+    setStartedGap(activeGap)
+    setStartedHasAuthenticatorTask(startedHasAuthenticatorTask ?? hasAuthenticatorTask)
+  }
   const handleCodesSaved = () => {
     setAreCodesSaved(true)
     onCodesComplete?.()
+    onTaskComplete?.('recovery_codes')
   }
   const flowProps = {
-    onStart: handleStart,
+    showSecurityLink: true,
+    onStart: () => {
+      handleStart()
+      onAction?.(isExhausted ? 'regenerate_codes' : 'generate_codes')
+    },
     onComplete: handleCodesSaved,
     children: getRecoveryCodeTrigger(isExhausted, areCodesSaved),
   }
@@ -156,13 +200,17 @@ export const RecoveryReminder = ({
           {!isPreview && isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
           {!isPreview && !isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
         </RecoveryTaskRow>
-        {hasAuthenticatorTask && (
+        {(startedHasAuthenticatorTask ?? hasAuthenticatorTask) && (
           <AuthenticatorTask
             isPreview={isPreview}
-            onStart={handleStart}
+            onStart={() => {
+              handleStart()
+              onAction?.('add_factor')
+            }}
             onComplete={() => {
               setIsFactorComplete(true)
               onFactorComplete?.()
+              onTaskComplete?.('authenticator')
             }}
             onRecoveryCodesSaved={handleCodesSaved}
           />
@@ -180,7 +228,10 @@ export const RecoveryReminder = ({
             ) : undefined
           }
         >
-          <a href={destination}>
+          <a
+            href={destination}
+            onClick={() => onExit?.({ gap: activeGap, areCodesSaved, isFactorComplete })}
+          >
             {areCodesSaved || isFactorComplete ? 'Continue' : 'Skip for now'}
           </a>
         </Button>

@@ -4183,9 +4183,58 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Account recovery rollout exposure and user interactions.
+ * @group Events
+ * @source Account recovery interstitial and automatic reminder controller
+ * @page /account-recovery
+ */
+export interface AccountRecoveryReminderEvent {
+  action: 'account_recovery_reminder_exposed'
+  properties: { gap: 'missing' | 'exhausted' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a recovery task
+ * @page /account-recovery
+ */
+export interface AccountRecoveryActionEvent {
+  action: 'account_recovery_action_clicked'
+  properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User saves recovery codes or verifies another authenticator
+ * @page /account-recovery
+ */
+export interface AccountRecoveryTaskEvent {
+  action: 'account_recovery_task_completed'
+  properties: { taskType: 'recovery_codes' | 'authenticator' }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User skips or continues from the recovery interstitial
+ * @page /account-recovery
+ */
+export interface AccountRecoveryClosedEvent {
+  action: 'account_recovery_reminder_closed'
+  properties: { hasCompletedTask: boolean }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AccountRecoveryReminderEvent
+  | AccountRecoveryActionEvent
+  | AccountRecoveryTaskEvent
+  | AccountRecoveryClosedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
