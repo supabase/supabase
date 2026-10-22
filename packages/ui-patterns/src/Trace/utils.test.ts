@@ -3,10 +3,13 @@ import { describe, expect, it } from 'vitest'
 import type { Span } from './types'
 import {
   buildTraceIndex,
+  collapsedChildMidpoints,
   createTimeScale,
+  effectiveEndMs,
   flattenTree,
   formatDuration,
   formatMs,
+  MAX_COLLAPSED_MARKS,
   niceTickStep,
 } from './utils'
 
@@ -154,5 +157,40 @@ describe('formatDuration', () => {
     expect(formatDuration(480)).toBe('480ms')
     expect(formatDuration(1234)).toBe('1.23s')
     expect(formatDuration(90_000)).toBe('1m 30s')
+  })
+})
+
+describe('effectiveEndMs', () => {
+  it('uses the end for finished spans and now for running spans', () => {
+    expect(effectiveEndMs(span('a', 10, 50), 999)).toBe(50)
+    expect(effectiveEndMs(span('a', 10, null), 200)).toBe(200)
+    expect(effectiveEndMs(span('a', 10, null), 5)).toBe(10)
+  })
+})
+
+describe('collapsedChildMidpoints', () => {
+  it('returns the midpoint of each direct child only, in start order', () => {
+    const index = buildTraceIndex([
+      span('root', 0, 100),
+      span('b', 60, 80, 'root'),
+      span('a', 10, 30, 'root'),
+      span('a1', 12, 14, 'a'),
+    ])
+    expect(collapsedChildMidpoints(index, 'root')).toEqual([20, 70])
+    expect(collapsedChildMidpoints(index, 'a1')).toEqual([])
+  })
+
+  it('extends a running child to now', () => {
+    const index = buildTraceIndex([span('root', 0, 100), span('a', 40, null, 'root')], 80)
+    expect(collapsedChildMidpoints(index, 'root')).toEqual([60])
+  })
+
+  it('renders nothing above the cap', () => {
+    const children = (count: number) =>
+      Array.from({ length: count }, (_, i) => span(`c${i}`, i, i + 1, 'root'))
+    const at = buildTraceIndex([span('root', 0, 1000), ...children(MAX_COLLAPSED_MARKS)])
+    const over = buildTraceIndex([span('root', 0, 1000), ...children(MAX_COLLAPSED_MARKS + 1)])
+    expect(collapsedChildMidpoints(at, 'root')).toHaveLength(MAX_COLLAPSED_MARKS)
+    expect(collapsedChildMidpoints(over, 'root')).toEqual([])
   })
 })
