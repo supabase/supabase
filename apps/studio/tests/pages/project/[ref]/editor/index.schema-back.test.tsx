@@ -163,6 +163,33 @@ describe('Table Editor index schema and history', () => {
     expect(replace).not.toHaveBeenCalled()
   })
 
+  test('decides the redirect again when the project ref changes', async () => {
+    mockNavigationType('navigate')
+    seedLastTable({ tableId: 12, schema: 'auth' })
+    const replace = vi.spyOn(mockRouter, 'replace')
+
+    const queryClient = renderIndex()
+    await waitForHistory(queryClient)
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledTimes(1)
+    })
+
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY('other'),
+      JSON.stringify({ editor: '34' })
+    )
+
+    await act(async () => {
+      params.ref = 'other'
+      mockRouter.setCurrentUrl('/project/other/editor')
+    })
+
+    await waitFor(() => {
+      expect(replace).toHaveBeenCalledWith(expect.stringMatching(/\/project\/other\/editor\/34$/))
+    })
+    expect(isHistoryTraverseNavigation).toHaveBeenCalledTimes(2)
+  })
+
   test('does not reopen the last table if the schema changes after the visit is decided', async () => {
     mockNavigationType('navigate')
     seedLastTable({ tableId: 12, schema: 'auth' })

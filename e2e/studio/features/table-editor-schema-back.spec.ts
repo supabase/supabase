@@ -91,3 +91,51 @@ test('schema switch replaces history and back leaves the editor', async ({ page,
   await expect(page).toHaveURL(/\/editor\?schema=public/)
   await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
 })
+
+test('a full back to /editor does not open the last table', async ({ page, ref }) => {
+  const tableName = 'pw_schema_back_doc'
+
+  await using _cleanup = await withSetupCleanup(
+    () => createTable(tableName, 'name'),
+    async () => {
+      await dropTable(tableName)
+    }
+  )
+
+  const [{ id: tableId }] = await query<{ id: number }>(
+    `select c.oid::int as id
+       from pg_class c
+       join pg_namespace n on n.oid = c.relnamespace
+       where n.nspname = 'public' and c.relname = $1`,
+    [tableName]
+  )
+
+  await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+  await page.evaluate((projectRef) => {
+    localStorage.removeItem(`dashboard-history-${projectRef}`)
+    localStorage.removeItem(`supabase_studio_tabs_${projectRef}`)
+  }, ref)
+  await page.reload()
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+
+  const gridLoad = waitForGridDataToLoad(page, ref)
+  await page.goto(toUrl(`/project/${ref}/editor/${tableId}?schema=public`))
+  await gridLoad
+  await expect
+    .poll(() =>
+      page.evaluate((projectRef) => localStorage.getItem(`dashboard-history-${projectRef}`), ref)
+    )
+    .toContain(String(tableId))
+
+  await page.goto(toUrl(`/project/${ref}`))
+  await page.goBack()
+  await expect(page).toHaveURL(new RegExp(`/editor/${tableId}`))
+
+  await page.goBack()
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
+  // a document back_forward load used to settle before the editor read the flag.
+  await page.waitForTimeout(1500)
+  await expect(page).toHaveURL(/\/editor\?schema=public/)
+  await expect(page).not.toHaveURL(new RegExp(`/editor/${tableId}`))
+})

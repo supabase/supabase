@@ -3,7 +3,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 import {
   installHistoryTraverseListener,
   isHistoryTraverseNavigation,
+  markHistoryTraverseShellReady,
   resetHistoryTraverseState,
+  scheduleHistoryTraverseSettlement,
   settleHistoryTraverseNavigation,
 } from './history-traverse'
 
@@ -56,12 +58,26 @@ describe('isHistoryTraverseNavigation', () => {
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 
-  test('clears a back-forward document load once the navigation settles', () => {
+  test('ignores a scheduled settle until the shell has rendered', () => {
+    mockNavigationType('navigate')
+
+    window.dispatchEvent(new PopStateEvent('popstate'))
+    scheduleHistoryTraverseSettlement()
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    markHistoryTraverseShellReady()
+    expect(isHistoryTraverseNavigation()).toBe(false)
+  })
+
+  test('keeps a back-forward document load after settle until the next push', () => {
     mockNavigationType('back_forward')
 
     expect(isHistoryTraverseNavigation()).toBe(true)
 
     settleHistoryTraverseNavigation()
+    expect(isHistoryTraverseNavigation()).toBe(true)
+
+    history.pushState(null, '', '/project/default/sql')
     expect(isHistoryTraverseNavigation()).toBe(false)
   })
 

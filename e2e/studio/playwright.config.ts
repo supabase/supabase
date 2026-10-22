@@ -83,6 +83,7 @@ export default defineConfig({
         '--disable-gpu', // Disables hardware GPU - not needed in headless mode
         '--disable-software-rasterizer', // Disables software-based rendering fallback
         // Performance optimizations for testing
+        '--disable-back-forward-cache', // Back/forward reloads the document so navigation type is observable
         '--disable-background-timer-throttling', // Prevents Chrome from throttling timers in background tabs
         '--disable-backgrounding-occluded-windows', // Keeps hidden windows running at full speed
         '--disable-renderer-backgrounding', // Prevents renderer processes from being deprioritized
