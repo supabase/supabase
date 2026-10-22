@@ -302,11 +302,11 @@ export const updateColumn = async ({
     await executeSql({
       projectRef,
       connectionString,
-      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\\n')}; COMMIT;`,
+      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
       queryKey: ['column', 'update-with-constraints', originalColumn.id],
     })
 
-    if (!skipSuccessMessage) toast.success(`Successfully updated column "\${originalColumn.name}"`)
+    if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
     return { error }
   }
@@ -723,7 +723,7 @@ export const updateTable = async ({
   const columnIds = columns.map((column) => column.id)
   const columnsToRemove = originalColumns.filter((column) => !columnIds.includes(column.id))
   for (const column of columnsToRemove) {
-    toast.loading(`Removing column \${column.name} from \${targetTableName}`, { id: toastId })
+    toast.loading(`Removing column ${column.name} from ${targetTableName}`, { id: toastId })
     const { sql: removeColumnSQL } = pgMeta.columns.remove({
       schema: targetSchema,
       table: targetTableName,
@@ -734,7 +734,7 @@ export const updateTable = async ({
 
   for (const column of columns) {
     if (!column.id.includes(table.id.toString())) {
-      toast.loading(`Adding column \${column.name} to \${targetTableName}`, { id: toastId })
+      toast.loading(`Adding column ${column.name} to ${targetTableName}`, { id: toastId })
       const columnPayload = generateCreateColumnPayload(targetTable, {
         ...column,
         isPrimaryKey: false,
@@ -760,7 +760,7 @@ export const updateTable = async ({
       if (originalColumn) {
         const columnPayload = generateUpdateColumnPayload(originalColumn, targetTable, column)
         if (!isEmpty(columnPayload)) {
-          toast.loading(`Updating column \${column.name} from \${targetTableName}`, { id: toastId })
+          toast.loading(`Updating column ${column.name} from ${targetTableName}`, { id: toastId })
           const updatedOriginalColumn = {
             ...originalColumn,
             table: targetTableName,
@@ -809,7 +809,7 @@ export const updateTable = async ({
     await executeSql({
       projectRef,
       connectionString,
-      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\\n')}; COMMIT;`,
+      sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
       queryKey: ['table', 'update-with-columns'],
     })
   }
