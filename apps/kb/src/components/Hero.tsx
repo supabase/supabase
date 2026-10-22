@@ -111,7 +111,7 @@ export const Hero = ({
     <section
       className={cn(
         'relative isolate flex justify-center',
-        isWarp ? 'pt-39 pb-60' : 'pt-32.5 pb-26 max-sm:pt-19.5 max-sm:pb-19.5 lg:pb-40',
+        isWarp ? 'pt-39 pb-60' : 'max-lg:py-10 max-lg:border-b lg:pt-32.5 lg:pb-40',
         'overflow-hidden bg-background',
         className
       )}
@@ -120,8 +120,14 @@ export const Hero = ({
       {variant === 'construction' ? (
         <CopyFrame
           lines={[
-            { id: 'left', className: cn('right-[calc(50%+20rem)]', UPRIGHT, DRAW_OUT) },
-            { id: 'right', className: cn('left-[calc(50%+20rem)]', UPRIGHT, DRAW_OUT) },
+            {
+              id: 'left',
+              className: cn('right-[calc(50%+20rem)] max-lg:hidden', UPRIGHT, DRAW_OUT),
+            },
+            {
+              id: 'right',
+              className: cn('left-[calc(50%+20rem)] max-lg:hidden', UPRIGHT, DRAW_OUT),
+            },
           ]}
         />
       ) : null}
@@ -153,6 +159,9 @@ export const Hero = ({
             isWarp ? 'py-16' : 'pt-12 pb-9.5'
           )}
         >
+          {variant === 'construction' && topic ? (
+            <TopicShape topic={topic} className="grain-mask h-45 w-full lg:hidden" />
+          ) : null}
           {breadcrumb}
           <h1 className="m-0 text-5xl tracking-display text-foreground sm:text-6xl">
             {isWarp ? (
@@ -235,7 +244,10 @@ const HeroFlanks = ({ topic }: HeroFlanksProps) => (
     <CopyFrame
       lines={[
         { id: 'top', className: cn('top-0', ACROSS, DRAW_OUT) },
-        { id: 'band', className: cn('-top-[calc(var(--spacing)*32.5/2)]', ACROSS, DRAW_OUT) },
+        {
+          id: 'band',
+          className: cn('-top-[calc(var(--spacing)*32.5/2)] max-lg:hidden', ACROSS, DRAW_OUT),
+        },
         { id: 'bottom', className: cn('bottom-0', ACROSS, DRAW_OUT) },
         {
           id: 'stem',
@@ -245,6 +257,7 @@ const HeroFlanks = ({ topic }: HeroFlanksProps) => (
           id: 'tail',
           className: cn(
             'top-full left-1/2 h-40 w-px origin-top bg-linear-to-b from-border to-transparent',
+            'max-lg:bg-border max-lg:bg-none',
             DRAW_OUT
           ),
         },
@@ -258,7 +271,7 @@ const CopyFrame = ({ lines }: CopyFrameProps) =>
     <span
       key={id}
       aria-hidden
-      className={cn('grain-mask pointer-events-none absolute max-lg:hidden', className)}
+      className={cn('grain-mask pointer-events-none absolute', className)}
     />
   ))
 
