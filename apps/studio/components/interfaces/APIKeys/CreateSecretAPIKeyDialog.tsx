@@ -51,7 +51,7 @@ export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
   const [visible, setVisible] = useQueryState(
     'new',
-    parseAsString.withOptions({ history: 'push', clearOnDefault: true })
+    parseAsString.withDefault('').withOptions({ history: 'push', clearOnDefault: true })
   )
   const formRef = useRef<HTMLFormElement>(null)
 
