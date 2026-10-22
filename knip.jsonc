@@ -38,6 +38,9 @@
         "compat/**/*.{ts,tsx}",
       ],
       "ignore": [
+        // Recovery evaluator consumed by the manual interstitial layer in #51643.
+        "hooks/misc/useAccountRecovery.ts",
+        "lib/account-recovery/evaluate-account-recovery.ts",
         "public/**",
         // one-off build/codegen scripts, run by hand or from package.json
         "scripts/**",
