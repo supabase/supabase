@@ -258,9 +258,10 @@ export function useQueryTableCommands(options?: CommandOptions) {
   const setPage = useSetPage()
 
   const commandMenuOpen = useCommandMenuOpen()
-  // false until this open prefetches, so a menu that mounts already open
-  // still prefetches once the project exists. reset when it closes.
-  const hasPrefetchedThisOpen = useRef(false)
+  // the ref prefetched for this open. unset until that prefetch runs, so a
+  // menu that mounts already open still prefetches once the project exists.
+  // a new ref prefetches while the menu stays open. cleared on close.
+  const prefetchedProjectRef = useRef<string | undefined>(undefined)
 
   const prefetchTables = usePrefetchTables({
     projectRef: project?.ref,
@@ -268,13 +269,17 @@ export function useQueryTableCommands(options?: CommandOptions) {
   })
   useEffect(() => {
     if (!commandMenuOpen) {
-      hasPrefetchedThisOpen.current = false
+      prefetchedProjectRef.current = undefined
       return
     }
 
-    if (hasPrefetchedThisOpen.current || !project) return
+    const shouldPrefetch = prefetchedProjectRef.current !== project?.ref && !!project
 
-    hasPrefetchedThisOpen.current = true
+    if (!shouldPrefetch) {
+      return
+    }
+
+    prefetchedProjectRef.current = project?.ref
     prefetchTables(undefined, true)
   }, [commandMenuOpen, project, prefetchTables])
 

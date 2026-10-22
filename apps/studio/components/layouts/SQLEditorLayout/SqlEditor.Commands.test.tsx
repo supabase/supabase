@@ -1,14 +1,27 @@
 import { QueryClient } from '@tanstack/react-query'
-import { act, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { useEffect, useState } from 'react'
 import { useCommandMenuOpen, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useQueryTableCommands } from './SqlEditor.Commands'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+
+const routeParams = vi.hoisted(() => {
+  const current: { ref: string } = { ref: 'default' }
+  return { current }
+})
+
+vi.mock('common', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('common')>()
+  return {
+    ...actual,
+    useParams: () => routeParams.current,
+  }
+})
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 
@@ -34,7 +47,17 @@ const PROJECT: ProjectDetailResponse = {
   updated_at: '2026-01-01T00:00:00.000Z',
 }
 
-const TABLES_QUERY_KEY = ['projects', 'default', 'tables', { includeColumns: true }]
+const OTHER_REF = 'other-project'
+
+function tablesQueryKey(ref: string) {
+  return ['projects', ref, 'tables', { includeColumns: true }]
+}
+
+const TABLES_QUERY_KEY = tablesQueryKey('default')
+
+function projectWithRef(ref: string): ProjectDetailResponse {
+  return { ...PROJECT, ref }
+}
 
 function mockProjectDetail(response: () => Promise<Response> | Response) {
   addAPIMock({
@@ -49,7 +72,7 @@ function QueryTableCommands() {
   return null
 }
 
-// The lazy menu mounts on the open that initiates it, so the first render is already open.
+// the lazy menu mounts on the open that initiates it, so the first render is already open.
 function MountWhileOpen() {
   const setOpen = useSetCommandMenuOpen()
   const isOpen = useCommandMenuOpen()
@@ -76,7 +99,36 @@ function renderOpenMenu() {
   return prefetchQuery
 }
 
+// stays mounted across open and close, unlike MountWhileOpen, which unmounts when the menu closes.
+function MenuToggle({ open }: { open: boolean }) {
+  const setOpen = useSetCommandMenuOpen()
+
+  useEffect(() => {
+    setOpen(open)
+  }, [open, setOpen])
+
+  return <QueryTableCommands />
+}
+
+function renderMountedMenu() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+  const prefetchQuery = vi.spyOn(queryClient, 'prefetchQuery').mockResolvedValue(undefined)
+  const view = customRender(<MenuToggle open={false} />, { queryClient })
+
+  return { prefetchQuery, ...view }
+}
+
 describe('useQueryTableCommands', () => {
+  let releaseProject = () => {}
+
+  afterEach(() => {
+    releaseProject()
+    releaseProject = () => {}
+    routeParams.current = { ref: 'default' }
+  })
+
   it('prefetches tables when the menu mounts already open', async () => {
     mockProjectDetail(() => HttpResponse.json<ProjectDetailResponse>(PROJECT))
     const prefetchQuery = renderOpenMenu()
@@ -103,19 +155,82 @@ describe('useQueryTableCommands', () => {
 
     const prefetchQuery = renderOpenMenu()
 
-    await waitFor(() => {
-      expect(didRequestProject).toBe(true)
-    })
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0))
-    })
-    expect(prefetchQuery).not.toHaveBeenCalled()
+    try {
+      await waitFor(() => {
+        expect(didRequestProject).toBe(true)
+      })
+      expect(prefetchQuery).not.toHaveBeenCalled()
 
-    releaseProject()
+      releaseProject()
+
+      await waitFor(() => {
+        expect(prefetchQuery).toHaveBeenCalledWith(
+          expect.objectContaining({ queryKey: TABLES_QUERY_KEY })
+        )
+      })
+    } finally {
+      releaseProject()
+    }
+  })
+
+  it('does not prefetch tables when the menu closes', async () => {
+    mockProjectDetail(() => HttpResponse.json<ProjectDetailResponse>(PROJECT))
+    const { prefetchQuery, rerender } = renderMountedMenu()
+
+    rerender(<MenuToggle open />)
+
+    await waitFor(() => {
+      expect(prefetchQuery).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(<MenuToggle open={false} />)
+
+    expect(prefetchQuery).toHaveBeenCalledTimes(1)
+  })
+
+  it('prefetches tables again when the menu reopens', async () => {
+    mockProjectDetail(() => HttpResponse.json<ProjectDetailResponse>(PROJECT))
+    const { prefetchQuery, rerender } = renderMountedMenu()
+
+    rerender(<MenuToggle open />)
+
+    await waitFor(() => {
+      expect(prefetchQuery).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(<MenuToggle open={false} />)
+    expect(prefetchQuery).toHaveBeenCalledTimes(1)
+
+    rerender(<MenuToggle open />)
+
+    await waitFor(() => {
+      expect(prefetchQuery).toHaveBeenCalledTimes(2)
+    })
+    expect(prefetchQuery).toHaveBeenLastCalledWith(
+      expect.objectContaining({ queryKey: TABLES_QUERY_KEY })
+    )
+  })
+
+  it('prefetches tables when the project changes while the menu is open', async () => {
+    mockProjectDetail(({ params }) =>
+      HttpResponse.json<ProjectDetailResponse>(projectWithRef(String(params.ref)))
+    )
+    const { prefetchQuery, rerender } = renderMountedMenu()
+
+    rerender(<MenuToggle open />)
 
     await waitFor(() => {
       expect(prefetchQuery).toHaveBeenCalledWith(
-        expect.objectContaining({ queryKey: TABLES_QUERY_KEY })
+        expect.objectContaining({ queryKey: tablesQueryKey('default') })
+      )
+    })
+
+    routeParams.current = { ref: OTHER_REF }
+    rerender(<MenuToggle open />)
+
+    await waitFor(() => {
+      expect(prefetchQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ queryKey: tablesQueryKey(OTHER_REF) })
       )
     })
   })
