@@ -37,3 +37,7 @@ Four primitives go inside a `Trace.Lane`. `Trace.Bar` draws the span from its st
 Rows follow the tree pattern. Use the arrow keys to move between rows, Right and Left to expand and collapse (Left on a collapsed row moves to its parent), and Enter or Space to select. Read the selection and collapse state with `useView()`.
 
 <ComponentPreview name="trace-waterfall-demo" peekCode wide squared />
+
+## Inspector
+
+Place `<Trace.Inspector />` once inside `Trace.Root`. When a span is selected, it opens a popover next to the span's bar with its name, status, start offset, duration, attributes and events. Arrow keys keep moving between rows while it is open, and clicking another row moves it to that span. Press Escape or click outside the waterfall to close it and clear the selection. If the selected row scrolls out of view, the popover hides and comes back when the row does.
