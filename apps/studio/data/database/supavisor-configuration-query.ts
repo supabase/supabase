@@ -15,7 +15,7 @@ export async function getSupavisorConfiguration(
 ) {
   if (!projectRef) throw new Error('Project ref is required')
 
-  const { data, error } = await get(`/platform/projects/{ref}/config/supavisor`, {
+  const { data, error } = await get(`/v1/projects/{ref}/config/database/pooler`, {
     params: { path: { ref: projectRef } },
     signal,
   })
